@@ -1,0 +1,504 @@
+{
+  "problem_id": 83,
+  "title": "Dot Product Calculator",
+  "category": "Linear Algebra",
+  "difficulty": "easy",
+  "description": "Write a Python function to calculate the dot product of two vectors. The function should take two 1D NumPy arrays as input and return the dot product as a single number.",
+  "example": {
+    "input": "vec1 = np.array([1, 2, 3]), vec2 = np.array([4, 5, 6])",
+    "output": "32",
+    "reasoning": "The function calculates the dot product by multiplying corresponding elements of the two vectors and summing the results. For vec1 = [1, 2, 3] and vec2 = [4, 5, 6], the result is (1 * 4) + (2 * 5) + (3 * 6) = 32."
+  },
+  "starter_code": "import numpy as np\n\ndef calculate_dot_product(vec1, vec2) -> float:\n\t\"\"\"\n\tCalculate the dot product of two vectors.\n\tArgs:\n\t\tvec1 (numpy.ndarray): 1D array representing the first vector.\n\t\tvec2 (numpy.ndarray): 1D array representing the second vector.\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Vector Representation and Component Access",
+      "relation_to_problem": "Understanding how vectors are represented as ordered n-tuples and how to access individual components is fundamental to implementing the element-wise multiplication required in the dot product formula.",
+      "prerequisites": [
+        "Basic Python",
+        "Array indexing",
+        "Elementary set theory"
+      ],
+      "learning_objectives": [
+        "Define vectors formally as elements of ℝⁿ",
+        "Extract individual components from vector representations",
+        "Understand zero-based indexing in computational implementations",
+        "Verify vector dimensions programmatically"
+      ],
+      "math_content": {
+        "definition": "A vector in n-dimensional Euclidean space is an ordered n-tuple: $\\vec{v} \\in \\mathbb{R}^n$ can be written as $\\vec{v} = (v_1, v_2, \\ldots, v_n)$ where $v_i \\in \\mathbb{R}$ for $i = 1, 2, \\ldots, n$. Each $v_i$ is called the i-th component or coordinate of $\\vec{v}$.",
+        "notation": "$\\vec{v} = (v_1, v_2, \\ldots, v_n)$ where $v_i$ denotes the component at position $i$. The dimension of $\\vec{v}$ is denoted $\\dim(\\vec{v}) = n$.",
+        "theorem": "Two vectors $\\vec{u}, \\vec{v} \\in \\mathbb{R}^n$ are equal if and only if all corresponding components are equal: $\\vec{u} = \\vec{v} \\iff u_i = v_i$ for all $i \\in \\{1, 2, \\ldots, n\\}$.",
+        "proof_sketch": "Equality of vectors follows from the definition of ordered n-tuples. Since vectors are defined by their components, two vectors are identical precisely when each component matches position-wise.",
+        "examples": [
+          "$\\vec{a} = (3, -2, 5) \\in \\mathbb{R}^3$ has components $a_1 = 3$, $a_2 = -2$, $a_3 = 5$",
+          "$\\vec{b} = (1, 0, 0, 1) \\in \\mathbb{R}^4$ has dimension 4 with $b_1 = 1$, $b_2 = 0$, $b_3 = 0$, $b_4 = 1$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Component Extraction",
+          "latex": "$v_i$ = i-th component of $\\vec{v}$",
+          "description": "Used to access individual elements of a vector for computation"
+        },
+        {
+          "name": "Dimension Formula",
+          "latex": "$n = \\dim(\\vec{v})$",
+          "description": "The number of components in vector $\\vec{v}$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that extracts the component at a given index from a vector (1D NumPy array). This function should return the value at the specified position. Use 0-based indexing as per Python convention.",
+        "function_signature": "def get_component(vec: np.ndarray, index: int) -> float:",
+        "starter_code": "import numpy as np\n\ndef get_component(vec: np.ndarray, index: int) -> float:\n    \"\"\"\n    Extract the component at the given index from a vector.\n    Args:\n        vec (numpy.ndarray): 1D array representing a vector.\n        index (int): The index of the component to extract (0-based).\n    Returns:\n        float: The value at the specified index.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "get_component(np.array([1, 2, 3]), 0)",
+            "expected": "1",
+            "explanation": "The component at index 0 (first position) is 1"
+          },
+          {
+            "input": "get_component(np.array([4.5, -2.3, 7.1]), 2)",
+            "expected": "7.1",
+            "explanation": "The component at index 2 (third position) is 7.1"
+          },
+          {
+            "input": "get_component(np.array([10, 20, 30, 40]), 1)",
+            "expected": "20",
+            "explanation": "The component at index 1 (second position) is 20"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing 1-based mathematical indexing with 0-based programming indexing",
+        "Not validating that the index is within valid bounds [0, n-1]",
+        "Treating vectors as scalars or confusing row vectors with column vectors"
+      ],
+      "hint": "NumPy arrays support direct indexing with square brackets. Remember that Python uses 0-based indexing.",
+      "references": [
+        "NumPy array indexing",
+        "Vector spaces in linear algebra",
+        "Coordinate systems in ℝⁿ"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Element-wise Multiplication of Vector Components",
+      "relation_to_problem": "The dot product formula requires multiplying corresponding components: $\\sum_{i=1}^{n} u_i v_i$. This sub-quest focuses on the multiplication step $u_i \\cdot v_i$ for each position $i$.",
+      "prerequisites": [
+        "Vector component access",
+        "Scalar multiplication",
+        "Array iteration"
+      ],
+      "learning_objectives": [
+        "Perform element-wise multiplication on vector components",
+        "Understand the difference between dot product and Hadamard product",
+        "Implement component-wise operations using loops or vectorization",
+        "Validate dimension compatibility before operations"
+      ],
+      "math_content": {
+        "definition": "Given two vectors $\\vec{u}, \\vec{v} \\in \\mathbb{R}^n$, the element-wise product (Hadamard product) produces a vector $\\vec{w} \\in \\mathbb{R}^n$ where each component is the product of corresponding components: $w_i = u_i \\cdot v_i$ for $i = 1, 2, \\ldots, n$. Note: This is distinct from the dot product which produces a scalar.",
+        "notation": "$\\vec{w} = \\vec{u} \\odot \\vec{v}$ denotes the Hadamard product, where $w_i = u_i v_i$. Alternatively written as $\\vec{w} = (u_1 v_1, u_2 v_2, \\ldots, u_n v_n)$.",
+        "theorem": "The Hadamard product is only defined for vectors of equal dimension. If $\\dim(\\vec{u}) \\neq \\dim(\\vec{v})$, the operation is undefined.",
+        "proof_sketch": "Since the Hadamard product requires pairing each component $u_i$ with $v_i$, both vectors must have the same number of components. If dimensions differ, there exist indices where one vector has a component but the other does not, making the operation ill-defined.",
+        "examples": [
+          "$\\vec{u} = (2, 3, -1)$, $\\vec{v} = (4, -2, 5)$ gives $\\vec{w} = (2 \\cdot 4, 3 \\cdot (-2), (-1) \\cdot 5) = (8, -6, -5)$",
+          "$\\vec{a} = (1, 0, 1)$, $\\vec{b} = (0, 5, 3)$ gives $(1 \\cdot 0, 0 \\cdot 5, 1 \\cdot 3) = (0, 0, 3)$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Component-wise Product",
+          "latex": "$w_i = u_i \\cdot v_i$",
+          "description": "Each component of the result is the product of corresponding input components"
+        },
+        {
+          "name": "Dimension Compatibility",
+          "latex": "$\\dim(\\vec{u}) = \\dim(\\vec{v}) = n$",
+          "description": "Both vectors must have the same dimension for the operation to be defined"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes two vectors (1D NumPy arrays) of equal length and returns a new array containing the element-wise product of their components. This intermediate step is crucial for understanding how the dot product aggregates these products.",
+        "function_signature": "def elementwise_multiply(vec1: np.ndarray, vec2: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef elementwise_multiply(vec1: np.ndarray, vec2: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute the element-wise product (Hadamard product) of two vectors.\n    Args:\n        vec1 (numpy.ndarray): First 1D array.\n        vec2 (numpy.ndarray): Second 1D array.\n    Returns:\n        numpy.ndarray: Array containing element-wise products.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "elementwise_multiply(np.array([1, 2, 3]), np.array([4, 5, 6]))",
+            "expected": "np.array([4, 10, 18])",
+            "explanation": "Each component is multiplied: (1*4, 2*5, 3*6) = (4, 10, 18)"
+          },
+          {
+            "input": "elementwise_multiply(np.array([2, -3]), np.array([5, 2]))",
+            "expected": "np.array([10, -6])",
+            "explanation": "Products are (2*5, -3*2) = (10, -6)"
+          },
+          {
+            "input": "elementwise_multiply(np.array([1, 0, -1, 2]), np.array([3, 7, 3, -1]))",
+            "expected": "np.array([3, 0, -3, -2])",
+            "explanation": "Component-wise: (1*3, 0*7, -1*3, 2*-1) = (3, 0, -3, -2)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing element-wise multiplication with matrix multiplication",
+        "Not checking that vectors have equal length before multiplying",
+        "Returning a scalar sum instead of a vector of products",
+        "Using incorrect array shapes (mixing row and column vectors)"
+      ],
+      "hint": "You can use a loop to multiply corresponding elements, or leverage NumPy's built-in element-wise multiplication operator.",
+      "references": [
+        "Hadamard product",
+        "NumPy element-wise operations",
+        "Broadcasting in NumPy"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Summation and Reduction Operations",
+      "relation_to_problem": "The dot product formula $\\vec{u} \\cdot \\vec{v} = \\sum_{i=1}^{n} u_i v_i$ requires summing all element-wise products. This sub-quest teaches the reduction operation that aggregates vector components into a scalar.",
+      "prerequisites": [
+        "Array iteration",
+        "Arithmetic operations",
+        "Accumulator pattern"
+      ],
+      "learning_objectives": [
+        "Understand mathematical summation notation and its computational implementation",
+        "Implement reduction operations that aggregate array elements",
+        "Recognize that summation transforms vectors (dimension n) to scalars (dimension 0)",
+        "Apply the associative and commutative properties of addition in algorithms"
+      ],
+      "math_content": {
+        "definition": "The summation operator aggregates all components of a vector into a single scalar value. For $\\vec{v} \\in \\mathbb{R}^n$, the sum is: $S(\\vec{v}) = \\sum_{i=1}^{n} v_i = v_1 + v_2 + \\cdots + v_n$ where $S: \\mathbb{R}^n \\to \\mathbb{R}$ is a linear functional.",
+        "notation": "$\\sum_{i=1}^{n} v_i$ denotes the sum over all indices from 1 to n. The index $i$ is a dummy variable; $\\sum_{i=1}^{n} v_i = \\sum_{k=1}^{n} v_k$.",
+        "theorem": "Summation is a linear operation: for vectors $\\vec{u}, \\vec{v} \\in \\mathbb{R}^n$ and scalar $c \\in \\mathbb{R}$: (1) $\\sum_{i=1}^{n}(u_i + v_i) = \\sum_{i=1}^{n} u_i + \\sum_{i=1}^{n} v_i$ (2) $\\sum_{i=1}^{n} c u_i = c \\sum_{i=1}^{n} u_i$",
+        "proof_sketch": "Linearity follows from the associative and commutative properties of real number addition. For (1), rearrange terms using commutativity. For (2), factor out the constant using distributivity.",
+        "examples": [
+          "$\\vec{v} = (1, 2, 3) \\implies \\sum_{i=1}^{3} v_i = 1 + 2 + 3 = 6$",
+          "$\\vec{w} = (5, -2, 4, 1) \\implies \\sum_{i=1}^{4} w_i = 5 + (-2) + 4 + 1 = 8$",
+          "Empty sum convention: $\\sum_{i=1}^{0} v_i = 0$ (sum over empty set is the additive identity)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Vector Sum",
+          "latex": "$S(\\vec{v}) = \\sum_{i=1}^{n} v_i$",
+          "description": "Aggregate all vector components into a single scalar value"
+        },
+        {
+          "name": "Linearity of Summation",
+          "latex": "$\\sum_{i=1}^{n}(a_i + b_i) = \\sum_{i=1}^{n} a_i + \\sum_{i=1}^{n} b_i$",
+          "description": "Sum of sums equals sum of combined terms"
+        },
+        {
+          "name": "Computational Complexity",
+          "latex": "$O(n)$ time, $O(1)$ space",
+          "description": "Linear scan with constant memory for accumulator"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the sum of all elements in a 1D NumPy array. This reduction operation transforms a vector into a scalar by aggregating all components through addition.",
+        "function_signature": "def sum_array(vec: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef sum_array(vec: np.ndarray) -> float:\n    \"\"\"\n    Calculate the sum of all elements in a 1D array.\n    Args:\n        vec (numpy.ndarray): 1D array of numbers.\n    Returns:\n        float: Sum of all elements.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "sum_array(np.array([1, 2, 3, 4]))",
+            "expected": "10",
+            "explanation": "1 + 2 + 3 + 4 = 10"
+          },
+          {
+            "input": "sum_array(np.array([4, 10, 18]))",
+            "expected": "32",
+            "explanation": "4 + 10 + 18 = 32 (notice these are the element-wise products from the main problem example)"
+          },
+          {
+            "input": "sum_array(np.array([-5, 5, -3, 3]))",
+            "expected": "0",
+            "explanation": "Sum of positive and negative values can cancel to zero"
+          },
+          {
+            "input": "sum_array(np.array([2.5, 3.7, 1.8]))",
+            "expected": "8.0",
+            "explanation": "Summation works with floating-point numbers: 2.5 + 3.7 + 1.8 = 8.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not initializing the accumulator variable properly (should start at 0)",
+        "Confusing sum with other reductions like product or mean",
+        "Integer overflow for very large sums (less common in Python but important conceptually)",
+        "Forgetting to handle empty arrays (should return 0 by convention)"
+      ],
+      "hint": "Use an accumulator variable that starts at 0 and add each element iteratively, or use NumPy's built-in summation function.",
+      "references": [
+        "Sigma notation",
+        "Fold/reduce operations",
+        "Numerical stability in summation",
+        "Kahan summation algorithm"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Dimension Validation and Error Handling",
+      "relation_to_problem": "The dot product is only defined for vectors of equal dimension. Before computing $\\sum_{i=1}^{n} u_i v_i$, we must verify that both vectors have the same value of n. This is critical for robust implementation.",
+      "prerequisites": [
+        "Vector dimensions",
+        "Conditional logic",
+        "Exception handling"
+      ],
+      "learning_objectives": [
+        "Formally understand when binary operations on vectors are well-defined",
+        "Implement dimension checking before computation",
+        "Handle edge cases gracefully with appropriate error messages",
+        "Apply defensive programming principles to mathematical functions"
+      ],
+      "math_content": {
+        "definition": "For a binary operation $\\circ: \\mathbb{R}^m \\times \\mathbb{R}^n \\to \\mathbb{R}$ to be well-defined on vectors $\\vec{u}$ and $\\vec{v}$, certain compatibility conditions must hold. For the dot product, the domain restriction is: $\\vec{u} \\cdot \\vec{v}$ is defined if and only if $\\dim(\\vec{u}) = \\dim(\\vec{v})$.",
+        "notation": "Let $n = \\dim(\\vec{u})$ and $m = \\dim(\\vec{v})$. The dot product requires $n = m$. We write this precondition as: $\\vec{u} \\cdot \\vec{v}$ is defined $\\iff$ $n = m$.",
+        "theorem": "The dot product function $f: \\mathbb{R}^n \\times \\mathbb{R}^n \\to \\mathbb{R}$ has domain restricted to pairs of vectors with equal dimension. Attempting to compute $\\vec{u} \\cdot \\vec{v}$ where $\\dim(\\vec{u}) \\neq \\dim(\\vec{v})$ is a type error in the mathematical sense.",
+        "proof_sketch": "The dot product formula $\\sum_{i=1}^{n} u_i v_i$ requires each term $u_i v_i$ to be defined. If $\\dim(\\vec{u}) = n < m = \\dim(\\vec{v})$, then $u_i$ is undefined for $i > n$, making the computation impossible. The symmetric case follows similarly.",
+        "examples": [
+          "Valid: $\\vec{u} = (1,2,3) \\in \\mathbb{R}^3$, $\\vec{v} = (4,5,6) \\in \\mathbb{R}^3$ → both dimension 3, dot product defined",
+          "Invalid: $\\vec{u} = (1,2) \\in \\mathbb{R}^2$, $\\vec{v} = (3,4,5) \\in \\mathbb{R}^3$ → different dimensions, dot product undefined",
+          "Edge case: $\\vec{u} = () \\in \\mathbb{R}^0$, $\\vec{v} = () \\in \\mathbb{R}^0$ → empty vectors have dot product 0 by convention"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Dimension Compatibility",
+          "latex": "$\\dim(\\vec{u}) = \\dim(\\vec{v}) = n$",
+          "description": "Precondition that must be verified before computing the dot product"
+        },
+        {
+          "name": "Dimension Function",
+          "latex": "$\\dim: \\mathbb{R}^n \\to \\mathbb{N}$",
+          "description": "Returns the number of components in a vector"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that checks whether two vectors have compatible dimensions for the dot product operation. Return True if they have equal length, False otherwise. This validation step prevents runtime errors in the final dot product implementation.",
+        "function_signature": "def check_dimension_compatibility(vec1: np.ndarray, vec2: np.ndarray) -> bool:",
+        "starter_code": "import numpy as np\n\ndef check_dimension_compatibility(vec1: np.ndarray, vec2: np.ndarray) -> bool:\n    \"\"\"\n    Check if two vectors have compatible dimensions for dot product.\n    Args:\n        vec1 (numpy.ndarray): First 1D array.\n        vec2 (numpy.ndarray): Second 1D array.\n    Returns:\n        bool: True if dimensions match, False otherwise.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "check_dimension_compatibility(np.array([1, 2, 3]), np.array([4, 5, 6]))",
+            "expected": "True",
+            "explanation": "Both vectors have length 3, so they are compatible"
+          },
+          {
+            "input": "check_dimension_compatibility(np.array([1, 2]), np.array([3, 4, 5]))",
+            "expected": "False",
+            "explanation": "Different lengths (2 vs 3) means incompatible dimensions"
+          },
+          {
+            "input": "check_dimension_compatibility(np.array([]), np.array([]))",
+            "expected": "True",
+            "explanation": "Empty vectors (dimension 0) are compatible with each other"
+          },
+          {
+            "input": "check_dimension_compatibility(np.array([7]), np.array([9]))",
+            "expected": "True",
+            "explanation": "Single-element vectors (dimension 1) are compatible"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not validating dimensions before attempting computation, leading to index errors",
+        "Assuming vectors can be automatically padded or truncated (violates mathematical definition)",
+        "Using shape comparison for multi-dimensional arrays without ensuring 1D constraint",
+        "Not handling the empty vector case explicitly"
+      ],
+      "hint": "NumPy arrays have a .shape attribute that returns dimensions. For 1D arrays, compare the first element of shape tuples.",
+      "references": [
+        "Function domains in mathematics",
+        "Type systems",
+        "Defensive programming",
+        "Preconditions and postconditions"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Properties and Geometric Interpretation of Dot Product",
+      "relation_to_problem": "Understanding the mathematical properties of the dot product (commutativity, distributivity, relationship to vector magnitude) provides insight into why the algebraic formula $\\sum_{i=1}^{n} u_i v_i$ works and connects to geometric concepts.",
+      "prerequisites": [
+        "Vector magnitude",
+        "Trigonometry",
+        "Linear algebra fundamentals"
+      ],
+      "learning_objectives": [
+        "State and verify the fundamental properties of the dot product",
+        "Connect the algebraic definition to geometric interpretation via the cosine formula",
+        "Understand special cases: orthogonal vectors, parallel vectors, self-dot product",
+        "Apply dot product properties to solve theoretical problems"
+      ],
+      "math_content": {
+        "definition": "The dot product satisfies several algebraic properties that make it a bilinear form. For vectors $\\vec{u}, \\vec{v}, \\vec{w} \\in \\mathbb{R}^n$ and scalars $c \\in \\mathbb{R}$: (1) Commutativity: $\\vec{u} \\cdot \\vec{v} = \\vec{v} \\cdot \\vec{u}$ (2) Distributivity: $\\vec{u} \\cdot (\\vec{v} + \\vec{w}) = \\vec{u} \\cdot \\vec{v} + \\vec{u} \\cdot \\vec{w}$ (3) Scalar compatibility: $(c\\vec{u}) \\cdot \\vec{v} = c(\\vec{u} \\cdot \\vec{v})$ (4) Positive definiteness: $\\vec{u} \\cdot \\vec{u} \\geq 0$, with equality iff $\\vec{u} = \\vec{0}$",
+        "notation": "$\\vec{u} \\cdot \\vec{v} = \\langle \\vec{u}, \\vec{v} \\rangle$ (inner product notation). $\\|\\vec{u}\\| = \\sqrt{\\vec{u} \\cdot \\vec{u}}$ (magnitude derived from dot product).",
+        "theorem": "Cauchy-Schwarz Inequality: For any $\\vec{u}, \\vec{v} \\in \\mathbb{R}^n$, $|\\vec{u} \\cdot \\vec{v}| \\leq \\|\\vec{u}\\| \\|\\vec{v}\\|$ with equality if and only if $\\vec{u}$ and $\\vec{v}$ are linearly dependent (parallel or antiparallel).",
+        "proof_sketch": "Consider $\\|\\vec{u} - t\\vec{v}\\|^2 \\geq 0$ for all $t \\in \\mathbb{R}$. Expanding using dot product properties yields a quadratic in $t$ that must be non-negative, implying its discriminant is non-positive. This gives the inequality. Equality occurs when the discriminant is zero, meaning $\\vec{u} = t\\vec{v}$ for some scalar $t$.",
+        "examples": [
+          "Commutativity: $(1,2) \\cdot (3,4) = 1(3) + 2(4) = 11 = 3(1) + 4(2) = (3,4) \\cdot (1,2)$",
+          "Orthogonality: $(1,0,0) \\cdot (0,1,0) = 0$ indicates perpendicular vectors",
+          "Self-dot product: $(3,4) \\cdot (3,4) = 9 + 16 = 25 = \\|(3,4)\\|^2$, so magnitude is 5",
+          "Geometric interpretation: $\\vec{u} \\cdot \\vec{v} = \\|\\vec{u}\\| \\|\\vec{v}\\| \\cos(\\theta)$ connects algebra to angle $\\theta$ between vectors"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Algebraic Dot Product",
+          "latex": "$\\vec{u} \\cdot \\vec{v} = \\sum_{i=1}^{n} u_i v_i$",
+          "description": "Computational definition for implementation"
+        },
+        {
+          "name": "Geometric Dot Product",
+          "latex": "$\\vec{u} \\cdot \\vec{v} = \\|\\vec{u}\\| \\|\\vec{v}\\| \\cos(\\theta)$",
+          "description": "Geometric interpretation relating to angle between vectors"
+        },
+        {
+          "name": "Magnitude from Dot Product",
+          "latex": "$\\|\\vec{u}\\| = \\sqrt{\\vec{u} \\cdot \\vec{u}}$",
+          "description": "Vector length derived from self-dot product"
+        },
+        {
+          "name": "Orthogonality Test",
+          "latex": "$\\vec{u} \\perp \\vec{v} \\iff \\vec{u} \\cdot \\vec{v} = 0$",
+          "description": "Vectors are perpendicular when dot product is zero"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the magnitude (length) of a vector using the self-dot product formula. The magnitude is defined as $\\|\\vec{v}\\| = \\sqrt{\\vec{v} \\cdot \\vec{v}} = \\sqrt{\\sum_{i=1}^{n} v_i^2}$. This demonstrates an important application of the dot product.",
+        "function_signature": "def compute_magnitude(vec: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_magnitude(vec: np.ndarray) -> float:\n    \"\"\"\n    Calculate the magnitude (Euclidean norm) of a vector using dot product.\n    Args:\n        vec (numpy.ndarray): 1D array representing a vector.\n    Returns:\n        float: The magnitude of the vector.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_magnitude(np.array([3, 4]))",
+            "expected": "5.0",
+            "explanation": "Classical 3-4-5 right triangle: √(3² + 4²) = √(9 + 16) = √25 = 5"
+          },
+          {
+            "input": "compute_magnitude(np.array([1, 0, 0]))",
+            "expected": "1.0",
+            "explanation": "Unit vector along x-axis has magnitude 1"
+          },
+          {
+            "input": "compute_magnitude(np.array([1, 2, 3]))",
+            "expected": "3.7416573867739413",
+            "explanation": "√(1² + 2² + 3²) = √(1 + 4 + 9) = √14 ≈ 3.742"
+          },
+          {
+            "input": "compute_magnitude(np.array([0, 0, 0]))",
+            "expected": "0.0",
+            "explanation": "Zero vector has magnitude 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting the square root in the magnitude formula (returning v·v instead of √(v·v))",
+        "Confusing magnitude with sum of components (magnitude uses sum of squares)",
+        "Not recognizing that magnitude is always non-negative",
+        "Numerical precision issues when testing for zero magnitude (use tolerance in practice)"
+      ],
+      "hint": "First compute the self-dot product (sum of squared components), then take the square root. You can use np.sqrt() for the square root operation.",
+      "references": [
+        "Euclidean norm",
+        "Inner product spaces",
+        "Cauchy-Schwarz inequality",
+        "Vector projections"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Composing the Complete Dot Product Algorithm",
+      "relation_to_problem": "This final sub-quest synthesizes all previous concepts: dimension validation, element-wise multiplication, and summation to implement the complete dot product algorithm $\\vec{u} \\cdot \\vec{v} = \\sum_{i=1}^{n} u_i v_i$.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Function composition",
+        "Algorithm design"
+      ],
+      "learning_objectives": [
+        "Combine validation, computation, and reduction steps into a cohesive algorithm",
+        "Implement the full dot product formula with proper error handling",
+        "Understand the computational complexity and optimization considerations",
+        "Verify correctness using diverse test cases including edge cases"
+      ],
+      "math_content": {
+        "definition": "The dot product (inner product) is a function $\\cdot: \\mathbb{R}^n \\times \\mathbb{R}^n \\to \\mathbb{R}$ defined by $\\vec{u} \\cdot \\vec{v} = \\sum_{i=1}^{n} u_i v_i$ where $\\vec{u}, \\vec{v} \\in \\mathbb{R}^n$. This operation maps pairs of n-dimensional vectors to scalar values.",
+        "notation": "$\\vec{u} \\cdot \\vec{v} = \\langle \\vec{u}, \\vec{v} \\rangle = \\sum_{i=1}^{n} u_i v_i = u_1 v_1 + u_2 v_2 + \\cdots + u_n v_n$",
+        "theorem": "The dot product is a bilinear form satisfying: (1) $\\vec{u} \\cdot \\vec{v} = \\vec{v} \\cdot \\vec{u}$ (symmetry), (2) $(a\\vec{u} + b\\vec{v}) \\cdot \\vec{w} = a(\\vec{u} \\cdot \\vec{w}) + b(\\vec{v} \\cdot \\vec{w})$ (linearity in first argument), (3) $\\vec{u} \\cdot \\vec{u} \\geq 0$ with equality iff $\\vec{u} = \\vec{0}$ (positive definiteness).",
+        "proof_sketch": "Properties (1) and (2) follow directly from the commutativity and distributivity of real number multiplication and addition. Property (3) holds because $\\vec{u} \\cdot \\vec{u} = \\sum_{i=1}^{n} u_i^2$ is a sum of non-negative terms (squares), equaling zero only when all $u_i = 0$.",
+        "examples": [
+          "Example from main problem: $(1,2,3) \\cdot (4,5,6) = 1(4) + 2(5) + 3(6) = 4 + 10 + 18 = 32$",
+          "Orthogonal case: $(1,1) \\cdot (1,-1) = 1(1) + 1(-1) = 0$ (perpendicular vectors)",
+          "Negative result: $(1,-2,1) \\cdot (2,3,-4) = 2 - 6 - 4 = -8$ (obtuse angle between vectors)",
+          "High-dimensional: $(1,0,0,1) \\cdot (1,1,1,1) = 1 + 0 + 0 + 1 = 2$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Dot Product Formula",
+          "latex": "$\\vec{u} \\cdot \\vec{v} = \\sum_{i=1}^{n} u_i v_i$",
+          "description": "The complete formula combining element-wise products and summation"
+        },
+        {
+          "name": "Algorithm Steps",
+          "latex": "$\\vec{u} \\cdot \\vec{v} = \\text{sum}(\\vec{u} \\odot \\vec{v})$",
+          "description": "Computational decomposition: element-wise multiply then sum"
+        },
+        {
+          "name": "Complexity",
+          "latex": "$O(n)$ time, $O(1)$ space",
+          "description": "Linear time with constant extra space (can compute in-place)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete dot product function that validates dimensions, performs element-wise multiplication, and computes the sum. The function should handle all cases: normal vectors, orthogonal vectors, zero vectors, and single-element vectors. This is NOT the final solution - structure your code differently from the main problem to demonstrate understanding.",
+        "function_signature": "def dot_product_complete(vec1: np.ndarray, vec2: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef dot_product_complete(vec1: np.ndarray, vec2: np.ndarray) -> float:\n    \"\"\"\n    Calculate the dot product of two vectors with full validation.\n    This is a learning exercise - implement step by step:\n    1. Validate dimensions match\n    2. Compute element-wise products\n    3. Sum the products\n    \n    Args:\n        vec1 (numpy.ndarray): First 1D array.\n        vec2 (numpy.ndarray): Second 1D array.\n    Returns:\n        float: The dot product value.\n    \"\"\"\n    # Your code here - implement using the concepts from previous sub-quests\n    pass",
+        "test_cases": [
+          {
+            "input": "dot_product_complete(np.array([1, 2, 3]), np.array([4, 5, 6]))",
+            "expected": "32.0",
+            "explanation": "Main problem example: (1×4) + (2×5) + (3×6) = 4 + 10 + 18 = 32"
+          },
+          {
+            "input": "dot_product_complete(np.array([1, 0, 1]), np.array([1, 2, -1]))",
+            "expected": "0.0",
+            "explanation": "Orthogonal vectors yield dot product of 0"
+          },
+          {
+            "input": "dot_product_complete(np.array([2, -3, 1]), np.array([4, 1, -2]))",
+            "expected": "3.0",
+            "explanation": "(2×4) + (-3×1) + (1×-2) = 8 - 3 - 2 = 3"
+          },
+          {
+            "input": "dot_product_complete(np.array([5]), np.array([7]))",
+            "expected": "35.0",
+            "explanation": "Single element vectors: 5 × 7 = 35"
+          },
+          {
+            "input": "dot_product_complete(np.array([1.5, 2.5]), np.array([2.0, 4.0]))",
+            "expected": "13.0",
+            "explanation": "Floating-point: (1.5×2.0) + (2.5×4.0) = 3.0 + 10.0 = 13.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not validating that input vectors have equal dimensions before computation",
+        "Returning a vector instead of a scalar (confusing with element-wise multiplication)",
+        "Implementing matrix multiplication instead of dot product",
+        "Not handling floating-point inputs correctly",
+        "Off-by-one errors in indexing or loop bounds",
+        "Using global variables or modifying input arrays"
+      ],
+      "hint": "Break the problem into three clear steps: (1) check dimensions, (2) multiply corresponding elements, (3) sum the results. You can use functions from previous sub-quests or implement from scratch using loops.",
+      "references": [
+        "Complete implementation patterns",
+        "Algorithm composition",
+        "Testing strategies",
+        "NumPy vectorization",
+        "Linear algebra applications"
+      ]
+    }
+  ]
+}

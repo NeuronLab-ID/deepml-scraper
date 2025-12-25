@@ -1,0 +1,569 @@
+{
+  "problem_id": 28,
+  "title": "SVD of a 2x2 Matrix",
+  "category": "Linear Algebra",
+  "difficulty": "hard",
+  "description": "Given a 2x2 matrix, write a Python function to compute its Singular Value Decomposition (SVD). The function should return matrices U, s, and V such that A = U @ diag(s) @ V.\n\nDo not use numpy.linalg.svd or other built-in SVD functions.\n\n**Returns:**\n- `U`: 2x2 orthogonal matrix (left singular vectors)\n- `s`: 1D array of 2 singular values (non-negative)\n- `V`: 2x2 matrix (right singular vectors)",
+  "example": {
+    "input": "A = np.array([[-10, 8], [10, -1]])",
+    "output": "U, s, V such that U @ diag(s) @ V ≈ A",
+    "reasoning": "The SVD decomposes A into orthogonal matrices U and V, and singular values s. The reconstruction U @ diag(s) @ V equals the original matrix A."
+  },
+  "starter_code": "import numpy as np\n\ndef svd_2x2(A: np.ndarray) -> tuple:\n    \"\"\"\n    Compute SVD of a 2x2 matrix.\n    \n    Args:\n        A: 2x2 numpy array\n    \n    Returns:\n        U: 2x2 orthogonal matrix (left singular vectors)\n        s: 1D array of singular values\n        V: 2x2 matrix (right singular vectors)\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Eigenvalues and Eigenvectors of Symmetric Matrices",
+      "relation_to_problem": "Computing SVD requires finding eigenvalues and eigenvectors of A^T*A, which is always a symmetric positive semi-definite matrix. This is the foundational step for extracting singular values and the V matrix.",
+      "prerequisites": [
+        "Matrix multiplication",
+        "Linear independence",
+        "Orthogonality"
+      ],
+      "learning_objectives": [
+        "Understand the definition of eigenvalues and eigenvectors",
+        "Compute eigenvalues using the characteristic polynomial",
+        "Find eigenvectors by solving homogeneous linear systems",
+        "Normalize eigenvectors to unit length"
+      ],
+      "math_content": {
+        "definition": "Let $A \\in \\mathbb{R}^{n \\times n}$ be a square matrix. A scalar $\\lambda \\in \\mathbb{R}$ is an **eigenvalue** of $A$ if there exists a non-zero vector $v \\in \\mathbb{R}^n$ such that $Av = \\lambda v$. The vector $v$ is called an **eigenvector** corresponding to eigenvalue $\\lambda$. For a 2×2 matrix $A = \\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}$, eigenvalues are found by solving $\\det(A - \\lambda I) = 0$.",
+        "notation": "$\\lambda$ = eigenvalue, $v$ = eigenvector, $I$ = identity matrix, $\\det$ = determinant",
+        "theorem": "**Spectral Theorem for Symmetric Matrices**: If $A \\in \\mathbb{R}^{n \\times n}$ is symmetric (i.e., $A^T = A$), then: (1) All eigenvalues are real. (2) Eigenvectors corresponding to distinct eigenvalues are orthogonal. (3) There exists an orthonormal basis of eigenvectors.",
+        "proof_sketch": "For a 2×2 symmetric matrix $A = \\begin{bmatrix} a & b \\\\ b & d \\end{bmatrix}$, the characteristic equation is $(a-\\lambda)(d-\\lambda) - b^2 = 0$, which simplifies to $\\lambda^2 - (a+d)\\lambda + (ad-b^2) = 0$. The discriminant $(a+d)^2 - 4(ad-b^2) = (a-d)^2 + 4b^2 \\geq 0$, guaranteeing real eigenvalues. If $v_1, v_2$ are eigenvectors for distinct eigenvalues $\\lambda_1 \\neq \\lambda_2$, then $\\lambda_1 v_1^T v_2 = (Av_1)^T v_2 = v_1^T A^T v_2 = v_1^T Av_2 = \\lambda_2 v_1^T v_2$, implying $(\\lambda_1 - \\lambda_2) v_1^T v_2 = 0$, thus $v_1^T v_2 = 0$.",
+        "examples": [
+          "For $A = \\begin{bmatrix} 5 & 4 \\\\ 4 & 5 \\end{bmatrix}$: Characteristic equation: $(5-\\lambda)^2 - 16 = \\lambda^2 - 10\\lambda + 9 = 0$. Eigenvalues: $\\lambda_1 = 9, \\lambda_2 = 1$. For $\\lambda_1=9$: $(A-9I)v = \\begin{bmatrix} -4 & 4 \\\\ 4 & -4 \\end{bmatrix}v = 0$ gives $v_1 = \\frac{1}{\\sqrt{2}}\\begin{bmatrix} 1 \\\\ 1 \\end{bmatrix}$. For $\\lambda_2=1$: $(A-I)v = \\begin{bmatrix} 4 & 4 \\\\ 4 & 4 \\end{bmatrix}v = 0$ gives $v_2 = \\frac{1}{\\sqrt{2}}\\begin{bmatrix} 1 \\\\ -1 \\end{bmatrix}$.",
+          "For $A = \\begin{bmatrix} 3 & 1 \\\\ 1 & 3 \\end{bmatrix}$: Eigenvalues are $\\lambda_1 = 4, \\lambda_2 = 2$. Normalized eigenvectors: $v_1 = \\frac{1}{\\sqrt{2}}\\begin{bmatrix} 1 \\\\ 1 \\end{bmatrix}$ and $v_2 = \\frac{1}{\\sqrt{2}}\\begin{bmatrix} 1 \\\\ -1 \\end{bmatrix}$. Verify: $v_1^T v_2 = 0$ (orthogonal)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Characteristic Polynomial",
+          "latex": "$\\det(A - \\lambda I) = 0$",
+          "description": "Solving this equation yields the eigenvalues"
+        },
+        {
+          "name": "2×2 Determinant",
+          "latex": "$\\det\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix} = ad - bc$",
+          "description": "For computing the characteristic polynomial"
+        },
+        {
+          "name": "Quadratic Formula",
+          "latex": "$\\lambda = \\frac{(a+d) \\pm \\sqrt{(a+d)^2 - 4(ad-b^2)}}{2}$",
+          "description": "Explicit formula for eigenvalues of 2×2 symmetric matrix"
+        },
+        {
+          "name": "Eigenvector Equation",
+          "latex": "$(A - \\lambda I)v = 0$",
+          "description": "System to solve for eigenvector corresponding to eigenvalue $\\lambda$"
+        },
+        {
+          "name": "Vector Normalization",
+          "latex": "$\\hat{v} = \\frac{v}{\\|v\\|} = \\frac{v}{\\sqrt{v_1^2 + v_2^2}}$",
+          "description": "Convert eigenvector to unit length"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the eigenvalues and normalized eigenvectors of a 2×2 symmetric matrix. This is a crucial building block for SVD, as the matrix A^T*A is always symmetric.",
+        "function_signature": "def eigen_2x2_symmetric(A: np.ndarray) -> tuple[np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef eigen_2x2_symmetric(A: np.ndarray) -> tuple[np.ndarray, np.ndarray]:\n    \"\"\"\n    Compute eigenvalues and eigenvectors of a 2x2 symmetric matrix.\n    \n    Args:\n        A: 2x2 symmetric numpy array\n    \n    Returns:\n        eigenvalues: 1D array of 2 eigenvalues in descending order\n        eigenvectors: 2x2 array where column i is the eigenvector for eigenvalues[i]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "eigen_2x2_symmetric(np.array([[5, 4], [4, 5]]))",
+            "expected": "eigenvalues=[9, 1], eigenvectors=[[1/√2, 1/√2], [1/√2, -1/√2]]",
+            "explanation": "The symmetric matrix has eigenvalues 9 and 1, with orthonormal eigenvectors forming a 45-degree rotation"
+          },
+          {
+            "input": "eigen_2x2_symmetric(np.array([[3, 1], [1, 3]]))",
+            "expected": "eigenvalues=[4, 2], eigenvectors=[[1/√2, 1/√2], [1/√2, -1/√2]]",
+            "explanation": "Another diagonal-dominant symmetric matrix with distinct eigenvalues"
+          },
+          {
+            "input": "eigen_2x2_symmetric(np.array([[2, 0], [0, 3]]))",
+            "expected": "eigenvalues=[3, 2], eigenvectors=[[0, 1], [1, 0]]",
+            "explanation": "A diagonal matrix where eigenvalues are the diagonal entries and eigenvectors are standard basis vectors"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to normalize eigenvectors to unit length (required for orthonormal matrices)",
+        "Not ordering eigenvalues in descending order (convention for SVD)",
+        "Confusing row vectors with column vectors when constructing the eigenvector matrix",
+        "Incorrectly solving the homogeneous system (A - λI)v = 0",
+        "Not checking that eigenvectors are orthogonal for symmetric matrices"
+      ],
+      "hint": "Start by extracting matrix elements a, b, d. Use the quadratic formula to find eigenvalues. For each eigenvalue, substitute into (A - λI)v = 0 and solve for v. Remember that for a 2×2 system with one equation, you can set one component (e.g., v1=1) and solve for the other.",
+      "references": [
+        "Spectral theorem for symmetric matrices",
+        "Characteristic polynomial",
+        "Gram-Schmidt orthogonalization",
+        "Quadratic formula derivation"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Matrix Transpose and the Gram Matrix A^T*A",
+      "relation_to_problem": "The Gram matrix A^T*A is central to SVD computation. Its eigenvalues are the squared singular values, and its eigenvectors form the V matrix. Understanding this relationship is essential for the SVD algorithm.",
+      "prerequisites": [
+        "Matrix multiplication",
+        "Transpose operation",
+        "Eigenvalues and eigenvectors"
+      ],
+      "learning_objectives": [
+        "Understand the properties of the Gram matrix A^T*A",
+        "Prove that A^T*A is always symmetric and positive semi-definite",
+        "Compute A^T*A for a given 2×2 matrix",
+        "Relate eigenvalues of A^T*A to the original matrix A"
+      ],
+      "math_content": {
+        "definition": "For any matrix $A \\in \\mathbb{R}^{m \\times n}$, the **Gram matrix** is defined as $G = A^T A \\in \\mathbb{R}^{n \\times n}$. For a 2×2 matrix $A = \\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}$, we have $A^T A = \\begin{bmatrix} a & c \\\\ b & d \\end{bmatrix} \\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix} = \\begin{bmatrix} a^2+c^2 & ab+cd \\\\ ab+cd & b^2+d^2 \\end{bmatrix}$.",
+        "notation": "$A^T$ = transpose of $A$, $G = A^T A$ = Gram matrix, $\\lambda_i(G)$ = eigenvalues of $G$",
+        "theorem": "**Properties of the Gram Matrix**: For any matrix $A \\in \\mathbb{R}^{m \\times n}$, the Gram matrix $G = A^T A$ satisfies: (1) $G$ is symmetric: $G^T = (A^T A)^T = A^T (A^T)^T = A^T A = G$. (2) $G$ is positive semi-definite: for any vector $x \\in \\mathbb{R}^n$, $x^T G x = x^T A^T A x = (Ax)^T(Ax) = \\|Ax\\|^2 \\geq 0$. (3) All eigenvalues of $G$ are non-negative: $\\lambda_i(G) \\geq 0$. (4) $\\det(G) = (\\det A)^2$.",
+        "proof_sketch": "Symmetry: $(A^T A)^T = A^T(A^T)^T = A^T A$. Positive semi-definite: For any $x$, $x^T(A^T A)x = (Ax)^T(Ax) = \\sum_i (Ax)_i^2 \\geq 0$. Non-negative eigenvalues follow from positive semi-definiteness: if $Gv = \\lambda v$, then $\\lambda v^T v = v^T G v = \\|Av\\|^2 \\geq 0$, and since $v^T v > 0$, we have $\\lambda \\geq 0$.",
+        "examples": [
+          "For $A = \\begin{bmatrix} 2 & 1 \\\\ 1 & 2 \\end{bmatrix}$: $A^T A = \\begin{bmatrix} 2 & 1 \\\\ 1 & 2 \\end{bmatrix} \\begin{bmatrix} 2 & 1 \\\\ 1 & 2 \\end{bmatrix} = \\begin{bmatrix} 5 & 4 \\\\ 4 & 5 \\end{bmatrix}$. Note that $A^T A$ is symmetric. Eigenvalues are $\\lambda_1 = 9, \\lambda_2 = 1$, both positive.",
+          "For $A = \\begin{bmatrix} 3 & 0 \\\\ 0 & 4 \\end{bmatrix}$: $A^T A = \\begin{bmatrix} 9 & 0 \\\\ 0 & 16 \\end{bmatrix}$. Eigenvalues are $16$ and $9$, matching the squared diagonal entries.",
+          "For rank-deficient $A = \\begin{bmatrix} 1 & 2 \\\\ 2 & 4 \\end{bmatrix}$: $A^T A = \\begin{bmatrix} 5 & 10 \\\\ 10 & 20 \\end{bmatrix}$. Eigenvalues are $25$ and $0$, showing one zero eigenvalue for the rank-1 matrix."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gram Matrix",
+          "latex": "$A^T A = \\begin{bmatrix} a^2+c^2 & ab+cd \\\\ ab+cd & b^2+d^2 \\end{bmatrix}$",
+          "description": "Explicit formula for 2×2 case"
+        },
+        {
+          "name": "Symmetry Property",
+          "latex": "$(A^T A)^T = A^T A$",
+          "description": "Gram matrix is always symmetric"
+        },
+        {
+          "name": "Positive Semi-definiteness",
+          "latex": "$x^T(A^T A)x = \\|Ax\\|^2 \\geq 0$",
+          "description": "Quadratic form is non-negative"
+        },
+        {
+          "name": "Determinant Identity",
+          "latex": "$\\det(A^T A) = (\\det A)^2$",
+          "description": "Relates to matrix rank and singularity"
+        },
+        {
+          "name": "Trace Identity",
+          "latex": "$\\text{tr}(A^T A) = \\sum_{i,j} a_{ij}^2 = \\|A\\|_F^2$",
+          "description": "Sum of eigenvalues equals Frobenius norm squared"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes A^T*A and verifies its key properties (symmetry and positive semi-definiteness). This prepares you for computing the V matrix in SVD.",
+        "function_signature": "def compute_gram_matrix(A: np.ndarray) -> tuple[np.ndarray, bool, bool]:",
+        "starter_code": "import numpy as np\n\ndef compute_gram_matrix(A: np.ndarray) -> tuple[np.ndarray, bool, bool]:\n    \"\"\"\n    Compute the Gram matrix A^T*A and verify its properties.\n    \n    Args:\n        A: 2x2 numpy array\n    \n    Returns:\n        gram: The Gram matrix A^T*A\n        is_symmetric: True if gram is symmetric (within tolerance)\n        is_positive_semidefinite: True if all eigenvalues >= 0\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_gram_matrix(np.array([[2, 1], [1, 2]]))",
+            "expected": "gram=[[5, 4], [4, 5]], is_symmetric=True, is_positive_semidefinite=True",
+            "explanation": "For a full-rank matrix, A^T*A is symmetric and has all positive eigenvalues"
+          },
+          {
+            "input": "compute_gram_matrix(np.array([[3, 0], [0, 4]]))",
+            "expected": "gram=[[9, 0], [0, 16]], is_symmetric=True, is_positive_semidefinite=True",
+            "explanation": "For a diagonal matrix, A^T*A is also diagonal with squared entries"
+          },
+          {
+            "input": "compute_gram_matrix(np.array([[1, 2], [2, 4]]))",
+            "expected": "gram=[[5, 10], [10, 20]], is_symmetric=True, is_positive_semidefinite=True",
+            "explanation": "Even for rank-deficient matrices, A^T*A is symmetric and positive semi-definite (eigenvalue 0 is allowed)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing A*A^T instead of A^T*A (these are different for non-square or non-symmetric matrices)",
+        "Not verifying symmetry numerically (use np.allclose due to floating-point errors)",
+        "Assuming A^T*A is positive definite (it's semi-definite; zero eigenvalues are allowed)",
+        "Forgetting that eigenvalues of A^T*A are squared singular values, not singular values themselves",
+        "Incorrect matrix multiplication order"
+      ],
+      "hint": "Use np.dot or @ operator for matrix multiplication. For symmetry check, compare gram with gram.T using np.allclose with a small tolerance (e.g., 1e-10). For positive semi-definiteness, compute eigenvalues using your eigen_2x2_symmetric function and check if all are >= -tolerance.",
+      "references": [
+        "Gram matrix properties",
+        "Positive definite vs positive semi-definite matrices",
+        "Matrix transpose properties",
+        "Frobenius norm"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Singular Values from Eigenvalue Decomposition",
+      "relation_to_problem": "Singular values are the square roots of eigenvalues of A^T*A. This step connects eigenvalue computation to singular value extraction, which forms the Σ matrix in SVD.",
+      "prerequisites": [
+        "Eigenvalues of symmetric matrices",
+        "Gram matrix A^T*A",
+        "Square root function"
+      ],
+      "learning_objectives": [
+        "Understand the relationship between singular values and eigenvalues",
+        "Compute singular values from A^T*A eigenvalues",
+        "Order singular values in descending order (SVD convention)",
+        "Handle numerical precision issues with near-zero singular values"
+      ],
+      "math_content": {
+        "definition": "The **singular values** of a matrix $A \\in \\mathbb{R}^{m \\times n}$ are the non-negative square roots of the eigenvalues of $A^T A$ (or equivalently $AA^T$). Formally, if $\\lambda_1 \\geq \\lambda_2 \\geq \\cdots \\geq \\lambda_n \\geq 0$ are the eigenvalues of $A^T A$, then the singular values are $\\sigma_i = \\sqrt{\\lambda_i}$ for $i = 1, \\ldots, n$. By convention, singular values are ordered: $\\sigma_1 \\geq \\sigma_2 \\geq \\cdots \\geq \\sigma_n \\geq 0$.",
+        "notation": "$\\sigma_i$ = $i$-th singular value, $\\lambda_i$ = $i$-th eigenvalue, $\\Sigma$ = diagonal matrix of singular values",
+        "theorem": "**Singular Value Properties**: For a matrix $A \\in \\mathbb{R}^{m \\times n}$ with singular values $\\sigma_1 \\geq \\sigma_2 \\geq \\cdots \\geq \\sigma_r > 0 = \\sigma_{r+1} = \\cdots = \\sigma_n$: (1) $\\text{rank}(A) = r$ (number of non-zero singular values). (2) $\\|A\\|_2 = \\sigma_1$ (spectral norm equals largest singular value). (3) $\\|A\\|_F = \\sqrt{\\sigma_1^2 + \\sigma_2^2 + \\cdots + \\sigma_n^2}$ (Frobenius norm). (4) $\\det(A) = \\sigma_1 \\sigma_2 \\cdots \\sigma_n$ for square matrices. (5) $\\kappa(A) = \\frac{\\sigma_1}{\\sigma_n}$ (condition number, if $\\sigma_n \\neq 0$).",
+        "proof_sketch": "Since eigenvalues of $A^T A$ are non-negative (proven in previous step), their square roots are well-defined and real. The relationship $\\sigma_i = \\sqrt{\\lambda_i(A^T A)}$ preserves ordering. For rank: if $\\sigma_i = 0$, then $\\lambda_i(A^T A) = 0$, meaning $A^T A$ has a null space, which implies $A$ has a null space. For spectral norm: $\\|A\\|_2 = \\max_{\\|x\\|=1} \\|Ax\\| = \\max_{\\|x\\|=1} \\sqrt{x^T A^T A x}$. Since $A^T A = V\\Lambda V^T$ (eigendecomposition), we get $\\|A\\|_2 = \\sqrt{\\lambda_1} = \\sigma_1$.",
+        "examples": [
+          "For $A = \\begin{bmatrix} 2 & 1 \\\\ 1 & 2 \\end{bmatrix}$: We found $A^T A$ has eigenvalues $9$ and $1$. Therefore, singular values are $\\sigma_1 = \\sqrt{9} = 3$ and $\\sigma_2 = \\sqrt{1} = 1$. The matrix is full-rank (both singular values positive).",
+          "For $A = \\begin{bmatrix} 3 & 0 \\\\ 0 & 4 \\end{bmatrix}$: $A^T A$ has eigenvalues $16$ and $9$. Singular values are $\\sigma_1 = 4, \\sigma_2 = 3$. Note these equal the absolute values of $A$'s diagonal entries.",
+          "For $A = \\begin{bmatrix} 1 & 2 \\\\ 2 & 4 \\end{bmatrix}$: $A^T A$ has eigenvalues $25$ and $0$. Singular values are $\\sigma_1 = 5, \\sigma_2 = 0$. The zero singular value indicates rank deficiency (rank = 1)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Singular Value Definition",
+          "latex": "$\\sigma_i = \\sqrt{\\lambda_i(A^T A)}$",
+          "description": "Fundamental relationship between singular values and eigenvalues"
+        },
+        {
+          "name": "Spectral Norm",
+          "latex": "$\\|A\\|_2 = \\sigma_1 = \\sigma_{\\max}$",
+          "description": "Largest singular value gives the operator norm"
+        },
+        {
+          "name": "Frobenius Norm",
+          "latex": "$\\|A\\|_F = \\sqrt{\\sigma_1^2 + \\sigma_2^2}$",
+          "description": "For 2×2 matrices, sum of squared singular values"
+        },
+        {
+          "name": "Determinant Formula",
+          "latex": "$|\\det(A)| = \\sigma_1 \\cdot \\sigma_2$",
+          "description": "Product of singular values equals absolute determinant"
+        },
+        {
+          "name": "Condition Number",
+          "latex": "$\\kappa(A) = \\frac{\\sigma_1}{\\sigma_2}$",
+          "description": "Ratio of largest to smallest singular value (if $\\sigma_2 \\neq 0$)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes singular values from a 2×2 matrix by finding eigenvalues of A^T*A and taking square roots. This is the core computation for the Σ matrix in SVD.",
+        "function_signature": "def compute_singular_values(A: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_singular_values(A: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute singular values of a 2x2 matrix.\n    \n    Args:\n        A: 2x2 numpy array\n    \n    Returns:\n        singular_values: 1D array of 2 singular values in descending order\n    \"\"\"\n    # Your code here\n    # Hint: Compute A^T*A, find its eigenvalues, take square roots, and sort\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_singular_values(np.array([[2, 1], [1, 2]]))",
+            "expected": "[3.0, 1.0]",
+            "explanation": "Eigenvalues of A^T*A are 9 and 1, so singular values are sqrt(9)=3 and sqrt(1)=1"
+          },
+          {
+            "input": "compute_singular_values(np.array([[3, 0], [0, 4]]))",
+            "expected": "[4.0, 3.0]",
+            "explanation": "For diagonal matrix, singular values equal absolute values of diagonal entries, sorted descending"
+          },
+          {
+            "input": "compute_singular_values(np.array([[-10, 8], [10, -1]]))",
+            "expected": "[14.61..., 6.85...]",
+            "explanation": "General matrix with non-integer singular values, demonstrating numerical computation"
+          },
+          {
+            "input": "compute_singular_values(np.array([[1, 2], [2, 4]]))",
+            "expected": "[5.0, 0.0]",
+            "explanation": "Rank-deficient matrix has one zero singular value"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to sort singular values in descending order",
+        "Taking square root of negative numbers due to numerical errors (use max(eigenvalue, 0) before sqrt)",
+        "Confusing singular values with eigenvalues (they are square roots of eigenvalues of A^T*A, not eigenvalues of A)",
+        "Not handling the case where eigenvalues are very small but negative due to numerical precision",
+        "Returning eigenvalues instead of their square roots"
+      ],
+      "hint": "Reuse your eigen_2x2_symmetric and compute_gram_matrix functions. After computing eigenvalues of A^T*A, apply np.sqrt element-wise. Use np.maximum(eigenvalues, 0) before taking square root to handle tiny negative values from numerical errors. Ensure descending order.",
+      "references": [
+        "Matrix norms (spectral norm and Frobenius norm)",
+        "Matrix rank and null space",
+        "Condition number of matrices",
+        "Numerical stability considerations"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Orthogonal Matrices and the V Matrix Construction",
+      "relation_to_problem": "The V matrix in SVD consists of the eigenvectors of A^T*A arranged as columns. Understanding orthogonal matrices and proper eigenvector arrangement is crucial for constructing V correctly.",
+      "prerequisites": [
+        "Eigenvalues and eigenvectors",
+        "Gram matrix A^T*A",
+        "Vector normalization",
+        "Dot product"
+      ],
+      "learning_objectives": [
+        "Understand properties of orthogonal matrices",
+        "Verify orthogonality of eigenvectors",
+        "Construct the V matrix from ordered eigenvectors",
+        "Verify that V^T*V = I (orthogonality condition)"
+      ],
+      "math_content": {
+        "definition": "A matrix $Q \\in \\mathbb{R}^{n \\times n}$ is **orthogonal** if its columns are orthonormal vectors, i.e., $Q^T Q = QQ^T = I$, where $I$ is the identity matrix. Equivalently, $Q^{-1} = Q^T$. For a 2×2 orthogonal matrix $Q = \\begin{bmatrix} q_1 & q_2 \\end{bmatrix}$ where $q_1, q_2$ are column vectors, we require: (1) $q_1^T q_1 = 1$ and $q_2^T q_2 = 1$ (unit length), (2) $q_1^T q_2 = 0$ (orthogonality).",
+        "notation": "$Q^T$ = transpose of $Q$, $I$ = identity matrix, $\\|v\\|$ = Euclidean norm of vector $v$, $u \\perp v$ = $u$ orthogonal to $v$",
+        "theorem": "**Properties of Orthogonal Matrices**: If $Q$ is orthogonal, then: (1) $\\det(Q) = \\pm 1$. (2) $\\|Qx\\| = \\|x\\|$ for all vectors $x$ (preserves length). (3) $(Qx)^T(Qy) = x^T y$ for all vectors $x, y$ (preserves inner products). (4) Eigenvalues have absolute value 1. (5) $Q^T$ is also orthogonal. For SVD, the matrix $V$ is formed by placing normalized eigenvectors of $A^T A$ as columns, ordered by decreasing eigenvalue: $V = \\begin{bmatrix} v_1 & v_2 \\end{bmatrix}$ where $v_i$ corresponds to $\\lambda_i$.",
+        "proof_sketch": "If $Q^T Q = I$, then $\\det(Q^T Q) = \\det(I) = 1$. Since $\\det(Q^T Q) = \\det(Q^T)\\det(Q) = (\\det Q)^2$, we have $(\\det Q)^2 = 1$, thus $\\det Q = \\pm 1$. For length preservation: $\\|Qx\\|^2 = (Qx)^T(Qx) = x^T Q^T Q x = x^T I x = x^T x = \\|x\\|^2$. For SVD, eigenvectors of the symmetric matrix $A^T A$ are automatically orthogonal (by spectral theorem) when eigenvalues are distinct. When normalized, they form an orthonormal set suitable for $V$.",
+        "examples": [
+          "Rotation matrix $Q = \\begin{bmatrix} \\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta \\end{bmatrix}$ is orthogonal. Verify: $Q^T Q = \\begin{bmatrix} \\cos\\theta & \\sin\\theta \\\\ -\\sin\\theta & \\cos\\theta \\end{bmatrix}\\begin{bmatrix} \\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta \\end{bmatrix} = \\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix} = I$.",
+          "For $A = \\begin{bmatrix} 2 & 1 \\\\ 1 & 2 \\end{bmatrix}$: Eigenvectors of $A^T A$ are $v_1 = \\frac{1}{\\sqrt{2}}\\begin{bmatrix} 1 \\\\ 1 \\end{bmatrix}$ and $v_2 = \\frac{1}{\\sqrt{2}}\\begin{bmatrix} 1 \\\\ -1 \\end{bmatrix}$. Thus $V = \\frac{1}{\\sqrt{2}}\\begin{bmatrix} 1 & 1 \\\\ 1 & -1 \\end{bmatrix}$. Check: $V^T V = \\frac{1}{2}\\begin{bmatrix} 1 & 1 \\\\ 1 & -1 \\end{bmatrix}\\begin{bmatrix} 1 & 1 \\\\ 1 & -1 \\end{bmatrix} = \\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}$.",
+          "Identity matrix $I = \\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}$ is trivially orthogonal."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Orthogonality Condition",
+          "latex": "$Q^T Q = I$",
+          "description": "Defining property of orthogonal matrices"
+        },
+        {
+          "name": "Column Orthonormality",
+          "latex": "$q_i^T q_j = \\delta_{ij} = \\begin{cases} 1 & i=j \\\\ 0 & i\\neq j \\end{cases}$",
+          "description": "Columns are orthonormal (Kronecker delta)"
+        },
+        {
+          "name": "Inverse Property",
+          "latex": "$Q^{-1} = Q^T$",
+          "description": "Transpose equals inverse for orthogonal matrices"
+        },
+        {
+          "name": "Determinant",
+          "latex": "$\\det(Q) = \\pm 1$",
+          "description": "Orthogonal matrices have determinant +1 (rotation) or -1 (reflection)"
+        },
+        {
+          "name": "V Matrix Construction",
+          "latex": "$V = \\begin{bmatrix} v_1 & v_2 \\end{bmatrix}$",
+          "description": "Arrange normalized eigenvectors as columns, ordered by eigenvalue magnitude"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that constructs the V matrix for SVD by computing eigenvectors of A^T*A and arranging them as columns in the correct order. Verify orthogonality.",
+        "function_signature": "def compute_V_matrix(A: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_V_matrix(A: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute the V matrix for SVD of a 2x2 matrix.\n    V consists of eigenvectors of A^T*A as columns, ordered by eigenvalue.\n    \n    Args:\n        A: 2x2 numpy array\n    \n    Returns:\n        V: 2x2 orthogonal matrix (eigenvectors of A^T*A)\n    \"\"\"\n    # Your code here\n    # Hint: Compute A^T*A, find eigenvalues and eigenvectors, arrange as columns\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_V_matrix(np.array([[2, 1], [1, 2]]))",
+            "expected": "[[1/√2, 1/√2], [1/√2, -1/√2]] (or equivalent orthogonal matrix)",
+            "explanation": "V matrix from eigenvectors of A^T*A, verify V^T*V ≈ I"
+          },
+          {
+            "input": "compute_V_matrix(np.array([[3, 0], [0, 4]]))",
+            "expected": "[[0, 1], [1, 0]] (or [[1, 0], [0, 1]] depending on ordering)",
+            "explanation": "For diagonal matrices, eigenvectors are standard basis vectors"
+          },
+          {
+            "input": "compute_V_matrix(np.array([[-10, 8], [10, -1]]))",
+            "expected": "2x2 orthogonal matrix where V^T*V ≈ I",
+            "explanation": "General case, verify orthogonality numerically"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not ordering eigenvectors to match the descending order of eigenvalues",
+        "Storing eigenvectors as rows instead of columns",
+        "Forgetting to normalize eigenvectors",
+        "Not verifying orthogonality (V^T*V should equal identity)",
+        "Sign ambiguity: eigenvectors are unique up to sign, so (-v) is as valid as v"
+      ],
+      "hint": "Use your eigen_2x2_symmetric function to get ordered eigenvalues and eigenvectors. The eigenvectors matrix returned should already have eigenvectors as columns. Verify with np.allclose(V.T @ V, np.eye(2)).",
+      "references": [
+        "Orthogonal matrices and their properties",
+        "Gram-Schmidt orthogonalization process",
+        "Spectral theorem for symmetric matrices",
+        "Eigenspaces and geometric multiplicity"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "The U Matrix via the Relationship U = A*V*Σ^(-1)",
+      "relation_to_problem": "The U matrix contains left singular vectors and is computed from A, V, and singular values. The formula u_i = (1/σ_i)*A*v_i provides a direct way to construct U, completing the SVD factorization.",
+      "prerequisites": [
+        "V matrix construction",
+        "Singular values",
+        "Matrix-vector multiplication",
+        "Orthogonal matrices"
+      ],
+      "learning_objectives": [
+        "Understand the relationship between U, A, V, and Σ",
+        "Compute left singular vectors using u_i = (1/σ_i)*A*v_i",
+        "Handle the case of zero singular values",
+        "Verify that U is orthogonal"
+      ],
+      "math_content": {
+        "definition": "The **U matrix** in SVD contains the left singular vectors as columns. For $A = U\\Sigma V^T$, if $v_i$ is a column of $V$ (right singular vector) and $\\sigma_i > 0$ is the corresponding singular value, then the $i$-th column of $U$ is defined as $u_i = \\frac{1}{\\sigma_i} Av_i$. The vectors $u_i$ are orthonormal and form an orthogonal basis. When $\\sigma_i = 0$, the corresponding $u_i$ can be any unit vector orthogonal to other columns of $U$.",
+        "notation": "$U = \\begin{bmatrix} u_1 & u_2 \\end{bmatrix}$ = left singular vectors, $V = \\begin{bmatrix} v_1 & v_2 \\end{bmatrix}$ = right singular vectors, $\\Sigma = \\text{diag}(\\sigma_1, \\sigma_2)$",
+        "theorem": "**Construction of U from V**: Given $A = U\\Sigma V^T$, multiplying both sides on the right by $V$ gives $AV = U\\Sigma V^T V = U\\Sigma$ (since $V^T V = I$). This means $Av_i = \\sigma_i u_i$, or equivalently $u_i = \\frac{1}{\\sigma_i}Av_i$ for $\\sigma_i \\neq 0$. The matrix $U$ is orthogonal: $U^T U = I$. For the 2×2 case, if both singular values are non-zero, we compute $u_1 = \\frac{1}{\\sigma_1}Av_1$ and $u_2 = \\frac{1}{\\sigma_2}Av_2$. If $\\sigma_2 = 0$, compute $u_1 = \\frac{1}{\\sigma_1}Av_1$ and choose $u_2$ orthogonal to $u_1$.",
+        "proof_sketch": "Starting from $A = U\\Sigma V^T$, right-multiply by $V$: $AV = U\\Sigma$. Writing out column-wise: $A[v_1, v_2] = U[\\sigma_1, \\sigma_2]$, which gives $Av_1 = \\sigma_1 u_1$ and $Av_2 = \\sigma_2 u_2$. When $\\sigma_i > 0$, we can divide to get $u_i = \\frac{1}{\\sigma_i}Av_i$. To verify orthonormality: $u_i^T u_j = \\frac{1}{\\sigma_i \\sigma_j}(Av_i)^T(Av_j) = \\frac{1}{\\sigma_i \\sigma_j}v_i^T A^T A v_j$. Since $v_j$ is an eigenvector of $A^T A$ with eigenvalue $\\sigma_j^2$, we have $A^T A v_j = \\sigma_j^2 v_j$. Thus $u_i^T u_j = \\frac{\\sigma_j^2}{\\sigma_i \\sigma_j} v_i^T v_j = \\frac{\\sigma_j}{\\sigma_i} \\delta_{ij}$, giving $\\delta_{ij}$ when $\\sigma_i = \\sigma_j$ (which happens for $i=j$).",
+        "examples": [
+          "For $A = \\begin{bmatrix} 2 & 1 \\\\ 1 & 2 \\end{bmatrix}$: We have $\\sigma_1=3, \\sigma_2=1$ and $V = \\frac{1}{\\sqrt{2}}\\begin{bmatrix} 1 & 1 \\\\ 1 & -1 \\end{bmatrix}$. Then $u_1 = \\frac{1}{3}\\begin{bmatrix} 2 & 1 \\\\ 1 & 2 \\end{bmatrix}\\frac{1}{\\sqrt{2}}\\begin{bmatrix} 1 \\\\ 1 \\end{bmatrix} = \\frac{1}{3\\sqrt{2}}\\begin{bmatrix} 3 \\\\ 3 \\end{bmatrix} = \\frac{1}{\\sqrt{2}}\\begin{bmatrix} 1 \\\\ 1 \\end{bmatrix}$. Similarly, $u_2 = \\frac{1}{\\sqrt{2}}\\begin{bmatrix} 1 \\\\ -1 \\end{bmatrix}$. Thus $U = \\frac{1}{\\sqrt{2}}\\begin{bmatrix} 1 & 1 \\\\ 1 & -1 \\end{bmatrix}$.",
+          "For $A = \\begin{bmatrix} 3 & 0 \\\\ 0 & 4 \\end{bmatrix}$: Singular values are $4, 3$ and $V = \\begin{bmatrix} 0 & 1 \\\\ 1 & 0 \\end{bmatrix}$ (swapped due to ordering). Then $u_1 = \\frac{1}{4}\\begin{bmatrix} 3 & 0 \\\\ 0 & 4 \\end{bmatrix}\\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix} = \\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix}$, and $u_2 = \\frac{1}{3}\\begin{bmatrix} 3 & 0 \\\\ 0 & 4 \\end{bmatrix}\\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix} = \\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix}$. So $U = \\begin{bmatrix} 0 & 1 \\\\ 1 & 0 \\end{bmatrix}$.",
+          "For rank-1 matrix $A = \\begin{bmatrix} 1 & 2 \\\\ 2 & 4 \\end{bmatrix}$: $\\sigma_1=5, \\sigma_2=0$. Compute $u_1 = \\frac{1}{5}Av_1$. For $u_2$, choose any unit vector orthogonal to $u_1$ (e.g., rotate $u_1$ by 90°)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "U Computation Formula",
+          "latex": "$u_i = \\frac{1}{\\sigma_i} A v_i$ for $\\sigma_i > 0$",
+          "description": "Direct formula for computing left singular vectors"
+        },
+        {
+          "name": "SVD Relationship",
+          "latex": "$AV = U\\Sigma \\Leftrightarrow Av_i = \\sigma_i u_i$",
+          "description": "Column-wise interpretation of SVD equation"
+        },
+        {
+          "name": "Orthogonality of U",
+          "latex": "$U^T U = I$",
+          "description": "U must be orthogonal"
+        },
+        {
+          "name": "Orthogonal Complement",
+          "latex": "$u_2 = \\begin{bmatrix} -u_{1,2} \\\\ u_{1,1} \\end{bmatrix}$ or $\\begin{bmatrix} u_{1,2} \\\\ -u_{1,1} \\end{bmatrix}$",
+          "description": "For 2D, orthogonal vector to $u_1 = \\begin{bmatrix} u_{1,1} \\\\ u_{1,2} \\end{bmatrix}$"
+        },
+        {
+          "name": "Full SVD Reconstruction",
+          "latex": "$A = U\\Sigma V^T = \\sum_{i=1}^{r} \\sigma_i u_i v_i^T$",
+          "description": "Outer product expansion of SVD"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the U matrix given A, V, and singular values. Handle both full-rank and rank-deficient cases. This completes the SVD computation.",
+        "function_signature": "def compute_U_matrix(A: np.ndarray, V: np.ndarray, singular_values: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_U_matrix(A: np.ndarray, V: np.ndarray, singular_values: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute the U matrix for SVD given A, V, and singular values.\n    \n    Args:\n        A: 2x2 numpy array (original matrix)\n        V: 2x2 orthogonal matrix (right singular vectors)\n        singular_values: 1D array of 2 singular values (descending order)\n    \n    Returns:\n        U: 2x2 orthogonal matrix (left singular vectors)\n    \"\"\"\n    # Your code here\n    # Hint: For each column v_i of V, compute u_i = (1/sigma_i) * A @ v_i if sigma_i > 0\n    # If sigma_2 == 0, construct u_2 orthogonal to u_1\n    pass",
+        "test_cases": [
+          {
+            "input": "A=[[2,1],[1,2]], V=[[1/√2,1/√2],[1/√2,-1/√2]], singular_values=[3,1]",
+            "expected": "U=[[1/√2,1/√2],[1/√2,-1/√2]] (verify U^T*U ≈ I and A ≈ U*Σ*V^T)",
+            "explanation": "Full-rank case where both singular values are positive"
+          },
+          {
+            "input": "A=[[3,0],[0,4]], V=[[0,1],[1,0]], singular_values=[4,3]",
+            "expected": "U=[[0,1],[1,0]] (verify orthogonality)",
+            "explanation": "Diagonal matrix case with permuted basis"
+          },
+          {
+            "input": "A=[[1,2],[2,4]], V (from A^T*A), singular_values=[5,0]",
+            "expected": "U where first column is (1/5)*A*v_1 and second column is orthogonal to first",
+            "explanation": "Rank-deficient case requiring special handling for zero singular value"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Dividing by zero when σ_i = 0 (need special handling for rank-deficient matrices)",
+        "Not normalizing u_i (should already be normalized if v_i is normalized and formula is used correctly)",
+        "Wrong correspondence between columns of U and V (must match singular value ordering)",
+        "Not verifying U^T*U = I after construction",
+        "Incorrect construction of orthogonal complement when σ_2 = 0"
+      ],
+      "hint": "For i=1,2: extract column v_i = V[:, i], compute u_i = A @ v_i / singular_values[i] if singular_values[i] > threshold (e.g., 1e-10). If σ_2 ≈ 0, construct u_2 as the 90° rotation of u_1: if u_1 = [a, b], then u_2 = [-b, a] or [b, -a]. Verify orthogonality at the end.",
+      "references": [
+        "Left singular vectors vs right singular vectors",
+        "Rank-deficient matrices and their SVD",
+        "Orthogonal complement in 2D",
+        "SVD reconstruction theorem"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete SVD Assembly and Verification",
+      "relation_to_problem": "The final step combines all components (U, Σ, V) and verifies the SVD factorization. This involves assembling the matrices correctly and checking reconstruction accuracy.",
+      "prerequisites": [
+        "U matrix computation",
+        "V matrix computation",
+        "Singular values",
+        "Matrix multiplication"
+      ],
+      "learning_objectives": [
+        "Assemble complete SVD factorization from components",
+        "Verify reconstruction: A = U @ diag(σ) @ V^T",
+        "Check orthogonality of U and V",
+        "Understand numerical tolerance for verification",
+        "Handle edge cases (zero singular values, near-singular matrices)"
+      ],
+      "math_content": {
+        "definition": "The **Singular Value Decomposition (SVD)** of a matrix $A \\in \\mathbb{R}^{2 \\times 2}$ is the factorization $A = U\\Sigma V^T$ where: (1) $U \\in \\mathbb{R}^{2 \\times 2}$ is orthogonal ($U^T U = I$) with columns being left singular vectors. (2) $\\Sigma = \\text{diag}(\\sigma_1, \\sigma_2)$ where $\\sigma_1 \\geq \\sigma_2 \\geq 0$ are singular values. (3) $V \\in \\mathbb{R}^{2 \\times 2}$ is orthogonal ($V^T V = I$) with columns being right singular vectors. Note: $V$ appears as $V^T$ (transposed) in the factorization.",
+        "notation": "$\\Sigma = \\text{diag}(\\sigma_1, \\sigma_2) = \\begin{bmatrix} \\sigma_1 & 0 \\\\ 0 & \\sigma_2 \\end{bmatrix}$, $A_{\\text{recon}} = U\\Sigma V^T$ = reconstructed matrix",
+        "theorem": "**SVD Verification Criteria**: A factorization $A = U\\Sigma V^T$ is a valid SVD if and only if: (1) Reconstruction: $\\|A - U\\Sigma V^T\\|_F < \\epsilon$ for small $\\epsilon$ (e.g., $10^{-10}$). (2) Orthogonality: $\\|U^T U - I\\|_F < \\epsilon$ and $\\|V^T V - I\\|_F < \\epsilon$. (3) Singular values ordered: $\\sigma_1 \\geq \\sigma_2 \\geq 0$. (4) Non-negativity: $\\sigma_i \\geq 0$. Additionally, the singular values satisfy: $\\sigma_i^2$ are eigenvalues of $A^T A$ (and $AA^T$).",
+        "proof_sketch": "The reconstruction property follows directly from the definition. For orthogonality, we've proven that eigenvectors of symmetric matrices are orthogonal, and our construction preserves this. The ordering convention is imposed during computation. Non-negativity comes from $\\sigma_i = \\sqrt{\\lambda_i(A^T A)}$ and eigenvalues of positive semi-definite matrices are non-negative. To verify numerically, we compute reconstruction error and check if it's within machine precision (accounting for floating-point errors).",
+        "examples": [
+          "Complete example for $A = \\begin{bmatrix} 2 & 1 \\\\ 1 & 2 \\end{bmatrix}$: $U = \\frac{1}{\\sqrt{2}}\\begin{bmatrix} 1 & 1 \\\\ 1 & -1 \\end{bmatrix}$, $\\Sigma = \\begin{bmatrix} 3 & 0 \\\\ 0 & 1 \\end{bmatrix}$, $V = \\frac{1}{\\sqrt{2}}\\begin{bmatrix} 1 & 1 \\\\ 1 & -1 \\end{bmatrix}$. Verify: $U\\Sigma V^T = \\frac{1}{2}\\begin{bmatrix} 1 & 1 \\\\ 1 & -1 \\end{bmatrix}\\begin{bmatrix} 3 & 0 \\\\ 0 & 1 \\end{bmatrix}\\begin{bmatrix} 1 & 1 \\\\ 1 & -1 \\end{bmatrix} = \\begin{bmatrix} 2 & 1 \\\\ 1 & 2 \\end{bmatrix} = A$ ✓",
+          "For diagonal $A = \\begin{bmatrix} 4 & 0 \\\\ 0 & 3 \\end{bmatrix}$: SVD is $U = I$, $\\Sigma = \\begin{bmatrix} 4 & 0 \\\\ 0 & 3 \\end{bmatrix}$, $V = I$. Simple case where singular values equal diagonal entries.",
+          "For $A = \\begin{bmatrix} 1 & 2 \\\\ 2 & 4 \\end{bmatrix}$ (rank-1): $\\sigma_1 = 5, \\sigma_2 = 0$. The reconstruction $A = \\sigma_1 u_1 v_1^T$ is a rank-1 outer product."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "SVD Factorization",
+          "latex": "$A = U\\Sigma V^T$",
+          "description": "Complete decomposition"
+        },
+        {
+          "name": "Diagonal Matrix Construction",
+          "latex": "$\\Sigma = \\begin{bmatrix} \\sigma_1 & 0 \\\\ 0 & \\sigma_2 \\end{bmatrix}$",
+          "description": "Create diagonal matrix from singular values"
+        },
+        {
+          "name": "Reconstruction Check",
+          "latex": "$\\|A - U\\Sigma V^T\\|_F < \\epsilon$",
+          "description": "Verify decomposition accuracy using Frobenius norm"
+        },
+        {
+          "name": "Orthogonality Check",
+          "latex": "$\\|U^T U - I\\|_F < \\epsilon$",
+          "description": "Verify U is orthogonal"
+        },
+        {
+          "name": "Outer Product Form",
+          "latex": "$A = \\sigma_1 u_1 v_1^T + \\sigma_2 u_2 v_2^T$",
+          "description": "Alternative representation as sum of rank-1 matrices"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete SVD function that integrates all previous steps: compute V from A^T*A eigendecomposition, extract singular values, compute U, and return the factorization. Verify reconstruction accuracy.",
+        "function_signature": "def svd_2x2_complete(A: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef svd_2x2_complete(A: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:\n    \"\"\"\n    Compute complete SVD of a 2x2 matrix without using built-in SVD.\n    \n    Args:\n        A: 2x2 numpy array\n    \n    Returns:\n        U: 2x2 orthogonal matrix (left singular vectors)\n        s: 1D array of 2 singular values in descending order\n        V: 2x2 orthogonal matrix (right singular vectors, NOT transposed)\n    \n    Note: Return V, not V^T. The reconstruction is A = U @ diag(s) @ V.T\n    \"\"\"\n    # Your code here\n    # Steps:\n    # 1. Compute A^T @ A\n    # 2. Find eigenvalues and eigenvectors of A^T @ A (these give s^2 and V)\n    # 3. Sort eigenvalues/eigenvectors in descending order\n    # 4. Compute singular values as sqrt of eigenvalues\n    # 5. Compute U using U = A @ V @ inv(Sigma) for non-zero singular values\n    # 6. Handle rank-deficient case if needed\n    # 7. Return U, s, V\n    pass",
+        "test_cases": [
+          {
+            "input": "svd_2x2_complete(np.array([[2, 1], [1, 2]]))",
+            "expected": "U, s=[3, 1], V where np.allclose(A, U @ np.diag(s) @ V.T)",
+            "explanation": "Full-rank symmetric matrix, verify complete reconstruction"
+          },
+          {
+            "input": "svd_2x2_complete(np.array([[-10, 8], [10, -1]]))",
+            "expected": "U, s, V where np.allclose(A, U @ np.diag(s) @ V.T) and np.allclose(U.T @ U, I) and np.allclose(V.T @ V, I)",
+            "explanation": "General non-symmetric matrix from problem statement, verify all properties"
+          },
+          {
+            "input": "svd_2x2_complete(np.array([[3, 0], [0, 4]]))",
+            "expected": "U, s=[4, 3], V where reconstruction matches A",
+            "explanation": "Diagonal matrix case"
+          },
+          {
+            "input": "svd_2x2_complete(np.array([[1, 2], [2, 4]]))",
+            "expected": "U, s=[5, 0], V where reconstruction matches A despite zero singular value",
+            "explanation": "Rank-deficient case, test handling of zero singular value"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Returning V^T instead of V (caller expects to apply transpose themselves)",
+        "Not handling numerical precision issues (use tolerances like 1e-10)",
+        "Incorrect matrix multiplication order in reconstruction check",
+        "Not ensuring singular values are in descending order",
+        "Failing to handle rank-deficient matrices (zero singular values)",
+        "Not verifying orthogonality of U and V matrices"
+      ],
+      "hint": "Combine all previous functions: use compute_gram_matrix, eigen_2x2_symmetric, compute_singular_values, compute_V_matrix, and compute_U_matrix. After assembly, verify with: reconstruction_error = np.linalg.norm(A - U @ np.diag(s) @ V.T, 'fro'). Ensure reconstruction_error < 1e-9.",
+      "references": [
+        "Numerical linear algebra and floating-point precision",
+        "SVD uniqueness and sign ambiguity",
+        "Truncated SVD and low-rank approximation",
+        "Condition number and numerical stability"
+      ]
+    }
+  ]
+}

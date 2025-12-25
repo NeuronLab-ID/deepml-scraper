@@ -1,0 +1,35 @@
+{
+  "description": "V3JpdGUgYSBmdW5jdGlvbiB0aGF0IHBlcmZvcm1zIG9uZSBzdGVwIG9mIHZhbHVlIGl0ZXJhdGlvbiBmb3IgYSBnaXZlbiBNYXJrb3YgRGVjaXNpb24gUHJvY2VzcyAoTURQKSB1c2luZyB0aGUgQmVsbG1hbiBlcXVhdGlvbi4gVGhlIGZ1bmN0aW9uIHNob3VsZCB1cGRhdGUgdGhlIHN0YXRlLXZhbHVlIGZ1bmN0aW9uIFYocykgZm9yIGVhY2ggc3RhdGUgYmFzZWQgb24gcG9zc2libGUgYWN0aW9ucywgdHJhbnNpdGlvbiBwcm9iYWJpbGl0aWVzLCByZXdhcmRzLCBhbmQgdGhlIGRpc2NvdW50IGZhY3RvciBnYW1tYS4gT25seSB1c2UgTnVtUHku",
+  "id": "157",
+  "test_cases": [
+    {
+      "test": "import numpy as np\ntransitions = [\n  # For state 0\n  {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, False)]},\n  # For state 1\n  {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, True)]}\n]\nV = np.array([0.0, 0.0])\ngamma = 0.9\nnew_V = bellman_update(V, transitions, gamma)\nprint(np.round(new_V, 2))",
+      "expected_output": "[1., 1.]"
+    },
+    {
+      "test": "import numpy as np\ntransitions = [\n  {0: [(0.8, 0, 5, False), (0.2, 1, 10, False)], 1: [(1.0, 1, 2, False)]},\n  {0: [(1.0, 0, 0, False)], 1: [(1.0, 1, 0, True)]}\n]\nV = np.array([0.0, 0.0])\ngamma = 0.5\nnew_V = bellman_update(V, transitions, gamma)\nprint(np.round(new_V, 2))",
+      "expected_output": "[6.,  0.]"
+    }
+  ],
+  "difficulty": "medium",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "import numpy as np\ntransitions = [\n  {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, False)]},\n  {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, True)]}\n]\nV = np.array([0.0, 0.0])\ngamma = 0.9\nnew_V = bellman_update(V, transitions, gamma)\nprint(np.round(new_V, 2))",
+    "output": "[1. 1.]",
+    "reasoning": "For state 0, the best action is to go to state 1 and get a reward of 1. For state 1, taking action 1 gives a reward of 1 and ends the episode, so its value is 1."
+  },
+  "category": "Reinforcement Learning",
+  "starter_code": "import numpy as np\n\ndef bellman_update(V, transitions, gamma):\n    \"\"\"\n    Perform one step of value iteration using the Bellman equation.\n    Args:\n      V: np.ndarray, state values, shape (n_states,)\n      transitions: list of dicts. transitions[s][a] is a list of (prob, next_state, reward, done)\n      gamma: float, discount factor\n    Returns:\n      np.ndarray, updated state values\n    \"\"\"\n    # TODO: Implement Bellman update\n    pass",
+  "title": "Implement the Bellman Equation for Value Iteration",
+  "learn_section": "IyAqKlRoZSBCZWxsbWFuIEVxdWF0aW9uKioKClRoZSAqKkJlbGxtYW4gZXF1YXRpb24qKiBpcyBhIGZ1bmRhbWVudGFsIHJlY3Vyc2l2ZSBlcXVhdGlvbiBpbiByZWluZm9yY2VtZW50IGxlYXJuaW5nIHRoYXQgcmVsYXRlcyB0aGUgdmFsdWUgb2YgYSBzdGF0ZSB0byB0aGUgdmFsdWVzIG9mIHBvc3NpYmxlIG5leHQgc3RhdGVzLiBJdCBwcm92aWRlcyB0aGUgbWF0aGVtYXRpY2FsIGZvdW5kYXRpb24gZm9yIGtleSBSTCBhbGdvcml0aG1zIHN1Y2ggYXMgdmFsdWUgaXRlcmF0aW9uIGFuZCBRLWxlYXJuaW5nLgoKLS0tCgojIyAqKktleSBJZGVhKioKRm9yIGVhY2ggc3RhdGUgJHMkLCB0aGUgdmFsdWUgJFYocykkIGlzIHRoZSBtYXhpbXVtIGV4cGVjdGVkIHJldHVybiBvYnRhaW5hYmxlIGJ5IGNob29zaW5nIHRoZSBiZXN0IGFjdGlvbiAkYSQgYW5kIHRoZW4gZm9sbG93aW5nIHRoZSBvcHRpbWFsIHBvbGljeToKCiQkClYocykgPSBcbWF4X3thfSBcc3VtX3tzJ30gUChzJ3xzLCBhKSBcbGVmdFsgUihzLCBhLCBzJykgKyBcZ2FtbWEgVihzJykgXHJpZ2h0XQokJAoKV2hlcmU6Ci0gJFYocykkOiB2YWx1ZSBvZiBzdGF0ZSAkcyQKLSAkYSQ6IHBvc3NpYmxlIGFjdGlvbnMKLSAkUChzJ3xzLCBhKSQ6IHByb2JhYmlsaXR5IG9mIG1vdmluZyB0byBzdGF0ZSAkcyckIGZyb20gJHMkIHZpYSAkYSQKLSAkUihzLCBhLCBzJykkOiByZXdhcmQgZm9yIHRoaXMgdHJhbnNpdGlvbgotICRcZ2FtbWEkOiBkaXNjb3VudCBmYWN0b3IgKCQwIFxsZXEgXGdhbW1hIFxsZXEgMSQpCi0gJFYocycpJDogdmFsdWUgb2YgbmV4dCBzdGF0ZQoKLS0tCgojIyAqKkhvdyB0byBVc2UqKgoxLiAqKkZvciBlYWNoIHN0YXRlOioqCiAgIC0gRm9yIGVhY2ggcG9zc2libGUgYWN0aW9uLCBzdW0gb3ZlciBwb3NzaWJsZSBuZXh0IHN0YXRlcywgd2VpZ2h0aW5nIGJ5IHRyYW5zaXRpb24gcHJvYmFiaWxpdHkuCiAgIC0gQWRkIHRoZSBpbW1lZGlhdGUgcmV3YXJkIGFuZCB0aGUgZGlzY291bnRlZCB2YWx1ZSBvZiB0aGUgbmV4dCBzdGF0ZS4KICAgLSBDaG9vc2UgdGhlIGFjdGlvbiB3aXRoIHRoZSBoaWdoZXN0IGV4cGVjdGVkIHZhbHVlIChmb3IgY29udHJvbCkuCjIuICoqUmVwZWF0IHVudGlsIHZhbHVlcyBjb252ZXJnZSoqICh2YWx1ZSBpdGVyYXRpb24pIG9yIGFzIHBhcnQgb2Ygb3RoZXIgUkwgdXBkYXRlcy4KCi0tLQoKIyMgKipBcHBsaWNhdGlvbnMqKgotICoqVmFsdWUgSXRlcmF0aW9uKiogYW5kICoqUG9saWN5IEl0ZXJhdGlvbioqIGluIE1hcmtvdiBEZWNpc2lvbiBQcm9jZXNzZXMgKE1EUCkKLSAqKlEtbGVhcm5pbmcqKiBhbmQgb3RoZXIgUkwgYWxnb3JpdGhtcwotIENhbGN1bGF0aW5nIHRoZSBvcHRpbWFsIHZhbHVlIGZ1bmN0aW9uIGFuZCBwb2xpY3kgaW4gZ3JpZHdvcmxkcywgZ2FtZXMsIGFuZCBnZW5lcmFsIE1EUHMKCi0tLQoKIyMgKipXaHkgSXQgTWF0dGVycyoqCi0gVGhlIEJlbGxtYW4gZXF1YXRpb24gZm9ybWFsaXplcyB0aGUgbm90aW9uIG9mICoqb3B0aW1hbGl0eSoqIGluIHNlcXVlbnRpYWwgZGVjaXNpb24tbWFraW5nLgotIEl0IGlzIGEgYmFja2JvbmUgZm9yIHRlYWNoaW5nIGFnZW50cyB0byBzb2x2ZSBlbnZpcm9ubWVudHMgd2l0aCByZXdhcmRzLCB1bmNlcnRhaW50eSwgYW5kIGxvbmctdGVybSBwbGFubmluZy4=",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/moe18",
+      "name": "Moe Chabot"
+    }
+  ],
+  "description_decoded": "Write a function that performs one step of value iteration for a given Markov Decision Process (MDP) using the Bellman equation. The function should update the state-value function V(s) for each state based on possible actions, transition probabilities, rewards, and the discount factor gamma. Only use NumPy.",
+  "learn_section_decoded": "# **The Bellman Equation**\n\nThe **Bellman equation** is a fundamental recursive equation in reinforcement learning that relates the value of a state to the values of possible next states. It provides the mathematical foundation for key RL algorithms such as value iteration and Q-learning.\n\n---\n\n## **Key Idea**\nFor each state $s$, the value $V(s)$ is the maximum expected return obtainable by choosing the best action $a$ and then following the optimal policy:\n\n$$\nV(s) = \\max_{a} \\sum_{s'} P(s'|s, a) \\left[ R(s, a, s') + \\gamma V(s') \\right]\n$$\n\nWhere:\n- $V(s)$: value of state $s$\n- $a$: possible actions\n- $P(s'|s, a)$: probability of moving to state $s'$ from $s$ via $a$\n- $R(s, a, s')$: reward for this transition\n- $\\gamma$: discount factor ($0 \\leq \\gamma \\leq 1$)\n- $V(s')$: value of next state\n\n---\n\n## **How to Use**\n1. **For each state:**\n   - For each possible action, sum over possible next states, weighting by transition probability.\n   - Add the immediate reward and the discounted value of the next state.\n   - Choose the action with the highest expected value (for control).\n2. **Repeat until values converge** (value iteration) or as part of other RL updates.\n\n---\n\n## **Applications**\n- **Value Iteration** and **Policy Iteration** in Markov Decision Processes (MDP)\n- **Q-learning** and other RL algorithms\n- Calculating the optimal value function and policy in gridworlds, games, and general MDPs\n\n---\n\n## **Why It Matters**\n- The Bellman equation formalizes the notion of **optimality** in sequential decision-making.\n- It is a backbone for teaching agents to solve environments with rewards, uncertainty, and long-term planning."
+}

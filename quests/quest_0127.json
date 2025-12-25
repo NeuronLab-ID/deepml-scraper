@@ -1,0 +1,529 @@
+{
+  "problem_id": 127,
+  "title": "Find Captain Redbeard's Hidden Treasure",
+  "category": "Calculus",
+  "difficulty": "medium",
+  "description": "Captain Redbeard, the most daring pirate of the seven seas, has uncovered a mysterious ancient map. Instead of islands, it shows a strange wavy curve, and the treasure lies at the lowest point of the land! (watch out for those tricky local mins)\n\nThe land's height at any point $x$ is given by:\n\nf(x) = x^4 - 3x^3 + 2\n\n\n**Your Mission:**\nImplement a Python function that finds the value of $x$ where $f(x)$ reaches its minimum, starting from any random initial position.",
+  "example": {
+    "input": "start_x = 0.0",
+    "output": "min float value",
+    "reasoning": "Cant really give you a example without giving the solution... so ya"
+  },
+  "starter_code": "def find_treasure(start_x: float) -> float:\n    \"\"\"\n    Find the x-coordinate where f(x) = x^4 - 3x^3 + 2 is minimized.\n\n  Returns:\n        float: The x-coordinate of the minimum point.\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Derivatives and the Power Rule",
+      "relation_to_problem": "Computing the derivative f'(x) = 4x³ - 9x² is the first step in gradient descent. The derivative tells us the slope at any point, which determines the direction to move to find the minimum.",
+      "prerequisites": [
+        "Basic algebra",
+        "Understanding of functions"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of a derivative as a limit",
+        "Master the power rule for polynomial differentiation",
+        "Compute derivatives of polynomial functions analytically"
+      ],
+      "math_content": {
+        "definition": "The derivative of a function f at a point x is defined as the limit: $$f'(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}$$ provided this limit exists. Geometrically, f'(x) represents the instantaneous rate of change or the slope of the tangent line to the curve at point x.",
+        "notation": "$f'(x)$ or $\\frac{df}{dx}$ = derivative of f with respect to x; $h$ = small increment approaching zero",
+        "theorem": "Power Rule: If $f(x) = x^n$ where n is any real number, then $f'(x) = nx^{n-1}$. For polynomials, differentiation is linear: $(af(x) + bg(x))' = af'(x) + bg'(x)$ where a, b are constants.",
+        "proof_sketch": "For f(x) = x^n, using the binomial theorem: $$f'(x) = \\lim_{h \\to 0} \\frac{(x+h)^n - x^n}{h} = \\lim_{h \\to 0} \\frac{x^n + nx^{n-1}h + O(h^2) - x^n}{h} = \\lim_{h \\to 0} (nx^{n-1} + O(h)) = nx^{n-1}$$",
+        "examples": [
+          "For $f(x) = x^4$: Apply power rule → $f'(x) = 4x^3$",
+          "For $g(x) = 3x^3$: Use linearity and power rule → $g'(x) = 3 \\cdot 3x^2 = 9x^2$",
+          "For $h(x) = x^4 - 3x^3 + 2$: Apply term-by-term → $h'(x) = 4x^3 - 9x^2 + 0 = 4x^3 - 9x^2$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Power Rule",
+          "latex": "$\\frac{d}{dx}[x^n] = nx^{n-1}$",
+          "description": "Use for each term in a polynomial"
+        },
+        {
+          "name": "Constant Rule",
+          "latex": "$\\frac{d}{dx}[c] = 0$",
+          "description": "Derivative of any constant is zero"
+        },
+        {
+          "name": "Sum Rule",
+          "latex": "$\\frac{d}{dx}[f(x) + g(x)] = f'(x) + g'(x)$",
+          "description": "Differentiate each term separately"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the derivative of f(x) = x^4 - 3x^3 + 2 at any given point x. This derivative will be essential for gradient descent.",
+        "function_signature": "def compute_derivative(x: float) -> float:",
+        "starter_code": "def compute_derivative(x: float) -> float:\n    \"\"\"\n    Compute f'(x) where f(x) = x^4 - 3x^3 + 2\n    \n    Args:\n        x: Point at which to evaluate the derivative\n    \n    Returns:\n        The value of f'(x) = 4x^3 - 9x^2\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_derivative(0.0)",
+            "expected": "0.0",
+            "explanation": "At x=0: f'(0) = 4(0)^3 - 9(0)^2 = 0"
+          },
+          {
+            "input": "compute_derivative(1.0)",
+            "expected": "-5.0",
+            "explanation": "At x=1: f'(1) = 4(1)^3 - 9(1)^2 = 4 - 9 = -5"
+          },
+          {
+            "input": "compute_derivative(2.0)",
+            "expected": "-4.0",
+            "explanation": "At x=2: f'(2) = 4(8) - 9(4) = 32 - 36 = -4"
+          },
+          {
+            "input": "compute_derivative(3.0)",
+            "expected": "27.0",
+            "explanation": "At x=3: f'(3) = 4(27) - 9(9) = 108 - 81 = 27"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to subtract 1 from the exponent in the power rule",
+        "Not multiplying the coefficient by the original exponent",
+        "Treating the constant term 2 as having a non-zero derivative",
+        "Sign errors when dealing with negative coefficients"
+      ],
+      "hint": "Apply the power rule to each term separately: for x^4, bring down the 4 and reduce the power by 1. Do the same for -3x^3. The constant disappears.",
+      "references": [
+        "Calculus: Early Transcendentals by James Stewart, Chapter 3",
+        "The Derivative and Rules for Differentiation",
+        "Fundamental theorem of calculus"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Critical Points and First Derivative Test",
+      "relation_to_problem": "Critical points (where f'(x) = 0) are candidates for minima. Understanding how to find and classify them helps us know where potential treasure locations are, though gradient descent will approach these points iteratively.",
+      "prerequisites": [
+        "Derivatives",
+        "Solving polynomial equations",
+        "Sign analysis"
+      ],
+      "learning_objectives": [
+        "Define critical points and understand their significance",
+        "Solve f'(x) = 0 to find critical points",
+        "Use the first derivative test to classify critical points as local minima or maxima",
+        "Evaluate the function at critical points"
+      ],
+      "math_content": {
+        "definition": "A critical point of a differentiable function f is a point $x_c$ in the domain of f where $f'(x_c) = 0$ or f'(x_c) does not exist. Critical points are the only interior points where a function can have local extrema (maxima or minima).",
+        "notation": "$x_c$ = critical point; $f(x_c)$ = function value at critical point; $f'(x_c) = 0$ = condition for critical point",
+        "theorem": "First Derivative Test: Let $x_c$ be a critical point of f. (1) If f' changes from negative to positive at $x_c$, then f has a local minimum at $x_c$. (2) If f' changes from positive to negative at $x_c$, then f has a local maximum at $x_c$. (3) If f' does not change sign, then $x_c$ is neither a local maximum nor minimum.",
+        "proof_sketch": "If f' changes from negative to positive at $x_c$, then for small ε > 0: f is decreasing on $(x_c - ε, x_c)$ since $f'(x) < 0$, and f is increasing on $(x_c, x_c + ε)$ since $f'(x) > 0$. Thus $f(x_c) \\leq f(x)$ for all x in a neighborhood of $x_c$, making $x_c$ a local minimum.",
+        "examples": [
+          "For $f(x) = x^4 - 3x^3 + 2$, we have $f'(x) = 4x^3 - 9x^2 = x^2(4x - 9)$",
+          "Setting $f'(x) = 0$: $x^2(4x - 9) = 0$ gives $x = 0$ or $x = 9/4 = 2.25$",
+          "Test intervals: For x < 0, f'(x) < 0; for 0 < x < 2.25, f'(x) < 0; for x > 2.25, f'(x) > 0",
+          "At x = 2.25, f' changes from negative to positive, indicating a local minimum"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Critical Point Condition",
+          "latex": "$f'(x_c) = 0$",
+          "description": "Necessary condition for interior extrema"
+        },
+        {
+          "name": "Function Value at Critical Point",
+          "latex": "$f(x_c) = x_c^4 - 3x_c^3 + 2$",
+          "description": "Evaluate to find the actual minimum value"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that evaluates f(x) = x^4 - 3x^3 + 2 at a given point. This is needed to compare function values and verify we've found the minimum.",
+        "function_signature": "def evaluate_function(x: float) -> float:",
+        "starter_code": "def evaluate_function(x: float) -> float:\n    \"\"\"\n    Evaluate f(x) = x^4 - 3x^3 + 2 at point x.\n    \n    Args:\n        x: Point at which to evaluate the function\n    \n    Returns:\n        The value of f(x)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "evaluate_function(0.0)",
+            "expected": "2.0",
+            "explanation": "f(0) = 0^4 - 3(0)^3 + 2 = 2"
+          },
+          {
+            "input": "evaluate_function(1.0)",
+            "expected": "0.0",
+            "explanation": "f(1) = 1 - 3 + 2 = 0"
+          },
+          {
+            "input": "evaluate_function(2.25)",
+            "expected": "-3.265625",
+            "explanation": "f(2.25) = 25.62890625 - 34.171875 + 2 + 5.27734375 ≈ -3.266 (this is near the minimum)"
+          },
+          {
+            "input": "evaluate_function(3.0)",
+            "expected": "2.0",
+            "explanation": "f(3) = 81 - 81 + 2 = 2"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing critical points (where derivative is zero) with zeros of the function",
+        "Assuming all critical points are minima - they could be maxima or saddle points",
+        "Forgetting to check the sign of f' on both sides of the critical point",
+        "Not considering boundary points in a restricted domain"
+      ],
+      "hint": "Use the power rule on each term: x^4 becomes 4x^3, and -3x^3 becomes -9x^2. Don't forget the constant at the end.",
+      "references": [
+        "Fermat's theorem on stationary points",
+        "Extreme value theorem",
+        "Mean value theorem applications"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Gradient Descent: The Update Rule",
+      "relation_to_problem": "This is the core algorithm for finding the minimum. The update rule x_new = x_old - α·f'(x_old) moves us downhill step by step until we reach the treasure location.",
+      "prerequisites": [
+        "Derivatives",
+        "Iterative algorithms",
+        "Function evaluation"
+      ],
+      "learning_objectives": [
+        "Understand the geometric intuition behind gradient descent",
+        "Implement the gradient descent update rule",
+        "Understand the role of the learning rate parameter",
+        "Perform a single iteration of gradient descent"
+      ],
+      "math_content": {
+        "definition": "Gradient descent is an iterative optimization algorithm for finding a local minimum of a differentiable function. At each step, we move in the direction opposite to the gradient (derivative) by an amount proportional to the gradient's magnitude. For a function f(x), the update rule is: $$x_{k+1} = x_k - \\alpha f'(x_k)$$ where $x_k$ is the current position, $\\alpha > 0$ is the learning rate (step size), and f'(x_k) is the derivative at $x_k$.",
+        "notation": "$x_k$ = position at iteration k; $\\alpha$ = learning rate (hyperparameter); $f'(x_k)$ = gradient at current position; $x_{k+1}$ = next position",
+        "theorem": "Descent Lemma: For a smooth function f with L-Lipschitz continuous gradient, if the learning rate satisfies $0 < \\alpha < \\frac{2}{L}$, then gradient descent satisfies: $$f(x_{k+1}) \\leq f(x_k) - \\alpha(1 - \\frac{\\alpha L}{2})||f'(x_k)||^2$$ This guarantees that each step decreases the function value (we're moving downhill).",
+        "proof_sketch": "The negative gradient $-f'(x_k)$ points in the direction of steepest descent. For small α, Taylor expansion gives: $$f(x_k - \\alpha f'(x_k)) \\approx f(x_k) - \\alpha ||f'(x_k)||^2 + O(\\alpha^2)$$ The term $-\\alpha ||f'(x_k)||^2 < 0$ ensures function decrease. If α is too large, the quadratic term dominates and we may overshoot.",
+        "examples": [
+          "Starting at x=0 with α=0.01: f'(0)=0, so x remains at 0 (this is a critical point, though not the minimum)",
+          "Starting at x=3 with α=0.01: f'(3)=27, so x_new = 3 - 0.01(27) = 2.73 (moved left, toward minimum)",
+          "Starting at x=1 with α=0.01: f'(1)=-5, so x_new = 1 - 0.01(-5) = 1.05 (moved right, toward minimum)",
+          "With large α=1.0 at x=3: x_new = 3 - 1.0(27) = -24 (too large a step, overshot badly)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gradient Descent Update",
+          "latex": "$x_{k+1} = x_k - \\alpha f'(x_k)$",
+          "description": "Core update rule for moving toward minimum"
+        },
+        {
+          "name": "Step Size",
+          "latex": "$\\Delta x = \\alpha f'(x_k)$",
+          "description": "The actual distance moved in one step"
+        },
+        {
+          "name": "Descent Direction",
+          "latex": "$d = -f'(x_k)$",
+          "description": "Always move opposite to the gradient"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a single gradient descent update step. Given a current position x, learning rate alpha, and the derivative at x, compute the next position. This is the building block for the full algorithm.",
+        "function_signature": "def gradient_descent_step(x: float, learning_rate: float, derivative: float) -> float:",
+        "starter_code": "def gradient_descent_step(x: float, learning_rate: float, derivative: float) -> float:\n    \"\"\"\n    Perform one step of gradient descent.\n    \n    Args:\n        x: Current position\n        learning_rate: Step size (alpha)\n        derivative: Value of f'(x) at current position\n    \n    Returns:\n        New position x_new = x - learning_rate * derivative\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "gradient_descent_step(3.0, 0.01, 27.0)",
+            "expected": "2.73",
+            "explanation": "x_new = 3.0 - 0.01 * 27.0 = 2.73 (moving toward minimum from right)"
+          },
+          {
+            "input": "gradient_descent_step(1.0, 0.01, -5.0)",
+            "expected": "1.05",
+            "explanation": "x_new = 1.0 - 0.01 * (-5.0) = 1.05 (moving toward minimum from left)"
+          },
+          {
+            "input": "gradient_descent_step(2.25, 0.01, 0.0)",
+            "expected": "2.25",
+            "explanation": "x_new = 2.25 - 0.01 * 0.0 = 2.25 (at critical point, no movement)"
+          },
+          {
+            "input": "gradient_descent_step(2.0, 0.05, -4.0)",
+            "expected": "2.2",
+            "explanation": "x_new = 2.0 - 0.05 * (-4.0) = 2.2 (larger learning rate, bigger step)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Adding instead of subtracting the gradient (climbing instead of descending)",
+        "Forgetting to multiply the gradient by the learning rate",
+        "Using a learning rate that's too large, causing oscillation or divergence",
+        "Using a learning rate that's too small, leading to extremely slow convergence",
+        "Not understanding that negative gradients move us in the positive x direction"
+      ],
+      "hint": "The formula is straightforward: subtract (learning_rate × derivative) from the current x. The sign of the derivative determines which direction we move.",
+      "references": [
+        "Convex Optimization by Boyd and Vandenberghe, Chapter 9",
+        "Gradient descent convergence analysis",
+        "Learning rate scheduling strategies"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Convergence Criteria and Tolerance",
+      "relation_to_problem": "We need to know when to stop iterating in gradient descent. Convergence criteria based on tolerance ensure we stop when we're sufficiently close to the minimum, avoiding infinite loops.",
+      "prerequisites": [
+        "Gradient descent update rule",
+        "Absolute value",
+        "Iterative algorithms"
+      ],
+      "learning_objectives": [
+        "Understand different convergence criteria for optimization",
+        "Implement tolerance-based stopping conditions",
+        "Distinguish between absolute and relative convergence",
+        "Recognize when an algorithm has converged"
+      ],
+      "math_content": {
+        "definition": "A sequence $\\{x_k\\}$ generated by an iterative algorithm converges to a limit point $x^*$ if for every $\\epsilon > 0$, there exists an integer N such that $||x_k - x^*|| < \\epsilon$ for all $k > N$. In practice, we use stopping criteria based on: (1) Step size: $||x_{k+1} - x_k|| < \\tau$ where $\\tau$ is the tolerance, or (2) Gradient norm: $||f'(x_k)|| < \\tau$, or (3) Function value change: $|f(x_{k+1}) - f(x_k)| < \\tau$.",
+        "notation": "$\\epsilon, \\tau$ = tolerance thresholds; $||\\cdot||$ = absolute value (1D) or norm (multi-D); $x^*$ = limit point (optimal solution); $k$ = iteration number",
+        "theorem": "For gradient descent on a strongly convex function with appropriate learning rate, if $||f'(x_k)|| < \\tau$, then $||x_k - x^*|| = O(\\tau)$. That is, small gradient implies we are close to the optimum. Similarly, if $||x_{k+1} - x_k|| < \\tau$, then we are making negligible progress and are near a critical point.",
+        "proof_sketch": "By strong convexity, $f(x) \\geq f(x^*) + \\nabla f(x^*)^T(x - x^*) + \\frac{\\mu}{2}||x - x^*||^2$ where $\\mu > 0$. At the minimum, $\\nabla f(x^*) = 0$. If $||\\nabla f(x_k)|| < \\tau$, then by Lipschitz continuity of the gradient, $||x_k - x^*|| \\leq \\frac{\\tau}{\\mu}$.",
+        "examples": [
+          "With tolerance τ=1e-6: If x_old=2.250000 and x_new=2.250001, then |x_new - x_old|=1e-6, meeting convergence",
+          "With tolerance τ=1e-4: If f'(x)=0.00005, then |f'(x)|<τ, indicating near-critical point",
+          "Premature convergence: τ=0.1 at x=2.3 may stop too early, missing the true minimum at x≈2.25",
+          "Slow convergence: τ=1e-10 requires many iterations but gives high precision"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Step Size Convergence",
+          "latex": "$|x_{k+1} - x_k| < \\tau$",
+          "description": "Stop when consecutive positions are very close"
+        },
+        {
+          "name": "Gradient Convergence",
+          "latex": "$|f'(x_k)| < \\tau$",
+          "description": "Stop when gradient magnitude is near zero"
+        },
+        {
+          "name": "Maximum Iterations",
+          "latex": "$k < k_{max}$",
+          "description": "Safety check to prevent infinite loops"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that checks if gradient descent has converged by comparing the change in position between consecutive iterations against a tolerance threshold.",
+        "function_signature": "def has_converged(x_old: float, x_new: float, tolerance: float) -> bool:",
+        "starter_code": "def has_converged(x_old: float, x_new: float, tolerance: float) -> bool:\n    \"\"\"\n    Check if gradient descent has converged.\n    \n    Args:\n        x_old: Previous position\n        x_new: Current position\n        tolerance: Convergence threshold\n    \n    Returns:\n        True if |x_new - x_old| < tolerance, False otherwise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "has_converged(2.25, 2.250001, 1e-5)",
+            "expected": "True",
+            "explanation": "|2.250001 - 2.25| = 1e-6 < 1e-5, so converged"
+          },
+          {
+            "input": "has_converged(2.0, 2.2, 1e-5)",
+            "expected": "False",
+            "explanation": "|2.2 - 2.0| = 0.2 > 1e-5, not converged yet"
+          },
+          {
+            "input": "has_converged(1.5, 1.50005, 1e-3)",
+            "expected": "True",
+            "explanation": "|1.50005 - 1.5| = 0.00005 < 0.001, so converged"
+          },
+          {
+            "input": "has_converged(3.0, 2.73, 0.5)",
+            "expected": "True",
+            "explanation": "|2.73 - 3.0| = 0.27 < 0.5, so converged with loose tolerance"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to use absolute value - the order of subtraction matters without abs()",
+        "Setting tolerance too loose, accepting poor approximations",
+        "Setting tolerance too tight, causing unnecessary iterations or never converging due to floating point precision",
+        "Not including a maximum iteration limit as a safety check",
+        "Checking convergence before taking at least one step"
+      ],
+      "hint": "Calculate the absolute difference between x_new and x_old, then compare it to the tolerance. The absolute value is crucial since positions can move in either direction.",
+      "references": [
+        "Numerical Analysis by Burden and Faires, Chapter 2",
+        "Stopping criteria for iterative methods",
+        "Floating point arithmetic and numerical stability"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Iterative Optimization Loop",
+      "relation_to_problem": "Combines all previous concepts into a complete gradient descent loop: repeatedly apply the update rule until convergence. This is the structure needed for the final treasure-finding algorithm.",
+      "prerequisites": [
+        "Gradient descent update",
+        "Convergence criteria",
+        "While loops",
+        "All previous sub-quests"
+      ],
+      "learning_objectives": [
+        "Implement a complete iterative optimization loop",
+        "Integrate derivative computation, update rule, and convergence check",
+        "Handle edge cases like maximum iterations",
+        "Track the optimization process across multiple iterations"
+      ],
+      "math_content": {
+        "definition": "An iterative optimization algorithm repeatedly applies an update rule to improve a candidate solution until a stopping criterion is met. The general structure is: (1) Initialize $x_0$, (2) For $k = 0, 1, 2, \\ldots$ until convergence: compute gradient $g_k = f'(x_k)$, update position $x_{k+1} = x_k - \\alpha g_k$, check convergence $||x_{k+1} - x_k|| < \\tau$, (3) Return $x_k$ as the approximate solution.",
+        "notation": "$x_0$ = initial guess; $k$ = iteration counter; $g_k = f'(x_k)$ = gradient at iteration k; $\\alpha$ = learning rate; $\\tau$ = tolerance; $k_{max}$ = maximum iterations",
+        "theorem": "Convergence of Gradient Descent: For a convex function f with L-Lipschitz continuous gradient, gradient descent with learning rate $\\alpha \\leq \\frac{1}{L}$ satisfies: $$f(x_k) - f(x^*) \\leq \\frac{||x_0 - x^*||^2}{2\\alpha k}$$ This shows convergence rate of $O(1/k)$. For strongly convex functions, convergence is exponential: $||x_k - x^*|| \\leq (1 - \\mu\\alpha)^k ||x_0 - x^*||$ where $\\mu$ is the strong convexity constant.",
+        "proof_sketch": "Each iteration reduces the function value by at least $\\frac{\\alpha}{2}||f'(x_k)||^2$ (from descent lemma). Summing over k iterations and using convexity bounds gives the $O(1/k)$ rate. For strongly convex f, the quadratic lower bound provides geometric convergence.",
+        "examples": [
+          "Starting at x=3.0 with α=0.01, τ=1e-6: Iter 1: f'(3)=27, x=2.73; Iter 2: f'(2.73)≈19.6, x≈2.534; ... continues until x≈2.25",
+          "Starting at x=0.0 with α=0.01, τ=1e-6: f'(0)=0, no update, algorithm stops (stuck at saddle point - bad initialization)",
+          "Starting at x=1.0 with α=0.01, τ=1e-6: Iter 1: f'(1)=-5, x=1.05; Iter 2: f'(1.05)≈-4.44, x≈1.094; ... converges to x≈2.25",
+          "With α=0.5 (too large): May oscillate wildly and diverge instead of converging smoothly"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Gradient Descent",
+          "latex": "$x_{k+1} = x_k - \\alpha f'(x_k), \\quad \\text{until } |x_{k+1} - x_k| < \\tau$",
+          "description": "Full algorithm combining update and stopping condition"
+        },
+        {
+          "name": "Iteration Bound",
+          "latex": "$k \\leq k_{max}$",
+          "description": "Prevent infinite loops with maximum iteration limit"
+        },
+        {
+          "name": "Convergence Rate",
+          "latex": "$\\text{error}_k \\approx \\text{error}_0 \\cdot (1-\\mu\\alpha)^k$",
+          "description": "Exponential decrease in error for strongly convex functions"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified gradient descent loop that performs multiple iterations. Given a starting point, perform gradient descent for a fixed number of iterations (no convergence check yet - that's the final integration). Return the position after all iterations.",
+        "function_signature": "def gradient_descent_n_steps(start_x: float, learning_rate: float, n_iterations: int) -> float:",
+        "starter_code": "def gradient_descent_n_steps(start_x: float, learning_rate: float, n_iterations: int) -> float:\n    \"\"\"\n    Perform n iterations of gradient descent on f(x) = x^4 - 3x^3 + 2.\n    \n    Args:\n        start_x: Initial position\n        learning_rate: Step size alpha\n        n_iterations: Number of steps to perform\n    \n    Returns:\n        Position after n iterations\n    \n    Note: You'll need to compute the derivative f'(x) = 4x^3 - 9x^2\n          and apply the update rule x_new = x - learning_rate * f'(x)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "gradient_descent_n_steps(3.0, 0.01, 1)",
+            "expected": "2.73",
+            "explanation": "One step from x=3: f'(3)=27, x_new = 3 - 0.01*27 = 2.73"
+          },
+          {
+            "input": "gradient_descent_n_steps(1.0, 0.01, 1)",
+            "expected": "1.05",
+            "explanation": "One step from x=1: f'(1)=-5, x_new = 1 - 0.01*(-5) = 1.05"
+          },
+          {
+            "input": "gradient_descent_n_steps(3.0, 0.01, 5)",
+            "expected": "2.3484",
+            "explanation": "Five iterations starting from x=3, gradually approaching minimum (approximate value)"
+          },
+          {
+            "input": "gradient_descent_n_steps(0.5, 0.01, 10)",
+            "expected": "1.17",
+            "explanation": "Ten iterations from x=0.5, moving toward minimum (approximate value)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not updating the x value in each iteration (using old x repeatedly)",
+        "Computing the derivative only once instead of at each new position",
+        "Off-by-one errors in the loop (doing n-1 or n+1 iterations instead of n)",
+        "Not initializing x properly before the loop starts",
+        "Modifying the learning_rate during iterations when it should stay constant",
+        "Forgetting that the derivative changes as x changes"
+      ],
+      "hint": "Use a loop that runs n_iterations times. In each iteration: compute the derivative at the current x, apply the gradient descent update rule to get a new x, and replace the old x with the new one.",
+      "references": [
+        "Introduction to Optimization by Chong and Zak",
+        "Algorithm design for gradient-based optimization",
+        "Iterative methods in numerical analysis"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Gradient Descent with Dynamic Convergence",
+      "relation_to_problem": "This final sub-quest integrates everything: start from any position, iteratively compute derivatives, update position, check for convergence, and return the x-coordinate where the treasure lies (the minimum of f(x)).",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Derivatives",
+        "Update rule",
+        "Convergence criteria",
+        "Iterative loops"
+      ],
+      "learning_objectives": [
+        "Integrate all components into a complete optimization algorithm",
+        "Implement dynamic stopping based on convergence tolerance",
+        "Handle different starting positions robustly",
+        "Return the optimal x-coordinate that minimizes the function"
+      ],
+      "math_content": {
+        "definition": "Complete Gradient Descent Algorithm for minimizing f(x) = x⁴ - 3x³ + 2:\n\n**Input:** Initial position $x_0$, learning rate $\\alpha$, tolerance $\\tau$, max iterations $k_{max}$\n\n**Output:** $x^* \\approx \\arg\\min_x f(x)$\n\n**Algorithm:**\n1. Set $x \\leftarrow x_0$, $k \\leftarrow 0$\n2. While $k < k_{max}$:\n   - Compute gradient: $g \\leftarrow f'(x) = 4x^3 - 9x^2$\n   - Update position: $x_{new} \\leftarrow x - \\alpha g$\n   - If $|x_{new} - x| < \\tau$: return $x_{new}$ (converged)\n   - Set $x \\leftarrow x_{new}$, $k \\leftarrow k + 1$\n3. Return $x$ (max iterations reached)",
+        "notation": "$x^* \\approx 2.25$ = approximate minimum location; $f(x^*) \\approx -3.266$ = minimum function value; $\\arg\\min_x f(x)$ = value of x that minimizes f",
+        "theorem": "For the function $f(x) = x^4 - 3x^3 + 2$, the global minimum occurs at $x^* = \\frac{9}{4} = 2.25$ with $f(x^*) = -\\frac{527}{256} \\approx -3.2656$. This can be verified by solving $f'(x) = 4x^3 - 9x^2 = 0$ to get critical points x=0 and x=9/4, then using the second derivative test: $f''(x) = 12x^2 - 18x$, so $f''(0) = 0$ (inconclusive) and $f''(9/4) = 12(81/16) - 18(9/4) = 60.75 - 40.5 = 20.25 > 0$ (local minimum).",
+        "proof_sketch": "The function $f(x) = x^4 - 3x^3 + 2$ is a polynomial with positive leading coefficient, so $\\lim_{x \\to \\pm\\infty} f(x) = +\\infty$. Thus a global minimum exists. Setting $f'(x) = 4x^3 - 9x^2 = x^2(4x - 9) = 0$ gives $x \\in \\{0, 9/4\\}$. Computing: $f(0) = 2$ and $f(9/4) = (9/4)^4 - 3(9/4)^3 + 2 = 6561/256 - 2187/64 + 2 = -527/256 \\approx -3.266$. Since this is the only local minimum and $f \\to \\infty$ at boundaries, x=9/4 is the global minimum.",
+        "examples": [
+          "Complete execution from x₀=3.0, α=0.01, τ=1e-6: After ~200 iterations, converges to x≈2.250000",
+          "From x₀=1.0, α=0.01, τ=1e-6: After ~150 iterations, converges to x≈2.250000",
+          "From x₀=0.0: Gets stuck at x=0 (saddle point) since f'(0)=0 - demonstrates importance of initialization",
+          "With α=0.001 (small): Converges correctly but requires many more iterations",
+          "With α=0.1 (large): May oscillate around the minimum but eventually converges if stable"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Objective Function",
+          "latex": "$f(x) = x^4 - 3x^3 + 2$",
+          "description": "The function we're minimizing to find the treasure"
+        },
+        {
+          "name": "Gradient",
+          "latex": "$f'(x) = 4x^3 - 9x^2$",
+          "description": "Direction and magnitude of steepest ascent"
+        },
+        {
+          "name": "Update Rule",
+          "latex": "$x_{k+1} = x_k - \\alpha f'(x_k)$",
+          "description": "Move opposite to gradient"
+        },
+        {
+          "name": "Stopping Criterion",
+          "latex": "$|x_{k+1} - x_k| < \\tau \\text{ or } k \\geq k_{max}$",
+          "description": "Terminate when converged or iteration limit reached"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete gradient descent algorithm that finds the minimum of f(x) = x⁴ - 3x³ + 2. Combine derivative computation, iterative updates, and convergence checking. This brings together all previous sub-quests into the solution framework (without revealing the exact treasure-finding implementation details).",
+        "function_signature": "def find_minimum_gradient_descent(start_x: float, learning_rate: float = 0.01, tolerance: float = 1e-6, max_iterations: int = 10000) -> float:",
+        "starter_code": "def find_minimum_gradient_descent(start_x: float, learning_rate: float = 0.01, \n                                   tolerance: float = 1e-6, max_iterations: int = 10000) -> float:\n    \"\"\"\n    Find the minimum of f(x) = x^4 - 3x^3 + 2 using gradient descent.\n    \n    Args:\n        start_x: Initial position\n        learning_rate: Step size (default 0.01)\n        tolerance: Convergence threshold (default 1e-6)\n        max_iterations: Maximum number of iterations (default 10000)\n    \n    Returns:\n        The x-coordinate where f(x) is minimized\n    \n    Algorithm:\n        1. Start at start_x\n        2. Compute derivative f'(x) = 4x^3 - 9x^2\n        3. Update: x_new = x - learning_rate * f'(x)\n        4. Check if |x_new - x| < tolerance\n        5. Repeat until convergence or max_iterations\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "find_minimum_gradient_descent(3.0)",
+            "expected": "2.25",
+            "explanation": "Starting from x=3.0, gradient descent should converge to the minimum at x=2.25"
+          },
+          {
+            "input": "find_minimum_gradient_descent(1.0)",
+            "expected": "2.25",
+            "explanation": "Starting from x=1.0, should also converge to x=2.25 (approaching from left)"
+          },
+          {
+            "input": "find_minimum_gradient_descent(0.5, learning_rate=0.005)",
+            "expected": "2.25",
+            "explanation": "Smaller learning rate from x=0.5, takes more iterations but still reaches x≈2.25"
+          },
+          {
+            "input": "find_minimum_gradient_descent(2.0)",
+            "expected": "2.25",
+            "explanation": "Starting near the minimum, should quickly converge to x=2.25"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not properly initializing variables before the loop",
+        "Checking convergence before computing at least one update",
+        "Using the wrong convergence criterion (comparing function values instead of positions)",
+        "Not breaking out of the loop when convergence is achieved",
+        "Computing the derivative incorrectly (wrong power rule application)",
+        "Forgetting the negative sign in the update rule (climbing instead of descending)",
+        "Not handling the max_iterations limit properly",
+        "Using integer division instead of float division for the derivative"
+      ],
+      "hint": "Structure your solution with a while loop that tracks iterations. In each iteration: calculate the derivative at current x, compute x_new using the update rule, check if the absolute difference |x_new - x| is less than tolerance, and if so, return. Don't forget to update x to x_new for the next iteration.",
+      "references": [
+        "Numerical Optimization by Nocedal and Wright, Chapter 3",
+        "Gradient descent and its variants (SGD, Adam, etc.)",
+        "Line search methods and step size selection",
+        "Convex optimization theory and applications"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,509 @@
+{
+  "problem_id": 8,
+  "title": "Calculate 2x2 Matrix Inverse",
+  "category": "Linear Algebra",
+  "difficulty": "easy",
+  "description": "Write a Python function that calculates the inverse of a 2x2 matrix. The inverse of a matrix A is another matrix A⁻¹ such that A × A⁻¹ = I (the identity matrix).\n\nFor a 2x2 matrix [[a, b], [c, d]], the inverse exists only if the determinant (ad - bc) is non-zero.\n\nReturn `None` if the matrix is not invertible (i.e., when the determinant equals zero).",
+  "example": {
+    "input": "matrix = [[4, 7], [2, 6]]",
+    "output": "[[0.6, -0.7], [-0.2, 0.4]]",
+    "reasoning": "For matrix [[a, b], [c, d]] = [[4, 7], [2, 6]]:\n1. Calculate determinant: det = ad - bc = 4×6 - 7×2 = 24 - 14 = 10\n2. Since det ≠ 0, the matrix is invertible\n3. Apply formula: A⁻¹ = (1/det) × [[d, -b], [-c, a]] = (1/10) × [[6, -7], [-2, 4]] = [[0.6, -0.7], [-0.2, 0.4]]"
+  },
+  "starter_code": "def inverse_2x2(matrix: list[list[float]]) -> list[list[float]] | None:\n    \"\"\"\n    Calculate the inverse of a 2x2 matrix.\n    \n    Args:\n        matrix: A 2x2 matrix represented as [[a, b], [c, d]]\n    \n    Returns:\n        The inverse matrix as a 2x2 list, or None if the matrix is singular\n        (i.e., determinant equals zero)\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Matrix Determinants for 2×2 Matrices",
+      "relation_to_problem": "The determinant is the critical value that determines if a matrix is invertible. Computing det(A) = ad - bc is the first step in the inverse formula and checking for singularity.",
+      "prerequisites": [
+        "Matrix notation",
+        "Basic arithmetic operations",
+        "Understanding of 2D arrays"
+      ],
+      "learning_objectives": [
+        "Define the determinant of a 2×2 matrix formally",
+        "Compute determinants using the formula ad - bc",
+        "Understand the geometric interpretation of determinants",
+        "Identify when a determinant equals zero"
+      ],
+      "math_content": {
+        "definition": "For a 2×2 matrix $A = \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$, the determinant is a scalar function $\\det: \\mathbb{R}^{2 \\times 2} \\rightarrow \\mathbb{R}$ defined as: $$\\det(A) = ad - bc$$",
+        "notation": "$a, b, c, d$ = matrix elements; $\\det(A)$ or $|A|$ = determinant of matrix A",
+        "theorem": "Theorem: A 2×2 matrix A is invertible if and only if det(A) ≠ 0. Proof: The inverse formula contains 1/det(A) in the denominator, which is undefined when det(A) = 0. Conversely, when det(A) ≠ 0, the formula produces a valid inverse that satisfies AA⁻¹ = I.",
+        "proof_sketch": "The determinant represents the signed area of the parallelogram formed by the column vectors of A. When det(A) = 0, the columns are linearly dependent (one is a scalar multiple of the other), meaning the transformation collapses 2D space to a line, making it non-invertible.",
+        "examples": [
+          "Example 1: $A = \\begin{pmatrix} 3 & 2 \\\\ 1 & 4 \\end{pmatrix}$ gives $\\det(A) = 3(4) - 2(1) = 12 - 2 = 10$",
+          "Example 2: $B = \\begin{pmatrix} 2 & 4 \\\\ 1 & 2 \\end{pmatrix}$ gives $\\det(B) = 2(2) - 4(1) = 4 - 4 = 0$ (singular matrix)",
+          "Example 3: $C = \\begin{pmatrix} -1 & 3 \\\\ 2 & 5 \\end{pmatrix}$ gives $\\det(C) = -1(5) - 3(2) = -5 - 6 = -11$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "2×2 Determinant Formula",
+          "latex": "$\\det\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} = ad - bc$",
+          "description": "Use this as the first step when checking invertibility and computing the inverse"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the determinant of a 2×2 matrix. This is the foundational building block for matrix inversion.",
+        "function_signature": "def calculate_determinant(matrix: list[list[float]]) -> float:",
+        "starter_code": "def calculate_determinant(matrix: list[list[float]]) -> float:\n    \"\"\"\n    Calculate the determinant of a 2x2 matrix.\n    \n    Args:\n        matrix: A 2x2 matrix [[a, b], [c, d]]\n    \n    Returns:\n        The determinant value (ad - bc)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_determinant([[3, 2], [1, 4]])",
+            "expected": "10.0",
+            "explanation": "det = 3×4 - 2×1 = 12 - 2 = 10"
+          },
+          {
+            "input": "calculate_determinant([[2, 4], [1, 2]])",
+            "expected": "0.0",
+            "explanation": "det = 2×2 - 4×1 = 4 - 4 = 0 (singular matrix)"
+          },
+          {
+            "input": "calculate_determinant([[5, 6], [7, 8]])",
+            "expected": "-2.0",
+            "explanation": "det = 5×8 - 6×7 = 40 - 42 = -2"
+          },
+          {
+            "input": "calculate_determinant([[1, 0], [0, 1]])",
+            "expected": "1.0",
+            "explanation": "det = 1×1 - 0×0 = 1 (identity matrix always has det = 1)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing ac - bd instead of ad - bc (wrong diagonal multiplication)",
+        "Forgetting that determinants can be negative",
+        "Not recognizing that det = 0 means the matrix is singular",
+        "Mixing up row and column indices when extracting elements"
+      ],
+      "hint": "Remember the diagonal rule: multiply down-right diagonal (ad) minus down-left diagonal (bc)",
+      "references": [
+        "Linear algebra textbooks chapter on determinants",
+        "Geometric interpretation of determinants as area scaling factors"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Matrix Singularity Testing and Zero-Determinant Detection",
+      "relation_to_problem": "Before attempting to compute an inverse, we must verify invertibility. This sub-quest teaches checking if det(A) = 0 and returning None for singular matrices, which is required by the problem specification.",
+      "prerequisites": [
+        "Determinant calculation",
+        "Understanding of floating-point arithmetic",
+        "Boolean logic"
+      ],
+      "learning_objectives": [
+        "Define singular and non-singular matrices formally",
+        "Implement robust zero-checking for floating-point numbers",
+        "Understand numerical stability in determinant checking",
+        "Connect determinant value to matrix rank and invertibility"
+      ],
+      "math_content": {
+        "definition": "A square matrix $A$ is called **singular** (or **degenerate**) if $\\det(A) = 0$. A matrix is **non-singular** (or **invertible**) if $\\det(A) \\neq 0$. Formally, the set of singular $n \\times n$ matrices forms a measure-zero subset of $\\mathbb{R}^{n \\times n}$.",
+        "notation": "$\\text{rank}(A)$ = dimension of column space; $A$ is singular $\\iff \\text{rank}(A) < n$ for $n \\times n$ matrix",
+        "theorem": "Invertibility Theorem: For a 2×2 matrix A, the following are equivalent: (1) A is invertible, (2) det(A) ≠ 0, (3) rank(A) = 2, (4) the columns of A are linearly independent, (5) the rows of A are linearly independent, (6) Ax = 0 has only the trivial solution x = 0.",
+        "proof_sketch": "For 2×2 matrices: If det(A) = ad - bc = 0, then the rows [a, b] and [c, d] satisfy ad = bc, implying [c, d] = (c/a)[a, b] (when a ≠ 0), showing linear dependence. This reduces the rank to 1, making the transformation non-invertible since it maps the plane onto a line.",
+        "examples": [
+          "Singular: $\\begin{pmatrix} 2 & 4 \\\\ 1 & 2 \\end{pmatrix}$ has det = 0, second row is 0.5 × first row",
+          "Singular: $\\begin{pmatrix} 0 & 0 \\\\ 5 & 3 \\end{pmatrix}$ has det = 0, zero row indicates rank < 2",
+          "Non-singular: $\\begin{pmatrix} 1 & 2 \\\\ 3 & 5 \\end{pmatrix}$ has det = -1 ≠ 0, rows are independent"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Singularity Condition",
+          "latex": "$A \\text{ is singular} \\iff \\det(A) = 0$",
+          "description": "Use this test before attempting to compute the inverse; if true, return None"
+        },
+        {
+          "name": "Numerical Tolerance",
+          "latex": "$|\\det(A)| < \\epsilon$ for small $\\epsilon \\approx 10^{-10}$",
+          "description": "In practice, check if determinant is near zero due to floating-point errors"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that checks if a 2×2 matrix is invertible by testing its determinant. This is essential for the conditional logic in matrix inversion.",
+        "function_signature": "def is_invertible(matrix: list[list[float]]) -> bool:",
+        "starter_code": "def is_invertible(matrix: list[list[float]]) -> bool:\n    \"\"\"\n    Check if a 2x2 matrix is invertible.\n    \n    Args:\n        matrix: A 2x2 matrix [[a, b], [c, d]]\n    \n    Returns:\n        True if the matrix is invertible (det ≠ 0), False otherwise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "is_invertible([[4, 7], [2, 6]])",
+            "expected": "True",
+            "explanation": "det = 4×6 - 7×2 = 10 ≠ 0, so matrix is invertible"
+          },
+          {
+            "input": "is_invertible([[2, 4], [1, 2]])",
+            "expected": "False",
+            "explanation": "det = 2×2 - 4×1 = 0, matrix is singular (second row is 0.5 × first row)"
+          },
+          {
+            "input": "is_invertible([[1, 0], [0, 1]])",
+            "expected": "True",
+            "explanation": "Identity matrix has det = 1, always invertible"
+          },
+          {
+            "input": "is_invertible([[3, 6], [2, 4]])",
+            "expected": "False",
+            "explanation": "det = 3×4 - 6×2 = 12 - 12 = 0, rows are linearly dependent"
+          },
+          {
+            "input": "is_invertible([[-1, 2], [3, -5]])",
+            "expected": "True",
+            "explanation": "det = (-1)×(-5) - 2×3 = 5 - 6 = -1 ≠ 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using exact equality (det == 0) without considering floating-point precision issues",
+        "Not handling the case where determinant is very close to zero but not exactly zero",
+        "Confusing singular with 'containing zeros' - a matrix with zeros can still be invertible",
+        "Not recognizing proportional rows as a sign of singularity"
+      ],
+      "hint": "Reuse your determinant function from the previous exercise. A matrix is invertible when its determinant is non-zero.",
+      "references": [
+        "Matrix rank and linear independence",
+        "Numerical stability in linear algebra computations",
+        "Condition number and ill-conditioned matrices"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Constructing the Adjugate Matrix for 2×2 Matrices",
+      "relation_to_problem": "The adjugate matrix (also called adjoint) is the matrix [[d, -b], [-c, a]] obtained by swapping diagonal elements and negating off-diagonal elements. This is the numerator in the inverse formula.",
+      "prerequisites": [
+        "Matrix element notation",
+        "Matrix construction",
+        "Understanding of matrix positions"
+      ],
+      "learning_objectives": [
+        "Define the adjugate matrix formally using cofactors",
+        "Compute the adjugate for 2×2 matrices using the swap-and-negate pattern",
+        "Understand the relationship between adjugate and inverse",
+        "Recognize that adjugate exists even for singular matrices (though it won't produce a valid inverse)"
+      ],
+      "math_content": {
+        "definition": "The **adjugate matrix** (or classical adjoint) of a square matrix $A$, denoted $\\text{adj}(A)$, is the transpose of the cofactor matrix. For $A = \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$, the adjugate is: $$\\text{adj}(A) = \\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix}$$",
+        "notation": "$C_{ij}$ = cofactor at position $(i,j)$; $\\text{adj}(A)$ = adjugate matrix; $A^T$ = transpose of A",
+        "theorem": "Adjugate-Determinant Relation: For any square matrix A, $A \\cdot \\text{adj}(A) = \\text{adj}(A) \\cdot A = \\det(A) \\cdot I$. This implies that when det(A) ≠ 0, we have $A^{-1} = \\frac{1}{\\det(A)} \\text{adj}(A)$.",
+        "proof_sketch": "For 2×2: Compute $\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} \\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix} = \\begin{pmatrix} ad-bc & -ab+ba \\\\ cd-dc & -cb+da \\end{pmatrix} = \\begin{pmatrix} ad-bc & 0 \\\\ 0 & ad-bc \\end{pmatrix} = (ad-bc)I$. Dividing both sides by det(A) = ad-bc (when non-zero) yields the inverse formula.",
+        "examples": [
+          "Example 1: $A = \\begin{pmatrix} 4 & 7 \\\\ 2 & 6 \\end{pmatrix}$ has $\\text{adj}(A) = \\begin{pmatrix} 6 & -7 \\\\ -2 & 4 \\end{pmatrix}$ (swap 4↔6, negate 7→-7, 2→-2)",
+          "Example 2: $A = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}$ has $\\text{adj}(A) = \\begin{pmatrix} 4 & -2 \\\\ -3 & 1 \\end{pmatrix}$",
+          "Example 3: Identity $I = \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix}$ has $\\text{adj}(I) = \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix} = I$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "2×2 Adjugate Formula",
+          "latex": "$\\text{adj}\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} = \\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix}$",
+          "description": "Swap the main diagonal elements (a↔d) and negate the anti-diagonal elements (b→-b, c→-c)"
+        },
+        {
+          "name": "Inverse via Adjugate",
+          "latex": "$A^{-1} = \\frac{1}{\\det(A)} \\text{adj}(A)$ when $\\det(A) \\neq 0$",
+          "description": "The inverse is the adjugate scaled by the reciprocal of the determinant"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the adjugate matrix of a 2×2 matrix. This constructs the numerator of the inverse formula before scaling by 1/det(A).",
+        "function_signature": "def adjugate_matrix(matrix: list[list[float]]) -> list[list[float]]:",
+        "starter_code": "def adjugate_matrix(matrix: list[list[float]]) -> list[list[float]]:\n    \"\"\"\n    Compute the adjugate (adjoint) matrix of a 2x2 matrix.\n    \n    Args:\n        matrix: A 2x2 matrix [[a, b], [c, d]]\n    \n    Returns:\n        The adjugate matrix [[d, -b], [-c, a]]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "adjugate_matrix([[4, 7], [2, 6]])",
+            "expected": "[[6, -7], [-2, 4]]",
+            "explanation": "Swap 4↔6 on diagonal, negate 7→-7 and 2→-2 on anti-diagonal"
+          },
+          {
+            "input": "adjugate_matrix([[1, 2], [3, 4]])",
+            "expected": "[[4, -2], [-3, 1]]",
+            "explanation": "Swap 1↔4, negate 2→-2 and 3→-3"
+          },
+          {
+            "input": "adjugate_matrix([[1, 0], [0, 1]])",
+            "expected": "[[1, 0], [0, 1]]",
+            "explanation": "Identity matrix: swap 1↔1 (no change), negate 0→0 (no change)"
+          },
+          {
+            "input": "adjugate_matrix([[5, -3], [2, 7]])",
+            "expected": "[[7, 3], [-2, 5]]",
+            "explanation": "Swap 5↔7, negate -3→3 and 2→-2"
+          },
+          {
+            "input": "adjugate_matrix([[2, 4], [1, 2]])",
+            "expected": "[[2, -4], [-1, 2]]",
+            "explanation": "Even for singular matrix (det=0), adjugate still exists"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to negate the anti-diagonal elements (b and c)",
+        "Swapping wrong elements - must swap a↔d, not a↔c or b↔d",
+        "Confusing adjugate with transpose (transpose keeps values, adjugate transforms them)",
+        "Not recognizing that adjugate exists for singular matrices (even though inverse doesn't)",
+        "Mixing up which elements are on the main diagonal vs anti-diagonal"
+      ],
+      "hint": "Think of the pattern: 'swap diagonal, flip signs of anti-diagonal'. Extract elements as a=matrix[0][0], b=matrix[0][1], c=matrix[1][0], d=matrix[1][1].",
+      "references": [
+        "Cofactor expansion and cofactor matrices",
+        "Relationship between determinant and adjugate",
+        "Cramer's rule connection to adjugate matrices"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Scalar Multiplication of Matrices",
+      "relation_to_problem": "The final step of computing A⁻¹ requires multiplying the adjugate matrix by the scalar 1/det(A). This sub-quest teaches matrix-scalar multiplication, which distributes the scalar to each element.",
+      "prerequisites": [
+        "Matrix representation",
+        "Scalar arithmetic",
+        "2D list manipulation"
+      ],
+      "learning_objectives": [
+        "Define scalar multiplication of matrices formally",
+        "Implement element-wise scalar multiplication for 2×2 matrices",
+        "Understand that scalar multiplication distributes over each element",
+        "Recognize scalar multiplication as a linear transformation"
+      ],
+      "math_content": {
+        "definition": "Let $A$ be an $m \\times n$ matrix and $k$ be a scalar. The **scalar multiplication** $kA$ is the $m \\times n$ matrix obtained by multiplying every entry of $A$ by $k$: $$(kA)_{ij} = k \\cdot A_{ij}$$ For a 2×2 matrix: $$k \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} = \\begin{pmatrix} ka & kb \\\\ kc & kd \\end{pmatrix}$$",
+        "notation": "$k$ or $\\alpha$ = scalar; $kA$ = scalar multiplication; $(kA)_{ij}$ = element at position $(i,j)$ in result",
+        "theorem": "Properties of Scalar Multiplication: (1) $k(A + B) = kA + kB$ (distributive over matrix addition), (2) $(k + m)A = kA + mA$ (distributive over scalar addition), (3) $(km)A = k(mA)$ (associative), (4) $1A = A$ (identity), (5) $\\det(kA) = k^n \\det(A)$ for $n \\times n$ matrix.",
+        "proof_sketch": "Scalar multiplication is element-wise by definition, so distributivity follows from scalar arithmetic: $(kA)_{ij} + (kB)_{ij} = kA_{ij} + kB_{ij} = k(A_{ij} + B_{ij}) = (k(A+B))_{ij}$. The determinant property for 2×2: $\\det(kA) = \\det\\begin{pmatrix} ka & kb \\\\ kc & kd \\end{pmatrix} = (ka)(kd) - (kb)(kc) = k^2(ad-bc) = k^2\\det(A)$.",
+        "examples": [
+          "Example 1: $\\frac{1}{10} \\begin{pmatrix} 6 & -7 \\\\ -2 & 4 \\end{pmatrix} = \\begin{pmatrix} 0.6 & -0.7 \\\\ -0.2 & 0.4 \\end{pmatrix}$",
+          "Example 2: $-1 \\begin{pmatrix} 3 & 5 \\\\ 1 & 2 \\end{pmatrix} = \\begin{pmatrix} -3 & -5 \\\\ -1 & -2 \\end{pmatrix}$ (negation)",
+          "Example 3: $0.5 \\begin{pmatrix} 4 & 2 \\\\ 6 & 8 \\end{pmatrix} = \\begin{pmatrix} 2 & 1 \\\\ 3 & 4 \\end{pmatrix}$ (halving)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Element-wise Scalar Multiplication",
+          "latex": "$(kA)_{ij} = k \\cdot A_{ij}$ for all $i, j$",
+          "description": "Multiply each matrix element by the scalar independently"
+        },
+        {
+          "name": "Inverse Scaling Step",
+          "latex": "$A^{-1} = \\frac{1}{\\det(A)} \\text{adj}(A)$",
+          "description": "In matrix inversion, the scalar is k = 1/det(A), applied to the adjugate matrix"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that multiplies a 2×2 matrix by a scalar. This operation is needed to scale the adjugate matrix by 1/det(A) in the inverse computation.",
+        "function_signature": "def scalar_multiply(scalar: float, matrix: list[list[float]]) -> list[list[float]]:",
+        "starter_code": "def scalar_multiply(scalar: float, matrix: list[list[float]]) -> list[list[float]]:\n    \"\"\"\n    Multiply a 2x2 matrix by a scalar.\n    \n    Args:\n        scalar: The scalar value to multiply by\n        matrix: A 2x2 matrix [[a, b], [c, d]]\n    \n    Returns:\n        The scaled matrix [[scalar*a, scalar*b], [scalar*c, scalar*d]]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "scalar_multiply(0.1, [[6, -7], [-2, 4]])",
+            "expected": "[[0.6, -0.7], [-0.2, 0.4]]",
+            "explanation": "Multiply each element by 0.1: 6×0.1=0.6, -7×0.1=-0.7, -2×0.1=-0.2, 4×0.1=0.4"
+          },
+          {
+            "input": "scalar_multiply(2, [[1, 2], [3, 4]])",
+            "expected": "[[2, 4], [6, 8]]",
+            "explanation": "Double each element: 1×2=2, 2×2=4, 3×2=6, 4×2=8"
+          },
+          {
+            "input": "scalar_multiply(0.5, [[4, 6], [8, 10]])",
+            "expected": "[[2.0, 3.0], [4.0, 5.0]]",
+            "explanation": "Halve each element"
+          },
+          {
+            "input": "scalar_multiply(-1, [[3, -2], [1, 5]])",
+            "expected": "[[-3, 2], [-1, -5]]",
+            "explanation": "Negate each element (multiply by -1)"
+          },
+          {
+            "input": "scalar_multiply(1, [[7, 9], [2, 3]])",
+            "expected": "[[7, 9], [2, 3]]",
+            "explanation": "Identity property: multiplying by 1 leaves matrix unchanged"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Only multiplying the diagonal elements instead of all elements",
+        "Confusing scalar multiplication with matrix multiplication (which has different rules)",
+        "Not handling negative scalars correctly",
+        "Attempting to multiply by zero without realizing this creates the zero matrix",
+        "Forgetting that scalar multiplication preserves matrix dimensions"
+      ],
+      "hint": "Use nested loops or list comprehension to multiply every element by the scalar. The operation is: result[i][j] = scalar * matrix[i][j].",
+      "references": [
+        "Matrix operations and linearity",
+        "Scalar fields in linear algebra",
+        "Linear transformations and scaling"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Verifying Matrix Inverses Using Matrix Multiplication",
+      "relation_to_problem": "A computed inverse A⁻¹ must satisfy AA⁻¹ = I. This sub-quest teaches how to verify the correctness of an inverse by implementing 2×2 matrix multiplication and checking if the product equals the identity matrix.",
+      "prerequisites": [
+        "Matrix multiplication rules",
+        "Identity matrix concept",
+        "Dot product"
+      ],
+      "learning_objectives": [
+        "Define matrix multiplication formally for 2×2 matrices",
+        "Implement the matrix product using row-column dot products",
+        "Understand the identity matrix as the multiplicative identity",
+        "Verify inverse correctness using the defining property AA⁻¹ = I"
+      ],
+      "math_content": {
+        "definition": "For matrices $A = \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$ and $B = \\begin{pmatrix} e & f \\\\ g & h \\end{pmatrix}$, the **matrix product** $AB$ is defined as: $$AB = \\begin{pmatrix} ae+bg & af+bh \\\\ ce+dg & cf+dh \\end{pmatrix}$$ Each entry $(AB)_{ij}$ is the dot product of row $i$ of $A$ with column $j$ of $B$: $(AB)_{ij} = \\sum_{k=1}^{n} A_{ik}B_{kj}$.",
+        "notation": "$AB$ = matrix product (not commutative: $AB \\neq BA$ in general); $I$ = identity matrix; $\\delta_{ij}$ = Kronecker delta",
+        "theorem": "Inverse Verification Theorem: Matrix B is the inverse of matrix A if and only if $AB = BA = I$, where I is the identity matrix. For 2×2 matrices, it suffices to check either $AB = I$ or $BA = I$ (the other equality follows automatically when det(A) ≠ 0).",
+        "proof_sketch": "If $AB = I$, multiply both sides on the left by $A^{-1}$ (assuming it exists): $A^{-1}(AB) = A^{-1}I$, which gives $(A^{-1}A)B = A^{-1}$, thus $IB = A^{-1}$, so $B = A^{-1}$. The converse is immediate from the definition of inverse.",
+        "examples": [
+          "Example 1: $A = \\begin{pmatrix} 2 & 1 \\\\ 1 & 2 \\end{pmatrix}$, $A^{-1} = \\begin{pmatrix} 2/3 & -1/3 \\\\ -1/3 & 2/3 \\end{pmatrix}$. Verify: $AA^{-1} = \\begin{pmatrix} 2(2/3)+1(-1/3) & 2(-1/3)+1(2/3) \\\\ 1(2/3)+2(-1/3) & 1(-1/3)+2(2/3) \\end{pmatrix} = \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix} = I$ ✓",
+          "Example 2: Identity verification: $I \\cdot I = \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix} \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix} = \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix} = I$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "2×2 Matrix Multiplication",
+          "latex": "$\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} \\begin{pmatrix} e & f \\\\ g & h \\end{pmatrix} = \\begin{pmatrix} ae+bg & af+bh \\\\ ce+dg & cf+dh \\end{pmatrix}$",
+          "description": "Compute each entry as the dot product of the corresponding row and column"
+        },
+        {
+          "name": "Identity Matrix",
+          "latex": "$I = \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix}$",
+          "description": "The 2×2 identity matrix - the product AA⁻¹ should equal this"
+        },
+        {
+          "name": "Inverse Verification",
+          "latex": "$AA^{-1} = A^{-1}A = I$",
+          "description": "The defining property that must be satisfied for correct inverses"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that multiplies two 2×2 matrices and then use it to verify if a given matrix is the inverse of another by checking if their product equals the identity matrix.",
+        "function_signature": "def multiply_matrices(A: list[list[float]], B: list[list[float]]) -> list[list[float]]:",
+        "starter_code": "def multiply_matrices(A: list[list[float]], B: list[list[float]]) -> list[list[float]]:\n    \"\"\"\n    Multiply two 2x2 matrices.\n    \n    Args:\n        A: First 2x2 matrix [[a, b], [c, d]]\n        B: Second 2x2 matrix [[e, f], [g, h]]\n    \n    Returns:\n        The product matrix AB\n    \"\"\"\n    # Your code here\n    pass\n\ndef verify_inverse(A: list[list[float]], A_inv: list[list[float]]) -> bool:\n    \"\"\"\n    Verify if A_inv is the inverse of A by checking if A * A_inv = I.\n    \n    Args:\n        A: Original 2x2 matrix\n        A_inv: Candidate inverse matrix\n    \n    Returns:\n        True if A * A_inv equals the identity matrix (within floating-point tolerance)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "multiply_matrices([[2, 1], [1, 2]], [[2/3, -1/3], [-1/3, 2/3]])",
+            "expected": "[[1.0, 0.0], [0.0, 1.0]] (approximately)",
+            "explanation": "Product should equal identity: (2×2/3 + 1×(-1/3), 2×(-1/3) + 1×2/3, ...) = (1, 0, 0, 1)"
+          },
+          {
+            "input": "multiply_matrices([[1, 2], [3, 4]], [[1, 0], [0, 1]])",
+            "expected": "[[1, 2], [3, 4]]",
+            "explanation": "Multiplying by identity returns the original matrix"
+          },
+          {
+            "input": "verify_inverse([[4, 7], [2, 6]], [[0.6, -0.7], [-0.2, 0.4]])",
+            "expected": "True",
+            "explanation": "Product equals identity within tolerance, so verification succeeds"
+          },
+          {
+            "input": "verify_inverse([[1, 2], [3, 4]], [[1, 2], [3, 4]])",
+            "expected": "False",
+            "explanation": "Matrix multiplied by itself does not equal identity (unless it's I itself)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row-column ordering in dot products (using columns from A instead of rows)",
+        "Computing element-wise multiplication instead of matrix multiplication",
+        "Forgetting that matrix multiplication is not commutative (AB ≠ BA)",
+        "Using exact equality for floating-point comparisons instead of tolerance-based comparison",
+        "Not checking all four elements when verifying identity matrix"
+      ],
+      "hint": "For entry (i,j) of the product, compute the dot product of row i from the first matrix with column j from the second matrix. For verification, check if the result is approximately [[1, 0], [0, 1]].",
+      "references": [
+        "Matrix multiplication algorithms",
+        "Numerical precision and tolerance in comparisons",
+        "Properties of identity matrices"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Synthesizing the Complete 2×2 Matrix Inverse Algorithm",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts into the complete inverse algorithm: check det(A) ≠ 0, compute adj(A), scale by 1/det(A), and verify the result. This is the full solution strategy.",
+      "prerequisites": [
+        "Determinant calculation",
+        "Singularity testing",
+        "Adjugate computation",
+        "Scalar multiplication",
+        "Matrix multiplication for verification"
+      ],
+      "learning_objectives": [
+        "Synthesize all previous sub-quest concepts into a cohesive algorithm",
+        "Implement proper error handling for singular matrices",
+        "Understand the complete inverse formula A⁻¹ = (1/det(A)) × adj(A)",
+        "Apply algorithm to various test cases including edge cases"
+      ],
+      "math_content": {
+        "definition": "For an invertible 2×2 matrix $A = \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$ with $\\det(A) = ad - bc \\neq 0$, the **inverse matrix** is given by: $$A^{-1} = \\frac{1}{\\det(A)} \\text{adj}(A) = \\frac{1}{ad-bc} \\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix}$$ This formula combines three operations: determinant computation, adjugate construction, and scalar multiplication.",
+        "notation": "$A^{-1}$ = inverse of matrix A; $\\text{adj}(A)$ = adjugate matrix; $\\det(A)$ or $|A|$ = determinant",
+        "theorem": "Complete Inverse Algorithm: Given matrix A, (1) Compute det(A); (2) If det(A) = 0, return None (singular); (3) Compute adj(A) by swapping diagonal and negating anti-diagonal; (4) Return (1/det(A)) × adj(A). This algorithm is both necessary and sufficient for 2×2 matrix inversion.",
+        "proof_sketch": "Correctness follows from the adjugate-determinant relation: $A \\cdot \\text{adj}(A) = \\det(A) \\cdot I$. Dividing both sides by det(A) (when non-zero) gives $A \\cdot \\frac{1}{\\det(A)}\\text{adj}(A) = I$, proving that $(1/\\det(A))\\text{adj}(A)$ is indeed $A^{-1}$. The algorithm handles the singular case by checking det(A) = 0 first.",
+        "examples": [
+          "Example 1: $A = \\begin{pmatrix} 4 & 7 \\\\ 2 & 6 \\end{pmatrix}$. Step 1: det = 10. Step 2: 10 ≠ 0 ✓. Step 3: adj(A) = [[6,-7],[-2,4]]. Step 4: $A^{-1} = \\frac{1}{10}[[6,-7],[-2,4]] = [[0.6,-0.7],[-0.2,0.4]]$",
+          "Example 2: $B = \\begin{pmatrix} 2 & 4 \\\\ 1 & 2 \\end{pmatrix}$. Step 1: det = 0. Step 2: Singular, return None.",
+          "Example 3: $I = \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix}$. Step 1: det = 1. Step 3: adj(I) = I. Step 4: $I^{-1} = (1/1) \\cdot I = I$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Inverse Formula",
+          "latex": "$A^{-1} = \\frac{1}{ad-bc} \\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix}$ when $ad - bc \\neq 0$",
+          "description": "The full formula combining all steps: determinant check, adjugate, and scalar multiplication"
+        },
+        {
+          "name": "Singularity Check",
+          "latex": "$\\det(A) = 0 \\implies A^{-1} \\text{ does not exist}$",
+          "description": "First step: if determinant is zero, immediately return None"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete 2×2 matrix inverse function by combining all previous sub-quest functions: determinant calculation, singularity check, adjugate computation, and scalar multiplication. This synthesizes everything into the final solution.",
+        "function_signature": "def compute_inverse_2x2(matrix: list[list[float]]) -> list[list[float]] | None:",
+        "starter_code": "def compute_inverse_2x2(matrix: list[list[float]]) -> list[list[float]] | None:\n    \"\"\"\n    Compute the inverse of a 2x2 matrix using the complete algorithm.\n    \n    Algorithm:\n    1. Extract elements a, b, c, d from [[a, b], [c, d]]\n    2. Calculate determinant: det = ad - bc\n    3. If det = 0, return None (singular matrix)\n    4. Compute adjugate: [[d, -b], [-c, a]]\n    5. Scale by 1/det: multiply each element by 1/det\n    6. Return the inverse matrix\n    \n    Args:\n        matrix: A 2x2 matrix [[a, b], [c, d]]\n    \n    Returns:\n        The inverse matrix, or None if matrix is singular\n    \"\"\"\n    # Your code here - integrate all previous sub-quest concepts\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_inverse_2x2([[4, 7], [2, 6]])",
+            "expected": "[[0.6, -0.7], [-0.2, 0.4]]",
+            "explanation": "det=10, adj=[[6,-7],[-2,4]], inverse = (1/10)×adj = [[0.6,-0.7],[-0.2,0.4]]"
+          },
+          {
+            "input": "compute_inverse_2x2([[2, 4], [1, 2]])",
+            "expected": "None",
+            "explanation": "det = 2×2 - 4×1 = 0, matrix is singular, no inverse exists"
+          },
+          {
+            "input": "compute_inverse_2x2([[1, 0], [0, 1]])",
+            "expected": "[[1.0, 0.0], [0.0, 1.0]]",
+            "explanation": "Identity matrix is its own inverse: det=1, adj=I, inverse=(1/1)×I=I"
+          },
+          {
+            "input": "compute_inverse_2x2([[3, 2], [1, 4]])",
+            "expected": "[[0.4, -0.2], [-0.1, 0.3]]",
+            "explanation": "det=10, adj=[[4,-2],[-1,3]], inverse=[[0.4,-0.2],[-0.1,0.3]]"
+          },
+          {
+            "input": "compute_inverse_2x2([[1, 2], [3, 4]])",
+            "expected": "[[-2.0, 1.0], [1.5, -0.5]]",
+            "explanation": "det=-2, adj=[[4,-2],[-3,1]], inverse=(1/-2)×adj=[[-2,1],[1.5,-0.5]]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking for singular matrices first (attempting division by zero)",
+        "Computing adjugate incorrectly (wrong swap or negation pattern)",
+        "Forgetting to scale by 1/det(A) after computing the adjugate",
+        "Returning the adjugate instead of the scaled adjugate as the inverse",
+        "Not handling floating-point precision properly in the result",
+        "Modifying the input matrix instead of creating a new result matrix"
+      ],
+      "hint": "Follow the algorithm step-by-step: (1) extract a,b,c,d; (2) compute det=ad-bc; (3) check if det==0; (4) create adjugate [[d,-b],[-c,a]]; (5) multiply adjugate by 1/det. You can reuse functions from previous sub-quests or implement inline.",
+      "references": [
+        "Complete matrix inversion algorithms",
+        "Computational linear algebra",
+        "Numerical methods for matrix operations",
+        "Applications of matrix inverses in solving linear systems"
+      ]
+    }
+  ]
+}

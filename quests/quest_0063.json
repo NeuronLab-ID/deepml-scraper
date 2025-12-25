@@ -1,0 +1,494 @@
+{
+  "problem_id": 63,
+  "title": "Implement the Conjugate Gradient Method for Solving Linear Systems",
+  "category": "Linear Algebra",
+  "difficulty": "hard",
+  "description": "## Task: Implement the Conjugate Gradient Method for Solving Linear Systems\n\nYour task is to implement the Conjugate Gradient (CG) method, an efficient iterative algorithm for solving large, sparse, symmetric, positive-definite linear systems. Given a matrix `A` and a vector `b`, the algorithm will solve for `x` in the system \\( Ax = b \\).\n\nWrite a function `conjugate_gradient(A, b, n, x0=None, tol=1e-8)` that performs the Conjugate Gradient method as follows:\n\n- `A`: A symmetric, positive-definite matrix representing the linear system.\n- `b`: The vector on the right side of the equation.\n- `n`: Maximum number of iterations.\n- `x0`: Initial guess for the solution vector.\n- `tol`: Tolerance for stopping criteria.\n\nThe function should return the solution vector `x`.\n\n    ",
+  "example": {
+    "input": "A = np.array([[4, 1], [1, 3]])\nb = np.array([1, 2])\nn = 5\n\nprint(conjugate_gradient(A, b, n))",
+    "output": "[0.09090909, 0.63636364]",
+    "reasoning": "The Conjugate Gradient method is applied to the linear system Ax = b with the given matrix A and vector b. The algorithm iteratively refines the solution to converge to the exact solution."
+  },
+  "starter_code": "import numpy as np\n\ndef conjugate_gradient(A, b, n, x0=None, tol=1e-8):\n\t\"\"\"\n\tSolve the system Ax = b using the Conjugate Gradient method.\n\n\t:param A: Symmetric positive-definite matrix\n\t:param b: Right-hand side vector\n\t:param n: Maximum number of iterations\n\t:param x0: Initial guess for solution (default is zero vector)\n\t:param tol: Convergence tolerance\n\t:return: Solution vector x\n\t\"\"\"\n\t# calculate initial residual vector\n\tx = np.zeros_like(b)\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Residuals and Symmetric Positive-Definite Matrices",
+      "relation_to_problem": "The CG method iteratively minimizes the residual vector $r_k = b - Ax_k$. Understanding residuals and verifying matrix properties (symmetric, positive-definite) is essential for initializing the algorithm and ensuring convergence guarantees.",
+      "prerequisites": [
+        "Matrix multiplication",
+        "Vector norms",
+        "Dot products",
+        "Matrix transposition"
+      ],
+      "learning_objectives": [
+        "Define and compute the residual vector for a linear system",
+        "Verify if a matrix is symmetric",
+        "Test if a matrix is positive-definite using eigenvalues or Sylvester's criterion",
+        "Understand why these properties guarantee CG convergence"
+      ],
+      "math_content": {
+        "definition": "Given a linear system $Ax = b$ where $A \\in \\mathbb{R}^{n \\times n}$, $x, b \\in \\mathbb{R}^n$, the **residual vector** at iteration $k$ is defined as:\n\n$$r_k = b - Ax_k$$\n\nThe residual measures how far the current approximation $x_k$ is from satisfying the equation. A matrix $A$ is **symmetric** if $A = A^T$. A symmetric matrix $A$ is **positive-definite** if for all non-zero vectors $v \\in \\mathbb{R}^n$:\n\n$$v^T A v > 0$$",
+        "notation": "$A$ = coefficient matrix, $x_k$ = solution approximation at iteration $k$, $b$ = right-hand side vector, $r_k$ = residual vector, $\\|\\cdot\\|$ = Euclidean norm",
+        "theorem": "**Sylvester's Criterion**: A symmetric matrix $A$ is positive-definite if and only if all its leading principal minors are positive. Equivalently, all eigenvalues of $A$ must be strictly positive.",
+        "proof_sketch": "If $A$ is positive-definite, then for any eigenvector $v$ with eigenvalue $\\lambda$: $v^T A v = v^T (\\lambda v) = \\lambda \\|v\\|^2 > 0$. Since $\\|v\\|^2 > 0$ for non-zero $v$, we must have $\\lambda > 0$.",
+        "examples": [
+          "Example 1: For $A = \\begin{bmatrix} 4 & 1 \\\\ 1 & 3 \\end{bmatrix}$, check symmetry: $A^T = A$ ✓. Check positive-definiteness: eigenvalues are $\\lambda_1 \\approx 4.30$, $\\lambda_2 \\approx 2.70$ (both positive) ✓",
+          "Example 2: Given $x_0 = [0, 0]^T$, $A = \\begin{bmatrix} 4 & 1 \\\\ 1 & 3 \\end{bmatrix}$, $b = [1, 2]^T$, compute $r_0 = b - Ax_0 = [1, 2]^T - [0, 0]^T = [1, 2]^T$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Residual Vector",
+          "latex": "$r_k = b - Ax_k$",
+          "description": "Measures error in current approximation; used to initialize CG and check convergence"
+        },
+        {
+          "name": "Positive-Definite Test",
+          "latex": "$v^T A v > 0 \\text{ for all } v \\neq 0$",
+          "description": "Ensures CG algorithm will not divide by zero and will converge"
+        },
+        {
+          "name": "Euclidean Norm",
+          "latex": "$\\|r\\| = \\sqrt{r^T r}$",
+          "description": "Used as convergence criterion: stop when $\\|r_k\\| < \\text{tolerance}$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the residual vector for a linear system and checks if a matrix is symmetric and positive-definite. This is the first step in CG initialization.",
+        "function_signature": "def compute_residual_and_check_matrix(A: np.ndarray, x: np.ndarray, b: np.ndarray) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef compute_residual_and_check_matrix(A: np.ndarray, x: np.ndarray, b: np.ndarray) -> tuple:\n    \"\"\"\n    Compute residual and verify matrix properties for CG method.\n    \n    :param A: Coefficient matrix\n    :param x: Current solution approximation\n    :param b: Right-hand side vector\n    :return: (residual, is_symmetric, is_positive_definite)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_residual_and_check_matrix(np.array([[4, 1], [1, 3]]), np.array([0, 0]), np.array([1, 2]))",
+            "expected": "(array([1, 2]), True, True)",
+            "explanation": "Initial residual is b - A*0 = b. Matrix is symmetric (A = A^T) and positive-definite (eigenvalues > 0)"
+          },
+          {
+            "input": "compute_residual_and_check_matrix(np.array([[2, 0], [0, 3]]), np.array([1, 1]), np.array([4, 5]))",
+            "expected": "(array([2, 2]), True, True)",
+            "explanation": "Residual: [4,5] - [[2,0],[0,3]][1,1] = [4,5] - [2,3] = [2,2]. Diagonal matrix is symmetric and positive-definite"
+          },
+          {
+            "input": "compute_residual_and_check_matrix(np.array([[1, 2], [3, 4]]), np.array([0, 0]), np.array([1, 1]))",
+            "expected": "(array([1, 1]), False, False)",
+            "explanation": "Residual is correct but matrix is not symmetric (A ≠ A^T), so cannot use CG method"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check matrix properties before applying CG - this can lead to algorithm failure",
+        "Computing residual as Ax - b instead of b - Ax",
+        "Using approximate equality for symmetry check without accounting for floating-point errors",
+        "Checking only eigenvalues without verifying symmetry first"
+      ],
+      "hint": "Use np.allclose() for symmetry check to handle floating-point precision. Use np.linalg.eigvals() to get eigenvalues for positive-definiteness test.",
+      "references": [
+        "Matrix decompositions",
+        "Eigenvalue problems",
+        "Numerical linear algebra stability"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Computing the Step Size Alpha: Line Search in Direction Space",
+      "relation_to_problem": "The parameter $\\alpha_k$ determines how far to move along the search direction $p_k$. Computing $\\alpha_k = \\frac{r_k^T r_k}{p_k^T A p_k}$ is a critical step in each CG iteration that ensures we minimize the quadratic form along the current direction.",
+      "prerequisites": [
+        "Residual computation",
+        "Matrix-vector multiplication",
+        "Dot products",
+        "Basic calculus (minimization)"
+      ],
+      "learning_objectives": [
+        "Understand how line search minimizes the quadratic form $f(x) = \\frac{1}{2}x^T A x - b^T x$",
+        "Derive the formula for optimal step size $\\alpha_k$ along direction $p_k$",
+        "Implement efficient computation of $\\alpha_k$ avoiding redundant operations",
+        "Recognize when division by zero might occur (non-positive-definite matrices)"
+      ],
+      "math_content": {
+        "definition": "The **step size** $\\alpha_k$ in the Conjugate Gradient method is the scalar that minimizes the quadratic form $f(x_{k+1})$ along the search direction $p_k$, where $x_{k+1} = x_k + \\alpha_k p_k$. It is defined as:\n\n$$\\alpha_k = \\frac{r_k^T r_k}{p_k^T A p_k}$$\n\nThis formula ensures that the new residual $r_{k+1}$ is orthogonal to the current residual $r_k$.",
+        "notation": "$\\alpha_k$ = step size at iteration $k$, $r_k$ = residual vector, $p_k$ = search direction, $A$ = coefficient matrix",
+        "theorem": "**Optimal Step Size Theorem**: Given $x_{k+1} = x_k + \\alpha p_k$, the value of $\\alpha$ that minimizes $f(x_{k+1}) = \\frac{1}{2}x_{k+1}^T A x_{k+1} - b^T x_{k+1}$ is obtained by setting $\\frac{\\partial f}{\\partial \\alpha} = 0$, yielding:\n\n$$\\alpha_k = \\frac{r_k^T p_k}{p_k^T A p_k}$$\n\nFor CG specifically, when $p_k = r_k$ (initially) or $p_k = r_k + \\beta_{k-1} p_{k-1}$ (subsequent iterations), this simplifies to $\\alpha_k = \\frac{r_k^T r_k}{p_k^T A p_k}$ due to orthogonality properties.",
+        "proof_sketch": "Starting with $f(x_k + \\alpha p_k)$, expand:\n\n$$f(x_k + \\alpha p_k) = \\frac{1}{2}(x_k + \\alpha p_k)^T A (x_k + \\alpha p_k) - b^T(x_k + \\alpha p_k)$$\n\nTaking derivative with respect to $\\alpha$ and setting to zero:\n\n$$\\frac{\\partial f}{\\partial \\alpha} = p_k^T A x_k + \\alpha p_k^T A p_k - b^T p_k = 0$$\n\nSince $r_k = b - Ax_k$, we have $b^T p_k - p_k^T A x_k = p_k^T r_k$, giving:\n\n$$\\alpha = \\frac{p_k^T r_k}{p_k^T A p_k}$$",
+        "examples": [
+          "Example 1: Given $r_0 = [1, 2]^T$, $p_0 = [1, 2]^T$, $A = \\begin{bmatrix} 4 & 1 \\\\ 1 & 3 \\end{bmatrix}$, compute:\n$r_0^T r_0 = 1^2 + 2^2 = 5$\n$Ap_0 = \\begin{bmatrix} 4 & 1 \\\\ 1 & 3 \\end{bmatrix} \\begin{bmatrix} 1 \\\\ 2 \\end{bmatrix} = \\begin{bmatrix} 6 \\\\ 7 \\end{bmatrix}$\n$p_0^T A p_0 = [1, 2] \\cdot [6, 7] = 6 + 14 = 20$\n$\\alpha_0 = \\frac{5}{20} = 0.25$",
+          "Example 2: For diagonal $A = \\text{diag}(2, 3)$, $r_k = [4, 6]^T$, $p_k = [4, 6]^T$:\n$r_k^T r_k = 16 + 36 = 52$\n$Ap_k = [8, 18]^T$\n$p_k^T A p_k = 32 + 108 = 140$\n$\\alpha_k = \\frac{52}{140} = 0.371$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Step Size Formula",
+          "latex": "$\\alpha_k = \\frac{r_k^T r_k}{p_k^T A p_k}$",
+          "description": "Optimal step size for CG iteration; denominator must be positive for positive-definite A"
+        },
+        {
+          "name": "Solution Update",
+          "latex": "$x_{k+1} = x_k + \\alpha_k p_k$",
+          "description": "Move from current approximation along search direction by step size"
+        },
+        {
+          "name": "Denominator Check",
+          "latex": "$p_k^T A p_k > 0$",
+          "description": "Must be positive for positive-definite A; guarantees convergence"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the optimal step size alpha_k and updates the solution vector. This is the core update step in CG.",
+        "function_signature": "def compute_alpha_and_update(A: np.ndarray, x: np.ndarray, r: np.ndarray, p: np.ndarray) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef compute_alpha_and_update(A: np.ndarray, x: np.ndarray, r: np.ndarray, p: np.ndarray) -> tuple:\n    \"\"\"\n    Compute step size alpha and update solution vector.\n    \n    :param A: Coefficient matrix (symmetric positive-definite)\n    :param x: Current solution approximation\n    :param r: Current residual vector\n    :param p: Current search direction\n    :return: (alpha, x_new) where alpha is the step size and x_new is updated solution\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_alpha_and_update(np.array([[4., 1.], [1., 3.]]), np.array([0., 0.]), np.array([1., 2.]), np.array([1., 2.]))",
+            "expected": "(0.25, array([0.25, 0.5]))",
+            "explanation": "alpha = (1^2 + 2^2) / ([1,2] · [[4,1],[1,3]][1,2]) = 5/20 = 0.25; x_new = [0,0] + 0.25[1,2] = [0.25, 0.5]"
+          },
+          {
+            "input": "compute_alpha_and_update(np.array([[2., 0.], [0., 3.]]), np.array([1., 1.]), np.array([2., 2.]), np.array([2., 2.]))",
+            "expected": "(0.4, array([1.8, 1.8]))",
+            "explanation": "For diagonal matrix: alpha = 8 / ([2,2] · [4,6]) = 8/20 = 0.4; x_new = [1,1] + 0.4[2,2] = [1.8, 1.8]"
+          },
+          {
+            "input": "compute_alpha_and_update(np.array([[5., 2.], [2., 3.]]), np.array([0.5, 0.5]), np.array([1., 1.]), np.array([1., 1.]))",
+            "expected": "(0.1, array([0.6, 0.6]))",
+            "explanation": "alpha = 2 / ([1,1] · [7,5]) = 2/20 = 0.1; demonstrates computation for non-diagonal matrix"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing alpha with wrong formula (e.g., using gradient instead of residual)",
+        "Not storing Ap_k for reuse in residual update (causes redundant matrix-vector multiplication)",
+        "Forgetting to check if denominator p^T A p is positive before division",
+        "Using integer division instead of floating-point division"
+      ],
+      "hint": "Compute Ap_k once and return it along with alpha and x_new for efficiency in the full CG algorithm. Use np.dot() for all vector products.",
+      "references": [
+        "Line search methods",
+        "Quadratic optimization",
+        "Numerical stability in iterative methods"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Updating the Residual Vector Efficiently",
+      "relation_to_problem": "Instead of recomputing $r_{k+1} = b - Ax_{k+1}$ from scratch (expensive matrix-vector multiplication), CG uses the recurrence relation $r_{k+1} = r_k - \\alpha_k A p_k$. This computational trick makes CG efficient for large systems.",
+      "prerequisites": [
+        "Residual definition",
+        "Step size computation",
+        "Matrix-vector multiplication properties"
+      ],
+      "learning_objectives": [
+        "Derive the residual update formula from the definition",
+        "Understand why the recurrence relation is computationally efficient",
+        "Implement residual update reusing previously computed Ap_k",
+        "Recognize when to stop iterations based on residual norm"
+      ],
+      "math_content": {
+        "definition": "The **residual update recurrence** in CG exploits the fact that:\n\n$$r_{k+1} = b - Ax_{k+1} = b - A(x_k + \\alpha_k p_k) = (b - Ax_k) - \\alpha_k A p_k = r_k - \\alpha_k A p_k$$\n\nThis eliminates the need to recompute $Ax_{k+1}$ from scratch, reducing computational cost from $O(n^2)$ or $O(\\text{nnz})$ (for sparse) per iteration.",
+        "notation": "$r_{k+1}$ = residual at iteration $k+1$, $\\alpha_k$ = step size, $Ap_k$ = matrix-vector product computed during alpha calculation",
+        "theorem": "**Residual Orthogonality**: In exact arithmetic, the CG method generates residuals that satisfy $r_{k+1}^T r_k = 0$ for all $k$. This orthogonality property is fundamental to CG's efficiency.\n\n**Convergence Criterion**: The algorithm terminates when $\\|r_{k+1}\\| < \\epsilon$ for some tolerance $\\epsilon > 0$, typically $10^{-8}$ or $10^{-10}$.",
+        "proof_sketch": "Starting from the definition:\n\n$$r_{k+1} = b - Ax_{k+1}$$\n\nSubstitute $x_{k+1} = x_k + \\alpha_k p_k$:\n\n$$r_{k+1} = b - A(x_k + \\alpha_k p_k) = b - Ax_k - \\alpha_k Ap_k$$\n\nRecognize $r_k = b - Ax_k$:\n\n$$r_{k+1} = r_k - \\alpha_k Ap_k$$\n\nThis requires only one matrix-vector product $Ap_k$, which was already computed when calculating $\\alpha_k$.",
+        "examples": [
+          "Example 1: Given $r_0 = [1, 2]^T$, $\\alpha_0 = 0.25$, $Ap_0 = [6, 7]^T$:\n$r_1 = r_0 - \\alpha_0 Ap_0 = [1, 2]^T - 0.25 \\times [6, 7]^T = [1, 2]^T - [1.5, 1.75]^T = [-0.5, 0.25]^T$\n$\\|r_1\\| = \\sqrt{0.25 + 0.0625} = 0.559$",
+          "Example 2: Checking convergence with tolerance $\\epsilon = 0.1$:\nIf $r_k = [0.05, 0.08]^T$, then $\\|r_k\\| = \\sqrt{0.0025 + 0.0064} = 0.0943 < 0.1$ → converged!"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Efficient Residual Update",
+          "latex": "$r_{k+1} = r_k - \\alpha_k A p_k$",
+          "description": "Reuses Ap_k from alpha computation; key to CG efficiency"
+        },
+        {
+          "name": "Residual Norm",
+          "latex": "$\\|r_k\\| = \\sqrt{r_k^T r_k}$",
+          "description": "Measures convergence; stop when below tolerance"
+        },
+        {
+          "name": "Convergence Test",
+          "latex": "$\\|r_{k+1}\\| < \\epsilon$",
+          "description": "Standard stopping criterion for iterative methods"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that updates the residual vector using the efficient recurrence relation and checks for convergence. This avoids recomputing expensive matrix-vector products.",
+        "function_signature": "def update_residual_and_check_convergence(r: np.ndarray, alpha: float, Ap: np.ndarray, tol: float) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef update_residual_and_check_convergence(r: np.ndarray, alpha: float, Ap: np.ndarray, tol: float) -> tuple:\n    \"\"\"\n    Update residual using recurrence and check convergence.\n    \n    :param r: Current residual vector\n    :param alpha: Step size from current iteration\n    :param Ap: Matrix-vector product A * p (already computed)\n    :param tol: Convergence tolerance\n    :return: (r_new, converged, residual_norm)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "update_residual_and_check_convergence(np.array([1., 2.]), 0.25, np.array([6., 7.]), 1e-8)",
+            "expected": "(array([-0.5, 0.25]), False, 0.559...)",
+            "explanation": "r_new = [1,2] - 0.25[6,7] = [-0.5, 0.25]; norm ≈ 0.559 > 1e-8, not converged"
+          },
+          {
+            "input": "update_residual_and_check_convergence(np.array([0.0001, 0.0002]), 0.5, np.array([0.0002, 0.0004]), 1e-4)",
+            "expected": "(array([0., 0.]), True, 0.0)",
+            "explanation": "r_new = [0.0001, 0.0002] - 0.5[0.0002, 0.0004] = [0, 0]; norm = 0 < 1e-4, converged"
+          },
+          {
+            "input": "update_residual_and_check_convergence(np.array([2., 3.]), 0.1, np.array([10., 15.]), 0.5)",
+            "expected": "(array([1., 1.5]), False, 1.802...)",
+            "explanation": "r_new = [2,3] - 0.1[10,15] = [1, 1.5]; norm ≈ 1.802 > 0.5, not converged"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Recomputing r = b - Ax instead of using the recurrence (wastes computation)",
+        "Not reusing Ap from the alpha calculation step",
+        "Computing residual norm as sum instead of Euclidean norm (sqrt of sum of squares)",
+        "Using absolute tolerance on individual components instead of vector norm",
+        "Forgetting to check convergence and running unnecessary iterations"
+      ],
+      "hint": "Use np.linalg.norm(r) or np.sqrt(np.dot(r, r)) to compute the Euclidean norm efficiently. The recurrence should use the already-computed Ap vector.",
+      "references": [
+        "Iterative method convergence theory",
+        "Floating-point error accumulation",
+        "Krylov subspace methods"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Computing Beta and Constructing Conjugate Search Directions",
+      "relation_to_problem": "The key innovation of CG over steepest descent is using conjugate directions. The parameter $\\beta_k = \\frac{r_{k+1}^T r_{k+1}}{r_k^T r_k}$ determines how to combine the new residual with the previous search direction to ensure A-orthogonality: $p_i^T A p_j = 0$ for $i \\neq j$.",
+      "prerequisites": [
+        "Residual computation",
+        "Vector orthogonality",
+        "Linear independence"
+      ],
+      "learning_objectives": [
+        "Understand the concept of A-conjugacy (A-orthogonality) between vectors",
+        "Derive why the beta formula ensures conjugate directions",
+        "Implement the search direction update $p_{k+1} = r_{k+1} + \\beta_k p_k$",
+        "Recognize that conjugacy prevents redundant searches and guarantees n-step convergence"
+      ],
+      "math_content": {
+        "definition": "Two vectors $p_i$ and $p_j$ are **A-conjugate** (or **A-orthogonal**) with respect to matrix $A$ if:\n\n$$p_i^T A p_j = 0 \\quad \\text{for } i \\neq j$$\n\nThe **direction update parameter** $\\beta_k$ in CG is:\n\n$$\\beta_k = \\frac{r_{k+1}^T r_{k+1}}{r_k^T r_k}$$\n\nThe **search direction** at iteration $k+1$ is:\n\n$$p_{k+1} = r_{k+1} + \\beta_k p_k$$\n\nThis construction ensures that $p_{k+1}$ is A-conjugate to all previous directions $p_0, p_1, \\ldots, p_k$.",
+        "notation": "$\\beta_k$ = direction update parameter, $p_k$ = search direction, $r_k$ = residual, $A$ = coefficient matrix",
+        "theorem": "**A-Conjugacy Theorem**: If $r_{k+1}^T r_k = 0$ (residual orthogonality) and $\\beta_k = \\frac{r_{k+1}^T r_{k+1}}{r_k^T r_k}$, then the directions $p_0, p_1, \\ldots, p_n$ generated by $p_{k+1} = r_{k+1} + \\beta_k p_k$ are mutually A-conjugate.\n\n**Convergence Guarantee**: For an $n \\times n$ positive-definite system, CG converges to the exact solution in at most $n$ iterations in exact arithmetic.",
+        "proof_sketch": "The CG method constructs directions in the Krylov subspace $\\mathcal{K}_k = \\text{span}\\{r_0, Ar_0, A^2r_0, \\ldots, A^{k-1}r_0\\}$. By the choice of $\\alpha_k$ and $\\beta_k$:\n\n1. Each $r_k$ is orthogonal to all previous $r_i$ (residual orthogonality)\n2. Each $p_k$ is A-conjugate to all previous $p_i$ (direction conjugacy)\n3. Since there are at most $n$ linearly independent vectors in $\\mathbb{R}^n$, convergence occurs in at most $n$ steps\n\nThe beta formula specifically ensures: $p_{k+1}^T A p_k = 0$ by construction.",
+        "examples": [
+          "Example 1: Given $r_0 = [1, 2]^T$, $r_1 = [-0.5, 0.25]^T$, compute beta:\n$r_1^T r_1 = 0.25 + 0.0625 = 0.3125$\n$r_0^T r_0 = 1 + 4 = 5$\n$\\beta_0 = \\frac{0.3125}{5} = 0.0625$",
+          "Example 2: Update direction with $\\beta_0 = 0.0625$, $p_0 = [1, 2]^T$, $r_1 = [-0.5, 0.25]^T$:\n$p_1 = r_1 + \\beta_0 p_0 = [-0.5, 0.25]^T + 0.0625 \\times [1, 2]^T = [-0.4375, 0.375]^T$",
+          "Example 3: Verifying A-conjugacy for $A = \\begin{bmatrix} 4 & 1 \\\\ 1 & 3 \\end{bmatrix}$, $p_0 = [1, 2]^T$, $p_1 = [-0.4375, 0.375]^T$:\n$Ap_0 = [6, 7]^T$\n$p_1^T A p_0 = [-0.4375, 0.375] \\cdot [6, 7] = -2.625 + 2.625 = 0$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Beta Parameter",
+          "latex": "$\\beta_k = \\frac{r_{k+1}^T r_{k+1}}{r_k^T r_k}$",
+          "description": "Ratio of squared residual norms; determines direction mixing coefficient"
+        },
+        {
+          "name": "Search Direction Update",
+          "latex": "$p_{k+1} = r_{k+1} + \\beta_k p_k$",
+          "description": "Combines new gradient with previous direction to maintain conjugacy"
+        },
+        {
+          "name": "A-Conjugacy Condition",
+          "latex": "$p_i^T A p_j = 0 \\text{ for } i \\neq j$",
+          "description": "Ensures each direction explores an independent component of solution space"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes beta and updates the search direction to maintain A-conjugacy. This is what makes CG superior to steepest descent.",
+        "function_signature": "def compute_beta_and_update_direction(r_old: np.ndarray, r_new: np.ndarray, p_old: np.ndarray) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef compute_beta_and_update_direction(r_old: np.ndarray, r_new: np.ndarray, p_old: np.ndarray) -> tuple:\n    \"\"\"\n    Compute beta and update search direction for A-conjugacy.\n    \n    :param r_old: Residual from previous iteration (r_k)\n    :param r_new: Residual from current iteration (r_{k+1})\n    :param p_old: Search direction from previous iteration (p_k)\n    :return: (beta, p_new) where beta is the mixing parameter and p_new is the new direction\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_beta_and_update_direction(np.array([1., 2.]), np.array([-0.5, 0.25]), np.array([1., 2.]))",
+            "expected": "(0.0625, array([-0.4375, 0.375]))",
+            "explanation": "beta = (0.25 + 0.0625) / (1 + 4) = 0.3125/5 = 0.0625; p_new = [-0.5, 0.25] + 0.0625[1, 2]"
+          },
+          {
+            "input": "compute_beta_and_update_direction(np.array([2., 3.]), np.array([1., 1.5]), np.array([2., 3.]))",
+            "expected": "(0.1923..., array([1.3846..., 2.0769...]))",
+            "explanation": "beta = (1 + 2.25)/(4 + 9) = 2.5/13 ≈ 0.1923; p_new = [1, 1.5] + 0.1923[2, 3]"
+          },
+          {
+            "input": "compute_beta_and_update_direction(np.array([4., 0.]), np.array([0., 3.]), np.array([4., 0.]))",
+            "expected": "(0.5625, array([2.25, 3.]))",
+            "explanation": "beta = 9/16 = 0.5625; demonstrates orthogonal residuals case"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing beta with r_old in numerator instead of r_new",
+        "Forgetting to square the residuals (using dot product r^T r, not just r)",
+        "Setting p_new = r_new (ignoring beta term) - this reduces to steepest descent",
+        "Not understanding that beta = 0 when residuals become orthogonal",
+        "Trying to verify A-conjugacy without understanding it's automatic from the formula"
+      ],
+      "hint": "Store r^T r from the previous iteration to avoid recomputing it. The direction update is a simple weighted sum of the new residual and old direction.",
+      "references": [
+        "Krylov subspace methods",
+        "Conjugate direction methods",
+        "Gram-Schmidt orthogonalization",
+        "Lanczos iteration"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Assembling the Complete CG Iteration Loop",
+      "relation_to_problem": "Now combine all components into the full iterative algorithm: initialize with $x_0$, compute $r_0$ and $p_0$, then iterate the four-step cycle (compute alpha, update x, update r, compute beta, update p) until convergence or max iterations.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Loop control structures",
+        "Convergence criteria"
+      ],
+      "learning_objectives": [
+        "Implement the complete CG algorithm by integrating all components",
+        "Handle initialization properly (x0 as zero or custom initial guess)",
+        "Manage iteration loop with dual stopping criteria (tolerance and max iterations)",
+        "Understand the computational complexity: O(n) storage, O(nnz) per iteration for sparse matrices"
+      ],
+      "math_content": {
+        "definition": "The **complete Conjugate Gradient algorithm** consists of:\n\n**Initialization**:\n$$x_0 = \\text{initial guess (default: zero vector)}$$\n$$r_0 = b - Ax_0$$\n$$p_0 = r_0$$\n\n**Iteration** (for $k = 0, 1, 2, \\ldots$ until convergence):\n\n1. Compute step size: $\\alpha_k = \\frac{r_k^T r_k}{p_k^T A p_k}$\n2. Update solution: $x_{k+1} = x_k + \\alpha_k p_k$\n3. Update residual: $r_{k+1} = r_k - \\alpha_k A p_k$\n4. Check convergence: if $\\|r_{k+1}\\| < \\epsilon$ or $k \\geq n_{\\max}$, stop\n5. Compute direction parameter: $\\beta_k = \\frac{r_{k+1}^T r_{k+1}}{r_k^T r_k}$\n6. Update direction: $p_{k+1} = r_{k+1} + \\beta_k p_k$",
+        "notation": "$k$ = iteration counter, $n_{\\max}$ = maximum iterations, $\\epsilon$ = tolerance",
+        "theorem": "**Computational Complexity**: Each CG iteration requires:\n- 1 matrix-vector product: $O(\\text{nnz})$ for sparse $A$, $O(n^2)$ for dense\n- 3 vector dot products: $O(n)$ each\n- 3 vector updates (AXPY operations): $O(n)$ each\n\nTotal per iteration: $O(\\text{nnz} + n)$ for sparse systems.\n\n**Storage**: Only 4 vectors needed ($x, r, p, Ap$): $O(n)$ memory.",
+        "proof_sketch": "The efficiency comes from:\n1. Never forming $A^{-1}$ explicitly\n2. Reusing $Ap_k$ computed for $\\alpha_k$ in the residual update\n3. Updating directions recursively rather than storing all previous directions\n4. Maintaining orthogonality/conjugacy automatically through the formulas\n\nFor sparse $A$ with $\\text{nnz} \\ll n^2$ non-zeros, the matrix-vector product dominates but is still much cheaper than $O(n^3)$ direct methods.",
+        "examples": [
+          "Example (complete iteration 0):\nGiven $A = \\begin{bmatrix} 4 & 1 \\\\ 1 & 3 \\end{bmatrix}$, $b = [1, 2]^T$, $x_0 = [0, 0]^T$, $\\epsilon = 10^{-8}$\n\nInit: $r_0 = [1, 2]^T$, $p_0 = [1, 2]^T$\n\n1. $\\alpha_0 = 5 / 20 = 0.25$\n2. $x_1 = [0, 0] + 0.25[1, 2] = [0.25, 0.5]$\n3. $r_1 = [1, 2] - 0.25[6, 7] = [-0.5, 0.25]$\n4. $\\|r_1\\| = 0.559 > 10^{-8}$ → continue\n5. $\\beta_0 = 0.3125 / 5 = 0.0625$\n6. $p_1 = [-0.5, 0.25] + 0.0625[1, 2] = [-0.4375, 0.375]$",
+          "Example (iteration count): For $n=2$, CG converges in at most 2 iterations. For $n=1000$ well-conditioned system, may converge in 50-100 iterations vs. $O(n^3)$ for direct solve."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Algorithm",
+          "latex": "$\\text{Initialize: } r_0 = b - Ax_0, \\; p_0 = r_0$ \n$\\text{Loop: } \\alpha_k, x_{k+1}, r_{k+1}, \\beta_k, p_{k+1}$",
+          "description": "Full CG iteration combining all steps from previous sub-quests"
+        },
+        {
+          "name": "Dual Stopping Criteria",
+          "latex": "$\\|r_k\\| < \\epsilon \\text{ OR } k \\geq n_{\\max}$",
+          "description": "Stop on convergence or maximum iteration limit"
+        },
+        {
+          "name": "Computational Cost",
+          "latex": "$O(k \\cdot (\\text{nnz} + n))$",
+          "description": "Total cost for k iterations on sparse system"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified version of the CG algorithm that performs exactly n iterations (no early stopping) and returns the final solution. This builds toward the main problem but without handling all edge cases yet.",
+        "function_signature": "def conjugate_gradient_simple(A: np.ndarray, b: np.ndarray, n_iterations: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef conjugate_gradient_simple(A: np.ndarray, b: np.ndarray, n_iterations: int) -> np.ndarray:\n    \"\"\"\n    Solve Ax = b using simplified CG (fixed iterations, no tolerance check).\n    \n    :param A: Symmetric positive-definite matrix\n    :param b: Right-hand side vector\n    :param n_iterations: Number of CG iterations to perform\n    :return: Solution vector x\n    \"\"\"\n    # Initialize x as zero vector\n    x = np.zeros_like(b, dtype=float)\n    \n    # Compute initial residual and direction\n    # Your code here\n    \n    # Main CG loop\n    for k in range(n_iterations):\n        # Compute alpha, update x, update r, compute beta, update p\n        # Your code here\n        pass\n    \n    return x",
+        "test_cases": [
+          {
+            "input": "conjugate_gradient_simple(np.array([[4., 1.], [1., 3.]]), np.array([1., 2.]), 2)",
+            "expected": "array([0.09090909, 0.63636364])",
+            "explanation": "After 2 iterations (dimension n=2), CG converges to exact solution of the 2x2 system"
+          },
+          {
+            "input": "conjugate_gradient_simple(np.array([[2., 0.], [0., 3.]]), np.array([4., 9.]), 1)",
+            "expected": "array([2., 3.])",
+            "explanation": "Diagonal matrix: CG solves exactly in 1 iteration per distinct eigenvalue"
+          },
+          {
+            "input": "conjugate_gradient_simple(np.array([[5., 2., 0.], [2., 6., 2.], [0., 2., 5.]]), np.array([1., 2., 3.]), 3)",
+            "expected": "array([0.0, 0.0, 0.6])",
+            "explanation": "3x3 system converges in at most 3 iterations; tests loop for higher dimensions"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not initializing x as float array (using integers causes precision loss)",
+        "Computing Ap twice per iteration (once for alpha, once for residual update)",
+        "Breaking loop on convergence when exercise specifies fixed iterations",
+        "Updating direction before checking if we need another iteration",
+        "Off-by-one errors in loop counter vs. number of iterations performed",
+        "Not storing r^T r for reuse in beta calculation"
+      ],
+      "hint": "Store r_dot_r = np.dot(r, r) after each residual update to reuse in both convergence check and beta calculation. Compute Ap = A @ p once and use for both alpha denominator and residual update.",
+      "references": [
+        "Iterative solver implementations",
+        "Numerical linear algebra textbooks",
+        "SciPy's conjugate gradient source code"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Handling Initial Guesses, Tolerance, and Edge Cases",
+      "relation_to_problem": "The final step adds production-ready features: custom initial guess x0, tolerance-based early stopping, handling edge cases (zero RHS, already-converged initial guess), and returning appropriate solutions. This completes all requirements for the main problem.",
+      "prerequisites": [
+        "Complete simple CG implementation",
+        "Numerical precision awareness",
+        "Edge case analysis"
+      ],
+      "learning_objectives": [
+        "Implement custom initial guess handling (x0 parameter)",
+        "Add tolerance-based early stopping to avoid unnecessary iterations",
+        "Handle edge cases: b = 0, x0 already converged, numerical instabilities",
+        "Understand trade-offs between tolerance and iteration count"
+      ],
+      "math_content": {
+        "definition": "**Initial guess handling**: If provided, use $x_0 \\neq 0$; otherwise default to $x_0 = 0$. The initial residual becomes:\n\n$$r_0 = b - Ax_0$$\n\nIf $x_0 = 0$, this simplifies to $r_0 = b$.\n\n**Early stopping criterion**: Stop when:\n\n$$\\|r_k\\| < \\epsilon \\quad \\text{OR} \\quad k \\geq n_{\\max}$$\n\nwhere $\\epsilon$ is typically $10^{-8}$ to $10^{-10}$.\n\n**Edge cases**:\n1. $b = 0$ → solution is $x = 0$ (trivial)\n2. $\\|r_0\\| < \\epsilon$ → $x_0$ already satisfies tolerance\n3. Very ill-conditioned $A$ → may require preconditioning",
+        "notation": "$x_0$ = initial guess, $\\epsilon$ = tolerance, $n_{\\max}$ = maximum iterations",
+        "theorem": "**Practical Convergence**: While theory guarantees convergence in $n$ iterations (exact arithmetic), floating-point errors can cause:\n1. Loss of orthogonality between residuals\n2. Loss of A-conjugacy between directions\n\nIn practice:\n- Well-conditioned systems: converge in $k \\ll n$ iterations\n- Ill-conditioned systems: may need all $n$ iterations or fail to meet tolerance\n- Condition number $\\kappa(A)$ determines convergence rate: $O(\\sqrt{\\kappa})$ iterations",
+        "proof_sketch": "Given non-zero $x_0$, the algorithm still works because:\n1. The residual $r_0 = b - Ax_0$ captures the error in initial guess\n2. All subsequent formulas depend only on residuals and directions, not on $x_0$ directly\n3. Better $x_0$ → smaller $\\|r_0\\|$ → fewer iterations needed\n\nEarly stopping prevents wasted computation when $\\|r_k\\|$ is already below tolerance. The dual criteria ensure termination even if tolerance is never met.",
+        "examples": [
+          "Example 1 (zero RHS): $A = \\begin{bmatrix} 4 & 1 \\\\ 1 & 3 \\end{bmatrix}$, $b = [0, 0]^T$\n$r_0 = b - Ax_0 = [0, 0]^T$ → $\\|r_0\\| = 0 < \\epsilon$ → return $x = [0, 0]^T$ immediately",
+          "Example 2 (good initial guess): $A = \\begin{bmatrix} 4 & 1 \\\\ 1 & 3 \\end{bmatrix}$, $b = [1, 2]^T$, $x_0 = [0.1, 0.6]^T$\n$r_0 = [1, 2] - [[4,1],[1,3]][0.1, 0.6] = [1, 2] - [1.0, 1.9] = [0, 0.1]^T$\n$\\|r_0\\| = 0.1$ → fewer iterations needed vs. $x_0 = 0$",
+          "Example 3 (early stopping): Set $\\epsilon = 0.5$, after iteration 0 with $\\|r_1\\| = 0.559$, continue; after iteration 1 with $\\|r_2\\| = 0.001$, stop early (vs. running all $n$ iterations)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Initial Residual with Guess",
+          "latex": "$r_0 = b - Ax_0$",
+          "description": "Accounts for non-zero initial guess; reduces to r_0 = b when x_0 = 0"
+        },
+        {
+          "name": "Combined Stopping Condition",
+          "latex": "$\\text{stop if } \\|r_k\\| < \\epsilon \\text{ or } k = n_{\\max}$",
+          "description": "Ensures termination and prevents unnecessary computation"
+        },
+        {
+          "name": "Edge Case Check",
+          "latex": "$\\text{if } \\|r_0\\| < \\epsilon \\text{ return } x_0$",
+          "description": "Handle already-converged initial guess efficiently"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete production-ready CG algorithm with all features: custom x0, tolerance-based early stopping, and edge case handling. This is the building block that directly maps to the main problem solution structure.",
+        "function_signature": "def conjugate_gradient_complete(A: np.ndarray, b: np.ndarray, x0: np.ndarray = None, max_iter: int = None, tol: float = 1e-8) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef conjugate_gradient_complete(A: np.ndarray, b: np.ndarray, x0: np.ndarray = None, max_iter: int = None, tol: float = 1e-8) -> np.ndarray:\n    \"\"\"\n    Complete CG implementation with all features.\n    \n    :param A: Symmetric positive-definite matrix\n    :param b: Right-hand side vector\n    :param x0: Initial guess (default: zero vector)\n    :param max_iter: Maximum iterations (default: len(b))\n    :param tol: Convergence tolerance (default: 1e-8)\n    :return: Solution vector x\n    \"\"\"\n    # Handle defaults\n    if x0 is None:\n        x = np.zeros_like(b, dtype=float)\n    else:\n        x = x0.astype(float).copy()\n    \n    if max_iter is None:\n        max_iter = len(b)\n    \n    # Initialize residual and check early convergence\n    # Your code here\n    \n    # Main CG loop with early stopping\n    # Your code here\n    \n    return x",
+        "test_cases": [
+          {
+            "input": "conjugate_gradient_complete(np.array([[4., 1.], [1., 3.]]), np.array([1., 2.]))",
+            "expected": "array([0.09090909, 0.63636364])",
+            "explanation": "Standard case with default parameters; converges to exact solution"
+          },
+          {
+            "input": "conjugate_gradient_complete(np.array([[4., 1.], [1., 3.]]), np.array([0., 0.]))",
+            "expected": "array([0., 0.])",
+            "explanation": "Edge case: zero RHS should return zero solution immediately"
+          },
+          {
+            "input": "conjugate_gradient_complete(np.array([[2., 0.], [0., 3.]]), np.array([4., 9.]), x0=np.array([1.5, 2.5]), tol=1e-6)",
+            "expected": "array([2., 3.])",
+            "explanation": "Custom initial guess closer to solution; should converge faster"
+          },
+          {
+            "input": "conjugate_gradient_complete(np.array([[4., 1.], [1., 3.]]), np.array([1., 2.]), max_iter=1)",
+            "expected": "array([0.25, 0.5])",
+            "explanation": "Limited iterations: stops after 1 iteration even if not fully converged"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Modifying input x0 directly instead of making a copy",
+        "Not converting x to float type (causes integer arithmetic errors)",
+        "Checking convergence only at end of loop instead of after residual update",
+        "Not handling None case for x0 (should default to zeros)",
+        "Setting max_iter default too small or too large",
+        "Not returning immediately when initial residual is below tolerance"
+      ],
+      "hint": "Check if x0 is None to set default. Always use x.copy() to avoid modifying input. Check convergence right after computing r_new and before computing beta (no need to update direction if converged).",
+      "references": [
+        "Production numerical code practices",
+        "IEEE floating-point standards",
+        "Numerical stability analysis",
+        "SciPy optimize module"
+      ]
+    }
+  ]
+}

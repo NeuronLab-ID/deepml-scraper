@@ -1,0 +1,487 @@
+{
+  "problem_id": 77,
+  "title": "Calculate Performance Metrics for a Classification Model",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "\n### Task: Implement Performance Metrics Calculation\n\nIn this task, you are required to implement a function `performance_metrics(actual, predicted)` that computes various performance metrics for a binary classification problem. These metrics include:\n\n- Confusion Matrix\n- Accuracy\n- F1 Score\n- Specificity\n- Negative Predictive Value\n\nThe function should take in two lists:\n\n- `actual`: The actual class labels (1 for positive, 0 for negative).\n- `predicted`: The predicted class labels from the model.\n\n### Output\n\nThe function should return a tuple containing:\n\n1. `confusion_matrix`: A 2x2 matrix.\n2. `accuracy`: A float representing the accuracy of the model.\n3. `f1_score`: A float representing the F1 score of the model.\n4. `specificity`: A float representing the specificity of the model.\n5. `negative_predictive_value`: A float representing the negative predictive value.\n\n### Constraints\n\n- All elements in the `actual` and `predicted` lists must be either 0 or 1.\n- Both lists must have the same length.\n",
+  "example": {
+    "input": "actual = [1, 0, 1, 0, 1]\npredicted = [1, 0, 0, 1, 1]\nprint(performance_metrics(actual, predicted))",
+    "output": "([[2, 1], [1, 1]], 0.6, 0.667, 0.5, 0.5)",
+    "reasoning": "The function calculates the confusion matrix, accuracy, F1 score, specificity, and negative predictive value based on the input labels. The resulting values are rounded to three decimal places as required."
+  },
+  "starter_code": "\ndef performance_metrics(actual: list[int], predicted: list[int]) -> tuple:\n\t# Implement your code here\n\treturn confusion_matrix, round(accuracy, 3), round(f1, 3), round(specificity, 3), round(negativePredictive, 3)\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding the Confusion Matrix: Foundation of Binary Classification Metrics",
+      "relation_to_problem": "The confusion matrix is the fundamental data structure from which all other metrics (accuracy, F1 score, specificity, NPV) are derived. Mastering its construction is essential for computing any classification metric.",
+      "prerequisites": [
+        "Basic set theory",
+        "Binary classification concepts",
+        "Array/list manipulation"
+      ],
+      "learning_objectives": [
+        "Formally define the four components of a confusion matrix",
+        "Understand the mathematical relationship between predictions and ground truth",
+        "Implement an algorithm to count TP, TN, FP, and FN from prediction vectors"
+      ],
+      "math_content": {
+        "definition": "Given a binary classification task with ground truth labels $y \\in \\{0, 1\\}^n$ and predicted labels $\\hat{y} \\in \\{0, 1\\}^n$ for $n$ observations, the confusion matrix is a $2 \\times 2$ matrix $M$ that partitions the sample space into four disjoint sets based on the Cartesian product of actual and predicted classes.",
+        "notation": "$TP = |\\{i : y_i = 1 \\land \\hat{y}_i = 1\\}|$ = True Positives (correctly predicted positive class)\n$TN = |\\{i : y_i = 0 \\land \\hat{y}_i = 0\\}|$ = True Negatives (correctly predicted negative class)\n$FP = |\\{i : y_i = 0 \\land \\hat{y}_i = 1\\}|$ = False Positives (Type I error)\n$FN = |\\{i : y_i = 1 \\land \\hat{y}_i = 0\\}|$ = False Negatives (Type II error)",
+        "theorem": "**Theorem (Partition Property)**: The four components of the confusion matrix form a partition of the sample space, i.e., $TP + TN + FP + FN = n$ and the sets are pairwise disjoint.",
+        "proof_sketch": "Each observation $i \\in \\{1, ..., n\\}$ belongs to exactly one of four disjoint categories determined by the truth table of $(y_i, \\hat{y}_i)$: $(1,1) \\rightarrow TP$, $(0,0) \\rightarrow TN$, $(0,1) \\rightarrow FP$, $(1,0) \\rightarrow FN$. Since these are exhaustive and mutually exclusive, their union covers all $n$ observations.",
+        "examples": [
+          "Example 1: $y = [1, 0, 1]$, $\\hat{y} = [1, 0, 0]$. Index 0: $(1,1) \\rightarrow TP$, Index 1: $(0,0) \\rightarrow TN$, Index 2: $(1,0) \\rightarrow FN$. Thus $TP=1, TN=1, FP=0, FN=1$.",
+          "Example 2: $y = [0, 0, 0, 0]$, $\\hat{y} = [0, 1, 0, 1]$. All actuals are negative, so $TP=0, FN=0$. Correct negatives: indices 0,2 give $TN=2$. Incorrect positives: indices 1,3 give $FP=2$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "True Positive Count",
+          "latex": "$TP = \\sum_{i=1}^{n} \\mathbb{1}_{y_i = 1} \\cdot \\mathbb{1}_{\\hat{y}_i = 1}$",
+          "description": "Sum of indicator functions where both actual and predicted are positive"
+        },
+        {
+          "name": "False Positive Count",
+          "latex": "$FP = \\sum_{i=1}^{n} \\mathbb{1}_{y_i = 0} \\cdot \\mathbb{1}_{\\hat{y}_i = 1}$",
+          "description": "Sum where actual is negative but predicted is positive (Type I error)"
+        },
+        {
+          "name": "Confusion Matrix Structure",
+          "latex": "$M = \\begin{pmatrix} TP & FN \\\\ FP & TN \\end{pmatrix}$",
+          "description": "Standard 2×2 arrangement with true positives in top-left position"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes actual and predicted binary labels and returns the four confusion matrix components as a tuple (TP, TN, FP, FN). This is the building block for all subsequent metrics.",
+        "function_signature": "def confusion_components(actual: list[int], predicted: list[int]) -> tuple[int, int, int, int]:",
+        "starter_code": "def confusion_components(actual: list[int], predicted: list[int]) -> tuple[int, int, int, int]:\n    \"\"\"\n    Calculate TP, TN, FP, FN from actual and predicted labels.\n    \n    Args:\n        actual: List of ground truth labels (0 or 1)\n        predicted: List of predicted labels (0 or 1)\n    \n    Returns:\n        Tuple of (TP, TN, FP, FN)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "confusion_components([1, 0, 1, 0], [1, 0, 1, 0])",
+            "expected": "(2, 2, 0, 0)",
+            "explanation": "Perfect predictions: 2 positive samples correctly identified (TP=2), 2 negative samples correctly identified (TN=2), no errors"
+          },
+          {
+            "input": "confusion_components([1, 1, 0, 0], [0, 0, 1, 1])",
+            "expected": "(0, 0, 2, 2)",
+            "explanation": "All predictions inverted: 2 positives missed (FN=2), 2 negatives wrongly called positive (FP=2)"
+          },
+          {
+            "input": "confusion_components([1, 0, 1, 0, 1], [1, 0, 0, 1, 1])",
+            "expected": "(2, 1, 1, 1)",
+            "explanation": "Mixed case: TP=2 (indices 0,4), TN=1 (index 1), FP=1 (index 3), FN=1 (index 2)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing FP and FN: Remember FP means predicting positive when actual is negative (crying wolf), FN means predicting negative when actual is positive (missing the signal)",
+        "Off-by-one errors when iterating through parallel lists",
+        "Not handling empty input lists or mismatched lengths",
+        "Confusing matrix position conventions (some sources use different arrangements)"
+      ],
+      "hint": "Use a single loop to iterate through both lists simultaneously with zip() or enumerate(), and use conditional statements to increment the appropriate counter based on the (actual, predicted) pair.",
+      "references": [
+        "Binary classification error types",
+        "Type I and Type II errors in hypothesis testing",
+        "Indicator functions and characteristic functions"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Constructing the Confusion Matrix as a 2D Array",
+      "relation_to_problem": "The main problem requires returning a confusion matrix as a 2×2 nested list structure. This sub-quest teaches how to organize the four counts (TP, TN, FP, FN) into the standard matrix format.",
+      "prerequisites": [
+        "Confusion matrix components (Step 1)",
+        "Nested list structures",
+        "2D array indexing"
+      ],
+      "learning_objectives": [
+        "Understand the standard convention for arranging confusion matrix elements",
+        "Map the four scalar counts to their correct 2D positions",
+        "Create properly formatted nested list structures in Python"
+      ],
+      "math_content": {
+        "definition": "The confusion matrix $M \\in \\mathbb{Z}^{2 \\times 2}_{\\geq 0}$ is a square matrix where entry $M_{ij}$ represents the count of observations with actual class $i$ and predicted class $j$. Using the convention where positive class is labeled 1 and negative class is labeled 0, the standard form is: $$M = \\begin{pmatrix} M_{11} & M_{10} \\\\ M_{01} & M_{00} \\end{pmatrix} = \\begin{pmatrix} TP & FN \\\\ FP & TN \\end{pmatrix}$$",
+        "notation": "$M_{ij}$ = count where actual class is $i$ and predicted class is $j$\n$M[0][0] = TP$ (both positive)\n$M[0][1] = FN$ (actual positive, predicted negative)\n$M[1][0] = FP$ (actual negative, predicted positive)\n$M[1][1] = TN$ (both negative)",
+        "theorem": "**Theorem (Matrix Trace and Accuracy)**: The trace of the confusion matrix $\\text{tr}(M) = M_{11} + M_{00} = TP + TN$ equals the total number of correct predictions, and the ratio $\\text{tr}(M)/n$ gives the accuracy metric.",
+        "proof_sketch": "The trace sums diagonal elements, which by definition are the cases where $i=j$ (predicted class matches actual class). For binary classification, these are exactly the true positives and true negatives. Since $n = TP + TN + FP + FN$, we have $\\text{Accuracy} = (TP + TN)/(TP + TN + FP + FN) = \\text{tr}(M)/n$.",
+        "examples": [
+          "Example 1: Given $TP=5, FN=2, FP=1, TN=10$, construct $M = [[5, 2], [1, 10]]$. Here $\\text{tr}(M) = 15$ and $n = 18$, so accuracy = $15/18 \\approx 0.833$.",
+          "Example 2: For a perfect classifier with $TP=3, TN=7, FP=0, FN=0$, we get $M = [[3, 0], [0, 7]]$, which is a diagonal matrix indicating zero classification errors."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Matrix Element Definition",
+          "latex": "$M_{ij} = |\\{k : y_k = i \\land \\hat{y}_k = j\\}|$",
+          "description": "Each cell counts observations where actual class is $i$ and predicted class is $j$"
+        },
+        {
+          "name": "Row Sum Property",
+          "latex": "$\\sum_{j} M_{ij} = |\\{k : y_k = i\\}|$",
+          "description": "Each row sums to the total count of observations in that actual class"
+        },
+        {
+          "name": "Column Sum Property",
+          "latex": "$\\sum_{i} M_{ij} = |\\{k : \\hat{y}_k = j\\}|$",
+          "description": "Each column sums to the total count of predictions for that class"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes the four confusion matrix components and returns a properly formatted 2×2 nested list (confusion matrix). This converts scalar counts into the matrix structure required by the main problem.",
+        "function_signature": "def build_confusion_matrix(tp: int, tn: int, fp: int, fn: int) -> list[list[int]]:",
+        "starter_code": "def build_confusion_matrix(tp: int, tn: int, fp: int, fn: int) -> list[list[int]]:\n    \"\"\"\n    Construct a 2x2 confusion matrix from component counts.\n    \n    Args:\n        tp: True positive count\n        tn: True negative count\n        fp: False positive count\n        fn: False negative count\n    \n    Returns:\n        2x2 nested list in format [[TP, FN], [FP, TN]]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "build_confusion_matrix(5, 10, 2, 3)",
+            "expected": "[[5, 3], [2, 10]]",
+            "explanation": "Standard format: top-left is TP=5, top-right is FN=3, bottom-left is FP=2, bottom-right is TN=10"
+          },
+          {
+            "input": "build_confusion_matrix(0, 0, 0, 0)",
+            "expected": "[[0, 0], [0, 0]]",
+            "explanation": "Edge case with all zeros produces zero matrix"
+          },
+          {
+            "input": "build_confusion_matrix(1, 1, 1, 1)",
+            "expected": "[[1, 1], [1, 1]]",
+            "explanation": "All components equal produces uniform matrix"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Reversing the row/column order and placing elements in wrong positions",
+        "Confusing which element goes in M[0][1] vs M[1][0] (FN vs FP)",
+        "Creating a 1D list instead of properly nested 2D structure",
+        "Using tuples instead of lists (main problem requires mutable list structure)"
+      ],
+      "hint": "Create a nested list using literal syntax [[a, b], [c, d]] where you carefully match each variable to its correct position based on the standard convention shown in the definition.",
+      "references": [
+        "Matrix indexing conventions",
+        "Nested data structures in Python",
+        "Contingency tables in statistics"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Computing Basic Rate Metrics: Accuracy and Specificity",
+      "relation_to_problem": "Two of the five required metrics (accuracy and specificity) are simple rates computed directly from confusion matrix components. Understanding their mathematical definitions and properties is essential for the solution.",
+      "prerequisites": [
+        "Confusion matrix construction (Steps 1-2)",
+        "Ratio and proportion calculations",
+        "Division by zero handling"
+      ],
+      "learning_objectives": [
+        "Derive accuracy and specificity formulas from first principles",
+        "Understand the geometric interpretation of these metrics as conditional probabilities",
+        "Implement robust calculation handling edge cases like zero denominators"
+      ],
+      "math_content": {
+        "definition": "**Accuracy** is defined as the probability that a randomly selected observation is correctly classified: $$\\text{Accuracy} = P(\\hat{y} = y) = \\frac{|\\{i : \\hat{y}_i = y_i\\}|}{n} = \\frac{TP + TN}{TP + TN + FP + FN}$$ **Specificity** (also called true negative rate or TNR) is the conditional probability of predicting negative given the observation is actually negative: $$\\text{Specificity} = P(\\hat{y} = 0 \\mid y = 0) = \\frac{TN}{TN + FP}$$",
+        "notation": "$\\text{Acc} \\in [0, 1]$ with 1 being perfect classification\n$\\text{Spec} \\in [0, 1]$ with 1 meaning all negatives correctly identified\n$\\text{Spec} = \\frac{TN}{N}$ where $N = TN + FP$ is the total number of actual negatives",
+        "theorem": "**Theorem (Accuracy Bounds)**: For any binary classifier, $\\text{Accuracy} \\geq \\max(P(y=0), P(y=1))$ where the equality holds for trivial constant classifiers. **Theorem (Specificity-FPR Complement)**: Specificity and False Positive Rate (FPR) are complementary: $\\text{Specificity} + \\text{FPR} = 1$ where $\\text{FPR} = \\frac{FP}{TN + FP}$.",
+        "proof_sketch": "For accuracy: A constant classifier that always predicts the majority class achieves accuracy equal to the majority class proportion. Any classifier doing worse than this performs below random baseline. For specificity: The denominator $TN + FP$ represents all actual negatives. Each must be either correctly classified (TN) or misclassified (FP), so $\\frac{TN}{TN+FP} + \\frac{FP}{TN+FP} = 1$.",
+        "examples": [
+          "Example 1: Given $TP=45, TN=50, FP=3, FN=2$, we have $n=100$. Accuracy $= (45+50)/100 = 0.95$. Specificity $= 50/(50+3) \\approx 0.943$, meaning 94.3% of negatives correctly identified.",
+          "Example 2: Imbalanced case with $TP=1, TN=99, FP=0, FN=0$. Accuracy $= 100/100 = 1.0$ (perfect). Specificity $= 99/99 = 1.0$ (all negatives caught). Note: even with class imbalance, both metrics are interpretable here."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Accuracy Formula",
+          "latex": "$\\text{Accuracy} = \\frac{TP + TN}{TP + TN + FP + FN}$",
+          "description": "Use when you need overall correctness rate across both classes"
+        },
+        {
+          "name": "Specificity Formula",
+          "latex": "$\\text{Specificity} = \\frac{TN}{TN + FP}$",
+          "description": "Use when you need to know how well the negative class is being identified"
+        },
+        {
+          "name": "Alternative Specificity",
+          "latex": "$\\text{Specificity} = 1 - \\text{FPR}$",
+          "description": "Complementary relationship with false positive rate"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes the four confusion matrix components and returns both accuracy and specificity as floats rounded to 3 decimal places. Handle the edge case where TN + FP = 0 (no actual negatives) by returning 0.0 for specificity.",
+        "function_signature": "def calculate_accuracy_specificity(tp: int, tn: int, fp: int, fn: int) -> tuple[float, float]:",
+        "starter_code": "def calculate_accuracy_specificity(tp: int, tn: int, fp: int, fn: int) -> tuple[float, float]:\n    \"\"\"\n    Calculate accuracy and specificity metrics.\n    \n    Args:\n        tp, tn, fp, fn: Confusion matrix components\n    \n    Returns:\n        Tuple of (accuracy, specificity), each rounded to 3 decimals\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_accuracy_specificity(2, 1, 1, 1)",
+            "expected": "(0.6, 0.5)",
+            "explanation": "Accuracy = (2+1)/5 = 0.6, Specificity = 1/(1+1) = 0.5"
+          },
+          {
+            "input": "calculate_accuracy_specificity(10, 10, 0, 0)",
+            "expected": "(1.0, 1.0)",
+            "explanation": "Perfect classifier: all 20 samples correct, all 10 negatives identified"
+          },
+          {
+            "input": "calculate_accuracy_specificity(5, 0, 0, 5)",
+            "expected": "(0.5, 0.0)",
+            "explanation": "Edge case: no actual negatives (TN+FP=0), so specificity is undefined/0.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle division by zero when TN + FP = 0 (dataset has no negative samples)",
+        "Not rounding to exactly 3 decimal places as required",
+        "Confusing specificity with sensitivity (recall) - they measure different things",
+        "Using integer division instead of float division, getting 0 instead of decimal values"
+      ],
+      "hint": "Calculate total sample size n = TP + TN + FP + FN for accuracy. For specificity, check if the denominator (TN + FP) is zero before dividing, and use Python's round() function with 3 as the second argument.",
+      "references": [
+        "Conditional probability in classification",
+        "True negative rate (TNR)",
+        "Receiver operating characteristic (ROC) curves"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Precision, Recall, and the Harmonic Mean",
+      "relation_to_problem": "The F1 score required by the main problem is the harmonic mean of precision and recall. Understanding these two fundamental positive-class metrics is essential before computing their harmonic mean.",
+      "prerequisites": [
+        "Confusion matrix components",
+        "Conditional probability",
+        "Mean calculations"
+      ],
+      "learning_objectives": [
+        "Define precision and recall as conditional probabilities",
+        "Understand the precision-recall tradeoff in classification",
+        "Master the mathematical properties of harmonic mean vs arithmetic mean"
+      ],
+      "math_content": {
+        "definition": "**Precision** (Positive Predictive Value) is the conditional probability that an observation is truly positive given it was predicted positive: $$\\text{Precision} = P(y = 1 \\mid \\hat{y} = 1) = \\frac{TP}{TP + FP}$$ **Recall** (Sensitivity or True Positive Rate) is the conditional probability that an observation is predicted positive given it is truly positive: $$\\text{Recall} = P(\\hat{y} = 1 \\mid y = 1) = \\frac{TP}{TP + FN}$$ **Harmonic Mean** of two positive numbers $a, b > 0$ is defined as: $$H(a,b) = \\frac{2ab}{a+b} = \\frac{2}{\\frac{1}{a} + \\frac{1}{b}}$$",
+        "notation": "$\\text{Prec}, \\text{Rec} \\in [0, 1]$\n$P = TP + FN$ = total actual positives\n$\\hat{P} = TP + FP$ = total predicted positives\nHarmonic mean: $H(a,b) \\leq \\sqrt{ab} \\leq \\frac{a+b}{2}$ (HM ≤ GM ≤ AM inequality)",
+        "theorem": "**Theorem (Precision-Recall Boundary)**: For fixed $TP$, precision and recall are inversely related. As we increase predictions to boost recall, precision typically decreases. **Theorem (Harmonic Mean Property)**: The harmonic mean $H(a,b)$ is closer to the minimum of $a$ and $b$ than the arithmetic mean, making it more sensitive to low values: if $a = 0.9$ and $b = 0.1$, then $H(a,b) \\approx 0.18$ while arithmetic mean is $0.5$.",
+        "proof_sketch": "Precision-Recall tradeoff: Holding TP constant, to increase recall we must decrease FN. But predicting more positives increases FP, which decreases precision. For harmonic mean sensitivity: rewrite $H = 2ab/(a+b)$. When $b \\ll a$, the denominator is dominated by $a$, giving $H \\approx 2ab/a = 2b$, approximately twice the minimum. This is much less than the arithmetic mean $(a+b)/2 \\approx a/2$ when $a \\gg b$.",
+        "examples": [
+          "Example 1: Classifier with $TP=8, FP=2, FN=3$. Precision $= 8/(8+2) = 0.8$ (80% of positive predictions are correct). Recall $= 8/(8+3) \\approx 0.727$ (found 72.7% of all positives). Harmonic mean $= 2(0.8)(0.727)/(0.8+0.727) \\approx 0.762$.",
+          "Example 2: Conservative classifier with $TP=4, FP=1, FN=10$. High precision $= 4/5 = 0.8$ but low recall $= 4/14 \\approx 0.286$ (missed most positives). Harmonic mean $\\approx 0.421$, heavily penalized by low recall."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Precision Formula",
+          "latex": "$\\text{Precision} = \\frac{TP}{TP + FP}$",
+          "description": "Among all positive predictions, what fraction are truly positive?"
+        },
+        {
+          "name": "Recall Formula",
+          "latex": "$\\text{Recall} = \\frac{TP}{TP + FN}$",
+          "description": "Among all actual positives, what fraction did we successfully identify?"
+        },
+        {
+          "name": "Harmonic Mean",
+          "latex": "$H(a,b) = \\frac{2ab}{a + b}$",
+          "description": "Balanced metric that heavily penalizes if either component is low"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates precision, recall, and their harmonic mean from confusion matrix components. Return all three as floats rounded to 3 decimal places. Handle edge cases where denominators are zero by returning 0.0 for those metrics.",
+        "function_signature": "def precision_recall_harmonic(tp: int, tn: int, fp: int, fn: int) -> tuple[float, float, float]:",
+        "starter_code": "def precision_recall_harmonic(tp: int, tn: int, fp: int, fn: int) -> tuple[float, float, float]:\n    \"\"\"\n    Calculate precision, recall, and their harmonic mean.\n    \n    Args:\n        tp, tn, fp, fn: Confusion matrix components\n    \n    Returns:\n        Tuple of (precision, recall, harmonic_mean), each rounded to 3 decimals\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "precision_recall_harmonic(2, 1, 1, 1)",
+            "expected": "(0.667, 0.667, 0.667)",
+            "explanation": "Precision = 2/3 ≈ 0.667, Recall = 2/3 ≈ 0.667, HM = 2(0.667)(0.667)/(0.667+0.667) ≈ 0.667"
+          },
+          {
+            "input": "precision_recall_harmonic(8, 5, 2, 3)",
+            "expected": "(0.8, 0.727, 0.762)",
+            "explanation": "Precision = 8/10 = 0.8, Recall = 8/11 ≈ 0.727, HM ≈ 0.762"
+          },
+          {
+            "input": "precision_recall_harmonic(0, 5, 0, 3)",
+            "expected": "(0.0, 0.0, 0.0)",
+            "explanation": "Edge case: TP=0 makes both precision and recall zero, so harmonic mean is also 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using arithmetic mean instead of harmonic mean - these are different formulas with different properties",
+        "Not handling division by zero: precision undefined when TP+FP=0, recall undefined when TP+FN=0",
+        "Attempting to compute harmonic mean when either precision or recall is zero (should return 0, not NaN)",
+        "Forgetting to convert integer division to float division",
+        "Incorrect rounding leading to accumulation errors"
+      ],
+      "hint": "First compute precision and recall separately, checking for zero denominators. Then for harmonic mean, check if either is zero (which makes HM = 0). Otherwise, use the formula HM = 2·prec·rec/(prec+rec).",
+      "references": [
+        "Harmonic mean vs arithmetic mean",
+        "Precision-recall curves",
+        "Information retrieval metrics",
+        "Sensitivity and positive predictive value in medical testing"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "The F1 Score: Harmonic Mean of Precision and Recall",
+      "relation_to_problem": "F1 score is one of the five required metrics in the main problem. It's specifically defined as the harmonic mean of precision and recall, providing a single metric that balances both concerns.",
+      "prerequisites": [
+        "Precision and recall (Step 4)",
+        "Harmonic mean",
+        "Metric interpretation"
+      ],
+      "learning_objectives": [
+        "Understand why F1 uses harmonic mean instead of arithmetic mean",
+        "Recognize when F1 score is appropriate vs when to use accuracy",
+        "Implement F1 calculation with proper edge case handling"
+      ],
+      "math_content": {
+        "definition": "The **F1 Score** (or F-measure) is defined as the harmonic mean of precision and recall: $$F_1 = 2 \\cdot \\frac{\\text{Precision} \\cdot \\text{Recall}}{\\text{Precision} + \\text{Recall}} = \\frac{2TP}{2TP + FP + FN}$$ The second form is derived by substituting the definitions of precision and recall and simplifying algebraically.",
+        "notation": "$F_1 \\in [0, 1]$ where $F_1 = 1$ indicates perfect precision and recall\n$F_\\beta$ = generalized form: $F_\\beta = (1 + \\beta^2) \\cdot \\frac{\\text{Prec} \\cdot \\text{Rec}}{\\beta^2 \\cdot \\text{Prec} + \\text{Rec}}$ where $\\beta=1$ gives $F_1$",
+        "theorem": "**Theorem (F1 Bounds)**: $F_1 \\leq \\min(\\text{Precision}, \\text{Recall})$ with equality when precision equals recall. Furthermore, $F_1 = 0$ if and only if $TP = 0$. **Theorem (Direct Formula Equivalence)**: The compact form $F_1 = \\frac{2TP}{2TP + FP + FN}$ is algebraically equivalent to the harmonic mean definition.",
+        "proof_sketch": "For the bound: harmonic mean of two numbers is always at most their minimum (proven using AM-GM-HM inequality). For direct formula: Start with $F_1 = 2PR/(P+R)$ where $P = TP/(TP+FP)$ and $R = TP/(TP+FN)$. Substitute: $F_1 = 2 \\cdot \\frac{TP/(TP+FP) \\cdot TP/(TP+FN)}{TP/(TP+FP) + TP/(TP+FN)}$. Simplify numerator: $2TP^2/[(TP+FP)(TP+FN)]$. Simplify denominator: $TP[(TP+FN)+(TP+FP)]/[(TP+FP)(TP+FN)] = TP[2TP+FP+FN]/[(TP+FP)(TP+FN)]$. Divide: $F_1 = 2TP/(2TP+FP+FN)$.",
+        "examples": [
+          "Example 1: Balanced classifier with $TP=10, FP=2, FN=3$. Using direct formula: $F_1 = 2(10)/(2(10)+2+3) = 20/25 = 0.8$. Verification: Prec=$10/12≈0.833$, Rec=$10/13≈0.769$, HM=$2(0.833)(0.769)/(0.833+0.769)≈0.8$. ✓",
+          "Example 2: From main problem example: $TP=2, FP=1, FN=1$. $F_1 = 2(2)/(2(2)+1+1) = 4/6 ≈ 0.667$. This matches the expected output of 0.667."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "F1 Score (Harmonic Form)",
+          "latex": "$F_1 = 2 \\cdot \\frac{\\text{Precision} \\cdot \\text{Recall}}{\\text{Precision} + \\text{Recall}}$",
+          "description": "Use when you already have precision and recall computed"
+        },
+        {
+          "name": "F1 Score (Direct Form)",
+          "latex": "$F_1 = \\frac{2TP}{2TP + FP + FN}$",
+          "description": "Use for efficient direct computation from confusion matrix components"
+        },
+        {
+          "name": "F1 Edge Case",
+          "latex": "$F_1 = 0 \\text{ when } TP = 0$",
+          "description": "Undefined precision/recall both become 0, making F1 = 0"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the F1 score from confusion matrix components using the direct formula. Return the result as a float rounded to 3 decimal places. When TP = 0, return 0.0.",
+        "function_signature": "def calculate_f1_score(tp: int, tn: int, fp: int, fn: int) -> float:",
+        "starter_code": "def calculate_f1_score(tp: int, tn: int, fp: int, fn: int) -> float:\n    \"\"\"\n    Calculate F1 score from confusion matrix components.\n    \n    Args:\n        tp, tn, fp, fn: Confusion matrix components\n    \n    Returns:\n        F1 score rounded to 3 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_f1_score(2, 1, 1, 1)",
+            "expected": "0.667",
+            "explanation": "F1 = 2(2)/(2(2)+1+1) = 4/6 ≈ 0.667 (matches main problem example)"
+          },
+          {
+            "input": "calculate_f1_score(10, 5, 2, 3)",
+            "expected": "0.8",
+            "explanation": "F1 = 2(10)/(20+2+3) = 20/25 = 0.8"
+          },
+          {
+            "input": "calculate_f1_score(0, 10, 0, 5)",
+            "expected": "0.0",
+            "explanation": "Edge case: TP=0 makes F1=0 (no true positives means zero performance on positive class)"
+          },
+          {
+            "input": "calculate_f1_score(15, 15, 0, 0)",
+            "expected": "1.0",
+            "explanation": "Perfect positive prediction: F1 = 30/30 = 1.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using arithmetic mean (P+R)/2 instead of harmonic mean - this gives incorrect results",
+        "Not handling TP=0 case, leading to division by zero",
+        "Forgetting to multiply numerator by 2 in the direct formula",
+        "Rounding errors from computing precision/recall separately vs using direct formula",
+        "Confusing F1 with accuracy - they measure different aspects of performance"
+      ],
+      "hint": "Use the direct formula F1 = 2TP/(2TP + FP + FN) for simplicity. Check if the denominator is zero (happens only when TP=FP=FN=0), and return 0.0 in that case. Otherwise compute and round to 3 decimals.",
+      "references": [
+        "F-measure in information retrieval",
+        "F-beta score generalizations",
+        "Imbalanced classification metrics",
+        "Precision-recall tradeoff visualization"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Negative Predictive Value: The Dual of Precision",
+      "relation_to_problem": "Negative Predictive Value (NPV) is the fifth and final metric required by the main problem. It mirrors precision but focuses on the negative class instead of the positive class.",
+      "prerequisites": [
+        "Precision concept (Step 4)",
+        "Conditional probability",
+        "Confusion matrix"
+      ],
+      "learning_objectives": [
+        "Understand NPV as the negative-class analog of precision",
+        "Recognize the symmetric relationship between positive and negative metrics",
+        "Complete the full set of five metrics needed for the main problem"
+      ],
+      "math_content": {
+        "definition": "**Negative Predictive Value** (NPV) is the conditional probability that an observation is truly negative given it was predicted negative: $$\\text{NPV} = P(y = 0 \\mid \\hat{y} = 0) = \\frac{TN}{TN + FN}$$ NPV answers the question: 'Among all negative predictions, what fraction are correct?'",
+        "notation": "$\\text{NPV} \\in [0, 1]$ with 1 meaning all negative predictions are correct\n$\\hat{N} = TN + FN$ = total predicted negatives\nDual relationship: $\\text{Precision} = P(y=1|\\hat{y}=1)$, $\\text{NPV} = P(y=0|\\hat{y}=0)$",
+        "theorem": "**Theorem (Precision-NPV Symmetry)**: Precision and NPV are symmetric metrics under class label inversion. If we swap positive/negative labels (relabeling 0↔1), precision becomes NPV and vice versa. **Theorem (NPV-FDR Complement)**: NPV and False Discovery Rate among negatives are complementary: $\\text{NPV} + \\text{FDR}_{neg} = 1$ where $\\text{FDR}_{neg} = FN/(TN+FN)$ is the rate of false discoveries among negative predictions.",
+        "proof_sketch": "For symmetry: Under label swap, $TP \\leftrightarrow TN$ and $FP \\leftrightarrow FN$. So precision $TP/(TP+FP)$ becomes $TN/(TN+FN) = $ NPV. For complement: The denominator $TN+FN$ represents all negative predictions. Each is either correct (TN) or incorrect (FN), so $TN/(TN+FN) + FN/(TN+FN) = 1$.",
+        "examples": [
+          "Example 1: Classifier with $TN=20, FN=5$. NPV $= 20/(20+5) = 0.8$, meaning 80% of negative predictions are actually negative. The other 20% (5 out of 25) are false negatives.",
+          "Example 2: From main problem: $TP=2, TN=1, FP=1, FN=1$. NPV $= 1/(1+1) = 0.5$. Only half of negative predictions are correct - this is the expected output."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Negative Predictive Value",
+          "latex": "$\\text{NPV} = \\frac{TN}{TN + FN}$",
+          "description": "Among all negative predictions, what fraction are truly negative?"
+        },
+        {
+          "name": "False Discovery Rate (Negative)",
+          "latex": "$\\text{FDR}_{neg} = \\frac{FN}{TN + FN} = 1 - \\text{NPV}$",
+          "description": "Complementary metric: rate of false negatives among predicted negatives"
+        },
+        {
+          "name": "Metric Symmetry",
+          "latex": "$\\text{NPV}(TN, FN) = \\text{Precision}(TN, FN \\text{ with labels swapped})$",
+          "description": "Conceptual relationship showing NPV is precision for the negative class"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates Negative Predictive Value from confusion matrix components. Return the result as a float rounded to 3 decimal places. When TN + FN = 0 (no negative predictions), return 0.0.",
+        "function_signature": "def calculate_npv(tp: int, tn: int, fp: int, fn: int) -> float:",
+        "starter_code": "def calculate_npv(tp: int, tn: int, fp: int, fn: int) -> float:\n    \"\"\"\n    Calculate Negative Predictive Value from confusion matrix.\n    \n    Args:\n        tp, tn, fp, fn: Confusion matrix components\n    \n    Returns:\n        NPV rounded to 3 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_npv(2, 1, 1, 1)",
+            "expected": "0.5",
+            "explanation": "NPV = 1/(1+1) = 0.5 (matches main problem example: half of negative predictions are correct)"
+          },
+          {
+            "input": "calculate_npv(5, 20, 2, 5)",
+            "expected": "0.8",
+            "explanation": "NPV = 20/(20+5) = 0.8 (80% of negative predictions are correct)"
+          },
+          {
+            "input": "calculate_npv(10, 0, 0, 0)",
+            "expected": "0.0",
+            "explanation": "Edge case: no negative predictions made (TN+FN=0), so NPV is undefined/0.0"
+          },
+          {
+            "input": "calculate_npv(3, 15, 2, 0)",
+            "expected": "1.0",
+            "explanation": "Perfect negative prediction: NPV = 15/(15+0) = 1.0 (all negative predictions correct)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing NPV with specificity - both involve TN but have different denominators",
+        "Using TP instead of TN in the numerator (mixing up positive/negative metrics)",
+        "Not handling the edge case where no negative predictions are made (TN+FN=0)",
+        "Forgetting that NPV is about prediction quality, not about finding all negatives (that's specificity)",
+        "Incorrectly implementing by computing 1 - something (NPV is not a complement of another metric)"
+      ],
+      "hint": "NPV has the same structure as precision but uses negative-class components. Compute TN/(TN+FN), checking first if the denominator is zero. Round to 3 decimal places.",
+      "references": [
+        "Predictive values in diagnostic testing",
+        "Positive and negative likelihood ratios",
+        "Bayes' theorem and conditional probabilities",
+        "Medical screening test interpretation"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,493 @@
+{
+  "problem_id": 35,
+  "title": "Convert Vector to Diagonal Matrix",
+  "category": "Linear Algebra",
+  "difficulty": "easy",
+  "description": "Write a Python function to convert a 1D numpy array into a diagonal matrix. The function should take in a 1D numpy array x and return a 2D numpy array representing the diagonal matrix.",
+  "example": {
+    "input": "x = np.array([1, 2, 3])\n    output = make_diagonal(x)\n    print(output)",
+    "output": "[[1. 0. 0.]\n    [0. 2. 0.]\n    [0. 0. 3.]]",
+    "reasoning": "The input vector [1, 2, 3] is converted into a diagonal matrix where the elements of the vector form the diagonal of the matrix."
+  },
+  "starter_code": "import numpy as np\n\ndef make_diagonal(x):\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Matrix Dimensions and Indexing",
+      "relation_to_problem": "Creating a diagonal matrix requires understanding how to construct a square n×n matrix from an n-dimensional vector, which depends on proper matrix indexing and dimension relationships.",
+      "prerequisites": [
+        "Basic Python programming",
+        "NumPy array creation",
+        "Array indexing"
+      ],
+      "learning_objectives": [
+        "Define and construct square matrices of arbitrary dimension",
+        "Understand the relationship between vector length and square matrix dimensions",
+        "Master matrix element indexing using row and column notation"
+      ],
+      "math_content": {
+        "definition": "A **matrix** $\\mathbf{A} \\in \\mathbb{R}^{m \\times n}$ is a rectangular array of real numbers arranged in $m$ rows and $n$ columns. A **square matrix** is a matrix where $m = n$. The **order** or **dimension** of a square matrix is $n$. Each element is uniquely identified by its position $(i,j)$ where $i$ is the row index and $j$ is the column index, both starting from 1 in mathematical notation (or 0 in programming).",
+        "notation": "$\\mathbf{A} = [a_{ij}]_{m \\times n}$ where $a_{ij}$ denotes the element at row $i$, column $j$. For square matrices: $\\mathbf{A} \\in \\mathbb{R}^{n \\times n}$.",
+        "theorem": "**Theorem (Vector-to-Matrix Dimension)**: Given a vector $\\mathbf{v} \\in \\mathbb{R}^n$, the corresponding diagonal matrix $\\mathbf{D}$ must be of dimension $n \\times n$ to accommodate all $n$ elements on its main diagonal.",
+        "proof_sketch": "A diagonal matrix has exactly $n$ diagonal positions (from $(1,1)$ to $(n,n)$). To place $n$ vector elements, we need exactly $n$ such positions, which occurs in an $n \\times n$ matrix. Any smaller dimension would lose elements; any larger would leave diagonal positions unfilled.",
+        "examples": [
+          "Vector $\\mathbf{v} = [2, 5, 7]$ has length 3, requiring a $3 \\times 3$ matrix with positions $(1,1), (2,2), (3,3)$",
+          "A $4 \\times 4$ matrix has $4^2 = 16$ total elements, but only 4 diagonal elements at positions $(i,i)$ for $i = 1,2,3,4$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Matrix Element Access",
+          "latex": "$a_{ij}$ with $1 \\leq i \\leq m$ and $1 \\leq j \\leq n$",
+          "description": "Access element at row $i$ and column $j$ in an $m \\times n$ matrix"
+        },
+        {
+          "name": "Square Matrix Condition",
+          "latex": "$\\mathbf{A} \\in \\mathbb{R}^{n \\times n}$ means $\\text{rows} = \\text{columns} = n$",
+          "description": "A matrix is square when number of rows equals number of columns"
+        }
+      ],
+      "exercise": {
+        "description": "Create a function that constructs a square zero matrix (all elements are 0) given the dimension n. This is the foundation for building diagonal matrices.",
+        "function_signature": "def create_zero_matrix(n: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef create_zero_matrix(n: int) -> np.ndarray:\n    # Create an n×n matrix filled with zeros\n    # Hint: Use np.zeros() with appropriate shape\n    pass",
+        "test_cases": [
+          {
+            "input": "create_zero_matrix(3)",
+            "expected": "[[0. 0. 0.]\n [0. 0. 0.]\n [0. 0. 0.]]",
+            "explanation": "A 3×3 matrix has 3 rows and 3 columns, all initialized to zero"
+          },
+          {
+            "input": "create_zero_matrix(2)",
+            "expected": "[[0. 0.]\n [0. 0.]]",
+            "explanation": "A 2×2 matrix has 4 total elements (2²), all zero"
+          },
+          {
+            "input": "create_zero_matrix(1)",
+            "expected": "[[0.]]",
+            "explanation": "A 1×1 matrix is the smallest square matrix, containing a single element"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing matrix shape (n, n) with (n,) which creates a 1D array, not a 2D matrix",
+        "Using 1-based indexing from mathematical notation in Python code (Python uses 0-based)",
+        "Creating non-square matrices by providing wrong dimensions to np.zeros()"
+      ],
+      "hint": "The shape parameter for np.zeros() should be a tuple (n, n) to create a square matrix.",
+      "references": [
+        "NumPy array creation",
+        "Matrix dimensions in linear algebra",
+        "Shape and size of multidimensional arrays"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "The Main Diagonal and Diagonal Element Characterization",
+      "relation_to_problem": "Diagonal matrices have non-zero values only on the main diagonal. Understanding the mathematical characterization of diagonal positions (where row index equals column index) is essential for placing vector elements correctly.",
+      "prerequisites": [
+        "Matrix indexing",
+        "Square matrices",
+        "Set notation"
+      ],
+      "learning_objectives": [
+        "Define the main diagonal mathematically using index equality",
+        "Identify diagonal vs off-diagonal elements in any square matrix",
+        "Access and modify diagonal elements programmatically"
+      ],
+      "math_content": {
+        "definition": "The **main diagonal** (or principal diagonal) of a square matrix $\\mathbf{A} \\in \\mathbb{R}^{n \\times n}$ is the set of elements $\\{a_{ii} : i = 1, 2, \\ldots, n\\}$ where the row index equals the column index. Formally: $\\text{diag}(\\mathbf{A}) = \\{a_{ii}\\}_{i=1}^{n}$. Elements with $i \\neq j$ are called **off-diagonal elements**.",
+        "notation": "$a_{ii}$ denotes diagonal elements (where $i=j$). The main diagonal consists of positions $(1,1), (2,2), (3,3), \\ldots, (n,n)$.",
+        "theorem": "**Theorem (Diagonal Position Characterization)**: An element $a_{ij}$ of a square matrix $\\mathbf{A}$ lies on the main diagonal if and only if $i = j$. The set of diagonal positions is $D_n = \\{(i,i) : 1 \\leq i \\leq n\\}$, which has cardinality $|D_n| = n$.",
+        "proof_sketch": "($\\Rightarrow$) If $a_{ij}$ is on the main diagonal, by definition it must have $i=j$. ($\\Leftarrow$) If $i=j$, then the element is at position $(i,i)$, which by definition is on the main diagonal. The cardinality follows from counting: for an $n \\times n$ matrix, $i$ ranges from 1 to $n$, giving exactly $n$ diagonal positions.",
+        "examples": [
+          "In $\\mathbf{A} = \\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\\\ 7 & 8 & 9 \\end{bmatrix}$, the main diagonal is $\\{a_{11}, a_{22}, a_{33}\\} = \\{1, 5, 9\\}$",
+          "For a $4 \\times 4$ matrix, diagonal positions are $(1,1), (2,2), (3,3), (4,4)$ - exactly 4 positions"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Diagonal Position Condition",
+          "latex": "$i = j$",
+          "description": "Element $a_{ij}$ is on the main diagonal when row index equals column index"
+        },
+        {
+          "name": "Diagonal Element Extraction",
+          "latex": "$d_i = a_{ii}$ for $i = 1, 2, \\ldots, n$",
+          "description": "Extract the $i$-th diagonal element by accessing position $(i,i)$"
+        },
+        {
+          "name": "Off-Diagonal Condition",
+          "latex": "$i \\neq j$",
+          "description": "Element $a_{ij}$ is off-diagonal when row index does not equal column index"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that extracts the main diagonal of a square matrix and returns it as a 1D array. This is the inverse operation of creating a diagonal matrix from a vector.",
+        "function_signature": "def extract_diagonal(matrix: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef extract_diagonal(matrix: np.ndarray) -> np.ndarray:\n    # Extract elements where row index equals column index\n    # Return as a 1D array\n    # Hint: Use a loop or np.diag()\n    pass",
+        "test_cases": [
+          {
+            "input": "extract_diagonal(np.array([[1, 2], [3, 4]]))",
+            "expected": "[1, 4]",
+            "explanation": "Elements at positions (0,0) and (1,1) are 1 and 4 respectively (using 0-based indexing)"
+          },
+          {
+            "input": "extract_diagonal(np.array([[5, 0, 0], [0, 7, 0], [0, 0, 9]]))",
+            "expected": "[5, 7, 9]",
+            "explanation": "This diagonal matrix has diagonal elements 5, 7, 9 at positions (i,i)"
+          },
+          {
+            "input": "extract_diagonal(np.array([[10]]))",
+            "expected": "[10]",
+            "explanation": "A 1×1 matrix has only one element, which is on the diagonal"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Accessing wrong indices by not maintaining i=j condition (e.g., accessing [i][j] instead of [i][i])",
+        "Returning a 2D array instead of a 1D vector for the diagonal",
+        "Attempting to extract diagonal from non-square matrices (undefined operation)"
+      ],
+      "hint": "Loop through indices from 0 to n-1, and for each i, access matrix[i][i]. Alternatively, NumPy provides np.diag() for this purpose.",
+      "references": [
+        "Main diagonal definition",
+        "Matrix trace (sum of diagonal elements)",
+        "Diagonal matrix properties"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Formal Definition of Diagonal Matrices",
+      "relation_to_problem": "Understanding the complete mathematical definition of diagonal matrices - where all off-diagonal elements must be zero - is crucial for correctly implementing the conversion from a vector.",
+      "prerequisites": [
+        "Matrix structure",
+        "Main diagonal",
+        "Zero matrix",
+        "Kronecker delta"
+      ],
+      "learning_objectives": [
+        "State the formal mathematical definition of a diagonal matrix",
+        "Use Kronecker delta notation to express diagonal matrix structure",
+        "Verify whether a given matrix is diagonal",
+        "Understand properties that make diagonal matrices computationally efficient"
+      ],
+      "math_content": {
+        "definition": "A square matrix $\\mathbf{D} \\in \\mathbb{R}^{n \\times n}$ is a **diagonal matrix** if and only if all off-diagonal elements are zero. Formally: $d_{ij} = 0$ for all $i \\neq j$. Using the Kronecker delta $\\delta_{ij}$, we can write: $d_{ij} = d_i \\cdot \\delta_{ij}$ where $\\delta_{ij} = \\begin{cases} 1 & \\text{if } i=j \\\\ 0 & \\text{if } i \\neq j \\end{cases}$ and $d_i$ are the diagonal values.",
+        "notation": "$\\mathbf{D} = \\text{diag}(d_1, d_2, \\ldots, d_n)$ or $\\mathbf{D} = \\text{diag}(\\mathbf{d})$ where $\\mathbf{d} = [d_1, d_2, \\ldots, d_n]^T$ is the vector of diagonal elements. The identity matrix is $\\mathbf{I} = \\text{diag}(1, 1, \\ldots, 1)$.",
+        "theorem": "**Theorem (Diagonal Matrix Properties)**: Let $\\mathbf{D} = \\text{diag}(d_1, \\ldots, d_n)$. Then: (1) $\\mathbf{D}$ is symmetric: $\\mathbf{D} = \\mathbf{D}^T$. (2) Matrix-vector multiplication simplifies to element-wise scaling: $(\\mathbf{D}\\mathbf{x})_i = d_i x_i$. (3) If all $d_i \\neq 0$, then $\\mathbf{D}^{-1} = \\text{diag}(1/d_1, \\ldots, 1/d_n)$. (4) $\\det(\\mathbf{D}) = \\prod_{i=1}^{n} d_i$.",
+        "proof_sketch": "(1) Since $d_{ij} = 0$ for $i \\neq j$, we have $d_{ji} = 0 = d_{ij}$, and $d_{ii} = d_{ii}$, so $\\mathbf{D}^T = \\mathbf{D}$. (2) $(\\mathbf{D}\\mathbf{x})_i = \\sum_{j=1}^{n} d_{ij}x_j = \\sum_{j=1}^{n} d_i \\delta_{ij} x_j = d_i x_i$. (3) For diagonal matrices, $\\mathbf{D}\\mathbf{D}^{-1} = \\mathbf{I}$ requires $(\\mathbf{D}\\mathbf{D}^{-1})_{ii} = d_i (\\mathbf{D}^{-1})_{ii} = 1$, giving $(\\mathbf{D}^{-1})_{ii} = 1/d_i$. (4) The determinant of a triangular matrix (including diagonal) is the product of diagonal elements.",
+        "examples": [
+          "$\\mathbf{D} = \\begin{bmatrix} 2 & 0 & 0 \\\\ 0 & -3 & 0 \\\\ 0 & 0 & 5 \\end{bmatrix}$ is diagonal with $\\mathbf{d} = [2, -3, 5]^T$",
+          "$\\mathbf{D}\\mathbf{x} = \\begin{bmatrix} 2 & 0 \\\\ 0 & 3 \\end{bmatrix} \\begin{bmatrix} 4 \\\\ 5 \\end{bmatrix} = \\begin{bmatrix} 8 \\\\ 15 \\end{bmatrix}$ demonstrates element-wise scaling"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Diagonal Matrix Element Formula",
+          "latex": "$d_{ij} = d_i \\cdot \\delta_{ij}$ where $\\delta_{ij}$ is the Kronecker delta",
+          "description": "Expresses that only diagonal positions (where $i=j$) have non-zero values"
+        },
+        {
+          "name": "Diagonal Matrix from Vector",
+          "latex": "$\\mathbf{D} = \\text{diag}(\\mathbf{v})$ maps vector $\\mathbf{v} \\in \\mathbb{R}^n$ to matrix $\\mathbf{D} \\in \\mathbb{R}^{n \\times n}$",
+          "description": "The diag operator creates a diagonal matrix from a vector"
+        },
+        {
+          "name": "Matrix-Vector Product Simplification",
+          "latex": "$(\\mathbf{D}\\mathbf{x})_i = d_i x_i$ for diagonal matrix $\\mathbf{D}$",
+          "description": "Multiplication by diagonal matrix scales each component independently"
+        }
+      ],
+      "exercise": {
+        "description": "Create a function that checks whether a given square matrix is diagonal. Return True if all off-diagonal elements are zero (or within a small tolerance for floating-point comparison), False otherwise.",
+        "function_signature": "def is_diagonal(matrix: np.ndarray, tol: float = 1e-10) -> bool:",
+        "starter_code": "import numpy as np\n\ndef is_diagonal(matrix: np.ndarray, tol: float = 1e-10) -> bool:\n    # Check if matrix is square first\n    # Then verify all off-diagonal elements are zero\n    # Use tolerance for floating-point comparison\n    pass",
+        "test_cases": [
+          {
+            "input": "is_diagonal(np.array([[1, 0], [0, 2]]))",
+            "expected": "True",
+            "explanation": "All off-diagonal elements (positions (0,1) and (1,0)) are zero"
+          },
+          {
+            "input": "is_diagonal(np.array([[1, 0.5], [0, 2]]))",
+            "expected": "False",
+            "explanation": "Element at position (0,1) is 0.5, not zero, so it's not diagonal"
+          },
+          {
+            "input": "is_diagonal(np.array([[5, 0, 0], [0, 0, 0], [0, 0, -3]]))",
+            "expected": "True",
+            "explanation": "Diagonal matrices can have zero values on the diagonal; only off-diagonal must be zero"
+          },
+          {
+            "input": "is_diagonal(np.array([[7]]))",
+            "expected": "True",
+            "explanation": "A 1×1 matrix is always diagonal (no off-diagonal elements exist)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Requiring diagonal elements to be non-zero (diagonal matrices can have zeros on the diagonal)",
+        "Forgetting to check if the matrix is square before testing diagonal property",
+        "Not using tolerance for floating-point comparisons (exact zero checks can fail due to numerical precision)",
+        "Inefficiently checking all n² elements instead of only n(n-1) off-diagonal elements"
+      ],
+      "hint": "For each row i, check all columns j where i≠j. Use np.abs() for tolerance comparison. Alternatively, compare the matrix with np.diag(np.diag(matrix)).",
+      "references": [
+        "Diagonal matrix properties",
+        "Kronecker delta function",
+        "Matrix determinant for diagonal matrices",
+        "Computational advantages of diagonal matrices"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Vector-to-Matrix Mapping via the Diag Operator",
+      "relation_to_problem": "The diag operator provides the mathematical foundation for converting a vector into a diagonal matrix. Understanding its formal definition and alternative formulations prepares you to implement the conversion efficiently.",
+      "prerequisites": [
+        "Vectors and vector spaces",
+        "Diagonal matrices",
+        "Outer products",
+        "Hadamard product"
+      ],
+      "learning_objectives": [
+        "Define the diag operator as a linear transformation from vector space to matrix space",
+        "Understand the Hadamard product formulation: diag(v) = (v·1ᵀ) ⊙ I",
+        "Implement element-wise construction of diagonal matrices",
+        "Apply the inverse diag operator to extract diagonals"
+      ],
+      "math_content": {
+        "definition": "The **diag operator** is a function $\\text{diag}: \\mathbb{R}^n \\to \\mathbb{R}^{n \\times n}$ that maps a vector to a diagonal matrix. Given $\\mathbf{v} = [v_1, v_2, \\ldots, v_n]^T \\in \\mathbb{R}^n$, define $\\mathbf{D} = \\text{diag}(\\mathbf{v})$ by: $d_{ij} = \\begin{cases} v_i & \\text{if } i = j \\\\ 0 & \\text{if } i \\neq j \\end{cases}$. Equivalently, $d_{ij} = v_i \\delta_{ij}$.",
+        "notation": "$\\text{diag}(\\mathbf{v}) = \\text{diag}(v_1, v_2, \\ldots, v_n)$ denotes the diagonal matrix with vector $\\mathbf{v}$ on its main diagonal. The inverse operation extracts the diagonal: $\\text{diag}(\\mathbf{D})$ returns the vector of diagonal elements when applied to a matrix.",
+        "theorem": "**Theorem (Hadamard Product Formulation)**: Let $\\mathbf{v} \\in \\mathbb{R}^n$ be a column vector and $\\mathbf{1} \\in \\mathbb{R}^n$ be the vector of all ones. Then: $\\text{diag}(\\mathbf{v}) = (\\mathbf{v}\\mathbf{1}^T) \\odot \\mathbf{I}_n$ where $\\odot$ denotes the Hadamard (element-wise) product and $\\mathbf{I}_n$ is the $n \\times n$ identity matrix.",
+        "proof_sketch": "The outer product $\\mathbf{v}\\mathbf{1}^T$ creates an $n \\times n$ matrix where each row is a copy of $\\mathbf{v}^T$: $(\\mathbf{v}\\mathbf{1}^T)_{ij} = v_i \\cdot 1 = v_i$ for all $j$. The identity matrix has $(\\mathbf{I}_n)_{ij} = \\delta_{ij}$. The Hadamard product multiplies element-wise: $[(\\mathbf{v}\\mathbf{1}^T) \\odot \\mathbf{I}_n]_{ij} = v_i \\cdot \\delta_{ij} = \\begin{cases} v_i & i=j \\\\ 0 & i \\neq j \\end{cases}$, which is exactly $\\text{diag}(\\mathbf{v})$.",
+        "examples": [
+          "For $\\mathbf{v} = [2, 3]^T$: $\\mathbf{v}\\mathbf{1}^T = \\begin{bmatrix} 2 \\\\ 3 \\end{bmatrix}[1, 1] = \\begin{bmatrix} 2 & 2 \\\\ 3 & 3 \\end{bmatrix}$, then $\\begin{bmatrix} 2 & 2 \\\\ 3 & 3 \\end{bmatrix} \\odot \\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix} = \\begin{bmatrix} 2 & 0 \\\\ 0 & 3 \\end{bmatrix}$",
+          "Inverse operation: if $\\mathbf{D} = \\begin{bmatrix} 4 & 0 \\\\ 0 & 7 \\end{bmatrix}$, then $\\text{diag}(\\mathbf{D}) = [4, 7]^T$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Diag Operator Definition",
+          "latex": "$[\\text{diag}(\\mathbf{v})]_{ij} = v_i \\delta_{ij}$",
+          "description": "Place vector element $v_i$ at position $(i,i)$, zeros elsewhere"
+        },
+        {
+          "name": "Hadamard Product Construction",
+          "latex": "$\\text{diag}(\\mathbf{v}) = (\\mathbf{v}\\mathbf{1}^T) \\odot \\mathbf{I}$",
+          "description": "Alternative formulation using outer product and element-wise multiplication with identity"
+        },
+        {
+          "name": "Outer Product",
+          "latex": "$(\\mathbf{v}\\mathbf{1}^T)_{ij} = v_i$ for all $j$",
+          "description": "Creates a matrix where each row is a copy of the vector"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that places the elements of a 1D vector onto the main diagonal of a pre-allocated zero matrix. This builds the core logic for diagonal matrix construction.",
+        "function_signature": "def place_on_diagonal(vector: np.ndarray, matrix: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef place_on_diagonal(vector: np.ndarray, matrix: np.ndarray) -> np.ndarray:\n    # Place each element vector[i] at position matrix[i][i]\n    # Assume matrix is square with same dimension as vector length\n    # Modify and return the matrix\n    pass",
+        "test_cases": [
+          {
+            "input": "place_on_diagonal(np.array([5, 7]), np.zeros((2, 2)))",
+            "expected": "[[5. 0.]\n [0. 7.]]",
+            "explanation": "Elements 5 and 7 are placed at positions (0,0) and (1,1) respectively"
+          },
+          {
+            "input": "place_on_diagonal(np.array([1, 2, 3]), np.zeros((3, 3)))",
+            "expected": "[[1. 0. 0.]\n [0. 2. 0.]\n [0. 0. 3.]]",
+            "explanation": "Three elements go to three diagonal positions in the 3×3 matrix"
+          },
+          {
+            "input": "place_on_diagonal(np.array([-1]), np.zeros((1, 1)))",
+            "expected": "[[-1.]]",
+            "explanation": "Single element creates a 1×1 diagonal matrix"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Attempting to assign the entire vector to the diagonal at once without proper indexing",
+        "Confusing matrix[i] with matrix[i][i] - the former gives the i-th row, not the diagonal element",
+        "Not ensuring the matrix dimensions match the vector length before placement",
+        "Forgetting to return the modified matrix"
+      ],
+      "hint": "Use a for loop with index i from 0 to len(vector)-1, and assign matrix[i][i] = vector[i]. Alternatively, use advanced NumPy indexing with np.arange().",
+      "references": [
+        "Linear transformations from vector to matrix spaces",
+        "Outer product and Kronecker product",
+        "Hadamard product properties",
+        "NumPy diagonal manipulation functions"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Efficient Matrix Construction from Vectors",
+      "relation_to_problem": "To implement the complete vector-to-diagonal-matrix conversion, you need to combine matrix initialization, dimension computation, and diagonal placement into a single efficient algorithm.",
+      "prerequisites": [
+        "Matrix initialization",
+        "Vector dimensions",
+        "Diag operator",
+        "Algorithm complexity"
+      ],
+      "learning_objectives": [
+        "Combine matrix creation and diagonal placement into a single function",
+        "Analyze time and space complexity of diagonal matrix construction",
+        "Handle edge cases (empty vectors, single elements)",
+        "Understand NumPy's memory layout for efficient matrix operations"
+      ],
+      "math_content": {
+        "definition": "A **vector-to-diagonal matrix algorithm** is a computational procedure that takes as input a vector $\\mathbf{v} \\in \\mathbb{R}^n$ and produces as output a diagonal matrix $\\mathbf{D} \\in \\mathbb{R}^{n \\times n}$ where $d_{ii} = v_i$ and $d_{ij} = 0$ for $i \\neq j$. The algorithm consists of two phases: (1) Matrix allocation: create an $n \\times n$ zero matrix; (2) Diagonal assignment: place $v_i$ at position $(i,i)$ for each $i \\in \\{1, \\ldots, n\\}$.",
+        "notation": "Let $T(n)$ denote time complexity and $S(n)$ denote space complexity as functions of the vector dimension $n$.",
+        "theorem": "**Theorem (Complexity of Diagonal Matrix Construction)**: The vector-to-diagonal matrix conversion has time complexity $T(n) = O(n^2)$ for initialization plus $O(n)$ for diagonal assignment, giving overall $T(n) = O(n^2)$. Space complexity is $S(n) = O(n^2)$ for storing the output matrix.",
+        "proof_sketch": "**Time**: Creating an $n \\times n$ zero matrix requires initializing $n^2$ elements, giving $O(n^2)$ time. Placing $n$ values on the diagonal requires $n$ assignments, giving $O(n)$ time. Since $O(n^2) + O(n) = O(n^2)$, the overall time complexity is $O(n^2)$. **Space**: The output matrix contains $n^2$ elements, requiring $O(n^2)$ storage. The input vector requires $O(n)$ storage. Total space is $O(n^2) + O(n) = O(n^2)$. Note: The $O(n^2)$ initialization can be optimized by only writing to diagonal positions if the language/library supports uninitialized allocation.",
+        "examples": [
+          "For $n=100$: output matrix has $100^2 = 10,000$ elements, but only 100 are non-zero",
+          "For $n=1000$: matrix has $10^6$ elements, storing 999,000 zeros explicitly (wasteful for large sparse matrices)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Matrix Size Formula",
+          "latex": "$\\text{size}(\\mathbf{D}) = n \\times n = n^2$ elements",
+          "description": "A diagonal matrix from an n-element vector requires n² storage locations"
+        },
+        {
+          "name": "Sparsity Ratio",
+          "latex": "$\\rho = \\frac{n}{n^2} = \\frac{1}{n}$",
+          "description": "Fraction of non-zero elements in a diagonal matrix (approaches 0 as n grows)"
+        },
+        {
+          "name": "Time Complexity",
+          "latex": "$T(n) = O(n^2)$ for dense representation",
+          "description": "Dominated by allocating and initializing all n² matrix elements"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete function that takes a 1D vector and returns a diagonal matrix. The function should: (1) determine the vector length, (2) create a square zero matrix of appropriate size, (3) place vector elements on the diagonal, and (4) return the result.",
+        "function_signature": "def vector_to_diagonal_matrix(vector: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef vector_to_diagonal_matrix(vector: np.ndarray) -> np.ndarray:\n    # Step 1: Get vector length n\n    # Step 2: Create n×n zero matrix\n    # Step 3: Place vector[i] at matrix[i][i] for all i\n    # Step 4: Return the diagonal matrix\n    pass",
+        "test_cases": [
+          {
+            "input": "vector_to_diagonal_matrix(np.array([4, 5, 6]))",
+            "expected": "[[4. 0. 0.]\n [0. 5. 0.]\n [0. 0. 6.]]",
+            "explanation": "Standard conversion: 3-element vector creates 3×3 diagonal matrix"
+          },
+          {
+            "input": "vector_to_diagonal_matrix(np.array([1.5, 2.5]))",
+            "expected": "[[1.5 0. ]\n [0.  2.5]]",
+            "explanation": "Works with floating-point values"
+          },
+          {
+            "input": "vector_to_diagonal_matrix(np.array([10]))",
+            "expected": "[[10.]]",
+            "explanation": "Single-element vector creates 1×1 matrix"
+          },
+          {
+            "input": "vector_to_diagonal_matrix(np.array([-1, 0, 3, -2]))",
+            "expected": "[[-1.  0.  0.  0.]\n [ 0.  0.  0.  0.]\n [ 0.  0.  3.  0.]\n [ 0.  0.  0. -2.]]",
+            "explanation": "Handles negative values and zeros on the diagonal"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not getting the vector length correctly (use len(vector) or vector.shape[0])",
+        "Creating a matrix with wrong dimensions (e.g., (n, 1) instead of (n, n))",
+        "Attempting to use 2D indexing on the input 1D vector",
+        "Not handling the edge case of empty or single-element vectors",
+        "Using inefficient nested loops instead of direct diagonal assignment"
+      ],
+      "hint": "Combine the techniques from previous exercises: create an n×n zero matrix, then loop through indices to assign diagonal values. Remember that len() or .shape[0] gives the vector length.",
+      "references": [
+        "Algorithm complexity analysis",
+        "NumPy array creation functions",
+        "Memory efficiency in sparse vs dense matrix representations",
+        "Big-O notation for time and space"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Matrix Properties Validation and Alternative Implementations",
+      "relation_to_problem": "Understanding alternative implementation approaches (using built-in functions vs manual construction) and validating output correctness ensures you can solve the problem robustly and understand the mathematical properties that must hold.",
+      "prerequisites": [
+        "Diagonal matrices",
+        "Matrix equality",
+        "NumPy library functions",
+        "Unit testing"
+      ],
+      "learning_objectives": [
+        "Validate that constructed matrices satisfy diagonal matrix properties",
+        "Compare manual implementation with NumPy's built-in np.diag() function",
+        "Understand when to use library functions vs custom implementations",
+        "Test edge cases and verify mathematical invariants"
+      ],
+      "math_content": {
+        "definition": "Two matrices $\\mathbf{A}, \\mathbf{B} \\in \\mathbb{R}^{m \\times n}$ are **equal** (written $\\mathbf{A} = \\mathbf{B}$) if and only if they have the same dimensions and $a_{ij} = b_{ij}$ for all $i, j$. A **matrix invariant** is a property that remains true regardless of the specific values. For diagonal matrices from vectors, key invariants include: (1) $\\mathbf{D}$ is square, (2) $\\text{diag}(\\mathbf{D}) = \\mathbf{v}$, (3) $\\text{trace}(\\mathbf{D}) = \\sum_{i=1}^{n} v_i$.",
+        "notation": "$\\text{trace}(\\mathbf{D}) = \\sum_{i=1}^{n} d_{ii}$ is the sum of diagonal elements. $\\|\\mathbf{A} - \\mathbf{B}\\|_F$ denotes the Frobenius norm of the difference (for floating-point comparison).",
+        "theorem": "**Theorem (Diagonal Matrix Invariants)**: Let $\\mathbf{v} \\in \\mathbb{R}^n$ and $\\mathbf{D} = \\text{diag}(\\mathbf{v})$. Then the following invariants hold: (1) $\\mathbf{D} \\in \\mathbb{R}^{n \\times n}$ (dimension preservation), (2) $\\text{diag}(\\mathbf{D}) = \\mathbf{v}$ (invertibility), (3) $\\text{trace}(\\mathbf{D}) = \\sum_{i=1}^{n} v_i$ (trace equality), (4) $\\mathbf{D} = \\mathbf{D}^T$ (symmetry), (5) $\\text{rank}(\\mathbf{D}) = \\#\\{i : v_i \\neq 0\\}$ (rank equals number of non-zero diagonal elements).",
+        "proof_sketch": "(1) By definition, diag maps $\\mathbb{R}^n$ to $\\mathbb{R}^{n \\times n}$. (2) The inverse diag operator extracts diagonal elements, giving back $\\mathbf{v}$. (3) Trace sums diagonal elements: $\\text{trace}(\\mathbf{D}) = \\sum_{i=1}^{n} d_{ii} = \\sum_{i=1}^{n} v_i$. (4) Since $d_{ij} = 0$ for $i \\neq j$, we have $d_{ij} = d_{ji}$, and $d_{ii} = d_{ii}$, so $\\mathbf{D}^T = \\mathbf{D}$. (5) The rank is the dimension of the column space. Column $i$ of $\\mathbf{D}$ is $v_i \\mathbf{e}_i$, which is zero if $v_i = 0$ and linearly independent otherwise. Thus rank equals the count of non-zero $v_i$.",
+        "examples": [
+          "For $\\mathbf{v} = [2, 0, 3]^T$: $\\mathbf{D} = \\text{diag}(2, 0, 3)$ has trace = 5, rank = 2 (two non-zero elements)",
+          "Testing equality: $\\text{diag}([1,2]) \\stackrel{?}{=} \\begin{bmatrix} 1 & 0 \\\\ 0 & 2 \\end{bmatrix}$ checks all 4 elements match"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Trace of Diagonal Matrix",
+          "latex": "$\\text{trace}(\\text{diag}(\\mathbf{v})) = \\sum_{i=1}^{n} v_i$",
+          "description": "Sum of diagonal elements equals sum of vector elements"
+        },
+        {
+          "name": "Invertibility Condition",
+          "latex": "$\\text{diag}(\\text{diag}(\\mathbf{D})) = \\mathbf{D}$ for diagonal matrix $\\mathbf{D}$",
+          "description": "Extracting then reconstructing diagonal gives back the original diagonal matrix"
+        },
+        {
+          "name": "Matrix Equality Test",
+          "latex": "$\\mathbf{A} = \\mathbf{B} \\iff \\|\\mathbf{A} - \\mathbf{B}\\|_F < \\epsilon$ for small $\\epsilon$",
+          "description": "Floating-point matrix comparison using Frobenius norm"
+        }
+      ],
+      "exercise": {
+        "description": "Create a validation function that tests whether a matrix was correctly constructed from a vector. It should verify: (1) the matrix is square with correct dimensions, (2) diagonal elements match the input vector, (3) all off-diagonal elements are zero. Return True if all checks pass.",
+        "function_signature": "def validate_diagonal_construction(vector: np.ndarray, matrix: np.ndarray, tol: float = 1e-10) -> bool:",
+        "starter_code": "import numpy as np\n\ndef validate_diagonal_construction(vector: np.ndarray, matrix: np.ndarray, tol: float = 1e-10) -> bool:\n    # Check 1: Matrix is square with shape (n, n) where n = len(vector)\n    # Check 2: Diagonal elements equal vector elements\n    # Check 3: All off-diagonal elements are zero (within tolerance)\n    # Return True only if all checks pass\n    pass",
+        "test_cases": [
+          {
+            "input": "validate_diagonal_construction(np.array([1, 2]), np.array([[1., 0.], [0., 2.]]))",
+            "expected": "True",
+            "explanation": "Correct 2×2 diagonal matrix with proper diagonal values"
+          },
+          {
+            "input": "validate_diagonal_construction(np.array([5, 7]), np.array([[5., 1.], [0., 7.]]))",
+            "expected": "False",
+            "explanation": "Off-diagonal element at (0,1) is 1, not 0"
+          },
+          {
+            "input": "validate_diagonal_construction(np.array([3]), np.array([[3.]]))",
+            "expected": "True",
+            "explanation": "Single element case is valid"
+          },
+          {
+            "input": "validate_diagonal_construction(np.array([1, 2, 3]), np.array([[1., 0.], [0., 2.]]))",
+            "expected": "False",
+            "explanation": "Dimension mismatch: vector has 3 elements but matrix is 2×2"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking matrix dimensions before accessing elements (can cause index errors)",
+        "Forgetting the tolerance parameter for floating-point comparisons",
+        "Only checking that some diagonal elements match, not all of them",
+        "Not verifying the matrix is square before checking diagonal property",
+        "Using exact equality (==) instead of np.allclose() for floating-point arrays"
+      ],
+      "hint": "Use matrix.shape to check dimensions, np.diag(matrix) to extract diagonal for comparison with the vector, and a loop or np.allclose() to verify off-diagonal elements are zero.",
+      "references": [
+        "Matrix validation and testing",
+        "Numerical stability and floating-point comparison",
+        "NumPy testing utilities (np.allclose, np.array_equal)",
+        "Invariant properties in linear algebra"
+      ]
+    }
+  ]
+}

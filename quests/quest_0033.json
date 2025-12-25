@@ -1,0 +1,509 @@
+{
+  "problem_id": 33,
+  "title": "Generate Random Subsets of a Dataset",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "Write a Python function to generate random subsets of a given dataset. The function should take in a 2D numpy array X, a 1D numpy array y, an integer n_subsets, and a boolean replacements. It should return a list of n_subsets random subsets of the dataset, where each subset is a tuple of (X_subset, y_subset). If replacements is True, the subsets should be created with replacements; otherwise, without replacements.",
+  "example": {
+    "input": "X = np.array([[1, 2],\n                  [3, 4],\n                  [5, 6],\n                  [7, 8],\n                  [9, 10]])\n    y = np.array([1, 2, 3, 4, 5])\n    n_subsets = 3\n    replacements = True\n    get_random_subsets(X, y, n_subsets, replacements)",
+    "output": "[array([[7, 8],\n            [1, 2]]), \n     array([4, 1])]\n     \n    [array([[9, 10],\n            [5, 6]]), \n     array([5, 3])]\n     \n    [array([[3, 4],\n            [5, 6]]), \n     array([2, 3])]",
+    "reasoning": "The function generates three random subsets of the dataset without replacements.\n    Each subset includes 50% of the samples (since replacements=False). The samples\n    are randomly selected without duplication."
+  },
+  "starter_code": "import numpy as np\n\ndef get_random_subsets(X, y, n_subsets, replacements=True, seed=42):\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Random Sampling Theory and Uniform Distributions",
+      "relation_to_problem": "Understanding uniform random sampling is fundamental to generating random subsets, as each element in the dataset must have equal probability of selection.",
+      "prerequisites": [
+        "Basic probability theory",
+        "Set theory",
+        "Python basics"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition of uniform random sampling",
+        "Apply discrete uniform distribution to select random indices",
+        "Implement basic random index generation with numpy"
+      ],
+      "math_content": {
+        "definition": "Let $S = \\{s_1, s_2, \\ldots, s_N\\}$ be a finite set of $N$ elements. A uniform random sample is an element $s_i \\in S$ where each element has equal probability of selection: $P(s_i) = \\frac{1}{N}$ for all $i \\in \\{1, 2, \\ldots, N\\}$. The discrete uniform distribution over indices is given by $U \\sim \\text{Discrete-Uniform}(0, N-1)$ where $P(U = k) = \\frac{1}{N}$ for $k \\in \\{0, 1, \\ldots, N-1\\}$.",
+        "notation": "$N$ = total number of elements in dataset, $P(s_i)$ = probability of selecting element $s_i$, $U$ = random variable following uniform distribution",
+        "theorem": "**Fundamental Theorem of Uniform Sampling**: For a discrete uniform distribution over $N$ elements, the expected position is $E[U] = \\frac{N-1}{2}$ and the variance is $\\text{Var}(U) = \\frac{(N-1)(N+1)}{12}$.",
+        "proof_sketch": "For discrete uniform distribution: $E[U] = \\sum_{k=0}^{N-1} k \\cdot \\frac{1}{N} = \\frac{1}{N} \\sum_{k=0}^{N-1} k = \\frac{1}{N} \\cdot \\frac{(N-1)N}{2} = \\frac{N-1}{2}$. The variance follows from $\\text{Var}(U) = E[U^2] - (E[U])^2$ using the sum of squares formula.",
+        "examples": [
+          "For a dataset with 5 elements, each has probability $P = \\frac{1}{5} = 0.2$ of being selected",
+          "To select one random element from $S = \\{10, 20, 30, 40\\}$, generate $i \\sim \\text{Uniform}(0, 3)$ and return $S[i]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Discrete Uniform Probability Mass Function",
+          "latex": "$P(X = k) = \\frac{1}{N}$ for $k \\in \\{0, 1, \\ldots, N-1\\}$",
+          "description": "Use this to verify that each element has equal selection probability"
+        },
+        {
+          "name": "Expected Value of Uniform Distribution",
+          "latex": "$E[U] = \\frac{N-1}{2}$",
+          "description": "The average index selected over many trials"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that generates a specified number of random indices from a dataset of size N. Each index should be uniformly distributed between 0 and N-1. This is the foundation for selecting random samples.",
+        "function_signature": "def generate_random_indices(n_samples: int, dataset_size: int, seed: int = 42) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef generate_random_indices(n_samples: int, dataset_size: int, seed: int = 42) -> np.ndarray:\n    \"\"\"\n    Generate n_samples random indices from range [0, dataset_size-1].\n    \n    Args:\n        n_samples: Number of random indices to generate\n        dataset_size: Size of the dataset (maximum index + 1)\n        seed: Random seed for reproducibility\n    \n    Returns:\n        Array of random indices\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "generate_random_indices(3, 10, seed=42)",
+            "expected": "array([6, 3, 7])",
+            "explanation": "With seed=42, numpy's random generator produces indices 6, 3, 7 from range [0, 9]"
+          },
+          {
+            "input": "generate_random_indices(5, 5, seed=0)",
+            "expected": "array([4, 0, 3, 3, 3])",
+            "explanation": "Note that indices can repeat (sampling with replacement by default)"
+          },
+          {
+            "input": "len(generate_random_indices(100, 50, seed=1))",
+            "expected": "100",
+            "explanation": "Should generate exactly the requested number of indices"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using random.randint() instead of numpy's random generator, which doesn't integrate well with numpy arrays",
+        "Forgetting to set the random seed, making results non-reproducible",
+        "Using incorrect bounds (e.g., [1, N] instead of [0, N-1]) for zero-indexed arrays"
+      ],
+      "hint": "Use numpy.random.default_rng(seed) to create a random generator, then use the integers() method to generate random indices in the correct range.",
+      "references": [
+        "Discrete uniform distribution",
+        "numpy.random.Generator.integers",
+        "Random seed and reproducibility in ML"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Sampling With and Without Replacement",
+      "relation_to_problem": "The problem requires both sampling modes: with replacement (bootstrap sampling) and without replacement (permutation sampling). Understanding the mathematical differences is crucial for correct implementation.",
+      "prerequisites": [
+        "Uniform random sampling",
+        "Combinatorics",
+        "Set operations"
+      ],
+      "learning_objectives": [
+        "Distinguish between sampling with and without replacement mathematically",
+        "Calculate probabilities for both sampling methods",
+        "Implement both sampling strategies using numpy"
+      ],
+      "math_content": {
+        "definition": "**Sampling With Replacement**: Given a set $S$ of size $N$, sampling $m$ elements with replacement means each selection is independent with $P(s_i) = \\frac{1}{N}$ for all draws. The same element can appear multiple times. **Sampling Without Replacement**: Each element can be selected at most once. After selecting $k$ elements, the remaining elements have probability $\\frac{1}{N-k}$ of being selected next. This is equivalent to selecting a $m$-subset from $S$ where the probability of any specific subset is $P(B) = \\frac{1}{\\binom{N}{m}}$ and $\\binom{N}{m} = \\frac{N!}{m!(N-m)!}$.",
+        "notation": "$m$ = sample size, $N$ = population size, $\\binom{N}{m}$ = binomial coefficient (number of ways to choose $m$ items from $N$)",
+        "theorem": "**Probability Distribution for Sampling Methods**: (1) With replacement: The number of possible sequences of length $m$ is $N^m$. Each specific sequence has probability $\\frac{1}{N^m}$. (2) Without replacement: The number of possible sequences (permutations) is $\\frac{N!}{(N-m)!}$ and the number of unordered subsets is $\\binom{N}{m}$. Each unordered subset has probability $\\frac{1}{\\binom{N}{m}}$.",
+        "proof_sketch": "For sampling with replacement: each of $m$ draws has $N$ independent choices, giving $N \\times N \\times \\cdots \\times N = N^m$ total sequences. For sampling without replacement: the first draw has $N$ choices, second has $N-1$, etc., giving $N \\times (N-1) \\times \\cdots \\times (N-m+1) = \\frac{N!}{(N-m)!}$ ordered sequences. Since order doesn't matter for subsets, we divide by $m!$ to get $\\binom{N}{m} = \\frac{N!}{m!(N-m)!}$.",
+        "examples": [
+          "With replacement from $\\{A, B, C\\}$, selecting 2 elements: possible outcomes include $(A,A), (A,B), (B,A), (B,B), \\ldots$ with $3^2 = 9$ total sequences",
+          "Without replacement from $\\{A, B, C\\}$, selecting 2 elements: possible unordered subsets are $\\{A,B\\}, \\{A,C\\}, \\{B,C\\}$ with $\\binom{3}{2} = 3$ total subsets"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sample Space Size With Replacement",
+          "latex": "$|\\Omega_{\\text{with}}| = N^m$",
+          "description": "Number of possible sequences when sampling m items with replacement from N elements"
+        },
+        {
+          "name": "Sample Space Size Without Replacement",
+          "latex": "$|\\Omega_{\\text{without}}| = \\binom{N}{m} = \\frac{N!}{m!(N-m)!}$",
+          "description": "Number of possible unordered subsets when sampling m items without replacement from N elements"
+        },
+        {
+          "name": "Probability of Specific Subset Without Replacement",
+          "latex": "$P(B) = \\frac{1}{\\binom{N}{m}}$",
+          "description": "Each subset of size m has equal probability under uniform sampling without replacement"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that samples random indices either with or without replacement. This builds on the previous exercise by adding the without-replacement constraint, which ensures no duplicate indices in a single sample.",
+        "function_signature": "def sample_indices(dataset_size: int, sample_size: int, replacement: bool = True, seed: int = 42) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef sample_indices(dataset_size: int, sample_size: int, replacement: bool = True, seed: int = 42) -> np.ndarray:\n    \"\"\"\n    Sample indices with or without replacement.\n    \n    Args:\n        dataset_size: Size of the dataset (N)\n        sample_size: Number of indices to sample (m)\n        replacement: If True, sample with replacement; if False, without replacement\n        seed: Random seed for reproducibility\n    \n    Returns:\n        Array of sampled indices\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "sample_indices(10, 5, replacement=False, seed=42)",
+            "expected": "array([8, 1, 5, 0, 7])",
+            "explanation": "Without replacement: all indices are unique. No duplicates in the output."
+          },
+          {
+            "input": "sample_indices(5, 8, replacement=True, seed=42)",
+            "expected": "array([3, 0, 4, 4, 4, 1, 3, 4])",
+            "explanation": "With replacement: sample size can exceed dataset size, and duplicates appear"
+          },
+          {
+            "input": "len(np.unique(sample_indices(100, 50, replacement=False, seed=0)))",
+            "expected": "50",
+            "explanation": "Without replacement: all sampled indices must be unique, so 50 unique values"
+          },
+          {
+            "input": "sample_indices(3, 3, replacement=False, seed=10)",
+            "expected": "array([1, 2, 0])",
+            "explanation": "Can sample all elements without replacement (a permutation of all indices)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Trying to sample without replacement when sample_size > dataset_size (mathematically impossible)",
+        "Not using numpy's choice() method with replace parameter, leading to inefficient manual implementations",
+        "Forgetting that with replacement allows duplicates and sample_size can exceed dataset_size"
+      ],
+      "hint": "NumPy's random generator has a choice() method that accepts a 'replace' parameter. Use this with the appropriate population range.",
+      "references": [
+        "Combinatorics and binomial coefficients",
+        "Bootstrap sampling in statistics",
+        "numpy.random.Generator.choice"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Index-Based Dataset Slicing and Array Synchronization",
+      "relation_to_problem": "When selecting random subsets, we must maintain correspondence between features X and labels y. This requires understanding how to slice multi-dimensional arrays using index arrays while preserving data alignment.",
+      "prerequisites": [
+        "NumPy array indexing",
+        "Array broadcasting",
+        "Data structure alignment"
+      ],
+      "learning_objectives": [
+        "Master advanced NumPy indexing with integer arrays",
+        "Maintain synchronization between paired datasets (features and labels)",
+        "Extract subsets from multi-dimensional arrays efficiently"
+      ],
+      "math_content": {
+        "definition": "**Index-Based Slicing**: Given a dataset $X \\in \\mathbb{R}^{N \\times d}$ (N samples, d features) and labels $y \\in \\mathbb{R}^N$, and an index set $I = \\{i_1, i_2, \\ldots, i_m\\}$ where $i_j \\in \\{0, 1, \\ldots, N-1\\}$, the indexed subset is defined as: $X_I = \\begin{bmatrix} X[i_1, :] \\\\ X[i_2, :] \\\\ \\vdots \\\\ X[i_m, :] \\end{bmatrix} \\in \\mathbb{R}^{m \\times d}$ and $y_I = \\begin{bmatrix} y[i_1] \\\\ y[i_2] \\\\ \\vdots \\\\ y[i_m] \\end{bmatrix} \\in \\mathbb{R}^m$. The correspondence property requires that for all $j \\in \\{1, \\ldots, m\\}$: $(X_I[j], y_I[j]) = (X[i_j], y[i_j])$.",
+        "notation": "$X \\in \\mathbb{R}^{N \\times d}$ = feature matrix, $y \\in \\mathbb{R}^N$ = label vector, $I$ = index set, $X[i, :]$ = $i$-th row of $X$, $m = |I|$ = subset size",
+        "theorem": "**Preservation of Correspondence Under Indexing**: Let $(X, y)$ be a paired dataset where each row $X[i]$ corresponds to label $y[i]$. For any index array $I = [i_1, \\ldots, i_m]$, the indexed subsets $(X_I, y_I)$ preserve the pairing: $\\forall j \\in \\{0, \\ldots, m-1\\}: X_I[j] \\text{ corresponds to } y_I[j] \\iff X[i_j] \\text{ corresponds to } y[i_j]$. This is the **invariance property of synchronized indexing**.",
+        "proof_sketch": "By definition of array indexing, $X_I[j] = X[I[j]] = X[i_j]$ and $y_I[j] = y[I[j]] = y[i_j]$. Since both operations use the same index $i_j = I[j]$, they select corresponding elements from the original paired dataset. Therefore, the correspondence relation is preserved: if $(X[i_j], y[i_j])$ is a valid pair, then $(X_I[j], y_I[j])$ is the same valid pair at a new position.",
+        "examples": [
+          "Given $X = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\\\ 5 & 6 \\end{bmatrix}$, $y = [10, 20, 30]$, and $I = [2, 0]$: $X_I = \\begin{bmatrix} 5 & 6 \\\\ 1 & 2 \\end{bmatrix}$, $y_I = [30, 10]$",
+          "For $I = [1, 1, 0]$ (with replacement), $X_I = \\begin{bmatrix} 3 & 4 \\\\ 3 & 4 \\\\ 1 & 2 \\end{bmatrix}$, $y_I = [20, 20, 10]$ - note the duplicate row"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Index-Based Subset Extraction",
+          "latex": "$X_I = X[I, :], \\quad y_I = y[I]$",
+          "description": "Extract rows from X and elements from y using the same index array I to maintain correspondence"
+        },
+        {
+          "name": "Subset Dimensionality",
+          "latex": "$X_I \\in \\mathbb{R}^{|I| \\times d}, \\quad y_I \\in \\mathbb{R}^{|I|}$",
+          "description": "The subset has size equal to the number of indices, preserving feature dimensionality d"
+        },
+        {
+          "name": "Correspondence Invariant",
+          "latex": "$X_I[j] \\leftrightarrow y_I[j] \\iff X[I[j]] \\leftrightarrow y[I[j]]$",
+          "description": "The pairing between features and labels is preserved under indexing"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that extracts a subset from paired feature and label arrays using a given index array. This ensures that the correspondence between X and y is maintained in the subset.",
+        "function_signature": "def extract_subset(X: np.ndarray, y: np.ndarray, indices: np.ndarray) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef extract_subset(X: np.ndarray, y: np.ndarray, indices: np.ndarray) -> tuple:\n    \"\"\"\n    Extract a subset of the dataset using the given indices.\n    \n    Args:\n        X: Feature matrix of shape (N, d)\n        y: Label vector of shape (N,)\n        indices: Array of indices to extract\n    \n    Returns:\n        Tuple (X_subset, y_subset) maintaining correspondence\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "X = np.array([[1, 2], [3, 4], [5, 6]]); y = np.array([10, 20, 30]); indices = np.array([2, 0]); extract_subset(X, y, indices)",
+            "expected": "(array([[5, 6], [1, 2]]), array([30, 10]))",
+            "explanation": "Extracts rows 2 and 0 from X and corresponding elements from y"
+          },
+          {
+            "input": "X = np.array([[1], [2], [3]]); y = np.array([0, 1, 0]); indices = np.array([1, 1, 2]); extract_subset(X, y, indices)",
+            "expected": "(array([[2], [2], [3]]), array([1, 1, 0]))",
+            "explanation": "With replacement: index 1 appears twice, so the row [2] and label 1 are duplicated"
+          },
+          {
+            "input": "X = np.array([[7, 8, 9], [4, 5, 6]]); y = np.array([100, 200]); indices = np.array([1, 0, 1]); X_sub, y_sub = extract_subset(X, y, indices); (X_sub.shape, y_sub.shape)",
+            "expected": "((3, 3), (3,))",
+            "explanation": "Output shapes match the number of indices (3), preserving feature dimensionality (3)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using different index arrays for X and y, breaking the correspondence between features and labels",
+        "Incorrectly handling multi-dimensional indexing (e.g., X[indices] instead of X[indices, :] though NumPy handles both)",
+        "Not preserving the order of indices, leading to shuffled correspondences",
+        "Forgetting that indices can contain duplicates when sampling with replacement"
+      ],
+      "hint": "NumPy's fancy indexing allows you to directly use an integer array to index rows. Use the same index array for both X and y to maintain synchronization.",
+      "references": [
+        "NumPy advanced indexing",
+        "Array broadcasting and slicing",
+        "Data alignment in machine learning"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Subset Size Selection and Statistical Properties",
+      "relation_to_problem": "When generating multiple random subsets, we need to determine appropriate subset sizes. Understanding the relationship between subset size and statistical properties helps create meaningful samples.",
+      "prerequisites": [
+        "Sample statistics",
+        "Central limit theorem basics",
+        "Variance and bias"
+      ],
+      "learning_objectives": [
+        "Understand how subset size affects statistical properties",
+        "Calculate appropriate subset sizes for different sampling scenarios",
+        "Implement flexible subset size selection strategies"
+      ],
+      "math_content": {
+        "definition": "**Subset Size Selection**: Given a dataset of size $N$, a subset of size $m$ where $0 < m \\leq N$ represents a fraction $f = \\frac{m}{N}$ of the data. Common strategies include: (1) **Fixed fraction**: $m = \\lfloor f \\cdot N \\rfloor$ where $f \\in (0, 1]$ is predetermined (e.g., $f = 0.5$ for 50%). (2) **Fixed size**: $m$ is constant regardless of $N$. (3) **Adaptive size**: $m = g(N)$ where $g$ is a function (e.g., $m = \\lfloor \\sqrt{N} \\rfloor$). For sampling without replacement, the constraint $m \\leq N$ must hold.",
+        "notation": "$N$ = dataset size, $m$ = subset size, $f = \\frac{m}{N}$ = sampling fraction, $g(N)$ = size selection function",
+        "theorem": "**Variance Reduction Theorem**: Consider estimating a population mean $\\mu$ from a random subset. The variance of the sample mean estimator decreases with subset size: $\\text{Var}(\\bar{X}_m) = \\frac{\\sigma^2}{m}$ for sampling with replacement, and $\\text{Var}(\\bar{X}_m) = \\frac{\\sigma^2}{m} \\cdot \\frac{N-m}{N-1}$ for sampling without replacement (finite population correction). The standard error is $SE(\\bar{X}_m) = \\frac{\\sigma}{\\sqrt{m}}$, which decreases as $O(m^{-1/2})$.",
+        "proof_sketch": "For sampling with replacement: each sample $X_i$ is i.i.d. with $\\text{Var}(X_i) = \\sigma^2$. By independence, $\\text{Var}(\\bar{X}_m) = \\text{Var}\\left(\\frac{1}{m}\\sum_{i=1}^m X_i\\right) = \\frac{1}{m^2} \\sum_{i=1}^m \\text{Var}(X_i) = \\frac{1}{m^2} \\cdot m\\sigma^2 = \\frac{\\sigma^2}{m}$. For sampling without replacement, the samples are not independent, and the finite population correction factor $\\frac{N-m}{N-1}$ accounts for the reduced variance when sampling a large fraction of the population.",
+        "examples": [
+          "For $N = 100$, $f = 0.5$: subset size is $m = \\lfloor 0.5 \\times 100 \\rfloor = 50$ (50% of data)",
+          "Bootstrap sampling typically uses $m = N$ with replacement to create resamples of the same size",
+          "For bagging with $N = 1000$, using $m = \\lfloor \\sqrt{1000} \\rfloor \\approx 31$ creates smaller diverse subsets"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Fixed Fraction Subset Size",
+          "latex": "$m = \\lfloor f \\cdot N \\rfloor$",
+          "description": "Calculate subset size as a fraction of dataset size, useful when you want proportional sampling"
+        },
+        {
+          "name": "Standard Error of Sample Mean",
+          "latex": "$SE(\\bar{X}_m) = \\frac{\\sigma}{\\sqrt{m}}$",
+          "description": "The estimation error decreases with square root of subset size"
+        },
+        {
+          "name": "Finite Population Correction",
+          "latex": "$FPC = \\sqrt{\\frac{N-m}{N-1}}$",
+          "description": "Correction factor for sampling without replacement; approaches 1 as N → ∞"
+        },
+        {
+          "name": "Maximum Subset Size Without Replacement",
+          "latex": "$m \\leq N$",
+          "description": "Hard constraint: cannot sample more unique elements than available"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the appropriate subset size given the dataset size and a sampling strategy. Support both fraction-based and fixed-size strategies, with validation for the without-replacement constraint.",
+        "function_signature": "def calculate_subset_size(dataset_size: int, fraction: float = None, fixed_size: int = None, replacement: bool = True) -> int:",
+        "starter_code": "import numpy as np\n\ndef calculate_subset_size(dataset_size: int, fraction: float = None, fixed_size: int = None, replacement: bool = True) -> int:\n    \"\"\"\n    Calculate subset size based on strategy.\n    \n    Args:\n        dataset_size: Size of the full dataset (N)\n        fraction: If provided, use this fraction of the dataset (0 < fraction <= 1)\n        fixed_size: If provided, use this fixed size\n        replacement: If False and fixed_size > dataset_size, clip to dataset_size\n    \n    Returns:\n        Calculated subset size (m)\n    \n    Note: If both fraction and fixed_size are None, default to dataset_size (full resample)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_subset_size(100, fraction=0.5)",
+            "expected": "50",
+            "explanation": "50% of 100 samples = 50"
+          },
+          {
+            "input": "calculate_subset_size(100, fixed_size=30)",
+            "expected": "30",
+            "explanation": "Fixed size of 30 is used regardless of dataset size"
+          },
+          {
+            "input": "calculate_subset_size(50, fixed_size=100, replacement=False)",
+            "expected": "50",
+            "explanation": "Without replacement: cannot exceed dataset size, so clipped to 50"
+          },
+          {
+            "input": "calculate_subset_size(50, fixed_size=100, replacement=True)",
+            "expected": "100",
+            "explanation": "With replacement: can exceed dataset size"
+          },
+          {
+            "input": "calculate_subset_size(200)",
+            "expected": "200",
+            "explanation": "Default behavior: full resample (m = N for bootstrap)"
+          },
+          {
+            "input": "calculate_subset_size(75, fraction=0.7)",
+            "expected": "52",
+            "explanation": "70% of 75 = 52.5, floored to 52"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not validating the constraint m ≤ N for sampling without replacement",
+        "Using round() instead of floor() for fractional sizes, which can cause m > N in edge cases",
+        "Forgetting to handle the case where both fraction and fixed_size are None",
+        "Not considering that with replacement allows m > N (e.g., in bootstrap)"
+      ],
+      "hint": "Use conditional logic to check which strategy is specified. For the without-replacement case, use min(calculated_size, dataset_size) to enforce the constraint.",
+      "references": [
+        "Bootstrap sampling theory",
+        "Bagging ensemble methods",
+        "Statistical sampling strategies"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Iterative Subset Generation and Random State Management",
+      "relation_to_problem": "The final problem requires generating multiple independent random subsets. This requires understanding random state management to ensure each subset is different while maintaining reproducibility.",
+      "prerequisites": [
+        "Random number generation",
+        "Iterative algorithms",
+        "Random seeds and state"
+      ],
+      "learning_objectives": [
+        "Understand pseudo-random number generation and state management",
+        "Generate multiple independent random samples correctly",
+        "Implement reproducible iterative random processes"
+      ],
+      "math_content": {
+        "definition": "**Pseudo-Random Number Generator (PRNG) State**: A PRNG is a deterministic algorithm that produces a sequence of numbers $\\{r_1, r_2, r_3, \\ldots\\}$ that approximates properties of random numbers. The state $s_t$ at iteration $t$ determines the next number: $r_{t+1} = f(s_t)$ and $s_{t+1} = g(s_t)$ where $f$ is the output function and $g$ is the state transition function. The initial state $s_0$ is set by the seed. **Independence of Generated Subsets**: When generating $k$ subsets $B_1, B_2, \\ldots, B_k$ using the same PRNG, they are not truly independent but pseudo-independent. Each $B_i$ is generated using a different portion of the PRNG sequence, ensuring $B_i \\neq B_j$ with high probability for $i \\neq j$.",
+        "notation": "$s_t$ = PRNG state at iteration $t$, $r_t$ = random number at iteration $t$, $\\text{seed}$ = initial state $s_0$, $B_i$ = $i$-th generated subset",
+        "theorem": "**Reproducibility Theorem**: Given a fixed seed $s_0$ and a deterministic PRNG with transition function $g$ and output function $f$, the sequence of generated random numbers $\\{r_1, r_2, \\ldots\\}$ is deterministic and reproducible. For generating $k$ subsets of size $m$ each: if we consume $m \\cdot k$ random numbers total, the sequence can be partitioned into $k$ blocks of $m$ consecutive numbers, where block $i$ produces subset $B_i$. The subsets are functionally independent if the PRNG has good statistical properties (low correlation between distant elements in the sequence).",
+        "proof_sketch": "Since $s_{t+1} = g(s_t)$ is deterministic and $s_0 = \\text{seed}$ is fixed, the entire sequence $s_0, s_1, s_2, \\ldots$ is determined by the seed. Therefore, $r_t = f(s_{t-1})$ is also fully determined. For subset generation, if $B_i$ uses random numbers $\\{r_{(i-1)m+1}, \\ldots, r_{im}\\}$ and $B_j$ uses $\\{r_{(j-1)m+1}, \\ldots, r_{jm}\\}$ with $i \\neq j$, these are disjoint portions of the sequence. A good PRNG ensures that $\\text{Corr}(r_i, r_j) \\approx 0$ for $|i - j|$ large, giving practical independence.",
+        "examples": [
+          "With seed=42, generating 3 subsets of size 2 from [0,1,2,3,4]: first subset might get random indices [3,1], second [4,2], third [0,3] - all different but reproducible",
+          "Using numpy's PCG64 PRNG with seed=0: calling rng.integers(0, 10, 3) twice gives different results each time as the state advances"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "PRNG State Transition",
+          "latex": "$s_{t+1} = g(s_t), \\quad r_t = f(s_{t-1})$",
+          "description": "The deterministic nature of pseudo-random generation"
+        },
+        {
+          "name": "Random Numbers Required",
+          "latex": "$N_{\\text{total}} = n_{\\text{subsets}} \\times m_{\\text{size}}$",
+          "description": "Total random numbers consumed when generating multiple subsets of equal size"
+        },
+        {
+          "name": "Subset Sequence Partitioning",
+          "latex": "$B_i \\leftarrow \\{r_{(i-1)m+1}, r_{(i-1)m+2}, \\ldots, r_{im}\\}$",
+          "description": "Each subset uses a consecutive block of m random numbers from the PRNG sequence"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that generates multiple random subsets from a dataset. Each subset should be independent (different random samples) but the entire process should be reproducible when using the same seed. Return a list of tuples, where each tuple contains (X_subset, y_subset).",
+        "function_signature": "def generate_multiple_subsets(X: np.ndarray, y: np.ndarray, n_subsets: int, subset_size: int, replacement: bool = True, seed: int = 42) -> list:",
+        "starter_code": "import numpy as np\n\ndef generate_multiple_subsets(X: np.ndarray, y: np.ndarray, n_subsets: int, subset_size: int, replacement: bool = True, seed: int = 42) -> list:\n    \"\"\"\n    Generate multiple random subsets from a dataset.\n    \n    Args:\n        X: Feature matrix of shape (N, d)\n        y: Label vector of shape (N,)\n        n_subsets: Number of subsets to generate\n        subset_size: Size of each subset\n        replacement: Sample with or without replacement\n        seed: Random seed for reproducibility\n    \n    Returns:\n        List of tuples [(X_subset_1, y_subset_1), (X_subset_2, y_subset_2), ...]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "X = np.array([[1,2],[3,4],[5,6],[7,8],[9,10]]); y = np.array([1,2,3,4,5]); result = generate_multiple_subsets(X, y, n_subsets=2, subset_size=2, replacement=False, seed=42); len(result)",
+            "expected": "2",
+            "explanation": "Should generate exactly 2 subsets as requested"
+          },
+          {
+            "input": "X = np.array([[1,2],[3,4],[5,6]]); y = np.array([1,2,3]); result = generate_multiple_subsets(X, y, n_subsets=3, subset_size=2, replacement=True, seed=10); result[0][0].shape",
+            "expected": "(2, 2)",
+            "explanation": "Each X_subset should have shape (subset_size, n_features) = (2, 2)"
+          },
+          {
+            "input": "X = np.array([[1],[2],[3],[4]]); y = np.array([10,20,30,40]); result = generate_multiple_subsets(X, y, n_subsets=2, subset_size=2, replacement=False, seed=0); [r[1].tolist() for r in result]",
+            "expected": "[[40, 10], [30, 20]]",
+            "explanation": "Each y_subset should maintain correspondence with its X_subset. With seed=0, specific indices are selected."
+          },
+          {
+            "input": "X = np.array([[1,2],[3,4],[5,6]]); y = np.array([1,2,3]); r1 = generate_multiple_subsets(X, y, 2, 2, seed=42); r2 = generate_multiple_subsets(X, y, 2, 2, seed=42); np.array_equal(r1[0][0], r2[0][0])",
+            "expected": "True",
+            "explanation": "Same seed should produce identical results (reproducibility)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Creating a new random generator inside the loop instead of reusing one, which can lead to correlation issues",
+        "Not setting the seed before the loop, making results non-reproducible",
+        "Forgetting to append results to a list, losing previous subsets",
+        "Mixing up the order of X and y in the returned tuples"
+      ],
+      "hint": "Create a single random generator with the seed before the loop. In each iteration, generate random indices and use them to extract corresponding subsets from X and y. Append each (X_subset, y_subset) tuple to a list.",
+      "references": [
+        "Pseudo-random number generation",
+        "NumPy random state management",
+        "Reproducibility in machine learning"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Integration: Flexible Subset Generation with Multiple Sampling Strategies",
+      "relation_to_problem": "This final step combines all previous concepts to implement a complete flexible random subset generator that handles various sampling strategies, subset sizes, and parameter configurations.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Function design and API",
+        "Parameter validation"
+      ],
+      "learning_objectives": [
+        "Integrate sampling with/without replacement into a unified interface",
+        "Handle flexible subset size specifications (fixed, fractional, or default)",
+        "Implement robust parameter validation and error handling",
+        "Create a production-ready function for random subset generation"
+      ],
+      "math_content": {
+        "definition": "**Complete Random Subset Generation Algorithm**: Given dataset $(X, y)$ where $X \\in \\mathbb{R}^{N \\times d}$ and $y \\in \\mathbb{R}^N$, parameters $(n, m, r, s)$ where $n$ = number of subsets, $m$ = subset size (or size function), $r$ = replacement flag, $s$ = seed, the algorithm produces $\\{B_1, B_2, \\ldots, B_n\\}$ where each $B_i = (X_i, y_i)$ and $X_i \\in \\mathbb{R}^{m \\times d}$, $y_i \\in \\mathbb{R}^m$. The generation process: (1) Initialize PRNG with seed $s$, (2) For $i = 1$ to $n$: (a) Generate indices $I_i$ of size $m$ using sampling method $r$, (b) Extract $X_i = X[I_i, :]$ and $y_i = y[I_i]$, (c) Append $(X_i, y_i)$ to results. **Default Behavior**: If $m$ is not specified, use $m = N$ (full bootstrap resampling).",
+        "notation": "$N$ = dataset size, $d$ = feature dimension, $n$ = number of subsets, $m$ = subset size, $r \\in \\{\\text{True}, \\text{False}\\}$ = replacement flag, $s$ = random seed, $B_i = (X_i, y_i)$ = $i$-th subset",
+        "theorem": "**Complete Coverage Theorem for Subset Generation**: For $n$ subsets each of size $m$ generated with replacement, the expected number of times each sample appears across all subsets is $\\frac{nm}{N}$. The probability that a specific sample $x_j$ appears at least once is $1 - \\left(1 - \\frac{m}{N}\\right)^n$ for with replacement. For without replacement, if $m \\cdot n \\leq N$, disjoint subsets are possible with appropriate sampling, but our algorithm allows overlapping subsets by resampling independently for each subset.",
+        "proof_sketch": "For each subset, each sample has probability $\\frac{m}{N}$ of being selected (for large $N$, this approximates the sampling probability). Across $n$ independent subsets, by linearity of expectation: $E[\\text{count}(x_j)] = n \\cdot \\frac{m}{N}$. For the probability of at least one appearance: the probability of NOT appearing in one subset is $1 - \\frac{m}{N}$ (approximately), and for $n$ independent subsets: $P(\\text{never appears}) = \\left(1 - \\frac{m}{N}\\right)^n$, so $P(\\text{appears at least once}) = 1 - \\left(1 - \\frac{m}{N}\\right)^n$.",
+        "examples": [
+          "Generating 3 subsets of size 50 from dataset of size 100 with replacement: each sample appears in expectation $\\frac{3 \\times 50}{100} = 1.5$ times total",
+          "For bagging: $n = 10$ trees, $m = N = 1000$, with replacement gives each tree a bootstrap sample of the full dataset size",
+          "For k-fold CV preparation: $n = k$ folds, $m = \\frac{N}{k}$, without replacement ensures each sample appears exactly once across all folds (requires special logic not covered here)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Expected Sample Coverage With Replacement",
+          "latex": "$E[\\text{count}(x_j)] = \\frac{nm}{N}$",
+          "description": "Expected number of times a specific sample appears across all generated subsets"
+        },
+        {
+          "name": "Probability of Sample Inclusion",
+          "latex": "$P(x_j \\in \\bigcup_{i=1}^n B_i) = 1 - \\left(1 - \\frac{m}{N}\\right)^n$",
+          "description": "Probability that a sample appears in at least one subset (approximate for with replacement)"
+        },
+        {
+          "name": "Default Subset Size",
+          "latex": "$m = N \\text{ (if not specified)}$",
+          "description": "Bootstrap convention: resample at the same size as the original dataset"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete random subset generator that combines all concepts. The function should handle flexible subset sizing (if None, use full dataset size), support both sampling modes, and return all generated subsets. This is the penultimate building block - similar structure to the main problem but with explicit subset_size parameter.",
+        "function_signature": "def create_random_subsets(X: np.ndarray, y: np.ndarray, n_subsets: int, subset_size: int = None, replacement: bool = True, seed: int = 42) -> list:",
+        "starter_code": "import numpy as np\n\ndef create_random_subsets(X: np.ndarray, y: np.ndarray, n_subsets: int, subset_size: int = None, replacement: bool = True, seed: int = 42) -> list:\n    \"\"\"\n    Create multiple random subsets with flexible configuration.\n    \n    Args:\n        X: Feature matrix of shape (N, d)\n        y: Label vector of shape (N,)\n        n_subsets: Number of random subsets to generate\n        subset_size: Size of each subset (if None, use N for bootstrap)\n        replacement: If True, sample with replacement; if False, without replacement\n        seed: Random seed for reproducibility\n    \n    Returns:\n        List of tuples [(X_1, y_1), (X_2, y_2), ..., (X_n, y_n)]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "X = np.array([[1,2],[3,4],[5,6]]); y = np.array([1,2,3]); result = create_random_subsets(X, y, n_subsets=2, subset_size=2, replacement=True, seed=42); len(result)",
+            "expected": "2",
+            "explanation": "Generates 2 subsets as requested"
+          },
+          {
+            "input": "X = np.array([[1,2],[3,4],[5,6],[7,8]]); y = np.array([10,20,30,40]); result = create_random_subsets(X, y, n_subsets=2, subset_size=None, replacement=True, seed=0); result[0][0].shape",
+            "expected": "(4, 2)",
+            "explanation": "When subset_size is None, defaults to N=4 (full bootstrap)"
+          },
+          {
+            "input": "X = np.array([[1],[2],[3],[4],[5]]); y = np.array([1,2,3,4,5]); result = create_random_subsets(X, y, n_subsets=3, subset_size=2, replacement=False, seed=10); all(len(np.unique(r[1])) == 2 for r in result)",
+            "expected": "True",
+            "explanation": "Without replacement: each subset should have 2 unique labels"
+          },
+          {
+            "input": "X = np.array([[1,2],[3,4]]); y = np.array([5,6]); r1 = create_random_subsets(X, y, 2, 1, seed=42); r2 = create_random_subsets(X, y, 2, 1, seed=42); (np.array_equal(r1[0][0], r2[0][0]) and np.array_equal(r1[1][1], r2[1][1]))",
+            "expected": "True",
+            "explanation": "Reproducibility: same seed produces identical subsets"
+          },
+          {
+            "input": "X = np.array([[1,2,3],[4,5,6],[7,8,9]]); y = np.array([0,1,0]); result = create_random_subsets(X, y, n_subsets=4, subset_size=2, replacement=True, seed=5); all(r[0].shape[1] == 3 for r in result)",
+            "expected": "True",
+            "explanation": "Feature dimensionality (3) is preserved in all subsets"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the subset_size=None case by defaulting to N",
+        "Validating subset_size > N when replacement=False but forgetting to enforce it",
+        "Creating random generators inside the loop instead of once before the loop",
+        "Not maintaining correspondence between X and y when extracting subsets",
+        "Returning raw arrays instead of list of tuples"
+      ],
+      "hint": "Start by determining the actual subset size (use X.shape[0] if None). Create one random generator with the seed. Loop n_subsets times, generating fresh random indices each iteration, extract synchronized subsets, and collect them in a list.",
+      "references": [
+        "Bootstrap aggregating (Bagging)",
+        "Random forest algorithm",
+        "Ensemble learning methods",
+        "Cross-validation techniques"
+      ]
+    }
+  ]
+}

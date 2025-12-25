@@ -1,0 +1,420 @@
+{
+  "problem_id": 213,
+  "title": "Bayesian Inference for Beta-Binomial Model",
+  "category": "Statistics",
+  "difficulty": "medium",
+  "description": "Implement Bayesian inference for a binomial likelihood with a Beta prior (Beta-Binomial conjugate model). Given prior parameters (alpha, beta) and observed data (successes, trials), compute the posterior distribution parameters and posterior mean. This demonstrates how prior beliefs are updated with observed data using Bayes' theorem.",
+  "example": {
+    "input": "prior_alpha=1, prior_beta=1, successes=7, trials=10",
+    "output": "(8.0, 4.0, 0.6667)",
+    "reasoning": "Prior: Beta(1,1) uniform. Data: 7 successes, 3 failures. Posterior: Beta(1+7, 1+3) = Beta(8, 4). Posterior mean = 8/(8+4) = 0.6667. The uniform prior is updated by the data to give posterior centered at observed proportion."
+  },
+  "starter_code": "import numpy as np\n\ndef bayesian_inference_beta_binomial(prior_alpha: float, prior_beta: float, \n                                     successes: int, trials: int) -> tuple[float, float, float]:\n\t\"\"\"\n\tPerform Bayesian inference for Beta-Binomial model.\n\t\n\tArgs:\n\t\tprior_alpha: Alpha parameter of Beta prior\n\t\tprior_beta: Beta parameter of Beta prior\n\t\tsuccesses: Number of successes observed\n\t\ttrials: Total number of trials\n\t\n\tReturns:\n\t\tTuple of (posterior_alpha, posterior_beta, posterior_mean) where:\n\t\t- posterior_alpha: Updated alpha parameter\n\t\t- posterior_beta: Updated beta parameter\n\t\t- posterior_mean: Mean of posterior distribution\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding the Beta Distribution: Properties and Parameterization",
+      "relation_to_problem": "The Beta distribution serves as both the prior and posterior in the Beta-Binomial model. Understanding its parameters and properties is essential for computing posterior parameters and means.",
+      "prerequisites": [
+        "Basic probability theory",
+        "Continuous probability distributions",
+        "Gamma function basics"
+      ],
+      "learning_objectives": [
+        "Define the Beta distribution mathematically with proper notation",
+        "Understand the role of alpha and beta parameters in shaping the distribution",
+        "Compute the mean and variance of a Beta distribution given its parameters",
+        "Implement a function to calculate Beta distribution mean"
+      ],
+      "math_content": {
+        "definition": "A continuous random variable $\\theta$ follows a Beta distribution with parameters $\\alpha > 0$ and $\\beta > 0$, denoted $\\theta \\sim \\text{Beta}(\\alpha, \\beta)$, if its probability density function is:\n\n$$f(\\theta; \\alpha, \\beta) = \\frac{\\Gamma(\\alpha + \\beta)}{\\Gamma(\\alpha)\\Gamma(\\beta)} \\theta^{\\alpha-1}(1-\\theta)^{\\beta-1}, \\quad 0 < \\theta < 1$$\n\nwhere $\\Gamma(\\cdot)$ is the gamma function satisfying $\\Gamma(n) = (n-1)!$ for positive integers $n$.",
+        "notation": "$\\alpha$ = shape parameter (controls left tail behavior), $\\beta$ = shape parameter (controls right tail behavior), $\\theta$ = random variable on interval $(0,1)$",
+        "theorem": "**Theorem (Beta Distribution Moments)**: If $\\theta \\sim \\text{Beta}(\\alpha, \\beta)$, then:\n\n1. **Mean (Expected Value)**: $E[\\theta] = \\frac{\\alpha}{\\alpha + \\beta}$\n\n2. **Variance**: $\\text{Var}(\\theta) = \\frac{\\alpha\\beta}{(\\alpha+\\beta)^2(\\alpha+\\beta+1)}$\n\n3. **Mode** (for $\\alpha, \\beta > 1$): $\\text{Mode}[\\theta] = \\frac{\\alpha - 1}{\\alpha + \\beta - 2}$",
+        "proof_sketch": "**Proof of Mean**: The mean is computed using the definition of expectation:\n\n$$E[\\theta] = \\int_0^1 \\theta \\cdot f(\\theta; \\alpha, \\beta) \\, d\\theta = \\int_0^1 \\theta \\cdot \\frac{\\Gamma(\\alpha + \\beta)}{\\Gamma(\\alpha)\\Gamma(\\beta)} \\theta^{\\alpha-1}(1-\\theta)^{\\beta-1} \\, d\\theta$$\n\n$$= \\frac{\\Gamma(\\alpha + \\beta)}{\\Gamma(\\alpha)\\Gamma(\\beta)} \\int_0^1 \\theta^{\\alpha}(1-\\theta)^{\\beta-1} \\, d\\theta$$\n\nThe integral is proportional to $\\text{Beta}(\\alpha+1, \\beta)$, and using the property that $\\int_0^1 \\theta^{a-1}(1-\\theta)^{b-1} d\\theta = \\frac{\\Gamma(a)\\Gamma(b)}{\\Gamma(a+b)}$, we obtain:\n\n$$E[\\theta] = \\frac{\\Gamma(\\alpha + \\beta)}{\\Gamma(\\alpha)\\Gamma(\\beta)} \\cdot \\frac{\\Gamma(\\alpha+1)\\Gamma(\\beta)}{\\Gamma(\\alpha+\\beta+1)} = \\frac{\\Gamma(\\alpha + \\beta)}{\\Gamma(\\alpha + \\beta + 1)} \\cdot \\frac{\\Gamma(\\alpha+1)}{\\Gamma(\\alpha)}$$\n\nUsing $\\Gamma(x+1) = x\\Gamma(x)$:\n\n$$E[\\theta] = \\frac{1}{\\alpha + \\beta} \\cdot \\alpha = \\frac{\\alpha}{\\alpha + \\beta}$$",
+        "examples": [
+          "**Example 1**: $\\text{Beta}(1, 1)$ is the **uniform distribution** on $(0,1)$. Mean: $E[\\theta] = \\frac{1}{1+1} = 0.5$, reflecting equal probability for all values.",
+          "**Example 2**: $\\text{Beta}(2, 5)$ has mean $E[\\theta] = \\frac{2}{2+5} = 0.286$, skewed toward smaller values due to larger $\\beta$.",
+          "**Example 3**: $\\text{Beta}(10, 10)$ has mean $E[\\theta] = \\frac{10}{20} = 0.5$ but is concentrated around 0.5 (low variance), representing strong belief in $\\theta \\approx 0.5$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Beta Distribution Mean",
+          "latex": "$E[\\theta] = \\frac{\\alpha}{\\alpha + \\beta}$",
+          "description": "Use this to find the expected value (central tendency) of any Beta-distributed parameter. The denominator $\\alpha + \\beta$ represents total \"pseudo-observations\", while $\\alpha$ represents \"pseudo-successes\"."
+        },
+        {
+          "name": "Beta Distribution Variance",
+          "latex": "$\\text{Var}(\\theta) = \\frac{\\alpha\\beta}{(\\alpha+\\beta)^2(\\alpha+\\beta+1)}$",
+          "description": "Quantifies uncertainty in $\\theta$. Note that variance decreases as $\\alpha + \\beta$ increases (more pseudo-observations = more certainty)."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the mean of a Beta distribution given its parameters. This is a fundamental building block for computing posterior means in Bayesian inference.",
+        "function_signature": "def beta_mean(alpha: float, beta: float) -> float:",
+        "starter_code": "def beta_mean(alpha: float, beta: float) -> float:\n    \"\"\"\n    Compute the mean of a Beta distribution.\n    \n    Args:\n        alpha: First shape parameter (alpha > 0)\n        beta: Second shape parameter (beta > 0)\n    \n    Returns:\n        Mean of Beta(alpha, beta) distribution\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "beta_mean(1, 1)",
+            "expected": "0.5",
+            "explanation": "Beta(1,1) is uniform on (0,1), so mean is 0.5 (center of interval)"
+          },
+          {
+            "input": "beta_mean(2, 5)",
+            "expected": "0.2857 (approximately 2/7)",
+            "explanation": "More weight on beta parameter means distribution skewed left, mean < 0.5"
+          },
+          {
+            "input": "beta_mean(8, 4)",
+            "expected": "0.6667 (approximately 8/12)",
+            "explanation": "Alpha dominates, so mean shifted toward 1. This will be a posterior mean in the main problem."
+          },
+          {
+            "input": "beta_mean(100, 100)",
+            "expected": "0.5",
+            "explanation": "Symmetric parameters always give mean 0.5, but with very low variance (strong belief)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that Beta distribution is only defined on interval (0,1), not arbitrary ranges",
+        "Confusing alpha and beta parameters - order matters! Beta(2,5) ≠ Beta(5,2)",
+        "Thinking larger alpha+beta means larger mean (false - it means lower variance, not higher mean)",
+        "Using integer division in implementation: alpha/alpha+beta may truncate in some languages"
+      ],
+      "hint": "The mean formula is simply a ratio: alpha divided by the sum of both parameters. Think of alpha as \"successes\" and alpha+beta as \"total observations\" to build intuition.",
+      "references": [
+        "Beta distribution properties and derivations",
+        "Gamma function and its relationship to factorials",
+        "Conjugate priors in Bayesian statistics"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Binomial Likelihood and Sufficient Statistics",
+      "relation_to_problem": "The Binomial likelihood models the observed data (successes in trials). Understanding how to decompose trials into successes and failures is essential for updating Beta prior parameters in Bayesian inference.",
+      "prerequisites": [
+        "Binomial distribution",
+        "Likelihood functions",
+        "Sufficient statistics",
+        "Beta distribution mean (Step 1)"
+      ],
+      "learning_objectives": [
+        "Define the Binomial likelihood function and its kernel form",
+        "Understand the role of sufficient statistics (successes, failures) in Bayesian updating",
+        "Compute the number of failures from trials and successes",
+        "Implement a function to extract sufficient statistics from binomial data"
+      ],
+      "math_content": {
+        "definition": "**Binomial Likelihood**: Given $n$ independent Bernoulli trials with unknown success probability $\\theta$, the probability of observing exactly $k$ successes is:\n\n$$P(\\text{Data} = k \\mid \\theta, n) = \\binom{n}{k} \\theta^k (1-\\theta)^{n-k}, \\quad k \\in \\{0, 1, \\ldots, n\\}$$\n\nwhere $\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$ is the binomial coefficient.\n\n**Likelihood Kernel**: For Bayesian inference, we can drop the constant binomial coefficient (as it doesn't depend on $\\theta$):\n\n$$L(\\theta \\mid k, n) \\propto \\theta^k (1-\\theta)^{n-k}$$\n\nThis kernel form reveals the **sufficient statistics**: the number of successes $k$ and failures $n-k$.",
+        "notation": "$n$ = total number of trials, $k$ = number of successes observed, $n-k$ = number of failures, $\\theta$ = success probability (parameter)",
+        "theorem": "**Theorem (Factorization Theorem for Sufficient Statistics)**: For Binomial data with parameter $\\theta$, the pair $(k, n-k)$ (successes and failures) are **jointly sufficient statistics**. This means all information about $\\theta$ contained in the data is captured by these counts.\n\n**Formally**: The likelihood factorizes as:\n$$P(\\text{Data} \\mid \\theta) = g(T(\\text{Data}), \\theta) \\cdot h(\\text{Data})$$\nwhere $T(\\text{Data}) = (k, n-k)$ and $h$ doesn't depend on $\\theta$.",
+        "proof_sketch": "**Why Successes and Failures are Sufficient**:\n\nThe likelihood for observing a specific sequence of outcomes (e.g., SFSSSF...) with $k$ successes in $n$ trials is:\n\n$$P(\\text{sequence} \\mid \\theta) = \\theta \\cdot (1-\\theta) \\cdot \\theta \\cdot \\theta \\cdot \\theta \\cdot (1-\\theta) \\cdots = \\theta^k (1-\\theta)^{n-k}$$\n\nNotice this probability **only depends on** $k$ (count of successes) and $n-k$ (count of failures), **not** on the specific order of successes/failures. Therefore, $(k, n-k)$ captures all information about $\\theta$.\n\nFor Bayesian inference, we update the prior using only these sufficient statistics:\n$$P(\\theta \\mid \\text{Data}) \\propto P(\\text{Data} \\mid \\theta) \\cdot P(\\theta) = \\theta^k(1-\\theta)^{n-k} \\cdot P(\\theta)$$",
+        "examples": [
+          "**Example 1**: 7 successes in 10 trials → $k=7$, failures $= 10-7 = 3$. The likelihood kernel is $\\theta^7(1-\\theta)^3$.",
+          "**Example 2**: 0 successes in 5 trials → $k=0$, failures $= 5-0 = 5$. Kernel: $\\theta^0(1-\\theta)^5 = (1-\\theta)^5$. This heavily penalizes large $\\theta$ values.",
+          "**Example 3**: All successes (10/10) → $k=10$, failures $= 0$. Kernel: $\\theta^{10}$. This heavily rewards large $\\theta$ values, but note we haven't observed any failures to constrain the upper bound."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Number of Failures",
+          "latex": "$\\text{failures} = n - k$",
+          "description": "Given total trials $n$ and successes $k$, compute failures. This is a sufficient statistic for Bayesian updating of Beta priors."
+        },
+        {
+          "name": "Binomial Likelihood Kernel",
+          "latex": "$L(\\theta \\mid k, n) \\propto \\theta^k (1-\\theta)^{n-k}$",
+          "description": "The likelihood function up to a proportionality constant. This form directly reveals how data updates Beta priors through conjugacy."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that extracts sufficient statistics from binomial data: given the number of successes and total trials, compute the number of failures. This is a preparatory step for Bayesian updating.",
+        "function_signature": "def compute_failures(successes: int, trials: int) -> int:",
+        "starter_code": "def compute_failures(successes: int, trials: int) -> int:\n    \"\"\"\n    Compute the number of failures from binomial data.\n    \n    Args:\n        successes: Number of successful trials (k)\n        trials: Total number of trials (n)\n    \n    Returns:\n        Number of failures (n - k)\n    \n    Raises:\n        ValueError: If successes > trials or if either is negative\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_failures(7, 10)",
+            "expected": "3",
+            "explanation": "10 trials with 7 successes means 3 failures. This matches the main problem example."
+          },
+          {
+            "input": "compute_failures(0, 5)",
+            "expected": "5",
+            "explanation": "All trials failed - edge case where k=0. Important for avoiding division by zero in MLE."
+          },
+          {
+            "input": "compute_failures(10, 10)",
+            "expected": "0",
+            "explanation": "All trials succeeded - edge case where k=n. The other extreme boundary case."
+          },
+          {
+            "input": "compute_failures(3, 3)",
+            "expected": "0",
+            "explanation": "Perfect success rate, no failures observed"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to validate that successes ≤ trials (impossible to have more successes than trials)",
+        "Not handling edge cases: k=0 (all failures) or k=n (all successes)",
+        "Confusing successes with success probability θ - they're different quantities",
+        "Thinking failures are redundant information - they're equally important as successes for Bayesian updating"
+      ],
+      "hint": "This is a simple subtraction, but validation is crucial. Ensure the input makes sense (non-negative, successes not exceeding trials). These counts will directly update the Beta prior parameters.",
+      "references": [
+        "Sufficient statistics in exponential families",
+        "Binomial distribution properties",
+        "Data reduction in statistical inference"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Bayes' Theorem and Posterior Proportionality",
+      "relation_to_problem": "Bayes' theorem is the foundation of Bayesian inference. Understanding the proportionality form allows us to derive posterior distributions without computing the normalizing constant, which is essential for the conjugate update rules.",
+      "prerequisites": [
+        "Conditional probability",
+        "Bayes' theorem basics",
+        "Probability density functions",
+        "Steps 1 and 2"
+      ],
+      "learning_objectives": [
+        "State Bayes' theorem in its general and proportional forms",
+        "Understand why the normalizing constant can be ignored when the posterior family is known",
+        "Apply the proportionality concept to identify posterior distributions",
+        "Recognize the multiplication of prior and likelihood kernels"
+      ],
+      "math_content": {
+        "definition": "**Bayes' Theorem for Continuous Parameters**: Let $\\theta$ be a continuous parameter and $\\mathcal{D}$ be observed data. The posterior distribution of $\\theta$ given data is:\n\n$$p(\\theta \\mid \\mathcal{D}) = \\frac{p(\\mathcal{D} \\mid \\theta) \\cdot p(\\theta)}{p(\\mathcal{D})}$$\n\nwhere:\n- $p(\\theta \\mid \\mathcal{D})$ is the **posterior distribution** (updated beliefs about $\\theta$)\n- $p(\\mathcal{D} \\mid \\theta)$ is the **likelihood function** (probability of data given $\\theta$)\n- $p(\\theta)$ is the **prior distribution** (beliefs about $\\theta$ before observing data)\n- $p(\\mathcal{D}) = \\int p(\\mathcal{D} \\mid \\theta) p(\\theta) d\\theta$ is the **marginal likelihood** or evidence (normalizing constant)",
+        "notation": "$p(\\cdot)$ denotes probability density functions, $\\mathcal{D}$ = observed data, $\\theta$ = parameter of interest, $\\propto$ means \"proportional to\" (equal up to a constant)",
+        "theorem": "**Theorem (Posterior Proportionality)**: The posterior distribution is proportional to the product of likelihood and prior:\n\n$$p(\\theta \\mid \\mathcal{D}) \\propto p(\\mathcal{D} \\mid \\theta) \\cdot p(\\theta)$$\n\nThe normalizing constant $p(\\mathcal{D})$ can be ignored when:\n1. We can recognize the posterior as belonging to a known distribution family, OR\n2. We only need point estimates (like the mean) that can be computed from the unnormalized posterior\n\n**Corollary (Kernel Matching)**: If prior and likelihood kernels multiply to produce a recognizable distribution kernel, we can identify the posterior distribution without integration.",
+        "proof_sketch": "**Why Proportionality Suffices**:\n\nBayes' theorem in full form:\n$$p(\\theta \\mid \\mathcal{D}) = \\frac{p(\\mathcal{D} \\mid \\theta) \\cdot p(\\theta)}{p(\\mathcal{D})}$$\n\nNote that $p(\\mathcal{D})$ does **not depend on** $\\theta$ - it's a constant with respect to $\\theta$. Therefore:\n$$p(\\theta \\mid \\mathcal{D}) \\propto p(\\mathcal{D} \\mid \\theta) \\cdot p(\\theta)$$\n\n**Application to Beta-Binomial**:\n\nPrior: $\\text{Beta}(\\alpha, \\beta) \\propto \\theta^{\\alpha-1}(1-\\theta)^{\\beta-1}$\n\nLikelihood: $\\text{Binomial}(k, n) \\propto \\theta^k(1-\\theta)^{n-k}$\n\nPosterior:\n$$p(\\theta \\mid k, n) \\propto [\\theta^k(1-\\theta)^{n-k}] \\cdot [\\theta^{\\alpha-1}(1-\\theta)^{\\beta-1}]$$\n$$= \\theta^{k+\\alpha-1}(1-\\theta)^{n-k+\\beta-1}$$\n\nThis is the kernel of $\\text{Beta}(\\alpha + k, \\beta + n - k)$ - we recognize the pattern without computing integrals!",
+        "examples": [
+          "**Example 1**: Prior $\\text{Beta}(1, 1)$, Data: 7 successes in 10 trials.\nPrior kernel: $\\theta^0(1-\\theta)^0 = 1$ (uniform)\nLikelihood kernel: $\\theta^7(1-\\theta)^3$\nPosterior kernel: $1 \\cdot \\theta^7(1-\\theta)^3 = \\theta^{7}(1-\\theta)^{3} = \\theta^{(8-1)}(1-\\theta)^{(4-1)}$\nRecognize as $\\text{Beta}(8, 4)$",
+          "**Example 2**: Prior $\\text{Beta}(2, 2)$, Data: 0 successes in 3 trials.\nPrior kernel: $\\theta^1(1-\\theta)^1$\nLikelihood kernel: $\\theta^0(1-\\theta)^3 = (1-\\theta)^3$\nPosterior kernel: $\\theta^1(1-\\theta)^1 \\cdot (1-\\theta)^3 = \\theta^{1}(1-\\theta)^{4} = \\theta^{(2-1)}(1-\\theta)^{(5-1)}$\nRecognize as $\\text{Beta}(2, 5)$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Bayes' Theorem (Proportional Form)",
+          "latex": "$p(\\theta \\mid \\mathcal{D}) \\propto p(\\mathcal{D} \\mid \\theta) \\cdot p(\\theta)$",
+          "description": "The posterior is proportional to likelihood times prior. Use this form when you can recognize the posterior distribution family by pattern matching kernels."
+        },
+        {
+          "name": "Beta-Binomial Posterior Kernel",
+          "latex": "$p(\\theta \\mid k, n) \\propto \\theta^{k+\\alpha-1}(1-\\theta)^{n-k+\\beta-1}$",
+          "description": "Multiply Beta prior kernel $\\theta^{\\alpha-1}(1-\\theta)^{\\beta-1}$ by Binomial likelihood kernel $\\theta^k(1-\\theta)^{n-k}$ to get this form, which is $\\text{Beta}(\\alpha+k, \\beta+n-k)$."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes prior Beta parameters and data sufficient statistics (successes, failures), and returns the exponents of the unnormalized posterior kernel $\\theta^{a}(1-\\theta)^{b}$. This demonstrates understanding of how likelihood and prior combine.",
+        "function_signature": "def posterior_kernel_exponents(prior_alpha: float, prior_beta: float, successes: int, failures: int) -> tuple[float, float]:",
+        "starter_code": "def posterior_kernel_exponents(prior_alpha: float, prior_beta: float, \n                                successes: int, failures: int) -> tuple[float, float]:\n    \"\"\"\n    Compute exponents of unnormalized posterior kernel theta^a * (1-theta)^b.\n    \n    Prior kernel: theta^(alpha-1) * (1-theta)^(beta-1)\n    Likelihood kernel: theta^k * (1-theta)^(n-k)\n    Posterior kernel: theta^a * (1-theta)^b\n    \n    Args:\n        prior_alpha: Alpha parameter of Beta prior\n        prior_beta: Beta parameter of Beta prior\n        successes: Number of observed successes (k)\n        failures: Number of observed failures (n-k)\n    \n    Returns:\n        Tuple (a, b) where posterior kernel is theta^a * (1-theta)^b\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "posterior_kernel_exponents(1, 1, 7, 3)",
+            "expected": "(7, 3)",
+            "explanation": "Uniform prior Beta(1,1) has kernel theta^0*(1-theta)^0=1. Likelihood kernel theta^7*(1-theta)^3. Product: theta^7*(1-theta)^3."
+          },
+          {
+            "input": "posterior_kernel_exponents(2, 2, 7, 3)",
+            "expected": "(8, 4)",
+            "explanation": "Prior kernel theta^1*(1-theta)^1, likelihood theta^7*(1-theta)^3. Product: theta^8*(1-theta)^4."
+          },
+          {
+            "input": "posterior_kernel_exponents(5, 3, 0, 10)",
+            "expected": "(4, 12)",
+            "explanation": "Prior kernel theta^4*(1-theta)^2, likelihood theta^0*(1-theta)^10. Product: theta^4*(1-theta)^12."
+          },
+          {
+            "input": "posterior_kernel_exponents(0.5, 0.5, 1, 1)",
+            "expected": "(0.5, 0.5)",
+            "explanation": "Jeffreys prior Beta(0.5,0.5) with minimal data (1 success, 1 failure). Product: theta^0.5*(1-theta)^0.5."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that Beta distribution kernel has exponents (alpha-1) and (beta-1), not alpha and beta directly",
+        "Trying to compute the normalizing constant p(D) - it's unnecessary for conjugate families",
+        "Adding exponents instead of multiplying the kernel functions: theta^a * theta^b = theta^(a+b)",
+        "Not recognizing that the posterior kernel determines the posterior parameters uniquely in exponential families"
+      ],
+      "hint": "When you multiply theta^(a-1) by theta^k, you get theta^(a-1+k) by the laws of exponents. Same logic applies to the (1-theta) terms. The posterior kernel exponents directly tell you the posterior distribution parameters.",
+      "references": [
+        "Conjugate priors and exponential families",
+        "Kernel density recognition techniques",
+        "Unnormalized posterior distributions"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Conjugate Priors and the Beta-Binomial Conjugate Pair",
+      "relation_to_problem": "Conjugacy is the key property that makes Beta-Binomial inference tractable. When the prior and posterior belong to the same distribution family, we can derive simple closed-form update rules for the parameters - this is exactly what the main problem requires.",
+      "prerequisites": [
+        "Beta distribution (Step 1)",
+        "Binomial likelihood (Step 2)",
+        "Bayes' theorem (Step 3)"
+      ],
+      "learning_objectives": [
+        "Define conjugate priors formally",
+        "Derive the Beta-Binomial conjugate update formulas",
+        "Understand the interpretation of prior parameters as pseudo-counts",
+        "Implement the conjugate update rule to compute posterior parameters"
+      ],
+      "math_content": {
+        "definition": "**Conjugate Prior**: A family of prior distributions $\\mathcal{F}$ is **conjugate** to a likelihood function $p(\\mathcal{D} \\mid \\theta)$ if, when the prior $p(\\theta) \\in \\mathcal{F}$, the posterior $p(\\theta \\mid \\mathcal{D})$ is also in $\\mathcal{F}$.\n\n**Beta-Binomial Conjugacy**: The Beta distribution is conjugate to the Binomial likelihood. Specifically:\n- **Prior**: $\\theta \\sim \\text{Beta}(\\alpha, \\beta)$\n- **Likelihood**: $k \\mid \\theta, n \\sim \\text{Binomial}(n, \\theta)$\n- **Posterior**: $\\theta \\mid k, n \\sim \\text{Beta}(\\alpha', \\beta')$\n\nwhere the updated parameters are:\n$$\\alpha' = \\alpha + k$$\n$$\\beta' = \\beta + (n-k)$$",
+        "notation": "$\\alpha, \\beta$ = prior parameters (hyperparameters), $\\alpha', \\beta'$ = posterior parameters, $k$ = observed successes, $n$ = total trials",
+        "theorem": "**Theorem (Beta-Binomial Conjugate Update)**: Given:\n- Prior distribution: $\\theta \\sim \\text{Beta}(\\alpha, \\beta)$\n- Observed data: $k$ successes in $n$ independent Bernoulli trials\n\nThe posterior distribution is:\n$$\\theta \\mid k, n \\sim \\text{Beta}(\\alpha + k, \\beta + n - k)$$\n\n**Interpretation**: The posterior parameters are simply prior parameters augmented by observed counts:\n- $\\alpha$ represents \"prior pseudo-successes\" → add $k$ actual successes\n- $\\beta$ represents \"prior pseudo-failures\" → add $n-k$ actual failures",
+        "proof_sketch": "**Derivation of Conjugate Update**:\n\nStart with Bayes' theorem in proportional form:\n$$p(\\theta \\mid k, n) \\propto p(k \\mid \\theta, n) \\cdot p(\\theta)$$\n\nSubstitute explicit forms:\n$$p(\\theta \\mid k, n) \\propto [\\theta^k(1-\\theta)^{n-k}] \\cdot [\\theta^{\\alpha-1}(1-\\theta)^{\\beta-1}]$$\n\nCombine by multiplying (add exponents):\n$$p(\\theta \\mid k, n) \\propto \\theta^{k+\\alpha-1}(1-\\theta)^{n-k+\\beta-1}$$\n\nRecognize this as the kernel of Beta distribution:\n$$p(\\theta \\mid k, n) \\propto \\theta^{(\\alpha'-1)}(1-\\theta)^{(\\beta'-1)}$$\n\nwhere $\\alpha' = \\alpha + k$ and $\\beta' = \\beta + n - k$.\n\nTherefore: $\\theta \\mid k, n \\sim \\text{Beta}(\\alpha + k, \\beta + n - k)$ ✓\n\n**Key Insight**: The exponential form of Beta and Binomial distributions causes their product to remain in the Beta family, just with updated exponents.",
+        "examples": [
+          "**Example 1**: Prior $\\text{Beta}(1, 1)$ (uniform), observe 7 successes in 10 trials.\nPosterior: $\\text{Beta}(1+7, 1+3) = \\text{Beta}(8, 4)$.\nInterpretation: Started with no prior belief (uniform), data dominates → posterior reflects observed 7/10 success rate.",
+          "**Example 2**: Prior $\\text{Beta}(10, 10)$ (strong belief in $\\theta=0.5$), observe 7 successes in 10 trials.\nPosterior: $\\text{Beta}(10+7, 10+3) = \\text{Beta}(17, 13)$.\nInterpretation: Strong prior (20 pseudo-observations) moderates the 10 actual observations. Posterior mean = 17/30 ≈ 0.567, between prior mean 0.5 and MLE 0.7.",
+          "**Example 3**: Prior $\\text{Beta}(2, 8)$ (belief that $\\theta$ is small), observe 0 successes in 5 trials.\nPosterior: $\\text{Beta}(2+0, 8+5) = \\text{Beta}(2, 13)$.\nInterpretation: Prior belief in small $\\theta$ confirmed by data with no successes."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Posterior Alpha Parameter",
+          "latex": "$\\alpha' = \\alpha + k$",
+          "description": "Add observed successes to prior pseudo-successes. This is the first parameter of the posterior Beta distribution."
+        },
+        {
+          "name": "Posterior Beta Parameter",
+          "latex": "$\\beta' = \\beta + (n - k)$",
+          "description": "Add observed failures to prior pseudo-failures. This is the second parameter of the posterior Beta distribution."
+        },
+        {
+          "name": "Pseudo-Count Interpretation",
+          "latex": "$\\alpha + \\beta$ = effective prior sample size",
+          "description": "The sum of prior parameters represents the strength of prior belief, measured in \"equivalent observations\". Larger sum = stronger prior that requires more data to overcome."
+        }
+      ],
+      "exercise": {
+        "description": "Implement the core conjugate update rule: given prior Beta parameters and observed binomial data, compute the posterior Beta parameters. This directly solves most of the main problem.",
+        "function_signature": "def beta_binomial_update(prior_alpha: float, prior_beta: float, successes: int, trials: int) -> tuple[float, float]:",
+        "starter_code": "def beta_binomial_update(prior_alpha: float, prior_beta: float, \n                          successes: int, trials: int) -> tuple[float, float]:\n    \"\"\"\n    Update Beta prior with Binomial data to get Beta posterior parameters.\n    \n    Args:\n        prior_alpha: Alpha parameter of Beta prior\n        prior_beta: Beta parameter of Beta prior\n        successes: Number of observed successes\n        trials: Total number of trials\n    \n    Returns:\n        Tuple (posterior_alpha, posterior_beta)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "beta_binomial_update(1, 1, 7, 10)",
+            "expected": "(8.0, 4.0)",
+            "explanation": "Uniform prior Beta(1,1) with 7/10 successes. Posterior: Beta(1+7, 1+3) = Beta(8, 4). This is the exact example from the main problem."
+          },
+          {
+            "input": "beta_binomial_update(2, 2, 7, 10)",
+            "expected": "(9.0, 5.0)",
+            "explanation": "Symmetric prior Beta(2,2) with same data. Posterior: Beta(2+7, 2+3) = Beta(9, 5). Prior adds 4 pseudo-observations."
+          },
+          {
+            "input": "beta_binomial_update(5, 3, 0, 10)",
+            "expected": "(5.0, 13.0)",
+            "explanation": "Prior Beta(5,3), observe all failures (0/10). Posterior: Beta(5+0, 3+10) = Beta(5, 13). Beta parameter increases dramatically."
+          },
+          {
+            "input": "beta_binomial_update(10, 10, 10, 10)",
+            "expected": "(20.0, 10.0)",
+            "explanation": "Strong symmetric prior Beta(10,10), observe perfect success (10/10). Posterior: Beta(20, 10). Despite perfect data, prior still has influence."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing failures incorrectly: must be (trials - successes), not just 'trials'",
+        "Forgetting to add to BOTH parameters - both alpha and beta must be updated",
+        "Confusing the update rule with the mean calculation - this step only updates parameters, not the mean",
+        "Thinking the prior is ignored after seeing data - it's always combined with the likelihood through addition",
+        "Not validating inputs: successes must be ≤ trials, and all parameters must be positive"
+      ],
+      "hint": "The update is elegantly simple: add successes to alpha, add failures to beta. Think of it as accumulating evidence - the prior represents past evidence (pseudo-counts), and the data represents new evidence.",
+      "references": [
+        "Conjugate prior families in exponential families",
+        "Sequential Bayesian updating",
+        "Interpretations of hyperparameters as pseudo-data"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Complete Bayesian Inference: Computing Posterior Mean",
+      "relation_to_problem": "The final step combines all previous concepts: update prior parameters using conjugacy, then compute the posterior mean. This completes the Beta-Binomial inference pipeline required by the main problem.",
+      "prerequisites": [
+        "Beta distribution mean (Step 1)",
+        "Sufficient statistics (Step 2)",
+        "Bayes' theorem (Step 3)",
+        "Conjugate updates (Step 4)"
+      ],
+      "learning_objectives": [
+        "Execute the complete Bayesian inference workflow",
+        "Compute posterior mean from posterior parameters",
+        "Understand the posterior mean as a weighted average of prior and data",
+        "Implement end-to-end Bayesian inference combining all previous building blocks"
+      ],
+      "math_content": {
+        "definition": "**Complete Bayesian Inference for Beta-Binomial Model**: The full inference process consists of:\n\n1. **Specify prior**: $\\theta \\sim \\text{Beta}(\\alpha, \\beta)$\n2. **Observe data**: $k$ successes in $n$ trials\n3. **Update to posterior**: $\\theta \\mid k, n \\sim \\text{Beta}(\\alpha', \\beta')$ where\n   $$\\alpha' = \\alpha + k, \\quad \\beta' = \\beta + (n-k)$$\n4. **Compute posterior mean**: \n   $$E[\\theta \\mid k, n] = \\frac{\\alpha'}{\\alpha' + \\beta'} = \\frac{\\alpha + k}{\\alpha + \\beta + n}$$",
+        "notation": "$E[\\theta \\mid k, n]$ = posterior mean (expected value of $\\theta$ given data), $\\hat{\\theta}_{\\text{Bayes}}$ = Bayesian point estimate",
+        "theorem": "**Theorem (Posterior Mean as Weighted Average)**: The posterior mean can be expressed as a convex combination of the prior mean and the maximum likelihood estimate (MLE):\n\n$$E[\\theta \\mid k, n] = \\frac{\\alpha + k}{\\alpha + \\beta + n} = w \\cdot \\frac{\\alpha}{\\alpha+\\beta} + (1-w) \\cdot \\frac{k}{n}$$\n\nwhere the weight is:\n$$w = \\frac{\\alpha + \\beta}{\\alpha + \\beta + n}$$\n\n**Interpretation**:\n- Prior mean: $\\frac{\\alpha}{\\alpha+\\beta}$ (belief before data)\n- MLE: $\\frac{k}{n}$ (pure data estimate)\n- Weight $w$ represents relative strength of prior vs data\n- As $n \\to \\infty$, weight $w \\to 0$, so posterior mean $\\to$ MLE (data dominates)\n- With weak prior ($\\alpha+\\beta$ small), posterior ≈ MLE\n- With strong prior ($\\alpha+\\beta$ large), prior has more influence",
+        "proof_sketch": "**Derivation of Weighted Average Form**:\n\nStart with posterior mean formula:\n$$E[\\theta \\mid k, n] = \\frac{\\alpha + k}{\\alpha + \\beta + n}$$\n\nRewrite numerator:\n$$= \\frac{\\alpha + k}{\\alpha + \\beta + n} = \\frac{(\\alpha + \\beta)\\frac{\\alpha}{\\alpha+\\beta} + n\\frac{k}{n}}{\\alpha + \\beta + n}$$\n\nFactor out denominator:\n$$= \\frac{\\alpha + \\beta}{\\alpha + \\beta + n} \\cdot \\frac{\\alpha}{\\alpha+\\beta} + \\frac{n}{\\alpha + \\beta + n} \\cdot \\frac{k}{n}$$\n\nLet $w = \\frac{\\alpha+\\beta}{\\alpha+\\beta+n}$, note $1-w = \\frac{n}{\\alpha+\\beta+n}$:\n$$= w \\cdot E[\\theta_{\\text{prior}}] + (1-w) \\cdot \\hat{\\theta}_{\\text{MLE}}$$\n\nThis shows posterior mean is a compromise between prior belief and observed data. ✓",
+        "examples": [
+          "**Example 1**: Uniform prior Beta(1,1), data 7/10.\nPosterior: Beta(8, 4), Mean = 8/12 = 0.6667\nWeight: w = 2/12 = 0.167 (weak prior)\nWeighted avg: 0.167×0.5 + 0.833×0.7 = 0.667 ✓",
+          "**Example 2**: Strong prior Beta(20,20), data 7/10.\nPosterior: Beta(27, 33), Mean = 27/60 = 0.45\nWeight: w = 40/50 = 0.8 (strong prior dominates)\nWeighted avg: 0.8×0.5 + 0.2×0.7 = 0.54 ≈ 0.45 (prior pulls toward 0.5)",
+          "**Example 3**: Weak prior Beta(1,1), large data 700/1000.\nPosterior: Beta(701, 301), Mean = 701/1002 ≈ 0.6996\nWeight: w = 2/1002 ≈ 0.002 (data dominates)\nPosterior mean ≈ MLE = 0.7"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Posterior Mean (Direct Form)",
+          "latex": "$E[\\theta \\mid k, n] = \\frac{\\alpha + k}{\\alpha + \\beta + n}$",
+          "description": "Apply the Beta mean formula to posterior parameters. This is the Bayesian point estimate for θ."
+        },
+        {
+          "name": "Posterior Mean (Weighted Average Form)",
+          "latex": "$E[\\theta \\mid k, n] = \\frac{\\alpha+\\beta}{\\alpha+\\beta+n} \\cdot \\frac{\\alpha}{\\alpha+\\beta} + \\frac{n}{\\alpha+\\beta+n} \\cdot \\frac{k}{n}$",
+          "description": "Reveals posterior mean as compromise between prior mean and MLE, weighted by effective sample sizes."
+        },
+        {
+          "name": "Complete Inference Pipeline",
+          "latex": "$\\text{Beta}(\\alpha, \\beta) \\xrightarrow{\\text{data: } k, n} \\text{Beta}(\\alpha+k, \\beta+n-k) \\xrightarrow{\\text{mean}} \\frac{\\alpha+k}{\\alpha+\\beta+n}$",
+          "description": "The full workflow: prior → update → posterior → mean estimation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete Bayesian inference pipeline: given prior parameters and data, perform the conjugate update AND compute the posterior mean. This combines Steps 1, 2, and 4 into the complete solution approach (without revealing the exact main problem solution structure).",
+        "function_signature": "def bayesian_update_and_mean(prior_alpha: float, prior_beta: float, successes: int, trials: int) -> tuple[float, float, float]:",
+        "starter_code": "def bayesian_update_and_mean(prior_alpha: float, prior_beta: float, \n                              successes: int, trials: int) -> tuple[float, float, float]:\n    \"\"\"\n    Perform complete Bayesian inference: update parameters and compute posterior mean.\n    \n    Args:\n        prior_alpha: Alpha parameter of Beta prior\n        prior_beta: Beta parameter of Beta prior\n        successes: Number of observed successes\n        trials: Total number of trials\n    \n    Returns:\n        Tuple of (posterior_alpha, posterior_beta, posterior_mean)\n        where posterior_mean = E[theta | data]\n    \"\"\"\n    # Your code here\n    # Hint: Use your functions from previous steps!\n    pass",
+        "test_cases": [
+          {
+            "input": "bayesian_update_and_mean(1, 1, 7, 10)",
+            "expected": "(8.0, 4.0, 0.6667)",
+            "explanation": "Uniform prior with 7/10 successes. Posterior Beta(8,4) with mean 8/12=0.6667. This is identical to the main problem example."
+          },
+          {
+            "input": "bayesian_update_and_mean(2, 5, 3, 10)",
+            "expected": "(5.0, 12.0, 0.2941)",
+            "explanation": "Prior Beta(2,5) suggests low θ. Data 3/10. Posterior Beta(5,12) with mean 5/17≈0.294. Prior belief confirmed by data."
+          },
+          {
+            "input": "bayesian_update_and_mean(10, 10, 0, 5)",
+            "expected": "(10.0, 15.0, 0.4)",
+            "explanation": "Strong symmetric prior Beta(10,10), observe all failures 0/5. Posterior Beta(10,15), mean=0.4. Prior prevents collapse to 0."
+          },
+          {
+            "input": "bayesian_update_and_mean(0.5, 0.5, 1, 2)",
+            "expected": "(1.5, 1.5, 0.5)",
+            "explanation": "Jeffreys prior Beta(0.5,0.5), minimal data 1/2. Posterior Beta(1.5,1.5) remains symmetric at 0.5."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing mean before updating parameters - must update first, then compute mean of posterior",
+        "Using prior parameters in mean calculation instead of posterior parameters",
+        "Forgetting to return all three values (posterior_alpha, posterior_beta, posterior_mean)",
+        "Rounding intermediate results - maintain precision throughout calculation",
+        "Not recognizing this combines multiple steps: failures calculation, parameter update, and mean calculation"
+      ],
+      "hint": "This exercise integrates all previous steps. First update the parameters (Step 4), then compute the mean of the resulting Beta distribution (Step 1). You can reuse logic from earlier exercises to build this efficiently.",
+      "references": [
+        "Bayesian point estimation and decision theory",
+        "Credible intervals for Beta distributions",
+        "Sequential Bayesian learning and online inference",
+        "Comparison of Bayesian and frequentist estimation"
+      ]
+    }
+  ]
+}

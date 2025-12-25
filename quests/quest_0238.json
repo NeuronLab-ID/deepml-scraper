@@ -1,0 +1,480 @@
+{
+  "problem_id": 238,
+  "title": "Flip an Image Horizontally or Vertically",
+  "category": "Computer Vision",
+  "difficulty": "easy",
+  "description": "## Task: Image Flipping\n\nImage flipping is a fundamental operation in computer vision, commonly used for data augmentation in deep learning. In this task, you will implement a function `flip_image(image, direction)` that flips an image either horizontally (left-right) or vertically (top-bottom).\n\n### Input:\n- `image`: A 2D list/array (grayscale) or 3D list/array (RGB/color) representing an image\n- `direction`: A string specifying the flip direction - either `'horizontal'` or `'vertical'`\n\n### Output:\n- Return the flipped image as a nested list\n- Return `-1` for invalid inputs\n\n### Edge Cases to Handle:\n- Input is not a valid 2D or 3D array\n- Empty image dimensions\n- Invalid direction string (anything other than 'horizontal' or 'vertical')",
+  "example": {
+    "input": "image = [[1, 2, 3], [4, 5, 6]]\nprint(flip_image(image, 'horizontal'))",
+    "output": "[[3, 2, 1], [6, 5, 4]]",
+    "reasoning": "For a horizontal flip, each row is reversed. The original image has two rows: [1, 2, 3] and [4, 5, 6]. After horizontal flipping, each row is reversed to [3, 2, 1] and [6, 5, 4] respectively."
+  },
+  "starter_code": "import numpy as np\n\ndef flip_image(image, direction):\n    \"\"\"\n    Flip an image horizontally or vertically.\n    \n    Args:\n        image: 2D or 3D list/array representing a grayscale or RGB image\n        direction: string, either 'horizontal' or 'vertical'\n    \n    Returns:\n        Flipped image as a nested list, or -1 if input is invalid\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Matrix Representation and Indexing in Digital Images",
+      "relation_to_problem": "Understanding how images are represented as 2D/3D matrices is fundamental to manipulating pixel positions during flipping operations",
+      "prerequisites": [
+        "Basic arrays/lists",
+        "2D array indexing"
+      ],
+      "learning_objectives": [
+        "Understand how digital images are represented as numerical matrices",
+        "Master zero-based indexing for accessing pixel values",
+        "Distinguish between grayscale (2D) and RGB (3D) image representations"
+      ],
+      "math_content": {
+        "definition": "A digital image $I$ is a discrete function mapping spatial coordinates to intensity values. For a grayscale image, $I: \\mathbb{Z}^2 \\to [0, 255]$ where $I(x, y)$ represents the pixel intensity at position $(x, y)$. In matrix notation, a grayscale image of height $H$ and width $W$ is represented as: $$I \\in \\mathbb{R}^{H \\times W}$$ For RGB color images, we have three channels (Red, Green, Blue): $$I \\in \\mathbb{R}^{H \\times W \\times 3}$$",
+        "notation": "$I(y, x)$ or $I[y, x]$ = pixel value at row $y$, column $x$ (note: row index first by convention)\n$H$ = image height (number of rows)\n$W$ = image width (number of columns)\n$C$ = number of channels (1 for grayscale, 3 for RGB)",
+        "theorem": "**Index Mapping Theorem**: For an image matrix $I$ with dimensions $H \\times W$, valid indices satisfy: $$0 \\leq y < H, \\quad 0 \\leq x < W$$ The total number of pixels is $N = H \\times W$, and any pixel can be uniquely identified by its coordinates $(y, x)$.",
+        "proof_sketch": "Since images use zero-based indexing, row indices range from $0$ to $H-1$ and column indices from $0$ to $W-1$. Each $(y, x)$ pair uniquely maps to one of $H \\times W$ storage locations, establishing a bijection between coordinate pairs and pixel positions.",
+        "examples": [
+          "A $2 \\times 3$ grayscale image: $I = \\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{bmatrix}$ has $I[0, 0] = 1$, $I[0, 2] = 3$, $I[1, 1] = 5$",
+          "A $2 \\times 2 \\times 3$ RGB image has shape $(H=2, W=2, C=3)$ where $I[0, 0, :]$ gives the RGB values $[R, G, B]$ of the top-left pixel"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Linear Index Conversion",
+          "latex": "$\\text{linear\\_index} = y \\times W + x$",
+          "description": "Converts 2D coordinates to 1D array index (useful for memory layout understanding)"
+        },
+        {
+          "name": "Boundary Check",
+          "latex": "$0 \\leq y < H \\land 0 \\leq x < W$",
+          "description": "Validates that coordinates are within image bounds"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that extracts and returns the value at a specific pixel coordinate. This validates understanding of matrix indexing and handles boundary checks - essential before manipulating pixel positions.",
+        "function_signature": "def get_pixel_value(image, y, x):",
+        "starter_code": "def get_pixel_value(image, y, x):\n    \"\"\"\n    Get pixel value at position (y, x) in the image.\n    \n    Args:\n        image: 2D or 3D list representing an image\n        y: row index\n        x: column index\n    \n    Returns:\n        Pixel value (int for grayscale, list for RGB), or -1 if invalid\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "get_pixel_value([[1, 2, 3], [4, 5, 6]], 0, 2)",
+            "expected": "3",
+            "explanation": "Accessing row 0, column 2 returns the value 3"
+          },
+          {
+            "input": "get_pixel_value([[1, 2], [3, 4]], 1, 0)",
+            "expected": "3",
+            "explanation": "Accessing row 1, column 0 returns the value 3"
+          },
+          {
+            "input": "get_pixel_value([[1, 2], [3, 4]], 2, 0)",
+            "expected": "-1",
+            "explanation": "Row index 2 is out of bounds for a 2-row image"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row-column order: accessing image[x][y] instead of image[y][x]",
+        "Forgetting zero-based indexing: using 1 to H instead of 0 to H-1",
+        "Not handling 3D RGB arrays differently from 2D grayscale",
+        "Assuming square images (H = W)"
+      ],
+      "hint": "Remember that Python lists use image[row][column] notation. Always validate indices before access.",
+      "references": [
+        "Digital Image Processing fundamentals",
+        "NumPy array indexing",
+        "Matrix notation conventions"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Coordinate Transformation Theory for Geometric Operations",
+      "relation_to_problem": "Image flipping requires transforming each pixel's coordinates according to specific mathematical rules - this teaches the underlying transformation formulas",
+      "prerequisites": [
+        "Matrix representation of images",
+        "Basic coordinate geometry",
+        "Affine transformations"
+      ],
+      "learning_objectives": [
+        "Understand how coordinate transformations map old positions to new positions",
+        "Derive transformation formulas for reflection operations",
+        "Apply homogeneous coordinates and transformation matrices"
+      ],
+      "math_content": {
+        "definition": "A **geometric transformation** $T$ is a mapping from original coordinates to transformed coordinates: $$T: (x, y) \\mapsto (x', y')$$ For image operations, we use **homogeneous coordinates** where a point $(x, y)$ is represented as $\\begin{bmatrix} x \\\\ y \\\\ 1 \\end{bmatrix}$, allowing transformations to be expressed as matrix multiplication: $$\\begin{bmatrix} x' \\\\ y' \\\\ 1 \\end{bmatrix} = \\mathbf{M} \\begin{bmatrix} x \\\\ y \\\\ 1 \\end{bmatrix}$$ where $\\mathbf{M}$ is a $3 \\times 3$ transformation matrix.",
+        "notation": "$T$ = transformation function\n$(x, y)$ = original coordinates\n$(x', y')$ = transformed coordinates\n$\\mathbf{M}$ = transformation matrix\n$W$ = image width, $H$ = image height",
+        "theorem": "**Horizontal Reflection Theorem**: A horizontal flip (reflection about the vertical axis) of an image with width $W$ transforms coordinates as: $$x' = W - 1 - x, \\quad y' = y$$ The transformation matrix is: $$\\mathbf{M}_H = \\begin{bmatrix} -1 & 0 & W-1 \\\\ 0 & 1 & 0 \\\\ 0 & 0 & 1 \\end{bmatrix}$$ **Vertical Reflection Theorem**: A vertical flip (reflection about the horizontal axis) of an image with height $H$ transforms coordinates as: $$x' = x, \\quad y' = H - 1 - y$$ The transformation matrix is: $$\\mathbf{M}_V = \\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & -1 & H-1 \\\\ 0 & 0 & 1 \\end{bmatrix}$$",
+        "proof_sketch": "For horizontal flip: Consider a pixel at column $x$ in an image of width $W$. The leftmost pixel is at $x=0$ and rightmost at $x=W-1$. After reflection, the rightmost should become leftmost. The mapping $x \\to W-1-x$ satisfies: when $x=0$, $x'=W-1$ (leftmost becomes rightmost); when $x=W-1$, $x'=0$ (rightmost becomes leftmost). The $y$ coordinate remains unchanged since reflection is about a vertical axis. Similar reasoning applies for vertical flip.",
+        "examples": [
+          "For a $2 \\times 3$ image (H=2, W=3), horizontal flip transforms pixel at $(x=0, y=0)$ to $(x'=2, y'=0)$ using $x' = 3-1-0 = 2$",
+          "Vertical flip of the same image transforms $(x=1, y=0)$ to $(x'=1, y'=1)$ using $y' = 2-1-0 = 1$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Horizontal Flip Coordinate Transform",
+          "latex": "$x_{\\text{new}} = W - 1 - x_{\\text{old}}$",
+          "description": "Maps each column position to its mirror position across the vertical center axis"
+        },
+        {
+          "name": "Vertical Flip Coordinate Transform",
+          "latex": "$y_{\\text{new}} = H - 1 - y_{\\text{old}}$",
+          "description": "Maps each row position to its mirror position across the horizontal center axis"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the new coordinates of a pixel after applying a specified flip transformation. This builds understanding of the mathematical transformation rules before applying them to actual image data.",
+        "function_signature": "def compute_flipped_coordinates(y, x, height, width, direction):",
+        "starter_code": "def compute_flipped_coordinates(y, x, height, width, direction):\n    \"\"\"\n    Compute new coordinates after flipping.\n    \n    Args:\n        y: original row index\n        x: original column index\n        height: image height\n        width: image width\n        direction: 'horizontal' or 'vertical'\n    \n    Returns:\n        Tuple (new_y, new_x) or -1 if invalid\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_flipped_coordinates(0, 0, 2, 3, 'horizontal')",
+            "expected": "(0, 2)",
+            "explanation": "Top-left pixel (0,0) in 2x3 image maps to (0,2) after horizontal flip using x'=3-1-0=2"
+          },
+          {
+            "input": "compute_flipped_coordinates(0, 2, 2, 3, 'horizontal')",
+            "expected": "(0, 0)",
+            "explanation": "Top-right pixel (0,2) maps to (0,0) after horizontal flip using x'=3-1-2=0"
+          },
+          {
+            "input": "compute_flipped_coordinates(0, 1, 2, 3, 'vertical')",
+            "expected": "(1, 1)",
+            "explanation": "Pixel (0,1) maps to (1,1) after vertical flip using y'=2-1-0=1"
+          },
+          {
+            "input": "compute_flipped_coordinates(1, 0, 2, 3, 'vertical')",
+            "expected": "(0, 0)",
+            "explanation": "Bottom-left pixel (1,0) maps to (0,0) after vertical flip using y'=2-1-1=0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using W instead of W-1 in the formula (off-by-one error)",
+        "Applying the wrong formula to wrong axis (using x formula for y coordinate)",
+        "Forgetting that horizontal flip affects x (columns) while vertical flip affects y (rows)",
+        "Not validating input dimensions before computing"
+      ],
+      "hint": "Draw a small 2x3 grid and manually trace where each position should move. Notice that horizontal flip changes columns, vertical flip changes rows.",
+      "references": [
+        "Affine transformations",
+        "Homogeneous coordinates",
+        "Reflection matrices in linear algebra"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Array Reversal and Sequence Manipulation",
+      "relation_to_problem": "Flipping an image involves reversing sequences (rows or columns) - mastering efficient reversal techniques is crucial for implementation",
+      "prerequisites": [
+        "List/array operations",
+        "Sequence indexing",
+        "Slicing notation"
+      ],
+      "learning_objectives": [
+        "Master efficient techniques for reversing sequences",
+        "Understand in-place vs. copy-based reversal",
+        "Apply reversal to both 1D and 2D structures"
+      ],
+      "math_content": {
+        "definition": "A **sequence reversal** is an operation that transforms an ordered sequence $S = [s_0, s_1, ..., s_{n-1}]$ of length $n$ into its reverse $S' = [s_{n-1}, s_{n-2}, ..., s_0]$. Formally, the reversal operation $R$ maps index $i$ to $n-1-i$: $$R(S)[i] = S[n-1-i], \\quad \\forall i \\in [0, n-1]$$ This is a **bijection** (one-to-one correspondence) where each element $s_i$ at position $i$ moves to position $n-1-i$.",
+        "notation": "$S$ = original sequence\n$S'$ or $R(S)$ = reversed sequence\n$n$ = length of sequence\n$S[i]$ = element at index $i$\n$S[a:b]$ = slice from index $a$ to $b-1$\n$S[::-1]$ = Python notation for full sequence reversal",
+        "theorem": "**Reversal Properties**: \n1. **Involution**: $R(R(S)) = S$ (reversing twice gives the original)\n2. **Index Mapping**: Element at index $i$ maps to index $j = n-1-i$ where $0 \\leq i, j < n$\n3. **Computational Complexity**: In-place reversal requires $O(n/2)$ swaps, space complexity $O(1)$; copy-based reversal requires $O(n)$ time and $O(n)$ space.",
+        "proof_sketch": "For involution property: Let $S' = R(S)$. Then $R(S')[i] = S'[n-1-i] = S[n-1-(n-1-i)] = S[i]$, so $R(R(S)) = S$. For complexity: in-place reversal swaps elements $S[i]$ and $S[n-1-i]$ for $i = 0$ to $\\lfloor n/2 \\rfloor - 1$, requiring exactly $\\lfloor n/2 \\rfloor$ swaps.",
+        "examples": [
+          "$S = [1, 2, 3, 4] \\Rightarrow R(S) = [4, 3, 2, 1]$. Index mapping: $0 \\to 3, 1 \\to 2, 2 \\to 1, 3 \\to 0$",
+          "For row reversal in matrix $M = \\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{bmatrix}$, reversing row order gives $\\begin{bmatrix} 4 & 5 & 6 \\\\ 1 & 2 & 3 \\end{bmatrix}$",
+          "For column reversal, reversing each row gives $\\begin{bmatrix} 3 & 2 & 1 \\\\ 6 & 5 & 4 \\end{bmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Index Reversal Mapping",
+          "latex": "$i_{\\text{new}} = n - 1 - i_{\\text{old}}$",
+          "description": "Maps old index to new index in reversed sequence"
+        },
+        {
+          "name": "Python Slice Reversal",
+          "latex": "$S[\\text{start}:\\text{stop}:-1]$",
+          "description": "Slice with step -1 creates reversed copy efficiently"
+        }
+      ],
+      "exercise": {
+        "description": "Implement functions to reverse a 1D list and to reverse each row in a 2D matrix. These are building blocks for horizontal image flipping where each row must be reversed.",
+        "function_signature": "def reverse_sequence(seq):\ndef reverse_each_row(matrix):",
+        "starter_code": "def reverse_sequence(seq):\n    \"\"\"\n    Reverse a 1D sequence.\n    \n    Args:\n        seq: list of elements\n    \n    Returns:\n        Reversed list, or -1 if invalid\n    \"\"\"\n    # Your code here\n    pass\n\ndef reverse_each_row(matrix):\n    \"\"\"\n    Reverse each row in a 2D matrix.\n    \n    Args:\n        matrix: 2D list\n    \n    Returns:\n        Matrix with each row reversed, or -1 if invalid\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "reverse_sequence([1, 2, 3, 4])",
+            "expected": "[4, 3, 2, 1]",
+            "explanation": "Simple reversal of 4-element list"
+          },
+          {
+            "input": "reverse_sequence([5])",
+            "expected": "[5]",
+            "explanation": "Single element remains unchanged"
+          },
+          {
+            "input": "reverse_each_row([[1, 2, 3], [4, 5, 6]])",
+            "expected": "[[3, 2, 1], [6, 5, 4]]",
+            "explanation": "Each row is independently reversed: [1,2,3]→[3,2,1] and [4,5,6]→[6,5,4]"
+          },
+          {
+            "input": "reverse_each_row([[7, 8]])",
+            "expected": "[[8, 7]]",
+            "explanation": "Single row with two elements is reversed"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Modifying the original list instead of creating a new one (when copy is needed)",
+        "Using inefficient element-by-element copying instead of slicing",
+        "Reversing the entire 2D matrix instead of each row independently",
+        "Not handling empty sequences properly"
+      ],
+      "hint": "Python's slice notation [::-1] provides an elegant way to reverse sequences. For 2D structures, think about what level you're reversing - rows, columns, or individual row contents.",
+      "references": [
+        "Python sequence slicing",
+        "In-place algorithms",
+        "List comprehensions"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Input Validation and Type Checking for Robust Image Processing",
+      "relation_to_problem": "The main problem requires handling invalid inputs gracefully - this teaches systematic validation of image structure and parameters",
+      "prerequisites": [
+        "Python type checking",
+        "Exception handling",
+        "Nested data structures"
+      ],
+      "learning_objectives": [
+        "Validate that input represents a proper 2D or 3D image array",
+        "Check for consistent row lengths and valid dimensions",
+        "Distinguish between valid and invalid direction parameters",
+        "Return appropriate error codes for different failure modes"
+      ],
+      "math_content": {
+        "definition": "A **valid image matrix** $I$ must satisfy structural consistency conditions: \n1. **Dimensionality**: $I$ is either 2D (grayscale) or 3D (color)\n2. **Rectangular property**: All rows have equal length (for 2D), all color planes have equal dimensions (for 3D)\n3. **Non-empty**: $H > 0, W > 0$ where $H$ = height, $W$ = width\n4. **Channel constraint**: For 3D, depth $C \\in \\{1, 3, 4\\}$ (grayscale, RGB, or RGBA)\n\nFormally, for 2D: $$I \\in \\mathbb{R}^{H \\times W}, \\quad H, W \\geq 1$$ For 3D: $$I \\in \\mathbb{R}^{H \\times W \\times C}, \\quad H, W \\geq 1, \\quad C \\in \\{1, 3, 4\\}$$",
+        "notation": "$\\text{valid}(I)$ = predicate indicating if $I$ is a valid image\n$\\text{dim}(I)$ = number of dimensions (2 or 3)\n$\\text{shape}(I) = (H, W)$ or $(H, W, C)$\n$|\\text{row}_i|$ = length of row $i$",
+        "theorem": "**Matrix Consistency Theorem**: A nested list structure $I$ represents a valid 2D matrix if and only if: $$\\forall i, j \\in [0, H-1]: |\\text{row}_i| = |\\text{row}_j| = W$$ where $H = |I|$ is the number of rows and $W = |\\text{row}_0|$ is the number of columns. For 3D: $$\\forall i, j: |\\text{row}_i| = |\\text{row}_j| = W \\land \\forall i, j: |\\text{row}_i[j]| = |\\text{row}_0[0]| = C$$",
+        "proof_sketch": "The rectangular property ensures that the matrix can be indexed consistently with $(y, x)$ coordinates. If rows had different lengths, accessing $I[y][x]$ for fixed $x$ across different $y$ values would fail for some rows. The consistency requirement establishes a proper Cartesian grid structure.",
+        "examples": [
+          "Valid 2D: $[[1, 2], [3, 4]]$ - both rows have length 2",
+          "Invalid 2D: $[[1, 2], [3]]$ - inconsistent row lengths (2 vs 1)",
+          "Valid 3D: $[[[1,2,3], [4,5,6]], [[7,8,9], [10,11,12]]]$ - shape $(2, 2, 3)$",
+          "Invalid: $[]$ - empty array has no dimensions"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Dimension Check",
+          "latex": "$\\text{dim}(I) \\in \\{2, 3\\}$",
+          "description": "Verify nested list depth is 2 or 3"
+        },
+        {
+          "name": "Consistency Check",
+          "latex": "$\\bigwedge_{i=0}^{H-1} |\\text{row}_i| = W$",
+          "description": "All rows must have identical length W"
+        },
+        {
+          "name": "Non-empty Check",
+          "latex": "$H > 0 \\land W > 0$",
+          "description": "Image must have at least one pixel"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a validation function that checks if a nested list represents a valid 2D or 3D image and if a direction parameter is valid. This is essential for robust error handling in the main problem.",
+        "function_signature": "def validate_image_input(image, direction):",
+        "starter_code": "def validate_image_input(image, direction):\n    \"\"\"\n    Validate image structure and direction parameter.\n    \n    Args:\n        image: nested list to validate\n        direction: string to validate\n    \n    Returns:\n        Dictionary with keys:\n        - 'valid': bool indicating if input is valid\n        - 'dimensions': 2 or 3 if valid, else None\n        - 'shape': tuple (H, W) or (H, W, C) if valid, else None\n        - 'error': error message if invalid, else None\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "validate_image_input([[1, 2], [3, 4]], 'horizontal')",
+            "expected": "{'valid': True, 'dimensions': 2, 'shape': (2, 2), 'error': None}",
+            "explanation": "Valid 2x2 grayscale image with valid direction"
+          },
+          {
+            "input": "validate_image_input([[1, 2], [3]], 'horizontal')",
+            "expected": "{'valid': False, 'dimensions': None, 'shape': None, 'error': 'Inconsistent row lengths'}",
+            "explanation": "Rows have different lengths (2 vs 1)"
+          },
+          {
+            "input": "validate_image_input([[1, 2]], 'diagonal')",
+            "expected": "{'valid': False, 'dimensions': None, 'shape': None, 'error': 'Invalid direction'}",
+            "explanation": "Direction must be 'horizontal' or 'vertical'"
+          },
+          {
+            "input": "validate_image_input([], 'horizontal')",
+            "expected": "{'valid': False, 'dimensions': None, 'shape': None, 'error': 'Empty image'}",
+            "explanation": "Empty list is not a valid image"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Only checking the first row's length, not all rows",
+        "Assuming input is always a list (could be None, string, etc.)",
+        "Not handling nested empty lists like [[]]",
+        "Using try-except to catch all errors instead of explicit validation",
+        "Forgetting to validate the direction parameter"
+      ],
+      "hint": "Use isinstance() to check types, iterate through all rows to verify consistency, and test edge cases like empty arrays and single-element arrays.",
+      "references": [
+        "Python type hints",
+        "Defensive programming",
+        "Input sanitization"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Row-Based vs Column-Based Matrix Operations",
+      "relation_to_problem": "Understanding when to reverse rows (horizontal flip) versus when to reverse row order (vertical flip) is key to correctly implementing both flip directions",
+      "prerequisites": [
+        "Matrix representation",
+        "Sequence reversal",
+        "Coordinate transformations"
+      ],
+      "learning_objectives": [
+        "Distinguish between reversing row contents vs reversing row order",
+        "Understand how coordinate transformations translate to array operations",
+        "Apply appropriate operation based on flip direction"
+      ],
+      "math_content": {
+        "definition": "For a matrix $M \\in \\mathbb{R}^{H \\times W}$, we define two distinct reversal operations:\n\n**Row Content Reversal** (affects columns): $$R_{\\text{row}}(M)[i, j] = M[i, W-1-j]$$ This reverses the elements within each row while maintaining row order.\n\n**Row Order Reversal** (affects rows): $$R_{\\text{order}}(M)[i, j] = M[H-1-i, j]$$ This reverses the order of rows while keeping each row's content unchanged.\n\nThese operations correspond to: horizontal flip $\\equiv R_{\\text{row}}$ and vertical flip $\\equiv R_{\\text{order}}$.",
+        "notation": "$M$ = original matrix\n$M[i, j]$ = element at row $i$, column $j$\n$R_{\\text{row}}(M)$ = matrix with row contents reversed\n$R_{\\text{order}}(M)$ = matrix with row order reversed\n$H, W$ = height and width",
+        "theorem": "**Flip-Operation Correspondence Theorem**: \n1. Horizontal flip of image $I$ equals row content reversal: $I_{\\text{horiz}} = R_{\\text{row}}(I)$\n2. Vertical flip of image $I$ equals row order reversal: $I_{\\text{vert}} = R_{\\text{order}}(I)$\n3. These operations commute: $R_{\\text{row}}(R_{\\text{order}}(M)) = R_{\\text{order}}(R_{\\text{row}}(M))$\n4. Applying both is equivalent to 180° rotation: $R_{\\text{row}}(R_{\\text{order}}(M)) = \\text{rotate}_{180°}(M)$",
+        "proof_sketch": "For commutativity: $R_{\\text{row}}(R_{\\text{order}}(M))[i,j] = R_{\\text{order}}(M)[i, W-1-j] = M[H-1-i, W-1-j]$. Similarly, $R_{\\text{order}}(R_{\\text{row}}(M))[i,j] = R_{\\text{row}}(M)[H-1-i, j] = M[H-1-i, W-1-j]$. Both yield the same element, proving commutativity. This double transformation maps $(i,j) \\to (H-1-i, W-1-j)$, which is exactly the coordinate transformation for 180° rotation.",
+        "examples": [
+          "Original: $M = \\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{bmatrix}$",
+          "Row content reversal (horizontal flip): $R_{\\text{row}}(M) = \\begin{bmatrix} 3 & 2 & 1 \\\\ 6 & 5 & 4 \\end{bmatrix}$",
+          "Row order reversal (vertical flip): $R_{\\text{order}}(M) = \\begin{bmatrix} 4 & 5 & 6 \\\\ 1 & 2 & 3 \\end{bmatrix}$",
+          "Both operations (180° rotation): $\\begin{bmatrix} 6 & 5 & 4 \\\\ 3 & 2 & 1 \\end{bmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Horizontal Flip (Row Content Reversal)",
+          "latex": "$I_{\\text{horiz}}[y, x] = I[y, W-1-x]$",
+          "description": "Each row is independently reversed"
+        },
+        {
+          "name": "Vertical Flip (Row Order Reversal)",
+          "latex": "$I_{\\text{vert}}[y, x] = I[H-1-y, x]$",
+          "description": "Rows are reordered from bottom to top"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that applies either row content reversal or row order reversal to a 2D matrix based on a parameter. This directly practices the core operations needed for image flipping.",
+        "function_signature": "def apply_matrix_reversal(matrix, operation):",
+        "starter_code": "def apply_matrix_reversal(matrix, operation):\n    \"\"\"\n    Apply reversal operation to matrix.\n    \n    Args:\n        matrix: 2D list\n        operation: 'row_content' (reverse within rows) or 'row_order' (reverse row sequence)\n    \n    Returns:\n        Transformed matrix, or -1 if invalid\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "apply_matrix_reversal([[1, 2, 3], [4, 5, 6]], 'row_content')",
+            "expected": "[[3, 2, 1], [6, 5, 4]]",
+            "explanation": "Each row's elements are reversed: [1,2,3]→[3,2,1], [4,5,6]→[6,5,4]"
+          },
+          {
+            "input": "apply_matrix_reversal([[1, 2, 3], [4, 5, 6]], 'row_order')",
+            "expected": "[[4, 5, 6], [1, 2, 3]]",
+            "explanation": "Rows are reordered: first row becomes last, last becomes first"
+          },
+          {
+            "input": "apply_matrix_reversal([[1]], 'row_content')",
+            "expected": "[[1]]",
+            "explanation": "Single element matrix unchanged by row content reversal"
+          },
+          {
+            "input": "apply_matrix_reversal([[1], [2], [3]], 'row_order')",
+            "expected": "[[3], [2], [1]]",
+            "explanation": "Three rows reordered from [1],[2],[3] to [3],[2],[1]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing which operation to use for which flip direction",
+        "Reversing both row order AND row content when only one is needed",
+        "Modifying the original matrix instead of creating a new one",
+        "Not preserving the data type (converting to NumPy array when input is list)"
+      ],
+      "hint": "Visualize a small 2x3 matrix. For horizontal flip, left and right should swap (within each row). For vertical flip, top and bottom should swap (row positions change).",
+      "references": [
+        "Matrix transformations",
+        "Array manipulation algorithms",
+        "Image processing operations"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Handling Multi-Dimensional Arrays and Channel Preservation",
+      "relation_to_problem": "Color images have 3 dimensions - flipping must preserve the color channel structure while transforming spatial dimensions",
+      "prerequisites": [
+        "3D array structure",
+        "RGB color model",
+        "All previous sub-quests"
+      ],
+      "learning_objectives": [
+        "Extend 2D flipping operations to 3D arrays (color images)",
+        "Preserve color channel integrity during spatial transformations",
+        "Understand that flipping affects spatial dimensions (H, W) but not channel dimension (C)",
+        "Combine validation, transformation, and reversal techniques into a complete solution"
+      ],
+      "math_content": {
+        "definition": "An **RGB color image** is represented as a 3D tensor $I \\in \\mathbb{R}^{H \\times W \\times C}$ where $H$ is height, $W$ is width, and $C$ is the number of color channels (typically $C=3$ for RGB). Each element $I[y, x, c]$ represents the intensity of channel $c$ at spatial position $(y, x)$.\n\nWhen applying geometric transformations to color images, we transform only the **spatial dimensions** $(y, x)$ while preserving the **channel dimension** $c$:\n\n**3D Horizontal Flip**: $$I_{\\text{horiz}}[y, x, c] = I[y, W-1-x, c], \\quad \\forall c \\in [0, C-1]$$\n\n**3D Vertical Flip**: $$I_{\\text{vert}}[y, x, c] = I[H-1-y, x, c], \\quad \\forall c \\in [0, C-1]$$\n\nThe channel values at each spatial location move together as a unit.",
+        "notation": "$I[y, x, :]$ = color vector at position $(y, x)$ (all channels)\n$I[:, :, c]$ = 2D plane for channel $c$ across all spatial positions\n$C$ = number of channels (3 for RGB)\n$\\forall c$ = for all channels",
+        "theorem": "**Channel Independence Theorem**: For color images, geometric transformations applied to spatial coordinates are **independent of the channel dimension**. That is: $$T(I)[y, x, c] = I[T^{-1}(y, x), c]$$ where $T$ is a spatial transformation and $T^{-1}$ is its inverse coordinate mapping. This means each color channel can be thought of as undergoing the same spatial transformation independently.\n\n**Dimension Preservation**: If $\\text{shape}(I) = (H, W, C)$, then $\\text{shape}(I_{\\text{flipped}}) = (H, W, C)$ for both horizontal and vertical flips.",
+        "proof_sketch": "The flip operations only change spatial indexing $(y, x)$ and do not depend on channel values. Each pixel's color vector $[R, G, B]$ at position $(y, x)$ moves as an atomic unit to the new position. Since the transformation matrix only has non-zero entries for spatial coordinates (not channel coordinate), the channel dimension remains unchanged. The independence means we can conceptually flip each channel plane separately and the results are identical to flipping the RGB pixels together.",
+        "examples": [
+          "Consider pixel at $(0, 0)$ with RGB value $[255, 128, 64]$. After horizontal flip in a $2 \\times 3$ image, this entire RGB vector moves to position $(0, 2)$, maintaining $[255, 128, 64]$",
+          "For $I = [[[1,2],[3,4]], [[5,6],[7,8]]]$ with shape $(2, 2, 2)$, horizontal flip gives $[[[3,4],[1,2]], [[7,8],[5,6]]]$ - note how the channel pairs stay together"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "3D Array Slicing for Horizontal Flip",
+          "latex": "$I[:, ::-1, :]$",
+          "description": "Reverses the column dimension (axis 1) while preserving row (axis 0) and channel (axis 2)"
+        },
+        {
+          "name": "3D Array Slicing for Vertical Flip",
+          "latex": "$I[::-1, :, :]$",
+          "description": "Reverses the row dimension (axis 0) while preserving column (axis 1) and channel (axis 2)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that flips a 3D color image array while preserving the channel structure. This integrates all previous concepts: validation, coordinate transformation understanding, and reversal operations, applied to multi-dimensional data.",
+        "function_signature": "def flip_color_image(image, direction):",
+        "starter_code": "def flip_color_image(image, direction):\n    \"\"\"\n    Flip a 3D color image horizontally or vertically.\n    \n    Args:\n        image: 3D list with shape (H, W, C) representing color image\n        direction: 'horizontal' or 'vertical'\n    \n    Returns:\n        Flipped 3D image, or -1 if invalid\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "flip_color_image([[[1,2],[3,4]], [[5,6],[7,8]]], 'horizontal')",
+            "expected": "[[[3,4],[1,2]], [[7,8],[5,6]]]",
+            "explanation": "Horizontal flip: each row's pixels are reversed. First row [[1,2],[3,4]] becomes [[3,4],[1,2]]"
+          },
+          {
+            "input": "flip_color_image([[[1,2],[3,4]], [[5,6],[7,8]]], 'vertical')",
+            "expected": "[[[5,6],[7,8]], [[1,2],[3,4]]]",
+            "explanation": "Vertical flip: row order is reversed. First row becomes last, last becomes first"
+          },
+          {
+            "input": "flip_color_image([[[10,20,30]]], 'horizontal')",
+            "expected": "[[[10,20,30]]]",
+            "explanation": "Single pixel image with 3 channels remains unchanged after horizontal flip"
+          },
+          {
+            "input": "flip_color_image([[[1,2,3],[4,5,6]], [[7,8,9],[10,11,12]]], 'vertical')",
+            "expected": "[[[7,8,9],[10,11,12]], [[1,2,3],[4,5,6]]]",
+            "explanation": "2x2 image with 3-channel RGB pixels: rows are reversed but RGB triplets stay intact"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Accidentally reversing or modifying the channel dimension",
+        "Treating 3D array as if it were 2D and losing color information",
+        "Flattening the structure during reversal instead of preserving 3D shape",
+        "Not validating that the third dimension has expected channel count (1, 3, or 4)",
+        "Confusing axis indices (0=rows, 1=columns, 2=channels)"
+      ],
+      "hint": "The key insight: spatial transformations affect positions, not colors. When you reverse columns for horizontal flip, each color vector moves together. Use slicing on the appropriate axis (axis 1 for horizontal, axis 0 for vertical) while keeping axis 2 (channels) unchanged.",
+      "references": [
+        "Tensor operations",
+        "RGB color model",
+        "Multi-dimensional array indexing",
+        "Image data structures in deep learning"
+      ]
+    }
+  ]
+}

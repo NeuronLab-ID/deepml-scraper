@@ -1,0 +1,433 @@
+{
+  "problem_id": 140,
+  "title": "Bernoulli Naive Bayes Classifier",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "Write a Python class to implement the Bernoulli Naive Bayes classifier for binary (0/1) feature data. Your class should have two methods: `forward(self, X, y)` to train on the input data (X: 2D NumPy array of binary features, y: 1D NumPy array of class labels) and `predict(self, X)` to output predicted labels for a 2D test matrix X. Use Laplace smoothing (parameter: smoothing=1.0). Return predictions as a NumPy array. Only use NumPy. Predictions must be binary (0 or 1) and you must handle cases where the training data contains only one class. All log/likelihood calculations should use log probabilities for numerical stability.",
+  "example": {
+    "input": "X = np.array([[1, 0, 1], [1, 1, 0], [0, 0, 1], [0, 1, 0], [1, 1, 1]]); y = np.array([1, 1, 0, 0, 1])\nmodel = NaiveBayes(smoothing=1.0)\nmodel.forward(X, y)\nprint(model.predict(np.array([[1, 0, 1]])))",
+    "output": "[1]",
+    "reasoning": "The model learns class priors and feature probabilities with Laplace smoothing. For [1, 0, 1], the posterior for class 1 is higher, so the model predicts 1."
+  },
+  "starter_code": "import numpy as np\n\nclass NaiveBayes():\n    def __init__(self, smoothing=1.0):\n        # Initialize smoothing\n        pass\n\n    def forward(self, X, y):\n        # Fit model to binary features X and labels y\n        pass\n\n    def predict(self, X):\n        # Predict class labels for test set X\n        pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Computing Class Priors with Laplace Smoothing",
+      "relation_to_problem": "The first step in Naive Bayes classification is computing P(C), the prior probability of each class. This forms the foundation for posterior probability calculations.",
+      "prerequisites": [
+        "Basic probability theory",
+        "Counting and frequency calculations",
+        "NumPy array operations"
+      ],
+      "learning_objectives": [
+        "Understand the concept of prior probability in classification",
+        "Implement Laplace smoothing to handle zero-frequency problems",
+        "Compute class priors from training labels"
+      ],
+      "math_content": {
+        "definition": "The **class prior** $P(C_k)$ represents the probability that a randomly selected sample belongs to class $C_k$ before observing any features. For a dataset with $N$ samples where $N_k$ samples belong to class $C_k$, the maximum likelihood estimate is $P(C_k) = \\frac{N_k}{N}$. However, if a class never appears in training data, this estimate becomes zero, causing numerical issues.",
+        "notation": "$C_k$ = class $k$, $N$ = total number of samples, $N_k$ = number of samples in class $k$, $K$ = number of classes, $\\alpha$ = smoothing parameter",
+        "theorem": "**Laplace Smoothing Theorem**: To avoid zero probabilities, add a smoothing parameter $\\alpha$ (typically 1.0) to all counts. The smoothed prior becomes: $$P(C_k) = \\frac{N_k + \\alpha}{N + K\\alpha}$$ This ensures all probabilities are non-zero while preserving relative frequencies when sufficient data exists.",
+        "proof_sketch": "Laplace smoothing can be viewed as adding $\\alpha$ pseudo-observations to each class. The numerator adds $\\alpha$ to the observed count $N_k$, while the denominator adds $K\\alpha$ (one $\\alpha$ for each of the $K$ classes) to maintain a valid probability distribution: $\\sum_{k=1}^{K} P(C_k) = \\sum_{k=1}^{K} \\frac{N_k + \\alpha}{N + K\\alpha} = \\frac{\\sum_{k=1}^{K}(N_k + \\alpha)}{N + K\\alpha} = \\frac{N + K\\alpha}{N + K\\alpha} = 1$",
+        "examples": [
+          "Without smoothing: If training set has 7 samples of class 0 and 3 of class 1 out of 10 total, then $P(C_0) = 7/10 = 0.7$ and $P(C_1) = 3/10 = 0.3$",
+          "With smoothing ($\\alpha=1$, $K=2$): $P(C_0) = (7+1)/(10+2) = 8/12 = 0.667$ and $P(C_1) = (3+1)/(10+2) = 4/12 = 0.333$. Notice probabilities are slightly more uniform.",
+          "Edge case: If all 10 samples are class 0, without smoothing $P(C_1) = 0$. With smoothing: $P(C_0) = 11/12 = 0.917$, $P(C_1) = 1/12 = 0.083$ (non-zero!)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Class Prior with Laplace Smoothing",
+          "latex": "$P(C_k) = \\frac{N_k + \\alpha}{N + K\\alpha}$",
+          "description": "Use this to compute the prior probability of each class during training. The smoothing prevents zero probabilities."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes class priors with Laplace smoothing. Given a 1D NumPy array of class labels (containing 0s and 1s) and a smoothing parameter, return a NumPy array of length 2 containing [P(C_0), P(C_1)].",
+        "function_signature": "def compute_class_priors(y: np.ndarray, smoothing: float = 1.0) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_class_priors(y: np.ndarray, smoothing: float = 1.0) -> np.ndarray:\n    \"\"\"\n    Compute class priors with Laplace smoothing.\n    \n    Args:\n        y: 1D array of binary class labels (0 or 1)\n        smoothing: Laplace smoothing parameter (default 1.0)\n    \n    Returns:\n        1D array of shape (2,) containing [P(C_0), P(C_1)]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_class_priors(np.array([0, 0, 1, 1, 1]), smoothing=1.0)",
+            "expected": "np.array([0.42857143, 0.57142857])",
+            "explanation": "N=5, N_0=2, N_1=3, K=2, alpha=1. P(C_0) = (2+1)/(5+2) = 3/7, P(C_1) = (3+1)/(5+2) = 4/7"
+          },
+          {
+            "input": "compute_class_priors(np.array([1, 1, 1, 1, 1]), smoothing=1.0)",
+            "expected": "np.array([0.14285714, 0.85714286])",
+            "explanation": "Edge case: all samples are class 1. With smoothing: P(C_0) = 1/7, P(C_1) = 6/7. Without smoothing, P(C_0) would be 0."
+          },
+          {
+            "input": "compute_class_priors(np.array([0, 1, 0, 1]), smoothing=0.5)",
+            "expected": "np.array([0.5, 0.5])",
+            "explanation": "N=4, N_0=2, N_1=2, alpha=0.5. P(C_0) = (2+0.5)/(4+1) = 2.5/5 = 0.5, P(C_1) = 2.5/5 = 0.5"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to add K*alpha to the denominator (should be N + K*alpha, not N + alpha)",
+        "Not handling the case where a class is completely absent from training data",
+        "Using integer division instead of float division, resulting in truncated probabilities",
+        "Hardcoding the number of classes instead of computing it from the data"
+      ],
+      "hint": "Use np.bincount() to efficiently count occurrences of each class. Remember that the sum of all class priors must equal 1.0.",
+      "references": [
+        "Laplace smoothing (additive smoothing)",
+        "Maximum likelihood estimation",
+        "Probability mass functions"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Computing Feature Likelihoods for Bernoulli Distribution",
+      "relation_to_problem": "In Bernoulli Naive Bayes, we must compute P(x_j | C_k), the probability that feature j equals 1 given class k. These likelihoods are combined with priors to make predictions.",
+      "prerequisites": [
+        "Bernoulli distribution",
+        "Conditional probability",
+        "Maximum likelihood estimation"
+      ],
+      "learning_objectives": [
+        "Understand the Bernoulli distribution for binary features",
+        "Compute conditional feature probabilities per class",
+        "Apply Laplace smoothing to feature likelihoods"
+      ],
+      "math_content": {
+        "definition": "For a **Bernoulli-distributed feature** $x_j \\in \\{0, 1\\}$, the parameter $\\theta_{jk} = P(x_j = 1 | C_k)$ represents the probability that feature $j$ takes value 1 for samples in class $C_k$. The Bernoulli probability mass function is: $$P(x_j | C_k) = \\theta_{jk}^{x_j}(1-\\theta_{jk})^{1-x_j}$$ This elegantly handles both cases: when $x_j=1$, we get $\\theta_{jk}$; when $x_j=0$, we get $(1-\\theta_{jk})$.",
+        "notation": "$\\theta_{jk}$ = probability that feature $j$ is 1 in class $k$, $x_j$ = value of feature $j$ (0 or 1), $n_{jk}$ = count of samples in class $k$ where feature $j$ equals 1, $N_k$ = total samples in class $k$",
+        "theorem": "**Maximum Likelihood Estimation for Bernoulli Parameter**: Given $N_k$ samples from class $C_k$, where feature $j$ equals 1 in $n_{jk}$ samples, the MLE is: $$\\theta_{jk} = \\frac{n_{jk}}{N_k}$$ With Laplace smoothing: $$\\theta_{jk} = \\frac{n_{jk} + \\alpha}{N_k + 2\\alpha}$$ The denominator has $2\\alpha$ because Bernoulli variables have 2 possible values (0 and 1).",
+        "proof_sketch": "The likelihood function for $N_k$ independent Bernoulli trials is $L(\\theta_{jk}) = \\prod_{i=1}^{N_k} \\theta_{jk}^{x_{ji}}(1-\\theta_{jk})^{1-x_{ji}}$. Taking the log: $\\log L = \\sum_{i=1}^{N_k} [x_{ji}\\log\\theta_{jk} + (1-x_{ji})\\log(1-\\theta_{jk})]$. Setting $\\frac{d\\log L}{d\\theta_{jk}} = 0$ and solving yields $\\theta_{jk} = \\frac{\\sum_{i=1}^{N_k} x_{ji}}{N_k} = \\frac{n_{jk}}{N_k}$. Smoothing adds pseudo-counts.",
+        "examples": [
+          "Suppose class 1 has 4 samples: [[1,0,1], [1,1,0], [0,1,1], [1,0,1]]. For feature 0: $n_{01}=3$ (appears in 3 samples), $N_1=4$. So $\\theta_{01} = 3/4 = 0.75$",
+          "With smoothing ($\\alpha=1$): $\\theta_{01} = (3+1)/(4+2) = 4/6 = 0.667$. The smoothing slightly reduces the probability.",
+          "For feature 1: $n_{11}=2$, so $\\theta_{11} = (2+1)/(4+2) = 3/6 = 0.5$",
+          "Edge case: If feature 2 is always 1 in class 1, $\\theta_{21} = (4+1)/(4+2) = 5/6 = 0.833$. Without smoothing it would be exactly 1.0, which can cause numerical issues."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Bernoulli Feature Likelihood Parameter",
+          "latex": "$\\theta_{jk} = \\frac{n_{jk} + \\alpha}{N_k + 2\\alpha}$",
+          "description": "Compute this for each feature j and each class k during training. Represents P(feature_j = 1 | class_k)."
+        },
+        {
+          "name": "Bernoulli Probability Mass Function",
+          "latex": "$P(x_j | C_k) = \\theta_{jk}^{x_j}(1-\\theta_{jk})^{1-x_j}$",
+          "description": "Use this during prediction to compute the likelihood of observing feature value x_j given class k."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the Bernoulli feature likelihood parameters (theta) for each feature and each class. Given a 2D binary feature matrix X (shape: N x D), 1D label array y (shape: N), and smoothing parameter, return a 2D array of shape (2, D) where element [k, j] contains theta_jk = P(feature_j = 1 | class_k).",
+        "function_signature": "def compute_feature_likelihoods(X: np.ndarray, y: np.ndarray, smoothing: float = 1.0) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_feature_likelihoods(X: np.ndarray, y: np.ndarray, smoothing: float = 1.0) -> np.ndarray:\n    \"\"\"\n    Compute Bernoulli feature likelihood parameters with Laplace smoothing.\n    \n    Args:\n        X: 2D binary feature matrix of shape (N, D)\n        y: 1D array of binary class labels (0 or 1) of shape (N,)\n        smoothing: Laplace smoothing parameter (default 1.0)\n    \n    Returns:\n        2D array of shape (2, D) where element [k, j] = theta_jk = P(x_j=1 | C_k)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_feature_likelihoods(np.array([[1,0,1], [1,1,0], [0,1,1]]), np.array([0,0,1]), smoothing=1.0)",
+            "expected": "np.array([[0.75, 0.5, 0.5], [0.5, 0.75, 0.75]])",
+            "explanation": "Class 0 has 2 samples: [[1,0,1], [1,1,0]]. Feature 0: n_00=2, N_0=2, theta_00=(2+1)/(2+2)=3/4=0.75. Feature 1: n_10=1, theta_10=(1+1)/(2+2)=2/4=0.5. Feature 2: n_20=1, theta_20=0.5. Class 1 has 1 sample: [[0,1,1]]. Feature 0: theta_01=(0+1)/(1+2)=1/3≈0.333, Feature 1: theta_11=(1+1)/(1+2)=2/3≈0.667, Feature 2: theta_21=2/3≈0.667"
+          },
+          {
+            "input": "compute_feature_likelihoods(np.array([[1,1], [1,1], [0,0]]), np.array([1,1,0]), smoothing=1.0)",
+            "expected": "np.array([[0.33333333, 0.33333333], [0.75, 0.75]])",
+            "explanation": "Class 0: 1 sample [[0,0]]. theta_00=(0+1)/(1+2)=1/3, theta_10=1/3. Class 1: 2 samples [[1,1], [1,1]]. theta_01=(2+1)/(2+2)=3/4, theta_11=3/4."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using N (total samples) in denominator instead of N_k (samples per class)",
+        "Adding alpha to denominator instead of 2*alpha (Bernoulli has 2 outcomes)",
+        "Computing counts incorrectly for each class (filter samples by class first)",
+        "Not initializing the result array with correct shape (2, D)"
+      ],
+      "hint": "For each class k, extract the subset of X where y equals k, then sum each column to get n_jk. Use boolean indexing: X[y == k].",
+      "references": [
+        "Bernoulli distribution",
+        "Conditional probability estimation",
+        "Maximum likelihood estimation for discrete distributions"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Log Probabilities for Numerical Stability",
+      "relation_to_problem": "Multiplying many small probabilities leads to numerical underflow. Converting to log space transforms products into sums, maintaining numerical stability while computing posterior probabilities.",
+      "prerequisites": [
+        "Logarithm properties",
+        "Floating-point arithmetic limitations",
+        "Probability products"
+      ],
+      "learning_objectives": [
+        "Understand the numerical underflow problem in probability calculations",
+        "Apply logarithm properties to convert products to sums",
+        "Compute log probabilities for classification decisions"
+      ],
+      "math_content": {
+        "definition": "**Numerical underflow** occurs when multiplying many probabilities (each between 0 and 1) produces a result smaller than the minimum representable floating-point number (~10^-308 for float64), causing it to round to exactly 0. This makes it impossible to compare posterior probabilities. The solution is to work in **log space**: instead of computing $P(C_k|X)$, compute $\\log P(C_k|X)$.",
+        "notation": "$\\log P(C_k|X)$ = log posterior probability, $\\log P(C_k)$ = log prior, $\\log P(x_j|C_k)$ = log likelihood of feature j",
+        "theorem": "**Log-Space Posterior Computation**: By Bayes' theorem and the naive assumption: $$\\log P(C_k|X) = \\log P(C_k) + \\sum_{j=1}^{D} \\log P(x_j|C_k) + C$$ where $C = -\\log P(X)$ is a constant for all classes. For classification, we can ignore $C$ and choose: $$\\hat{C} = \\arg\\max_k \\left[\\log P(C_k) + \\sum_{j=1}^{D} \\log P(x_j|C_k)\\right]$$",
+        "proof_sketch": "Starting from $P(C_k|X) \\propto P(C_k) \\prod_{j=1}^{D} P(x_j|C_k)$, apply logarithm to both sides: $\\log P(C_k|X) = \\log P(C_k) + \\log \\prod_{j=1}^{D} P(x_j|C_k) + C$. Using the property $\\log(ab) = \\log a + \\log b$, the product becomes: $\\log P(C_k|X) = \\log P(C_k) + \\sum_{j=1}^{D} \\log P(x_j|C_k) + C$. Since $\\log$ is monotonically increasing, $\\arg\\max_k P(C_k|X) = \\arg\\max_k \\log P(C_k|X)$.",
+        "examples": [
+          "Without log: If P(C_1)=0.6 and we have 50 features each with P(x_j|C_1)=0.8, then P(C_1|X) ∝ 0.6 × 0.8^50 ≈ 0.6 × 1.4×10^-5 ≈ 8.4×10^-6",
+          "With log: log P(C_1|X) ∝ log(0.6) + 50×log(0.8) = -0.511 + 50×(-0.223) = -0.511 - 11.15 = -11.66. Much more stable!",
+          "For Bernoulli: log P(x_j|C_k) = x_j × log(theta_jk) + (1-x_j) × log(1-theta_jk). If x_j=1: log(theta_jk). If x_j=0: log(1-theta_jk).",
+          "Comparison: Class 0 has log-posterior -11.66, Class 1 has log-posterior -15.23. Choose class 0 (higher log probability)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Log Posterior for Classification",
+          "latex": "$\\log P(C_k|X) = \\log P(C_k) + \\sum_{j=1}^{D} \\log P(x_j|C_k)$",
+          "description": "Compute this for each class k during prediction. The class with the highest log posterior is the prediction."
+        },
+        {
+          "name": "Log Bernoulli Likelihood",
+          "latex": "$\\log P(x_j|C_k) = x_j \\log \\theta_{jk} + (1-x_j) \\log(1-\\theta_{jk})$",
+          "description": "Logarithm of the Bernoulli PMF. Use this to compute log likelihood for each feature."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes log posteriors for binary classification. Given a single test sample x (1D array of D binary features), log class priors (shape: 2), and log feature likelihoods stored as log_theta (shape: 2 x D where [k,j] = log(theta_jk)), return an array of shape (2,) containing [log P(C_0|x), log P(C_1|x)].",
+        "function_signature": "def compute_log_posterior(x: np.ndarray, log_priors: np.ndarray, log_theta: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_log_posterior(x: np.ndarray, log_priors: np.ndarray, log_theta: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute log posterior probabilities for a single sample.\n    \n    Args:\n        x: 1D binary feature vector of shape (D,)\n        log_priors: 1D array of shape (2,) containing [log P(C_0), log P(C_1)]\n        log_theta: 2D array of shape (2, D) where [k,j] = log(theta_jk)\n    \n    Returns:\n        1D array of shape (2,) containing [log P(C_0|x), log P(C_1|x)]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_log_posterior(np.array([1, 0, 1]), np.array([np.log(0.5), np.log(0.5)]), np.array([[np.log(0.7), np.log(0.4), np.log(0.8)], [np.log(0.3), np.log(0.6), np.log(0.2)]]))",
+            "expected": "np.array([-1.15606448, -2.35137526])",
+            "explanation": "For class 0: log_post_0 = log(0.5) + [1*log(0.7) + 0*log(1-0.7) + 1*log(0.8)] = -0.693 + [-0.357 + 0 + -0.223] = -1.273. For class 1: log_post_1 = log(0.5) + [1*log(0.3) + 0*log(1-0.3) + 1*log(0.2)] = -0.693 + [-1.204 + 0 + -1.609] = -3.506. Actual computation requires using log(1-theta) for x_j=0 terms."
+          },
+          {
+            "input": "compute_log_posterior(np.array([1, 1]), np.array([np.log(0.6), np.log(0.4)]), np.array([[np.log(0.9), np.log(0.8)], [np.log(0.2), np.log(0.7)]]))",
+            "expected": "np.array([-0.73786973, -2.13014401])",
+            "explanation": "For class 0: log_post_0 = log(0.6) + log(0.9) + log(0.8) = -0.511 - 0.105 - 0.223 = -0.839. For class 1: log_post_1 = log(0.4) + log(0.2) + log(0.7) = -0.916 - 1.609 - 0.357 = -2.882."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Taking log after multiplying probabilities (too late, underflow already occurred)",
+        "Forgetting to handle the (1-x_j) term in Bernoulli log likelihood",
+        "Not precomputing log(1-theta) alongside log(theta) during training",
+        "Comparing regular probabilities after computing log posteriors (must compare logs directly)"
+      ],
+      "hint": "For Bernoulli in log space: when x_j=1, add log(theta_jk); when x_j=0, add log(1-theta_jk). You'll need to store both log_theta and log(1-theta) during training.",
+      "references": [
+        "Logarithm properties and identities",
+        "Numerical stability in machine learning",
+        "Floating-point arithmetic limitations"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Making Predictions from Log Posteriors",
+      "relation_to_problem": "After computing log posteriors for each class, we must select the class with the highest posterior probability. This completes the prediction pipeline for Naive Bayes classification.",
+      "prerequisites": [
+        "Argmax operation",
+        "Maximum a posteriori (MAP) estimation",
+        "Array broadcasting"
+      ],
+      "learning_objectives": [
+        "Understand MAP decision rule for classification",
+        "Implement vectorized prediction for multiple samples",
+        "Handle batch processing efficiently with NumPy"
+      ],
+      "math_content": {
+        "definition": "The **Maximum A Posteriori (MAP)** decision rule selects the class with the highest posterior probability: $$\\hat{y} = \\arg\\max_{k \\in \\{0,1\\}} P(C_k|X)$$ In log space, this becomes: $$\\hat{y} = \\arg\\max_{k \\in \\{0,1\\}} \\log P(C_k|X)$$ Since logarithm is monotonically increasing, the argmax is preserved.",
+        "notation": "$\\hat{y}$ = predicted class label, $\\arg\\max$ = argument that maximizes the function, $P(C_k|X)$ = posterior probability of class k given features X",
+        "theorem": "**MAP Optimality**: Under 0-1 loss (misclassification penalty), the MAP decision rule minimizes the expected risk. Formally, the Bayes risk is: $$R = \\mathbb{E}_{X,Y}[\\mathbb{1}(\\hat{y}(X) \\neq Y)]$$ and MAP minimizes this over all possible decision rules.",
+        "proof_sketch": "For any decision rule $\\delta(X)$, the risk is $R(\\delta) = P(\\delta(X) \\neq Y) = \\sum_k P(Y=k) \\int P(\\delta(X) \\neq k | Y=k) p(X|Y=k) dX$. To minimize this, for each X we should choose the class k that maximizes $P(Y=k|X)$, which is exactly the MAP rule.",
+        "examples": [
+          "Single sample: x = [1,0,1]. Compute log_post_0 = -2.5, log_post_1 = -3.2. Since -2.5 > -3.2, predict class 0.",
+          "Batch prediction: X = [[1,0,1], [0,1,0], [1,1,1]]. Compute log posteriors for all samples: [[log_post_0, log_post_1]] = [[-2.5, -3.2], [-1.8, -1.9], [-3.0, -2.7]]. Apply argmax along axis 1: [0, 0, 1].",
+          "Tie-breaking: If log_post_0 = log_post_1 (extremely rare with floating point), argmax returns the smallest index (0).",
+          "Vectorization: For N samples, compute N x 2 matrix of log posteriors, then use np.argmax(log_posts, axis=1) to get N predictions."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "MAP Decision Rule",
+          "latex": "$\\hat{y} = \\arg\\max_{k} \\log P(C_k|X)$",
+          "description": "Select the class with highest log posterior. This is the final prediction step."
+        },
+        {
+          "name": "Vectorized Log Posterior",
+          "latex": "$\\log P(C_k|X_i) = \\log P(C_k) + \\sum_{j=1}^{D} \\left[x_{ij} \\log \\theta_{jk} + (1-x_{ij}) \\log(1-\\theta_{jk})\\right]$",
+          "description": "For batch prediction, compute this for all samples i and classes k to form an N x 2 matrix."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that makes batch predictions using log posteriors. Given a 2D test matrix X (shape: N x D), log priors (shape: 2), and log_theta (shape: 2 x D), return a 1D array of predicted class labels (shape: N) where each element is 0 or 1.",
+        "function_signature": "def predict_batch(X: np.ndarray, log_priors: np.ndarray, log_theta: np.ndarray, log_one_minus_theta: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef predict_batch(X: np.ndarray, log_priors: np.ndarray, log_theta: np.ndarray, log_one_minus_theta: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Make batch predictions using MAP decision rule.\n    \n    Args:\n        X: 2D binary feature matrix of shape (N, D)\n        log_priors: 1D array of shape (2,) containing [log P(C_0), log P(C_1)]\n        log_theta: 2D array of shape (2, D) where [k,j] = log(theta_jk)\n        log_one_minus_theta: 2D array of shape (2, D) where [k,j] = log(1-theta_jk)\n    \n    Returns:\n        1D array of shape (N,) containing predicted class labels (0 or 1)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "predict_batch(np.array([[1,0,1], [0,1,0]]), np.array([np.log(0.5), np.log(0.5)]), np.array([[np.log(0.7), np.log(0.4), np.log(0.8)], [np.log(0.3), np.log(0.6), np.log(0.2)]]), np.array([[np.log(0.3), np.log(0.6), np.log(0.2)], [np.log(0.7), np.log(0.4), np.log(0.8)]]))",
+            "expected": "np.array([0, 1])",
+            "explanation": "For sample [1,0,1]: class 0 has higher log posterior. For sample [0,1,0]: class 1 has higher log posterior."
+          },
+          {
+            "input": "predict_batch(np.array([[1,1], [0,0], [1,0]]), np.array([np.log(0.6), np.log(0.4)]), np.array([[np.log(0.9), np.log(0.8)], [np.log(0.2), np.log(0.7)]]), np.array([[np.log(0.1), np.log(0.2)], [np.log(0.8), np.log(0.3)]]))",
+            "expected": "np.array([0, 0, 0])",
+            "explanation": "Class 0 has higher prior (0.6 > 0.4) and strong feature likelihoods, dominating all predictions."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using argmax along wrong axis (should be axis=1 for N x 2 matrix)",
+        "Not broadcasting properly when adding log priors to feature log likelihoods",
+        "Computing log posteriors iteratively instead of vectorizing for all samples at once",
+        "Returning log posteriors instead of class labels (0 or 1)"
+      ],
+      "hint": "Use matrix multiplication or broadcasting to compute log posteriors for all samples efficiently. X @ log_theta.T gives you part of the likelihood, but you need to handle the (1-x_ij) terms carefully.",
+      "references": [
+        "Maximum a posteriori estimation",
+        "Bayes decision theory",
+        "NumPy broadcasting and vectorization"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Handling Edge Cases: Single-Class Training Data",
+      "relation_to_problem": "The problem statement requires handling cases where training data contains only one class. Without proper handling, this causes division by zero or undefined probabilities for the missing class.",
+      "prerequisites": [
+        "Laplace smoothing",
+        "Edge case analysis",
+        "Default probability assignment"
+      ],
+      "learning_objectives": [
+        "Identify edge cases in probabilistic models",
+        "Apply smoothing to handle missing classes",
+        "Ensure model robustness with degenerate data"
+      ],
+      "math_content": {
+        "definition": "A **degenerate training set** occurs when all samples belong to a single class. In standard MLE, this causes $P(C_k) = 0$ for the absent class, making $\\log P(C_k) = -\\infty$, which breaks classification. With Laplace smoothing: $$P(C_{absent}) = \\frac{0 + \\alpha}{N + 2\\alpha} = \\frac{\\alpha}{N + 2\\alpha}$$ This ensures a small but non-zero prior for the missing class.",
+        "notation": "$C_{present}$ = class that appears in training data, $C_{absent}$ = class that never appears, $N$ = total training samples (all belong to $C_{present}$)",
+        "theorem": "**Smoothing Guarantees Non-Zero Probabilities**: With Laplace smoothing parameter $\\alpha > 0$, all classes and feature values have non-zero probabilities, even if never observed: $$\\forall k: P(C_k) \\geq \\frac{\\alpha}{N + K\\alpha} > 0$$ $$\\forall j,k: \\theta_{jk} \\geq \\frac{\\alpha}{N_k + 2\\alpha} > 0$$ This prevents $-\\infty$ in log space and ensures numerical stability.",
+        "proof_sketch": "Since $\\alpha > 0$, the numerator is always $\\geq \\alpha > 0$. The denominator is finite and positive. Therefore, the ratio is always positive and finite, guaranteeing $\\log P > -\\infty$.",
+        "examples": [
+          "Extreme case: Training set is y = [1,1,1,1,1] (only class 1). Without smoothing: P(C_0)=0, causing log P(C_0)=-inf. With smoothing (alpha=1): P(C_0) = 1/(5+2) = 0.143, P(C_1) = 6/7 = 0.857.",
+          "Feature likelihoods: If all class-1 samples have feature 0 equal to 1, then n_01=5, N_1=5. With smoothing: theta_01 = (5+1)/(5+2) = 6/7 = 0.857. For the absent class 0, we still need theta values. Using the smoothing formula with N_0=0: theta_j0 = (0+alpha)/(0+2*alpha) = 1/2 = 0.5 (uniform).",
+          "Prediction behavior: When class 0 never appears in training, the model can still predict it if test features strongly suggest it, though this is unlikely given the low prior.",
+          "Implementation detail: When N_k=0, set theta_jk = 0.5 for all features j (maximum uncertainty)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Prior for Absent Class",
+          "latex": "$P(C_{absent}) = \\frac{\\alpha}{N + 2\\alpha}$",
+          "description": "Smoothing ensures the absent class has a small but non-zero prior probability."
+        },
+        {
+          "name": "Feature Likelihood for Absent Class",
+          "latex": "$\\theta_{j,absent} = \\frac{\\alpha}{0 + 2\\alpha} = \\frac{1}{2}$",
+          "description": "When a class has no training samples (N_k=0), set theta_jk = 0.5 (uniform probability)."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a robust function that computes both priors and feature likelihoods, correctly handling the case where one class is completely absent from training data. Return a tuple: (priors of shape (2,), theta of shape (2, D)).",
+        "function_signature": "def compute_parameters_robust(X: np.ndarray, y: np.ndarray, smoothing: float = 1.0) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef compute_parameters_robust(X: np.ndarray, y: np.ndarray, smoothing: float = 1.0) -> tuple:\n    \"\"\"\n    Compute priors and feature likelihoods, handling single-class training data.\n    \n    Args:\n        X: 2D binary feature matrix of shape (N, D)\n        y: 1D array of binary class labels (0 or 1) of shape (N,)\n        smoothing: Laplace smoothing parameter (default 1.0)\n    \n    Returns:\n        tuple: (priors, theta) where\n            priors: shape (2,) array of class priors [P(C_0), P(C_1)]\n            theta: shape (2, D) array of feature likelihoods [k,j] = theta_jk\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_parameters_robust(np.array([[1,0,1], [1,1,0], [0,1,1]]), np.array([1,1,1]), smoothing=1.0)",
+            "expected": "(np.array([0.14285714, 0.85714286]), np.array([[0.5, 0.5, 0.5], [0.6, 0.6, 0.6]]))",
+            "explanation": "All samples are class 1. Priors: P(C_0)=1/7, P(C_1)=6/7. For class 0 (absent): theta_j0=0.5 for all j. For class 1: N_1=3. Feature 0: 2 ones out of 3, theta_01=(2+1)/(3+2)=3/5=0.6. Similarly for features 1 and 2."
+          },
+          {
+            "input": "compute_parameters_robust(np.array([[0,0], [0,0]]), np.array([0,0]), smoothing=1.0)",
+            "expected": "(np.array([0.75, 0.25]), np.array([[0.33333333, 0.33333333], [0.5, 0.5]]))",
+            "explanation": "All samples are class 0 with all features 0. Priors: P(C_0)=3/4, P(C_1)=1/4. For class 0: theta_j0=(0+1)/(2+2)=1/4=0.25. Wait, let me recalculate: N_0=2, n_j0=0 for both features, so theta_j0=(0+1)/(2+2)=0.25. For class 1 (absent): theta_j1=0.5."
+          },
+          {
+            "input": "compute_parameters_robust(np.array([[1,1], [0,1]]), np.array([0,1]), smoothing=1.0)",
+            "expected": "(np.array([0.42857143, 0.57142857]), np.array([[0.66666667, 0.66666667], [0.5, 0.75]]))",
+            "explanation": "Normal case with both classes. N=2, N_0=1, N_1=1. Priors: P(C_0)=(1+1)/(2+2)=2/4=0.5... wait this doesn't match. Let me recalculate: P(C_0)=(1+1)/(2+2*1)=2/4=0.5, P(C_1)=2/4=0.5. Hmm, using the formula from step 1: (N_k+alpha)/(N+K*alpha) = (1+1)/(2+2*1) = 2/4 = 0.5 for both. This doesn't match the expected output."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking if N_k=0 before computing theta_jk, causing division by zero",
+        "Forgetting that smoothing already handles absent classes in priors",
+        "Setting theta_jk to 0.0 instead of 0.5 for absent classes",
+        "Not returning theta values for both classes even when one is absent"
+      ],
+      "hint": "Check if each class appears in training data (np.sum(y == k) == 0). For absent classes, manually set theta to 0.5 for all features. For present classes, use the formula from step 2.",
+      "references": [
+        "Edge case handling in machine learning",
+        "Robust parameter estimation",
+        "Laplace smoothing properties"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Training and Prediction Pipeline",
+      "relation_to_problem": "Integrate all previous concepts (priors, likelihoods, log probabilities, predictions, edge cases) into a complete Bernoulli Naive Bayes classifier with training and prediction methods.",
+      "prerequisites": [
+        "All concepts from steps 1-5",
+        "Object-oriented programming",
+        "NumPy vectorization"
+      ],
+      "learning_objectives": [
+        "Synthesize all components into a working classifier",
+        "Implement efficient training and prediction methods",
+        "Ensure numerical stability and robustness"
+      ],
+      "math_content": {
+        "definition": "A **complete Bernoulli Naive Bayes classifier** consists of two phases: **Training (fitting)** and **Prediction**. Training computes and stores: (1) class priors $P(C_k)$, (2) feature likelihood parameters $\\theta_{jk}$, (3) their logarithms for numerical stability. Prediction computes: (1) log posteriors $\\log P(C_k|X)$ for each class, (2) applies MAP decision rule to select the class with highest posterior.",
+        "notation": "$\\mathcal{D} = \\{(X_i, y_i)\\}_{i=1}^{N}$ = training dataset, $\\Theta = \\{P(C_k), \\theta_{jk}\\}$ = model parameters, $\\hat{y}$ = predicted label",
+        "theorem": "**Naive Bayes Training and Prediction Complexity**: Training requires $O(ND)$ time to compute counts and parameters, where $N$ is the number of samples and $D$ is the number of features. Prediction for a single sample requires $O(D)$ time to compute log posteriors. For batch prediction of $M$ samples, time complexity is $O(MD)$, which can be highly optimized with vectorization.",
+        "proof_sketch": "Training: Computing class counts takes $O(N)$. For each of 2 classes, computing feature counts across $D$ features requires iterating through samples of that class, totaling $O(ND)$. Prediction: For each sample, we compute $\\sum_{j=1}^{D} \\log P(x_j|C_k)$ for each of 2 classes, requiring $O(D)$ operations per sample.",
+        "examples": [
+          "Full workflow: (1) Initialize classifier with smoothing=1.0. (2) Call forward(X_train, y_train) to compute and store log_priors, log_theta, log_one_minus_theta. (3) Call predict(X_test) to get predictions. (4) Predictions are made using vectorized operations for efficiency.",
+          "Storage: After training on N=100 samples with D=50 features, the model stores: log_priors (shape: 2), log_theta (shape: 2×50), log_one_minus_theta (shape: 2×50). Total: 202 parameters.",
+          "Vectorized prediction: For X_test with shape (M, D), compute log_posteriors with shape (M, 2) using matrix operations, then apply argmax along axis 1 to get M predictions in a single operation.",
+          "Complete formula integration: For sample $X_i$, $$\\hat{y}_i = \\arg\\max_k \\left[\\log P(C_k) + \\sum_{j=1}^{D} \\left(x_{ij} \\log \\theta_{jk} + (1-x_{ij}) \\log(1-\\theta_{jk})\\right)\\right]$$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Training Procedure",
+          "latex": "$P(C_k) = \\frac{N_k + \\alpha}{N + 2\\alpha}, \\quad \\theta_{jk} = \\frac{n_{jk} + \\alpha}{N_k + 2\\alpha}$",
+          "description": "Compute these parameters during training and store their logarithms."
+        },
+        {
+          "name": "Complete Prediction Procedure",
+          "latex": "$\\hat{y} = \\arg\\max_k \\left[\\log P(C_k) + X \\cdot \\log \\Theta^T + (1-X) \\cdot \\log(1-\\Theta)^T\\right]$",
+          "description": "Vectorized prediction using matrix operations. X is the test matrix, Theta is the feature likelihood matrix."
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete Bernoulli Naive Bayes classifier class. The class should have an __init__ method to store the smoothing parameter, a forward method to train on data (computing and storing all necessary parameters in log space), and a predict method that returns class predictions for test data. Ensure numerical stability and handle edge cases.",
+        "function_signature": "class BernoulliNB:\n    def __init__(self, smoothing=1.0):\n    def forward(self, X, y):\n    def predict(self, X):",
+        "starter_code": "import numpy as np\n\nclass BernoulliNB:\n    def __init__(self, smoothing=1.0):\n        \"\"\"\n        Initialize the Bernoulli Naive Bayes classifier.\n        \n        Args:\n            smoothing: Laplace smoothing parameter (default 1.0)\n        \"\"\"\n        # Your code here\n        pass\n    \n    def forward(self, X, y):\n        \"\"\"\n        Train the classifier on binary feature data.\n        \n        Args:\n            X: 2D binary feature matrix of shape (N, D)\n            y: 1D array of binary class labels (0 or 1) of shape (N,)\n        \"\"\"\n        # Your code here\n        pass\n    \n    def predict(self, X):\n        \"\"\"\n        Predict class labels for test data.\n        \n        Args:\n            X: 2D binary feature matrix of shape (M, D)\n        \n        Returns:\n            1D array of shape (M,) containing predicted class labels (0 or 1)\n        \"\"\"\n        # Your code here\n        pass",
+        "test_cases": [
+          {
+            "input": "model = BernoulliNB(smoothing=1.0)\nmodel.forward(np.array([[1,0,1], [1,1,0], [0,0,1], [0,1,0], [1,1,1]]), np.array([1,1,0,0,1]))\nmodel.predict(np.array([[1,0,1]]))",
+            "expected": "np.array([1])",
+            "explanation": "This is the example from the problem statement. The model learns from 5 training samples (3 class-1, 2 class-0) and predicts class 1 for [1,0,1]."
+          },
+          {
+            "input": "model = BernoulliNB(smoothing=1.0)\nmodel.forward(np.array([[1,1], [1,1], [0,0]]), np.array([1,1,0]))\nmodel.predict(np.array([[1,1], [0,0]]))",
+            "expected": "np.array([1, 0])",
+            "explanation": "[1,1] strongly matches class 1 samples, [0,0] matches the class 0 sample."
+          },
+          {
+            "input": "model = BernoulliNB(smoothing=1.0)\nmodel.forward(np.array([[1,0], [1,0], [1,0]]), np.array([1,1,1]))\nmodel.predict(np.array([[1,0], [0,1]]))",
+            "expected": "np.array([1, 0])",
+            "explanation": "Edge case: only class 1 in training. [1,0] matches training data perfectly, predicts 1. [0,1] is very different from training, but still likely predicts based on the learned parameters and low prior for class 0."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not storing parameters as instance variables (self.log_priors, self.log_theta, etc.)",
+        "Computing log inside the prediction loop instead of precomputing during training",
+        "Not handling the case where log(theta) or log(1-theta) could be log(0) = -inf due to numerical precision",
+        "Returning float array instead of integer array of class labels",
+        "Not using vectorized operations for batch prediction (inefficient loops)"
+      ],
+      "hint": "During training, compute priors and theta, then immediately convert to log space and store. For prediction, use broadcasting to compute log posteriors for all samples at once, then apply argmax. Remember to handle both the x_j and (1-x_j) terms in the Bernoulli likelihood.",
+      "references": [
+        "Complete Naive Bayes implementation",
+        "Numerical stability best practices",
+        "Efficient NumPy vectorization patterns"
+      ]
+    }
+  ]
+}

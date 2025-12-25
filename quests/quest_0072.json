@@ -1,0 +1,472 @@
+{
+  "problem_id": 72,
+  "title": "Calculate Jaccard Index for Binary Classification",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "\n## Task: Implement the Jaccard Index\n\nYour task is to implement a function `jaccard_index(y_true, y_pred)` that calculates the Jaccard Index, a measure of similarity between two binary sets. The Jaccard Index is widely used in binary classification tasks to evaluate the overlap between predicted and true labels.\n\n### Your Task:\nImplement the function `jaccard_index(y_true, y_pred)` to:\n1. Calculate the Jaccard Index between the arrays `y_true` and `y_pred`.\n2. Return the Jaccard Index as a float value.\n3. Ensure the function handles cases where:\n   - There is no overlap between `y_true` and `y_pred`.\n   - Both arrays contain only zeros (edge cases).\n\nThe Jaccard Index is defined as:\n\n$$\n\\scriptsize\n\\text{Jaccard Index} = \\frac{\\text{Number of elements in the intersection of } y_{\\text{true}} \\text{ and } y_{\\text{pred}}}{\\text{Number of elements in the union of } y_{\\text{true}} \\text{ and } y_{\\text{pred}}}\n$$\n\n\nWhere:\n- $ y_{\\text{true}} $ and $ y_{\\text{pred}} $ are binary arrays of the same length, representing true and predicted labels.\n- The result ranges from 0 (no overlap) to 1 (perfect overlap).\n",
+  "example": {
+    "input": "y_true = np.array([1, 0, 1, 1, 0, 1])\ny_pred = np.array([1, 0, 1, 0, 0, 1])\nprint(jaccard_index(y_true, y_pred))",
+    "output": "0.75",
+    "reasoning": "The Jaccard Index is calculated as 3 / 4 = 0.75, indicating a 75% overlap between the true and predicted labels."
+  },
+  "starter_code": "\nimport numpy as np\n\ndef jaccard_index(y_true, y_pred):\n\t# Write your code here\n\treturn round(result, 3)\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Set Theory Fundamentals: Intersection and Union Operations",
+      "relation_to_problem": "The Jaccard Index is fundamentally based on set operations - specifically calculating the intersection (elements common to both sets) and union (all unique elements from both sets). Understanding these operations is essential for implementing the numerator and denominator of the Jaccard formula.",
+      "prerequisites": [
+        "Basic Python programming",
+        "Array/List manipulation",
+        "Boolean logic"
+      ],
+      "learning_objectives": [
+        "Define intersection and union operations formally using set notation",
+        "Compute intersection and union for finite sets",
+        "Translate set operations to binary array operations",
+        "Understand cardinality and its role in set operations"
+      ],
+      "math_content": {
+        "definition": "Given two sets $A$ and $B$, the **intersection** $A \\cap B$ is the set of all elements that belong to both $A$ and $B$: $$A \\cap B = \\{x : x \\in A \\text{ and } x \\in B\\}$$ The **union** $A \\cup B$ is the set of all elements that belong to either $A$ or $B$ (or both): $$A \\cup B = \\{x : x \\in A \\text{ or } x \\in B\\}$$ The **cardinality** $|S|$ of a set $S$ is the number of elements in $S$.",
+        "notation": "$A \\cap B$ = intersection of sets A and B, $A \\cup B$ = union of sets A and B, $|S|$ = cardinality (size) of set S, $\\in$ = element membership operator",
+        "theorem": "**Inclusion-Exclusion Principle**: For any two finite sets $A$ and $B$, $$|A \\cup B| = |A| + |B| - |A \\cap B|$$",
+        "proof_sketch": "Elements in $A \\cup B$ consist of elements in $A$, elements in $B$, but elements in both $A$ and $B$ are counted twice when we compute $|A| + |B|$. Therefore, we must subtract $|A \\cap B|$ once to avoid double-counting. This yields the inclusion-exclusion formula.",
+        "examples": [
+          "Example 1: Let $A = \\{1, 2, 3, 4\\}$ and $B = \\{3, 4, 5, 6\\}$. Then $A \\cap B = \\{3, 4\\}$ with $|A \\cap B| = 2$, and $A \\cup B = \\{1, 2, 3, 4, 5, 6\\}$ with $|A \\cup B| = 6$. Verify: $|A| + |B| - |A \\cap B| = 4 + 4 - 2 = 6$.",
+          "Example 2 (Binary Arrays): For binary arrays $y_1 = [1, 0, 1, 1, 0]$ and $y_2 = [1, 1, 1, 0, 0]$, treating positions with value 1 as set elements: $A = \\{0, 2, 3\\}$ (indices where $y_1 = 1$), $B = \\{0, 1, 2\\}$ (indices where $y_2 = 1$). Then $A \\cap B = \\{0, 2\\}$ and $A \\cup B = \\{0, 1, 2, 3\\}$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Intersection Cardinality",
+          "latex": "$|A \\cap B| = \\sum_{i} \\mathbb{1}(x_i \\in A \\text{ and } x_i \\in B)$",
+          "description": "Count elements present in both sets; for binary arrays, count positions where both arrays have value 1"
+        },
+        {
+          "name": "Union Cardinality via Inclusion-Exclusion",
+          "latex": "$|A \\cup B| = |A| + |B| - |A \\cap B|$",
+          "description": "Calculate union size by adding individual set sizes and subtracting the overlap to avoid double-counting"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the cardinality of the intersection for two binary arrays. Given two binary arrays (containing only 0s and 1s), count how many positions have the value 1 in BOTH arrays simultaneously. This is the foundation for computing the numerator of the Jaccard Index.",
+        "function_signature": "def count_intersection(arr1: np.ndarray, arr2: np.ndarray) -> int:",
+        "starter_code": "import numpy as np\n\ndef count_intersection(arr1: np.ndarray, arr2: np.ndarray) -> int:\n    # Count positions where both arrays have value 1\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "count_intersection(np.array([1, 0, 1, 1, 0]), np.array([1, 1, 1, 0, 0]))",
+            "expected": "2",
+            "explanation": "Positions 0 and 2 have value 1 in both arrays, so the intersection cardinality is 2"
+          },
+          {
+            "input": "count_intersection(np.array([1, 1, 1, 1]), np.array([1, 1, 1, 1]))",
+            "expected": "4",
+            "explanation": "All positions have value 1 in both arrays, perfect overlap gives intersection of 4"
+          },
+          {
+            "input": "count_intersection(np.array([1, 0, 1, 0]), np.array([0, 1, 0, 1]))",
+            "expected": "0",
+            "explanation": "No position has value 1 in both arrays simultaneously, intersection is empty"
+          },
+          {
+            "input": "count_intersection(np.array([0, 0, 0]), np.array([0, 0, 0]))",
+            "expected": "0",
+            "explanation": "Both arrays contain only zeros, so intersection is empty"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing intersection (AND operation) with union (OR operation) - intersection requires BOTH conditions to be true",
+        "Using + operator instead of logical AND when computing intersection for binary arrays",
+        "Forgetting that set operations work on positions/indices where the value is 1, not on the array values themselves",
+        "Not handling edge cases where one or both arrays contain all zeros"
+      ],
+      "hint": "Think about what logical operation (AND, OR, XOR) corresponds to intersection. For binary values, when is an element in both sets?",
+      "references": [
+        "Set Theory - Intersection and Union",
+        "Boolean Algebra and Logical Operations",
+        "NumPy element-wise operations"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Computing Union Cardinality for Binary Sets",
+      "relation_to_problem": "The denominator of the Jaccard Index formula requires calculating the union cardinality $|A \\cup B|$. For binary arrays, this represents all positions where at least one array has value 1. Understanding union is critical for the complete Jaccard calculation.",
+      "prerequisites": [
+        "Set intersection (Step 1)",
+        "Inclusion-exclusion principle",
+        "Binary array operations"
+      ],
+      "learning_objectives": [
+        "Calculate union cardinality using the inclusion-exclusion principle",
+        "Implement union counting for binary arrays",
+        "Understand the relationship between intersection and union",
+        "Handle edge cases where union might be empty"
+      ],
+      "math_content": {
+        "definition": "For binary arrays representing sets $A$ and $B$, the **union cardinality** $|A \\cup B|$ counts the number of positions where at least one array has value 1. Formally, if $A$ and $B$ are sets derived from binary arrays: $$|A \\cup B| = |\\{i : y_{\\text{true}}[i] = 1 \\text{ or } y_{\\text{pred}}[i] = 1\\}|$$",
+        "notation": "$|A \\cup B|$ = size of union, $y[i]$ = value at position i in array y, $\\vee$ = logical OR operator",
+        "theorem": "**Inclusion-Exclusion for Union Cardinality**: Given the cardinalities of two sets and their intersection, $$|A \\cup B| = |A| + |B| - |A \\cap B|$$ This formula avoids double-counting elements that appear in both sets.",
+        "proof_sketch": "Partition $A \\cup B$ into three disjoint regions: elements only in $A$, elements only in $B$, and elements in both. We have: $|A \\cup B| = |A \\setminus B| + |B \\setminus A| + |A \\cap B|$. Since $|A| = |A \\setminus B| + |A \\cap B|$ and $|B| = |B \\setminus A| + |A \\cap B|$, we get $|A| + |B| = |A \\setminus B| + |B \\setminus A| + 2|A \\cap B|$. Rearranging: $|A \\cup B| = |A| + |B| - |A \\cap B|$.",
+        "examples": [
+          "Example 1: For $A = \\{1, 2, 3\\}$ and $B = \\{2, 3, 4, 5\\}$, we have $|A| = 3$, $|B| = 4$, $|A \\cap B| = 2$ (elements 2 and 3). Using inclusion-exclusion: $|A \\cup B| = 3 + 4 - 2 = 5$. Indeed, $A \\cup B = \\{1, 2, 3, 4, 5\\}$ has 5 elements.",
+          "Example 2 (Binary): Arrays $[1, 0, 1, 1]$ and $[1, 1, 0, 1]$ give $|A| = 3$, $|B| = 3$, $|A \\cap B| = 2$ (positions 0 and 3). Union cardinality: $3 + 3 - 2 = 4$. Direct count: positions 0, 1, 2, 3 all have at least one 1, confirming $|A \\cup B| = 4$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Union Cardinality (Direct Method)",
+          "latex": "$|A \\cup B| = \\sum_{i} \\mathbb{1}(y_{\\text{true}}[i] = 1 \\text{ or } y_{\\text{pred}}[i] = 1)$",
+          "description": "Count positions where at least one array has value 1 using logical OR"
+        },
+        {
+          "name": "Union Cardinality (Inclusion-Exclusion)",
+          "latex": "$|A \\cup B| = |A| + |B| - |A \\cap B|$",
+          "description": "Compute union size using individual counts minus overlap"
+        },
+        {
+          "name": "Set Cardinality from Binary Array",
+          "latex": "$|A| = \\sum_{i} y[i]$",
+          "description": "For binary array y, the set cardinality equals the sum of all elements (count of 1s)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the cardinality of the union for two binary arrays using the inclusion-exclusion principle. Your function should: (1) count how many 1s are in the first array, (2) count how many 1s are in the second array, (3) count the intersection, and (4) apply the inclusion-exclusion formula. This builds toward the denominator of the Jaccard Index.",
+        "function_signature": "def count_union(arr1: np.ndarray, arr2: np.ndarray) -> int:",
+        "starter_code": "import numpy as np\n\ndef count_union(arr1: np.ndarray, arr2: np.ndarray) -> int:\n    # Calculate |A ∪ B| using inclusion-exclusion: |A| + |B| - |A ∩ B|\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "count_union(np.array([1, 0, 1, 1, 0]), np.array([1, 1, 1, 0, 0]))",
+            "expected": "4",
+            "explanation": "Array 1 has 3 ones, array 2 has 3 ones, intersection is 2. Union = 3 + 3 - 2 = 4"
+          },
+          {
+            "input": "count_union(np.array([1, 1, 1, 1]), np.array([1, 1, 1, 1]))",
+            "expected": "4",
+            "explanation": "Identical arrays with 4 ones each, intersection is 4. Union = 4 + 4 - 4 = 4"
+          },
+          {
+            "input": "count_union(np.array([1, 0, 1, 0]), np.array([0, 1, 0, 1]))",
+            "expected": "4",
+            "explanation": "Each array has 2 ones at different positions, intersection is 0. Union = 2 + 2 - 0 = 4"
+          },
+          {
+            "input": "count_union(np.array([0, 0, 0]), np.array([0, 0, 0]))",
+            "expected": "0",
+            "explanation": "Both arrays contain only zeros. Union = 0 + 0 - 0 = 0 (empty union)"
+          },
+          {
+            "input": "count_union(np.array([1, 0, 0]), np.array([0, 0, 0]))",
+            "expected": "1",
+            "explanation": "First array has 1 one, second has 0 ones, intersection is 0. Union = 1 + 0 - 0 = 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using logical AND instead of addition when computing |A| + |B|, which gives intersection instead",
+        "Forgetting to subtract the intersection, leading to double-counting overlapping elements",
+        "Computing union directly with OR operation instead of using inclusion-exclusion (both approaches are valid, but this exercise specifically practices the formula)",
+        "Not handling the edge case where both arrays are all zeros, resulting in division by zero in later Jaccard calculation"
+      ],
+      "hint": "You can reuse the intersection counting logic from Step 1. Remember that |A| for a binary array equals the sum of its elements.",
+      "references": [
+        "Inclusion-Exclusion Principle",
+        "Venn Diagrams and Set Relationships",
+        "NumPy sum() and counting operations"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Similarity Coefficients: Definition and Properties",
+      "relation_to_problem": "The Jaccard Index is a specific type of similarity coefficient that quantifies how similar two sets are. Understanding the mathematical properties of similarity measures (boundedness, symmetry, interpretability) is essential for correctly implementing and interpreting the Jaccard Index as a classification metric.",
+      "prerequisites": [
+        "Set intersection and union (Steps 1-2)",
+        "Real numbers and intervals",
+        "Ratio and proportion"
+      ],
+      "learning_objectives": [
+        "Define similarity coefficients formally as normalized measures",
+        "Understand the properties that characterize good similarity measures",
+        "Compute basic similarity ratios from set operations",
+        "Interpret similarity values in the context of binary classification"
+      ],
+      "math_content": {
+        "definition": "A **similarity coefficient** $S: \\mathcal{P}(U) \\times \\mathcal{P}(U) \\rightarrow [0, 1]$ is a function that maps pairs of sets to real numbers in the interval $[0, 1]$, where $\\mathcal{P}(U)$ denotes the power set of universe $U$. The **Jaccard Similarity Coefficient** is defined as: $$J(A, B) = \\frac{|A \\cap B|}{|A \\cup B|}$$ with the convention that $J(\\emptyset, \\emptyset) = 0$ when both sets are empty (to avoid $\\frac{0}{0}$).",
+        "notation": "$S(A, B)$ = similarity between sets A and B, $[0, 1]$ = closed interval from 0 to 1, $\\mathcal{P}(U)$ = power set of U (all possible subsets)",
+        "theorem": "**Properties of Jaccard Similarity**: For any sets $A, B \\subseteq U$, the Jaccard coefficient satisfies: (1) **Boundedness**: $0 \\leq J(A, B) \\leq 1$, (2) **Symmetry**: $J(A, B) = J(B, A)$, (3) **Identity**: $J(A, A) = 1$ for non-empty $A$, (4) **Monotonicity**: If $A \\cap B$ grows while $A \\cup B$ stays constant, $J(A, B)$ increases.",
+        "proof_sketch": "**Boundedness**: Since $A \\cap B \\subseteq A \\cup B$, we have $|A \\cap B| \\leq |A \\cup B|$, giving $J(A, B) \\leq 1$. Non-negativity follows from cardinality being non-negative. **Symmetry**: Both intersection and union are commutative operations, so $J(A, B) = J(B, A)$. **Identity**: For $A = B \\neq \\emptyset$, $A \\cap B = A \\cup B = A$, thus $J(A, A) = |A|/|A| = 1$.",
+        "examples": [
+          "Example 1 (Perfect Similarity): $A = \\{1, 2, 3\\}$, $B = \\{1, 2, 3\\}$. Then $J(A, B) = \\frac{3}{3} = 1.0$, indicating identical sets.",
+          "Example 2 (No Similarity): $A = \\{1, 2\\}$, $B = \\{3, 4\\}$. Then $|A \\cap B| = 0$, $|A \\cup B| = 4$, so $J(A, B) = \\frac{0}{4} = 0.0$, indicating disjoint sets.",
+          "Example 3 (Partial Similarity): $A = \\{1, 2, 3\\}$, $B = \\{2, 3, 4, 5\\}$. Then $|A \\cap B| = 2$, $|A \\cup B| = 5$, so $J(A, B) = \\frac{2}{5} = 0.4$, indicating moderate overlap.",
+          "Example 4 (Binary Classification): True labels $[1, 0, 1, 1, 0, 1]$, Predicted $[1, 0, 1, 0, 0, 1]$. Sets: $A = \\{0, 2, 3, 5\\}$, $B = \\{0, 2, 5\\}$. Intersection size = 3, union size = 4, $J = 0.75$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Jaccard Similarity Coefficient",
+          "latex": "$J(A, B) = \\frac{|A \\cap B|}{|A \\cup B|} = \\frac{|A \\cap B|}{|A| + |B| - |A \\cap B|}$",
+          "description": "Ratio of intersection to union, representing the proportion of overlap between two sets"
+        },
+        {
+          "name": "Jaccard Distance (Dissimilarity)",
+          "latex": "$d_J(A, B) = 1 - J(A, B)$",
+          "description": "Complementary measure where 0 indicates identical sets and 1 indicates disjoint sets; forms a proper metric"
+        },
+        {
+          "name": "Binary Classification Form",
+          "latex": "$J = \\frac{\\text{TP}}{\\text{TP} + \\text{FP} + \\text{FN}}$",
+          "description": "Jaccard Index in terms of true positives, false positives, and false negatives"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes a similarity ratio given the intersection and union cardinalities. This function represents the core mathematical operation of the Jaccard Index: dividing intersection by union. Handle the edge case where the union is empty (both sets empty), returning 0.0 by convention. Return the result as a float rounded to 3 decimal places.",
+        "function_signature": "def similarity_ratio(intersection_size: int, union_size: int) -> float:",
+        "starter_code": "def similarity_ratio(intersection_size: int, union_size: int) -> float:\n    # Compute intersection/union ratio\n    # Handle edge case: when union_size is 0, return 0.0\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "similarity_ratio(3, 4)",
+            "expected": "0.75",
+            "explanation": "Intersection of 3 elements, union of 4 elements gives ratio 3/4 = 0.75"
+          },
+          {
+            "input": "similarity_ratio(4, 4)",
+            "expected": "1.0",
+            "explanation": "Perfect overlap: intersection equals union, giving maximum similarity of 1.0"
+          },
+          {
+            "input": "similarity_ratio(0, 4)",
+            "expected": "0.0",
+            "explanation": "No overlap (disjoint sets): intersection is 0, giving minimum similarity of 0.0"
+          },
+          {
+            "input": "similarity_ratio(0, 0)",
+            "expected": "0.0",
+            "explanation": "Edge case: both sets empty. By convention, return 0.0 to avoid division by zero"
+          },
+          {
+            "input": "similarity_ratio(2, 5)",
+            "expected": "0.4",
+            "explanation": "Partial overlap: 2/5 = 0.4, indicating 40% similarity"
+          },
+          {
+            "input": "similarity_ratio(1, 10)",
+            "expected": "0.1",
+            "explanation": "Small overlap relative to union: 1/10 = 0.1, indicating 10% similarity"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the division by zero case when union_size is 0, causing runtime errors",
+        "Returning integer division result instead of float, losing precision (e.g., 3/4 = 0 in integer division)",
+        "Confusing the roles of numerator and denominator (using union in numerator and intersection in denominator)",
+        "Forgetting to round to the specified number of decimal places for output consistency",
+        "Returning values outside [0, 1] range due to incorrect input validation or computation"
+      ],
+      "hint": "This is a simple ratio calculation, but pay special attention to the edge case. What should happen mathematically when comparing two empty sets?",
+      "references": [
+        "Similarity Measures in Data Mining",
+        "Set-theoretic Similarity Coefficients",
+        "Division by Zero Handling in Python"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Binary Classification Metrics: True Positives, False Positives, and False Negatives",
+      "relation_to_problem": "The Jaccard Index in binary classification is expressed as TP/(TP+FP+FN). Understanding how to identify and count these three quantities from prediction and ground truth arrays is essential for translating the abstract set formula into a practical classification metric implementation.",
+      "prerequisites": [
+        "Binary classification concepts",
+        "Confusion matrix basics",
+        "Element-wise array comparison"
+      ],
+      "learning_objectives": [
+        "Define True Positives, False Positives, and False Negatives formally",
+        "Extract TP, FP, FN counts from binary arrays",
+        "Understand why True Negatives are excluded from Jaccard Index",
+        "Connect confusion matrix components to set operations"
+      ],
+      "math_content": {
+        "definition": "In binary classification with true labels $y_{\\text{true}}$ and predictions $y_{\\text{pred}}$: **True Positives (TP)**: Instances correctly classified as positive. $$\\text{TP} = \\sum_{i=1}^{n} \\mathbb{1}(y_{\\text{true}}[i] = 1 \\text{ and } y_{\\text{pred}}[i] = 1)$$ **False Positives (FP)**: Instances incorrectly classified as positive. $$\\text{FP} = \\sum_{i=1}^{n} \\mathbb{1}(y_{\\text{true}}[i] = 0 \\text{ and } y_{\\text{pred}}[i] = 1)$$ **False Negatives (FN)**: Instances incorrectly classified as negative. $$\\text{FN} = \\sum_{i=1}^{n} \\mathbb{1}(y_{\\text{true}}[i] = 1 \\text{ and } y_{\\text{pred}}[i] = 0)$$",
+        "notation": "$\\mathbb{1}(\\cdot)$ = indicator function (1 if condition true, 0 otherwise), $y_{\\text{true}}[i]$ = true label at position i, $y_{\\text{pred}}[i]$ = predicted label at position i, $n$ = number of samples",
+        "theorem": "**Relationship to Set Operations**: Let $A = \\{i : y_{\\text{true}}[i] = 1\\}$ be the set of true positive indices and $B = \\{i : y_{\\text{pred}}[i] = 1\\}$ be the set of predicted positive indices. Then: $$\\text{TP} = |A \\cap B|$$ $$\\text{FP} = |B \\setminus A| = |B| - |A \\cap B|$$ $$\\text{FN} = |A \\setminus B| = |A| - |A \\cap B|$$ The Jaccard Index can thus be written as: $$J = \\frac{\\text{TP}}{\\text{TP} + \\text{FP} + \\text{FN}} = \\frac{|A \\cap B|}{|A \\cup B|}$$",
+        "proof_sketch": "TP represents positions where both arrays are 1, which is exactly the intersection $A \\cap B$. FP represents positions predicted as 1 but actually 0, which are elements in $B$ but not in $A$ (i.e., $B \\setminus A$). FN represents positions actually 1 but predicted as 0, which are elements in $A$ but not in $B$ (i.e., $A \\setminus B$). The denominator $\\text{TP} + \\text{FP} + \\text{FN} = |A \\cap B| + |B \\setminus A| + |A \\setminus B| = |A \\cup B|$ by the disjoint union property.",
+        "examples": [
+          "Example 1: $y_{\\text{true}} = [1, 0, 1, 1, 0]$, $y_{\\text{pred}} = [1, 1, 1, 0, 0]$. Position-by-position analysis: Position 0: true=1, pred=1 → TP. Position 1: true=0, pred=1 → FP. Position 2: true=1, pred=1 → TP. Position 3: true=1, pred=0 → FN. Position 4: true=0, pred=0 → TN (not used in Jaccard). Counts: TP=2, FP=1, FN=1, TN=1.",
+          "Example 2: $y_{\\text{true}} = [1, 1, 1]$, $y_{\\text{pred}} = [1, 1, 1]$. Perfect prediction: TP=3, FP=0, FN=0. Jaccard = 3/(3+0+0) = 1.0.",
+          "Example 3: $y_{\\text{true}} = [1, 0]$, $y_{\\text{pred}} = [0, 1]$. Complete mismatch: TP=0, FP=1, FN=1. Jaccard = 0/(0+1+1) = 0.0."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "True Positives (Intersection)",
+          "latex": "$\\text{TP} = \\sum_{i} \\mathbb{1}(y_{\\text{true}}[i] = 1 \\land y_{\\text{pred}}[i] = 1)$",
+          "description": "Count of correct positive predictions; equivalent to set intersection"
+        },
+        {
+          "name": "False Positives",
+          "latex": "$\\text{FP} = \\sum_{i} \\mathbb{1}(y_{\\text{true}}[i] = 0 \\land y_{\\text{pred}}[i] = 1)$",
+          "description": "Count of negative instances incorrectly predicted as positive"
+        },
+        {
+          "name": "False Negatives",
+          "latex": "$\\text{FN} = \\sum_{i} \\mathbb{1}(y_{\\text{true}}[i] = 1 \\land y_{\\text{pred}}[i] = 0)$",
+          "description": "Count of positive instances incorrectly predicted as negative"
+        },
+        {
+          "name": "Jaccard in Terms of Classification Metrics",
+          "latex": "$J = \\frac{\\text{TP}}{\\text{TP} + \\text{FP} + \\text{FN}}$",
+          "description": "Alternative formulation of Jaccard Index using confusion matrix components"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the three key classification metrics (TP, FP, FN) from binary arrays. Given true labels and predictions, count: (1) True Positives - positions where both are 1, (2) False Positives - positions where true is 0 but predicted is 1, (3) False Negatives - positions where true is 1 but predicted is 0. Return these three counts as a tuple (TP, FP, FN).",
+        "function_signature": "def compute_confusion_components(y_true: np.ndarray, y_pred: np.ndarray) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef compute_confusion_components(y_true: np.ndarray, y_pred: np.ndarray) -> tuple:\n    # Compute TP, FP, FN from the two binary arrays\n    # Return as tuple: (TP, FP, FN)\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_confusion_components(np.array([1, 0, 1, 1, 0]), np.array([1, 1, 1, 0, 0]))",
+            "expected": "(2, 1, 1)",
+            "explanation": "TP at positions 0,2 (both=1). FP at position 1 (true=0,pred=1). FN at position 3 (true=1,pred=0). Result: (2, 1, 1)"
+          },
+          {
+            "input": "compute_confusion_components(np.array([1, 1, 1, 1]), np.array([1, 1, 1, 1]))",
+            "expected": "(4, 0, 0)",
+            "explanation": "Perfect prediction: all positions are TP, no errors. Result: (4, 0, 0)"
+          },
+          {
+            "input": "compute_confusion_components(np.array([1, 0, 1, 0]), np.array([0, 1, 0, 1]))",
+            "expected": "(0, 2, 2)",
+            "explanation": "Complete mismatch: no TP (positions with both=1). FP at 1,3 (true=0,pred=1). FN at 0,2 (true=1,pred=0). Result: (0, 2, 2)"
+          },
+          {
+            "input": "compute_confusion_components(np.array([0, 0, 0]), np.array([0, 0, 0]))",
+            "expected": "(0, 0, 0)",
+            "explanation": "All zeros in both: no positives predicted or actual. Only TN exist (not counted). Result: (0, 0, 0)"
+          },
+          {
+            "input": "compute_confusion_components(np.array([1, 0, 1, 1, 0, 1]), np.array([1, 0, 1, 0, 0, 1]))",
+            "expected": "(3, 0, 1)",
+            "explanation": "TP at 0,2,5. No FP (no incorrect positives). FN at position 3. Result: (3, 0, 1)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing FP and FN - remember FP means predicting positive when it's actually negative, FN means predicting negative when it's actually positive",
+        "Including True Negatives in the calculation - Jaccard Index explicitly excludes TN from both numerator and denominator",
+        "Using incorrect logical operations (e.g., OR instead of AND for TP)",
+        "Not handling the case where all predictions and true labels are 0, which gives (0, 0, 0) and leads to division by zero in Jaccard",
+        "Summing incorrectly when using element-wise boolean operations - need to count True values"
+      ],
+      "hint": "Use element-wise boolean operations with NumPy. Remember that & is AND, and you can sum boolean arrays to count True values. Think about what combination of true and predicted values corresponds to each metric.",
+      "references": [
+        "Confusion Matrix in Binary Classification",
+        "Evaluation Metrics for Imbalanced Data",
+        "NumPy Boolean Indexing and Operations"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Synthesizing the Jaccard Index: Integration and Edge Case Handling",
+      "relation_to_problem": "This final sub-quest combines all previous concepts into understanding the complete Jaccard Index computation. You'll learn how to integrate intersection/union calculations, apply the similarity ratio, handle edge cases (empty unions, all-zero arrays), and interpret results in classification context. This prepares you to implement the full solution.",
+      "prerequisites": [
+        "Set intersection and union (Steps 1-2)",
+        "Similarity coefficients (Step 3)",
+        "Classification metrics (Step 4)",
+        "Division by zero handling"
+      ],
+      "learning_objectives": [
+        "Integrate all components into a complete similarity measure",
+        "Handle critical edge cases in Jaccard Index computation",
+        "Understand when and why Jaccard Index returns 0.0",
+        "Interpret Jaccard Index values in classification performance evaluation",
+        "Apply proper mathematical conventions for undefined cases"
+      ],
+      "math_content": {
+        "definition": "The **Jaccard Index** (or Jaccard Similarity Coefficient) for binary classification is defined as: $$J(y_{\\text{true}}, y_{\\text{pred}}) = \\begin{cases} \\frac{|A \\cap B|}{|A \\cup B|} & \\text{if } |A \\cup B| > 0 \\\\ 0 & \\text{if } |A \\cup B| = 0 \\end{cases}$$ where $A = \\{i : y_{\\text{true}}[i] = 1\\}$ and $B = \\{i : y_{\\text{pred}}[i] = 1\\}$. Equivalently, in terms of classification metrics: $$J = \\begin{cases} \\frac{\\text{TP}}{\\text{TP} + \\text{FP} + \\text{FN}} & \\text{if } \\text{TP} + \\text{FP} + \\text{FN} > 0 \\\\ 0 & \\text{otherwise} \\end{cases}$$",
+        "notation": "$J \\in [0, 1]$ = Jaccard Index value, $A \\cap B$ = intersection (True Positives), $A \\cup B$ = union (all positive-related instances), $y_{\\text{true}}, y_{\\text{pred}} \\in \\{0, 1\\}^n$ = binary label arrays",
+        "theorem": "**Properties and Interpretation**: (1) **Range**: $0 \\leq J \\leq 1$ always holds, (2) **Perfect Agreement**: $J = 1 \\iff y_{\\text{true}} = y_{\\text{pred}}$ and at least one positive exists, (3) **No Overlap**: $J = 0 \\iff$ no position has both arrays equal to 1, (4) **Insensitivity to True Negatives**: Positions where both arrays are 0 do not affect the Jaccard Index, (5) **Undefined Convention**: When both $y_{\\text{true}}$ and $y_{\\text{pred}}$ contain only zeros, $J$ is defined as 0 by convention to avoid $\\frac{0}{0}$.",
+        "proof_sketch": "**Range**: Since $A \\cap B \\subseteq A \\cup B$, we have $0 \\leq |A \\cap B| \\leq |A \\cup B|$, giving $0 \\leq J \\leq 1$. **Perfect Agreement**: If $J = 1$, then $|A \\cap B| = |A \\cup B|$, which implies $A = B$ (the sets are identical). Conversely, if $A = B$, then $A \\cap B = A \\cup B = A$, so $J = 1$. **No Overlap**: $J = 0$ means $|A \\cap B| = 0$ (no TP), so predicted and true positive sets are disjoint. **TN Insensitivity**: By definition, only positions with at least one 1 contribute to union, so TN positions (both 0) are excluded from both numerator and denominator.",
+        "examples": [
+          "Example 1 (Standard Case): $y_{\\text{true}} = [1, 0, 1, 1, 0, 1]$, $y_{\\text{pred}} = [1, 0, 1, 0, 0, 1]$. TP=3 (positions 0,2,5), FP=0, FN=1 (position 3). $J = \\frac{3}{3+0+1} = \\frac{3}{4} = 0.75$. Interpretation: 75% overlap between predicted and true positives.",
+          "Example 2 (Edge Case - All Zeros): $y_{\\text{true}} = [0, 0, 0]$, $y_{\\text{pred}} = [0, 0, 0]$. TP=0, FP=0, FN=0, union=0. By convention, $J = 0.0$ to avoid $\\frac{0}{0}$.",
+          "Example 3 (Edge Case - No Overlap): $y_{\\text{true}} = [1, 1, 0, 0]$, $y_{\\text{pred}} = [0, 0, 1, 1]$. TP=0, FP=2, FN=2. $J = \\frac{0}{0+2+2} = 0.0$. Completely disjoint positive predictions.",
+          "Example 4 (High Imbalance): $y_{\\text{true}} = [0, 0, 0, 0, 1]$, $y_{\\text{pred}} = [0, 0, 0, 0, 1]$. Despite 4 TNs, TP=1, FP=0, FN=0. $J = \\frac{1}{1+0+0} = 1.0$. Perfect positive prediction, TNs ignored."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Jaccard Index Formula",
+          "latex": "$J = \\frac{\\text{TP}}{\\text{TP} + \\text{FP} + \\text{FN}}$ where $\\text{TP} + \\text{FP} + \\text{FN} = |A \\cup B|$",
+          "description": "Full formula with explicit edge case: return 0 when denominator is 0"
+        },
+        {
+          "name": "Set-Theoretic Formulation",
+          "latex": "$J(A, B) = \\frac{|A \\cap B|}{|A| + |B| - |A \\cap B|}$",
+          "description": "Using inclusion-exclusion for union in denominator"
+        },
+        {
+          "name": "Jaccard Distance",
+          "latex": "$d_J(A, B) = 1 - J(A, B)$",
+          "description": "Complementary dissimilarity measure that forms a proper metric"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes a validation-safe Jaccard Index given TP, FP, and FN counts. This function represents the final similarity calculation step, correctly handling the critical edge case where the denominator (TP+FP+FN) is zero. When the denominator is 0 (meaning both arrays are all zeros), return 0.0 by convention. Otherwise, compute and return TP/(TP+FP+FN) rounded to 3 decimal places. This exercise focuses on the mathematical formula and edge case handling without implementing the full array processing.",
+        "function_signature": "def jaccard_from_metrics(tp: int, fp: int, fn: int) -> float:",
+        "starter_code": "def jaccard_from_metrics(tp: int, fp: int, fn: int) -> float:\n    # Compute Jaccard Index from classification metrics\n    # Handle edge case: when denominator is 0, return 0.0\n    # Otherwise: return TP / (TP + FP + FN), rounded to 3 decimals\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "jaccard_from_metrics(3, 0, 1)",
+            "expected": "0.75",
+            "explanation": "Standard case: 3/(3+0+1) = 3/4 = 0.75. Good classification with one missed positive."
+          },
+          {
+            "input": "jaccard_from_metrics(4, 0, 0)",
+            "expected": "1.0",
+            "explanation": "Perfect classification: 4/(4+0+0) = 1.0. All positives correctly identified, no errors."
+          },
+          {
+            "input": "jaccard_from_metrics(0, 2, 2)",
+            "expected": "0.0",
+            "explanation": "No true positives: 0/(0+2+2) = 0.0. Complete classification failure on positives."
+          },
+          {
+            "input": "jaccard_from_metrics(0, 0, 0)",
+            "expected": "0.0",
+            "explanation": "Edge case: all zeros (empty union). Denominator is 0, return 0.0 by convention to avoid division by zero."
+          },
+          {
+            "input": "jaccard_from_metrics(2, 1, 1)",
+            "expected": "0.5",
+            "explanation": "Moderate performance: 2/(2+1+1) = 2/4 = 0.5. Half the union is correctly identified."
+          },
+          {
+            "input": "jaccard_from_metrics(1, 0, 0)",
+            "expected": "1.0",
+            "explanation": "Single positive correctly classified: 1/(1+0+0) = 1.0. Perfect despite small sample."
+          },
+          {
+            "input": "jaccard_from_metrics(10, 5, 3)",
+            "expected": "0.556",
+            "explanation": "Realistic case: 10/(10+5+3) = 10/18 ≈ 0.556. Reasonable but imperfect classification."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the division by zero case when TP+FP+FN=0, causing runtime errors",
+        "Returning 1.0 instead of 0.0 for the edge case (both arrays all zeros), which is mathematically incorrect",
+        "Using integer division instead of float division, losing precision",
+        "Including TN in the denominator, which violates the Jaccard definition and changes the metric entirely",
+        "Not rounding to the specified precision, causing test case failures due to floating-point representation",
+        "Forgetting that when TP=0 but FP or FN exist, the result should be 0.0 (not undefined)"
+      ],
+      "hint": "Start by computing the denominator. Check if it's zero before dividing. What value makes mathematical sense when comparing two empty sets?",
+      "references": [
+        "Jaccard Index for Binary Classification",
+        "Handling Division by Zero in Metrics",
+        "Set Similarity Measures",
+        "Evaluation Metrics for Imbalanced Datasets"
+      ]
+    }
+  ]
+}

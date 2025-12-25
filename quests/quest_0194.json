@@ -1,0 +1,505 @@
+{
+  "problem_id": 194,
+  "title": "Implement Label Smoothing for Multi-Class Cross-Entropy",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "Implement functions to (1) generate smoothed one-hot label distributions and (2) compute cross-entropy loss using those smoothed labels for a multi-class classification problem. The implementation should handle different values of the smoothing parameter epsilon, use numerically stable log-softmax, and support optional rounding of the final loss value.",
+  "example": {
+    "input": "logits = [[2.0, 0.0, -1.0], [0.0, 1.0, 0.0]]\ny_true = [0, 2]\nloss = label_smoothing_cross_entropy(logits, y_true, num_classes=3, epsilon=0.1, round_decimals=6)\nprint(loss)",
+    "output": "0.927312",
+    "reasoning": "With ε=0.1 and K=3, the true class gets 0.9333 probability and others 0.0333. Using stable log-softmax and averaging cross-entropy gives ≈ 0.927312."
+  },
+  "starter_code": "import numpy as np\n\ndef smooth_labels(y_true, num_classes, epsilon):\n    \"\"\"\n    Create smoothed one-hot target vectors.\n\n    Args:\n        y_true: Iterable[int] of shape (N,) with values in [0, K-1]\n        num_classes: int, total number of classes (K)\n        epsilon: float in [0, 1]\n\n    Returns:\n        np.ndarray of shape (N, K) with smoothed probabilities.\n    \"\"\"\n    # Your implementation here\n    pass\n\n\ndef label_smoothing_cross_entropy(logits, y_true, num_classes, epsilon=0.1, round_decimals=None):\n    \"\"\"\n    Compute mean cross-entropy between logits and smoothed targets using stable log-softmax.\n\n    Args:\n        logits: Array-like of shape (N, K), model output scores.\n        y_true: Array-like of shape (N,), integer class indices.\n        num_classes: int, number of classes (K).\n        epsilon: float in [0, 1].\n        round_decimals: int | None, round the loss to this many decimals if given.\n\n    Returns:\n        float: Mean cross-entropy loss.\n    \"\"\"\n    # Your implementation here\n    pass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "One-Hot Encoding and Probability Distributions",
+      "relation_to_problem": "Understanding one-hot encoding is the foundation for label smoothing, as smoothed labels are modifications of one-hot vectors into valid probability distributions.",
+      "prerequisites": [
+        "Basic linear algebra",
+        "Array indexing",
+        "Summation notation"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition of one-hot encoding",
+        "Convert integer class labels to one-hot vectors",
+        "Verify probability distribution constraints (non-negative, sum to 1)"
+      ],
+      "math_content": {
+        "definition": "A **one-hot encoding** of a class label $y \\in \\{0, 1, \\ldots, K-1\\}$ in a $K$-class classification problem is a vector $\\mathbf{e}_y \\in \\mathbb{R}^K$ defined as: $$e_k = \\begin{cases} 1, & \\text{if } k = y \\\\ 0, & \\text{if } k \\neq y \\end{cases}$$ This vector is a standard basis vector in $\\mathbb{R}^K$. For a batch of $N$ samples with labels $\\mathbf{y} = [y_1, y_2, \\ldots, y_N]^T$, the one-hot encoding produces a matrix $E \\in \\mathbb{R}^{N \\times K}$ where each row $i$ is $\\mathbf{e}_{y_i}$.",
+        "notation": "$K$ = number of classes, $y$ = true class index (0-indexed), $\\mathbf{e}_y$ = one-hot vector, $e_k$ = element at position $k$",
+        "theorem": "**Theorem (Probability Simplex)**: Any one-hot encoded vector $\\mathbf{e}_y$ lies on the probability simplex $\\Delta^{K-1} = \\{\\mathbf{p} \\in \\mathbb{R}^K : p_k \\geq 0, \\sum_{k=1}^{K} p_k = 1\\}$.",
+        "proof_sketch": "**Proof**: (1) Non-negativity: $e_k \\in \\{0, 1\\}$ so $e_k \\geq 0$ for all $k$. (2) Sum constraint: $\\sum_{k=1}^{K} e_k = 1$ since exactly one element is 1 and all others are 0. Therefore $\\mathbf{e}_y \\in \\Delta^{K-1}$. □",
+        "examples": [
+          "For $K=3$ classes and true class $y=0$: $\\mathbf{e}_0 = [1, 0, 0]$",
+          "For $K=4$ classes and true class $y=2$: $\\mathbf{e}_2 = [0, 0, 1, 0]$",
+          "For batch with $N=2$ samples, $\\mathbf{y} = [0, 2]$, and $K=3$: $E = \\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & 0 & 1 \\end{bmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "One-Hot Element",
+          "latex": "$e_k = \\delta_{k,y} = \\begin{cases} 1, & k = y \\\\ 0, & k \\neq y \\end{cases}$",
+          "description": "Kronecker delta function; use to convert a single integer label to a probability distribution"
+        },
+        {
+          "name": "Probability Simplex Constraint",
+          "latex": "$\\sum_{k=0}^{K-1} e_k = 1$",
+          "description": "Verify that the encoding represents a valid probability distribution"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that converts a batch of integer class labels into a matrix of one-hot encoded vectors. This is the foundation for creating smoothed labels.",
+        "function_signature": "def one_hot_encode(y_true: np.ndarray, num_classes: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef one_hot_encode(y_true, num_classes):\n    \"\"\"\n    Convert integer labels to one-hot encoded matrix.\n    \n    Args:\n        y_true: Array of shape (N,) with integer labels in [0, K-1]\n        num_classes: int, total number of classes K\n    \n    Returns:\n        Array of shape (N, K) with one-hot encoded rows\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "one_hot_encode(np.array([0]), 3)",
+            "expected": "[[1, 0, 0]]",
+            "explanation": "Single sample with class 0 in 3-class problem produces [1, 0, 0]"
+          },
+          {
+            "input": "one_hot_encode(np.array([0, 2, 1]), 3)",
+            "expected": "[[1, 0, 0], [0, 0, 1], [0, 1, 0]]",
+            "explanation": "Three samples produce three one-hot rows, each with exactly one 1"
+          },
+          {
+            "input": "one_hot_encode(np.array([1, 1, 1]), 4)",
+            "expected": "[[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]]",
+            "explanation": "All samples have same class 1, all rows identical"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using 1-indexed labels instead of 0-indexed (e.g., classes 1-K instead of 0 to K-1)",
+        "Not handling edge case of empty input array",
+        "Creating incorrect shape (K, N) instead of (N, K)",
+        "Using float labels without converting to integers first"
+      ],
+      "hint": "Consider using np.eye(num_classes) to create an identity matrix, then use integer array indexing to select the appropriate rows.",
+      "references": [
+        "Indicator functions and Kronecker delta",
+        "Probability simplex and convex geometry",
+        "NumPy advanced indexing"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Label Smoothing Transformation",
+      "relation_to_problem": "This is the core transformation needed for smooth_labels(). Understanding the mathematical formula and its properties is essential for implementing the first function in the main problem.",
+      "prerequisites": [
+        "One-hot encoding",
+        "Convex combinations",
+        "Uniform distribution"
+      ],
+      "learning_objectives": [
+        "Understand label smoothing as a convex combination of one-hot and uniform distributions",
+        "Apply the smoothing transformation with parameter epsilon",
+        "Verify that smoothed labels maintain probability distribution properties"
+      ],
+      "math_content": {
+        "definition": "**Label smoothing** is a regularization technique that transforms a one-hot encoded label $\\mathbf{e}_y$ into a smoothed distribution $\\tilde{\\mathbf{t}}$ by mixing it with the uniform distribution $\\mathbf{u} = [1/K, 1/K, \\ldots, 1/K]^T$. For smoothing parameter $\\varepsilon \\in [0, 1]$, the smoothed target is: $$\\tilde{t}_k = (1 - \\varepsilon) \\cdot e_k + \\varepsilon \\cdot \\frac{1}{K}$$ Equivalently: $$\\tilde{t}_k = \\begin{cases} 1 - \\varepsilon + \\frac{\\varepsilon}{K}, & \\text{if } k = y \\\\ \\frac{\\varepsilon}{K}, & \\text{if } k \\neq y \\end{cases}$$",
+        "notation": "$\\varepsilon$ = smoothing parameter, $K$ = number of classes, $\\tilde{t}_k$ = smoothed probability for class $k$, $\\mathbf{u}$ = uniform distribution",
+        "theorem": "**Theorem (Smoothed Distribution Properties)**: For any $\\varepsilon \\in [0, 1]$ and $K \\geq 2$: (1) $\\tilde{t}_k \\geq 0$ for all $k$, (2) $\\sum_{k=0}^{K-1} \\tilde{t}_k = 1$, (3) $\\tilde{\\mathbf{t}} \\in \\Delta^{K-1}$ (probability simplex), (4) $\\tilde{\\mathbf{t}}$ is a convex combination of $\\mathbf{e}_y$ and $\\mathbf{u}$.",
+        "proof_sketch": "**Proof**: (1) Non-negativity: For $k=y$: $\\tilde{t}_y = 1 - \\varepsilon + \\varepsilon/K \\geq 1 - \\varepsilon \\geq 0$. For $k \\neq y$: $\\tilde{t}_k = \\varepsilon/K \\geq 0$. (2) Sum: $\\sum_k \\tilde{t}_k = (1-\\varepsilon+\\varepsilon/K) + (K-1)(\\varepsilon/K) = 1-\\varepsilon+\\varepsilon/K + \\varepsilon - \\varepsilon/K = 1$. (3) Follows from (1) and (2). (4) $\\tilde{\\mathbf{t}} = (1-\\varepsilon)\\mathbf{e}_y + \\varepsilon\\mathbf{u}$ with $(1-\\varepsilon) + \\varepsilon = 1$. □",
+        "examples": [
+          "For $K=3$, $\\varepsilon=0.1$, $y=0$: $\\tilde{\\mathbf{t}} = [1-0.1+0.1/3, 0.1/3, 0.1/3] = [0.9333, 0.0333, 0.0333]$",
+          "For $K=4$, $\\varepsilon=0.2$, $y=2$: $\\tilde{\\mathbf{t}} = [0.05, 0.05, 0.85, 0.05]$ where $0.85 = 1-0.2+0.2/4$",
+          "Extreme case $\\varepsilon=0$: $\\tilde{\\mathbf{t}} = \\mathbf{e}_y$ (no smoothing, pure one-hot)",
+          "Extreme case $\\varepsilon=1$: $\\tilde{\\mathbf{t}} = \\mathbf{u}$ (uniform distribution, maximum smoothing)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Smoothed True Class",
+          "latex": "$\\tilde{t}_y = 1 - \\varepsilon + \\frac{\\varepsilon}{K} = 1 - \\varepsilon\\left(1 - \\frac{1}{K}\\right)$",
+          "description": "Probability assigned to the correct class; always the largest probability"
+        },
+        {
+          "name": "Smoothed Other Classes",
+          "latex": "$\\tilde{t}_k = \\frac{\\varepsilon}{K}$ for $k \\neq y$",
+          "description": "Equal small probability distributed to all incorrect classes"
+        },
+        {
+          "name": "Convex Combination Form",
+          "latex": "$\\tilde{\\mathbf{t}} = (1-\\varepsilon)\\mathbf{e}_y + \\varepsilon\\mathbf{u}$",
+          "description": "Weighted average interpretation: blend one-hot with uniform"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the smooth_labels function that converts integer labels to smoothed probability distributions. This directly implements the first required function from the main problem.",
+        "function_signature": "def smooth_labels(y_true: np.ndarray, num_classes: int, epsilon: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef smooth_labels(y_true, num_classes, epsilon):\n    \"\"\"\n    Create smoothed one-hot target vectors.\n    \n    Args:\n        y_true: Array of shape (N,) with integer labels in [0, K-1]\n        num_classes: int, total number of classes K\n        epsilon: float in [0, 1], smoothing parameter\n    \n    Returns:\n        Array of shape (N, K) with smoothed probabilities\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "smooth_labels(np.array([0]), 3, 0.1)",
+            "expected": "[[0.93333333, 0.03333333, 0.03333333]]",
+            "explanation": "Single sample: true class gets 1-0.1+0.1/3≈0.9333, others get 0.1/3≈0.0333"
+          },
+          {
+            "input": "smooth_labels(np.array([0, 2]), 3, 0.1)",
+            "expected": "[[0.93333333, 0.03333333, 0.03333333], [0.03333333, 0.03333333, 0.93333333]]",
+            "explanation": "Two samples with different true classes; each row sums to 1.0"
+          },
+          {
+            "input": "smooth_labels(np.array([1]), 4, 0.0)",
+            "expected": "[[0.0, 1.0, 0.0, 0.0]]",
+            "explanation": "epsilon=0 produces standard one-hot encoding (no smoothing)"
+          },
+          {
+            "input": "smooth_labels(np.array([2]), 5, 1.0)",
+            "expected": "[[0.2, 0.2, 0.2, 0.2, 0.2]]",
+            "explanation": "epsilon=1 produces uniform distribution regardless of true class"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to add epsilon/K back to the true class (only subtracting epsilon)",
+        "Not dividing epsilon by K for the non-true classes",
+        "Using integer division which causes loss of precision",
+        "Not handling batch processing correctly (operating on one sample at a time)"
+      ],
+      "hint": "Start by creating a matrix filled with epsilon/K, then add (1-epsilon) to the positions corresponding to the true classes. Use advanced indexing like matrix[range(N), y_true] to access the true class positions.",
+      "references": [
+        "Convex combinations and weighted averages",
+        "Regularization techniques in machine learning",
+        "Entropy and information theory"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Softmax Function and Numerical Stability",
+      "relation_to_problem": "The softmax function converts raw logits to probabilities, but naive implementation causes overflow. Understanding the log-sum-exp trick is critical for stable computation in label_smoothing_cross_entropy().",
+      "prerequisites": [
+        "Exponential function",
+        "Logarithms",
+        "Maximum function",
+        "Numerical precision"
+      ],
+      "learning_objectives": [
+        "Understand the softmax transformation from logits to probabilities",
+        "Identify numerical overflow issues in naive softmax implementation",
+        "Apply the log-sum-exp trick for numerically stable computation"
+      ],
+      "math_content": {
+        "definition": "The **softmax function** $\\sigma: \\mathbb{R}^K \\to \\Delta^{K-1}$ transforms a vector of logits $\\mathbf{z} = [z_1, \\ldots, z_K]^T$ into a probability distribution: $$\\sigma(\\mathbf{z})_k = \\frac{e^{z_k}}{\\sum_{j=1}^{K} e^{z_j}}$$ Each output $\\sigma(\\mathbf{z})_k \\in (0, 1)$ and $\\sum_{k=1}^{K} \\sigma(\\mathbf{z})_k = 1$. The softmax is the gradient of the log-sum-exp function.",
+        "notation": "$\\mathbf{z}$ = logits (unnormalized scores), $\\sigma(\\mathbf{z})_k$ = probability for class $k$, $e$ = Euler's number ≈ 2.71828",
+        "theorem": "**Theorem (Translation Invariance)**: For any constant $c \\in \\mathbb{R}$, $\\sigma(\\mathbf{z} + c\\mathbf{1}) = \\sigma(\\mathbf{z})$, where $\\mathbf{1} = [1, 1, \\ldots, 1]^T$. This property enables numerical stabilization by choosing $c = -\\max_j z_j$.",
+        "proof_sketch": "**Proof**: $$\\sigma(\\mathbf{z} + c\\mathbf{1})_k = \\frac{e^{z_k+c}}{\\sum_j e^{z_j+c}} = \\frac{e^c \\cdot e^{z_k}}{e^c \\cdot \\sum_j e^{z_j}} = \\frac{e^{z_k}}{\\sum_j e^{z_j}} = \\sigma(\\mathbf{z})_k$$ Setting $c = -\\max_j z_j$ ensures the largest exponent is 0, preventing overflow: $e^{z_k - \\max_j z_j} \\leq e^0 = 1$. □",
+        "examples": [
+          "Naive: $\\mathbf{z} = [1000, 1001, 1002]$ causes overflow since $e^{1002}$ is astronomical",
+          "Stable: Subtract max: $\\mathbf{z}' = [-2, -1, 0]$, then $\\sigma(\\mathbf{z}')_3 = e^0/(e^{-2}+e^{-1}+e^0) \\approx 0.665$",
+          "For $\\mathbf{z} = [1, 2, 3]$: $\\sigma(\\mathbf{z}) \\approx [0.090, 0.245, 0.665]$ (probabilities sum to 1)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Softmax (Naive)",
+          "latex": "$p_k = \\frac{e^{z_k}}{\\sum_{j=1}^{K} e^{z_j}}$",
+          "description": "Direct formula; numerically unstable for large |z_k|"
+        },
+        {
+          "name": "Softmax (Stable)",
+          "latex": "$p_k = \\frac{e^{z_k - m}}{\\sum_{j=1}^{K} e^{z_j - m}}$ where $m = \\max_j z_j$",
+          "description": "Subtract maximum before exponentiation to prevent overflow"
+        },
+        {
+          "name": "Log-Softmax",
+          "latex": "$\\log p_k = z_k - m - \\log\\left(\\sum_{j=1}^{K} e^{z_j - m}\\right)$",
+          "description": "Direct computation of log-probabilities without computing probabilities first"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a numerically stable log-softmax function that computes log(softmax(z)) directly without intermediate overflow. This is a building block for the cross-entropy computation.",
+        "function_signature": "def log_softmax(logits: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef log_softmax(logits):\n    \"\"\"\n    Compute log-softmax in a numerically stable way.\n    \n    Args:\n        logits: Array of shape (N, K) with raw model scores\n    \n    Returns:\n        Array of shape (N, K) with log-probabilities\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "log_softmax(np.array([[1.0, 2.0, 3.0]]))",
+            "expected": "[[-2.4076, -1.4076, -0.4076]]",
+            "explanation": "log(softmax([1,2,3])) = [log(0.09), log(0.245), log(0.665)] ≈ [-2.408, -1.408, -0.408]"
+          },
+          {
+            "input": "log_softmax(np.array([[0.0, 0.0, 0.0]]))",
+            "expected": "[[-1.0986, -1.0986, -1.0986]]",
+            "explanation": "All equal logits produce uniform distribution; log(1/3) ≈ -1.0986"
+          },
+          {
+            "input": "log_softmax(np.array([[1000.0, 1001.0, 1002.0]]))",
+            "expected": "[[-2.4076, -1.4076, -0.4076]]",
+            "explanation": "Large values handled stably; same probabilities as [1,2,3] due to translation invariance"
+          },
+          {
+            "input": "log_softmax(np.array([[1.0, 2.0], [3.0, 4.0]]))",
+            "expected": "[[-1.3133, -0.3133], [-1.3133, -0.3133]]",
+            "explanation": "Batch processing: each row processed independently"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing softmax first, then taking log (loses numerical precision and wastes computation)",
+        "Not subtracting the maximum before exponentiation (causes overflow for large logits)",
+        "Subtracting maximum globally instead of per-row in batched inputs",
+        "Forgetting to use keepdims=True when computing max, causing broadcasting errors"
+      ],
+      "hint": "For each row, compute m = max(logits), then log_softmax = logits - m - log(sum(exp(logits - m))). Use np.max with axis=1 and keepdims=True for proper broadcasting.",
+      "references": [
+        "Log-sum-exp trick in numerical computing",
+        "Softmax function properties",
+        "Floating-point arithmetic and overflow"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Cross-Entropy Loss Function",
+      "relation_to_problem": "Cross-entropy measures the distance between predicted and target distributions. Understanding its mathematical definition and properties is essential for computing the final loss in label_smoothing_cross_entropy().",
+      "prerequisites": [
+        "Logarithms",
+        "Probability distributions",
+        "Expected value",
+        "Information theory basics"
+      ],
+      "learning_objectives": [
+        "Understand cross-entropy as a measure of distributional distance",
+        "Compute cross-entropy between predicted probabilities and target distributions",
+        "Recognize the connection between cross-entropy and negative log-likelihood"
+      ],
+      "math_content": {
+        "definition": "The **cross-entropy** between a target distribution $\\mathbf{t} = [t_1, \\ldots, t_K]^T$ and a predicted distribution $\\mathbf{p} = [p_1, \\ldots, p_K]^T$ is: $$H(\\mathbf{t}, \\mathbf{p}) = -\\sum_{k=1}^{K} t_k \\log p_k$$ This measures the expected number of bits needed to encode samples from $\\mathbf{t}$ using a code optimized for $\\mathbf{p}$. For one-hot targets $\\mathbf{t} = \\mathbf{e}_y$, this simplifies to $H(\\mathbf{e}_y, \\mathbf{p}) = -\\log p_y$, the negative log-likelihood of the true class.",
+        "notation": "$H(\\mathbf{t}, \\mathbf{p})$ = cross-entropy, $t_k$ = target probability for class $k$, $p_k$ = predicted probability, $\\log$ = natural logarithm",
+        "theorem": "**Theorem (Cross-Entropy Properties)**: (1) $H(\\mathbf{t}, \\mathbf{p}) \\geq 0$ with equality iff $\\mathbf{t} = \\mathbf{p}$, (2) $H(\\mathbf{t}, \\mathbf{p}) \\geq H(\\mathbf{t})$ where $H(\\mathbf{t}) = -\\sum_k t_k \\log t_k$ is the entropy of $\\mathbf{t}$, (3) $H(\\mathbf{t}, \\mathbf{p})$ is convex in $\\mathbf{p}$.",
+        "proof_sketch": "**Proof of (2)**: Define the Kullback-Leibler divergence $D_{KL}(\\mathbf{t} \\| \\mathbf{p}) = \\sum_k t_k \\log(t_k/p_k) \\geq 0$ by Gibbs' inequality. Then: $$H(\\mathbf{t}, \\mathbf{p}) = -\\sum_k t_k \\log p_k = -\\sum_k t_k \\log t_k + \\sum_k t_k \\log(t_k/p_k) = H(\\mathbf{t}) + D_{KL}(\\mathbf{t} \\| \\mathbf{p}) \\geq H(\\mathbf{t})$$ Equality holds when $\\mathbf{t} = \\mathbf{p}$. □",
+        "examples": [
+          "One-hot target $\\mathbf{t} = [1, 0, 0]$, prediction $\\mathbf{p} = [0.7, 0.2, 0.1]$: $H = -1 \\cdot \\log(0.7) \\approx 0.357$",
+          "Same target, better prediction $\\mathbf{p} = [0.9, 0.05, 0.05]$: $H = -\\log(0.9) \\approx 0.105$ (lower is better)",
+          "Smoothed target $\\mathbf{t} = [0.9, 0.05, 0.05]$, prediction $\\mathbf{p} = [0.7, 0.2, 0.1]$: $H = -0.9\\log(0.7) - 0.05\\log(0.2) - 0.05\\log(0.1) \\approx 0.482$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cross-Entropy (General)",
+          "latex": "$H(\\mathbf{t}, \\mathbf{p}) = -\\sum_{k=1}^{K} t_k \\log p_k$",
+          "description": "Use for arbitrary target distributions (including smoothed labels)"
+        },
+        {
+          "name": "Cross-Entropy (One-Hot)",
+          "latex": "$H(\\mathbf{e}_y, \\mathbf{p}) = -\\log p_y$",
+          "description": "Simplified form for one-hot targets; only the true class probability matters"
+        },
+        {
+          "name": "Mean Cross-Entropy Loss",
+          "latex": "$\\mathcal{L} = \\frac{1}{N} \\sum_{i=1}^{N} H(\\mathbf{t}^{(i)}, \\mathbf{p}^{(i)})$",
+          "description": "Average cross-entropy over a batch of N samples"
+        }
+      ],
+      "exercise": {
+        "description": "Implement cross-entropy loss computation given predicted probabilities and target distributions. This teaches the core loss calculation that will be combined with log-softmax and smoothed labels in the final solution.",
+        "function_signature": "def cross_entropy(predictions: np.ndarray, targets: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef cross_entropy(predictions, targets):\n    \"\"\"\n    Compute mean cross-entropy loss between predictions and targets.\n    \n    Args:\n        predictions: Array of shape (N, K) with predicted probabilities\n        targets: Array of shape (N, K) with target probabilities\n    \n    Returns:\n        float: Mean cross-entropy loss over the batch\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "cross_entropy(np.array([[0.7, 0.2, 0.1]]), np.array([[1.0, 0.0, 0.0]]))",
+            "expected": "0.3567",
+            "explanation": "One-hot target [1,0,0]: loss = -log(0.7) ≈ 0.3567"
+          },
+          {
+            "input": "cross_entropy(np.array([[0.9, 0.05, 0.05]]), np.array([[1.0, 0.0, 0.0]]))",
+            "expected": "0.1054",
+            "explanation": "Better prediction (0.9) gives lower loss: -log(0.9) ≈ 0.1054"
+          },
+          {
+            "input": "cross_entropy(np.array([[0.7, 0.2, 0.1]]), np.array([[0.9, 0.05, 0.05]]))",
+            "expected": "0.4820",
+            "explanation": "Smoothed target: -0.9*log(0.7) - 0.05*log(0.2) - 0.05*log(0.1) ≈ 0.4820"
+          },
+          {
+            "input": "cross_entropy(np.array([[0.8, 0.2], [0.3, 0.7]]), np.array([[1.0, 0.0], [0.0, 1.0]]))",
+            "expected": "0.2677",
+            "explanation": "Batch of 2: mean of [-log(0.8), -log(0.7)] = mean([0.2231, 0.3567]) ≈ 0.2899"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Taking log of zero probabilities (causes -inf); add small epsilon for numerical stability",
+        "Not averaging over the batch (returning sum instead of mean)",
+        "Summing over wrong axis (summing over samples instead of classes first)",
+        "Forgetting the negative sign in the formula"
+      ],
+      "hint": "Compute element-wise product targets * log(predictions), sum over axis=1 (classes), take negative, then compute mean over axis=0 (samples). Add a small epsilon (1e-15) inside log to avoid log(0).",
+      "references": [
+        "Information theory and Shannon entropy",
+        "Kullback-Leibler divergence",
+        "Maximum likelihood estimation"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Efficient Cross-Entropy with Log-Probabilities",
+      "relation_to_problem": "Combining log-softmax with cross-entropy computation avoids redundant exp/log operations and improves numerical stability. This is the key computational optimization for label_smoothing_cross_entropy().",
+      "prerequisites": [
+        "Cross-entropy loss",
+        "Log-softmax",
+        "Logarithm properties"
+      ],
+      "learning_objectives": [
+        "Understand how to compute cross-entropy directly from log-probabilities",
+        "Recognize the mathematical equivalence of different computational paths",
+        "Apply logarithm properties to simplify and stabilize computations"
+      ],
+      "math_content": {
+        "definition": "Given logits $\\mathbf{z}$ and target distribution $\\mathbf{t}$, the **cross-entropy can be computed directly from log-probabilities** without materializing the probability distribution: $$H(\\mathbf{t}, \\sigma(\\mathbf{z})) = -\\sum_{k=1}^{K} t_k \\log p_k = -\\sum_{k=1}^{K} t_k \\cdot \\text{log\\_softmax}(\\mathbf{z})_k$$ where $\\text{log\\_softmax}(\\mathbf{z})_k = z_k - m - \\log\\sum_j e^{z_j - m}$ and $m = \\max_j z_j$.",
+        "notation": "$\\mathbf{z}$ = logits, $\\sigma(\\mathbf{z})$ = softmax probabilities, $\\text{log\\_softmax}(\\mathbf{z})$ = log-probabilities",
+        "theorem": "**Theorem (Computational Equivalence)**: The following are mathematically equivalent but differ in numerical stability and efficiency: (1) $H(\\mathbf{t}, \\sigma(\\mathbf{z})) = -\\sum_k t_k \\log\\left(\\frac{e^{z_k}}{\\sum_j e^{z_j}}\\right)$ (naive), (2) $H(\\mathbf{t}, \\sigma(\\mathbf{z})) = -\\sum_k t_k(z_k - \\text{LSE}(\\mathbf{z}))$ (stable), where $\\text{LSE}(\\mathbf{z}) = m + \\log\\sum_j e^{z_j - m}$ is the log-sum-exp function.",
+        "proof_sketch": "**Proof**: Start with definition: $$H = -\\sum_k t_k \\log p_k = -\\sum_k t_k \\log\\left(\\frac{e^{z_k}}{\\sum_j e^{z_j}}\\right) = -\\sum_k t_k(z_k - \\log\\sum_j e^{z_j})$$ Distribute: $$H = -\\sum_k t_k z_k + \\left(\\sum_k t_k\\right) \\log\\sum_j e^{z_j} = -\\sum_k t_k z_k + \\text{LSE}(\\mathbf{z})$$ since $\\sum_k t_k = 1$. This can be computed stably using $\\text{LSE}(\\mathbf{z}) = m + \\log\\sum_j e^{z_j-m}$. □",
+        "examples": [
+          "Logits $\\mathbf{z} = [1, 2, 3]$, one-hot $\\mathbf{t} = [0, 0, 1]$: log_softmax($\\mathbf{z}$) ≈ [-2.408, -1.408, -0.408], so $H = -1 \\cdot (-0.408) = 0.408$",
+          "Same logits, smoothed $\\mathbf{t} = [0.0333, 0.0333, 0.9333]$: $H = -0.0333(-2.408) - 0.0333(-1.408) - 0.9333(-0.408) ≈ 0.508$",
+          "Why stable: Large logits [1000, 1001, 1002] would overflow in $e^{z_k}$, but log-softmax handles them via subtraction first"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cross-Entropy from Log-Probabilities",
+          "latex": "$H(\\mathbf{t}, \\mathbf{p}) = -\\sum_{k=1}^{K} t_k \\cdot \\log p_k = -\\sum_{k=1}^{K} t_k \\cdot L_k$",
+          "description": "where $L_k = \\log p_k$ is the log-probability; use this to avoid computing exponentials"
+        },
+        {
+          "name": "Log-Sum-Exp Function",
+          "latex": "$\\text{LSE}(\\mathbf{z}) = m + \\log\\sum_{j=1}^{K} e^{z_j - m}$ where $m = \\max_j z_j$",
+          "description": "Stable computation of $\\log\\sum_j e^{z_j}$; core building block"
+        },
+        {
+          "name": "Alternative Form",
+          "latex": "$H(\\mathbf{t}, \\sigma(\\mathbf{z})) = -\\mathbf{t}^T \\mathbf{z} + \\text{LSE}(\\mathbf{z})$",
+          "description": "Vector notation: dot product of targets with logits, then add LSE term"
+        }
+      ],
+      "exercise": {
+        "description": "Implement cross-entropy loss computation directly from logits and target distributions using log-softmax, without explicitly computing the probability distribution. This combines concepts from steps 3 and 4 efficiently.",
+        "function_signature": "def cross_entropy_from_logits(logits: np.ndarray, targets: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef cross_entropy_from_logits(logits, targets):\n    \"\"\"\n    Compute mean cross-entropy loss from logits and targets using log-softmax.\n    \n    Args:\n        logits: Array of shape (N, K) with raw model scores\n        targets: Array of shape (N, K) with target probability distributions\n    \n    Returns:\n        float: Mean cross-entropy loss over the batch\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "cross_entropy_from_logits(np.array([[2.0, 0.0, -1.0]]), np.array([[1.0, 0.0, 0.0]]))",
+            "expected": "0.4076",
+            "explanation": "log_softmax([2,0,-1]) ≈ [-0.408, -2.408, -3.408]; loss = -1*(-0.408) = 0.408"
+          },
+          {
+            "input": "cross_entropy_from_logits(np.array([[1.0, 2.0, 3.0]]), np.array([[0.0333, 0.0333, 0.9333]]))",
+            "expected": "0.5078",
+            "explanation": "Smoothed target with epsilon=0.1: weighted sum of log-probabilities"
+          },
+          {
+            "input": "cross_entropy_from_logits(np.array([[1000.0, 1001.0, 1002.0]]), np.array([[0.0, 0.0, 1.0]]))",
+            "expected": "0.4076",
+            "explanation": "Large logits handled stably; same result as [1,2,3] due to translation invariance"
+          },
+          {
+            "input": "cross_entropy_from_logits(np.array([[2.0, 1.0], [0.0, 3.0]]), np.array([[1.0, 0.0], [0.0, 1.0]]))",
+            "expected": "0.4439",
+            "explanation": "Batch of 2 samples: mean of individual losses"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing softmax first, then log, then cross-entropy (numerically unstable and inefficient)",
+        "Not using log-sum-exp trick when computing log-softmax",
+        "Incorrect broadcasting when computing element-wise products",
+        "Summing over wrong axis in batched computation"
+      ],
+      "hint": "First compute log-softmax of logits (use your implementation from step 3 or reimplement). Then compute element-wise product with targets, sum over classes (axis=1), take mean over batch. Don't forget the negative sign.",
+      "references": [
+        "Numerical stability in neural network training",
+        "Log-sum-exp and its applications",
+        "Efficient deep learning implementations"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Label Smoothing Cross-Entropy Pipeline",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts: smoothed labels, log-softmax, and efficient cross-entropy computation. You'll build the complete pipeline needed to solve the main problem.",
+      "prerequisites": [
+        "Label smoothing",
+        "Log-softmax",
+        "Cross-entropy from log-probabilities",
+        "Batch processing"
+      ],
+      "learning_objectives": [
+        "Integrate label smoothing with cross-entropy computation",
+        "Handle batch processing of multiple samples efficiently",
+        "Apply optional output formatting (rounding)",
+        "Understand the complete data flow from raw inputs to final loss"
+      ],
+      "math_content": {
+        "definition": "**Label smoothing cross-entropy** is the cross-entropy loss computed between model predictions (via softmax on logits) and smoothed target distributions: $$\\mathcal{L}_{LS}(\\mathbf{z}, y; \\varepsilon) = H(\\tilde{\\mathbf{t}}, \\sigma(\\mathbf{z})) = -\\sum_{k=1}^{K} \\tilde{t}_k \\log\\sigma(\\mathbf{z})_k$$ where $\\tilde{\\mathbf{t}}$ is the smoothed label for true class $y$ with parameter $\\varepsilon$. For a batch of $N$ samples with logits $Z \\in \\mathbb{R}^{N \\times K}$ and labels $\\mathbf{y} \\in \\{0, \\ldots, K-1\\}^N$: $$\\mathcal{L}_{LS}(Z, \\mathbf{y}; \\varepsilon) = \\frac{1}{N} \\sum_{i=1}^{N} \\mathcal{L}_{LS}(\\mathbf{z}^{(i)}, y_i; \\varepsilon)$$",
+        "notation": "$\\mathcal{L}_{LS}$ = label smoothing cross-entropy loss, $Z$ = batch of logits, $\\mathbf{y}$ = batch of integer labels, $\\varepsilon$ = smoothing parameter",
+        "theorem": "**Theorem (Gradient Regularization)**: Label smoothing with parameter $\\varepsilon$ and $K$ classes modifies the gradient of the cross-entropy loss. For the true class $y$, the gradient becomes: $$\\frac{\\partial \\mathcal{L}_{LS}}{\\partial z_y} = p_y - \\left(1 - \\varepsilon + \\frac{\\varepsilon}{K}\\right)$$ and for other classes $k \\neq y$: $$\\frac{\\partial \\mathcal{L}_{LS}}{\\partial z_k} = p_k - \\frac{\\varepsilon}{K}$$ This encourages the model to not be over-confident, as even correct predictions with $p_y \\to 1$ still receive gradient signal due to the $\\varepsilon$ term.",
+        "proof_sketch": "**Proof Sketch**: The gradient of cross-entropy with targets $\\mathbf{t}$ w.r.t. logits is $\\nabla_z H = \\mathbf{p} - \\mathbf{t}$ where $\\mathbf{p} = \\sigma(\\mathbf{z})$. Substituting $\\tilde{\\mathbf{t}}$ from label smoothing: For $k=y$: $\\frac{\\partial \\mathcal{L}}{\\partial z_y} = p_y - (1 - \\varepsilon + \\varepsilon/K)$. For $k \\neq y$: $\\frac{\\partial \\mathcal{L}}{\\partial z_k} = p_k - \\varepsilon/K$. Even when $p_y \\approx 1$, the gradient $(1 - (1-\\varepsilon+\\varepsilon/K)) = \\varepsilon(1 - 1/K) > 0$ prevents complete saturation. □",
+        "examples": [
+          "Full pipeline: logits [2.0, 0.0, -1.0], $y=0$, $\\varepsilon=0.1$, $K=3$ → smooth labels [0.933, 0.033, 0.033] → log_softmax ≈ [-0.408, -2.408, -3.408] → loss ≈ 0.508",
+          "Batch processing: logits [[2,0,-1], [0,1,0]], labels [0,2], $\\varepsilon=0.1$ → individual losses [0.508, 0.927] → mean loss ≈ 0.718",
+          "No smoothing case: $\\varepsilon=0$ recovers standard cross-entropy with one-hot targets",
+          "Full smoothing: $\\varepsilon=1$ gives uniform target [1/K, ..., 1/K] regardless of true class"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Loss Function",
+          "latex": "$\\mathcal{L}_{LS} = \\frac{1}{N}\\sum_{i=1}^{N}\\left[-\\sum_{k=1}^{K} \\tilde{t}_k^{(i)} \\cdot \\log\\sigma(\\mathbf{z}^{(i)})_k\\right]$",
+          "description": "Full formula combining all components: smoothing, log-softmax, cross-entropy, and batch averaging"
+        },
+        {
+          "name": "Efficient Computation",
+          "latex": "$\\mathcal{L}_{LS} = \\frac{1}{N}\\sum_{i=1}^{N}\\left[-\\sum_{k=1}^{K} \\tilde{t}_k^{(i)} \\cdot L_k^{(i)}\\right]$ where $L_k^{(i)} = \\text{log\\_softmax}(\\mathbf{z}^{(i)})_k$",
+          "description": "Implementation form: compute log-softmax once, then dot product with smoothed targets"
+        },
+        {
+          "name": "Gradient w.r.t. True Class",
+          "latex": "$\\frac{\\partial \\mathcal{L}_{LS}}{\\partial z_y} = \\sigma(\\mathbf{z})_y - \\left(1 - \\varepsilon\\left(1 - \\frac{1}{K}\\right)\\right)$",
+          "description": "Modified gradient for the correct class; includes regularization from smoothing"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete label smoothing cross-entropy pipeline. This is very close to the final solution but guides you to think about the proper integration of all components: converting labels to smoothed distributions, computing stable log-softmax, and efficiently computing the loss.",
+        "function_signature": "def label_smoothing_loss(logits: np.ndarray, y_true: np.ndarray, num_classes: int, epsilon: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef label_smoothing_loss(logits, y_true, num_classes, epsilon):\n    \"\"\"\n    Compute mean label smoothing cross-entropy loss.\n    \n    Args:\n        logits: Array of shape (N, K) with raw model scores\n        y_true: Array of shape (N,) with integer class labels in [0, K-1]\n        num_classes: int, total number of classes K\n        epsilon: float in [0, 1], smoothing parameter\n    \n    Returns:\n        float: Mean label smoothing cross-entropy loss\n    \"\"\"\n    # Your code here\n    # Hint: Use functions you've built in previous steps\n    pass",
+        "test_cases": [
+          {
+            "input": "label_smoothing_loss(np.array([[2.0, 0.0, -1.0]]), np.array([0]), 3, 0.1)",
+            "expected": "0.5078",
+            "explanation": "Single sample: smooth labels [0.933, 0.033, 0.033], compute cross-entropy with log-softmax"
+          },
+          {
+            "input": "label_smoothing_loss(np.array([[2.0, 0.0, -1.0], [0.0, 1.0, 0.0]]), np.array([0, 2]), 3, 0.1)",
+            "expected": "0.7177",
+            "explanation": "Batch of 2: mean of individual losses from the problem example"
+          },
+          {
+            "input": "label_smoothing_loss(np.array([[1.0, 2.0, 3.0]]), np.array([2]), 3, 0.0)",
+            "expected": "0.4076",
+            "explanation": "epsilon=0 gives standard cross-entropy: -log_softmax([1,2,3])[2] ≈ 0.408"
+          },
+          {
+            "input": "label_smoothing_loss(np.array([[10.0, 0.0, 0.0]]), np.array([0]), 3, 0.1)",
+            "expected": "0.1033",
+            "explanation": "Very confident correct prediction still has small loss due to smoothing"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing smoothed labels and log-softmax separately for each sample instead of batching",
+        "Using naive softmax instead of stable log-softmax for numerical reasons",
+        "Not dividing by batch size to get mean loss",
+        "Recomputing log-softmax multiple times when once is sufficient",
+        "Incorrect shapes when doing element-wise multiplication of targets and log-probabilities"
+      ],
+      "hint": "Break into three steps: (1) Generate smoothed labels using smooth_labels() or similar logic, (2) Compute log-softmax of logits stably, (3) Compute element-wise product, sum over classes, and average over batch. The structure should mirror your implementations from steps 2, 3, and 5.",
+      "references": [
+        "Label smoothing in modern deep learning (Szegedy et al., 2016)",
+        "When does label smoothing help? (Müller et al., 2019)",
+        "PyTorch and TensorFlow implementations of label smoothing",
+        "Calibration of neural networks"
+      ]
+    }
+  ]
+}

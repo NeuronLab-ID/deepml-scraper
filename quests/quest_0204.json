@@ -1,0 +1,425 @@
+{
+  "problem_id": 204,
+  "title": "Mutual Information",
+  "category": "Information Theory",
+  "difficulty": "medium",
+  "description": "Compute the mutual information between two random variables X and Y given their joint probability distribution. Mutual information measures how much information one variable provides about another - it quantifies the reduction in uncertainty about one variable given knowledge of the other. The result is 0 when variables are independent and maximized when they are perfectly dependent.",
+  "example": {
+    "input": "joint_prob = [[0.4, 0.1], [0.1, 0.4]]",
+    "output": "0.192745",
+    "reasoning": "First compute marginals: $P(X) = [0.5, 0.5]$, $P(Y) = [0.5, 0.5]$. Then apply the formula: $I(X;Y) = 0.4\\log(0.4/0.25) + 0.1\\log(0.1/0.25) + 0.1\\log(0.1/0.25) + 0.4\\log(0.4/0.25) = 0.188 - 0.092 - 0.092 + 0.188 \\approx 0.193$."
+  },
+  "starter_code": "import numpy as np\n\ndef mutual_information(joint_prob: list[list[float]]) -> float:\n\t\"\"\"\n\tCompute the mutual information between two random variables.\n\t\n\tArgs:\n\t\tjoint_prob: 2D joint probability distribution P(X,Y)\n\t\n\tReturns:\n\t\tMutual information I(X;Y)\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Probability Distributions and Marginal Probabilities",
+      "relation_to_problem": "Computing mutual information requires extracting marginal probability distributions P(X) and P(Y) from the joint distribution P(X,Y), which is the foundation for the MI formula.",
+      "prerequisites": [
+        "Basic probability theory",
+        "Matrix operations",
+        "Summation notation"
+      ],
+      "learning_objectives": [
+        "Understand joint probability distributions as 2D matrices",
+        "Compute marginal probabilities by summing over rows and columns",
+        "Verify probability distributions sum to 1",
+        "Handle edge cases with zero probabilities"
+      ],
+      "math_content": {
+        "definition": "A **joint probability distribution** $P(X,Y)$ for discrete random variables $X$ and $Y$ assigns probabilities to all possible pairs $(x,y)$ such that $\\sum_{x \\in X}\\sum_{y \\in Y} P(x,y) = 1$ and $P(x,y) \\geq 0$ for all $x,y$. A **marginal probability distribution** is obtained by summing over one variable: $P(X=x) = \\sum_{y \\in Y} P(X=x, Y=y)$ and $P(Y=y) = \\sum_{x \\in X} P(X=x, Y=y)$.",
+        "notation": "$P(X,Y)$ = joint distribution, $P(X)$ = marginal of X (row sums), $P(Y)$ = marginal of Y (column sums)",
+        "theorem": "**Marginalization Theorem**: Given a valid joint distribution, the marginal distributions satisfy $\\sum_x P(x) = 1$ and $\\sum_y P(y) = 1$, preserving the normalization property.",
+        "proof_sketch": "From $\\sum_x \\sum_y P(x,y) = 1$, we can rearrange: $\\sum_x (\\sum_y P(x,y)) = \\sum_x P(x) = 1$. The interchange of summation order is valid for finite discrete variables.",
+        "examples": [
+          "For $P(X,Y) = \\begin{pmatrix} 0.2 & 0.3 \\\\ 0.1 & 0.4 \\end{pmatrix}$, we have $P(X) = [0.5, 0.5]$ (sum each row) and $P(Y) = [0.3, 0.7]$ (sum each column).",
+          "For independent variables with $P(X) = [0.6, 0.4]$ and $P(Y) = [0.7, 0.3]$, the joint is $P(X,Y) = \\begin{pmatrix} 0.42 & 0.18 \\\\ 0.28 & 0.12 \\end{pmatrix}$ where each entry equals $P(x)P(y)$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Marginal Probability of X",
+          "latex": "$P(X=i) = \\sum_{j} P(X=i, Y=j)$",
+          "description": "Sum across all columns (axis 1) for each row i to get P(X)"
+        },
+        {
+          "name": "Marginal Probability of Y",
+          "latex": "$P(Y=j) = \\sum_{i} P(X=i, Y=j)$",
+          "description": "Sum across all rows (axis 0) for each column j to get P(Y)"
+        },
+        {
+          "name": "Normalization Constraint",
+          "latex": "$\\sum_{i,j} P(X=i, Y=j) = 1$",
+          "description": "All probabilities in the joint distribution must sum to exactly 1"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a 2D joint probability distribution and returns the marginal distributions for both variables X and Y. This is the first step needed for computing mutual information.",
+        "function_signature": "def compute_marginals(joint_prob: list[list[float]]) -> tuple[list[float], list[float]]:",
+        "starter_code": "import numpy as np\n\ndef compute_marginals(joint_prob: list[list[float]]) -> tuple[list[float], list[float]]:\n    \"\"\"\n    Compute marginal probability distributions from joint distribution.\n    \n    Args:\n        joint_prob: 2D joint probability distribution P(X,Y)\n    \n    Returns:\n        Tuple of (P(X), P(Y)) as lists\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_marginals([[0.4, 0.1], [0.1, 0.4]])",
+            "expected": "([0.5, 0.5], [0.5, 0.5])",
+            "explanation": "Symmetric distribution yields equal marginals: P(X=0)=0.4+0.1=0.5, P(X=1)=0.1+0.4=0.5, similarly for Y"
+          },
+          {
+            "input": "compute_marginals([[0.2, 0.3], [0.1, 0.4]])",
+            "expected": "([0.5, 0.5], [0.3, 0.7])",
+            "explanation": "Asymmetric distribution: P(X) is balanced but P(Y) favors second outcome with 0.7 probability"
+          },
+          {
+            "input": "compute_marginals([[0.6, 0.0], [0.0, 0.4]])",
+            "expected": "([0.6, 0.4], [0.6, 0.4])",
+            "explanation": "Diagonal distribution (perfect positive correlation) yields identical marginals"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Summing in the wrong axis direction (confusing rows vs columns)",
+        "Not converting the result to a proper list format",
+        "Forgetting to handle 2D array indexing correctly",
+        "Not validating that marginals sum to 1.0"
+      ],
+      "hint": "Use numpy.sum() with the axis parameter: axis=1 sums across columns (for P(X)), axis=0 sums across rows (for P(Y)).",
+      "references": [
+        "Probability mass functions",
+        "Law of total probability",
+        "NumPy array summation operations"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Shannon Entropy: Measuring Uncertainty",
+      "relation_to_problem": "Mutual information can be computed as I(X;Y) = H(X) + H(Y) - H(X,Y), requiring entropy calculations. Understanding entropy is essential for the alternative formulation of MI.",
+      "prerequisites": [
+        "Logarithms (natural log and log base 2)",
+        "Probability distributions",
+        "Summation notation"
+      ],
+      "learning_objectives": [
+        "Understand entropy as a measure of uncertainty or information content",
+        "Compute Shannon entropy from probability distributions",
+        "Handle the special case of zero probability (0*log(0) = 0)",
+        "Interpret entropy values in bits or nats"
+      ],
+      "math_content": {
+        "definition": "The **Shannon entropy** of a discrete random variable $X$ with probability mass function $P(X)$ is defined as: $H(X) = -\\sum_{x \\in X} P(x) \\log P(x)$, measured in bits (log base 2) or nats (natural log). By convention, $0 \\log 0 = 0$ since $\\lim_{p \\to 0^+} p \\log p = 0$.",
+        "notation": "$H(X)$ = entropy of X, $P(x)$ = probability of outcome x, $\\log$ = logarithm (base 2 for bits, natural log for nats)",
+        "theorem": "**Entropy Bounds Theorem**: For a discrete random variable with $n$ possible outcomes, $0 \\leq H(X) \\leq \\log n$. Entropy is minimized (H=0) when one outcome has probability 1, and maximized ($H = \\log n$) when all outcomes are equally likely ($P(x) = 1/n$ for all x).",
+        "proof_sketch": "Maximum: By Lagrange multipliers with constraint $\\sum_i p_i = 1$, we maximize $-\\sum_i p_i \\log p_i$. Setting derivative to zero yields $p_i = 1/n$ for all i, giving $H = -n \\cdot (1/n) \\log(1/n) = \\log n$. Minimum: If $P(x_0) = 1$ and $P(x) = 0$ for $x \\neq x_0$, then $H = -1 \\cdot \\log 1 = 0$.",
+        "examples": [
+          "For a fair coin flip with $P(X) = [0.5, 0.5]$: $H(X) = -0.5 \\log_2(0.5) - 0.5 \\log_2(0.5) = 0.5 + 0.5 = 1$ bit. Maximum uncertainty.",
+          "For a biased coin with $P(X) = [0.9, 0.1]$: $H(X) = -0.9 \\log_2(0.9) - 0.1 \\log_2(0.1) \\approx 0.137 + 0.332 = 0.469$ bits. Less uncertainty than fair coin.",
+          "For a deterministic outcome $P(X) = [1.0, 0.0]$: $H(X) = -1 \\cdot \\log_2(1) - 0 = 0$ bits. No uncertainty."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Shannon Entropy",
+          "latex": "$H(X) = -\\sum_{x} P(x) \\log P(x)$",
+          "description": "Sum the negative log-probability weighted by probability for all outcomes"
+        },
+        {
+          "name": "Joint Entropy",
+          "latex": "$H(X,Y) = -\\sum_{x,y} P(x,y) \\log P(x,y)$",
+          "description": "Entropy of the joint distribution, measuring total uncertainty in both variables together"
+        },
+        {
+          "name": "Zero Probability Convention",
+          "latex": "$\\lim_{p \\to 0^+} p \\log p = 0$",
+          "description": "When P(x)=0, the contribution to entropy is 0, not undefined"
+        }
+      ],
+      "exercise": {
+        "description": "Implement Shannon entropy for a 1D probability distribution. Use natural logarithm (nats). Handle zero probabilities correctly by skipping them or using the convention that 0*log(0)=0. This function will be used to compute H(X) and H(Y) from marginals.",
+        "function_signature": "def entropy(prob_dist: list[float]) -> float:",
+        "starter_code": "import numpy as np\n\ndef entropy(prob_dist: list[float]) -> float:\n    \"\"\"\n    Compute Shannon entropy of a probability distribution.\n    \n    Args:\n        prob_dist: 1D probability distribution\n    \n    Returns:\n        Entropy H in nats (using natural log)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "entropy([0.5, 0.5])",
+            "expected": "0.693147 (ln(2))",
+            "explanation": "Maximum entropy for binary variable: H = -0.5*ln(0.5) - 0.5*ln(0.5) = ln(2) ≈ 0.693 nats"
+          },
+          {
+            "input": "entropy([1.0, 0.0])",
+            "expected": "0.0",
+            "explanation": "No uncertainty when outcome is deterministic: H = -1*ln(1) - 0 = 0"
+          },
+          {
+            "input": "entropy([0.25, 0.25, 0.25, 0.25])",
+            "expected": "1.386294 (ln(4))",
+            "explanation": "Uniform distribution over 4 outcomes: H = -4*(0.25*ln(0.25)) = ln(4) ≈ 1.386 nats"
+          },
+          {
+            "input": "entropy([0.7, 0.2, 0.1])",
+            "expected": "0.8018",
+            "explanation": "Skewed distribution has lower entropy: H = -0.7*ln(0.7) - 0.2*ln(0.2) - 0.1*ln(0.1) ≈ 0.8018 nats"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using log base 2 instead of natural log (or vice versa) - be consistent with problem requirements",
+        "Not handling zero probabilities, causing log(0) errors or NaN results",
+        "Forgetting the negative sign in front of the summation",
+        "Computing log(P(x)) without multiplying by P(x) first",
+        "Not filtering out zero probabilities before taking logarithm"
+      ],
+      "hint": "Filter the probability distribution to include only non-zero values before computing log, or use numpy.where to set zero contributions to 0.",
+      "references": [
+        "Information theory fundamentals",
+        "Claude Shannon's 1948 paper",
+        "Properties of logarithms",
+        "Entropy in statistical mechanics"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Joint Entropy and Probability Product Tables",
+      "relation_to_problem": "The mutual information formula I(X;Y) = Σ P(x,y) log(P(x,y)/(P(x)P(y))) requires computing the product of marginal probabilities P(x)P(y) for each cell, which represents the expected probability if variables were independent.",
+      "prerequisites": [
+        "Marginal probabilities",
+        "Matrix operations",
+        "Broadcasting in NumPy"
+      ],
+      "learning_objectives": [
+        "Compute joint entropy H(X,Y) from a 2D probability distribution",
+        "Understand the product of marginals P(X)P(Y) as the independence baseline",
+        "Create the probability product table using outer product",
+        "Compare joint distribution to independence assumption"
+      ],
+      "math_content": {
+        "definition": "The **joint entropy** of two random variables $X$ and $Y$ is defined as $H(X,Y) = -\\sum_{x \\in X}\\sum_{y \\in Y} P(x,y) \\log P(x,y)$, measuring the total uncertainty in both variables together. The **product of marginals** $P(X)P(Y)$ creates a matrix where entry $(i,j)$ equals $P(X=i) \\cdot P(Y=j)$, representing the joint distribution if $X$ and $Y$ were independent.",
+        "notation": "$H(X,Y)$ = joint entropy, $P(x,y)$ = joint probability, $P(x)P(y)$ = product of marginal probabilities",
+        "theorem": "**Independence Characterization**: Random variables $X$ and $Y$ are independent if and only if $P(x,y) = P(x)P(y)$ for all pairs $(x,y)$. When independent, $H(X,Y) = H(X) + H(Y)$.",
+        "proof_sketch": "If independent: $H(X,Y) = -\\sum_{x,y} P(x)P(y) \\log(P(x)P(y)) = -\\sum_{x,y} P(x)P(y)[\\log P(x) + \\log P(y)] = -\\sum_x P(x)\\log P(x) \\sum_y P(y) - \\sum_y P(y)\\log P(y) \\sum_x P(x) = H(X) + H(Y)$.",
+        "examples": [
+          "For joint $P(X,Y) = \\begin{pmatrix} 0.4 & 0.1 \\\\ 0.1 & 0.4 \\end{pmatrix}$ with marginals $P(X)=[0.5,0.5]$, $P(Y)=[0.5,0.5]$, the product is $\\begin{pmatrix} 0.25 & 0.25 \\\\ 0.25 & 0.25 \\end{pmatrix}$. Since $P(x,y) \\neq P(x)P(y)$, variables are dependent.",
+          "For independent case with $P(X)=[0.6, 0.4]$ and $P(Y)=[0.3, 0.7]$, the joint equals the product: $P(X,Y) = \\begin{pmatrix} 0.18 & 0.42 \\\\ 0.12 & 0.28 \\end{pmatrix}$ and $H(X,Y) = H(X) + H(Y)$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Joint Entropy Formula",
+          "latex": "$H(X,Y) = -\\sum_{x,y} P(x,y) \\log P(x,y)$",
+          "description": "Apply entropy formula to the entire joint distribution (flattened)"
+        },
+        {
+          "name": "Product of Marginals",
+          "latex": "$[P(X)P(Y)]_{ij} = P(X=i) \\cdot P(Y=j)$",
+          "description": "Outer product of marginal probability vectors creates the independence baseline matrix"
+        },
+        {
+          "name": "Subadditivity of Entropy",
+          "latex": "$H(X,Y) \\leq H(X) + H(Y)$",
+          "description": "Joint entropy is always less than or equal to sum of marginal entropies, with equality only for independent variables"
+        }
+      ],
+      "exercise": {
+        "description": "Implement two functions: (1) compute joint entropy H(X,Y) from a 2D joint distribution, and (2) compute the product of marginals P(X)P(Y) as a 2D matrix. The second function creates the independence baseline needed for computing the MI ratio P(x,y)/(P(x)P(y)).",
+        "function_signature": "def joint_entropy(joint_prob: list[list[float]]) -> float:\n\ndef marginal_product(px: list[float], py: list[float]) -> list[list[float]]:",
+        "starter_code": "import numpy as np\n\ndef joint_entropy(joint_prob: list[list[float]]) -> float:\n    \"\"\"\n    Compute joint entropy H(X,Y) from joint distribution.\n    \n    Args:\n        joint_prob: 2D joint probability distribution\n    \n    Returns:\n        Joint entropy in nats\n    \"\"\"\n    # Your code here\n    pass\n\ndef marginal_product(px: list[float], py: list[float]) -> list[list[float]]:\n    \"\"\"\n    Compute outer product of marginal distributions P(X)P(Y).\n    \n    Args:\n        px: Marginal distribution P(X)\n        py: Marginal distribution P(Y)\n    \n    Returns:\n        2D matrix where entry [i,j] = P(X=i) * P(Y=j)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "joint_entropy([[0.25, 0.25], [0.25, 0.25]])",
+            "expected": "1.386294 (ln(4))",
+            "explanation": "Uniform joint distribution over 4 outcomes: H(X,Y) = -4*(0.25*ln(0.25)) = ln(4)"
+          },
+          {
+            "input": "joint_entropy([[0.5, 0.0], [0.0, 0.5]])",
+            "expected": "0.693147 (ln(2))",
+            "explanation": "Diagonal distribution with two equally likely joint outcomes: H(X,Y) = -2*(0.5*ln(0.5)) = ln(2)"
+          },
+          {
+            "input": "marginal_product([0.5, 0.5], [0.5, 0.5])",
+            "expected": "[[0.25, 0.25], [0.25, 0.25]]",
+            "explanation": "Uniform marginals produce uniform product: each cell is 0.5 * 0.5 = 0.25"
+          },
+          {
+            "input": "marginal_product([0.6, 0.4], [0.3, 0.7])",
+            "expected": "[[0.18, 0.42], [0.12, 0.28]]",
+            "explanation": "Product matrix: entry[0,0] = 0.6*0.3 = 0.18, entry[0,1] = 0.6*0.7 = 0.42, etc."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using np.dot instead of np.outer for marginal product - dot product gives wrong dimensionality",
+        "Not flattening the joint distribution before computing entropy",
+        "Forgetting to handle zero probabilities in joint entropy calculation",
+        "Computing H(X) + H(Y) instead of H(X,Y) when variables are dependent",
+        "Not understanding that product of marginals represents independence assumption"
+      ],
+      "hint": "For joint entropy, flatten the 2D array and apply the entropy formula. For marginal product, use np.outer(px, py) to create the outer product matrix.",
+      "references": [
+        "Outer product of vectors",
+        "NumPy broadcasting",
+        "Conditional entropy and chain rule",
+        "Independence in probability theory"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Pointwise Mutual Information and Logarithm of Ratios",
+      "relation_to_problem": "Each cell in the MI formula contributes P(x,y) * log(P(x,y) / (P(x)P(y))). Understanding this pointwise contribution is essential for implementing the full mutual information calculation correctly.",
+      "prerequisites": [
+        "Logarithm properties",
+        "Probability ratios",
+        "Element-wise operations"
+      ],
+      "learning_objectives": [
+        "Understand pointwise mutual information (PMI) as the information in a specific outcome",
+        "Compute log ratios log(P(x,y)/(P(x)P(y))) element-wise",
+        "Handle the special case when P(x,y)=0 or when variables are independent",
+        "Interpret positive vs negative PMI values"
+      ],
+      "math_content": {
+        "definition": "The **pointwise mutual information** (PMI) for a specific pair of outcomes $(x,y)$ is defined as: $\\text{PMI}(x,y) = \\log \\frac{P(x,y)}{P(x)P(y)}$. This measures how much more (or less) likely the pair $(x,y)$ occurs compared to what would be expected if $X$ and $Y$ were independent. The total mutual information is: $I(X;Y) = \\sum_{x,y} P(x,y) \\cdot \\text{PMI}(x,y)$.",
+        "notation": "$\\text{PMI}(x,y)$ = pointwise mutual information, $P(x,y)/P(x)P(y)$ = likelihood ratio",
+        "theorem": "**PMI Interpretation Theorem**: For any outcome pair $(x,y)$: (1) If $\\text{PMI}(x,y) > 0$, the outcomes co-occur more often than expected under independence (positive association). (2) If $\\text{PMI}(x,y) = 0$, they occur exactly as often as expected (independence at that point). (3) If $\\text{PMI}(x,y) < 0$, they co-occur less often than expected (negative association).",
+        "proof_sketch": "The ratio $P(x,y)/P(x)P(y)$ compares observed to expected. When ratio > 1, log is positive; when ratio = 1, log is zero; when ratio < 1, log is negative. For independent variables, $P(x,y) = P(x)P(y)$ everywhere, so PMI = log(1) = 0.",
+        "examples": [
+          "For perfect positive correlation $P(X,Y) = \\begin{pmatrix} 0.5 & 0 \\\\ 0 & 0.5 \\end{pmatrix}$ with uniform marginals: $\\text{PMI}(0,0) = \\log(0.5/0.25) = \\log(2) > 0$ (positive association). $\\text{PMI}(0,1) = \\log(0/0.25) = -\\infty$ but contributes 0 since $P(0,1)=0$.",
+          "For independent variables with $P(x,y) = P(x)P(y)$ everywhere: $\\text{PMI}(x,y) = \\log(1) = 0$ for all pairs, so $I(X;Y) = 0$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Pointwise Mutual Information",
+          "latex": "$\\text{PMI}(x,y) = \\log \\frac{P(x,y)}{P(x)P(y)}$",
+          "description": "Log ratio measuring association between specific outcomes x and y"
+        },
+        {
+          "name": "Logarithm of Ratio Property",
+          "latex": "$\\log \\frac{P(x,y)}{P(x)P(y)} = \\log P(x,y) - \\log P(x) - \\log P(y)$",
+          "description": "Logarithm of ratio equals difference of logarithms - more numerically stable"
+        },
+        {
+          "name": "Mutual Information as Expected PMI",
+          "latex": "$I(X;Y) = \\mathbb{E}_{P(x,y)}[\\text{PMI}(x,y)] = \\sum_{x,y} P(x,y) \\cdot \\text{PMI}(x,y)$",
+          "description": "MI is the expectation of PMI over the joint distribution"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the pointwise mutual information (PMI) matrix from joint and marginal distributions. For each cell (i,j), compute log(P(x,y)/(P(x)P(y))). Handle zero probabilities by returning 0 for those cells (since they don't contribute to the sum). This PMI matrix will be element-wise multiplied with the joint distribution to get MI.",
+        "function_signature": "def pointwise_mutual_information(joint_prob: list[list[float]], px: list[float], py: list[float]) -> list[list[float]]:",
+        "starter_code": "import numpy as np\n\ndef pointwise_mutual_information(joint_prob: list[list[float]], px: list[float], py: list[float]) -> list[list[float]]:\n    \"\"\"\n    Compute pointwise mutual information (PMI) matrix.\n    \n    Args:\n        joint_prob: 2D joint probability distribution P(X,Y)\n        px: Marginal distribution P(X)\n        py: Marginal distribution P(Y)\n    \n    Returns:\n        2D matrix where entry [i,j] = log(P(x,y)/(P(x)*P(y)))\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "pointwise_mutual_information([[0.25, 0.25], [0.25, 0.25]], [0.5, 0.5], [0.5, 0.5])",
+            "expected": "[[0.0, 0.0], [0.0, 0.0]]",
+            "explanation": "Independent uniform distribution: P(x,y) = P(x)P(y) = 0.25 everywhere, so log(0.25/0.25) = 0"
+          },
+          {
+            "input": "pointwise_mutual_information([[0.4, 0.1], [0.1, 0.4]], [0.5, 0.5], [0.5, 0.5])",
+            "expected": "[[0.470, -0.916], [-0.916, 0.470]]",
+            "explanation": "Correlated variables: diagonal entries log(0.4/0.25)≈0.470 (positive PMI), off-diagonal log(0.1/0.25)≈-0.916 (negative PMI)"
+          },
+          {
+            "input": "pointwise_mutual_information([[0.5, 0.0], [0.0, 0.5]], [0.5, 0.5], [0.5, 0.5])",
+            "expected": "[[0.693, 0.0], [0.0, 0.693]]",
+            "explanation": "Perfect correlation: diagonal log(0.5/0.25)=ln(2)≈0.693, zeros contribute 0 (handled specially)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling zero probabilities - attempting log(0) causes errors or -inf",
+        "Using the wrong logarithm base (should match the one used for entropy)",
+        "Computing log(P(x,y)) - log(P(x)*P(y)) without handling numerical stability",
+        "Not using element-wise operations correctly with NumPy broadcasting",
+        "Forgetting that PMI alone is not MI - still need to weight by P(x,y) and sum"
+      ],
+      "hint": "Use np.outer(px, py) to get the product of marginals, then compute element-wise log(joint/product). Use np.where or masking to set PMI=0 where joint_prob=0.",
+      "references": [
+        "Kullback-Leibler divergence",
+        "Log-space arithmetic for numerical stability",
+        "Association measures in information theory",
+        "Church and Hanks (1990) on word association norms"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Complete Mutual Information Computation",
+      "relation_to_problem": "This final sub-quest integrates all previous components: marginal computation, entropy understanding, probability products, and PMI to implement the complete mutual information formula I(X;Y) = Σ P(x,y) log(P(x,y)/(P(x)P(y))).",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Element-wise array multiplication",
+        "Summation over arrays"
+      ],
+      "learning_objectives": [
+        "Integrate marginal extraction, PMI computation, and weighted summation",
+        "Implement the complete MI formula efficiently using NumPy",
+        "Verify MI properties: non-negativity, symmetry, bounded by min(H(X), H(Y))",
+        "Handle edge cases: independence (MI=0), perfect dependence (MI=H(X)=H(Y))"
+      ],
+      "math_content": {
+        "definition": "**Mutual information** $I(X;Y)$ between random variables $X$ and $Y$ quantifies the reduction in uncertainty about one variable given knowledge of the other. Formally: $I(X;Y) = \\sum_{x \\in X}\\sum_{y \\in Y} P(x,y) \\log \\frac{P(x,y)}{P(x)P(y)}$. Equivalently, using entropy: $I(X;Y) = H(X) + H(Y) - H(X,Y) = H(X) - H(X|Y) = H(Y) - H(Y|X)$.",
+        "notation": "$I(X;Y)$ = mutual information between X and Y (in nats or bits depending on log base)",
+        "theorem": "**Fundamental Properties of Mutual Information**: (1) Non-negativity: $I(X;Y) \\geq 0$ with equality iff $X$ and $Y$ are independent. (2) Symmetry: $I(X;Y) = I(Y;X)$. (3) Upper bound: $I(X;Y) \\leq \\min(H(X), H(Y))$ with equality when one variable is a deterministic function of the other.",
+        "proof_sketch": "Non-negativity follows from Gibbs' inequality: $D_{KL}(P(X,Y) || P(X)P(Y)) \\geq 0$ with equality iff distributions are identical (independence). Symmetry is immediate from the formula. Upper bound: $I(X;Y) = H(X) - H(X|Y) \\leq H(X)$ since $H(X|Y) \\geq 0$, and similarly $I(X;Y) \\leq H(Y)$.",
+        "examples": [
+          "For the example joint distribution $P(X,Y) = \\begin{pmatrix} 0.4 & 0.1 \\\\ 0.1 & 0.4 \\end{pmatrix}$: Marginals are $P(X)=P(Y)=[0.5, 0.5]$. Computing: $I(X;Y) = 0.4\\log(0.4/0.25) + 0.1\\log(0.1/0.25) + 0.1\\log(0.1/0.25) + 0.4\\log(0.4/0.25) = 2(0.4 \\times 0.470) - 2(0.1 \\times 0.916) \\approx 0.193$ nats.",
+          "For independent case with $P(X,Y) = P(X)P(Y)$: The ratio $P(x,y)/P(x)P(y) = 1$ everywhere, so $\\log(1) = 0$ and $I(X;Y) = 0$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Mutual Information (Direct Summation)",
+          "latex": "$I(X;Y) = \\sum_{x,y} P(x,y) \\log \\frac{P(x,y)}{P(x)P(y)}$",
+          "description": "Sum over all cells: probability times log-ratio (PMI weighted by probability)"
+        },
+        {
+          "name": "Mutual Information (Entropy Form)",
+          "latex": "$I(X;Y) = H(X) + H(Y) - H(X,Y)$",
+          "description": "Alternative formulation using marginal and joint entropies"
+        },
+        {
+          "name": "Conditional Entropy Form",
+          "latex": "$I(X;Y) = H(Y) - H(Y|X)$",
+          "description": "MI as reduction in uncertainty about Y when X is observed"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete mutual information function by combining all previous concepts. Given a joint probability distribution, compute: (1) marginals P(X) and P(Y), (2) PMI matrix log(P(x,y)/(P(x)P(y))), (3) element-wise multiply joint probabilities by PMI and sum. Handle zero probabilities correctly (they contribute 0 to the sum). Return the MI value in nats.",
+        "function_signature": "def mutual_information_complete(joint_prob: list[list[float]]) -> float:",
+        "starter_code": "import numpy as np\n\ndef mutual_information_complete(joint_prob: list[list[float]]) -> float:\n    \"\"\"\n    Compute mutual information I(X;Y) from joint distribution.\n    Combine all previous steps: extract marginals, compute PMI, weight by P(x,y), sum.\n    \n    Args:\n        joint_prob: 2D joint probability distribution P(X,Y)\n    \n    Returns:\n        Mutual information I(X;Y) in nats\n    \"\"\"\n    # Step 1: Extract marginals\n    # Step 2: Compute marginal product P(X)P(Y)\n    # Step 3: Compute PMI matrix (handle zeros)\n    # Step 4: Weight by joint probabilities and sum\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "mutual_information_complete([[0.4, 0.1], [0.1, 0.4]])",
+            "expected": "0.192745",
+            "explanation": "Correlated variables: diagonal dominance indicates dependence, MI > 0 measures shared information"
+          },
+          {
+            "input": "mutual_information_complete([[0.25, 0.25], [0.25, 0.25]])",
+            "expected": "0.0",
+            "explanation": "Independent uniform distribution: P(x,y)=P(x)P(y) everywhere, so I(X;Y)=0"
+          },
+          {
+            "input": "mutual_information_complete([[0.5, 0.0], [0.0, 0.5]])",
+            "expected": "0.693147 (ln(2))",
+            "explanation": "Perfect positive correlation: Y is deterministic given X, so I(X;Y)=H(Y)=ln(2)"
+          },
+          {
+            "input": "mutual_information_complete([[0.3, 0.2], [0.2, 0.3]])",
+            "expected": "0.0288",
+            "explanation": "Weak correlation: diagonal preference is slight, resulting in small positive MI"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling zeros: attempting log(0/p) or 0*log(0/p) without special handling",
+        "Using different log bases for entropy and MI - must be consistent",
+        "Summing PMI directly instead of P(x,y)*PMI(x,y)",
+        "Not verifying that result is non-negative (if negative, there's a bug)",
+        "Computing H(X)+H(Y)-H(X,Y) but making errors in entropy calculations",
+        "Forgetting to convert input list to NumPy array for vectorized operations"
+      ],
+      "hint": "Create a mask for non-zero joint probabilities. Compute log-ratio only where joint_prob>0, then multiply by joint_prob and sum all elements. Use np.sum(joint_prob * pmi_matrix) where pmi_matrix has zeros for zero-probability cells.",
+      "references": [
+        "Cover and Thomas 'Elements of Information Theory' Chapter 2",
+        "MacKay 'Information Theory, Inference, and Learning Algorithms'",
+        "Kullback-Leibler divergence as foundation",
+        "Applications: feature selection, image registration, clustering evaluation"
+      ]
+    }
+  ]
+}

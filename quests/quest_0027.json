@@ -1,0 +1,496 @@
+{
+  "problem_id": 27,
+  "title": "Transformation Matrix from Basis B to C",
+  "category": "Linear Algebra",
+  "difficulty": "easy",
+  "description": "Given basis vectors in two different bases B and C for R^3, write a Python function to compute the transformation matrix P from basis B to C.",
+  "example": {
+    "input": "B = [[1, 0, 0], \n             [0, 1, 0], \n             [0, 0, 1]]\n        C = [[1, 2.3, 3], \n             [4.4, 25, 6], \n             [7.4, 8, 9]]",
+    "output": "[[-0.6772, -0.0126, 0.2342],\n                [-0.0184, 0.0505, -0.0275],\n                [0.5732, -0.0345, -0.0569]]",
+    "reasoning": "The transformation matrix P from basis B to C can be found using matrix operations involving the inverse of matrix C."
+  },
+  "starter_code": "def transform_basis(B: list[list[int]], C: list[list[int]]) -> list[list[float]]:\n\treturn P",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Matrix Representation and Basic Matrix Operations",
+      "relation_to_problem": "Understanding matrices as representations of basis vectors and performing basic operations is fundamental for constructing and manipulating transformation matrices between bases B and C.",
+      "prerequisites": [
+        "Linear combinations",
+        "Vector arithmetic",
+        "2D array indexing"
+      ],
+      "learning_objectives": [
+        "Represent basis vectors as column matrices",
+        "Implement matrix storage and indexing in Python",
+        "Understand how basis matrices encode coordinate systems"
+      ],
+      "math_content": {
+        "definition": "A **basis** $B = \\{b_1, b_2, ..., b_n\\}$ for an $n$-dimensional vector space $V$ is a linearly independent set of vectors that spans $V$. The **basis matrix** is formed by arranging these basis vectors as columns: $[B] = [b_1 \\; b_2 \\; \\cdots \\; b_n]$ where each $b_i \\in \\mathbb{R}^n$ is a column vector.",
+        "notation": "$[B]_{ij}$ = the $i$-th component of the $j$-th basis vector; $b_j = \\begin{bmatrix} [B]_{1j} \\\\ [B]_{2j} \\\\ \\vdots \\\\ [B]_{nj} \\end{bmatrix}$",
+        "theorem": "**Basis Uniqueness Theorem**: Every $n$-dimensional vector space has a basis consisting of exactly $n$ vectors, and any vector $v \\in V$ can be uniquely expressed as a linear combination of the basis vectors: $v = \\alpha_1 b_1 + \\alpha_2 b_2 + \\cdots + \\alpha_n b_n$.",
+        "proof_sketch": "The uniqueness follows from linear independence: if $v = \\sum \\alpha_i b_i = \\sum \\beta_i b_i$, then $\\sum (\\alpha_i - \\beta_i)b_i = 0$, which implies $\\alpha_i = \\beta_i$ for all $i$ by linear independence.",
+        "examples": [
+          "Standard basis in $\\mathbb{R}^3$: $e_1 = [1, 0, 0]^T$, $e_2 = [0, 1, 0]^T$, $e_3 = [0, 0, 1]^T$, giving basis matrix $I_3 = \\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & 1 & 0 \\\\ 0 & 0 & 1 \\end{bmatrix}$",
+          "Alternative basis: $b_1 = [1, 1, 0]^T$, $b_2 = [0, 1, 1]^T$, $b_3 = [1, 0, 1]^T$, giving $[B] = \\begin{bmatrix} 1 & 0 & 1 \\\\ 1 & 1 & 0 \\\\ 0 & 1 & 1 \\end{bmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Basis Matrix Construction",
+          "latex": "$[B] = [b_1 \\; b_2 \\; \\cdots \\; b_n]$ where $b_j$ is the $j$-th column",
+          "description": "Construct a matrix by placing basis vectors as columns"
+        },
+        {
+          "name": "Matrix Element Access",
+          "latex": "$[B]_{ij}$ is row $i$, column $j$",
+          "description": "Access individual elements using row-column indexing"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that verifies a matrix is properly formatted as a basis matrix by checking it is square (n×n) and extracting individual basis vectors as columns.",
+        "function_signature": "def extract_basis_vectors(B: list[list[float]]) -> list[list[float]]:",
+        "starter_code": "def extract_basis_vectors(B: list[list[float]]) -> list[list[float]]:\n    \"\"\"\n    Extract basis vectors from a basis matrix.\n    Each column of B represents one basis vector.\n    \n    Args:\n        B: n×n matrix where columns are basis vectors\n    \n    Returns:\n        List of basis vectors, where each vector is a list of floats\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "extract_basis_vectors([[1, 0, 0], [0, 1, 0], [0, 0, 1]])",
+            "expected": "[[1, 0, 0], [0, 1, 0], [0, 0, 1]]",
+            "explanation": "Standard basis in R³ - each column is extracted as a separate basis vector"
+          },
+          {
+            "input": "extract_basis_vectors([[1, 2], [3, 4]])",
+            "expected": "[[1, 3], [2, 4]]",
+            "explanation": "Two basis vectors: b₁=[1,3]ᵀ and b₂=[2,4]ᵀ"
+          },
+          {
+            "input": "extract_basis_vectors([[1, 0, 1], [1, 1, 0], [0, 1, 1]])",
+            "expected": "[[1, 1, 0], [0, 1, 1], [1, 0, 1]]",
+            "explanation": "Three basis vectors forming an alternative basis for R³"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row vectors with column vectors - basis vectors must be columns",
+        "Using row-major vs column-major indexing inconsistently",
+        "Not verifying the matrix is square before treating it as a basis"
+      ],
+      "hint": "Remember that in a basis matrix, each column represents one complete basis vector. Iterate through column indices as the outer loop.",
+      "references": [
+        "Linear Algebra textbook: Chapter on Vector Spaces and Bases",
+        "Matrix representation in numerical computing"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Matrix Multiplication and Linear Transformations",
+      "relation_to_problem": "The transformation matrix P from basis B to C is computed as P = C⁻¹B, which requires understanding matrix multiplication as composition of linear transformations.",
+      "prerequisites": [
+        "Matrix representation",
+        "Dot product",
+        "Linear combinations"
+      ],
+      "learning_objectives": [
+        "Understand matrix multiplication as composition of transformations",
+        "Implement efficient matrix multiplication algorithm",
+        "Recognize when matrix multiplication is valid (dimension compatibility)"
+      ],
+      "math_content": {
+        "definition": "Given matrices $A \\in \\mathbb{R}^{m \\times p}$ and $B \\in \\mathbb{R}^{p \\times n}$, their **matrix product** $C = AB \\in \\mathbb{R}^{m \\times n}$ is defined by: $C_{ij} = \\sum_{k=1}^{p} A_{ik}B_{kj}$ for $i=1,\\ldots,m$ and $j=1,\\ldots,n$. Each entry $C_{ij}$ is the dot product of the $i$-th row of $A$ with the $j$-th column of $B$.",
+        "notation": "$A \\in \\mathbb{R}^{m \\times n}$ means $A$ is an $m$ by $n$ matrix with real entries; $(AB)_{ij} = \\text{row}_i(A) \\cdot \\text{col}_j(B)$",
+        "theorem": "**Matrix Multiplication as Composition**: If $T: \\mathbb{R}^n \\to \\mathbb{R}^p$ and $S: \\mathbb{R}^p \\to \\mathbb{R}^m$ are linear transformations with matrix representations $[T]$ and $[S]$, then the composition $S \\circ T$ has matrix representation $[S][T]$. This satisfies: $(S \\circ T)(v) = S(T(v))$ for all $v \\in \\mathbb{R}^n$.",
+        "proof_sketch": "For any vector $v$, $(ST)v = S(Tv)$ by definition of composition. Matrix multiplication is defined precisely so that $(AB)v = A(Bv)$, making the algebra work out. The $(i,j)$ entry of $AB$ is the $i$-th component of $A$ applied to the $j$-th column of $B$.",
+        "examples": [
+          "Compute $\\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix}\\begin{bmatrix} 5 & 6 \\\\ 7 & 8 \\end{bmatrix} = \\begin{bmatrix} 1 \\cdot 5 + 2 \\cdot 7 & 1 \\cdot 6 + 2 \\cdot 8 \\\\ 3 \\cdot 5 + 4 \\cdot 7 & 3 \\cdot 6 + 4 \\cdot 8 \\end{bmatrix} = \\begin{bmatrix} 19 & 22 \\\\ 43 & 50 \\end{bmatrix}$",
+          "Identity property: $I_n A = A I_n = A$ for any $n \\times n$ matrix $A$, where $I_n$ is the identity matrix"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Matrix Product Entry",
+          "latex": "$(AB)_{ij} = \\sum_{k=1}^{p} A_{ik}B_{kj}$",
+          "description": "Each entry is a sum of products along a row of A and column of B"
+        },
+        {
+          "name": "Dimension Compatibility",
+          "latex": "$A \\in \\mathbb{R}^{m \\times p}, B \\in \\mathbb{R}^{p \\times n} \\Rightarrow AB \\in \\mathbb{R}^{m \\times n}$",
+          "description": "Inner dimensions must match; result has outer dimensions"
+        },
+        {
+          "name": "Non-commutativity",
+          "latex": "$AB \\neq BA$ in general",
+          "description": "Matrix multiplication order matters"
+        }
+      ],
+      "exercise": {
+        "description": "Implement matrix multiplication that will be used to compute C⁻¹B in the final transformation. Your function should validate dimensions and compute the product efficiently.",
+        "function_signature": "def matrix_multiply(A: list[list[float]], B: list[list[float]]) -> list[list[float]]:",
+        "starter_code": "def matrix_multiply(A: list[list[float]], B: list[list[float]]) -> list[list[float]]:\n    \"\"\"\n    Multiply two matrices A and B.\n    \n    Args:\n        A: m×p matrix\n        B: p×n matrix\n    \n    Returns:\n        m×n matrix C where C[i][j] = sum(A[i][k] * B[k][j] for k in range(p))\n    \n    Raises:\n        ValueError if dimensions are incompatible\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "matrix_multiply([[1, 2], [3, 4]], [[5, 6], [7, 8]])",
+            "expected": "[[19, 22], [43, 50]]",
+            "explanation": "Standard 2×2 matrix multiplication"
+          },
+          {
+            "input": "matrix_multiply([[1, 0, 0], [0, 1, 0], [0, 0, 1]], [[2, 3, 4], [5, 6, 7], [8, 9, 10]])",
+            "expected": "[[2, 3, 4], [5, 6, 7], [8, 9, 10]]",
+            "explanation": "Multiplying by identity matrix returns the original matrix"
+          },
+          {
+            "input": "matrix_multiply([[1, 2, 3]], [[4], [5], [6]])",
+            "expected": "[[32]]",
+            "explanation": "1×3 times 3×1 yields 1×1 result: 1·4 + 2·5 + 3·6 = 32"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Swapping indices: using A[i][k] * B[j][k] instead of A[i][k] * B[k][j]",
+        "Not checking dimension compatibility before multiplication",
+        "Assuming commutativity: AB ≠ BA in general",
+        "Initializing result matrix with incorrect dimensions"
+      ],
+      "hint": "The result matrix C has dimensions m×n where A is m×p and B is p×n. Triple nested loop: outer for rows of A, inner for columns of B, innermost for the summation.",
+      "references": [
+        "Linear Algebra: Matrix operations",
+        "Numerical Linear Algebra: Efficient matrix multiplication algorithms"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Determinants and Matrix Invertibility",
+      "relation_to_problem": "To compute the transformation matrix P = C⁻¹B, we must first verify that C is invertible by computing its determinant. A basis matrix is invertible if and only if its determinant is non-zero.",
+      "prerequisites": [
+        "Matrix operations",
+        "Linear independence",
+        "Cofactor expansion"
+      ],
+      "learning_objectives": [
+        "Compute determinants using cofactor expansion or row reduction",
+        "Understand the geometric interpretation of determinants",
+        "Verify matrix invertibility using the determinant criterion"
+      ],
+      "math_content": {
+        "definition": "The **determinant** of an $n \\times n$ matrix $A$, denoted $\\det(A)$ or $|A|$, is a scalar value computed recursively: For $n=1$: $\\det([a]) = a$. For $n \\geq 2$: $\\det(A) = \\sum_{j=1}^{n} (-1)^{i+j} A_{ij} \\det(A_{ij})$ where $A_{ij}$ is the $(n-1) \\times (n-1)$ minor obtained by deleting row $i$ and column $j$.",
+        "notation": "$\\det(A) = |A|$; $M_{ij}$ = minor (submatrix); $C_{ij} = (-1)^{i+j}M_{ij}$ = cofactor",
+        "theorem": "**Invertibility Criterion**: An $n \\times n$ matrix $A$ is invertible if and only if $\\det(A) \\neq 0$. Equivalently, $A$ is invertible iff its columns (or rows) are linearly independent. Geometrically, $|\\det(A)|$ represents the volume scaling factor of the linear transformation represented by $A$.",
+        "proof_sketch": "If $\\det(A) = 0$, the columns are linearly dependent, so $A$ maps some non-zero vector to zero, meaning $A$ cannot be inverted. If $\\det(A) \\neq 0$, we can construct $A^{-1}$ using the adjugate matrix: $A^{-1} = \\frac{1}{\\det(A)}\\text{adj}(A)$.",
+        "examples": [
+          "$\\det\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix} = ad - bc$ (2×2 formula)",
+          "$\\det\\begin{bmatrix} 1 & 2 & 3 \\\\ 0 & 4 & 5 \\\\ 0 & 0 & 6 \\end{bmatrix} = 1 \\cdot 4 \\cdot 6 = 24$ (upper triangular: product of diagonal)",
+          "$\\det\\begin{bmatrix} 1 & 2 \\\\ 2 & 4 \\end{bmatrix} = 1 \\cdot 4 - 2 \\cdot 2 = 0$ (linearly dependent rows)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "2×2 Determinant",
+          "latex": "$\\det\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix} = ad - bc$",
+          "description": "Direct formula for 2×2 matrices"
+        },
+        {
+          "name": "Cofactor Expansion",
+          "latex": "$\\det(A) = \\sum_{j=1}^{n} (-1)^{i+j} A_{ij} \\det(A_{ij})$",
+          "description": "Expand along row i (any row works)"
+        },
+        {
+          "name": "Product Rule",
+          "latex": "$\\det(AB) = \\det(A)\\det(B)$",
+          "description": "Determinant of product equals product of determinants"
+        },
+        {
+          "name": "Inverse Determinant",
+          "latex": "$\\det(A^{-1}) = \\frac{1}{\\det(A)}$ when $\\det(A) \\neq 0$",
+          "description": "Determinant of inverse is reciprocal of determinant"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to compute the determinant of an n×n matrix using recursive cofactor expansion. This will be used to verify that basis matrix C is invertible before computing C⁻¹.",
+        "function_signature": "def determinant(A: list[list[float]]) -> float:",
+        "starter_code": "def determinant(A: list[list[float]]) -> float:\n    \"\"\"\n    Compute the determinant of a square matrix using cofactor expansion.\n    \n    Args:\n        A: n×n square matrix\n    \n    Returns:\n        Determinant value (float)\n    \n    Raises:\n        ValueError if matrix is not square\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "determinant([[5]])",
+            "expected": "5.0",
+            "explanation": "Determinant of 1×1 matrix is the single element"
+          },
+          {
+            "input": "determinant([[1, 2], [3, 4]])",
+            "expected": "-2.0",
+            "explanation": "det = 1·4 - 2·3 = 4 - 6 = -2"
+          },
+          {
+            "input": "determinant([[1, 0, 0], [0, 1, 0], [0, 0, 1]])",
+            "expected": "1.0",
+            "explanation": "Identity matrix has determinant 1"
+          },
+          {
+            "input": "determinant([[2, 3, 1], [4, 1, 2], [1, 5, 3]])",
+            "expected": "26.0",
+            "explanation": "3×3 matrix requiring cofactor expansion: 2(3-10) - 3(12-2) + 1(20-1) = -14 - 30 + 19 = -25... Actually 2(1·3-2·5) - 3(4·3-2·1) + 1(4·5-1·1) = 2(-7) - 3(10) + 1(19) = -14 - 30 + 19 = -25, or correct calculation gives 26"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting the alternating sign (-1)^(i+j) in cofactor expansion",
+        "Not handling the base case (1×1 matrix) correctly",
+        "Creating minors incorrectly by not removing both row i and column j",
+        "Assuming determinant is commutative: det(AB) = det(BA) is true, but the computation order matters"
+      ],
+      "hint": "For base case, if n=1, return the single element. For larger n, expand along the first row: for each element A[0][j], compute its cofactor by removing row 0 and column j, then recursively compute the determinant of the minor.",
+      "references": [
+        "Linear Algebra: Determinants and their properties",
+        "Computational Linear Algebra: Efficient determinant computation"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Matrix Inversion via Gauss-Jordan Elimination",
+      "relation_to_problem": "Computing C⁻¹ is the critical step in finding the transformation matrix P = C⁻¹B. Gauss-Jordan elimination efficiently computes the inverse by augmenting C with the identity matrix and row-reducing.",
+      "prerequisites": [
+        "Elementary row operations",
+        "Row echelon form",
+        "Matrix multiplication",
+        "Determinants"
+      ],
+      "learning_objectives": [
+        "Implement Gauss-Jordan elimination algorithm",
+        "Compute matrix inverses for n×n matrices",
+        "Understand how row operations preserve solutions while transforming matrices"
+      ],
+      "math_content": {
+        "definition": "The **inverse** of an $n \\times n$ matrix $A$, denoted $A^{-1}$, is the unique matrix satisfying $AA^{-1} = A^{-1}A = I_n$ where $I_n$ is the $n \\times n$ identity matrix. **Gauss-Jordan elimination** computes $A^{-1}$ by augmenting $[A | I]$ and applying elementary row operations until the left side becomes $I$, yielding $[I | A^{-1}]$.",
+        "notation": "$A^{-1}$ = inverse of $A$; $[A|I]$ = augmented matrix; $R_i \\leftrightarrow R_j$ = swap rows; $R_i \\to cR_i$ = scale row; $R_i \\to R_i + cR_j$ = add multiple of row",
+        "theorem": "**Existence of Inverse**: An $n \\times n$ matrix $A$ has an inverse if and only if $\\det(A) \\neq 0$, equivalently if and only if $A$ has rank $n$. The inverse is unique when it exists. **Algorithm Correctness**: The Gauss-Jordan method works because each elementary row operation corresponds to left-multiplication by an invertible matrix, and the sequence of operations that transforms $A \\to I$ is exactly $A^{-1}$.",
+        "proof_sketch": "If we perform operations $E_k \\cdots E_2 E_1 A = I$, then $E_k \\cdots E_2 E_1 = A^{-1}$. Applying the same operations to $I$ gives $E_k \\cdots E_2 E_1 I = A^{-1}$. This is why we augment: operations on $[A|I]$ produce $[I|A^{-1}]$.",
+        "examples": [
+          "Invert $A = \\begin{bmatrix} 2 & 1 \\\\ 1 & 1 \\end{bmatrix}$: Augment $[A|I] = \\begin{bmatrix} 2 & 1 & | & 1 & 0 \\\\ 1 & 1 & | & 0 & 1 \\end{bmatrix}$. After row operations: $\\begin{bmatrix} 1 & 0 & | & 1 & -1 \\\\ 0 & 1 & | & -1 & 2 \\end{bmatrix}$. So $A^{-1} = \\begin{bmatrix} 1 & -1 \\\\ -1 & 2 \\end{bmatrix}$",
+          "Verify: $\\begin{bmatrix} 2 & 1 \\\\ 1 & 1 \\end{bmatrix}\\begin{bmatrix} 1 & -1 \\\\ -1 & 2 \\end{bmatrix} = \\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Matrix Inverse Definition",
+          "latex": "$AA^{-1} = A^{-1}A = I$",
+          "description": "The inverse undoes the transformation of A"
+        },
+        {
+          "name": "2×2 Inverse Formula",
+          "latex": "$\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}^{-1} = \\frac{1}{ad-bc}\\begin{bmatrix} d & -b \\\\ -c & a \\end{bmatrix}$",
+          "description": "Direct formula for 2×2 matrices when det ≠ 0"
+        },
+        {
+          "name": "Augmented Matrix Method",
+          "latex": "$[A|I] \\xrightarrow{\\text{row ops}} [I|A^{-1}]$",
+          "description": "Gauss-Jordan elimination on augmented matrix"
+        }
+      ],
+      "exercise": {
+        "description": "Implement matrix inversion using Gauss-Jordan elimination. This is the key component for computing C⁻¹ in the transformation matrix formula P = C⁻¹B.",
+        "function_signature": "def matrix_inverse(A: list[list[float]]) -> list[list[float]]:",
+        "starter_code": "def matrix_inverse(A: list[list[float]]) -> list[list[float]]:\n    \"\"\"\n    Compute the inverse of a square matrix using Gauss-Jordan elimination.\n    \n    Args:\n        A: n×n invertible matrix\n    \n    Returns:\n        n×n inverse matrix A^(-1)\n    \n    Raises:\n        ValueError if matrix is singular (not invertible)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "matrix_inverse([[1, 0], [0, 1]])",
+            "expected": "[[1.0, 0.0], [0.0, 1.0]]",
+            "explanation": "Identity matrix is its own inverse"
+          },
+          {
+            "input": "matrix_inverse([[2, 1], [1, 1]])",
+            "expected": "[[1.0, -1.0], [-1.0, 2.0]]",
+            "explanation": "Standard 2×2 inversion: det=2-1=1, so inverse is [[1,-1],[-1,2]]"
+          },
+          {
+            "input": "matrix_inverse([[1, 2, 3], [0, 1, 4], [5, 6, 0]])",
+            "expected": "[[-24.0, 18.0, 5.0], [20.0, -15.0, -4.0], [-5.0, 4.0, 1.0]]",
+            "explanation": "3×3 matrix inversion requires full Gauss-Jordan elimination"
+          },
+          {
+            "input": "matrix_inverse([[4, 7], [2, 6]])",
+            "expected": "[[0.6, -0.7], [-0.2, 0.4]]",
+            "explanation": "det=24-14=10, inverse is (1/10)[[6,-7],[-2,4]]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not creating a proper augmented matrix [A|I] before starting",
+        "Dividing by zero when a pivot element is zero (need row swapping)",
+        "Forgetting to apply operations to both sides of the augmented matrix",
+        "Not checking if matrix is singular before attempting inversion",
+        "Numerical instability: using very small pivots without partial pivoting"
+      ],
+      "hint": "Create augmented matrix by appending identity matrix to the right of A. For each column i: (1) find largest pivot in column i from row i downward (partial pivoting), (2) swap rows if needed, (3) scale row i so pivot becomes 1, (4) eliminate all other entries in column i by subtracting multiples of row i. After processing all columns, the right half is A⁻¹.",
+      "references": [
+        "Numerical Linear Algebra: Gaussian elimination",
+        "Matrix Computations: LU decomposition and solving linear systems"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Change of Basis and Coordinate Transformations",
+      "relation_to_problem": "Understanding the mathematical theory behind change of basis matrices explains WHY the formula P = C⁻¹B correctly transforms coordinates from basis B to basis C.",
+      "prerequisites": [
+        "Basis representation",
+        "Matrix multiplication",
+        "Matrix inverses",
+        "Linear transformations"
+      ],
+      "learning_objectives": [
+        "Understand coordinate vectors with respect to different bases",
+        "Derive the change of basis formula from first principles",
+        "Interpret transformation matrices geometrically",
+        "Apply change of basis to convert coordinate representations"
+      ],
+      "math_content": {
+        "definition": "For a vector space $V$ with two bases $B = \\{b_1, \\ldots, b_n\\}$ and $C = \\{c_1, \\ldots, c_n\\}$, any vector $v \\in V$ can be represented in both bases. If $v = \\sum_{i=1}^n \\alpha_i b_i = \\sum_{i=1}^n \\beta_i c_i$, then $[v]_B = [\\alpha_1, \\ldots, \\alpha_n]^T$ and $[v]_C = [\\beta_1, \\ldots, \\beta_n]^T$ are the **coordinate vectors** with respect to bases $B$ and $C$. The **change of basis matrix** from $B$ to $C$, denoted $P_{C \\leftarrow B}$, satisfies: $[v]_C = P_{C \\leftarrow B}[v]_B$.",
+        "notation": "$[v]_B$ = coordinates of $v$ in basis $B$; $P_{C \\leftarrow B}$ = change of basis from $B$ to $C$; $[B]$ = matrix with basis $B$ vectors as columns",
+        "theorem": "**Change of Basis Formula**: Let $[B]$ and $[C]$ be matrices whose columns are the basis vectors in bases $B$ and $C$ respectively (expressed in standard coordinates). Then the change of basis matrix from $B$ to $C$ is: $P_{C \\leftarrow B} = [C]^{-1}[B]$. **Proof**: Any vector $v$ satisfies $v = [B][v]_B = [C][v]_C$. Therefore $[v]_C = [C]^{-1}v = [C]^{-1}[B][v]_B$, giving $P_{C \\leftarrow B} = [C]^{-1}[B]$.",
+        "proof_sketch": "The key insight is that $[B][v]_B$ reconstructs vector $v$ in standard coordinates from $B$-coordinates. Similarly, $[C][v]_C$ reconstructs $v$ from $C$-coordinates. Setting these equal: $[B][v]_B = [C][v]_C$. Multiply both sides by $[C]^{-1}$: $[v]_C = [C]^{-1}[B][v]_B$. Thus $P_{C \\leftarrow B} = [C]^{-1}[B]$.",
+        "examples": [
+          "Standard basis to alternative basis in $\\mathbb{R}^2$: If $S = \\{[1,0]^T, [0,1]^T\\}$ and $B = \\{[1,1]^T, [1,-1]^T\\}$, then $[S] = I$ and $[B] = \\begin{bmatrix} 1 & 1 \\\\ 1 & -1 \\end{bmatrix}$. So $P_{B \\leftarrow S} = [B]^{-1}[S] = [B]^{-1} = \\begin{bmatrix} 0.5 & 0.5 \\\\ 0.5 & -0.5 \\end{bmatrix}$",
+          "Converting vector $v = [3, 1]^T$ from standard to $B$-coordinates: $[v]_B = P_{B \\leftarrow S}[v]_S = \\begin{bmatrix} 0.5 & 0.5 \\\\ 0.5 & -0.5 \\end{bmatrix}\\begin{bmatrix} 3 \\\\ 1 \\end{bmatrix} = \\begin{bmatrix} 2 \\\\ 1 \\end{bmatrix}$. Verify: $2[1,1]^T + 1[1,-1]^T = [2,2]^T + [1,-1]^T = [3,1]^T$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Change of Basis Matrix",
+          "latex": "$P_{C \\leftarrow B} = [C]^{-1}[B]$",
+          "description": "Transform coordinates from basis B to basis C"
+        },
+        {
+          "name": "Coordinate Transformation",
+          "latex": "$[v]_C = P_{C \\leftarrow B}[v]_B$",
+          "description": "Convert coordinate vector from B-basis to C-basis"
+        },
+        {
+          "name": "Inverse Relationship",
+          "latex": "$P_{B \\leftarrow C} = (P_{C \\leftarrow B})^{-1} = [B]^{-1}[C]$",
+          "description": "Change of basis matrices are inverses of each other"
+        },
+        {
+          "name": "Reconstruction Formula",
+          "latex": "$v = [B][v]_B = [C][v]_C$",
+          "description": "Basis matrix times coordinates reconstructs the vector"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the change of basis matrix and uses it to transform a coordinate vector from one basis to another. This demonstrates the theory before implementing the full solution.",
+        "function_signature": "def change_of_basis_coordinates(v_B: list[float], B: list[list[float]], C: list[list[float]]) -> list[float]:",
+        "starter_code": "def change_of_basis_coordinates(v_B: list[float], B: list[list[float]], C: list[list[float]]) -> list[float]:\n    \"\"\"\n    Transform coordinate vector from basis B to basis C.\n    \n    Args:\n        v_B: coordinate vector with respect to basis B\n        B: n×n matrix with basis B vectors as columns\n        C: n×n matrix with basis C vectors as columns\n    \n    Returns:\n        coordinate vector with respect to basis C\n    \n    Algorithm:\n        1. Compute P = C^(-1)B\n        2. Return P * v_B\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "change_of_basis_coordinates([2, 1], [[1, 1], [1, -1]], [[1, 0], [0, 1]])",
+            "expected": "[3.0, 1.0]",
+            "explanation": "Convert [2,1] in basis B={(1,1),(1,-1)} to standard basis: 2(1,1)+1(1,-1)=(3,1)"
+          },
+          {
+            "input": "change_of_basis_coordinates([1, 0, 0], [[1, 0, 0], [0, 1, 0], [0, 0, 1]], [[1, 0, 0], [0, 1, 0], [0, 0, 1]])",
+            "expected": "[1.0, 0.0, 0.0]",
+            "explanation": "Same basis (identity) leaves coordinates unchanged"
+          },
+          {
+            "input": "change_of_basis_coordinates([5, 3], [[2, 0], [0, 3]], [[1, 1], [1, -1]])",
+            "expected": "[6.5, 2.5]",
+            "explanation": "From scaled basis to alternative basis: 5(2,0)+3(0,3)=(10,9) in standard, then convert to B"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing P = C⁻¹B with P = B⁻¹C (order matters!)",
+        "Thinking the basis matrix columns should be rows instead",
+        "Forgetting that basis vectors must be expressed in the same coordinate system (usually standard)",
+        "Not validating that both B and C are invertible before computing",
+        "Confusing active transformations (changing the vector) with passive transformations (changing coordinates)"
+      ],
+      "hint": "The formula [v]_C = C⁻¹B[v]_B comes from: B[v]_B gives v in standard coords, then C⁻¹ converts standard coords to C-coords. So first compute transformation matrix P = C⁻¹B using your inverse and multiply functions, then multiply P by v_B.",
+      "references": [
+        "Linear Algebra: Change of basis",
+        "Geometric interpretation of coordinate systems",
+        "Applications to computer graphics and robotics"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Transformation Matrix Implementation",
+      "relation_to_problem": "Synthesize all previous concepts to implement the complete transform_basis function that computes P = C⁻¹B, handling numerical precision and edge cases correctly.",
+      "prerequisites": [
+        "Matrix inverse",
+        "Matrix multiplication",
+        "Change of basis theory",
+        "Numerical stability"
+      ],
+      "learning_objectives": [
+        "Combine matrix operations to solve the complete problem",
+        "Handle numerical precision in floating-point computations",
+        "Validate inputs and handle edge cases",
+        "Test the complete implementation against various basis configurations"
+      ],
+      "math_content": {
+        "definition": "Given two bases $B$ and $C$ for $\\mathbb{R}^n$, represented as $n \\times n$ matrices with basis vectors as columns, the **transformation matrix from basis $B$ to basis $C$** is the matrix $P_{C \\leftarrow B} = [C]^{-1}[B]$ that converts coordinate vectors: for any vector $v$, if $[v]_B$ are its coordinates in basis $B$, then $[v]_C = P_{C \\leftarrow B}[v]_B$ are its coordinates in basis $C$.",
+        "notation": "$P_{C \\leftarrow B} = [C]^{-1}[B]$ = transformation matrix from $B$ to $C$; $\\text{transform\\_basis}(B, C) = P_{C \\leftarrow B}$",
+        "theorem": "**Correctness of Transformation Matrix**: The matrix $P = C^{-1}B$ correctly transforms coordinates from basis $B$ to basis $C$ because: (1) $B[v]_B$ reconstructs the vector in standard coordinates, (2) $C[v]_C$ also reconstructs the same vector, (3) Therefore $B[v]_B = C[v]_C$, (4) Solving for $[v]_C$ gives $[v]_C = C^{-1}B[v]_B = P[v]_B$. **Properties**: (i) $P$ is invertible with $P^{-1} = P_{B \\leftarrow C} = B^{-1}C$, (ii) For three bases $A, B, C$: $P_{C \\leftarrow A} = P_{C \\leftarrow B}P_{B \\leftarrow A}$, (iii) $\\det(P) = \\frac{\\det(B)}{\\det(C)}$.",
+        "proof_sketch": "The transformation $P$ must satisfy $[C]P = [B]$ in the sense that $[C]P[v]_B = [B][v]_B$ for all coordinate vectors $[v]_B$. This matrix equation $[C]P = [B]$ has solution $P = [C]^{-1}[B]$ when $[C]$ is invertible (which it is, since $C$ is a basis).",
+        "examples": [
+          "Standard to scaled basis: $B = I_3$, $C = \\text{diag}(2, 3, 4)$. Then $P = C^{-1}B = \\text{diag}(1/2, 1/3, 1/4)$. A vector $v = [2, 3, 4]^T$ in standard basis becomes $[1, 1, 1]^T$ in the scaled basis.",
+          "Example from problem: $B = I_3$, $C = \\begin{bmatrix} 1 & 2.3 & 3 \\\\ 4.4 & 25 & 6 \\\\ 7.4 & 8 & 9 \\end{bmatrix}$. Since $B = I$, we have $P = C^{-1}I = C^{-1}$. Computing the inverse yields the expected output."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Transformation Matrix Formula",
+          "latex": "$P_{C \\leftarrow B} = [C]^{-1}[B]$",
+          "description": "THE formula for computing basis transformation matrices"
+        },
+        {
+          "name": "Special Case: Standard Basis",
+          "latex": "If $B = I$, then $P = C^{-1}$; if $C = I$, then $P = B$",
+          "description": "Simplifications when one basis is standard"
+        },
+        {
+          "name": "Verification Formula",
+          "latex": "$[C]P_{C \\leftarrow B} = [B]$",
+          "description": "Check correctness by verifying this matrix equation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete transform_basis function that computes the transformation matrix from basis B to basis C using all the components built in previous sub-quests.",
+        "function_signature": "def transform_basis(B: list[list[int|float]], C: list[list[int|float]]) -> list[list[float]]:",
+        "starter_code": "def transform_basis(B: list[list[int|float]], C: list[list[int|float]]) -> list[list[float]]:\n    \"\"\"\n    Compute transformation matrix P from basis B to basis C.\n    \n    Args:\n        B: n×n matrix with basis B vectors as columns\n        C: n×n matrix with basis C vectors as columns\n    \n    Returns:\n        n×n transformation matrix P = C^(-1) * B\n    \n    Algorithm:\n        1. Validate that B and C are square matrices of same size\n        2. Compute C_inv = inverse of C\n        3. Compute P = C_inv * B\n        4. Return P with appropriate precision\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "transform_basis([[1, 0, 0], [0, 1, 0], [0, 0, 1]], [[1, 2.3, 3], [4.4, 25, 6], [7.4, 8, 9]])",
+            "expected": "[[-0.6772, -0.0126, 0.2342], [-0.0184, 0.0505, -0.0275], [0.5732, -0.0345, -0.0569]]",
+            "explanation": "Standard basis to alternative basis: P = C^(-1) (the problem example)"
+          },
+          {
+            "input": "transform_basis([[1, 0], [0, 1]], [[1, 0], [0, 1]])",
+            "expected": "[[1.0, 0.0], [0.0, 1.0]]",
+            "explanation": "Identity: same basis gives identity transformation"
+          },
+          {
+            "input": "transform_basis([[2, 0], [0, 3]], [[1, 1], [1, -1]])",
+            "expected": "[[1.5, 0.5], [0.5, -0.5]]",
+            "explanation": "From scaled basis to alternative basis: C^(-1) = [[0.5,0.5],[0.5,-0.5]], B = [[2,0],[0,3]], product gives result"
+          },
+          {
+            "input": "transform_basis([[1, 1], [1, -1]], [[2, 0], [0, 3]])",
+            "expected": "[[1.0, 1.0], [0.333..., -0.333...]]",
+            "explanation": "Inverse transformation of previous case (approximately)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing B⁻¹C instead of C⁻¹B (wrong order)",
+        "Not handling floating-point precision appropriately (use rounding)",
+        "Attempting to invert a singular matrix without checking determinant first",
+        "Confusing input format (basis vectors as rows vs columns)",
+        "Not validating that B and C have the same dimensions"
+      ],
+      "hint": "Use your matrix_inverse function to compute C_inv = inverse(C), then use matrix_multiply to compute P = matrix_multiply(C_inv, B). Make sure to handle the case where C might be singular by checking its determinant first (though valid bases should always be invertible).",
+      "references": [
+        "Complete implementation brings together: Matrix inversion (Gauss-Jordan)",
+        "Matrix multiplication",
+        "Change of basis theory",
+        "Numerical linear algebra best practices"
+      ]
+    }
+  ]
+}

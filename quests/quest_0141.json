@@ -1,0 +1,433 @@
+{
+  "problem_id": 141,
+  "title": "Shift and Scale Array to Target Range",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "Write a Python function `convert_range` that shifts and scales the values of a NumPy array from their original range $[a, b]$ (where $a=\\min(x)$ and $b=\\max(x)$) to a new target range $[c, d]$. Your function should work for both 1D and 2D arrays, returning an array of the same shape, and only use NumPy. Return floating-point results, and ensure you use the correct formula to map the input interval to the output interval.",
+  "example": {
+    "input": "import numpy as np\nx = np.array([0, 5, 10])\nc, d = 2, 4\nprint(convert_range(x, c, d))",
+    "output": "[2. 3. 4.]",
+    "reasoning": "The minimum value (a) is 0 and the maximum value (b) is 10. The formula maps 0 to 2, 5 to 3, and 10 to 4 using: f(x) = c + (d-c)/(b-a)*(x-a)."
+  },
+  "starter_code": "import numpy as np\n\ndef convert_range(values: np.ndarray, c: float, d: float) -> np.ndarray:\n    \"\"\"\n    Shift and scale values from their original range [min, max] to a target [c, d] range.\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Linear Affine Transformations",
+      "relation_to_problem": "The core of range shifting and scaling is an affine transformation f(x) = αx + β. Understanding how to construct such transformations is the foundation for mapping one range to another.",
+      "prerequisites": [
+        "Basic algebra",
+        "Function composition",
+        "Understanding of intervals"
+      ],
+      "learning_objectives": [
+        "Define affine transformations mathematically",
+        "Understand the geometric interpretation of shift and scale operations",
+        "Implement basic affine transformations in NumPy",
+        "Recognize the role of α (scale) and β (shift) parameters"
+      ],
+      "math_content": {
+        "definition": "An **affine transformation** (or affine map) on ℝ is a function of the form T(x) = αx + β where α, β ∈ ℝ and α ≠ 0. The parameter α is called the **scale factor** and β is called the **shift** (or translation).",
+        "notation": "$T(x) = αx + β$ where $α$ = scale factor (multiplicative), $β$ = shift (additive), $x$ = input value, $T(x)$ = transformed value",
+        "theorem": "**Theorem (Composition of Affine Maps)**: The composition of two affine transformations is also affine. If $T_1(x) = α_1x + β_1$ and $T_2(x) = α_2x + β_2$, then $(T_2 ∘ T_1)(x) = α_2α_1x + (α_2β_1 + β_2)$.",
+        "proof_sketch": "Let $T_1(x) = α_1x + β_1$ and $T_2(x) = α_2x + β_2$. Then $(T_2 ∘ T_1)(x) = T_2(T_1(x)) = T_2(α_1x + β_1) = α_2(α_1x + β_1) + β_2 = α_2α_1x + α_2β_1 + β_2$, which is affine with scale $α_2α_1$ and shift $α_2β_1 + β_2$.",
+        "examples": [
+          "T(x) = 2x + 3 transforms x=1 to T(1) = 2(1) + 3 = 5. This doubles the value then adds 3.",
+          "T(x) = -x + 10 transforms x=3 to T(3) = -3 + 10 = 7. This reflects about zero then shifts up by 10.",
+          "Identity transformation: T(x) = 1·x + 0 = x leaves all values unchanged."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "General Affine Transformation",
+          "latex": "$T(x) = αx + β$",
+          "description": "Use when you need to scale by factor α and shift by amount β"
+        },
+        {
+          "name": "Scale-then-shift decomposition",
+          "latex": "$T(x) = α(x) + β$",
+          "description": "First multiply by α (scale), then add β (shift)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that applies an affine transformation T(x) = αx + β to a NumPy array. This builds understanding of how scale and shift parameters affect array values.",
+        "function_signature": "def affine_transform(x: np.ndarray, alpha: float, beta: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef affine_transform(x: np.ndarray, alpha: float, beta: float) -> np.ndarray:\n    \"\"\"\n    Apply affine transformation T(x) = alpha * x + beta to array x.\n    \n    Args:\n        x: Input array (1D or 2D)\n        alpha: Scale factor\n        beta: Shift amount\n    \n    Returns:\n        Transformed array of same shape as x\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "affine_transform(np.array([1, 2, 3]), 2.0, 5.0)",
+            "expected": "[7. 9. 11.]",
+            "explanation": "Each element is scaled by 2 then shifted by 5: T(1)=2(1)+5=7, T(2)=9, T(3)=11"
+          },
+          {
+            "input": "affine_transform(np.array([0, 10, 20]), 0.5, -3.0)",
+            "expected": "[-3. 2. 7.]",
+            "explanation": "Scale by 0.5 (halve) then subtract 3: T(0)=-3, T(10)=5-3=2, T(20)=10-3=7"
+          },
+          {
+            "input": "affine_transform(np.array([[1, 2], [3, 4]]), 3.0, 0.0)",
+            "expected": "[[3. 6.]\n [9. 12.]]",
+            "explanation": "2D array: scale by 3 with no shift. Works element-wise on entire array."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing the order: doing shift-then-scale instead of scale-then-shift",
+        "Not using NumPy broadcasting, trying to loop over elements manually",
+        "Forgetting that α=0 makes the transformation degenerate (not injective)"
+      ],
+      "hint": "NumPy operations are element-wise by default. The expression alpha * x + beta automatically applies to every element.",
+      "references": [
+        "Linear algebra: affine spaces",
+        "NumPy broadcasting rules",
+        "Function composition"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Computing Range Statistics: Minimum and Maximum",
+      "relation_to_problem": "To map from an original range [a,b] to a target range [c,d], we must first identify a=min(x) and b=max(x). Understanding how to compute these statistics correctly for multidimensional arrays is essential.",
+      "prerequisites": [
+        "NumPy array operations",
+        "Understanding of array axes",
+        "Basic statistics"
+      ],
+      "learning_objectives": [
+        "Compute minimum and maximum values of arrays using NumPy",
+        "Understand the difference between global and axis-specific statistics",
+        "Handle both 1D and 2D arrays uniformly",
+        "Define the range R = b - a of a dataset"
+      ],
+      "math_content": {
+        "definition": "For a finite set $\\mathbf{X} = \\{x_1, x_2, \\ldots, x_n\\} \\subset \\mathbb{R}$, the **minimum** is $a = \\min(\\mathbf{X}) = \\min_{i \\in \\{1,\\ldots,n\\}} x_i$ and the **maximum** is $b = \\max(\\mathbf{X}) = \\max_{i \\in \\{1,\\ldots,n\\}} x_i$. The **range** (or spread) is defined as $R = b - a$.",
+        "notation": "$a = \\min(\\mathbf{X})$ = smallest value, $b = \\max(\\mathbf{X})$ = largest value, $R = b - a$ = range (spread), $[a, b]$ = interval containing all values",
+        "theorem": "**Theorem (Range Properties)**: For any non-empty dataset $\\mathbf{X}$, (i) $a \\leq x_i \\leq b$ for all $i$, (ii) $R \\geq 0$, (iii) $R = 0$ if and only if all values are identical.",
+        "proof_sketch": "(i) By definition of min and max. (ii) Since $b \\geq a$ (max ≥ min always), $R = b - a \\geq 0$. (iii) $R = 0$ ⟺ $b = a$ ⟺ $\\min(\\mathbf{X}) = \\max(\\mathbf{X})$ ⟺ all elements equal (since min ≤ all elements ≤ max).",
+        "examples": [
+          "For $\\mathbf{X} = [3, 7, 2, 9, 5]$: $a = 2$, $b = 9$, $R = 7$",
+          "For $\\mathbf{X} = [5, 5, 5]$: $a = 5$, $b = 5$, $R = 0$ (constant array)",
+          "For 2D array $\\mathbf{X} = \\begin{bmatrix}1 & 8\\\\3 & 2\\end{bmatrix}$: global $a = 1$, $b = 8$, $R = 7$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Minimum",
+          "latex": "$a = \\min(\\mathbf{X}) = \\min_{i} x_i$",
+          "description": "Smallest value in the dataset"
+        },
+        {
+          "name": "Maximum",
+          "latex": "$b = \\max(\\mathbf{X}) = \\max_{i} x_i$",
+          "description": "Largest value in the dataset"
+        },
+        {
+          "name": "Range",
+          "latex": "$R = b - a = \\max(\\mathbf{X}) - \\min(\\mathbf{X})$",
+          "description": "Spread of the data; measures how far apart min and max are"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes the minimum, maximum, and range of a NumPy array. This function should work for both 1D and 2D arrays, computing global statistics across all elements.",
+        "function_signature": "def compute_range_stats(x: np.ndarray) -> tuple[float, float, float]:",
+        "starter_code": "import numpy as np\n\ndef compute_range_stats(x: np.ndarray) -> tuple[float, float, float]:\n    \"\"\"\n    Compute the minimum, maximum, and range of array x.\n    \n    Args:\n        x: Input array (1D or 2D)\n    \n    Returns:\n        Tuple (min_val, max_val, range_val) where:\n        - min_val is the global minimum\n        - max_val is the global maximum  \n        - range_val = max_val - min_val\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_range_stats(np.array([5, 1, 9, 3]))",
+            "expected": "(1.0, 9.0, 8.0)",
+            "explanation": "Minimum is 1, maximum is 9, range is 9-1=8"
+          },
+          {
+            "input": "compute_range_stats(np.array([7.5, 7.5, 7.5]))",
+            "expected": "(7.5, 7.5, 0.0)",
+            "explanation": "All values identical, so min=max=7.5 and range=0"
+          },
+          {
+            "input": "compute_range_stats(np.array([[1, 8], [3, 2]]))",
+            "expected": "(1.0, 8.0, 7.0)",
+            "explanation": "2D array: global min=1, global max=8, range=7. Statistics computed across all elements."
+          },
+          {
+            "input": "compute_range_stats(np.array([-5, -2, -10]))",
+            "expected": "(-10.0, -2.0, 8.0)",
+            "explanation": "Works with negative numbers: min=-10, max=-2, range=8"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using Python's built-in min()/max() instead of np.min()/np.max(), which can fail on multidimensional arrays",
+        "Computing min and max along specific axes instead of globally",
+        "Not handling the edge case where range is zero",
+        "Returning integer types instead of floats"
+      ],
+      "hint": "NumPy's min() and max() methods automatically work across all dimensions when called without an axis parameter.",
+      "references": [
+        "NumPy array methods: .min(), .max()",
+        "Descriptive statistics",
+        "Array flattening concepts"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Normalization to Unit Interval [0,1]",
+      "relation_to_problem": "Before mapping to an arbitrary target range [c,d], we first normalize data to the unit interval [0,1]. This is a canonical intermediate step in the range transformation pipeline.",
+      "prerequisites": [
+        "Affine transformations",
+        "Range statistics (min, max)",
+        "Understanding of linear interpolation"
+      ],
+      "learning_objectives": [
+        "Derive the normalization formula from first principles",
+        "Understand min-max normalization mathematically",
+        "Implement normalization to [0,1] for arbitrary input ranges",
+        "Handle the degenerate case when all values are equal"
+      ],
+      "math_content": {
+        "definition": "**Min-Max Normalization to [0,1]**: Given data $\\mathbf{X}$ with $a = \\min(\\mathbf{X})$ and $b = \\max(\\mathbf{X})$ where $a < b$, the normalized value is: $$x'_i = \\frac{x_i - a}{b - a}$$ This maps the interval $[a, b]$ linearly to $[0, 1]$.",
+        "notation": "$x_i$ = original value, $x'_i$ = normalized value in [0,1], $a = \\min(\\mathbf{X})$, $b = \\max(\\mathbf{X})$, $R = b - a$ = range",
+        "theorem": "**Theorem (Normalization Bounds)**: For all $x_i \\in [a, b]$, the normalized value $x'_i = \\frac{x_i - a}{R}$ satisfies $0 \\leq x'_i \\leq 1$, with $x'_i = 0$ iff $x_i = a$ and $x'_i = 1$ iff $x_i = b$.",
+        "proof_sketch": "Since $a \\leq x_i \\leq b$, we have $0 \\leq x_i - a \\leq b - a = R$. Dividing by $R > 0$ preserves inequalities: $0 \\leq \\frac{x_i - a}{R} \\leq 1$. Boundary cases: (i) $x_i = a$ gives $x'_i = \\frac{a-a}{R} = 0$. (ii) $x_i = b$ gives $x'_i = \\frac{b-a}{R} = \\frac{R}{R} = 1$.",
+        "examples": [
+          "For $\\mathbf{X} = [10, 20, 30]$ with $a=10$, $b=30$, $R=20$: $x'_1 = \\frac{10-10}{20} = 0$, $x'_2 = \\frac{20-10}{20} = 0.5$, $x'_3 = \\frac{30-10}{20} = 1$",
+          "For $\\mathbf{X} = [5, 15, 25]$ with $a=5$, $b=25$, $R=20$: $x'_1 = 0$, $x'_2 = \\frac{10}{20} = 0.5$, $x'_3 = 1$",
+          "Geometric interpretation: $x'_i$ represents the relative position of $x_i$ within the interval $[a,b]$. At the midpoint, $x'_i = 0.5$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Normalization to [0,1]",
+          "latex": "$x'_i = \\frac{x_i - \\min(\\mathbf{X})}{\\max(\\mathbf{X}) - \\min(\\mathbf{X})}$",
+          "description": "Maps any range [a,b] to [0,1] linearly"
+        },
+        {
+          "name": "Compact form",
+          "latex": "$x'_i = \\frac{x_i - a}{R}$",
+          "description": "Same formula using a=min and R=range"
+        },
+        {
+          "name": "Degenerate case",
+          "latex": "$\\text{if } R = 0: x'_i = 0.5 \\text{ (or any constant in [0,1])}$",
+          "description": "When all values equal, can't normalize; convention is to use midpoint"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that normalizes a NumPy array to the range [0,1] using min-max normalization. Handle the edge case where all values are identical by returning an array of 0.5 values.",
+        "function_signature": "def normalize_to_unit(x: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef normalize_to_unit(x: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Normalize array x to the range [0, 1] using min-max normalization.\n    \n    Args:\n        x: Input array (1D or 2D)\n    \n    Returns:\n        Normalized array where values are in [0, 1]\n        If all values are equal, return array of 0.5 values\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "normalize_to_unit(np.array([0, 5, 10]))",
+            "expected": "[0. 0.5 1.]",
+            "explanation": "Range is [0,10]. Normalized: 0→0, 5→0.5 (midpoint), 10→1"
+          },
+          {
+            "input": "normalize_to_unit(np.array([20, 30, 40, 50]))",
+            "expected": "[0. 0.33333333 0.66666667 1.]",
+            "explanation": "Range [20,50], span=30. Values map to: (0,10,20,30)/30 = (0, 0.333, 0.667, 1)"
+          },
+          {
+            "input": "normalize_to_unit(np.array([7, 7, 7]))",
+            "expected": "[0.5 0.5 0.5]",
+            "explanation": "All values identical (R=0). Return midpoint 0.5 to avoid division by zero"
+          },
+          {
+            "input": "normalize_to_unit(np.array([[-1, 1], [0, 2]]))",
+            "expected": "[[0. 0.66666667]\n [0.33333333 1.]]",
+            "explanation": "2D array, global range [-1,2], span=3. Values: (-1→0, 0→1/3, 1→2/3, 2→1)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the R=0 case, leading to division by zero",
+        "Using axis-specific min/max instead of global statistics",
+        "Forgetting to convert to float type, causing integer division issues",
+        "Not testing that output actually lies in [0,1]"
+      ],
+      "hint": "First compute the range R. If R is zero (or very close to zero), return a constant array. Otherwise, apply the formula (x - min) / R.",
+      "references": [
+        "Feature scaling in machine learning",
+        "Min-max normalization",
+        "Data preprocessing techniques"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Scaling from Unit Interval to Arbitrary Range",
+      "relation_to_problem": "After normalizing to [0,1], we need to scale and shift to the target range [c,d]. This step completes the two-stage transformation pipeline: [a,b] → [0,1] → [c,d].",
+      "prerequisites": [
+        "Affine transformations",
+        "Normalization to [0,1]",
+        "Function composition"
+      ],
+      "learning_objectives": [
+        "Derive the formula to map [0,1] to [c,d]",
+        "Understand the two-stage transformation pipeline",
+        "Implement the scaling transformation",
+        "Recognize this as a special case of affine transformation"
+      ],
+      "math_content": {
+        "definition": "**Scaling from Unit Interval**: Given a value $t \\in [0, 1]$ and target range $[c, d]$, the scaled value is: $$y = c + t(d - c)$$ This is an affine transformation with scale factor $(d-c)$ and shift $c$.",
+        "notation": "$t \\in [0,1]$ = normalized input, $y$ = output in [c,d], $c$ = target minimum, $d$ = target maximum, $(d-c)$ = target range width",
+        "theorem": "**Theorem (Unit Interval Scaling)**: The transformation $T(t) = c + t(d-c)$ maps $[0,1]$ bijectively onto $[c,d]$. Specifically: $T(0) = c$, $T(1) = d$, and for any $y \\in [c,d]$, there exists unique $t \\in [0,1]$ such that $T(t) = y$.",
+        "proof_sketch": "**Boundary mapping**: $T(0) = c + 0(d-c) = c$ ✓ and $T(1) = c + 1(d-c) = c + d - c = d$ ✓. **Injectivity**: If $T(t_1) = T(t_2)$, then $c + t_1(d-c) = c + t_2(d-c)$, so $t_1(d-c) = t_2(d-c)$. Since $d \\neq c$, we have $t_1 = t_2$. **Surjectivity**: For any $y \\in [c,d]$, let $t = \\frac{y-c}{d-c}$. Then $t \\in [0,1]$ and $T(t) = c + \\frac{y-c}{d-c}(d-c) = y$.",
+        "examples": [
+          "Map $t=0.5$ from [0,1] to [2,8]: $y = 2 + 0.5(8-2) = 2 + 3 = 5$ (midpoint of [2,8])",
+          "Map $t=0.25$ to [-1,1]: $y = -1 + 0.25(1-(-1)) = -1 + 0.5 = -0.5$",
+          "Map $t=1$ to [100,200]: $y = 100 + 1(200-100) = 200$ (upper bound)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Unit interval to arbitrary range",
+          "latex": "$y = c + t(d - c)$",
+          "description": "Maps t ∈ [0,1] linearly to y ∈ [c,d]"
+        },
+        {
+          "name": "Equivalent form",
+          "latex": "$y = c(1-t) + dt$",
+          "description": "Linear interpolation between c and d with weight t"
+        },
+        {
+          "name": "Two-stage pipeline",
+          "latex": "$x \\xrightarrow{\\text{normalize}} t = \\frac{x-a}{b-a} \\xrightarrow{\\text{scale}} y = c + t(d-c)$",
+          "description": "Complete transformation from [a,b] to [c,d] via [0,1]"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a normalized array (values in [0,1]) and scales it to an arbitrary target range [c,d]. This is the second stage of the range transformation pipeline.",
+        "function_signature": "def scale_from_unit(t: np.ndarray, c: float, d: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef scale_from_unit(t: np.ndarray, c: float, d: float) -> np.ndarray:\n    \"\"\"\n    Scale array t from [0,1] to target range [c,d].\n    \n    Args:\n        t: Normalized input array with values in [0, 1]\n        c: Target minimum\n        d: Target maximum\n    \n    Returns:\n        Array with values in [c, d]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "scale_from_unit(np.array([0, 0.5, 1]), 2.0, 8.0)",
+            "expected": "[2. 5. 8.]",
+            "explanation": "Map [0,1] to [2,8]: 0→2, 0.5→5 (midpoint), 1→8"
+          },
+          {
+            "input": "scale_from_unit(np.array([0, 0.25, 0.75, 1]), -10.0, 10.0)",
+            "expected": "[-10. -5. 5. 10.]",
+            "explanation": "Map to [-10,10], width=20: 0→-10, 0.25→-5, 0.75→5, 1→10"
+          },
+          {
+            "input": "scale_from_unit(np.array([[0, 1], [0.5, 0.25]]), 0.0, 100.0)",
+            "expected": "[[0. 100.]\n [50. 25.]]",
+            "explanation": "2D array to [0,100]: scale by 100 then shift by 0"
+          },
+          {
+            "input": "scale_from_unit(np.array([0.5, 0.5]), 7.0, 7.0)",
+            "expected": "[7. 7.]",
+            "explanation": "Degenerate target range [7,7]: all outputs are 7 regardless of input"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Getting the formula backwards: d + t(c-d) instead of c + t(d-c)",
+        "Forgetting that this only works if input is already normalized to [0,1]",
+        "Not recognizing this as affine transformation T(t) = αt + β with α=(d-c), β=c",
+        "Assuming c < d; formula works even if c > d (reverses order)"
+      ],
+      "hint": "This is a simple affine transformation. Think of it as: start at c, then add a fraction t of the distance (d-c).",
+      "references": [
+        "Linear interpolation (LERP)",
+        "Affine transformations",
+        "Parametric representations of line segments"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Composing the Complete Range Transformation",
+      "relation_to_problem": "This final step combines normalization [a,b]→[0,1] and scaling [0,1]→[c,d] into a single formula. This is the complete solution strategy: understand the composition, derive the combined formula, and implement it efficiently.",
+      "prerequisites": [
+        "Affine transformations",
+        "Range statistics",
+        "Normalization to [0,1]",
+        "Scaling from unit interval"
+      ],
+      "learning_objectives": [
+        "Compose the two-stage transformation into a single formula",
+        "Derive the direct mapping formula from first principles",
+        "Understand when and why to use the two-stage vs direct approach",
+        "Implement the complete range transformation with proper edge case handling"
+      ],
+      "math_content": {
+        "definition": "**Complete Range Transformation**: Given data in range $[a, b]$ and target range $[c, d]$, the transformation $f: [a,b] \\to [c,d]$ is: $$f(x) = c + \\frac{(x - a)(d - c)}{b - a}$$ This maps $a \\mapsto c$ and $b \\mapsto d$ linearly.",
+        "notation": "$x \\in [a,b]$ = original value, $a = \\min(\\mathbf{X})$, $b = \\max(\\mathbf{X})$, $R = b - a$ = original range, $c, d$ = target bounds, $f(x)$ = transformed value in [c,d]",
+        "theorem": "**Theorem (Composition Formula)**: The transformation $f(x) = c + \\frac{(x-a)(d-c)}{b-a}$ is the composition of normalization $N(x) = \\frac{x-a}{b-a}$ and scaling $S(t) = c + t(d-c)$. That is, $f = S \\circ N$.",
+        "proof_sketch": "Let $N(x) = \\frac{x-a}{b-a}$ normalize to [0,1] and $S(t) = c + t(d-c)$ scale to [c,d]. Then $(S \\circ N)(x) = S(N(x)) = S\\left(\\frac{x-a}{b-a}\\right) = c + \\frac{x-a}{b-a}(d-c) = c + \\frac{(x-a)(d-c)}{b-a}$, which is exactly $f(x)$.",
+        "examples": [
+          "Transform $x=5$ from [0,10] to [2,4]: $f(5) = 2 + \\frac{(5-0)(4-2)}{10-0} = 2 + \\frac{10}{10} = 3$ (midpoint maps to midpoint)",
+          "Transform $x=15$ from [10,20] to [-1,1]: $f(15) = -1 + \\frac{(15-10)(1-(-1))}{20-10} = -1 + \\frac{5 \\cdot 2}{10} = 0$",
+          "Transform $x=0$ from [0,100] to [50,150]: $f(0) = 50 + \\frac{(0-0)(150-50)}{100-0} = 50$ (min maps to target min)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Direct range transformation",
+          "latex": "$f(x) = c + \\frac{(x - a)(d - c)}{b - a}$",
+          "description": "Single-step formula mapping [a,b] to [c,d]"
+        },
+        {
+          "name": "Factored form",
+          "latex": "$f(x) = c + (d-c) \\cdot \\frac{x-a}{b-a}$",
+          "description": "Shows two-stage structure: normalize, then scale"
+        },
+        {
+          "name": "Vectorized form",
+          "latex": "$\\mathbf{y} = c + (d-c) \\cdot \\frac{\\mathbf{x} - a}{b - a}$",
+          "description": "Apply element-wise to entire array using NumPy broadcasting"
+        },
+        {
+          "name": "Edge case formula",
+          "latex": "$\\text{if } b = a: f(x) = \\frac{c+d}{2}$",
+          "description": "When input is constant, map to midpoint of target range"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that transforms an array from its original range [min, max] to a specified target range [c, d]. This combines all previous concepts: compute statistics, normalize, and scale. Handle the edge case where all values are equal.",
+        "function_signature": "def transform_range(x: np.ndarray, c: float, d: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef transform_range(x: np.ndarray, c: float, d: float) -> np.ndarray:\n    \"\"\"\n    Transform array x from its original range to target range [c, d].\n    \n    Args:\n        x: Input array (1D or 2D)\n        c: Target minimum value\n        d: Target maximum value\n    \n    Returns:\n        Transformed array with values in [c, d]\n        If all input values are equal, returns array filled with (c+d)/2\n    \"\"\"\n    # Your code here\n    # Hint: Follow the two-stage pipeline or use the direct formula\n    pass",
+        "test_cases": [
+          {
+            "input": "transform_range(np.array([0, 5, 10]), 2.0, 4.0)",
+            "expected": "[2. 3. 4.]",
+            "explanation": "Map [0,10] to [2,4]: 0→2, 5→3 (midpoint), 10→4"
+          },
+          {
+            "input": "transform_range(np.array([10, 20, 30, 40]), -1.0, 1.0)",
+            "expected": "[-1. -0.33333333 0.33333333 1.]",
+            "explanation": "Range [10,40] width=30 to [-1,1] width=2. Formula gives equally spaced values."
+          },
+          {
+            "input": "transform_range(np.array([5, 5, 5]), 0.0, 10.0)",
+            "expected": "[5. 5. 5.]",
+            "explanation": "Constant input: map to midpoint (0+10)/2 = 5"
+          },
+          {
+            "input": "transform_range(np.array([[1, 2], [3, 4]]), 0.0, 100.0)",
+            "expected": "[[0. 33.33333333]\n [66.66666667 100.]]",
+            "explanation": "2D array, range [1,4] to [0,100]: (1→0, 2→33.33, 3→66.67, 4→100)"
+          },
+          {
+            "input": "transform_range(np.array([-10, 0, 10]), 50.0, 150.0)",
+            "expected": "[50. 100. 150.]",
+            "explanation": "Symmetric range [-10,10] to [50,150]: -10→50, 0→100 (midpoint), 10→150"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking for R=0 before dividing, causing division by zero errors",
+        "Computing min/max along wrong axis for 2D arrays",
+        "Using integer division instead of float division",
+        "Forgetting to return float type (using np.float64 or ensuring float arithmetic)",
+        "Not recognizing that the formula can be computed in one vectorized operation"
+      ],
+      "hint": "First compute a (min) and b (max) globally. Check if b==a (constant case). Otherwise, apply the formula: c + (d-c)*(x-a)/(b-a). NumPy will broadcast this across all elements automatically.",
+      "references": [
+        "Feature scaling in ML",
+        "Min-max normalization",
+        "Data preprocessing",
+        "Function composition",
+        "NumPy broadcasting"
+      ]
+    }
+  ]
+}

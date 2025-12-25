@@ -1,0 +1,511 @@
+{
+  "problem_id": 21,
+  "title": "Pegasos Kernel SVM Implementation",
+  "category": "Machine Learning",
+  "difficulty": "hard",
+  "description": "Write a Python function that implements a **deterministic** version of the Pegasos algorithm to train a kernel SVM classifier from scratch. The function should take a dataset (as a 2D NumPy array where each row represents a data sample and each column represents a feature), a label vector (1D NumPy array where each entry corresponds to the label of the sample), and training parameters such as the choice of kernel (linear or RBF), regularization parameter (lambda), and the number of iterations. Note that while the original Pegasos algorithm is stochastic (it selects a single random sample at each step), **this problem requires using all samples in every iteration** (i.e., **no random sampling**). The function should perform binary classification and return the model's alpha coefficients and bias.",
+  "example": {
+    "input": "data = np.array([[1, 2], [2, 3], [3, 1], [4, 1]]), labels = np.array([1, 1, -1, -1]), kernel = 'rbf', lambda_val = 0.01, iterations = 100, sigma = 1.0",
+    "output": "alpha = [0.03, 0.02, 0.05, 0.01], b = -0.05",
+    "reasoning": "Using the RBF kernel, the Pegasos algorithm iteratively updates the weights based on a sub-gradient descent method, taking into account the non-linear separability of the data induced by the kernel transformation."
+  },
+  "starter_code": "def pegasos_kernel_svm(data: np.ndarray, labels: np.ndarray, kernel='linear', lambda_val=0.01, iterations=100,sigma=1.0) -> (list, float):\n\t# Your code here\n\treturn alphas, b",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Kernel Functions and the Kernel Trick",
+      "relation_to_problem": "Kernel functions enable non-linear classification by implicitly mapping data to higher-dimensional spaces. This is fundamental to implementing the kernel-based distance computations in Pegasos.",
+      "prerequisites": [
+        "Linear algebra (dot products, norms)",
+        "Basic calculus",
+        "NumPy array operations"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition of kernel functions and Mercer's condition",
+        "Implement linear and RBF kernel functions from scratch",
+        "Compute kernel matrices (Gram matrices) efficiently",
+        "Understand how kernels measure similarity between data points"
+      ],
+      "math_content": {
+        "definition": "A kernel function is a symmetric positive semi-definite function $K: \\mathcal{X} \\times \\mathcal{X} \\rightarrow \\mathbb{R}$ that computes the inner product of two vectors in a (potentially infinite-dimensional) feature space $\\mathcal{F}$ without explicitly computing the transformation $\\phi: \\mathcal{X} \\rightarrow \\mathcal{F}$. Formally: $$K(x, x') = \\langle \\phi(x), \\phi(x') \\rangle_{\\mathcal{F}}$$",
+        "notation": "$K(x, x')$ = kernel function evaluating similarity between $x$ and $x'$; $\\phi(x)$ = feature mapping from input space to feature space; $\\langle \\cdot, \\cdot \\rangle$ = inner product",
+        "theorem": "**Mercer's Theorem**: A symmetric function $K(x, x')$ is a valid kernel if and only if for any finite set of points $\\{x_1, \\ldots, x_n\\}$, the kernel matrix $K_{ij} = K(x_i, x_j)$ is positive semi-definite, i.e., for all vectors $c \\in \\mathbb{R}^n$: $$\\sum_{i=1}^{n}\\sum_{j=1}^{n} c_i c_j K(x_i, x_j) \\geq 0$$",
+        "proof_sketch": "The positive semi-definiteness ensures the kernel matrix has non-negative eigenvalues, guaranteeing the existence of a feature space where $K(x, x') = \\langle \\phi(x), \\phi(x') \\rangle$. This allows us to work with inner products in the feature space without explicit computation of $\\phi$.",
+        "examples": [
+          "**Linear Kernel**: $K(x, x') = x^T x' = \\sum_{i=1}^{d} x_i x'_i$. This corresponds to the identity mapping $\\phi(x) = x$, yielding a linear decision boundary in the original space.",
+          "**RBF (Gaussian) Kernel**: $K(x, x') = \\exp\\left(-\\frac{\\|x - x'\\|^2}{2\\sigma^2}\\right)$. This maps to an infinite-dimensional space. For $x = [1, 2]$ and $x' = [2, 1]$ with $\\sigma = 1$: $K(x, x') = \\exp\\left(-\\frac{(1-2)^2 + (2-1)^2}{2}\\right) = \\exp(-1) \\approx 0.368$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Linear Kernel",
+          "latex": "$K_{\\text{linear}}(x, x') = x^T x'$",
+          "description": "Use for linearly separable data; computationally efficient"
+        },
+        {
+          "name": "RBF Kernel",
+          "latex": "$K_{\\text{rbf}}(x, x') = \\exp\\left(-\\frac{\\|x - x'\\|^2}{2\\sigma^2}\\right)$",
+          "description": "Use for non-linear boundaries; $\\sigma$ controls the width of the Gaussian"
+        },
+        {
+          "name": "Squared Euclidean Distance",
+          "latex": "$\\|x - x'\\|^2 = \\sum_{i=1}^{d}(x_i - x'_i)^2$",
+          "description": "Required for computing RBF kernel efficiently"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the kernel matrix (Gram matrix) for a dataset using either linear or RBF kernel. The kernel matrix $K$ is an $n \\times n$ symmetric matrix where $K_{ij} = K(x_i, x_j)$. This matrix is essential for kernel-based algorithms as it stores all pairwise similarities.",
+        "function_signature": "def compute_kernel_matrix(X: np.ndarray, kernel: str = 'linear', sigma: float = 1.0) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_kernel_matrix(X: np.ndarray, kernel: str = 'linear', sigma: float = 1.0) -> np.ndarray:\n    \"\"\"\n    Compute the kernel matrix for dataset X.\n    \n    Args:\n        X: numpy array of shape (n, d) where n is number of samples\n        kernel: 'linear' or 'rbf'\n        sigma: bandwidth parameter for RBF kernel\n    \n    Returns:\n        K: numpy array of shape (n, n) - the kernel matrix\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "X = np.array([[1, 0], [0, 1], [1, 1]]), kernel='linear'",
+            "expected": "np.array([[1, 0, 1], [0, 1, 1], [1, 1, 2]])",
+            "explanation": "Linear kernel computes dot products. K[0,0] = [1,0]·[1,0] = 1; K[0,1] = [1,0]·[0,1] = 0; K[2,2] = [1,1]·[1,1] = 2"
+          },
+          {
+            "input": "X = np.array([[0, 0], [1, 1]]), kernel='rbf', sigma=1.0",
+            "expected": "np.array([[1.0, 0.1353], [0.1353, 1.0]]) (approximately)",
+            "explanation": "RBF kernel: K[0,0] = exp(0) = 1 (same point); K[0,1] = exp(-||[0,0]-[1,1]||²/2) = exp(-2/2) = exp(-1) ≈ 0.1353"
+          },
+          {
+            "input": "X = np.array([[1], [2], [3]]), kernel='linear'",
+            "expected": "np.array([[1, 2, 3], [2, 4, 6], [3, 6, 9]])",
+            "explanation": "For 1D vectors, linear kernel is simple multiplication. K[1,2] = 2*3 = 6"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that kernel matrices must be symmetric: K[i,j] = K[j,i]. Exploit this by computing only upper/lower triangle",
+        "Not squaring the Euclidean distance in RBF kernel (using ||x-x'|| instead of ||x-x'||²)",
+        "Incorrect sigma usage: the denominator is 2σ², not σ or 2σ",
+        "Using inefficient loops instead of NumPy broadcasting for kernel matrix computation"
+      ],
+      "hint": "For RBF kernel, compute the squared distance matrix first using the identity: ||x-x'||² = ||x||² + ||x'||² - 2x·x'. This allows vectorized computation using broadcasting.",
+      "references": [
+        "Reproducing Kernel Hilbert Spaces (RKHS)",
+        "Mercer's theorem proof",
+        "NumPy broadcasting for efficient matrix operations"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Hinge Loss and Sub-gradients in SVM",
+      "relation_to_problem": "The Pegasos algorithm minimizes the SVM objective using sub-gradient descent on the hinge loss. Understanding when and how to compute sub-gradients is critical for implementing the parameter updates.",
+      "prerequisites": [
+        "Convex analysis basics",
+        "Gradient descent",
+        "Loss functions in machine learning"
+      ],
+      "learning_objectives": [
+        "Understand the hinge loss function and its role in SVM optimization",
+        "Learn what sub-gradients are and why they're needed for non-differentiable functions",
+        "Identify when the hinge loss is active (margin violated) vs. inactive",
+        "Compute sub-gradients for individual training examples"
+      ],
+      "math_content": {
+        "definition": "The **hinge loss** for a training example $(x, y)$ with $y \\in \\{-1, +1\\}$ and decision function $f(x)$ is defined as: $$\\ell_{\\text{hinge}}(f(x), y) = \\max(0, 1 - y f(x))$$ The loss is zero when $y f(x) \\geq 1$ (correct classification with sufficient margin) and positive when $y f(x) < 1$ (margin violation). A **sub-gradient** of a convex function $f$ at point $x_0$ is any vector $g$ such that for all $x$: $$f(x) \\geq f(x_0) + g^T(x - x_0)$$ For non-differentiable points, the set of all sub-gradients forms the **sub-differential** $\\partial f(x_0)$.",
+        "notation": "$\\ell(\\cdot)$ = loss function; $f(x) = \\sum_j \\alpha_j y_j K(x_j, x) + b$ = decision function; $y f(x)$ = functional margin; $g$ = sub-gradient vector",
+        "theorem": "**Sub-gradient of Hinge Loss**: For the hinge loss $\\ell(f(x), y) = \\max(0, 1 - y f(x))$, the sub-gradient with respect to model parameters is: $$\\partial \\ell = \\begin{cases} -y x & \\text{if } y f(x) < 1 \\\\ 0 & \\text{if } y f(x) > 1 \\\\ [-y x, 0] & \\text{if } y f(x) = 1 \\end{cases}$$ The boundary case ($y f(x) = 1$) corresponds to the non-differentiable point where any convex combination of $-yx$ and $0$ is a valid sub-gradient.",
+        "proof_sketch": "The hinge loss is piecewise linear. For $y f(x) < 1$, the active piece is $1 - y f(x)$, which has derivative $-y$ with respect to $f(x)$. By chain rule, this gives $-y x$ for the input. For $y f(x) > 1$, the loss is constantly zero (flat), giving zero gradient.",
+        "examples": [
+          "**Example 1**: Given $x = [2, 3]$, $y = 1$, and $f(x) = 0.5$. Then $y f(x) = 0.5 < 1$, so the margin is violated. The sub-gradient is $-y x = -1 \\cdot [2, 3] = [-2, -3]$. The loss value is $\\max(0, 1 - 0.5) = 0.5$.",
+          "**Example 2**: Given $x = [1, -1]$, $y = -1$, and $f(x) = -2$. Then $y f(x) = (-1)(-2) = 2 > 1$, so the point is correctly classified beyond the margin. The sub-gradient is $0$, and loss is $\\max(0, 1 - 2) = 0$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Hinge Loss",
+          "latex": "$\\ell(f(x), y) = \\max(0, 1 - y f(x))$",
+          "description": "Measures margin violation; equals zero when margin ≥ 1"
+        },
+        {
+          "name": "Margin Condition",
+          "latex": "$y f(x) \\geq 1$",
+          "description": "When satisfied, the point is correctly classified with sufficient margin (no loss)"
+        },
+        {
+          "name": "Sub-gradient (Active)",
+          "latex": "$g = -y x$ when $y f(x) < 1$",
+          "description": "Update direction when margin is violated"
+        },
+        {
+          "name": "Decision Function",
+          "latex": "$f(x) = \\sum_{j=1}^{n} \\alpha_j y_j K(x_j, x) + b$",
+          "description": "Linear combination of kernel evaluations in dual form"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the hinge loss and identifies which samples violate the margin condition (i.e., have active loss). Given a dataset, labels, current alpha coefficients, bias, and kernel matrix, return a boolean array indicating which samples have $y_i f(x_i) < 1$. This step is crucial for determining which samples require parameter updates in Pegasos.",
+        "function_signature": "def identify_margin_violations(K: np.ndarray, labels: np.ndarray, alphas: np.ndarray, b: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef identify_margin_violations(K: np.ndarray, labels: np.ndarray, alphas: np.ndarray, b: float) -> np.ndarray:\n    \"\"\"\n    Identify which samples violate the margin condition.\n    \n    Args:\n        K: kernel matrix of shape (n, n)\n        labels: label vector of shape (n,) with values in {-1, +1}\n        alphas: current alpha coefficients of shape (n,)\n        b: current bias term (scalar)\n    \n    Returns:\n        violations: boolean array of shape (n,) where True indicates yf(x) < 1\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "K = np.array([[1, 0], [0, 1]]), labels = np.array([1, -1]), alphas = np.array([0.5, 0.3]), b = 0.0",
+            "expected": "np.array([True, True])",
+            "explanation": "f(x₀) = 0.5*1*1 + 0.3*(-1)*0 + 0 = 0.5, so y₀f(x₀) = 1*0.5 = 0.5 < 1 (violated). f(x₁) = 0.5*1*0 + 0.3*(-1)*1 + 0 = -0.3, so y₁f(x₁) = (-1)*(-0.3) = 0.3 < 1 (violated)"
+          },
+          {
+            "input": "K = np.array([[4, 1], [1, 4]]), labels = np.array([1, 1]), alphas = np.array([0.3, 0.2]), b = 0.1",
+            "expected": "np.array([False, False])",
+            "explanation": "f(x₀) = 0.3*1*4 + 0.2*1*1 + 0.1 = 1.5, so y₀f(x₀) = 1.5 ≥ 1 (not violated). f(x₁) = 0.3*1*1 + 0.2*1*4 + 0.1 = 1.2, so y₁f(x₁) = 1.2 ≥ 1 (not violated)"
+          },
+          {
+            "input": "K = np.array([[2, 0.5], [0.5, 2]]), labels = np.array([1, -1]), alphas = np.array([0.2, 0.5]), b = -0.1",
+            "expected": "np.array([True, False])",
+            "explanation": "f(x₀) = 0.2*1*2 + 0.5*(-1)*0.5 - 0.1 = 0.15, so y₀f(x₀) = 0.15 < 1 (violated). f(x₁) = 0.2*1*0.5 + 0.5*(-1)*2 - 0.1 = -1.2, so y₁f(x₁) = (-1)*(-1.2) = 1.2 ≥ 1 (not violated)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to multiply by the label y when computing yf(x) - the condition is yf(x) < 1, not f(x) < 1",
+        "Using strict inequality ≤ instead of <. At the boundary yf(x) = 1, the loss is zero by convention",
+        "Computing f(x) incorrectly: remember f(xᵢ) = Σⱼ αⱼ yⱼ K(xⱼ, xᵢ) + b, which can be vectorized as (alphas * labels) @ K + b",
+        "Confusing the sign: loss is active when yf(x) < 1, meaning the functional margin is insufficient"
+      ],
+      "hint": "To compute all decision values efficiently, use matrix-vector multiplication: f = K @ (alphas * labels) + b. Then check element-wise: labels * f < 1.",
+      "references": [
+        "Convex analysis and sub-gradients",
+        "Support vector margins",
+        "Hinge loss vs. other loss functions (logistic, squared)"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Learning Rate Schedules and Stochastic Sub-gradient Descent",
+      "relation_to_problem": "Pegasos uses a specific time-dependent learning rate schedule ηₜ = 1/(λt) that guarantees convergence. Understanding this schedule is essential for implementing the parameter updates correctly.",
+      "prerequisites": [
+        "Gradient descent optimization",
+        "Convex optimization",
+        "Convergence analysis basics"
+      ],
+      "learning_objectives": [
+        "Understand the role of learning rate in gradient descent",
+        "Learn why Pegasos uses the specific schedule ηₜ = 1/(λt)",
+        "Implement iterative parameter updates with decreasing learning rates",
+        "Understand the trade-off between learning rate and convergence speed"
+      ],
+      "math_content": {
+        "definition": "A **learning rate schedule** is a function $\\eta: \\mathbb{N} \\rightarrow \\mathbb{R}^+$ that determines the step size at iteration $t$ in gradient-based optimization. For sub-gradient descent on convex objectives, the general update rule is: $$\\theta_{t+1} = \\theta_t - \\eta_t g_t$$ where $\\theta_t$ are the parameters and $g_t$ is a sub-gradient. Pegasos uses the schedule: $$\\eta_t = \\frac{1}{\\lambda t}$$ where $\\lambda$ is the regularization parameter and $t$ is the iteration number starting from 1.",
+        "notation": "$\\eta_t$ = learning rate at iteration $t$; $\\lambda$ = regularization parameter; $g_t$ = sub-gradient at iteration $t$; $\\theta_t$ = parameters (alphas and bias)",
+        "theorem": "**Convergence of Sub-gradient Descent with Diminishing Step Size**: For a convex, $L$-Lipschitz function, sub-gradient descent with step sizes satisfying $\\sum_{t=1}^{\\infty} \\eta_t = \\infty$ and $\\sum_{t=1}^{\\infty} \\eta_t^2 < \\infty$ converges to the optimal solution. The Pegasos schedule $\\eta_t = 1/(\\lambda t)$ satisfies these conditions: $$\\sum_{t=1}^{\\infty} \\frac{1}{\\lambda t} = \\infty \\quad \\text{and} \\quad \\sum_{t=1}^{\\infty} \\frac{1}{(\\lambda t)^2} = \\frac{\\pi^2}{6\\lambda^2} < \\infty$$",
+        "proof_sketch": "The first condition ensures the algorithm can reach any point (step sizes don't decay too fast). The second condition ensures that the noise from stochastic sub-gradients diminishes (step sizes don't decay too slow). Together, they guarantee convergence to the optimum. The 1/t schedule is optimal in terms of convergence rate for this class of problems.",
+        "examples": [
+          "**Example 1**: With λ = 0.01, the learning rates are: η₁ = 1/(0.01·1) = 100, η₂ = 1/(0.01·2) = 50, η₃ ≈ 33.33, η₁₀ = 10, η₁₀₀ = 1. The rate decays rapidly early but never reaches zero.",
+          "**Example 2**: Compare with constant learning rate η = 0.1. Initially, Pegasos has much larger steps (η₁ = 100 vs 0.1), allowing faster initial progress. Later iterations have smaller, more refined steps ensuring convergence."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Pegasos Learning Rate",
+          "latex": "$\\eta_t = \\frac{1}{\\lambda t}$",
+          "description": "Time-dependent schedule that decreases as O(1/t)"
+        },
+        {
+          "name": "Parameter Update Rule",
+          "latex": "$\\alpha_i^{(t+1)} = \\alpha_i^{(t)} - \\eta_t g_{i,t}$",
+          "description": "General sub-gradient descent update for coefficient αᵢ"
+        },
+        {
+          "name": "Effective Step at Iteration t",
+          "latex": "$\\Delta\\alpha_i = \\frac{1}{\\lambda t} g_{i,t}$",
+          "description": "Actual change in αᵢ; decreases over time"
+        },
+        {
+          "name": "Robbins-Monro Conditions",
+          "latex": "$\\sum \\eta_t = \\infty, \\sum \\eta_t^2 < \\infty$",
+          "description": "Necessary conditions for convergence of stochastic approximation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs iterative updates on a single parameter using the Pegasos learning rate schedule. Given an initial value, a sequence of sub-gradient values, and λ, compute the parameter value after all updates. This simulates the core update mechanism without the complexity of the full SVM.",
+        "function_signature": "def pegasos_parameter_updates(initial_value: float, subgradients: np.ndarray, lambda_val: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef pegasos_parameter_updates(initial_value: float, subgradients: np.ndarray, lambda_val: float) -> np.ndarray:\n    \"\"\"\n    Simulate parameter updates using Pegasos learning rate schedule.\n    \n    Args:\n        initial_value: starting parameter value\n        subgradients: array of sub-gradient values, one per iteration\n        lambda_val: regularization parameter\n    \n    Returns:\n        history: array of parameter values after each iteration (including initial)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "initial_value = 0.0, subgradients = np.array([1.0, 0.5, 0.25]), lambda_val = 0.1",
+            "expected": "np.array([0.0, -10.0, -12.5, -14.583...]) (approximately)",
+            "explanation": "η₁ = 1/(0.1·1) = 10: α₁ = 0 - 10·1 = -10. η₂ = 1/(0.1·2) = 5: α₂ = -10 - 5·0.5 = -12.5. η₃ = 1/(0.1·3) ≈ 3.33: α₃ = -12.5 - 3.33·0.25 ≈ -13.33"
+          },
+          {
+            "input": "initial_value = 5.0, subgradients = np.array([-2.0, -1.0]), lambda_val = 0.5",
+            "expected": "np.array([5.0, 9.0, 10.0])",
+            "explanation": "η₁ = 1/(0.5·1) = 2: α₁ = 5 - 2·(-2) = 9. η₂ = 1/(0.5·2) = 1: α₂ = 9 - 1·(-1) = 10. Negative sub-gradients increase the parameter"
+          },
+          {
+            "input": "initial_value = 1.0, subgradients = np.array([0.0, 0.0, 0.0]), lambda_val = 1.0",
+            "expected": "np.array([1.0, 1.0, 1.0, 1.0])",
+            "explanation": "Zero sub-gradients mean no updates regardless of learning rate. Parameter stays constant at initial value"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Starting iteration count at 0 instead of 1, which would cause division by zero in η₀ = 1/(λ·0)",
+        "Using η = 1/λ as constant instead of η_t = 1/(λt), missing the time-dependence",
+        "Applying learning rate incorrectly: should be parameter -= learning_rate * subgradient, not parameter *= (1 - learning_rate)",
+        "Not storing the history correctly: should include initial value and all T updated values (T+1 total)"
+      ],
+      "hint": "Create an array to store parameter history. Loop through iterations t = 1, 2, ..., computing η_t = 1/(λt) each time, then update: param = param - η_t * subgradient[t-1].",
+      "references": [
+        "Robbins-Monro stochastic approximation theorem",
+        "Learning rate schedules (constant, exponential decay, polynomial decay)",
+        "Convergence rates of first-order methods"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Dual Representation and Alpha Coefficients in Kernel SVM",
+      "relation_to_problem": "Pegasos maintains alpha coefficients (one per training sample) that represent the dual variables. Understanding the dual formulation explains why we update alphas instead of an explicit weight vector w.",
+      "prerequisites": [
+        "Lagrange duality",
+        "Kernel functions (Step 1)",
+        "Constrained optimization"
+      ],
+      "learning_objectives": [
+        "Understand the primal vs. dual formulation of SVM",
+        "Learn why kernel methods require the dual representation",
+        "Understand what alpha coefficients represent geometrically (support vectors)",
+        "Compute predictions using the dual form with kernel evaluations"
+      ],
+      "math_content": {
+        "definition": "In the **primal formulation**, SVM optimizes over the weight vector $w \\in \\mathbb{R}^d$ directly. The **dual formulation** optimizes over Lagrange multipliers $\\alpha_i \\geq 0$ (one per training example), where the weight vector is represented as: $$w = \\sum_{i=1}^{n} \\alpha_i y_i x_i$$ For kernelized SVM, we never explicitly compute $w$. Instead, predictions use: $$f(x) = \\sum_{i=1}^{n} \\alpha_i y_i K(x_i, x) + b$$ where $K$ is the kernel function. The $\\alpha_i$ coefficients determine each training example's influence on the decision boundary.",
+        "notation": "$w$ = primal weight vector; $\\alpha_i$ = dual coefficient for example $i$; $b$ = bias term; $K(x_i, x)$ = kernel evaluation between training point $x_i$ and test point $x$",
+        "theorem": "**Representer Theorem**: For a kernel-based learning problem with regularization, the optimal solution has the form $w^* = \\sum_{i=1}^{n} \\alpha_i^* y_i \\phi(x_i)$ where $\\phi$ is the feature mapping. This means the optimal weight vector lies in the span of the training data in feature space. Equivalently, predictions can be written using only kernel evaluations: $$f(x) = \\sum_{i=1}^{n} \\alpha_i^* y_i K(x_i, x) + b^*$$",
+        "proof_sketch": "Any optimal $w$ can be decomposed into components parallel and perpendicular to the span of training data. The regularization term $\\|w\\|^2$ penalizes both components, but only the parallel component affects the loss (since loss depends on predictions, which only depend on projections onto training data). Therefore, the perpendicular component must be zero at optimum.",
+        "examples": [
+          "**Example 1**: Consider 3 training points with optimal coefficients α = [0.2, 0.8, 0.0] and labels y = [1, 1, -1]. Point 3 has α₃ = 0 and doesn't influence predictions (not a support vector). Points 1 and 2 are support vectors, with point 2 having larger influence.",
+          "**Example 2**: To predict on new point x with linear kernel: f(x) = 0.2·1·(x₁·x) + 0.8·1·(x₂·x) + 0·(-1)·(x₃·x) + b = 0.2(x₁·x) + 0.8(x₂·x) + b. Only support vectors (α > 0) contribute."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Dual Representation of Weight",
+          "latex": "$w = \\sum_{i=1}^{n} \\alpha_i y_i \\phi(x_i)$",
+          "description": "Weight vector as linear combination of mapped training points"
+        },
+        {
+          "name": "Kernelized Prediction",
+          "latex": "$f(x) = \\sum_{i=1}^{n} \\alpha_i y_i K(x_i, x) + b$",
+          "description": "Decision function using only kernel evaluations; no explicit w"
+        },
+        {
+          "name": "Support Vector Condition",
+          "latex": "$\\alpha_i > 0 \\Leftrightarrow y_i f(x_i) \\leq 1$",
+          "description": "Non-zero alphas correspond to points on or inside the margin"
+        },
+        {
+          "name": "Decision Boundary",
+          "latex": "$\\{x : f(x) = 0\\}$",
+          "description": "Points where weighted kernel sum plus bias equals zero"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that makes predictions on new data points using the dual representation. Given training data, labels, trained alpha coefficients, bias, and kernel parameters, compute the decision values f(x) for a set of test points. This is the core prediction mechanism in kernel SVM.",
+        "function_signature": "def predict_dual_svm(X_train: np.ndarray, y_train: np.ndarray, alphas: np.ndarray, b: float, X_test: np.ndarray, kernel: str = 'linear', sigma: float = 1.0) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef predict_dual_svm(X_train: np.ndarray, y_train: np.ndarray, alphas: np.ndarray, b: float, X_test: np.ndarray, kernel: str = 'linear', sigma: float = 1.0) -> np.ndarray:\n    \"\"\"\n    Compute decision values for test points using dual SVM representation.\n    \n    Args:\n        X_train: training data of shape (n, d)\n        y_train: training labels of shape (n,) with values in {-1, +1}\n        alphas: trained alpha coefficients of shape (n,)\n        b: trained bias term (scalar)\n        X_test: test data of shape (m, d)\n        kernel: 'linear' or 'rbf'\n        sigma: bandwidth for RBF kernel\n    \n    Returns:\n        f_values: decision values of shape (m,) for each test point\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "X_train = np.array([[1, 0], [0, 1]]), y_train = np.array([1, -1]), alphas = np.array([0.5, 0.5]), b = 0.0, X_test = np.array([[1, 0], [0.5, 0.5]]), kernel='linear'",
+            "expected": "np.array([0.5, 0.0])",
+            "explanation": "For test point [1,0]: f = 0.5·1·([1,0]·[1,0]) + 0.5·(-1)·([0,1]·[1,0]) + 0 = 0.5·1 + 0 = 0.5. For [0.5,0.5]: f = 0.5·1·0.5 + 0.5·(-1)·0.5 = 0.25 - 0.25 = 0"
+          },
+          {
+            "input": "X_train = np.array([[0], [1]]), y_train = np.array([1, -1]), alphas = np.array([1.0, 0.0]), b = 0.5, X_test = np.array([[0], [2]]), kernel='linear'",
+            "expected": "np.array([0.5, 2.5])",
+            "explanation": "Only α₀ = 1 is non-zero. For x = [0]: f = 1·1·(0·0) + 0.5 = 0.5. For x = [2]: f = 1·1·(0·2) + 0.5 = 0.5. Wait, correction: f = 1·1·([0]·[0]) + 0.5 = 0.5 and f = 1·1·([0]·[2]) + 0.5 = 0 + 0.5 = 0.5"
+          },
+          {
+            "input": "X_train = np.array([[0, 0]]), y_train = np.array([1]), alphas = np.array([2.0]), b = -1.0, X_test = np.array([[1, 1], [2, 2]]), kernel='rbf', sigma=1.0",
+            "expected": "np.array([-0.1353, -0.0183]) (approximately)",
+            "explanation": "For [1,1]: K([0,0],[1,1]) = exp(-2/2) = exp(-1) ≈ 0.3679, so f = 2·1·0.3679 - 1 ≈ -0.264. For [2,2]: K([0,0],[2,2]) = exp(-8/2) ≈ 0.0183, so f ≈ 2·0.0183 - 1 ≈ -0.963"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing kernel between test points instead of between each test point and each training point. Need K(X_train, X_test), not K(X_test, X_test)",
+        "Forgetting to multiply by the label yᵢ in the sum: f(x) = Σ αᵢ yᵢ K(xᵢ, x), not Σ αᵢ K(xᵢ, x)",
+        "Not handling the bias term b correctly - it should be added after the kernel sum",
+        "Inefficient looping when this can be vectorized: compute kernel matrix between train and test, then use matrix multiplication"
+      ],
+      "hint": "First compute the cross-kernel matrix K_cross of shape (n_train, n_test) where K_cross[i,j] = K(X_train[i], X_test[j]). Then use: f = (alphas * y_train) @ K_cross + b.",
+      "references": [
+        "Lagrange duality in optimization",
+        "KKT conditions for SVM",
+        "Representer theorem",
+        "Support vectors and sparsity in SVM"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Regularization and the SVM Objective Function",
+      "relation_to_problem": "The Pegasos algorithm optimizes a regularized objective that balances margin maximization (through λ||w||²) and loss minimization. Understanding this objective explains the complete parameter update rules.",
+      "prerequisites": [
+        "Convex optimization",
+        "Regularization in machine learning",
+        "Hinge loss (Step 2)"
+      ],
+      "learning_objectives": [
+        "Understand the complete SVM primal objective with regularization",
+        "Learn how the regularization parameter λ controls overfitting",
+        "Derive the parameter update rules from the objective's sub-gradient",
+        "Understand the connection between primal and dual updates in Pegasos"
+      ],
+      "math_content": {
+        "definition": "The **regularized SVM objective** combines a regularization term with the empirical loss: $$J(w, b) = \\frac{\\lambda}{2}\\|w\\|^2 + \\frac{1}{n}\\sum_{i=1}^{n} \\max(0, 1 - y_i(w^T x_i + b))$$ The first term $\\frac{\\lambda}{2}\\|w\\|^2$ encourages small weight magnitudes (large margin), while the second term penalizes margin violations. The parameter $\\lambda > 0$ controls this trade-off: large $\\lambda$ emphasizes margin width over training accuracy.",
+        "notation": "$\\lambda$ = regularization parameter; $\\|w\\|^2 = \\sum_{j=1}^{d} w_j^2$ = squared L2 norm; $J(w,b)$ = objective function to minimize",
+        "theorem": "**Sub-gradient of Regularized Objective**: For the deterministic Pegasos variant that processes all samples per iteration, the sub-gradient of $J$ with respect to the dual variables is: For each training example $i$, if $y_i f(x_i) < 1$ (margin violated): $$\\frac{\\partial J}{\\partial \\alpha_i} \\ni \\lambda \\alpha_i - y_i$$ If $y_i f(x_i) \\geq 1$ (margin satisfied): $$\\frac{\\partial J}{\\partial \\alpha_i} \\ni \\lambda \\alpha_i$$ This leads to the update rule: $$\\alpha_i \\leftarrow \\alpha_i - \\eta_t(\\lambda \\alpha_i - y_i \\mathbb{1}_{[y_i f(x_i) < 1]})$$ where $\\mathbb{1}_{[\\cdot]}$ is the indicator function and $\\eta_t = 1/(\\lambda t)$.",
+        "proof_sketch": "The regularization term contributes $\\lambda \\alpha_i$ to the sub-gradient (from $\\|w\\|^2$ where $w = \\sum_j \\alpha_j y_j x_j$). The hinge loss contributes $-y_i$ when active (margin violated) and $0$ when inactive. Combining these gives the full sub-gradient. The bias term has sub-gradient $-y_i$ when margin is violated.",
+        "examples": [
+          "**Example 1**: λ = 0.1, iteration t = 5, so η₅ = 1/(0.1·5) = 2. For a sample with αᵢ = 0.3, yᵢ = 1, and yᵢf(xᵢ) = 0.7 < 1 (violated): Sub-gradient = 0.1·0.3 - 1 = -0.97. Update: αᵢ ← 0.3 - 2·(-0.97) = 0.3 + 1.94 = 2.24.",
+          "**Example 2**: Same parameters, but now yᵢf(xᵢ) = 1.5 ≥ 1 (satisfied): Sub-gradient = 0.1·0.3 - 0 = 0.03. Update: αᵢ ← 0.3 - 2·0.03 = 0.24. The alpha shrinks toward zero (regularization effect)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "SVM Primal Objective",
+          "latex": "$J(w,b) = \\frac{\\lambda}{2}\\|w\\|^2 + \\frac{1}{n}\\sum_{i=1}^{n}\\max(0, 1 - y_i f(x_i))$",
+          "description": "Minimize for optimal classifier; balance margin and loss"
+        },
+        {
+          "name": "Alpha Update (Violation)",
+          "latex": "$\\alpha_i \\leftarrow \\alpha_i + \\eta_t(y_i - \\lambda\\alpha_i)$",
+          "description": "When margin violated: increase αᵢ in direction of yᵢ, shrink by λαᵢ"
+        },
+        {
+          "name": "Alpha Update (No Violation)",
+          "latex": "$\\alpha_i \\leftarrow \\alpha_i(1 - \\eta_t\\lambda)$",
+          "description": "When margin satisfied: shrink αᵢ toward zero (regularization)"
+        },
+        {
+          "name": "Bias Update",
+          "latex": "$b \\leftarrow b + \\eta_t y_i$ if violated",
+          "description": "Bias increases in direction of yᵢ when margin violated"
+        },
+        {
+          "name": "Combined Update",
+          "latex": "$\\alpha_i \\leftarrow (1 - \\eta_t\\lambda)\\alpha_i + \\eta_t y_i \\mathbb{1}_{[y_i f(x_i) < 1]}$",
+          "description": "Complete update: regularization shrinkage plus conditional boost"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a single iteration of deterministic Pegasos updates. Given the kernel matrix, current alphas, bias, labels, regularization parameter, and iteration number, update all alpha coefficients and the bias according to the Pegasos rules. Process ALL samples in the iteration (deterministic variant). Return the updated alphas and bias.",
+        "function_signature": "def pegasos_iteration(K: np.ndarray, alphas: np.ndarray, b: float, labels: np.ndarray, lambda_val: float, iteration: int) -> (np.ndarray, float):",
+        "starter_code": "import numpy as np\n\ndef pegasos_iteration(K: np.ndarray, alphas: np.ndarray, b: float, labels: np.ndarray, lambda_val: float, iteration: int) -> (np.ndarray, float):\n    \"\"\"\n    Perform one iteration of deterministic Pegasos algorithm.\n    \n    Args:\n        K: kernel matrix of shape (n, n)\n        alphas: current alpha coefficients of shape (n,)\n        b: current bias (scalar)\n        labels: labels of shape (n,) with values in {-1, +1}\n        lambda_val: regularization parameter\n        iteration: current iteration number (starting from 1)\n    \n    Returns:\n        alphas_new: updated alpha coefficients\n        b_new: updated bias\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "K = np.eye(2), alphas = np.array([0.0, 0.0]), b = 0.0, labels = np.array([1, -1]), lambda_val = 0.1, iteration = 1",
+            "expected": "alphas ≈ [10.0, -10.0], b ≈ 0.0",
+            "explanation": "η₁ = 1/(0.1·1) = 10. Initially f(x₀) = f(x₁) = 0, so both violate y·f < 1. Update: α₀ ← 0 + 10(1 - 0.1·0) = 10; α₁ ← 0 + 10(-1 - 0.1·0) = -10. Bias: b ← 0 + 10·1 + 10·(-1) = 0"
+          },
+          {
+            "input": "K = np.array([[1, 0.5], [0.5, 1]]), alphas = np.array([1.0, 1.0]), b = 0.5, labels = np.array([1, 1]), lambda_val = 0.5, iteration = 2",
+            "expected": "alphas ≈ [0.5, 0.5], b = 0.5",
+            "explanation": "η₂ = 1/(0.5·2) = 1. f(x₀) = 1·1·1 + 1·1·0.5 + 0.5 = 2 ≥ 1 (not violated). f(x₁) = 1·1·0.5 + 1·1·1 + 0.5 = 2 ≥ 1. Both satisfied, so only regularization: α₀ ← 1(1 - 1·0.5) = 0.5; α₁ ← 0.5. Bias unchanged."
+          },
+          {
+            "input": "K = np.eye(3), alphas = np.array([0.5, 0.3, 0.0]), b = 0.0, labels = np.array([1, -1, 1]), lambda_val = 0.2, iteration = 10",
+            "expected": "alphas ≈ [0.95, -0.65, 0.5], b ≈ 0.5",
+            "explanation": "η₁₀ = 1/(0.2·10) = 0.5. f(x₀) = 0.5, f(x₁) = -0.3, f(x₂) = 0, all violate. α₀ ← 0.5(1-0.5·0.2) + 0.5·1 = 0.45 + 0.5 = 0.95. α₁ ← 0.3·0.9 + 0.5·(-1) = -0.23. α₂ ← 0 + 0.5·1 = 0.5. b ← 0 + 0.5(1-1+1) = 0.5"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Applying updates in-place without using temporary variables, causing later samples to use partially updated alphas incorrectly",
+        "Forgetting the regularization shrinkage term (1 - η_t λ) that applies to all alphas every iteration",
+        "Updating bias incorrectly: should add η_t y_i for each violated sample, not set to a single value",
+        "Not accumulating bias updates across all violated samples in the deterministic version",
+        "Using wrong learning rate formula: η_t = 1/(λt), not 1/t or 1/λ"
+      ],
+      "hint": "Compute all decision values f first. Identify violations: mask = (labels * f < 1). Apply regularization shrinkage to all alphas: alphas *= (1 - eta*lambda). Then add conditional updates: alphas += eta * labels * mask. For bias, sum: b += eta * np.sum(labels[mask]).",
+      "references": [
+        "Tikhonov regularization",
+        "Ridge regression vs. SVM regularization",
+        "L1 vs. L2 regularization",
+        "Bias-variance tradeoff"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Deterministic Pegasos Algorithm Implementation",
+      "relation_to_problem": "This final quest integrates all previous concepts into the complete deterministic Pegasos algorithm: kernel computations, margin violation detection, learning rate scheduling, dual representation, and regularized updates over multiple iterations.",
+      "prerequisites": [
+        "All previous steps: Kernels, Hinge Loss, Learning Rates, Dual Representation, Regularization"
+      ],
+      "learning_objectives": [
+        "Synthesize all components into a complete training algorithm",
+        "Implement proper initialization and iteration control",
+        "Handle both linear and RBF kernels in a unified framework",
+        "Validate the implementation produces reasonable classifiers"
+      ],
+      "math_content": {
+        "definition": "The **Deterministic Pegasos Algorithm** is a variant of the original stochastic Pegasos that processes all training samples in each iteration instead of random sampling. The complete algorithm: **Input**: Training data $(x_1, y_1), \\ldots, (x_n, y_n)$, kernel $K$, regularization $\\lambda$, iterations $T$, kernel parameters (e.g., $\\sigma$ for RBF). **Output**: Dual coefficients $\\alpha = (\\alpha_1, \\ldots, \\alpha_n)$ and bias $b$. **Procedure**: 1. Compute kernel matrix $K_{ij} = K(x_i, x_j)$ for all $i,j$. 2. Initialize $\\alpha_i = 0$ for all $i$, and $b = 0$. 3. For $t = 1$ to $T$: (a) Compute learning rate $\\eta_t = \\frac{1}{\\lambda t}$. (b) For each sample $i$: Compute $f(x_i) = \\sum_{j=1}^{n} \\alpha_j y_j K_{ij} + b$. (c) Identify violations: $V = \\{i : y_i f(x_i) < 1\\}$. (d) Update alphas: $\\alpha_i \\leftarrow (1 - \\eta_t \\lambda)\\alpha_i + \\eta_t y_i \\mathbb{1}_{[i \\in V]}$ for all $i$. (e) Update bias: $b \\leftarrow b + \\eta_t \\sum_{i \\in V} y_i$. 4. Return $(\\alpha, b)$.",
+        "notation": "$T$ = number of iterations; $V$ = set of indices violating margin; $\\mathbb{1}_{[\\cdot]}$ = indicator function; $\\eta_t$ = learning rate at iteration $t$",
+        "theorem": "**Convergence of Deterministic Pegasos**: For convex objective with Lipschitz-continuous sub-gradients and the learning rate $\\eta_t = 1/(\\lambda t)$, the deterministic version converges to a solution within $\\epsilon$ of optimal after $O(1/(\\lambda \\epsilon))$ iterations. The deterministic variant typically converges faster than stochastic for small datasets since it uses complete gradient information.",
+        "proof_sketch": "Each iteration uses the full batch sub-gradient, which is an unbiased estimate with zero variance (unlike stochastic sampling). The decreasing learning rate ensures convergence, and the regularization term maintains bounded parameter growth. The convergence rate follows from standard convex optimization analysis with diminishing step sizes.",
+        "examples": [
+          "**Linearly Separable Case**: For data $X = [[1,0], [0,1], [2,1], [1,2]]$ with labels $y = [1, 1, -1, -1]$ and linear kernel, after sufficient iterations, samples on the decision boundary (support vectors) will have larger $|\\alpha_i|$ values, while correctly classified points far from the boundary will have $\\alpha_i \\approx 0$.",
+          "**Non-linear Case with RBF**: For XOR-like data that's not linearly separable, RBF kernel with appropriate $\\sigma$ enables classification. The algorithm learns non-zero alphas for all points since they all contribute to the non-linear boundary."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Full Algorithm Objective",
+          "latex": "$\\min_{\\alpha, b} \\frac{\\lambda}{2}\\sum_{i,j}\\alpha_i \\alpha_j y_i y_j K_{ij} + \\frac{1}{n}\\sum_{i=1}^{n}\\max(0, 1-y_i f(x_i))$",
+          "description": "Dual formulation with kernel matrix"
+        },
+        {
+          "name": "Decision Function",
+          "latex": "$f(x) = \\sum_{i=1}^{n}\\alpha_i y_i K(x_i, x) + b$",
+          "description": "Prediction formula using learned parameters"
+        },
+        {
+          "name": "Batch Update Rule",
+          "latex": "$\\alpha^{(t+1)} = (1-\\eta_t\\lambda)\\alpha^{(t)} + \\eta_t \\cdot (y \\odot \\text{mask}_{\\text{violations}})$",
+          "description": "Vectorized update for all alphas; ⊙ is element-wise product"
+        },
+        {
+          "name": "Classification Rule",
+          "latex": "$\\hat{y}(x) = \\text{sign}(f(x))$",
+          "description": "Predicted label is sign of decision function"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete deterministic Pegasos algorithm for kernel SVM. The function should: (1) compute the kernel matrix once at the start, (2) initialize alphas and bias to zero, (3) iterate T times performing batch updates on all samples, (4) return final alpha coefficients and bias. This is a simplified version of the main problem - you should implement the core training loop without worrying about optimization tricks. The final solution may require additional considerations like numerical stability and efficient kernel computation.",
+        "function_signature": "def train_pegasos_kernel_svm_simplified(X: np.ndarray, y: np.ndarray, kernel: str = 'linear', lambda_val: float = 0.01, iterations: int = 100, sigma: float = 1.0) -> (np.ndarray, float):",
+        "starter_code": "import numpy as np\n\ndef train_pegasos_kernel_svm_simplified(X: np.ndarray, y: np.ndarray, kernel: str = 'linear', lambda_val: float = 0.01, iterations: int = 100, sigma: float = 1.0) -> (np.ndarray, float):\n    \"\"\"\n    Train a kernel SVM using deterministic Pegasos algorithm.\n    \n    Args:\n        X: training data of shape (n, d)\n        y: labels of shape (n,) with values in {-1, +1}\n        kernel: 'linear' or 'rbf'\n        lambda_val: regularization parameter\n        iterations: number of training iterations\n        sigma: bandwidth for RBF kernel\n    \n    Returns:\n        alphas: trained dual coefficients of shape (n,)\n        b: trained bias (scalar)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "X = np.array([[1, 2], [2, 1], [2, 3], [3, 2]]), y = np.array([1, 1, -1, -1]), kernel='linear', lambda_val=0.01, iterations=50",
+            "expected": "alphas with non-zero values for support vectors, b near decision boundary",
+            "explanation": "Linearly separable data. After training, expect alphas to be positive for positive class support vectors, negative for negative class support vectors, and decision boundary (b) between the two classes."
+          },
+          {
+            "input": "X = np.array([[0, 0], [1, 1], [1, 0], [0, 1]]), y = np.array([1, 1, -1, -1]), kernel='rbf', lambda_val=0.1, iterations=100, sigma=0.5",
+            "expected": "alphas with significant magnitudes for all points (XOR pattern), b near 0",
+            "explanation": "XOR pattern - not linearly separable. RBF kernel with small sigma creates local influence. All points are support vectors in this non-linear case."
+          },
+          {
+            "input": "X = np.array([[1], [2], [3]]), y = np.array([1, -1, 1]), kernel='linear', lambda_val=0.5, iterations=20",
+            "expected": "alphas showing the pattern learned from 1D data, b as decision threshold",
+            "explanation": "Simple 1D case. Middle point (label -1) surrounded by label 1. Demonstrates algorithm works in low dimensions."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing kernel matrix inside the iteration loop instead of once before the loop (huge performance waste)",
+        "Not handling the deterministic batch updates correctly - must process ALL samples per iteration, not randomly sample",
+        "Forgetting to cast labels and data to appropriate types (int vs float) which can cause subtle bugs",
+        "Not initializing the iteration counter at 1 (should be range(1, iterations+1), not range(iterations))",
+        "Returning alphas and bias in wrong order or wrong format (should return numpy array and float)",
+        "Not implementing both kernel types (linear and RBF) with proper parameter handling"
+      ],
+      "hint": "Structure your solution: (1) Compute K once using nested loops or vectorized operations, (2) Initialize alphas = np.zeros(n) and b = 0.0, (3) Loop t from 1 to iterations, (4) In each iteration: compute f_values = K @ (alphas * y) + b, find violations where y * f_values < 1, compute eta_t, apply vectorized updates to alphas and b. Return (alphas, b) at the end.",
+      "references": [
+        "Full Pegasos paper (Shalev-Shwartz et al.)",
+        "Batch vs. stochastic gradient descent",
+        "Kernel SVM optimization",
+        "Support Vector Machine theory"
+      ]
+    }
+  ]
+}

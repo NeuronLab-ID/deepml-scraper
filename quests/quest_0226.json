@@ -1,0 +1,439 @@
+{
+  "problem_id": 226,
+  "title": "Pass@k and Majority Voting Evaluation Metrics",
+  "category": "Reinforcement Learning",
+  "difficulty": "easy",
+  "description": "Implement evaluation metrics for reasoning models: pass@1 and majority voting (consensus). These metrics are essential for evaluating models where multiple samples are generated per problem. Pass@1 measures the average correctness across samples, while majority voting selects the most common answer, often improving accuracy by filtering out inconsistent errors.",
+  "example": {
+    "input": "responses_correct = np.array([True, False, True, False])",
+    "output": "0.5",
+    "reasoning": "2 out of 4 responses are correct, so pass@1 = 2/4 = 0.5. This represents a 50% chance of getting a correct answer when sampling once."
+  },
+  "starter_code": "import numpy as np\nfrom collections import Counter\n\ndef pass_at_1(responses_correct: np.ndarray) -> float:\n\t\"\"\"\n\tCompute pass@1 by averaging correctness.\n\t\n\tArgs:\n\t\tresponses_correct: Boolean array for each response\n\t\t\n\tReturns:\n\t\tpass@1 score\n\t\"\"\"\n\t# Your code here\n\tpass\n\n\ndef majority_voting(responses: list[str]) -> str:\n\t\"\"\"\n\tReturn the most common response.\n\t\n\tArgs:\n\t\tresponses: List of response strings\n\t\t\n\tReturns:\n\t\tMost frequent response\n\t\"\"\"\n\t# Your code here\n\tpass\n\n\ndef pass_at_k(n: int, c: int, k: int) -> float:\n\t\"\"\"\n\tCompute unbiased pass@k from n samples with c correct.\n\t\n\tFormula: pass@k = 1 - C(n-c, k) / C(n, k)\n\t\n\tArgs:\n\t\tn: Total samples\n\t\tc: Correct samples\n\t\tk: k in pass@k\n\t\t\n\tReturns:\n\t\tEstimated pass@k\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Boolean Arrays and Statistical Aggregation",
+      "relation_to_problem": "Pass@1 requires computing the mean of boolean correctness values, which is the foundation for understanding how we measure model accuracy across multiple samples.",
+      "prerequisites": [
+        "Basic probability",
+        "Array operations",
+        "Boolean logic"
+      ],
+      "learning_objectives": [
+        "Understand boolean arrays as binary random variables",
+        "Compute statistical measures (mean, sum) on boolean data",
+        "Interpret boolean mean as empirical probability"
+      ],
+      "math_content": {
+        "definition": "A **boolean random variable** $X$ takes values in $\\{0, 1\\}$ or equivalently $\\{\\text{False}, \\text{True}\\}$. For a sequence of boolean observations $X_1, X_2, \\ldots, X_n$, the **empirical mean** provides an unbiased estimate of the true probability: $$\\hat{p} = \\frac{1}{n} \\sum_{i=1}^{n} X_i$$ where $X_i = 1$ if observation $i$ is True, and $X_i = 0$ otherwise.",
+        "notation": "$X_i \\in \\{0,1\\}$ = binary outcome, $n$ = sample size, $\\hat{p}$ = empirical probability estimate, $\\mathbb{E}[X]$ = expected value",
+        "theorem": "**Law of Large Numbers for Binary Variables**: As $n \\to \\infty$, the empirical mean $\\hat{p}$ converges in probability to the true probability $p$: $$\\lim_{n \\to \\infty} P\\left(\\left|\\hat{p} - p\\right| > \\epsilon\\right) = 0$$ for any $\\epsilon > 0$.",
+        "proof_sketch": "Since $X_i$ are i.i.d. with $\\mathbb{E}[X_i] = p$ and $\\text{Var}(X_i) = p(1-p)$, by the Central Limit Theorem: $$\\frac{\\hat{p} - p}{\\sqrt{p(1-p)/n}} \\xrightarrow{d} N(0,1)$$. The variance of $\\hat{p}$ is $\\sigma^2_{\\hat{p}} = \\frac{p(1-p)}{n}$, which decreases as $n$ increases, ensuring convergence.",
+        "examples": [
+          "If responses are [True, False, True, True], then $\\hat{p} = \\frac{3}{4} = 0.75$",
+          "For 100 samples with 73 correct: $\\hat{p} = 0.73$ with standard error $\\sqrt{0.73 \\cdot 0.27 / 100} \\approx 0.044$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Empirical Mean",
+          "latex": "$\\hat{p} = \\frac{1}{n} \\sum_{i=1}^{n} X_i$",
+          "description": "Use to compute average correctness from boolean array"
+        },
+        {
+          "name": "Standard Error",
+          "latex": "$\\text{SE} = \\sqrt{\\frac{\\hat{p}(1-\\hat{p})}{n}}$",
+          "description": "Use to quantify uncertainty in the estimate"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the empirical probability (mean) of a boolean array representing correct/incorrect model responses. This directly implements the pass@1 metric computation.",
+        "function_signature": "def compute_empirical_probability(outcomes: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_empirical_probability(outcomes: np.ndarray) -> float:\n    \"\"\"\n    Compute empirical probability from boolean outcomes.\n    \n    Args:\n        outcomes: Boolean array of True/False values\n        \n    Returns:\n        Empirical probability (float between 0 and 1)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_empirical_probability(np.array([True, True, True, True]))",
+            "expected": "1.0",
+            "explanation": "All outcomes are True, so probability is 1.0"
+          },
+          {
+            "input": "compute_empirical_probability(np.array([True, False, True, False]))",
+            "expected": "0.5",
+            "explanation": "2 out of 4 are True, so probability is 0.5"
+          },
+          {
+            "input": "compute_empirical_probability(np.array([False, False, False]))",
+            "expected": "0.0",
+            "explanation": "No True values, so probability is 0.0"
+          },
+          {
+            "input": "compute_empirical_probability(np.array([True, True, False, True, True, True]))",
+            "expected": "0.8333333333333334",
+            "explanation": "5 out of 6 are True, so probability is 5/6"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle empty arrays (should they return 0.0 or raise an error?)",
+        "Using integer division instead of float division in languages that distinguish them",
+        "Not recognizing that boolean True equals 1 and False equals 0 in numerical operations",
+        "Confusing empirical probability with theoretical probability"
+      ],
+      "hint": "NumPy's mean() function works directly on boolean arrays, treating True as 1 and False as 0.",
+      "references": [
+        "Law of Large Numbers",
+        "Bernoulli random variables",
+        "Maximum likelihood estimation for binomial proportions"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Mode and Frequency Analysis",
+      "relation_to_problem": "Majority voting requires finding the most frequent element in a collection, which is the statistical mode. This is essential for selecting the consensus answer from multiple model responses.",
+      "prerequisites": [
+        "Hash maps/dictionaries",
+        "Counting algorithms",
+        "Statistical mode"
+      ],
+      "learning_objectives": [
+        "Understand the mode as the value with maximum frequency",
+        "Implement efficient frequency counting using hash tables",
+        "Handle tie-breaking scenarios in mode selection"
+      ],
+      "math_content": {
+        "definition": "The **mode** of a discrete dataset $\\mathcal{D} = \\{x_1, x_2, \\ldots, x_n\\}$ is the value that appears most frequently: $$\\text{mode}(\\mathcal{D}) = \\arg\\max_{x \\in \\mathcal{D}} \\left|\\{i : x_i = x\\}\\right|$$ where $|\\cdot|$ denotes cardinality (count). For a probability distribution $P(X)$, the mode is: $$x^* = \\arg\\max_{x} P(X = x)$$",
+        "notation": "$f(x)$ = frequency of value $x$, $\\mathcal{D}$ = dataset, $\\arg\\max$ = argument that maximizes, $x^*$ = mode",
+        "theorem": "**Majority Voting Convergence Theorem**: Given i.i.d. samples from a distribution where the correct answer $y^*$ has probability $p(y^*) = \\max_{y \\in Y} p(y) > 0.5$, the mode converges to $y^*$ as sample size $n \\to \\infty$ with probability 1. Formally: $$P(\\text{mode}(X_1, \\ldots, X_n) = y^*) \\xrightarrow{n \\to \\infty} 1$$",
+        "proof_sketch": "By the Law of Large Numbers, the empirical frequency $\\hat{f}(y)$ converges to $p(y)$ for each $y \\in Y$. Since $p(y^*) > p(y)$ for all $y \\neq y^*$, there exists $n_0$ such that for $n > n_0$, $\\hat{f}(y^*) > \\hat{f}(y)$ almost surely. Thus the empirical mode equals $y^*$ for sufficiently large $n$.",
+        "examples": [
+          "For responses ['A', 'B', 'A', 'A', 'C'], frequencies are: A=3, B=1, C=1. Mode is 'A' with frequency 3.",
+          "For responses ['yes', 'no', 'yes'], mode is 'yes' with frequency 2/3 = 0.667."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Frequency Function",
+          "latex": "$f(x) = \\sum_{i=1}^{n} \\mathbb{1}_{x_i = x}$",
+          "description": "Count occurrences of value x in dataset"
+        },
+        {
+          "name": "Mode Selection",
+          "latex": "$x^* = \\arg\\max_{x \\in \\mathcal{D}} f(x)$",
+          "description": "Select value with highest frequency"
+        },
+        {
+          "name": "Majority Condition",
+          "latex": "$f(x^*) > \\frac{n}{2}$",
+          "description": "True majority exists if mode appears more than half the time"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that finds the most frequent element in a list using a frequency counter. This is the core operation for majority voting. Handle ties by returning any of the most frequent elements.",
+        "function_signature": "def find_most_frequent(items: list) -> any:",
+        "starter_code": "from collections import Counter\n\ndef find_most_frequent(items: list):\n    \"\"\"\n    Find the most frequent element in a list.\n    \n    Args:\n        items: List of any hashable items\n        \n    Returns:\n        The most frequent item\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "find_most_frequent(['A', 'B', 'A', 'C', 'A'])",
+            "expected": "'A'",
+            "explanation": "A appears 3 times, more than any other element"
+          },
+          {
+            "input": "find_most_frequent([1, 2, 2, 3, 3, 3])",
+            "expected": "3",
+            "explanation": "3 appears 3 times, which is the maximum frequency"
+          },
+          {
+            "input": "find_most_frequent(['yes', 'no', 'yes'])",
+            "expected": "'yes'",
+            "explanation": "yes appears 2 times out of 3"
+          },
+          {
+            "input": "find_most_frequent([42])",
+            "expected": "42",
+            "explanation": "Single element is trivially the mode"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling empty lists (edge case that should be defined)",
+        "Inefficient O(n²) algorithms instead of O(n) hash-based counting",
+        "Not considering how to break ties when multiple elements have the same max frequency",
+        "Assuming the mode always represents a true majority (>50%)"
+      ],
+      "hint": "Python's Counter class from collections provides a most_common() method that returns elements sorted by frequency.",
+      "references": [
+        "Hash table data structures",
+        "Statistical mode and multimodal distributions",
+        "Voting theory and Condorcet's jury theorem"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Combinatorial Coefficient Computation",
+      "relation_to_problem": "The unbiased pass@k estimator requires computing binomial coefficients C(n,k). Understanding combinatorics is essential for calculating the probability of success in k attempts.",
+      "prerequisites": [
+        "Factorials",
+        "Combinations",
+        "Basic probability"
+      ],
+      "learning_objectives": [
+        "Understand binomial coefficients and their combinatorial interpretation",
+        "Implement numerically stable computation avoiding large factorials",
+        "Apply combinations to probability calculations"
+      ],
+      "math_content": {
+        "definition": "The **binomial coefficient** $\\binom{n}{k}$ (read as 'n choose k') counts the number of ways to select $k$ items from $n$ items without regard to order: $$\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$$ where $n! = n \\cdot (n-1) \\cdot (n-2) \\cdots 2 \\cdot 1$ is the factorial function. By convention, $\\binom{n}{k} = 0$ if $k > n$ or $k < 0$.",
+        "notation": "$\\binom{n}{k}$ or $C(n,k)$ = binomial coefficient, $n!$ = n factorial, $k$ = selection size",
+        "theorem": "**Pascal's Identity**: The binomial coefficients satisfy the recurrence relation: $$\\binom{n}{k} = \\binom{n-1}{k-1} + \\binom{n-1}{k}$$ with base cases $\\binom{n}{0} = 1$ and $\\binom{n}{n} = 1$. **Symmetry Property**: $$\\binom{n}{k} = \\binom{n}{n-k}$$",
+        "proof_sketch": "Pascal's identity: Consider selecting $k$ items from $n$. Either we include item $n$ (leaving $k-1$ items to select from $n-1$), or we exclude it (leaving $k$ items to select from $n-1$). These cases partition all possibilities, giving the sum. Symmetry: Selecting $k$ items is equivalent to selecting the $n-k$ items to exclude.",
+        "examples": [
+          "$\\binom{5}{2} = \\frac{5!}{2!3!} = \\frac{120}{2 \\cdot 6} = 10$. There are 10 ways to choose 2 items from 5.",
+          "$\\binom{10}{3} = \\frac{10 \\cdot 9 \\cdot 8}{3 \\cdot 2 \\cdot 1} = 120$. Computing as successive products avoids large factorials."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Binomial Coefficient Definition",
+          "latex": "$\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$",
+          "description": "Fundamental definition using factorials"
+        },
+        {
+          "name": "Product Form",
+          "latex": "$\\binom{n}{k} = \\frac{n(n-1)(n-2)\\cdots(n-k+1)}{k!}$",
+          "description": "More efficient for computation, only k terms in numerator"
+        },
+        {
+          "name": "Iterative Ratio",
+          "latex": "$\\binom{n}{k} = \\prod_{i=0}^{k-1} \\frac{n-i}{i+1}$",
+          "description": "Most numerically stable, computes ratio term by term"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes binomial coefficients C(n,k) using an iterative approach that avoids computing large factorials. This approach prevents integer overflow and is numerically stable.",
+        "function_signature": "def binomial_coefficient(n: int, k: int) -> int:",
+        "starter_code": "def binomial_coefficient(n: int, k: int) -> int:\n    \"\"\"\n    Compute binomial coefficient C(n,k) = n!/(k!(n-k)!).\n    \n    Args:\n        n: Total number of items\n        k: Number of items to choose\n        \n    Returns:\n        Binomial coefficient as integer\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "binomial_coefficient(5, 2)",
+            "expected": "10",
+            "explanation": "C(5,2) = 5!/(2!3!) = 10 ways to choose 2 from 5"
+          },
+          {
+            "input": "binomial_coefficient(10, 3)",
+            "expected": "120",
+            "explanation": "C(10,3) = 10*9*8/(3*2*1) = 120"
+          },
+          {
+            "input": "binomial_coefficient(6, 0)",
+            "expected": "1",
+            "explanation": "There is exactly 1 way to choose 0 items"
+          },
+          {
+            "input": "binomial_coefficient(6, 6)",
+            "expected": "1",
+            "explanation": "There is exactly 1 way to choose all items"
+          },
+          {
+            "input": "binomial_coefficient(100, 2)",
+            "expected": "4950",
+            "explanation": "C(100,2) = 100*99/2 = 4950, tests larger values"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing n! directly causes overflow for large n (e.g., 100!)",
+        "Not handling edge cases: k > n (should return 0), k < 0 (should return 0)",
+        "Integer division issues in languages that distinguish int and float division",
+        "Not using symmetry property C(n,k) = C(n,n-k) to reduce computation when k > n/2"
+      ],
+      "hint": "Use the iterative formula where you multiply by (n-i) and divide by (i+1) for i from 0 to k-1, starting with result = 1. This keeps intermediate values manageable.",
+      "references": [
+        "Combinatorics and counting principles",
+        "Pascal's triangle",
+        "Dynamic programming for binomial coefficients"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Hypergeometric Distribution and Sampling Without Replacement",
+      "relation_to_problem": "The pass@k formula uses hypergeometric probability to compute the chance that none of k samples are correct. Understanding sampling without replacement is crucial for the unbiased estimator.",
+      "prerequisites": [
+        "Binomial coefficients",
+        "Probability theory",
+        "Conditional probability"
+      ],
+      "learning_objectives": [
+        "Understand the hypergeometric distribution for sampling without replacement",
+        "Compute probability of getting exactly 0 successes in k draws",
+        "Apply complement rule to find probability of at least 1 success"
+      ],
+      "math_content": {
+        "definition": "The **hypergeometric distribution** models the probability of drawing exactly $x$ successes when sampling $k$ items without replacement from a population of $n$ items containing $c$ successes: $$P(X = x) = \\frac{\\binom{c}{x} \\binom{n-c}{k-x}}{\\binom{n}{k}}$$ where $c$ = total successes in population, $n-c$ = total failures, $k$ = sample size, $x$ = successes in sample.",
+        "notation": "$X \\sim \\text{Hypergeometric}(n, c, k)$ = hypergeometric random variable, $P(X=x)$ = probability mass function",
+        "theorem": "**Pass@k Unbiased Estimator**: The probability that at least one of $k$ samples (without replacement) from $n$ total samples with $c$ correct is successful equals: $$\\text{pass@k} = P(X \\geq 1) = 1 - P(X = 0) = 1 - \\frac{\\binom{n-c}{k}}{\\binom{n}{k}}$$ This is the complement of drawing $k$ failures from the $n-c$ failures in the population.",
+        "proof_sketch": "The event 'at least 1 success in k draws' is the complement of 'exactly 0 successes in k draws'. For $X=0$, all $k$ draws must come from the $n-c$ failures: there are $\\binom{n-c}{k}$ ways to choose $k$ failures and $\\binom{n}{k}$ total ways to choose $k$ items. By the complement rule, $P(X \\geq 1) = 1 - P(X=0)$.",
+        "examples": [
+          "If $n=10$ samples with $c=3$ correct, pass@2 = $1 - \\binom{7}{2}/\\binom{10}{2} = 1 - 21/45 = 24/45 \\approx 0.533$",
+          "If $n=5$ samples with $c=4$ correct, pass@1 = $1 - \\binom{1}{1}/\\binom{5}{1} = 1 - 1/5 = 4/5 = 0.8$, which equals $c/n$ for $k=1$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Hypergeometric PMF",
+          "latex": "$P(X=x) = \\frac{\\binom{c}{x}\\binom{n-c}{k-x}}{\\binom{n}{k}}$",
+          "description": "Probability of exactly x successes in k draws without replacement"
+        },
+        {
+          "name": "Pass@k Formula",
+          "latex": "$\\text{pass@k} = 1 - \\frac{\\binom{n-c}{k}}{\\binom{n}{k}}$",
+          "description": "Probability at least 1 of k samples is correct"
+        },
+        {
+          "name": "Binomial Coefficient Ratio",
+          "latex": "$\\frac{\\binom{n-c}{k}}{\\binom{n}{k}} = \\prod_{i=0}^{k-1} \\frac{n-c-i}{n-i}$",
+          "description": "Efficient computation avoiding large factorials"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the probability of getting exactly 0 successes when drawing k items without replacement from a population of n items with c successes. This is the key component needed for the pass@k formula.",
+        "function_signature": "def probability_all_failures(n: int, c: int, k: int) -> float:",
+        "starter_code": "def probability_all_failures(n: int, c: int, k: int) -> float:\n    \"\"\"\n    Compute probability of drawing k items with 0 successes.\n    Uses P(X=0) = C(n-c, k) / C(n, k) from hypergeometric distribution.\n    \n    Args:\n        n: Total number of samples\n        c: Number of correct samples\n        k: Number of samples to draw\n        \n    Returns:\n        Probability of all k samples being failures\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "probability_all_failures(10, 3, 2)",
+            "expected": "0.4666666666666667",
+            "explanation": "With 3 correct and 7 wrong out of 10, probability of drawing 2 wrong is C(7,2)/C(10,2) = 21/45"
+          },
+          {
+            "input": "probability_all_failures(5, 4, 1)",
+            "expected": "0.2",
+            "explanation": "With 4 correct and 1 wrong out of 5, probability of drawing the 1 wrong is 1/5"
+          },
+          {
+            "input": "probability_all_failures(100, 50, 10)",
+            "expected": "0.0003266928772169906",
+            "explanation": "With 50 correct and 50 wrong, very unlikely to draw 10 all wrong"
+          },
+          {
+            "input": "probability_all_failures(10, 0, 5)",
+            "expected": "1.0",
+            "explanation": "If there are 0 correct samples, all draws must be failures"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling edge case where c = n (all correct), making n-c = 0 and C(0,k) invalid for k > 0",
+        "Not handling edge case where k > n-c (can't draw k failures if fewer than k failures exist)",
+        "Computing large binomial coefficients separately instead of using the product ratio formula",
+        "Confusing hypergeometric (without replacement) with binomial (with replacement)"
+      ],
+      "hint": "Use the product formula: multiply (n-c-i)/(n-i) for i from 0 to k-1. Handle edge cases where this is impossible (return 0 if k > n-c).",
+      "references": [
+        "Hypergeometric distribution",
+        "Sampling without replacement",
+        "Urn models in probability theory"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Integration: Complete Evaluation Metric Implementation",
+      "relation_to_problem": "This final sub-quest combines all previous concepts to implement the three evaluation metrics: pass@1, majority voting, and pass@k. Understanding how these metrics work together is essential for evaluating reasoning models.",
+      "prerequisites": [
+        "Empirical probability",
+        "Mode finding",
+        "Binomial coefficients",
+        "Hypergeometric distribution"
+      ],
+      "learning_objectives": [
+        "Implement pass@1 as empirical probability of correctness",
+        "Implement majority voting by finding the mode",
+        "Implement unbiased pass@k using the hypergeometric formula",
+        "Understand when to use each metric and their relative strengths"
+      ],
+      "math_content": {
+        "definition": "**Evaluation Metrics for Multi-Sample Generation**: Given a model that generates multiple responses per problem, we need metrics to assess performance: (1) **Pass@1**: $\\text{pass@1} = \\mathbb{E}[\\mathbb{1}_{\\text{correct}}] = \\frac{1}{n}\\sum_{i=1}^n \\mathbb{1}_{y_i = y^*}$ where $y_i$ is response $i$ and $y^*$ is the ground truth. (2) **Majority Vote**: $\\hat{y} = \\arg\\max_{y} |\\{i : y_i = y\\}|$, then evaluate $\\mathbb{1}_{\\hat{y} = y^*}$. (3) **Pass@k**: $\\text{pass@k} = 1 - \\frac{\\binom{n-c}{k}}{\\binom{n}{k}}$ where $c = |\\{i : y_i = y^*\\}|$",
+        "notation": "$\\mathbb{1}_{\\text{condition}}$ = indicator function (1 if true, 0 if false), $y^*$ = ground truth, $\\hat{y}$ = predicted answer",
+        "theorem": "**Asymptotic Behavior**: As sample size $k \\to \\infty$: (1) Pass@k converges to 1 if and only if $p(y^*) > 0$ (correct answer has any non-zero probability). (2) Majority voting accuracy converges to 1 if and only if $p(y^*) = \\max_y p(y)$ (correct answer is the mode). This shows pass@k is more robust to model errors than majority voting.",
+        "proof_sketch": "For pass@k: If $p(y^*) > 0$, then in $k$ samples, probability of all failures is $(1-p(y^*))^k \\to 0$ as $k \\to \\infty$. For majority voting: By LLN, the empirical mode converges to the distributional mode. If $y^*$ is not the mode, majority voting will converge to the wrong answer.",
+        "examples": [
+          "Responses = [True, False, True, False]: pass@1 = 0.5. Majority voting not applicable without answer values.",
+          "Responses = ['A', 'A', 'B', 'A'], ground truth = 'A': majority voting gives 'A' (3/4 frequency), which is correct.",
+          "n=10, c=3, k=5: pass@5 = 1 - C(7,5)/C(10,5) = 1 - 21/252 = 0.917, meaning 91.7% chance at least one of 5 samples is correct"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Pass@1 Metric",
+          "latex": "$\\text{pass@1} = \\frac{1}{n}\\sum_{i=1}^n \\mathbb{1}_{\\text{correct}_i}$",
+          "description": "Average correctness across all samples"
+        },
+        {
+          "name": "Majority Voting",
+          "latex": "$\\hat{y} = \\arg\\max_y |\\{i : y_i = y\\}|$",
+          "description": "Select most frequent response as the answer"
+        },
+        {
+          "name": "Unbiased Pass@k",
+          "latex": "$\\text{pass@k} = 1 - \\prod_{i=0}^{k-1} \\frac{n-c-i}{n-i}$",
+          "description": "Probability of at least 1 success in k attempts"
+        },
+        {
+          "name": "Pass@1 Special Case",
+          "latex": "$\\text{pass@1} = 1 - \\frac{n-c}{n} = \\frac{c}{n}$",
+          "description": "Pass@1 is simply the fraction of correct samples"
+        }
+      ],
+      "exercise": {
+        "description": "Implement three evaluation functions that work together: (1) compute_pass_at_1 for boolean correctness arrays, (2) find_majority for selecting the consensus answer, and (3) compute_pass_at_k for the unbiased estimator. Each function should handle edge cases appropriately.",
+        "function_signature": "def compute_pass_at_1(correct: np.ndarray) -> float:\ndef find_majority(responses: list[str]) -> str:\ndef compute_pass_at_k(n: int, c: int, k: int) -> float:",
+        "starter_code": "import numpy as np\nfrom collections import Counter\n\ndef compute_pass_at_1(correct: np.ndarray) -> float:\n    \"\"\"\n    Compute pass@1 metric from boolean correctness array.\n    \n    Args:\n        correct: Boolean numpy array indicating correctness\n        \n    Returns:\n        Pass@1 score (fraction correct)\n    \"\"\"\n    # Your code here\n    pass\n\ndef find_majority(responses: list[str]) -> str:\n    \"\"\"\n    Find majority vote (most common response).\n    \n    Args:\n        responses: List of response strings\n        \n    Returns:\n        Most frequent response\n    \"\"\"\n    # Your code here\n    pass\n\ndef compute_pass_at_k(n: int, c: int, k: int) -> float:\n    \"\"\"\n    Compute unbiased pass@k estimator.\n    \n    Args:\n        n: Total samples generated\n        c: Number of correct samples\n        k: Number of attempts\n        \n    Returns:\n        Pass@k probability\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_pass_at_1(np.array([True, False, True, False]))",
+            "expected": "0.5",
+            "explanation": "2 out of 4 correct gives pass@1 = 0.5"
+          },
+          {
+            "input": "find_majority(['A', 'B', 'A', 'C', 'A'])",
+            "expected": "'A'",
+            "explanation": "A appears 3 times, most frequent"
+          },
+          {
+            "input": "compute_pass_at_k(10, 3, 1)",
+            "expected": "0.3",
+            "explanation": "Pass@1 = c/n = 3/10 = 0.3"
+          },
+          {
+            "input": "compute_pass_at_k(10, 3, 2)",
+            "expected": "0.5333333333333333",
+            "explanation": "Pass@2 = 1 - C(7,2)/C(10,2) = 1 - 21/45 = 0.533..."
+          },
+          {
+            "input": "compute_pass_at_k(100, 50, 10)",
+            "expected": "0.9996733071227831",
+            "explanation": "With 50% correct, very high chance at least 1 of 10 is correct"
+          },
+          {
+            "input": "compute_pass_at_k(5, 5, 1)",
+            "expected": "1.0",
+            "explanation": "All samples correct, so pass@k = 1.0 for any k"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling k > n (should either cap k at n or return appropriate value)",
+        "Not handling c = 0 (pass@k should be 0) or c = n (pass@k should be 1)",
+        "Computing pass@1 using the complex formula instead of simply c/n",
+        "Not recognizing that majority voting requires the actual response values, not just boolean correctness",
+        "Numerical instability when computing very small probabilities for large k"
+      ],
+      "hint": "For pass@k: build the product iteratively to maintain numerical stability. Handle the special cases where k > n-c (return 1.0) or c = 0 (return 0.0) before computing.",
+      "references": [
+        "Evaluating Large Language Models Trained on Code (Chen et al., 2021) - original pass@k paper",
+        "Self-consistency improves chain of thought reasoning (Wang et al., 2022) - majority voting",
+        "Test-time scaling for reasoning models"
+      ]
+    }
+  ]
+}

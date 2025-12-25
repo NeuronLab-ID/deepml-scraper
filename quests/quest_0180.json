@@ -1,0 +1,506 @@
+{
+  "problem_id": 180,
+  "title": "Conditional Probability from Joint Distribution",
+  "category": "Probability",
+  "difficulty": "medium",
+  "description": "Write a Python function that computes the conditional probability P(A|B), given a joint probability distribution over events A and B. The distribution is provided as a dictionary with keys ('A','B'), ('A','`B'), ('`A','B'), ('`A','`B'), where the backtick ` denotes logical NOT.",
+  "example": {
+    "input": "conditional_probability({('A','B'):0.2, ('A','`B'):0.3, ('`A','B'):0.1, ('`A','`B'):0.4})",
+    "output": "0.6667",
+    "reasoning": "P(B)=0.2+0.1=0.3 and P(A∩B)=0.2, so P(A|B)=0.2/0.3=0.6667."
+  },
+  "starter_code": "def conditional_probability(joint_distribution: dict) -> float:\n\t\"\"\"\n\tCompute conditional probability P(A|B) from a joint probability distribution.\n\n\tArgs:\n\t\tjoint_distribution (dict): dictionary with keys ('A','B'), ('A','`B'), ('`A','B'), ('`A','`B')\n\n\tReturns:\n\t\tfloat: Conditional probability P(A|B)\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Joint Probability Distributions",
+      "relation_to_problem": "The main problem provides a joint probability distribution as input. This sub-quest teaches how to interpret and validate joint distributions over binary events, which is essential for extracting probabilities from the input dictionary.",
+      "prerequisites": [
+        "Basic probability axioms",
+        "Set theory notation",
+        "Boolean logic"
+      ],
+      "learning_objectives": [
+        "Define joint probability for two events formally",
+        "Understand the structure of a complete joint distribution over binary events",
+        "Validate that a joint distribution is proper (sums to 1, all values non-negative)"
+      ],
+      "math_content": {
+        "definition": "A **joint probability distribution** over two events $A$ and $B$ assigns probabilities to all possible combinations of outcomes. For binary events, the sample space is $\\Omega = \\{(A,B), (A,\\neg B), (\\neg A, B), (\\neg A, \\neg B)\\}$. The joint probability $P(A \\cap B)$ represents the probability that both events $A$ and $B$ occur simultaneously. A valid joint distribution must satisfy: (1) $P(\\omega) \\geq 0$ for all $\\omega \\in \\Omega$, and (2) $\\sum_{\\omega \\in \\Omega} P(\\omega) = 1$.",
+        "notation": "$P(A \\cap B)$ = probability both A and B occur; $P(A \\cap \\neg B)$ = probability A occurs but B does not; $\\neg A$ = logical negation of A (\"not A\")",
+        "theorem": "**Kolmogorov's Axioms**: Any probability measure must satisfy: (1) $P(E) \\geq 0$ for all events $E$, (2) $P(\\Omega) = 1$, and (3) for disjoint events $E_1, E_2, \\ldots$, $P(\\bigcup_i E_i) = \\sum_i P(E_i)$.",
+        "proof_sketch": "For binary events over $A$ and $B$, the four outcomes $(A,B)$, $(A,\\neg B)$, $(\\neg A, B)$, $(\\neg A, \\neg B)$ are mutually exclusive and exhaustive. By axiom (3), their probabilities sum to $P(\\Omega) = 1$.",
+        "examples": [
+          "Consider rolling a fair die: $A$ = \"roll is even\", $B$ = \"roll ≤ 3\". Then $P(A \\cap B) = P(\\{2\\}) = 1/6$, $P(A \\cap \\neg B) = P(\\{4,6\\}) = 2/6$, $P(\\neg A \\cap B) = P(\\{1,3\\}) = 2/6$, $P(\\neg A \\cap \\neg B) = P(\\{5\\}) = 1/6$. Sum: $1/6 + 2/6 + 2/6 + 1/6 = 1$ ✓",
+          "Given $P(A \\cap B) = 0.2$, $P(A \\cap \\neg B) = 0.3$, $P(\\neg A \\cap B) = 0.1$, $P(\\neg A \\cap \\neg B) = 0.4$, verify: $0.2 + 0.3 + 0.1 + 0.4 = 1.0$ ✓ and all values in $[0,1]$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Completeness",
+          "latex": "$P(A \\cap B) + P(A \\cap \\neg B) + P(\\neg A \\cap B) + P(\\neg A \\cap \\neg B) = 1$",
+          "description": "The four joint probabilities must sum to 1 for a valid distribution"
+        },
+        {
+          "name": "Non-negativity",
+          "latex": "$P(\\omega) \\geq 0 \\text{ for all } \\omega \\in \\Omega$",
+          "description": "Every probability must be non-negative"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that validates whether a given dictionary represents a valid joint probability distribution over binary events A and B. Return True if valid, False otherwise. The dictionary uses notation ('A','B'), ('A','`B'), ('`A','B'), ('`A','`B') where backtick denotes negation.",
+        "function_signature": "def validate_joint_distribution(joint_dist: dict) -> bool:",
+        "starter_code": "def validate_joint_distribution(joint_dist: dict) -> bool:\n    \"\"\"\n    Check if joint_dist is a valid probability distribution.\n    \n    Args:\n        joint_dist: dict with keys ('A','B'), ('A','`B'), ('`A','B'), ('`A','`B')\n    \n    Returns:\n        bool: True if valid (sums to 1, all non-negative), False otherwise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "validate_joint_distribution({('A','B'):0.2, ('A','`B'):0.3, ('`A','B'):0.1, ('`A','`B'):0.4})",
+            "expected": "True",
+            "explanation": "All probabilities are non-negative and sum to exactly 1.0"
+          },
+          {
+            "input": "validate_joint_distribution({('A','B'):0.5, ('A','`B'):0.3, ('`A','B'):0.1, ('`A','`B'):0.2})",
+            "expected": "False",
+            "explanation": "Sum is 1.1, not 1.0 - violates completeness"
+          },
+          {
+            "input": "validate_joint_distribution({('A','B'):-0.1, ('A','`B'):0.4, ('`A','B'):0.3, ('`A','`B'):0.4})",
+            "expected": "False",
+            "explanation": "Negative probability violates non-negativity axiom"
+          },
+          {
+            "input": "validate_joint_distribution({('A','B'):0.25, ('A','`B'):0.25, ('`A','B'):0.25, ('`A','`B'):0.25})",
+            "expected": "True",
+            "explanation": "Uniform distribution - all outcomes equally likely"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check that probabilities sum to exactly 1.0 (allowing numerical errors like 0.9999 to pass)",
+        "Not checking all four required keys exist in the dictionary",
+        "Confusing the backtick notation for negation with other symbols"
+      ],
+      "hint": "Use Python's sum() function on the dictionary values and check both the sum condition and that each value is non-negative. Account for floating-point precision using a small tolerance (e.g., abs(sum - 1.0) < 1e-9).",
+      "references": [
+        "Kolmogorov's probability axioms",
+        "Joint probability distributions",
+        "Boolean algebra"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Computing Marginal Probabilities",
+      "relation_to_problem": "To compute P(A|B), we need P(B) in the denominator. This sub-quest teaches how to derive marginal probabilities from a joint distribution by summing over the appropriate entries - a critical step in the main problem.",
+      "prerequisites": [
+        "Joint probability distributions",
+        "Law of total probability",
+        "Summation notation"
+      ],
+      "learning_objectives": [
+        "Define marginal probability formally as a sum over joint probabilities",
+        "Extract marginal probabilities P(A) and P(B) from a joint distribution",
+        "Understand marginalization as integrating out variables"
+      ],
+      "math_content": {
+        "definition": "The **marginal probability** of an event $B$ is the probability of $B$ occurring regardless of whether $A$ occurs or not. Formally, $P(B) = P(A \\cap B) + P(\\neg A \\cap B)$. This is obtained by 'marginalizing out' variable $A$ - summing the joint distribution over all values of $A$ while fixing $B$. Similarly, $P(A) = P(A \\cap B) + P(A \\cap \\neg B)$.",
+        "notation": "$P(B)$ = marginal probability of B; $\\sum_A$ = sum over all values of A (here, $A$ and $\\neg A$)",
+        "theorem": "**Law of Total Probability (Discrete Form)**: If $\\{A_1, A_2, \\ldots, A_n\\}$ partitions the sample space (mutually exclusive and exhaustive), then for any event $B$: $$P(B) = \\sum_{i=1}^n P(B \\cap A_i)$$. For binary A, this becomes $P(B) = P(B \\cap A) + P(B \\cap \\neg A)$.",
+        "proof_sketch": "Since $A$ and $\\neg A$ partition the sample space, events $(B \\cap A)$ and $(B \\cap \\neg A)$ are disjoint. By Kolmogorov's additivity axiom, $P(B) = P((B \\cap A) \\cup (B \\cap \\neg A)) = P(B \\cap A) + P(B \\cap \\neg A)$.",
+        "examples": [
+          "Given joint distribution: $P(A \\cap B) = 0.2$, $P(\\neg A \\cap B) = 0.1$, $P(A \\cap \\neg B) = 0.3$, $P(\\neg A \\cap \\neg B) = 0.4$. Then $P(B) = 0.2 + 0.1 = 0.3$ and $P(A) = 0.2 + 0.3 = 0.5$.",
+          "In a medical test: $P(\\text{disease} \\cap \\text{positive}) = 0.09$, $P(\\neg\\text{disease} \\cap \\text{positive}) = 0.18$. The marginal probability of testing positive is $P(\\text{positive}) = 0.09 + 0.18 = 0.27$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Marginal of B",
+          "latex": "$P(B) = P(A \\cap B) + P(\\neg A \\cap B)$",
+          "description": "Sum joint probabilities where B occurs (regardless of A)"
+        },
+        {
+          "name": "Marginal of A",
+          "latex": "$P(A) = P(A \\cap B) + P(A \\cap \\neg B)$",
+          "description": "Sum joint probabilities where A occurs (regardless of B)"
+        },
+        {
+          "name": "Marginal of negations",
+          "latex": "$P(\\neg B) = P(A \\cap \\neg B) + P(\\neg A \\cap \\neg B)$",
+          "description": "Similarly for negated events"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes all four marginal probabilities P(A), P(¬A), P(B), and P(¬B) from a joint distribution. Return them as a dictionary with keys 'P(A)', 'P(`A)', 'P(B)', 'P(`B)'. This isolates the marginalization step needed for conditional probability.",
+        "function_signature": "def compute_marginals(joint_dist: dict) -> dict:",
+        "starter_code": "def compute_marginals(joint_dist: dict) -> dict:\n    \"\"\"\n    Compute marginal probabilities from joint distribution.\n    \n    Args:\n        joint_dist: dict with keys ('A','B'), ('A','`B'), ('`A','B'), ('`A','`B')\n    \n    Returns:\n        dict: {'P(A)': float, 'P(`A)': float, 'P(B)': float, 'P(`B)': float}\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_marginals({('A','B'):0.2, ('A','`B'):0.3, ('`A','B'):0.1, ('`A','`B'):0.4})",
+            "expected": "{'P(A)': 0.5, 'P(`A)': 0.5, 'P(B)': 0.3, 'P(`B)': 0.7}",
+            "explanation": "P(A) = 0.2+0.3 = 0.5; P(`A) = 0.1+0.4 = 0.5; P(B) = 0.2+0.1 = 0.3; P(`B) = 0.3+0.4 = 0.7"
+          },
+          {
+            "input": "compute_marginals({('A','B'):0.15, ('A','`B'):0.35, ('`A','B'):0.25, ('`A','`B'):0.25})",
+            "expected": "{'P(A)': 0.5, 'P(`A)': 0.5, 'P(B)': 0.4, 'P(`B)': 0.6}",
+            "explanation": "P(A) = 0.15+0.35 = 0.5; P(B) = 0.15+0.25 = 0.4"
+          },
+          {
+            "input": "compute_marginals({('A','B'):0.25, ('A','`B'):0.25, ('`A','B'):0.25, ('`A','`B'):0.25})",
+            "expected": "{'P(A)': 0.5, 'P(`A)': 0.5, 'P(B)': 0.5, 'P(`B)': 0.5}",
+            "explanation": "Uniform distribution yields marginals of 0.5 for all events (independence)"
+          },
+          {
+            "input": "compute_marginals({('A','B'):0.6, ('A','`B'):0.0, ('`A','B'):0.0, ('`A','`B'):0.4})",
+            "expected": "{'P(A)': 0.6, 'P(`A)': 0.4, 'P(B)': 0.6, 'P(`B)': 0.4}",
+            "explanation": "Perfect correlation: A and B always occur together or both fail"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Summing the wrong entries (e.g., computing P(B) by summing entries where B doesn't occur)",
+        "Not recognizing that P(A) + P(¬A) must equal 1.0 (sanity check)",
+        "Confusing marginal probabilities with conditional probabilities"
+      ],
+      "hint": "For P(B), sum all dictionary entries where the second element of the key tuple is 'B'. For P(A), sum entries where the first element is 'A'.",
+      "references": [
+        "Law of total probability",
+        "Marginalization",
+        "Summation over discrete distributions"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Conditional Probability: Definition and Interpretation",
+      "relation_to_problem": "This is the core concept - the main problem asks for P(A|B). This sub-quest provides the formal definition and mathematical justification for the conditional probability formula that will be directly applied in the solution.",
+      "prerequisites": [
+        "Joint probability",
+        "Marginal probability",
+        "Division by zero handling"
+      ],
+      "learning_objectives": [
+        "State the formal definition of conditional probability",
+        "Understand the geometric/frequentist interpretation of conditioning",
+        "Recognize when conditional probability is undefined (P(B) = 0)"
+      ],
+      "math_content": {
+        "definition": "The **conditional probability** of event $A$ given event $B$ is defined as: $$P(A|B) = \\frac{P(A \\cap B)}{P(B)}$$ provided that $P(B) > 0$. This represents the probability that $A$ occurs in the reduced sample space where we know $B$ has occurred. If $P(B) = 0$, the conditional probability is undefined.",
+        "notation": "$P(A|B)$ = probability of A given B; $|$ = \"given that\"; $P(A \\cap B)$ = joint probability",
+        "theorem": "**Multiplication Rule**: Rearranging the conditional probability definition yields: $$P(A \\cap B) = P(B) \\cdot P(A|B) = P(A) \\cdot P(B|A)$$. This shows that joint probability can be decomposed into marginal times conditional probability.",
+        "proof_sketch": "The definition $P(A|B) = \\frac{P(A \\cap B)}{P(B)}$ is motivated by the frequentist interpretation: among all trials where $B$ occurs (proportion $P(B)$ of total), the proportion where both $A$ and $B$ occur is $P(A \\cap B)$. The ratio gives the relative frequency of $A$ within the subset where $B$ holds. Multiplying both sides by $P(B)$ yields the multiplication rule.",
+        "examples": [
+          "From joint distribution: $P(A \\cap B) = 0.2$, $P(B) = 0.3$. Then $P(A|B) = 0.2/0.3 = 2/3 \\approx 0.6667$. Interpretation: given B occurred, there's a 66.67% chance A also occurred.",
+          "Rolling a die: $A$ = \"roll is 2\", $B$ = \"roll is even\". Then $P(A \\cap B) = P(\\{2\\}) = 1/6$, $P(B) = P(\\{2,4,6\\}) = 1/2$. So $P(A|B) = (1/6)/(1/2) = 1/3$. Given the roll is even, there's a 1/3 chance it's specifically 2."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Conditional Probability",
+          "latex": "$P(A|B) = \\frac{P(A \\cap B)}{P(B)}$",
+          "description": "Core definition - use when P(B) > 0"
+        },
+        {
+          "name": "Multiplication Rule",
+          "latex": "$P(A \\cap B) = P(A|B) \\cdot P(B)$",
+          "description": "Decomposition of joint into conditional and marginal"
+        },
+        {
+          "name": "Symmetry",
+          "latex": "$P(A \\cap B) = P(B \\cap A)$",
+          "description": "Joint probability is commutative, but conditional is not: $P(A|B) \\neq P(B|A)$ in general"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes P(A|B) given P(A∩B) and P(B) directly (not from a joint distribution yet). Handle the edge case where P(B) = 0 by returning None. Include a small tolerance for floating-point comparison.",
+        "function_signature": "def simple_conditional_probability(p_a_and_b: float, p_b: float) -> float:",
+        "starter_code": "def simple_conditional_probability(p_a_and_b: float, p_b: float) -> float:\n    \"\"\"\n    Compute P(A|B) = P(A∩B) / P(B).\n    \n    Args:\n        p_a_and_b: P(A ∩ B), the joint probability\n        p_b: P(B), the marginal probability of B\n    \n    Returns:\n        float: P(A|B), or None if P(B) is effectively 0\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "simple_conditional_probability(0.2, 0.3)",
+            "expected": "0.6667 (rounded)",
+            "explanation": "P(A|B) = 0.2/0.3 = 0.666... ≈ 0.6667"
+          },
+          {
+            "input": "simple_conditional_probability(0.15, 0.4)",
+            "expected": "0.375",
+            "explanation": "P(A|B) = 0.15/0.4 = 0.375"
+          },
+          {
+            "input": "simple_conditional_probability(0.0, 0.0)",
+            "expected": "None",
+            "explanation": "P(B) = 0, so conditional probability is undefined"
+          },
+          {
+            "input": "simple_conditional_probability(0.5, 1.0)",
+            "expected": "0.5",
+            "explanation": "When P(B) = 1 (B is certain), P(A|B) = P(A∩B) = P(A)"
+          },
+          {
+            "input": "simple_conditional_probability(0.1, 0.1)",
+            "expected": "1.0",
+            "explanation": "P(A∩B) = P(B) implies A occurs whenever B does, so P(A|B) = 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking for division by zero when P(B) = 0",
+        "Confusing P(A|B) with P(B|A) - these are generally different (prosecutor's fallacy)",
+        "Thinking P(A|B) must be less than P(A) - conditioning can increase or decrease probability",
+        "Using integer division instead of float division in languages like Python 2"
+      ],
+      "hint": "Check if P(B) is very close to zero (e.g., < 1e-10) before dividing. Return None or raise an exception in that case.",
+      "references": [
+        "Conditional probability axioms",
+        "Bayes' theorem",
+        "Prosecutor's fallacy"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Extracting Joint Probabilities from Dictionary Notation",
+      "relation_to_problem": "The main problem uses a specific dictionary notation with tuples like ('A','B') and ('`A','B'). This sub-quest teaches how to parse this notation and extract the specific joint probability P(A∩B) needed for the numerator of P(A|B).",
+      "prerequisites": [
+        "Python dictionaries",
+        "Tuple keys",
+        "String comparison"
+      ],
+      "learning_objectives": [
+        "Parse dictionary keys with event notation ('A' vs '`A')",
+        "Extract specific joint probabilities by matching tuple patterns",
+        "Handle different notational conventions programmatically"
+      ],
+      "math_content": {
+        "definition": "In the problem's notation, tuples represent joint events: ('A','B') encodes $P(A \\cap B)$, ('A','`B') encodes $P(A \\cap \\neg B)$, ('`A','B') encodes $P(\\neg A \\cap B)$, and ('`A','`B') encodes $P(\\neg A \\cap \\neg B)$. The backtick character '`' serves as the negation operator. To extract $P(A \\cap B)$, we access the dictionary with key ('A','B').",
+        "notation": "('A','B') $\\equiv A \\cap B$; ('`A','B') $\\equiv \\neg A \\cap B$; backtick prefix = negation",
+        "theorem": "**Dictionary Lookup Principle**: In Python, dictionaries provide $O(1)$ average-case access to values via keys. Tuple keys are hashable and compared element-wise. The key ('A','B') matches only if both elements match exactly (case-sensitive).",
+        "proof_sketch": "Python's tuple equality: $(a_1, a_2) = (b_1, b_2)$ if and only if $a_1 = b_1$ and $a_2 = b_2$. String equality is checked character-by-character. Thus ('A','B') $\\neq$ ('`A','B') since 'A' $\\neq$ '`A'.",
+        "examples": [
+          "Given dict = {('A','B'):0.2, ...}, accessing dict[('A','B')] returns 0.2, which represents $P(A \\cap B) = 0.2$.",
+          "To get $P(\\neg A \\cap B)$, use dict[('`A','B')]."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Joint P(A∩B)",
+          "latex": "$P(A \\cap B) = \\text{dict}[('A','B')]$",
+          "description": "Direct dictionary lookup for joint probability"
+        },
+        {
+          "name": "Joint P(¬A∩B)",
+          "latex": "$P(\\neg A \\cap B) = \\text{dict}[('`A','B')]$",
+          "description": "Use backtick prefix for negation"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that extracts P(A∩B) from a joint distribution dictionary. The function should return the value associated with key ('A','B'). Also handle the case where the key might not exist by returning 0.0.",
+        "function_signature": "def extract_joint_probability(joint_dist: dict, event_a: str, event_b: str) -> float:",
+        "starter_code": "def extract_joint_probability(joint_dist: dict, event_a: str, event_b: str) -> float:\n    \"\"\"\n    Extract P(event_a ∩ event_b) from joint distribution.\n    \n    Args:\n        joint_dist: dict with tuple keys like ('A','B'), ('`A','B'), etc.\n        event_a: string 'A' or '`A'\n        event_b: string 'B' or '`B'\n    \n    Returns:\n        float: joint probability, or 0.0 if key not found\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "extract_joint_probability({('A','B'):0.2, ('A','`B'):0.3, ('`A','B'):0.1, ('`A','`B'):0.4}, 'A', 'B')",
+            "expected": "0.2",
+            "explanation": "Direct lookup of ('A','B') returns 0.2"
+          },
+          {
+            "input": "extract_joint_probability({('A','B'):0.2, ('A','`B'):0.3, ('`A','B'):0.1, ('`A','`B'):0.4}, '`A', 'B')",
+            "expected": "0.1",
+            "explanation": "Lookup of ('`A','B') returns 0.1"
+          },
+          {
+            "input": "extract_joint_probability({('A','B'):0.2, ('A','`B'):0.3, ('`A','B'):0.1, ('`A','`B'):0.4}, 'A', '`B')",
+            "expected": "0.3",
+            "explanation": "Lookup of ('A','`B') returns 0.3"
+          },
+          {
+            "input": "extract_joint_probability({('A','B'):0.25, ('A','`B'):0.25, ('`A','B'):0.25, ('`A','`B'):0.25}, '`A', '`B')",
+            "expected": "0.25",
+            "explanation": "Uniform distribution: all four outcomes have probability 0.25"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not using tuple notation for dictionary lookup - writing dict['A','B'] instead of dict[('A','B')]",
+        "Case sensitivity - 'a' vs 'A' are different strings",
+        "Not handling missing keys, which would raise KeyError"
+      ],
+      "hint": "Use the dict.get() method with a default value of 0.0 to safely handle missing keys: dict.get((event_a, event_b), 0.0)",
+      "references": [
+        "Python dictionaries",
+        "Tuple unpacking",
+        "Dictionary key lookup"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Combining Operations: From Joint Distribution to P(B)",
+      "relation_to_problem": "To compute P(A|B), we need P(B) in the denominator. This sub-quest combines marginalization (from step 2) with dictionary parsing (from step 4) to compute P(B) = P(A∩B) + P(¬A∩B) directly from the problem's dictionary format.",
+      "prerequisites": [
+        "Marginal probability computation",
+        "Dictionary key access",
+        "Summation"
+      ],
+      "learning_objectives": [
+        "Compute marginal P(B) by identifying and summing the correct dictionary entries",
+        "Apply the law of total probability to the specific notation",
+        "Verify the computation yields a valid probability"
+      ],
+      "math_content": {
+        "definition": "To compute the **marginal probability** $P(B)$ from the dictionary, we sum all entries where the second component of the key tuple is 'B': $$P(B) = P(A \\cap B) + P(\\neg A \\cap B) = \\text{dict}[('A','B')] + \\text{dict}[('`A','B')]$$. This applies the law of total probability by summing over all mutually exclusive ways $B$ can occur (with $A$ or with $\\neg A$).",
+        "notation": "$P(B) = \\sum_{\\text{second key component = 'B'}} \\text{dict}[\\text{key}]$",
+        "theorem": "**Law of Total Probability Application**: For binary variable $A$ partitioning the space, $P(B) = P(B|A)P(A) + P(B|\\neg A)P(\\neg A)$. Equivalently (by multiplication rule), $P(B) = P(A \\cap B) + P(\\neg A \\cap B)$.",
+        "proof_sketch": "Since $(A \\cap B)$ and $(\\neg A \\cap B)$ are disjoint and their union is $B$, by Kolmogorov's additivity: $P(B) = P((A \\cap B) \\cup (\\neg A \\cap B)) = P(A \\cap B) + P(\\neg A \\cap B)$.",
+        "examples": [
+          "Given {('A','B'):0.2, ('A','`B'):0.3, ('`A','B'):0.1, ('`A','`B'):0.4}: $P(B) = 0.2 + 0.1 = 0.3$",
+          "Given {('A','B'):0.35, ('A','`B'):0.15, ('`A','B'):0.05, ('`A','`B'):0.45}: $P(B) = 0.35 + 0.05 = 0.4$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Marginal P(B) from dict",
+          "latex": "$P(B) = \\text{dict}[('A','B')] + \\text{dict}[('`A','B')]$",
+          "description": "Sum entries where second tuple element is 'B'"
+        },
+        {
+          "name": "Filter and sum",
+          "latex": "$P(B) = \\sum_{(x,y) \\in \\text{keys}, y='B'} \\text{dict}[(x,y)]$",
+          "description": "General pattern: filter keys by second element, sum values"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes P(B) from a joint distribution dictionary by summing the appropriate entries. This is the denominator needed for P(A|B).",
+        "function_signature": "def compute_marginal_b(joint_dist: dict) -> float:",
+        "starter_code": "def compute_marginal_b(joint_dist: dict) -> float:\n    \"\"\"\n    Compute marginal probability P(B) from joint distribution.\n    \n    Args:\n        joint_dist: dict with keys ('A','B'), ('A','`B'), ('`A','B'), ('`A','`B')\n    \n    Returns:\n        float: P(B) = P(A∩B) + P(¬A∩B)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_marginal_b({('A','B'):0.2, ('A','`B'):0.3, ('`A','B'):0.1, ('`A','`B'):0.4})",
+            "expected": "0.3",
+            "explanation": "P(B) = 0.2 + 0.1 = 0.3"
+          },
+          {
+            "input": "compute_marginal_b({('A','B'):0.35, ('A','`B'):0.15, ('`A','B'):0.05, ('`A','`B'):0.45})",
+            "expected": "0.4",
+            "explanation": "P(B) = 0.35 + 0.05 = 0.4"
+          },
+          {
+            "input": "compute_marginal_b({('A','B'):0.25, ('A','`B'):0.25, ('`A','B'):0.25, ('`A','`B'):0.25})",
+            "expected": "0.5",
+            "explanation": "Uniform distribution: P(B) = 0.25 + 0.25 = 0.5"
+          },
+          {
+            "input": "compute_marginal_b({('A','B'):0.0, ('A','`B'):0.4, ('`A','B'):0.0, ('`A','`B'):0.6})",
+            "expected": "0.0",
+            "explanation": "B never occurs: P(B) = 0.0 + 0.0 = 0.0 (edge case for conditioning)"
+          },
+          {
+            "input": "compute_marginal_b({('A','B'):0.45, ('A','`B'):0.05, ('`A','B'):0.45, ('`A','`B'):0.05})",
+            "expected": "0.9",
+            "explanation": "B is very likely: P(B) = 0.45 + 0.45 = 0.9"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Summing entries where B doesn't occur (i.e., summing ('A','`B') and ('`A','`B') instead)",
+        "Forgetting to include both ('A','B') and ('`A','B') - missing one term",
+        "Not recognizing that P(B) = 0 is a valid result that creates issues for conditional probability"
+      ],
+      "hint": "You can iterate through dictionary keys and check if the second element equals 'B', or directly access dict[('A','B')] + dict[('`A','B')].",
+      "references": [
+        "Marginalization algorithms",
+        "Dictionary iteration in Python",
+        "Law of total probability"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Computation: P(A|B) from Joint Distribution",
+      "relation_to_problem": "This is the synthesis step that combines all previous concepts to solve the main problem. Given only the joint distribution dictionary, compute P(A|B) by extracting P(A∩B), computing P(B), and applying the conditional probability formula.",
+      "prerequisites": [
+        "Conditional probability formula",
+        "Marginal computation",
+        "Dictionary parsing",
+        "Edge case handling"
+      ],
+      "learning_objectives": [
+        "Synthesize all previous steps into a complete solution",
+        "Extract the numerator P(A∩B) and compute the denominator P(B) from the same dictionary",
+        "Apply error handling for edge cases (P(B) = 0)",
+        "Validate the result is a valid probability"
+      ],
+      "math_content": {
+        "definition": "Given a joint probability distribution over $(A, B)$ as a dictionary, we compute $P(A|B)$ through a three-step process: (1) Extract $P(A \\cap B) = \\text{dict}[('A','B')]$, (2) Compute $P(B) = \\text{dict}[('A','B')] + \\text{dict}[('`A','B')]$, (3) Calculate $P(A|B) = \\frac{P(A \\cap B)}{P(B)}$ if $P(B) > 0$.",
+        "notation": "Complete pipeline: $\\text{dict} \\rightarrow P(A \\cap B), P(B) \\rightarrow P(A|B)$",
+        "theorem": "**Conditional Probability from Joint Distribution**: If a probability space is fully specified by a joint distribution, all conditional probabilities can be derived through marginalization and division. For discrete binary events: $$P(A|B) = \\frac{\\text{dict}[('A','B')]}{\\text{dict}[('A','B')] + \\text{dict}[('`A','B')]}$$ provided the denominator is positive.",
+        "proof_sketch": "By definition of conditional probability, $P(A|B) = \\frac{P(A \\cap B)}{P(B)}$. The joint distribution provides $P(A \\cap B)$ directly. The marginal $P(B)$ is obtained by summing joint probabilities where $B$ occurs (law of total probability). Substituting these into the definition yields the result.",
+        "examples": [
+          "Given {('A','B'):0.2, ('A','`B'):0.3, ('`A','B'):0.1, ('`A','`B'):0.4}: $P(A \\cap B) = 0.2$, $P(B) = 0.2 + 0.1 = 0.3$, so $P(A|B) = 0.2/0.3 \\approx 0.6667$",
+          "Given {('A','B'):0.3, ('A','`B'):0.2, ('`A','B'):0.3, ('`A','`B'):0.2}: $P(A \\cap B) = 0.3$, $P(B) = 0.3 + 0.3 = 0.6$, so $P(A|B) = 0.3/0.6 = 0.5$",
+          "Given {('A','B'):0.0, ('A','`B'):0.5, ('`A','B'):0.0, ('`A','`B'):0.5}: $P(B) = 0.0$, so $P(A|B)$ is undefined"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete formula",
+          "latex": "$P(A|B) = \\frac{\\text{dict}[('A','B')]}{\\text{dict}[('A','B')] + \\text{dict}[('`A','B')]}$",
+          "description": "Direct computation from dictionary"
+        },
+        {
+          "name": "Validation",
+          "latex": "$0 \\leq P(A|B) \\leq 1$",
+          "description": "Result must be a valid probability"
+        },
+        {
+          "name": "Edge case",
+          "latex": "$P(B) = 0 \\implies P(A|B) \\text{ undefined}$",
+          "description": "Handle division by zero"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes P(A|B) from a joint probability distribution dictionary. This combines extraction, marginalization, and conditional probability computation. Round the result to 4 decimal places. If P(B) = 0, handle appropriately (return None or raise an exception).",
+        "function_signature": "def compute_conditional_probability(joint_dist: dict) -> float:",
+        "starter_code": "def compute_conditional_probability(joint_dist: dict) -> float:\n    \"\"\"\n    Compute P(A|B) from joint distribution.\n    \n    Args:\n        joint_dist: dict with keys ('A','B'), ('A','`B'), ('`A','B'), ('`A','`B')\n    \n    Returns:\n        float: P(A|B) rounded to 4 decimal places, or None if P(B) = 0\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_conditional_probability({('A','B'):0.2, ('A','`B'):0.3, ('`A','B'):0.1, ('`A','`B'):0.4})",
+            "expected": "0.6667",
+            "explanation": "P(A∩B)=0.2, P(B)=0.3, P(A|B)=0.2/0.3≈0.6667"
+          },
+          {
+            "input": "compute_conditional_probability({('A','B'):0.3, ('A','`B'):0.2, ('`A','B'):0.3, ('`A','`B'):0.2})",
+            "expected": "0.5",
+            "explanation": "P(A∩B)=0.3, P(B)=0.6, P(A|B)=0.3/0.6=0.5"
+          },
+          {
+            "input": "compute_conditional_probability({('A','B'):0.1, ('A','`B'):0.4, ('`A','B'):0.4, ('`A','`B'):0.1})",
+            "expected": "0.2",
+            "explanation": "P(A∩B)=0.1, P(B)=0.5, P(A|B)=0.1/0.5=0.2"
+          },
+          {
+            "input": "compute_conditional_probability({('A','B'):0.0, ('A','`B'):0.5, ('`A','B'):0.0, ('`A','`B'):0.5})",
+            "expected": "None or error",
+            "explanation": "P(B)=0, conditional probability undefined"
+          },
+          {
+            "input": "compute_conditional_probability({('A','B'):0.45, ('A','`B'):0.05, ('`A','B'):0.05, ('`A','`B'):0.45})",
+            "expected": "0.9",
+            "explanation": "P(A∩B)=0.45, P(B)=0.5, P(A|B)=0.45/0.5=0.9"
+          },
+          {
+            "input": "compute_conditional_probability({('A','B'):0.6, ('A','`B'):0.0, ('`A','B'):0.0, ('`A','`B'):0.4})",
+            "expected": "1.0",
+            "explanation": "Perfect correlation: whenever B occurs, A occurs too, so P(A|B)=1.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing P(A) instead of P(B) for the denominator (wrong marginal)",
+        "Using P(A∩B) where P(B∩A) is intended - though these are equal, conceptual confusion matters",
+        "Not handling the P(B)=0 edge case, leading to division by zero errors",
+        "Rounding too early in intermediate steps, causing accumulation of numerical error",
+        "Forgetting to validate that the input dictionary is a proper joint distribution before computing"
+      ],
+      "hint": "Structure your solution in three clear steps: (1) Extract P(A∩B) = dict[('A','B')], (2) Compute P(B) = dict[('A','B')] + dict[('`A','B')], (3) Divide if P(B) > 0. Use a small epsilon (e.g., 1e-10) to check if P(B) is effectively zero.",
+      "references": [
+        "End-to-end conditional probability computation",
+        "Numerical stability in probability calculations",
+        "Python round() function"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,507 @@
+{
+  "problem_id": 36,
+  "title": "Calculate Accuracy Score",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "Write a Python function to calculate the accuracy score of a model's predictions. The function should take in two 1D numpy arrays: y_true, which contains the true labels, and y_pred, which contains the predicted labels. It should return the accuracy score as a float.",
+  "example": {
+    "input": "y_true = np.array([1, 0, 1, 1, 0, 1])\n    y_pred = np.array([1, 0, 0, 1, 0, 1])\n    output = accuracy_score(y_true, y_pred)\n    print(output)",
+    "output": "# 0.8333333333333334",
+    "reasoning": "The function compares the true labels with the predicted labels and calculates the ratio of correct predictions to the total number of predictions. In this example, there are 5 correct predictions out of 6, resulting in an accuracy score of 0.8333333333333334."
+  },
+  "starter_code": "import numpy as np\n\ndef accuracy_score(y_true, y_pred):\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "The Indicator Function and Equality Testing",
+      "relation_to_problem": "The accuracy score requires comparing each predicted label with its true label. The indicator function $\\mathbb{1}(\\cdot)$ is the mathematical foundation for this comparison, converting boolean equality tests into numeric values that can be summed and averaged.",
+      "prerequisites": [
+        "Basic set theory",
+        "Boolean logic",
+        "Function notation"
+      ],
+      "learning_objectives": [
+        "Define the indicator function formally using set-theoretic notation",
+        "Implement element-wise equality testing between arrays",
+        "Understand how indicator functions convert logical statements to numerical values"
+      ],
+      "math_content": {
+        "definition": "The **indicator function** (also called characteristic function) is a function defined on a set $X$ that indicates membership in a subset $A \\subseteq X$. Formally: $$\\mathbb{1}_A(x) = \\begin{cases} 1 & \\text{if } x \\in A \\\\ 0 & \\text{if } x \\notin A \\end{cases}$$ For our purposes, we use the indicator function on a logical predicate: $$\\mathbb{1}(P) = \\begin{cases} 1 & \\text{if } P \\text{ is true} \\\\ 0 & \\text{if } P \\text{ is false} \\end{cases}$$",
+        "notation": "$\\mathbb{1}(y_i = \\hat{y}_i)$ = 1 if prediction matches true label, 0 otherwise",
+        "theorem": "**Theorem (Indicator Function Properties)**: For any predicate $P$: (1) $\\mathbb{1}(P) \\in \\{0, 1\\}$, (2) $\\mathbb{1}(\\neg P) = 1 - \\mathbb{1}(P)$, (3) $\\mathbb{1}(P \\land Q) = \\mathbb{1}(P) \\cdot \\mathbb{1}(Q)$",
+        "proof_sketch": "Property (1) follows directly from the definition. For (2), if $P$ is true, $\\neg P$ is false, so $\\mathbb{1}(\\neg P) = 0 = 1 - 1 = 1 - \\mathbb{1}(P)$. Similarly when $P$ is false. Property (3): the product equals 1 only when both indicators are 1, which occurs exactly when both $P$ and $Q$ are true.",
+        "examples": [
+          "Example 1: Let $y = 5$ and $\\hat{y} = 5$. Then $\\mathbb{1}(y = \\hat{y}) = \\mathbb{1}(5 = 5) = \\mathbb{1}(\\text{true}) = 1$",
+          "Example 2: Let $y = 3$ and $\\hat{y} = 7$. Then $\\mathbb{1}(y = \\hat{y}) = \\mathbb{1}(3 = 7) = \\mathbb{1}(\\text{false}) = 0$",
+          "Example 3: For arrays $y = [1, 0, 1]$ and $\\hat{y} = [1, 0, 0]$, the element-wise indicator gives $[\\mathbb{1}(1=1), \\mathbb{1}(0=0), \\mathbb{1}(1=0)] = [1, 1, 0]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Indicator Function",
+          "latex": "$\\mathbb{1}(P) = \\begin{cases} 1 & \\text{if } P \\text{ is true} \\\\ 0 & \\text{if } P \\text{ is false} \\end{cases}$",
+          "description": "Use this to convert equality tests into numeric values suitable for counting"
+        },
+        {
+          "name": "Element-wise Equality",
+          "latex": "$[\\mathbb{1}(y_1 = \\hat{y}_1), \\mathbb{1}(y_2 = \\hat{y}_2), \\ldots, \\mathbb{1}(y_n = \\hat{y}_n)]$",
+          "description": "Apply indicator function to each pair of corresponding elements"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that compares two numpy arrays element-wise and returns a boolean array indicating where elements are equal. This is the first step in calculating accuracy - identifying correct predictions.",
+        "function_signature": "def compare_arrays(arr1: np.ndarray, arr2: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compare_arrays(arr1: np.ndarray, arr2: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compare two arrays element-wise and return boolean array.\n    \n    Args:\n        arr1: First numpy array\n        arr2: Second numpy array\n    \n    Returns:\n        Boolean array where True indicates elements are equal\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compare_arrays(np.array([1, 2, 3]), np.array([1, 2, 3]))",
+            "expected": "np.array([True, True, True])",
+            "explanation": "All corresponding elements are equal, so all positions are True"
+          },
+          {
+            "input": "compare_arrays(np.array([1, 0, 1]), np.array([1, 0, 0]))",
+            "expected": "np.array([True, True, False])",
+            "explanation": "First two positions match, third position differs (1 ≠ 0)"
+          },
+          {
+            "input": "compare_arrays(np.array([5]), np.array([3]))",
+            "expected": "np.array([False])",
+            "explanation": "Single element arrays with different values return False"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using a single '=' instead of '==' for comparison (assignment vs equality)",
+        "Forgetting that numpy array comparison returns an array, not a single boolean",
+        "Not handling arrays of different lengths (though in accuracy score, inputs should be same length)"
+      ],
+      "hint": "Numpy arrays support element-wise comparison operators. The '==' operator returns a boolean array.",
+      "references": [
+        "Numpy array broadcasting and element-wise operations",
+        "Boolean indexing in numpy",
+        "Set theory and characteristic functions"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Summation and the Count of Matching Elements",
+      "relation_to_problem": "After identifying which predictions are correct (via indicator function), we need to count the total number of correct predictions. This requires understanding summation over indicator functions, which forms the numerator of the accuracy formula.",
+      "prerequisites": [
+        "Indicator functions",
+        "Summation notation",
+        "Array element-wise operations"
+      ],
+      "learning_objectives": [
+        "Understand formal summation notation and its properties",
+        "Apply summation to indicator functions to count occurrences",
+        "Implement counting of True values in boolean arrays"
+      ],
+      "math_content": {
+        "definition": "**Summation** is a mathematical operation that adds a sequence of numbers. Formally, given a sequence $a_1, a_2, \\ldots, a_n$, the summation is denoted: $$\\sum_{i=1}^{n} a_i = a_1 + a_2 + \\cdots + a_n$$ where $i$ is the **index of summation**, $1$ is the **lower bound**, $n$ is the **upper bound**, and $a_i$ is the **summand**.",
+        "notation": "$\\sum_{i=1}^{n} \\mathbb{1}(y_i = \\hat{y}_i)$ = sum of indicator functions = count of matches",
+        "theorem": "**Theorem (Summation of Indicators as Counting)**: Let $P_1, P_2, \\ldots, P_n$ be predicates. Then $$\\sum_{i=1}^{n} \\mathbb{1}(P_i) = |\\{i : P_i \\text{ is true}\\}|$$ where $|S|$ denotes the cardinality (count) of set $S$. In other words, summing indicator functions counts how many predicates are true.",
+        "proof_sketch": "Each $\\mathbb{1}(P_i)$ contributes 1 to the sum if $P_i$ is true, and 0 otherwise. Therefore, the sum equals the number of indices $i$ where $P_i$ is true. This is precisely the cardinality of the set of indices satisfying the predicate.",
+        "examples": [
+          "Example 1: Let boolean array $B = [\\text{True}, \\text{True}, \\text{False}, \\text{True}]$. Then $\\sum_{i=1}^{4} \\mathbb{1}(B_i) = 1 + 1 + 0 + 1 = 3$ correct predictions.",
+          "Example 2: For $y = [1, 0, 1, 1]$ and $\\hat{y} = [1, 0, 0, 1]$, we have $\\sum_{i=1}^{4} \\mathbb{1}(y_i = \\hat{y}_i) = \\mathbb{1}(1=1) + \\mathbb{1}(0=0) + \\mathbb{1}(1=0) + \\mathbb{1}(1=1) = 1 + 1 + 0 + 1 = 3$",
+          "Example 3: If all predictions are wrong, $\\sum_{i=1}^{n} \\mathbb{1}(y_i = \\hat{y}_i) = 0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Summation Notation",
+          "latex": "$\\sum_{i=1}^{n} a_i = a_1 + a_2 + \\cdots + a_n$",
+          "description": "Basic summation that adds all elements in a sequence"
+        },
+        {
+          "name": "Count via Indicator Sum",
+          "latex": "$\\text{count} = \\sum_{i=1}^{n} \\mathbb{1}(y_i = \\hat{y}_i)$",
+          "description": "The number of correct predictions equals the sum of indicator functions over all comparisons"
+        },
+        {
+          "name": "Summation Linearity",
+          "latex": "$\\sum_{i=1}^{n} (c \\cdot a_i) = c \\cdot \\sum_{i=1}^{n} a_i$",
+          "description": "Constants can be factored out of summations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a boolean numpy array and returns the count of True values. This represents counting the number of correct predictions from the comparison step.",
+        "function_signature": "def count_true(bool_array: np.ndarray) -> int:",
+        "starter_code": "import numpy as np\n\ndef count_true(bool_array: np.ndarray) -> int:\n    \"\"\"\n    Count the number of True values in a boolean array.\n    \n    Args:\n        bool_array: A numpy array of boolean values\n    \n    Returns:\n        Integer count of True values\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "count_true(np.array([True, True, True]))",
+            "expected": "3",
+            "explanation": "All three elements are True, so count is 3"
+          },
+          {
+            "input": "count_true(np.array([True, False, True, False]))",
+            "expected": "2",
+            "explanation": "Two True values out of four elements"
+          },
+          {
+            "input": "count_true(np.array([False, False, False]))",
+            "expected": "0",
+            "explanation": "No True values means count is 0"
+          },
+          {
+            "input": "count_true(np.array([True]))",
+            "expected": "1",
+            "explanation": "Single True element gives count of 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using len() instead of sum() on boolean array (len gives total size, not count of True)",
+        "Forgetting that in Python/numpy, True is treated as 1 and False as 0 in arithmetic operations",
+        "Not converting to int type (sum might return numpy integer type)"
+      ],
+      "hint": "Boolean values can be summed directly in numpy. True is treated as 1 and False as 0.",
+      "references": [
+        "Summation notation and properties",
+        "Boolean algebra",
+        "Numpy sum() function and axis parameter"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Array Cardinality and Sample Size",
+      "relation_to_problem": "The accuracy formula requires dividing the count of correct predictions by the total number of predictions. Understanding array length (cardinality) is essential for computing the denominator of the accuracy fraction.",
+      "prerequisites": [
+        "Set cardinality",
+        "Array/sequence length",
+        "Basic counting principles"
+      ],
+      "learning_objectives": [
+        "Define cardinality formally for finite sets and sequences",
+        "Relate array length to the total number of predictions",
+        "Understand why sample size (n) is crucial for normalization"
+      ],
+      "math_content": {
+        "definition": "**Cardinality** of a finite set $S$, denoted $|S|$ or $\\text{card}(S)$, is the number of elements in $S$. For a sequence or array $a = (a_1, a_2, \\ldots, a_n)$, its **length** is $n$, often denoted $|a|$ or $\\text{len}(a)$. Formally, if $a: \\{1, 2, \\ldots, n\\} \\to X$ is a finite sequence, then $|a| = n$.",
+        "notation": "$n = |y| = |\\hat{y}|$ = number of samples = total number of predictions",
+        "theorem": "**Theorem (Consistency Requirement)**: For accuracy calculation, we require $|y_{\\text{true}}| = |y_{\\text{pred}}|$. That is, the true labels and predicted labels must have the same cardinality. If they differ, the accuracy is undefined.",
+        "proof_sketch": "Each prediction $\\hat{y}_i$ must correspond to exactly one true label $y_i$ for comparison. If $|y_{\\text{true}}| \\neq |y_{\\text{pred}}|$, there exist elements in one array without a corresponding element in the other, making element-wise comparison impossible for those positions.",
+        "examples": [
+          "Example 1: For arrays $y = [1, 0, 1]$ and $\\hat{y} = [1, 0, 0]$, both have length $n = 3$, so accuracy can be calculated.",
+          "Example 2: An array $a = [5, 3, 8, 1, 9]$ has cardinality $|a| = 5$ (five elements).",
+          "Example 3: The set $S = \\{2, 4, 6, 8\\}$ has cardinality $|S| = 4$ (four distinct elements)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Array Length",
+          "latex": "$n = |a|$",
+          "description": "The total number of elements in array $a$"
+        },
+        {
+          "name": "Consistency Condition",
+          "latex": "$|y_{\\text{true}}| = |y_{\\text{pred}}| = n$",
+          "description": "Both arrays must have the same length for accuracy to be well-defined"
+        },
+        {
+          "name": "Total Predictions",
+          "latex": "$N_{\\text{total}} = n$",
+          "description": "The denominator in the accuracy formula is the sample size"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that returns the length of a numpy array. This represents determining the total number of predictions made, which is the denominator in the accuracy calculation.",
+        "function_signature": "def get_array_length(arr: np.ndarray) -> int:",
+        "starter_code": "import numpy as np\n\ndef get_array_length(arr: np.ndarray) -> int:\n    \"\"\"\n    Get the length (number of elements) of a numpy array.\n    \n    Args:\n        arr: A 1D numpy array\n    \n    Returns:\n        Integer representing the number of elements\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "get_array_length(np.array([1, 2, 3, 4, 5]))",
+            "expected": "5",
+            "explanation": "Array has 5 elements, so length is 5"
+          },
+          {
+            "input": "get_array_length(np.array([10]))",
+            "expected": "1",
+            "explanation": "Single element array has length 1"
+          },
+          {
+            "input": "get_array_length(np.array([7, 3, 9, 1, 2, 8, 4]))",
+            "expected": "7",
+            "explanation": "Seven elements means length is 7"
+          },
+          {
+            "input": "get_array_length(np.array([True, False, True]))",
+            "expected": "3",
+            "explanation": "Works for boolean arrays too - 3 elements"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using .size on multidimensional arrays without understanding it gives total elements",
+        "Confusing .shape (returns tuple) with length (returns integer for 1D arrays)",
+        "Not verifying that both input arrays have the same length before calculation"
+      ],
+      "hint": "Numpy arrays have a built-in attribute or function to get their length. For 1D arrays, this is straightforward.",
+      "references": [
+        "Set theory and cardinality",
+        "Array data structures",
+        "Numpy array shape and size attributes"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Ratio and Proportion: The Fraction Form",
+      "relation_to_problem": "Accuracy is fundamentally a ratio: correct predictions divided by total predictions. Understanding ratios, proportions, and their properties is essential for implementing the accuracy formula correctly and interpreting the result.",
+      "prerequisites": [
+        "Division operation",
+        "Fractions and rational numbers",
+        "Normalization concepts"
+      ],
+      "learning_objectives": [
+        "Define ratio and proportion formally",
+        "Understand the range and properties of proportions [0, 1]",
+        "Implement division operations that produce floating-point ratios"
+      ],
+      "math_content": {
+        "definition": "A **ratio** is a comparison of two quantities by division. For quantities $a$ and $b$ (with $b \\neq 0$), the ratio is $\\frac{a}{b}$ or $a:b$. A **proportion** is a ratio expressed as a fraction where the numerator is a subset count and the denominator is the total count. For classification accuracy: $$\\text{Proportion} = \\frac{\\text{count of matches}}{\\text{total count}} = \\frac{\\sum_{i=1}^{n} \\mathbb{1}(y_i = \\hat{y}_i)}{n}$$",
+        "notation": "$r = \\frac{a}{b}$ where $a$ is the part (correct predictions), $b$ is the whole (total predictions)",
+        "theorem": "**Theorem (Range of Proportions)**: If $a$ represents a count of items satisfying a condition and $n$ is the total count, then the proportion $p = \\frac{a}{n}$ satisfies $0 \\leq p \\leq 1$. Furthermore, $p = 0$ iff $a = 0$ (no matches) and $p = 1$ iff $a = n$ (all matches).",
+        "proof_sketch": "Since $a$ counts items from a set of size $n$, we have $0 \\leq a \\leq n$ by definition. Dividing by $n > 0$ preserves the inequality: $0 \\leq \\frac{a}{n} \\leq 1$. The extreme cases follow directly: $\\frac{0}{n} = 0$ and $\\frac{n}{n} = 1$.",
+        "examples": [
+          "Example 1: If 5 out of 6 predictions are correct, the proportion is $\\frac{5}{6} \\approx 0.8333$, meaning 83.33% accuracy.",
+          "Example 2: Perfect predictions: $\\frac{10}{10} = 1.0$ or 100% accuracy.",
+          "Example 3: Complete failure: $\\frac{0}{8} = 0.0$ or 0% accuracy.",
+          "Example 4: Half correct: $\\frac{4}{8} = 0.5$ or 50% accuracy."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Ratio (Division)",
+          "latex": "$r = \\frac{a}{b}$",
+          "description": "Basic division operation to compute proportion"
+        },
+        {
+          "name": "Accuracy as Proportion",
+          "latex": "$\\text{Accuracy} = \\frac{\\text{correct}}{\\text{total}} = \\frac{\\sum_{i=1}^{n} \\mathbb{1}(y_i = \\hat{y}_i)}{n}$",
+          "description": "The complete accuracy formula combining count and total"
+        },
+        {
+          "name": "Percentage Conversion",
+          "latex": "$\\text{Accuracy}_{\\%} = \\text{Accuracy} \\times 100\\%$",
+          "description": "Convert proportion to percentage by multiplying by 100"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a count of correct predictions and a total count, then returns the proportion (ratio) as a float. This is the mathematical operation at the heart of the accuracy calculation.",
+        "function_signature": "def calculate_ratio(correct: int, total: int) -> float:",
+        "starter_code": "def calculate_ratio(correct: int, total: int) -> float:\n    \"\"\"\n    Calculate the ratio of correct predictions to total predictions.\n    \n    Args:\n        correct: Number of correct predictions\n        total: Total number of predictions\n    \n    Returns:\n        Float representing the proportion (between 0.0 and 1.0)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_ratio(5, 6)",
+            "expected": "0.8333333333333334",
+            "explanation": "5 correct out of 6 total gives proportion 5/6 ≈ 0.833"
+          },
+          {
+            "input": "calculate_ratio(10, 10)",
+            "expected": "1.0",
+            "explanation": "Perfect score: all predictions correct gives ratio of 1.0"
+          },
+          {
+            "input": "calculate_ratio(0, 5)",
+            "expected": "0.0",
+            "explanation": "No correct predictions gives ratio of 0.0"
+          },
+          {
+            "input": "calculate_ratio(3, 4)",
+            "expected": "0.75",
+            "explanation": "3 out of 4 correct gives 0.75 (or 75%)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using integer division (//) instead of float division (/) which truncates the result",
+        "Not handling the edge case where total is 0 (division by zero error)",
+        "Reversing numerator and denominator (calculating total/correct instead of correct/total)",
+        "Expecting an integer result when accuracy is always a float between 0 and 1"
+      ],
+      "hint": "In Python 3, the '/' operator performs float division by default. Make sure to return a float, not an integer.",
+      "references": [
+        "Ratios and proportions in mathematics",
+        "Normalization techniques",
+        "Floating-point arithmetic"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Composition: Building the Complete Accuracy Metric",
+      "relation_to_problem": "This sub-quest combines all previous concepts into the complete accuracy score calculation. You'll compose the operations: comparison → counting → division, applying the full mathematical formula for classification accuracy.",
+      "prerequisites": [
+        "Indicator functions",
+        "Summation",
+        "Array length",
+        "Ratio calculation"
+      ],
+      "learning_objectives": [
+        "Synthesize multiple operations into a single pipeline",
+        "Apply the complete accuracy formula to real data",
+        "Understand the mathematical composition of functions",
+        "Validate results against expected accuracy values"
+      ],
+      "math_content": {
+        "definition": "**Classification Accuracy** is formally defined as the proportion of correct predictions in a finite sample. Given true labels $y = (y_1, y_2, \\ldots, y_n)$ and predicted labels $\\hat{y} = (\\hat{y}_1, \\hat{y}_2, \\ldots, \\hat{y}_n)$, accuracy is: $$\\text{Accuracy}(y, \\hat{y}) = \\frac{1}{n}\\sum_{i=1}^{n} \\mathbb{1}(y_i = \\hat{y}_i)$$ This can be decomposed as a composition of functions: $\\text{Accuracy} = \\text{ratio} \\circ \\text{sum} \\circ \\text{indicator} \\circ \\text{compare}$",
+        "notation": "$\\text{Acc}(y, \\hat{y}) \\in [0, 1]$ where values closer to 1 indicate better performance",
+        "theorem": "**Theorem (Accuracy Extrema)**: For any classification problem with $n$ samples: (1) $\\min\\{\\text{Accuracy}(y, \\hat{y})\\} = 0$ achieved when $\\forall i: y_i \\neq \\hat{y}_i$, (2) $\\max\\{\\text{Accuracy}(y, \\hat{y})\\} = 1$ achieved when $\\forall i: y_i = \\hat{y}_i$. (3) For random guessing on balanced binary classification, expected accuracy is 0.5.",
+        "proof_sketch": "(1) If all predictions are wrong, $\\sum_{i=1}^{n} \\mathbb{1}(y_i = \\hat{y}_i) = 0$, so accuracy is $\\frac{0}{n} = 0$. (2) If all predictions are correct, $\\sum_{i=1}^{n} \\mathbb{1}(y_i = \\hat{y}_i) = n$, so accuracy is $\\frac{n}{n} = 1$. (3) For random binary guessing, $P(y_i = \\hat{y}_i) = 0.5$, so by linearity of expectation, $E[\\text{Accuracy}] = \\frac{1}{n}\\sum_{i=1}^{n} E[\\mathbb{1}(y_i = \\hat{y}_i)] = \\frac{1}{n} \\cdot n \\cdot 0.5 = 0.5$.",
+        "examples": [
+          "Example 1: $y = [1, 0, 1, 1, 0, 1]$, $\\hat{y} = [1, 0, 0, 1, 0, 1]$. Comparison: $[T, T, F, T, T, T]$. Count: 5. Total: 6. Accuracy: $\\frac{5}{6} \\approx 0.833$.",
+          "Example 2: Binary classification with $y = [1, 1, 1, 1]$, $\\hat{y} = [1, 1, 1, 1]$ gives accuracy $\\frac{4}{4} = 1.0$ (perfect).",
+          "Example 3: Multi-class with $y = [0, 1, 2, 1]$, $\\hat{y} = [0, 2, 2, 0]$ gives comparisons $[T, F, T, F]$, count 2, accuracy $\\frac{2}{4} = 0.5$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Accuracy Formula",
+          "latex": "$\\text{Accuracy} = \\frac{1}{n}\\sum_{i=1}^{n} \\mathbb{1}(y_i = \\hat{y}_i) = \\frac{|\\{i : y_i = \\hat{y}_i\\}|}{n}$",
+          "description": "The complete mathematical definition combining all components"
+        },
+        {
+          "name": "Vectorized Form",
+          "latex": "$\\text{Accuracy} = \\frac{\\text{sum}(y == \\hat{y})}{\\text{len}(y)}$",
+          "description": "Implementation-friendly notation using array operations"
+        },
+        {
+          "name": "Error Rate Relation",
+          "latex": "$\\text{Error Rate} = 1 - \\text{Accuracy} = \\frac{\\sum_{i=1}^{n} \\mathbb{1}(y_i \\neq \\hat{y}_i)}{n}$",
+          "description": "Accuracy and error rate are complementary metrics"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete function that calculates accuracy by composing all previous steps: compare arrays element-wise, count matches, get total length, and compute the ratio. Use the functions you've conceptually built in previous sub-quests, but implement the full pipeline here.",
+        "function_signature": "def compute_accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:\n    \"\"\"\n    Calculate classification accuracy score.\n    \n    Args:\n        y_true: Array of true labels\n        y_pred: Array of predicted labels\n    \n    Returns:\n        Float accuracy score between 0.0 and 1.0\n    \"\"\"\n    # Step 1: Compare arrays element-wise\n    # Step 2: Count number of matches\n    # Step 3: Get total number of samples\n    # Step 4: Calculate ratio\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_accuracy(np.array([1, 0, 1, 1, 0, 1]), np.array([1, 0, 0, 1, 0, 1]))",
+            "expected": "0.8333333333333334",
+            "explanation": "5 correct predictions out of 6 total: 5/6 = 0.833..."
+          },
+          {
+            "input": "compute_accuracy(np.array([1, 1, 1, 1]), np.array([1, 1, 1, 1]))",
+            "expected": "1.0",
+            "explanation": "All predictions correct: 4/4 = 1.0 (perfect accuracy)"
+          },
+          {
+            "input": "compute_accuracy(np.array([0, 1, 0, 1]), np.array([1, 0, 1, 0]))",
+            "expected": "0.0",
+            "explanation": "All predictions wrong: 0/4 = 0.0 (worst accuracy)"
+          },
+          {
+            "input": "compute_accuracy(np.array([2, 0, 1, 3, 1]), np.array([2, 0, 2, 3, 0]))",
+            "expected": "0.6",
+            "explanation": "Multi-class: 3 correct (indices 0,1,3) out of 5 total: 3/5 = 0.6"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing element-wise equality but forgetting to sum the boolean array",
+        "Summing correctly but dividing by sum instead of length (double-counting error)",
+        "Not converting boolean array to numeric before summing (though numpy handles this)",
+        "Using wrong axis parameter if accidentally working with 2D arrays",
+        "Forgetting to return float type (though Python 3 division handles this)"
+      ],
+      "hint": "Think of this as a pipeline: compare → count → divide. Each operation flows into the next. Numpy's element-wise operations and aggregation functions make this elegant.",
+      "references": [
+        "Function composition in mathematics",
+        "Evaluation metrics in machine learning",
+        "Numpy vectorization"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Edge Cases and Robustness in Accuracy Calculation",
+      "relation_to_problem": "A production-ready accuracy function must handle edge cases: empty arrays, mismatched lengths, and single-element arrays. Understanding these cases ensures mathematical rigor and prevents runtime errors in real applications.",
+      "prerequisites": [
+        "Complete accuracy calculation",
+        "Exception handling",
+        "Input validation"
+      ],
+      "learning_objectives": [
+        "Identify edge cases in accuracy calculation",
+        "Understand undefined mathematical operations (e.g., 0/0)",
+        "Implement defensive programming practices",
+        "Validate input preconditions before computation"
+      ],
+      "math_content": {
+        "definition": "An **edge case** is an input or situation that occurs at an extreme (maximum, minimum, empty, or boundary) of operating parameters. For accuracy calculation, critical edge cases include: (1) Empty arrays: $n = 0$, (2) Single-element arrays: $n = 1$, (3) Mismatched lengths: $|y| \\neq |\\hat{y}|$, (4) All correct: $\\forall i, y_i = \\hat{y}_i$, (5) All incorrect: $\\forall i, y_i \\neq \\hat{y}_i$.",
+        "notation": "$n = 0 \\implies \\text{Accuracy}$ is undefined (division by zero)",
+        "theorem": "**Theorem (Well-definedness of Accuracy)**: The accuracy metric is well-defined if and only if: (1) $n > 0$ (non-empty arrays), and (2) $|y_{\\text{true}}| = |y_{\\text{pred}}|$ (matched lengths). If either condition fails, accuracy is mathematically undefined.",
+        "proof_sketch": "Condition (1): If $n = 0$, the formula $\\frac{1}{n}\\sum_{i=1}^{n} \\mathbb{1}(y_i = \\hat{y}_i)$ involves division by zero, which is undefined in standard arithmetic. Condition (2): If lengths differ, say $|y| = n_1$ and $|\\hat{y}| = n_2$ with $n_1 \\neq n_2$, then element-wise comparison cannot be performed for all indices simultaneously. Some indices would lack a corresponding pair.",
+        "examples": [
+          "Example 1: Empty arrays $y = []$, $\\hat{y} = []$. Here $n = 0$, so accuracy involves $\\frac{\\text{sum}}{0}$, which is undefined. Should raise an error or return None.",
+          "Example 2: Single element $y = [1]$, $\\hat{y} = [1]$. Accuracy = $\\frac{1}{1} = 1.0$. Valid edge case.",
+          "Example 3: Mismatched lengths $y = [1, 0, 1]$ (n=3), $\\hat{y} = [1, 0]$ (n=2). Cannot compute accuracy. Should raise ValueError.",
+          "Example 4: All correct with $n=100$: accuracy = $\\frac{100}{100} = 1.0$. Valid but important to test."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Precondition Check",
+          "latex": "$n > 0 \\land |y| = |\\hat{y}|$",
+          "description": "Logical precondition that must be true before computing accuracy"
+        },
+        {
+          "name": "Single Sample Accuracy",
+          "latex": "$\\text{Accuracy}_{n=1} = \\mathbb{1}(y_1 = \\hat{y}_1) \\in \\{0, 1\\}$",
+          "description": "For a single sample, accuracy is either 0 or 1 (no intermediate values)"
+        },
+        {
+          "name": "Error Handling",
+          "latex": "$\\text{Accuracy}(y, \\hat{y}) = \\begin{cases} \\frac{1}{n}\\sum_{i=1}^{n} \\mathbb{1}(y_i = \\hat{y}_i) & \\text{if } n > 0 \\land |y| = |\\hat{y}| \\\\ \\text{undefined} & \\text{otherwise} \\end{cases}$",
+          "description": "Complete definition including edge case handling"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a robust accuracy function that validates inputs before calculation. Check for empty arrays and mismatched lengths, raising appropriate errors. This ensures your accuracy implementation is production-ready and mathematically sound.",
+        "function_signature": "def robust_accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef robust_accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:\n    \"\"\"\n    Calculate accuracy with input validation and edge case handling.\n    \n    Args:\n        y_true: Array of true labels\n        y_pred: Array of predicted labels\n    \n    Returns:\n        Float accuracy score between 0.0 and 1.0\n        \n    Raises:\n        ValueError: If arrays are empty or have mismatched lengths\n    \"\"\"\n    # Validate inputs\n    # Check for empty arrays (n = 0)\n    # Check for mismatched lengths\n    # If valid, compute accuracy\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "robust_accuracy(np.array([1]), np.array([1]))",
+            "expected": "1.0",
+            "explanation": "Single element, matching: accuracy = 1/1 = 1.0"
+          },
+          {
+            "input": "robust_accuracy(np.array([0]), np.array([1]))",
+            "expected": "0.0",
+            "explanation": "Single element, not matching: accuracy = 0/1 = 0.0"
+          },
+          {
+            "input": "robust_accuracy(np.array([]), np.array([]))",
+            "expected": "ValueError: Cannot calculate accuracy for empty arrays",
+            "explanation": "Empty arrays mean n=0, causing division by zero - must raise error"
+          },
+          {
+            "input": "robust_accuracy(np.array([1, 0, 1]), np.array([1, 0]))",
+            "expected": "ValueError: Arrays must have the same length",
+            "explanation": "Mismatched lengths (3 vs 2) make comparison impossible - must raise error"
+          },
+          {
+            "input": "robust_accuracy(np.array([1, 0, 1, 1]), np.array([1, 0, 1, 1]))",
+            "expected": "1.0",
+            "explanation": "All predictions correct: 4/4 = 1.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking for empty arrays before division, causing ZeroDivisionError",
+        "Assuming arrays are same length without validation, leading to subtle bugs",
+        "Returning None or 0 for error cases instead of raising exceptions (silently failing)",
+        "Not testing edge cases during development (single element, all correct, all wrong)",
+        "Using assert statements for validation (they can be disabled in production)"
+      ],
+      "hint": "Use conditional statements to check array lengths before any computation. Python's 'raise' keyword allows you to throw informative exceptions. Check both arrays simultaneously.",
+      "references": [
+        "Defensive programming",
+        "Input validation",
+        "Exception handling in Python",
+        "Preconditions and postconditions"
+      ]
+    }
+  ]
+}

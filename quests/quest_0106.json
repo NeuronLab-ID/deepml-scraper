@@ -1,0 +1,536 @@
+{
+  "problem_id": 106,
+  "title": "Train Logistic Regression with Gradient Descent",
+  "category": "Machine Learning",
+  "difficulty": "hard",
+  "description": "Implement a gradient descent training algorithm for logistic regression. Your task is to compute model parameters using Binary Cross Entropy loss and return the optimized coefficients along with loss values collected over iterations.\n\nSpecifications:\n- Add a bias term (column of ones) as the FIRST column of the feature matrix\n- Initialize all coefficients to ZERO\n- Use SUM-based BCE loss (not mean): L = -Σ[y·log(p) + (1-y)·log(1-p)]\n- Update rule: β = β - lr × X^T × (predictions - y)",
+  "example": {
+    "input": "X = np.array([[1.0, 0.5], [-0.5, -1.5], [2.0, 1.5], [-2.0, -1.0]]), y = np.array([1, 0, 1, 0]), learning_rate = 0.01, iterations = 5",
+    "output": "([-0.0001, 0.128, 0.1053], [2.7726, 2.6485, 2.533, 2.4254, 2.325])",
+    "reasoning": "The function adds a bias column to X (making it 4×3), initializes 3 coefficients to zero, then iteratively updates them using gradient descent. After 5 iterations, the loss decreases from 2.77 to 2.33, showing the model is learning."
+  },
+  "starter_code": "import numpy as np\n\ndef train_logreg(X: np.ndarray, y: np.ndarray, learning_rate: float, iterations: int) -> tuple[list[float], list[float]]:\n    \"\"\"\n    Train logistic regression using gradient descent with BCE loss.\n    \n    Args:\n        X: Feature matrix of shape (n_samples, n_features)\n        y: Binary labels of shape (n_samples,)\n        learning_rate: Step size for gradient descent\n        iterations: Number of training iterations\n    \n    Returns:\n        Tuple of (coefficients, losses) where:\n        - coefficients: List of learned weights (bias first, then feature weights)\n        - losses: List of sum-based BCE loss values at each iteration\n    \n    Notes:\n        - Initialize all coefficients to zero\n        - Add bias column as FIRST column of X\n        - Use sum-based BCE loss: -sum(y*log(p) + (1-y)*log(1-p))\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "The Sigmoid Function and Its Derivative",
+      "relation_to_problem": "The sigmoid function σ(z) = 1/(1+e^(-z)) is the core activation function in logistic regression that maps linear combinations to probabilities. Understanding its derivative is essential for computing gradients in the backward pass.",
+      "prerequisites": [
+        "Basic calculus (derivatives)",
+        "Exponential functions",
+        "Chain rule"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition and properties of the sigmoid function",
+        "Derive and apply the elegant self-referential derivative σ'(z) = σ(z)(1-σ(z))",
+        "Implement vectorized sigmoid computation with numerical stability"
+      ],
+      "math_content": {
+        "definition": "The **sigmoid function** (also called logistic function) is defined as:\n$$\\sigma(z) = \\frac{1}{1+e^{-z}}$$\nwhere $z \\in \\mathbb{R}$ is the input (often called the logit or log-odds). The sigmoid maps the entire real line to the bounded interval $(0, 1)$, making it ideal for probability modeling.",
+        "notation": "$\\sigma(z)$ = sigmoid function; $z$ = input (logit); $e$ = Euler's number (≈2.71828)",
+        "theorem": "**Sigmoid Derivative Theorem**: The derivative of the sigmoid function has the elegant form:\n$$\\frac{d}{dz}\\sigma(z) = \\sigma(z)(1-\\sigma(z))$$\nThis self-referential property means if we've already computed $\\sigma(z)$, we can compute its derivative without additional exponential operations.",
+        "proof_sketch": "Starting with $\\sigma(z) = \\frac{1}{1+e^{-z}} = (1+e^{-z})^{-1}$, apply the chain rule:\n$$\\frac{d}{dz}\\sigma(z) = -(1+e^{-z})^{-2} \\cdot (-e^{-z}) = \\frac{e^{-z}}{(1+e^{-z})^2}$$\nFactor and simplify:\n$$= \\frac{1}{1+e^{-z}} \\cdot \\frac{e^{-z}}{1+e^{-z}} = \\frac{1}{1+e^{-z}} \\cdot \\frac{1+e^{-z}-1}{1+e^{-z}} = \\sigma(z)(1-\\sigma(z))$$",
+        "examples": [
+          "At z=0: σ(0) = 1/(1+1) = 0.5, σ'(0) = 0.5(1-0.5) = 0.25",
+          "At z=2: σ(2) ≈ 0.88, σ'(2) ≈ 0.88×0.12 ≈ 0.105",
+          "At z=-5: σ(-5) ≈ 0.0067, σ'(-5) ≈ 0.0067×0.9933 ≈ 0.0066",
+          "As z→∞: σ(z)→1 and σ'(z)→0 (flat at extremes)",
+          "As z→-∞: σ(z)→0 and σ'(z)→0 (flat at extremes)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sigmoid Function",
+          "latex": "$\\sigma(z) = \\frac{1}{1+e^{-z}}$",
+          "description": "Converts logits to probabilities in range (0,1)"
+        },
+        {
+          "name": "Sigmoid Derivative",
+          "latex": "$\\sigma'(z) = \\sigma(z)(1-\\sigma(z))$",
+          "description": "Used in backpropagation for gradient computation"
+        },
+        {
+          "name": "Vectorized Sigmoid",
+          "latex": "$\\sigma(\\mathbf{z}) = \\frac{1}{1+e^{-\\mathbf{z}}}$",
+          "description": "Apply sigmoid element-wise to vector/matrix inputs"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the sigmoid function that takes a numpy array of any shape and returns the sigmoid applied element-wise. Ensure numerical stability by clipping extreme values.",
+        "function_signature": "def sigmoid(z: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef sigmoid(z: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute sigmoid function element-wise.\n    \n    Args:\n        z: Input array of any shape\n    \n    Returns:\n        Array of same shape with sigmoid applied element-wise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "sigmoid(np.array([0]))",
+            "expected": "np.array([0.5])",
+            "explanation": "At z=0, sigmoid is exactly 0.5 (inflection point)"
+          },
+          {
+            "input": "sigmoid(np.array([1, -1]))",
+            "expected": "np.array([0.7311, 0.2689])",
+            "explanation": "Sigmoid is symmetric: σ(-z) = 1 - σ(z)"
+          },
+          {
+            "input": "sigmoid(np.array([[2, -2], [0, 5]]))",
+            "expected": "np.array([[0.8808, 0.1192], [0.5, 0.9933]])",
+            "explanation": "Works on multidimensional arrays element-wise"
+          },
+          {
+            "input": "sigmoid(np.array([100, -100]))",
+            "expected": "np.array([1.0, 0.0])",
+            "explanation": "Handles extreme values without overflow (clips to [0,1])"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling numerical overflow when z is very large (use np.clip or np.exp clipping)",
+        "Forgetting that sigmoid output is strictly between 0 and 1 (never exactly 0 or 1)",
+        "Not vectorizing the implementation (using loops instead of numpy operations)",
+        "Confusing sigmoid with softmax (sigmoid is for binary, softmax for multi-class)"
+      ],
+      "hint": "For numerical stability, consider that when z is very negative, e^(-z) becomes huge. You can clip z to a reasonable range like [-500, 500] before computing the exponential.",
+      "references": [
+        "Logistic functions in machine learning",
+        "Numerical stability in neural network computations",
+        "Activation functions comparison"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Binary Cross-Entropy Loss Function",
+      "relation_to_problem": "Binary Cross-Entropy (BCE) is the loss function we minimize during training. Understanding its mathematical form and why we use sum-based (not mean-based) loss is crucial for implementing the correct gradient descent updates.",
+      "prerequisites": [
+        "Logarithms",
+        "Information theory basics",
+        "Probability theory"
+      ],
+      "learning_objectives": [
+        "Understand the information-theoretic motivation for cross-entropy loss",
+        "Compute sum-based BCE loss for binary classification",
+        "Handle numerical stability issues with log(0) edge cases",
+        "Interpret loss values and their relationship to prediction quality"
+      ],
+      "math_content": {
+        "definition": "**Binary Cross-Entropy Loss** measures the dissimilarity between true labels and predicted probabilities. For a dataset with $n$ samples, true labels $y_i \\in \\{0,1\\}$, and predicted probabilities $p_i \\in (0,1)$, the **sum-based** BCE loss is:\n$$\\mathcal{L} = -\\sum_{i=1}^{n} \\left[ y_i \\log(p_i) + (1-y_i) \\log(1-p_i) \\right]$$\nNote: This differs from mean-based BCE which divides by $n$. Sum-based loss scales with dataset size.",
+        "notation": "$\\mathcal{L}$ = total loss; $y_i$ = true label (0 or 1); $p_i$ = predicted probability; $n$ = number of samples",
+        "theorem": "**Loss Decomposition Property**: The BCE loss can be understood as:\n- When $y_i = 1$: contributes $-\\log(p_i)$ to loss (penalizes low confidence in true class)\n- When $y_i = 0$: contributes $-\\log(1-p_i)$ to loss (penalizes high confidence in false class)\nThe loss is minimized when predictions match labels: $p_i = y_i$.",
+        "proof_sketch": "BCE derives from maximum likelihood estimation. The likelihood of observing labels $\\mathbf{y}$ given predictions $\\mathbf{p}$ is:\n$$P(\\mathbf{y}|\\mathbf{p}) = \\prod_{i=1}^{n} p_i^{y_i}(1-p_i)^{1-y_i}$$\nMaximizing log-likelihood:\n$$\\log P(\\mathbf{y}|\\mathbf{p}) = \\sum_{i=1}^{n} [y_i \\log(p_i) + (1-y_i)\\log(1-p_i)]$$\nMinimizing negative log-likelihood gives BCE loss.",
+        "examples": [
+          "Perfect prediction: y=1, p=1 → loss = -log(1) = 0 (minimum)",
+          "Good prediction: y=1, p=0.9 → loss = -log(0.9) ≈ 0.105",
+          "Bad prediction: y=1, p=0.1 → loss = -log(0.1) ≈ 2.303",
+          "Terrible prediction: y=1, p=0.01 → loss = -log(0.01) ≈ 4.605",
+          "For 4 samples with y=[1,0,1,0], p=[0.8,0.3,0.9,0.2]: sum-based loss ≈ 0.223 + 0.357 + 0.105 + 0.223 ≈ 0.908"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sum-Based BCE Loss",
+          "latex": "$\\mathcal{L} = -\\sum_{i=1}^{n} [y_i \\log(p_i) + (1-y_i)\\log(1-p_i)]$",
+          "description": "Total loss across all samples (scales with dataset size)"
+        },
+        {
+          "name": "Mean-Based BCE Loss",
+          "latex": "$\\mathcal{L}_{mean} = -\\frac{1}{n}\\sum_{i=1}^{n} [y_i \\log(p_i) + (1-y_i)\\log(1-p_i)]$",
+          "description": "Average loss per sample (NOT used in this problem)"
+        },
+        {
+          "name": "Single Sample BCE",
+          "latex": "$\\ell_i = -[y_i \\log(p_i) + (1-y_i)\\log(1-p_i)]$",
+          "description": "Loss contribution from individual sample"
+        }
+      ],
+      "exercise": {
+        "description": "Implement sum-based binary cross-entropy loss. Handle numerical stability by clipping predictions to avoid log(0).",
+        "function_signature": "def binary_cross_entropy(y_true: np.ndarray, y_pred: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef binary_cross_entropy(y_true: np.ndarray, y_pred: np.ndarray) -> float:\n    \"\"\"\n    Compute sum-based binary cross-entropy loss.\n    \n    Args:\n        y_true: True binary labels, shape (n,)\n        y_pred: Predicted probabilities, shape (n,)\n    \n    Returns:\n        Sum-based BCE loss (scalar)\n    \n    Note: Clip predictions to [1e-15, 1-1e-15] for numerical stability\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "binary_cross_entropy(np.array([1, 0]), np.array([0.9, 0.1]))",
+            "expected": "0.2107",
+            "explanation": "For y=1, p=0.9: -log(0.9)≈0.1054; for y=0, p=0.1: -log(0.9)≈0.1054; sum≈0.2107"
+          },
+          {
+            "input": "binary_cross_entropy(np.array([1, 0, 1, 0]), np.array([0.8, 0.3, 0.9, 0.2]))",
+            "expected": "0.9083",
+            "explanation": "Sum of individual losses: 0.2231 + 0.3567 + 0.1054 + 0.2231 ≈ 0.9083"
+          },
+          {
+            "input": "binary_cross_entropy(np.array([1, 1, 1]), np.array([1.0, 1.0, 1.0]))",
+            "expected": "0.0 (after clipping)",
+            "explanation": "Perfect predictions, but clip to avoid log(1)=0 edge case"
+          },
+          {
+            "input": "binary_cross_entropy(np.array([1, 0]), np.array([0.5, 0.5]))",
+            "expected": "1.3863",
+            "explanation": "Maximum uncertainty: -log(0.5) for each sample, sum = 2×0.6931 ≈ 1.3863"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to clip predictions, causing log(0) or log(1) numerical issues",
+        "Using mean-based loss instead of sum-based (dividing by n)",
+        "Not handling edge cases where y_pred is exactly 0 or 1",
+        "Incorrect indexing when y=0 (should use log(1-p), not log(p))",
+        "Forgetting the negative sign in front of the sum"
+      ],
+      "hint": "The formula has two terms per sample. When y=1, only the first term contributes; when y=0, only the second term contributes. Use np.clip to ensure predictions are in (epsilon, 1-epsilon).",
+      "references": [
+        "Cross-entropy in information theory",
+        "Loss functions for classification",
+        "Maximum likelihood estimation",
+        "Numerical stability in log computations"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Matrix Formulation and Bias Term",
+      "relation_to_problem": "Logistic regression uses matrix multiplication X·β to compute logits. Adding a bias term as the first column of X (column of ones) allows us to learn an intercept. This vectorized formulation is essential for efficient gradient descent implementation.",
+      "prerequisites": [
+        "Linear algebra",
+        "Matrix multiplication",
+        "Vector operations"
+      ],
+      "learning_objectives": [
+        "Understand why bias is implemented as a feature column of ones",
+        "Perform matrix-vector multiplication to compute logits z = X·β",
+        "Recognize how adding bias affects coefficient dimensionality",
+        "Apply vectorized operations instead of loops for efficiency"
+      ],
+      "math_content": {
+        "definition": "In logistic regression, the **linear combination** or **logit** for sample $i$ is:\n$$z_i = \\beta_0 + \\beta_1 x_{i1} + \\beta_2 x_{i2} + \\cdots + \\beta_d x_{id} = \\beta_0 + \\sum_{j=1}^{d} \\beta_j x_{ij}$$\nwhere $\\beta_0$ is the **bias** (intercept) and $\\beta_1, \\ldots, \\beta_d$ are feature weights. To express this in matrix form, we augment the feature matrix $X \\in \\mathbb{R}^{n \\times d}$ by prepending a column of ones:\n$$X_{aug} = [\\mathbf{1}_n \\mid X] \\in \\mathbb{R}^{n \\times (d+1)}$$\nThen all logits can be computed as: $\\mathbf{z} = X_{aug}\\boldsymbol{\\beta}$ where $\\boldsymbol{\\beta} = [\\beta_0, \\beta_1, \\ldots, \\beta_d]^T \\in \\mathbb{R}^{d+1}$.",
+        "notation": "$X$ = original features (n×d); $X_{aug}$ = augmented features (n×(d+1)); $\\boldsymbol{\\beta}$ = coefficients including bias (d+1 dimensions); $\\mathbf{1}_n$ = column vector of ones (length n)",
+        "theorem": "**Bias as Feature Theorem**: Adding a column of ones as the first column of the feature matrix is mathematically equivalent to explicitly adding a bias term. The first coefficient $\\beta_0$ becomes the learned bias/intercept.\n$$z_i = [1, x_{i1}, \\ldots, x_{id}]\\begin{bmatrix}\\beta_0 \\\\ \\beta_1 \\\\ \\vdots \\\\ \\beta_d\\end{bmatrix} = \\beta_0 \\cdot 1 + \\sum_{j=1}^{d} \\beta_j x_{ij}$$",
+        "proof_sketch": "Given $X \\in \\mathbb{R}^{n \\times d}$ and creating $X_{aug} = [\\mathbf{1}_n \\mid X]$, the matrix-vector product is:\n$$X_{aug}\\boldsymbol{\\beta} = \\begin{bmatrix}1 & x_{11} & \\cdots & x_{1d} \\\\ 1 & x_{21} & \\cdots & x_{2d} \\\\ \\vdots & \\vdots & \\ddots & \\vdots \\\\ 1 & x_{n1} & \\cdots & x_{nd}\\end{bmatrix}\\begin{bmatrix}\\beta_0 \\\\ \\beta_1 \\\\ \\vdots \\\\ \\beta_d\\end{bmatrix} = \\begin{bmatrix}\\beta_0 + \\sum_j \\beta_j x_{1j} \\\\ \\beta_0 + \\sum_j \\beta_j x_{2j} \\\\ \\vdots \\\\ \\beta_0 + \\sum_j \\beta_j x_{nj}\\end{bmatrix}$$\nEach row includes the bias term $\\beta_0$ plus the weighted sum of features.",
+        "examples": [
+          "Original X = [[2, 3], [4, 5]] (2 samples, 2 features) → X_aug = [[1, 2, 3], [1, 4, 5]] (2 samples, 3 features)",
+          "With β = [0.5, 0.2, 0.3]: logits = [[1,2,3]·[0.5,0.2,0.3], [1,4,5]·[0.5,0.2,0.3]] = [2.3, 3.8]",
+          "If X has shape (100, 5), X_aug has shape (100, 6), and β has shape (6,)",
+          "Zero bias: β[0]=0 means the decision boundary passes through origin in feature space"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Logit Computation",
+          "latex": "$\\mathbf{z} = X_{aug}\\boldsymbol{\\beta}$",
+          "description": "Compute all logits in one matrix multiplication"
+        },
+        {
+          "name": "Bias Augmentation",
+          "latex": "$X_{aug} = [\\mathbf{1}_n \\mid X]$",
+          "description": "Prepend column of ones to feature matrix"
+        },
+        {
+          "name": "Predictions",
+          "latex": "$\\mathbf{p} = \\sigma(X_{aug}\\boldsymbol{\\beta})$",
+          "description": "Apply sigmoid to logits to get probabilities"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that adds a bias column (ones) as the FIRST column of a feature matrix, then computes logits using given coefficients.",
+        "function_signature": "def compute_logits(X: np.ndarray, coefficients: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_logits(X: np.ndarray, coefficients: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Add bias column and compute logits.\n    \n    Args:\n        X: Feature matrix of shape (n_samples, n_features)\n        coefficients: Coefficient vector of shape (n_features + 1,)\n                     where coefficients[0] is bias\n    \n    Returns:\n        Logits of shape (n_samples,)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_logits(np.array([[2.0], [3.0]]), np.array([1.0, 0.5]))",
+            "expected": "np.array([2.0, 2.5])",
+            "explanation": "X_aug=[[1,2],[1,3]], coeffs=[1,0.5]: logits = [1+2*0.5, 1+3*0.5] = [2.0, 2.5]"
+          },
+          {
+            "input": "compute_logits(np.array([[1.0, 2.0], [3.0, 4.0]]), np.array([0.5, 0.2, 0.3]))",
+            "expected": "np.array([1.3, 2.7])",
+            "explanation": "X_aug=[[1,1,2],[1,3,4]]: logits = [0.5+0.2+0.6, 0.5+0.6+1.2] = [1.3, 2.3]"
+          },
+          {
+            "input": "compute_logits(np.array([[0.0, 0.0]]), np.array([2.0, 1.0, 1.0]))",
+            "expected": "np.array([2.0])",
+            "explanation": "When all features are zero, logit equals bias term only"
+          },
+          {
+            "input": "compute_logits(np.array([[-1.0], [0.0], [1.0]]), np.array([0.0, 2.0]))",
+            "expected": "np.array([-2.0, 0.0, 2.0])",
+            "explanation": "Zero bias, coefficient=2: logits = [-2, 0, 2]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Adding bias column at the END instead of the BEGINNING (wrong coefficient alignment)",
+        "Not matching coefficient dimensions (need n_features + 1 coefficients)",
+        "Using np.concatenate incorrectly (wrong axis or order)",
+        "Forgetting that coefficients[0] corresponds to the bias column",
+        "Returning wrong shape (should be 1D array of length n_samples)"
+      ],
+      "hint": "Use np.hstack or np.column_stack to prepend a column of ones. Create the ones column with np.ones((X.shape[0], 1)). Then use np.dot or @ for matrix-vector multiplication.",
+      "references": [
+        "Matrix representation of linear models",
+        "Bias-variance tradeoff",
+        "Feature engineering in machine learning",
+        "Numpy array manipulation"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Gradient Computation for Logistic Regression",
+      "relation_to_problem": "The gradient ∇L = X^T(p - y) tells us how to update coefficients to reduce loss. Deriving this formula requires applying the chain rule through sigmoid and BCE loss. This is the mathematical heart of gradient descent.",
+      "prerequisites": [
+        "Calculus (chain rule, partial derivatives)",
+        "Matrix calculus",
+        "Sigmoid derivative"
+      ],
+      "learning_objectives": [
+        "Derive the gradient formula using the chain rule",
+        "Understand why the gradient has the elegant form X^T(predictions - labels)",
+        "Compute gradients efficiently using matrix operations",
+        "Interpret gradient direction and magnitude"
+      ],
+      "math_content": {
+        "definition": "The **gradient** of the sum-based BCE loss with respect to coefficients $\\boldsymbol{\\beta}$ is the vector of partial derivatives:\n$$\\nabla_{\\boldsymbol{\\beta}} \\mathcal{L} = \\begin{bmatrix}\\frac{\\partial \\mathcal{L}}{\\partial \\beta_0} \\\\ \\frac{\\partial \\mathcal{L}}{\\partial \\beta_1} \\\\ \\vdots \\\\ \\frac{\\partial \\mathcal{L}}{\\partial \\beta_d}\\end{bmatrix} \\in \\mathbb{R}^{d+1}$$\nFor logistic regression with sum-based BCE, this gradient has the remarkably simple form:\n$$\\nabla_{\\boldsymbol{\\beta}} \\mathcal{L} = X_{aug}^T(\\mathbf{p} - \\mathbf{y})$$\nwhere $\\mathbf{p} = \\sigma(X_{aug}\\boldsymbol{\\beta})$ are the predicted probabilities and $\\mathbf{y}$ are true labels.",
+        "notation": "$\\nabla_{\\boldsymbol{\\beta}} \\mathcal{L}$ = gradient vector; $X_{aug}$ = augmented feature matrix (n×(d+1)); $\\mathbf{p}$ = predictions (n×1); $\\mathbf{y}$ = labels (n×1)",
+        "theorem": "**Gradient Derivation Theorem**: For BCE loss $\\mathcal{L} = -\\sum_{i=1}^{n}[y_i\\log(p_i) + (1-y_i)\\log(1-p_i)]$ with $p_i = \\sigma(z_i)$ and $z_i = \\mathbf{x}_i^T\\boldsymbol{\\beta}$, the gradient is:\n$$\\frac{\\partial \\mathcal{L}}{\\partial \\beta_j} = \\sum_{i=1}^{n}(p_i - y_i)x_{ij}$$\nIn matrix form: $\\nabla_{\\boldsymbol{\\beta}} \\mathcal{L} = X_{aug}^T(\\mathbf{p} - \\mathbf{y})$",
+        "proof_sketch": "Apply chain rule: $\\frac{\\partial \\mathcal{L}}{\\partial \\beta_j} = \\sum_i \\frac{\\partial \\mathcal{L}}{\\partial p_i} \\frac{\\partial p_i}{\\partial z_i} \\frac{\\partial z_i}{\\partial \\beta_j}$\n\n**Step 1**: Derivative of BCE w.r.t. predictions:\n$$\\frac{\\partial \\mathcal{L}}{\\partial p_i} = -\\left[\\frac{y_i}{p_i} - \\frac{1-y_i}{1-p_i}\\right] = \\frac{p_i - y_i}{p_i(1-p_i)}$$\n\n**Step 2**: Derivative of sigmoid:\n$$\\frac{\\partial p_i}{\\partial z_i} = \\frac{\\partial \\sigma(z_i)}{\\partial z_i} = p_i(1-p_i)$$\n\n**Step 3**: Derivative of logit w.r.t. coefficient:\n$$\\frac{\\partial z_i}{\\partial \\beta_j} = x_{ij}$$\n\n**Combine**: The $p_i(1-p_i)$ terms cancel:\n$$\\frac{\\partial \\mathcal{L}}{\\partial \\beta_j} = \\sum_i \\frac{p_i-y_i}{p_i(1-p_i)} \\cdot p_i(1-p_i) \\cdot x_{ij} = \\sum_i (p_i-y_i)x_{ij} = \\mathbf{x}_j^T(\\mathbf{p}-\\mathbf{y})$$",
+        "examples": [
+          "If predictions are perfect (p=y), gradient is zero vector (no update needed)",
+          "If model overestimates (p>y), gradient is positive, causing coefficient decrease",
+          "If model underestimates (p<y), gradient is negative, causing coefficient increase",
+          "For X_aug=[[1,2],[1,3]], y=[1,0], p=[0.9,0.1]: gradient = [[1,1],[2,3]]^T @ [[0.9-1],[0.1-0]] = [[-0.1],[0.1]] = [[-0.1],[-0.2]]"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gradient (Matrix Form)",
+          "latex": "$\\nabla_{\\boldsymbol{\\beta}} \\mathcal{L} = X_{aug}^T(\\mathbf{p} - \\mathbf{y})$",
+          "description": "Vectorized gradient computation in one line"
+        },
+        {
+          "name": "Gradient (Element Form)",
+          "latex": "$\\frac{\\partial \\mathcal{L}}{\\partial \\beta_j} = \\sum_{i=1}^{n}(p_i - y_i)x_{ij}$",
+          "description": "Gradient for individual coefficient j"
+        },
+        {
+          "name": "Error Vector",
+          "latex": "$\\mathbf{e} = \\mathbf{p} - \\mathbf{y}$",
+          "description": "Prediction errors (positive when overestimating)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement gradient computation for logistic regression. Given augmented features, true labels, and predicted probabilities, compute the gradient vector.",
+        "function_signature": "def compute_gradient(X_aug: np.ndarray, y: np.ndarray, predictions: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_gradient(X_aug: np.ndarray, y: np.ndarray, predictions: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute gradient of BCE loss with respect to coefficients.\n    \n    Args:\n        X_aug: Augmented feature matrix (n_samples, n_features+1) with bias column\n        y: True labels (n_samples,)\n        predictions: Predicted probabilities (n_samples,)\n    \n    Returns:\n        Gradient vector of shape (n_features+1,)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_gradient(np.array([[1.0, 2.0], [1.0, 3.0]]), np.array([1.0, 0.0]), np.array([0.9, 0.1]))",
+            "expected": "np.array([-0.8, -1.7])",
+            "explanation": "Errors: [0.9-1, 0.1-0]=[-0.1, 0.1]. Gradient = [[1,1],[2,3]]^T @ [-0.1,0.1] = [-0.8, -1.7]"
+          },
+          {
+            "input": "compute_gradient(np.array([[1.0, 0.0], [1.0, 1.0]]), np.array([1.0, 1.0]), np.array([1.0, 1.0]))",
+            "expected": "np.array([0.0, 0.0])",
+            "explanation": "Perfect predictions (p=y): errors are zero, so gradient is zero"
+          },
+          {
+            "input": "compute_gradient(np.array([[1.0, 1.0], [1.0, -1.0]]), np.array([1.0, 0.0]), np.array([0.7, 0.3]))",
+            "expected": "np.array([0.0, 0.0])",
+            "explanation": "Errors: [0.7-1, 0.3-0] = [-0.3, 0.3]. Gradient = [[1,1],[1,-1]]^T @ [-0.3,0.3] = [0.0, -0.6]"
+          },
+          {
+            "input": "compute_gradient(np.array([[1.0, 2.0, 3.0]]), np.array([0.0]), np.array([0.8]))",
+            "expected": "np.array([0.8, 1.6, 2.4])",
+            "explanation": "Single sample: error=0.8, gradient = [1,2,3]*0.8 = [0.8, 1.6, 2.4]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing y - p instead of p - y (wrong sign)",
+        "Not transposing X_aug (need X^T for correct dimensions)",
+        "Forgetting this is sum-based gradient (no division by n)",
+        "Wrong matrix multiplication order (X^T goes first)",
+        "Using incorrect shapes (gradient should be 1D array with d+1 elements)"
+      ],
+      "hint": "The error vector is (predictions - y). Then multiply X_aug.T by this error vector. The result should have the same shape as the coefficient vector.",
+      "references": [
+        "Matrix calculus for machine learning",
+        "Backpropagation fundamentals",
+        "Chain rule in multivariate calculus",
+        "Automatic differentiation"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Gradient Descent Update Rule",
+      "relation_to_problem": "Gradient descent iteratively updates coefficients by moving in the direction that reduces loss. The update rule β = β - η∇L combines the gradient with a learning rate. Understanding convergence and learning rate selection is crucial.",
+      "prerequisites": [
+        "Optimization theory",
+        "Gradient computation",
+        "Iterative algorithms"
+      ],
+      "learning_objectives": [
+        "Understand the gradient descent update mechanism",
+        "Implement iterative coefficient updates",
+        "Monitor loss convergence over iterations",
+        "Recognize the role of learning rate in convergence speed and stability"
+      ],
+      "math_content": {
+        "definition": "**Gradient Descent** is an iterative optimization algorithm that updates parameters in the direction of steepest descent. At iteration $t$, the update rule is:\n$$\\boldsymbol{\\beta}^{(t+1)} = \\boldsymbol{\\beta}^{(t)} - \\eta \\nabla_{\\boldsymbol{\\beta}} \\mathcal{L}(\\boldsymbol{\\beta}^{(t)})$$\nwhere $\\eta > 0$ is the **learning rate** (step size) and $\\nabla_{\\boldsymbol{\\beta}} \\mathcal{L}$ is the gradient. The negative sign ensures movement toward lower loss (gradients point uphill, we move downhill).",
+        "notation": "$\\boldsymbol{\\beta}^{(t)}$ = coefficients at iteration t; $\\eta$ = learning rate; $\\nabla_{\\boldsymbol{\\beta}} \\mathcal{L}$ = gradient vector",
+        "theorem": "**Descent Direction Theorem**: For a differentiable function $\\mathcal{L}$, moving in the negative gradient direction guarantees a decrease in loss for sufficiently small learning rate:\n$$\\mathcal{L}(\\boldsymbol{\\beta} - \\eta\\nabla\\mathcal{L}) < \\mathcal{L}(\\boldsymbol{\\beta})$$\nfor small enough $\\eta > 0$. This is because the directional derivative in the negative gradient direction is:\n$$\\frac{d}{d\\eta}\\mathcal{L}(\\boldsymbol{\\beta} - \\eta\\nabla\\mathcal{L})\\bigg|_{\\eta=0} = -\\|\\nabla\\mathcal{L}\\|^2 < 0$$",
+        "proof_sketch": "By Taylor expansion around $\\boldsymbol{\\beta}$:\n$$\\mathcal{L}(\\boldsymbol{\\beta} - \\eta\\nabla\\mathcal{L}) \\approx \\mathcal{L}(\\boldsymbol{\\beta}) - \\eta\\|\\nabla\\mathcal{L}\\|^2 + O(\\eta^2)$$\nFor small $\\eta$, the $-\\eta\\|\\nabla\\mathcal{L}\\|^2$ term dominates (negative), ensuring decrease. If $\\eta$ is too large, the $O(\\eta^2)$ terms can cause overshooting and divergence.",
+        "examples": [
+          "Initialize: β=[0,0], gradient=[2,3], η=0.1 → β_new = [0,0] - 0.1*[2,3] = [-0.2, -0.3]",
+          "Next iteration: β=[-0.2,-0.3], gradient=[1,1.5], η=0.1 → β_new = [-0.2,-0.3] - 0.1*[1,1.5] = [-0.3, -0.45]",
+          "If η too large (e.g., η=10): updates oscillate or diverge",
+          "If η too small (e.g., η=0.0001): convergence is extremely slow",
+          "Typical loss trajectory: L=[2.77, 2.65, 2.53, 2.43, 2.33] shows decreasing trend"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gradient Descent Update",
+          "latex": "$\\boldsymbol{\\beta}^{(t+1)} = \\boldsymbol{\\beta}^{(t)} - \\eta \\nabla_{\\boldsymbol{\\beta}} \\mathcal{L}$",
+          "description": "Core update rule applied each iteration"
+        },
+        {
+          "name": "Full Update for Logistic Regression",
+          "latex": "$\\boldsymbol{\\beta}^{(t+1)} = \\boldsymbol{\\beta}^{(t)} - \\eta X^T(\\sigma(X\\boldsymbol{\\beta}^{(t)}) - \\mathbf{y})$",
+          "description": "Combined formula with gradient substituted"
+        },
+        {
+          "name": "Loss Decrease",
+          "latex": "$\\mathcal{L}(\\boldsymbol{\\beta}^{(t+1)}) < \\mathcal{L}(\\boldsymbol{\\beta}^{(t)})$",
+          "description": "Loss should decrease each iteration (for proper η)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement one iteration of gradient descent. Given current coefficients, learning rate, gradient, update and return new coefficients.",
+        "function_signature": "def gradient_descent_step(coefficients: np.ndarray, gradient: np.ndarray, learning_rate: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef gradient_descent_step(coefficients: np.ndarray, gradient: np.ndarray, learning_rate: float) -> np.ndarray:\n    \"\"\"\n    Perform one gradient descent update step.\n    \n    Args:\n        coefficients: Current coefficient values (d+1,)\n        gradient: Gradient vector (d+1,)\n        learning_rate: Step size η\n    \n    Returns:\n        Updated coefficients (d+1,)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "gradient_descent_step(np.array([0.0, 0.0]), np.array([2.0, 3.0]), 0.1)",
+            "expected": "np.array([-0.2, -0.3])",
+            "explanation": "Update: [0,0] - 0.1*[2,3] = [-0.2, -0.3]"
+          },
+          {
+            "input": "gradient_descent_step(np.array([1.0, 2.0, 3.0]), np.array([0.5, -0.5, 1.0]), 0.2)",
+            "expected": "np.array([0.9, 2.1, 2.8])",
+            "explanation": "Update: [1,2,3] - 0.2*[0.5,-0.5,1.0] = [0.9, 2.1, 2.8]"
+          },
+          {
+            "input": "gradient_descent_step(np.array([5.0]), np.array([0.0]), 1.0)",
+            "expected": "np.array([5.0])",
+            "explanation": "Zero gradient means no update (at critical point)"
+          },
+          {
+            "input": "gradient_descent_step(np.array([1.0, 1.0]), np.array([10.0, 10.0]), 0.05)",
+            "expected": "np.array([0.5, 0.5])",
+            "explanation": "Large gradient with small learning rate: controlled descent"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Adding gradient instead of subtracting (moving uphill instead of downhill)",
+        "Forgetting to multiply gradient by learning rate",
+        "Modifying coefficients in-place without creating new array",
+        "Using wrong array shapes (must match coefficient dimensions)",
+        "Not handling the case when gradient is zero"
+      ],
+      "hint": "The formula is very simple: new_coefficients = old_coefficients - learning_rate * gradient. Make sure to subtract, not add.",
+      "references": [
+        "Optimization algorithms in machine learning",
+        "Learning rate scheduling strategies",
+        "Convergence analysis of gradient descent",
+        "Adaptive learning rate methods (Adam, RMSprop)"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Training Loop with Loss Tracking",
+      "relation_to_problem": "The complete training algorithm combines all previous components: initialize coefficients to zero, add bias column, compute predictions with sigmoid, calculate BCE loss, compute gradient, update coefficients, and repeat for multiple iterations while tracking loss.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Algorithm design",
+        "Iterative processes"
+      ],
+      "learning_objectives": [
+        "Integrate sigmoid, BCE loss, gradient computation, and updates into a complete training loop",
+        "Initialize coefficients correctly (zeros) and add bias column properly",
+        "Track and store loss values across iterations for monitoring convergence",
+        "Implement the exact specification: sum-based BCE, bias as first column, specific update order"
+      ],
+      "math_content": {
+        "definition": "**Training logistic regression with gradient descent** is the complete iterative algorithm:\n\n1. **Initialize**: $\\boldsymbol{\\beta}^{(0)} = \\mathbf{0} \\in \\mathbb{R}^{d+1}$ (all zeros)\n2. **Augment features**: $X_{aug} = [\\mathbf{1}_n \\mid X] \\in \\mathbb{R}^{n \\times (d+1)}$\n3. **For** $t = 0, 1, 2, \\ldots, T-1$:\n   - **Forward pass**: $\\mathbf{p}^{(t)} = \\sigma(X_{aug}\\boldsymbol{\\beta}^{(t)})$\n   - **Compute loss**: $\\mathcal{L}^{(t)} = -\\sum_{i=1}^{n}[y_i\\log(p_i^{(t)}) + (1-y_i)\\log(1-p_i^{(t)})]$\n   - **Backward pass**: $\\mathbf{g}^{(t)} = X_{aug}^T(\\mathbf{p}^{(t)} - \\mathbf{y})$\n   - **Update**: $\\boldsymbol{\\beta}^{(t+1)} = \\boldsymbol{\\beta}^{(t)} - \\eta \\mathbf{g}^{(t)}$\n4. **Return**: Final coefficients $\\boldsymbol{\\beta}^{(T)}$ and loss history $[\\mathcal{L}^{(0)}, \\ldots, \\mathcal{L}^{(T-1)}]$",
+        "notation": "$T$ = number of iterations; $\\mathcal{L}^{(t)}$ = loss at iteration t; $\\mathbf{p}^{(t)}$ = predictions at iteration t; $\\mathbf{g}^{(t)}$ = gradient at iteration t",
+        "theorem": "**Convergence Guarantee**: For logistic regression with convex BCE loss, gradient descent with appropriate learning rate $\\eta$ converges to the global minimum. The loss sequence $\\{\\mathcal{L}^{(t)}\\}$ is monotonically decreasing (for proper $\\eta$): $\\mathcal{L}^{(t+1)} \\leq \\mathcal{L}^{(t)}$ for all $t$. If gradients remain bounded and $\\eta$ is sufficiently small, convergence is guaranteed: $\\lim_{t\\to\\infty}\\|\\nabla\\mathcal{L}^{(t)}\\| = 0$.",
+        "proof_sketch": "BCE loss for logistic regression is strictly convex in $\\boldsymbol{\\beta}$ because its Hessian $H = X_{aug}^T \\text{diag}[p_i(1-p_i)] X_{aug}$ is positive definite (all eigenvalues positive). Strict convexity + gradient descent with $\\eta < 2/\\lambda_{max}(H)$ guarantees convergence to unique global minimum.",
+        "examples": [
+          "Typical loss trajectory: [2.7726, 2.6485, 2.5330, 2.4254, 2.3250] shows steady decrease",
+          "Coefficient evolution: [0,0,0] → [-0.0001, 0.128, 0.105] over 5 iterations",
+          "With larger learning rate (η=0.1): faster convergence but risk of instability",
+          "With tiny learning rate (η=0.001): very slow convergence, may need 1000+ iterations",
+          "Final predictions after training should better match true labels than initial random predictions"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Algorithm",
+          "latex": "$\\boldsymbol{\\beta}^{(t+1)} = \\boldsymbol{\\beta}^{(t)} - \\eta X_{aug}^T(\\sigma(X_{aug}\\boldsymbol{\\beta}^{(t)}) - \\mathbf{y})$",
+          "description": "Full update combining all components"
+        },
+        {
+          "name": "Loss Recording",
+          "latex": "$\\text{losses} = [\\mathcal{L}^{(0)}, \\mathcal{L}^{(1)}, \\ldots, \\mathcal{L}^{(T-1)}]$",
+          "description": "Track loss before each update for monitoring"
+        },
+        {
+          "name": "Initialization",
+          "latex": "$\\boldsymbol{\\beta}^{(0)} = \\mathbf{0}_{d+1}$",
+          "description": "Start with zero coefficients (required for this problem)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified training loop (without all features of the final problem) that: adds bias, initializes coefficients to zero, runs gradient descent for given iterations, and returns both final coefficients and loss history. Use sum-based BCE loss.",
+        "function_signature": "def train_logistic_regression_basic(X: np.ndarray, y: np.ndarray, learning_rate: float, iterations: int) -> tuple[np.ndarray, list[float]]:",
+        "starter_code": "import numpy as np\n\ndef sigmoid(z):\n    return 1 / (1 + np.exp(-np.clip(z, -500, 500)))\n\ndef train_logistic_regression_basic(X: np.ndarray, y: np.ndarray, learning_rate: float, iterations: int) -> tuple[np.ndarray, list[float]]:\n    \"\"\"\n    Train logistic regression with gradient descent.\n    \n    Args:\n        X: Feature matrix (n_samples, n_features)\n        y: Binary labels (n_samples,)\n        learning_rate: Learning rate η\n        iterations: Number of training iterations\n    \n    Returns:\n        Tuple of (final_coefficients, loss_history)\n        - final_coefficients: numpy array of shape (n_features+1,)\n        - loss_history: list of losses at each iteration\n    \n    Requirements:\n        - Add bias column as FIRST column of X\n        - Initialize all coefficients to zero\n        - Use sum-based BCE loss (not mean)\n        - Clip predictions to [1e-15, 1-1e-15] for stability\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "train_logistic_regression_basic(np.array([[1.0], [2.0]]), np.array([0.0, 1.0]), 0.1, 3)",
+            "expected": "coefficients shape (2,), losses decreasing over 3 iterations",
+            "explanation": "Simple 2-sample problem: coefficients should move from [0,0] toward separating the classes"
+          },
+          {
+            "input": "train_logistic_regression_basic(np.array([[1.0, 0.5], [-0.5, -1.5]]), np.array([1.0, 0.0]), 0.01, 5)",
+            "expected": "coefficients shape (3,), loss[0] > loss[4]",
+            "explanation": "First loss should be higher than last loss, showing learning"
+          },
+          {
+            "input": "train_logistic_regression_basic(np.array([[0.0], [0.0]]), np.array([1.0, 1.0]), 0.1, 2)",
+            "expected": "coefficients[0] increases (bias learns to predict 1)",
+            "explanation": "When all features are zero and all labels are 1, bias should increase"
+          },
+          {
+            "input": "train_logistic_regression_basic(np.array([[2.0, 1.0]]), np.array([0.0]), 0.05, 10)",
+            "expected": "loss decreases monotonically, coefficients become negative",
+            "explanation": "Single sample with label 0: model should learn to predict low probability"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not initializing to zeros (using random initialization instead)",
+        "Computing loss after update instead of before (wrong timing)",
+        "Using mean-based BCE instead of sum-based (dividing by n)",
+        "Not clipping predictions, causing log(0) errors",
+        "Bias column added at end instead of beginning",
+        "Returning coefficients as list instead of numpy array",
+        "Not storing loss at every iteration (missing values)",
+        "Wrong gradient sign (adding instead of subtracting)"
+      ],
+      "hint": "Structure your loop: (1) compute predictions with current coefficients, (2) compute and store loss, (3) compute gradient, (4) update coefficients. Repeat for specified iterations. Don't forget to add bias column before the loop starts.",
+      "references": [
+        "Complete gradient descent implementation",
+        "Training loop best practices",
+        "Debugging machine learning algorithms",
+        "Loss curve interpretation",
+        "Overfitting vs underfitting indicators"
+      ]
+    }
+  ]
+}

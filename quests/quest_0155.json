@@ -1,0 +1,529 @@
+{
+  "problem_id": 155,
+  "title": "CosineAnnealingLR Learning Rate Scheduler",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "Write a Python class CosineAnnealingLRScheduler to implement a learning rate scheduler based on the Cosine Annealing LR strategy. Your class should have an __init__ method to initialize with an initial_lr (float), T_max (int, the maximum number of iterations/epochs), and min_lr (float, the minimum learning rate) parameters. It should also have a **get_lr(self, epoch)** method that returns the current learning rate for a given epoch (int). The learning rate should follow a cosine annealing schedule. The returned learning rate should be rounded to 4 decimal places. Only use standard Python and the math module for trigonometric functions.",
+  "example": {
+    "input": "import math\nscheduler = CosineAnnealingLRScheduler(initial_lr=0.1, T_max=10, min_lr=0.001)\nprint(f\"{scheduler.get_lr(epoch=0):.4f}\")\nprint(f\"{scheduler.get_lr(epoch=2):.4f}\")\nprint(f\"{scheduler.get_lr(epoch=5):.4f}\")\nprint(f\"{scheduler.get_lr(epoch=7):.4f}\")\nprint(f\"{scheduler.get_lr(epoch=10):.4f}\")",
+    "output": "0.1000\n0.0905\n0.0505\n0.0214\n0.0010",
+    "reasoning": "The learning rate starts at initial_lr (0.1), follows a cosine curve, reaches min_lr (0.001) at T_max (epoch 10), and then cycles back up. Each value is rounded to 4 decimal places."
+  },
+  "starter_code": "import math\n\nclass CosineAnnealingLRScheduler:\n    def __init__(self, initial_lr, T_max, min_lr):\n        # Initialize initial_lr, T_max, and min_lr\n        pass\n\n    def get_lr(self, epoch):\n        # Calculate and return the learning rate for the given epoch, rounded to 4 decimal places\n        pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding the Cosine Function and Its Properties",
+      "relation_to_problem": "The cosine function is the mathematical foundation of the learning rate scheduler. Understanding its behavior over [0, π] is essential for implementing the annealing curve.",
+      "prerequisites": [
+        "Basic trigonometry",
+        "Radian measure",
+        "Python math module"
+      ],
+      "learning_objectives": [
+        "Understand the cosine function's behavior over the interval [0, π]",
+        "Compute cosine values for specific angles in radians",
+        "Recognize how cosine transforms from 1 to -1 over this interval"
+      ],
+      "math_content": {
+        "definition": "The **cosine function** $\\cos: \\mathbb{R} \\to [-1, 1]$ is a periodic trigonometric function. For our purposes, we focus on the interval $[0, \\pi]$ where $\\cos$ is strictly decreasing from $\\cos(0) = 1$ to $\\cos(\\pi) = -1$.",
+        "notation": "$\\theta$ = angle in radians, $\\cos(\\theta)$ = cosine of angle $\\theta$, $\\pi \\approx 3.14159$ = mathematical constant pi",
+        "theorem": "**Monotonicity on $[0, \\pi]$**: The cosine function is strictly decreasing on the interval $[0, \\pi]$. That is, for any $0 \\leq \\theta_1 < \\theta_2 \\leq \\pi$, we have $\\cos(\\theta_1) > \\cos(\\theta_2)$.",
+        "proof_sketch": "The derivative of $\\cos(\\theta)$ is $-\\sin(\\theta)$. On the interval $(0, \\pi)$, we have $\\sin(\\theta) > 0$, which means $\\frac{d}{d\\theta}\\cos(\\theta) = -\\sin(\\theta) < 0$. A negative derivative implies the function is strictly decreasing.",
+        "examples": [
+          "At $\\theta = 0$: $\\cos(0) = 1$ (maximum value)",
+          "At $\\theta = \\pi/4 \\approx 0.785$: $\\cos(\\pi/4) \\approx 0.707$",
+          "At $\\theta = \\pi/2$: $\\cos(\\pi/2) = 0$ (midpoint)",
+          "At $\\theta = 3\\pi/4 \\approx 2.356$: $\\cos(3\\pi/4) \\approx -0.707$",
+          "At $\\theta = \\pi$: $\\cos(\\pi) = -1$ (minimum value)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cosine Function",
+          "latex": "$\\cos(\\theta)$",
+          "description": "Returns the cosine of angle $\\theta$ (in radians), ranging from -1 to 1"
+        },
+        {
+          "name": "Linear Mapping to [0, π]",
+          "latex": "$\\theta = \\frac{t}{T} \\times \\pi$",
+          "description": "Maps a progress parameter $t \\in [0, T]$ linearly to the interval $[0, \\pi]$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the cosine value for a normalized progress parameter. Given a current step $t$ and maximum steps $T$, map the progress linearly to $[0, \\pi]$ and return the cosine value.",
+        "function_signature": "def compute_cosine_progress(t: int, T_max: int) -> float:",
+        "starter_code": "import math\n\ndef compute_cosine_progress(t: int, T_max: int) -> float:\n    \"\"\"\n    Compute cos(t/T_max * π) for a given step t and maximum T_max.\n    \n    Args:\n        t: Current step (0 <= t <= T_max)\n        T_max: Maximum number of steps\n    \n    Returns:\n        The cosine value, rounded to 4 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_cosine_progress(0, 10)",
+            "expected": "1.0000",
+            "explanation": "At t=0, angle is 0, and cos(0) = 1"
+          },
+          {
+            "input": "compute_cosine_progress(5, 10)",
+            "expected": "0.0000",
+            "explanation": "At t=5 (halfway), angle is π/2, and cos(π/2) = 0"
+          },
+          {
+            "input": "compute_cosine_progress(10, 10)",
+            "expected": "-1.0000",
+            "explanation": "At t=10 (end), angle is π, and cos(π) = -1"
+          },
+          {
+            "input": "compute_cosine_progress(2, 10)",
+            "expected": "0.8090",
+            "explanation": "At t=2, angle is π/5, and cos(π/5) ≈ 0.8090"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using degrees instead of radians (e.g., math.cos(90) instead of math.cos(math.pi/2))",
+        "Incorrect normalization: using t/T instead of (t/T)*π",
+        "Integer division issues: in Python 2, 5/10 = 0; use float division or ensure floats",
+        "Not handling the edge case when T_max = 0 (though problem constraints may prevent this)"
+      ],
+      "hint": "Use the math module's pi constant (math.pi) and cos function (math.cos). Remember to multiply the normalized ratio by π.",
+      "references": [
+        "Trigonometric functions in Python's math module",
+        "Radian vs degree measurement",
+        "Properties of periodic functions"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Linear Interpolation and Affine Transformations",
+      "relation_to_problem": "The cosine scheduler requires transforming the cosine output from [-1, 1] to the desired learning rate range [min_lr, max_lr]. This is accomplished through affine transformation (linear interpolation).",
+      "prerequisites": [
+        "Basic algebra",
+        "Function composition",
+        "Understanding of domain and range"
+      ],
+      "learning_objectives": [
+        "Understand affine transformations as mappings between intervals",
+        "Implement linear interpolation between two values",
+        "Apply the transformation formula $y = a + (b-a) \\cdot f(x)$ where $f(x) \\in [0, 1]$"
+      ],
+      "math_content": {
+        "definition": "An **affine transformation** is a function of the form $f(x) = mx + b$ where $m$ (slope) and $b$ (intercept) are constants. **Linear interpolation** between two values $a$ and $b$ using a normalized parameter $s \\in [0, 1]$ is given by: $$\\text{lerp}(a, b, s) = a + s(b - a) = (1-s)a + sb$$",
+        "notation": "$a$ = starting value, $b$ = ending value, $s$ = interpolation parameter in $[0, 1]$, $\\text{lerp}(a, b, s)$ = interpolated value",
+        "theorem": "**Affine Mapping Theorem**: Let $f: [c, d] \\to [p, q]$ be an affine function. Then $f(x) = p + \\frac{q-p}{d-c}(x-c)$ maps the interval $[c, d]$ linearly onto $[p, q]$, preserving the property that $f(c) = p$ and $f(d) = q$.",
+        "proof_sketch": "We verify the boundary conditions: $f(c) = p + \\frac{q-p}{d-c}(c-c) = p + 0 = p$ ✓, and $f(d) = p + \\frac{q-p}{d-c}(d-c) = p + (q-p) = q$ ✓. The linearity follows from the fact that $f$ has constant derivative $\\frac{q-p}{d-c}$.",
+        "examples": [
+          "Interpolate between 0 and 100 at s=0.5: lerp(0, 100, 0.5) = 0 + 0.5(100-0) = 50",
+          "Interpolate between 10 and 20 at s=0.25: lerp(10, 20, 0.25) = 10 + 0.25(10) = 12.5",
+          "Map cos(θ) from [-1, 1] to [0, 1]: Use s = (cos(θ) + 1)/2, so s ∈ [0, 1]",
+          "Map from [-1, 1] to [a, b]: f(x) = a + ((x+1)/2)(b-a) = a + 0.5(b-a)(1+x)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Linear Interpolation",
+          "latex": "$\\text{lerp}(a, b, s) = a + s(b - a)$",
+          "description": "Interpolates between $a$ and $b$ using parameter $s \\in [0, 1]$"
+        },
+        {
+          "name": "Normalized Scaling",
+          "latex": "$s = \\frac{x - x_{\\min}}{x_{\\max} - x_{\\min}}$",
+          "description": "Normalizes $x$ from range $[x_{\\min}, x_{\\max}]$ to $[0, 1]$"
+        },
+        {
+          "name": "Cosine Normalization",
+          "latex": "$s = \\frac{1 + \\cos(\\theta)}{2}$",
+          "description": "Transforms $\\cos(\\theta) \\in [-1, 1]$ to $s \\in [0, 1]$, note that $s$ decreases as $\\theta$ increases"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs linear interpolation. Given a minimum value, maximum value, and a normalized progress parameter in [0, 1], return the interpolated value.",
+        "function_signature": "def linear_interpolate(min_val: float, max_val: float, progress: float) -> float:",
+        "starter_code": "def linear_interpolate(min_val: float, max_val: float, progress: float) -> float:\n    \"\"\"\n    Perform linear interpolation between min_val and max_val.\n    \n    Args:\n        min_val: Starting value (at progress=0)\n        max_val: Ending value (at progress=1)\n        progress: Normalized parameter in [0, 1]\n    \n    Returns:\n        Interpolated value, rounded to 4 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "linear_interpolate(0, 100, 0.0)",
+            "expected": "0.0000",
+            "explanation": "At progress=0, we get min_val"
+          },
+          {
+            "input": "linear_interpolate(0, 100, 1.0)",
+            "expected": "100.0000",
+            "explanation": "At progress=1, we get max_val"
+          },
+          {
+            "input": "linear_interpolate(0, 100, 0.5)",
+            "expected": "50.0000",
+            "explanation": "At progress=0.5 (midpoint), we get the average"
+          },
+          {
+            "input": "linear_interpolate(0.001, 0.1, 0.5)",
+            "expected": "0.0505",
+            "explanation": "Halfway between 0.001 and 0.1 is 0.0505"
+          },
+          {
+            "input": "linear_interpolate(10, 20, 0.3)",
+            "expected": "13.0000",
+            "explanation": "30% of the way from 10 to 20 is 13"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using (progress * max_val) instead of min_val + progress * (max_val - min_val)",
+        "Confusing which value is min and which is max in the formula",
+        "Not handling the case where min_val > max_val (though valid mathematically)",
+        "Forgetting to add min_val to the scaled difference"
+      ],
+      "hint": "The formula is: result = min_val + progress × (max_val - min_val). This ensures that when progress=0, you get min_val, and when progress=1, you get max_val.",
+      "references": [
+        "Affine transformations in computer graphics",
+        "Linear interpolation (LERP) in animation",
+        "Normalization and scaling techniques"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Composing Transformations: From Cosine to Learning Rate",
+      "relation_to_problem": "The CosineAnnealingLR formula combines the cosine function with affine transformation. Understanding function composition is essential to derive and implement the complete formula.",
+      "prerequisites": [
+        "Cosine function properties",
+        "Linear interpolation",
+        "Function composition"
+      ],
+      "learning_objectives": [
+        "Understand how to compose the cosine function with linear interpolation",
+        "Derive the complete CosineAnnealingLR formula",
+        "Recognize the role of each term in the formula"
+      ],
+      "math_content": {
+        "definition": "**Function composition** combines two functions $f$ and $g$ to create a new function $(g \\circ f)(x) = g(f(x))$. For the CosineAnnealing scheduler, we compose: (1) a linear map from epoch to angle: $\\theta(t) = \\frac{t}{T_{\\max}} \\pi$, (2) the cosine function: $c(\\theta) = \\cos(\\theta)$, and (3) an affine transformation from $[-1, 1]$ to $[\\eta_{\\min}, \\eta_{\\max}]$.",
+        "notation": "$\\eta(t)$ = learning rate at epoch $t$, $\\eta_{\\max}$ = initial/maximum learning rate, $\\eta_{\\min}$ = minimum learning rate, $T_{\\max}$ = period of annealing cycle",
+        "theorem": "**CosineAnnealingLR Formula Derivation**: The learning rate at epoch $t$ is given by: $$\\eta(t) = \\eta_{\\min} + \\frac{1}{2}(\\eta_{\\max} - \\eta_{\\min})\\left(1 + \\cos\\left(\\frac{t \\pi}{T_{\\max}}\\right)\\right)$$ This formula ensures $\\eta(0) = \\eta_{\\max}$ and $\\eta(T_{\\max}) = \\eta_{\\min}$, with smooth cosine decay between them.",
+        "proof_sketch": "We transform $\\cos(\\theta)$ from $[-1, 1]$ to $[0, 1]$ using $s = \\frac{1 + \\cos(\\theta)}{2}$. Then we interpolate: $\\eta = \\eta_{\\min} + s(\\eta_{\\max} - \\eta_{\\min}) = \\eta_{\\min} + \\frac{1 + \\cos(\\theta)}{2}(\\eta_{\\max} - \\eta_{\\min})$. Verify boundaries: At $t=0$: $\\cos(0)=1$, so $s=1$, giving $\\eta(0) = \\eta_{\\min} + (\\eta_{\\max} - \\eta_{\\min}) = \\eta_{\\max}$ ✓. At $t=T_{\\max}$: $\\cos(\\pi)=-1$, so $s=0$, giving $\\eta(T_{\\max}) = \\eta_{\\min}$ ✓.",
+        "examples": [
+          "With $\\eta_{\\max}=0.1$, $\\eta_{\\min}=0.001$, $T_{\\max}=10$ at epoch 0: $\\eta(0) = 0.001 + 0.5(0.099)(1+1) = 0.1$",
+          "At epoch 5: $\\eta(5) = 0.001 + 0.5(0.099)(1+\\cos(\\pi/2)) = 0.001 + 0.0495(1) = 0.0505$",
+          "At epoch 10: $\\eta(10) = 0.001 + 0.5(0.099)(1-1) = 0.001$",
+          "The factor $0.5(1 + \\cos(\\theta))$ creates a smooth decay from 1 to 0 as $\\theta$ goes from 0 to $\\pi$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete CosineAnnealingLR Formula",
+          "latex": "$\\eta(t) = \\eta_{\\min} + \\frac{1}{2}(\\eta_{\\max} - \\eta_{\\min})\\left(1 + \\cos\\left(\\frac{t \\pi}{T_{\\max}}\\right)\\right)$",
+          "description": "The full learning rate formula combining all transformations"
+        },
+        {
+          "name": "Cosine Normalization Factor",
+          "latex": "$s(t) = \\frac{1 + \\cos\\left(\\frac{t \\pi}{T_{\\max}}\\right)}{2}$",
+          "description": "Normalized progress that goes from 1 to 0, can be used with lerp"
+        },
+        {
+          "name": "Alternative Form",
+          "latex": "$\\eta(t) = \\eta_{\\min} + (\\eta_{\\max} - \\eta_{\\min}) \\cdot \\frac{1 + \\cos\\left(\\frac{t \\pi}{T_{\\max}}\\right)}{2}$",
+          "description": "Emphasizes the interpolation structure: min + (max-min) × normalized_factor"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete CosineAnnealingLR formula. Given initial_lr (max), min_lr, T_max, and current epoch t, compute and return the learning rate using the full formula.",
+        "function_signature": "def cosine_annealing_lr(initial_lr: float, min_lr: float, T_max: int, epoch: int) -> float:",
+        "starter_code": "import math\n\ndef cosine_annealing_lr(initial_lr: float, min_lr: float, T_max: int, epoch: int) -> float:\n    \"\"\"\n    Calculate learning rate using CosineAnnealingLR formula.\n    \n    Args:\n        initial_lr: Initial (maximum) learning rate\n        min_lr: Minimum learning rate\n        T_max: Maximum number of epochs for one annealing cycle\n        epoch: Current epoch number (0 <= epoch <= T_max)\n    \n    Returns:\n        Learning rate at the given epoch, rounded to 4 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "cosine_annealing_lr(0.1, 0.001, 10, 0)",
+            "expected": "0.1000",
+            "explanation": "At epoch 0, learning rate starts at initial_lr (maximum)"
+          },
+          {
+            "input": "cosine_annealing_lr(0.1, 0.001, 10, 5)",
+            "expected": "0.0505",
+            "explanation": "At the midpoint (epoch 5), cos(π/2)=0, giving the average of min and max"
+          },
+          {
+            "input": "cosine_annealing_lr(0.1, 0.001, 10, 10)",
+            "expected": "0.0010",
+            "explanation": "At epoch T_max, learning rate reaches min_lr"
+          },
+          {
+            "input": "cosine_annealing_lr(0.1, 0.001, 10, 2)",
+            "expected": "0.0905",
+            "explanation": "At epoch 2, angle is π/5, cos(π/5)≈0.809, giving lr≈0.0905"
+          },
+          {
+            "input": "cosine_annealing_lr(0.1, 0.001, 10, 7)",
+            "expected": "0.0214",
+            "explanation": "At epoch 7, angle is 7π/10, cos(7π/10)≈-0.809, giving lr≈0.0214"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting the factor of 0.5 in front of the cosine term",
+        "Using (1 - cos()) instead of (1 + cos()), which inverts the curve",
+        "Not normalizing the epoch by T_max before multiplying by π",
+        "Swapping min_lr and initial_lr in the interpolation",
+        "Integer division: ensure epoch/T_max is computed as float"
+      ],
+      "hint": "The formula has three parts: (1) min_lr baseline, (2) the range (initial_lr - min_lr), and (3) the normalized cosine factor 0.5(1 + cos(t·π/T_max)). Combine them carefully.",
+      "references": [
+        "Cosine annealing learning rate schedule (Loshchilov & Hutter, 2017)",
+        "Learning rate schedules in deep learning",
+        "SGDR: Stochastic Gradient Descent with Warm Restarts"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Understanding Python Classes and Object-Oriented Design",
+      "relation_to_problem": "The final solution requires implementing a class with initialization and a method. Understanding object-oriented programming principles is essential for proper encapsulation and state management.",
+      "prerequisites": [
+        "Python basics",
+        "Functions",
+        "Understanding of variables and scope"
+      ],
+      "learning_objectives": [
+        "Understand the purpose of classes in Python",
+        "Learn how to define __init__ method for initialization",
+        "Implement instance methods that access object attributes",
+        "Understand the role of 'self' in Python classes"
+      ],
+      "math_content": {
+        "definition": "A **class** in Python is a blueprint for creating objects that encapsulate data (attributes) and behavior (methods). The **__init__ method** is a special method (constructor) called when an object is instantiated. **Instance variables** (attributes) are variables bound to a specific object instance, accessed via the 'self' parameter.",
+        "notation": "$\\texttt{self}$ = reference to the current instance, $\\texttt{__init__}$ = constructor method, $\\texttt{attribute}$ = data stored in the object, $\\texttt{method}$ = function defined within a class",
+        "theorem": "**Encapsulation Principle**: A well-designed class encapsulates related data and operations. For a scheduler, this means storing configuration parameters (initial_lr, T_max, min_lr) as instance variables during initialization, and providing methods (get_lr) that compute derived values using these stored parameters.",
+        "proof_sketch": "By storing parameters in __init__, we ensure they persist for the lifetime of the object. Each call to get_lr can access these parameters via self, maintaining consistency. This prevents errors from passing parameters repeatedly and ensures the scheduler's configuration remains immutable unless explicitly modified.",
+        "examples": [
+          "Class definition: class MyClass: defines a new class",
+          "Constructor: def __init__(self, param): initializes instance with param",
+          "Instance variable: self.value = param stores param in the instance",
+          "Method: def get_value(self): return self.value accesses stored data",
+          "Usage: obj = MyClass(5); print(obj.get_value()) creates and uses an instance"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Class Definition Structure",
+          "latex": "$\\texttt{class ClassName:}$",
+          "description": "Defines a new class in Python"
+        },
+        {
+          "name": "Constructor Pattern",
+          "latex": "$\\texttt{def __init__(self, params):}$",
+          "description": "Special method for initializing new instances"
+        },
+        {
+          "name": "Attribute Access",
+          "latex": "$\\texttt{self.attribute}$",
+          "description": "Access instance variables within methods"
+        }
+      ],
+      "exercise": {
+        "description": "Create a simple scheduler class that stores configuration parameters and provides a method to compute a value. Implement a LinearScheduler class with __init__ taking start_value, end_value, and total_steps, and a get_value(step) method that returns a linearly interpolated value.",
+        "function_signature": "class LinearScheduler:\n    def __init__(self, start_value: float, end_value: float, total_steps: int):\n        pass\n    \n    def get_value(self, step: int) -> float:\n        pass",
+        "starter_code": "class LinearScheduler:\n    def __init__(self, start_value: float, end_value: float, total_steps: int):\n        \"\"\"\n        Initialize the linear scheduler.\n        \n        Args:\n            start_value: Value at step 0\n            end_value: Value at step total_steps\n            total_steps: Total number of steps\n        \"\"\"\n        # Store the parameters as instance variables\n        pass\n    \n    def get_value(self, step: int) -> float:\n        \"\"\"\n        Get the linearly interpolated value at a given step.\n        \n        Args:\n            step: Current step (0 <= step <= total_steps)\n        \n        Returns:\n            Interpolated value, rounded to 4 decimal places\n        \"\"\"\n        # Use self.attribute to access stored parameters\n        # Compute: start + (step/total_steps) * (end - start)\n        pass",
+        "test_cases": [
+          {
+            "input": "scheduler = LinearScheduler(1.0, 0.0, 10); scheduler.get_value(0)",
+            "expected": "1.0000",
+            "explanation": "At step 0, value is start_value (1.0)"
+          },
+          {
+            "input": "scheduler = LinearScheduler(1.0, 0.0, 10); scheduler.get_value(5)",
+            "expected": "0.5000",
+            "explanation": "At step 5 (halfway), value is midpoint (0.5)"
+          },
+          {
+            "input": "scheduler = LinearScheduler(1.0, 0.0, 10); scheduler.get_value(10)",
+            "expected": "0.0000",
+            "explanation": "At step 10 (end), value is end_value (0.0)"
+          },
+          {
+            "input": "scheduler = LinearScheduler(0.1, 0.01, 100); scheduler.get_value(50)",
+            "expected": "0.0550",
+            "explanation": "Halfway from 0.1 to 0.01 is 0.055"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to use 'self' parameter in method definitions: def get_value() instead of def get_value(self)",
+        "Not storing parameters as instance variables: using local variables instead of self.param",
+        "Forgetting to use 'self.' prefix when accessing attributes: using param instead of self.param",
+        "Not understanding that __init__ doesn't return a value (the instance is returned automatically)",
+        "Misspelling __init__ (must have exactly two underscores on each side)"
+      ],
+      "hint": "In __init__, store each parameter as an instance variable using self.param = param. In get_value, access these stored values using self.param and apply the linear interpolation formula.",
+      "references": [
+        "Python classes and objects (official documentation)",
+        "Object-oriented programming in Python",
+        "The self parameter in Python"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Numerical Precision and Rounding",
+      "relation_to_problem": "The problem requires rounding results to 4 decimal places. Understanding floating-point arithmetic and proper rounding techniques ensures accurate and consistent outputs.",
+      "prerequisites": [
+        "Floating-point representation",
+        "Python's round function",
+        "Numerical error awareness"
+      ],
+      "learning_objectives": [
+        "Understand floating-point precision limitations",
+        "Apply correct rounding techniques in Python",
+        "Format numerical output to specified decimal places"
+      ],
+      "math_content": {
+        "definition": "**Rounding** is the process of reducing the precision of a number to a specified number of decimal places. In Python, $\\texttt{round(x, n)}$ rounds the float $x$ to $n$ decimal places using **round-half-to-even** (banker's rounding) strategy. For display purposes, string formatting can also control decimal places.",
+        "notation": "$x$ = floating-point number, $n$ = number of decimal places, $\\texttt{round}(x, n)$ = rounded value",
+        "theorem": "**IEEE 754 Floating-Point Representation**: Computers represent real numbers in binary floating-point format, which can introduce small rounding errors. For example, $0.1 + 0.2$ may not exactly equal $0.3$ in binary representation. When comparing or outputting floating-point results, always round to appropriate precision.",
+        "proof_sketch": "Decimal fractions like $0.1$ cannot be represented exactly in binary (similar to how $1/3 = 0.333...$ in decimal). The representation $0.1_{10} = 0.0001100110011..._{2}$ (repeating). When performing arithmetic, these representation errors can accumulate, necessitating rounding for meaningful comparison or output.",
+        "examples": [
+          "round(3.14159, 2) returns 3.14 (2 decimal places)",
+          "round(2.5, 0) returns 2.0 (banker's rounding: round to nearest even)",
+          "round(0.0505, 4) returns 0.0505 (already at 4 decimal places)",
+          "round(0.12345678, 4) returns 0.1235 (truncates beyond 4th place)",
+          "Format string: f'{3.14159:.4f}' gives '3.1416' (always shows 4 decimals)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Python round Function",
+          "latex": "$\\texttt{round}(x, n)$",
+          "description": "Rounds float x to n decimal places"
+        },
+        {
+          "name": "Format Specification",
+          "latex": "$\\texttt{f'}\\{x\\texttt{:.4f}\\}'$",
+          "description": "Formats x as string with exactly 4 decimal places (for display)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs a calculation and returns the result rounded to 4 decimal places. Given three values (a, b, c), compute the expression a * cos(b * π / c) and return it properly rounded.",
+        "function_signature": "def compute_and_round(a: float, b: float, c: float) -> float:",
+        "starter_code": "import math\n\ndef compute_and_round(a: float, b: float, c: float) -> float:\n    \"\"\"\n    Compute a * cos(b * π / c) and round to 4 decimal places.\n    \n    Args:\n        a: Multiplier\n        b: Numerator for angle\n        c: Denominator for angle\n    \n    Returns:\n        Result rounded to 4 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_and_round(1.0, 0, 10)",
+            "expected": "1.0000",
+            "explanation": "cos(0) = 1, so 1.0 * 1 = 1.0"
+          },
+          {
+            "input": "compute_and_round(0.5, 1, 2)",
+            "expected": "0.0000",
+            "explanation": "cos(π/2) = 0, so 0.5 * 0 = 0.0"
+          },
+          {
+            "input": "compute_and_round(0.099, 1, 1)",
+            "expected": "-0.0990",
+            "explanation": "cos(π) = -1, so 0.099 * (-1) = -0.099"
+          },
+          {
+            "input": "compute_and_round(0.0495, 2, 10)",
+            "expected": "0.0400",
+            "explanation": "cos(π/5) ≈ 0.809, so 0.0495 * 0.809 ≈ 0.0400"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using integer division: b/c might give wrong result in Python 2 or with integers",
+        "Not using math.pi for the π constant",
+        "Rounding too early in the calculation (should compute fully, then round once at the end)",
+        "Confusing round() with truncation or ceiling functions",
+        "Not handling potential division by zero when c=0"
+      ],
+      "hint": "First compute the angle (b * math.pi / c), then compute the cosine, then multiply by a, and finally use round(..., 4) on the result.",
+      "references": [
+        "IEEE 754 floating-point standard",
+        "Python's decimal module for precise decimal arithmetic",
+        "Understanding floating-point arithmetic"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Integrating All Components: Building the Complete Scheduler",
+      "relation_to_problem": "This final sub-quest combines all previous concepts—cosine function, interpolation, class design, and rounding—to implement a fully functional CosineAnnealingLR scheduler class.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Understanding of software integration",
+        "Systematic testing approach"
+      ],
+      "learning_objectives": [
+        "Combine mathematical concepts with object-oriented design",
+        "Implement a complete scheduler class with proper encapsulation",
+        "Test the implementation against multiple test cases",
+        "Understand the practical application of learning rate scheduling"
+      ],
+      "math_content": {
+        "definition": "The **CosineAnnealingLR Scheduler** is a complete system that: (1) stores configuration parameters (initial_lr, T_max, min_lr) during initialization, (2) computes the learning rate for any given epoch using the formula $\\eta(t) = \\eta_{\\min} + \\frac{1}{2}(\\eta_{\\max} - \\eta_{\\min})\\left(1 + \\cos\\left(\\frac{t \\pi}{T_{\\max}}\\right)\\right)$, and (3) returns properly rounded results.",
+        "notation": "$\\mathcal{S}$ = scheduler object, $\\mathcal{S}.\\texttt{get_lr}(t)$ = method returning learning rate at epoch $t$",
+        "theorem": "**Scheduler Correctness**: A correct implementation satisfies: (1) **Boundary conditions**: $\\mathcal{S}.\\texttt{get_lr}(0) = \\eta_{\\max}$ and $\\mathcal{S}.\\texttt{get_lr}(T_{\\max}) = \\eta_{\\min}$, (2) **Monotonicity**: For $0 \\leq t_1 < t_2 \\leq T_{\\max}$, we have $\\mathcal{S}.\\texttt{get_lr}(t_1) > \\mathcal{S}.\\texttt{get_lr}(t_2)$, (3) **Smoothness**: The learning rate changes continuously (no discontinuities).",
+        "proof_sketch": "Boundary conditions follow from our earlier proof of the formula. Monotonicity follows from the fact that $\\cos$ is strictly decreasing on $[0, \\pi]$, which means $1 + \\cos(\\cdot)$ is also strictly decreasing, making the entire expression decrease monotonically. Smoothness follows from the continuity of the cosine function.",
+        "examples": [
+          "Complete workflow: Initialize scheduler → Call get_lr for each epoch → Use returned learning rate for optimization",
+          "Example: scheduler = CosineAnnealingLRScheduler(0.1, 10, 0.001); lr = scheduler.get_lr(5)",
+          "The scheduler maintains its configuration across multiple calls: scheduler.get_lr(0), scheduler.get_lr(1), etc.",
+          "Integration with training loop: for epoch in range(T_max): lr = scheduler.get_lr(epoch); optimize_with_lr(lr)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Implementation Formula",
+          "latex": "$\\texttt{self.min_lr} + 0.5 \\times (\\texttt{self.initial_lr} - \\texttt{self.min_lr}) \\times \\left(1 + \\cos\\left(\\frac{\\texttt{epoch} \\times \\pi}{\\texttt{self.T_max}}\\right)\\right)$",
+          "description": "The full formula implemented in get_lr method using instance attributes"
+        },
+        {
+          "name": "Rounded Result",
+          "latex": "$\\texttt{round}(\\eta(t), 4)$",
+          "description": "Apply rounding to the calculated learning rate"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete CosineAnnealingLRScheduler class. The class should have an __init__ method that stores initial_lr, T_max, and min_lr as instance variables, and a get_lr(epoch) method that computes the learning rate using the CosineAnnealing formula and returns it rounded to 4 decimal places. This combines all concepts from previous sub-quests.",
+        "function_signature": "class CosineAnnealingLRScheduler:\n    def __init__(self, initial_lr: float, T_max: int, min_lr: float):\n        pass\n    \n    def get_lr(self, epoch: int) -> float:\n        pass",
+        "starter_code": "import math\n\nclass CosineAnnealingLRScheduler:\n    def __init__(self, initial_lr: float, T_max: int, min_lr: float):\n        \"\"\"\n        Initialize the CosineAnnealingLR scheduler.\n        \n        Args:\n            initial_lr: Initial (maximum) learning rate\n            T_max: Maximum number of epochs for one annealing cycle\n            min_lr: Minimum learning rate\n        \"\"\"\n        # Store parameters as instance variables\n        pass\n    \n    def get_lr(self, epoch: int) -> float:\n        \"\"\"\n        Calculate the learning rate for a given epoch.\n        \n        Args:\n            epoch: Current epoch number (0 <= epoch <= T_max)\n        \n        Returns:\n            Learning rate at the given epoch, rounded to 4 decimal places\n        \"\"\"\n        # Implement the CosineAnnealingLR formula\n        # Step 1: Calculate the angle: (epoch / self.T_max) * π\n        # Step 2: Calculate cosine of the angle\n        # Step 3: Apply the full formula with interpolation\n        # Step 4: Round to 4 decimal places\n        pass",
+        "test_cases": [
+          {
+            "input": "scheduler = CosineAnnealingLRScheduler(0.1, 10, 0.001); scheduler.get_lr(0)",
+            "expected": "0.1000",
+            "explanation": "At epoch 0, learning rate is at maximum (initial_lr)"
+          },
+          {
+            "input": "scheduler = CosineAnnealingLRScheduler(0.1, 10, 0.001); scheduler.get_lr(2)",
+            "expected": "0.0905",
+            "explanation": "At epoch 2, angle is π/5, giving lr ≈ 0.0905"
+          },
+          {
+            "input": "scheduler = CosineAnnealingLRScheduler(0.1, 10, 0.001); scheduler.get_lr(5)",
+            "expected": "0.0505",
+            "explanation": "At epoch 5 (midpoint), cos(π/2)=0, giving average of min and max"
+          },
+          {
+            "input": "scheduler = CosineAnnealingLRScheduler(0.1, 10, 0.001); scheduler.get_lr(7)",
+            "expected": "0.0214",
+            "explanation": "At epoch 7, angle is 7π/10, giving lr ≈ 0.0214"
+          },
+          {
+            "input": "scheduler = CosineAnnealingLRScheduler(0.1, 10, 0.001); scheduler.get_lr(10)",
+            "expected": "0.0010",
+            "explanation": "At epoch 10 (T_max), learning rate reaches minimum (min_lr)"
+          },
+          {
+            "input": "scheduler = CosineAnnealingLRScheduler(1.0, 100, 0.01); scheduler.get_lr(25)",
+            "expected": "0.8559",
+            "explanation": "Different parameters: at epoch 25/100, lr ≈ 0.8559"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not storing all three parameters (initial_lr, T_max, min_lr) in __init__",
+        "Forgetting to use 'self.' when accessing instance variables in get_lr",
+        "Implementing the formula incorrectly (common: missing 0.5 factor or using wrong signs)",
+        "Not rounding the final result to 4 decimal places",
+        "Using incorrect order of operations (parentheses matter in the formula)",
+        "Integer division issues when computing epoch/T_max",
+        "Swapping initial_lr and min_lr in the formula"
+      ],
+      "hint": "Break down the implementation into steps: (1) In __init__, store all three parameters using self.param = param. (2) In get_lr, compute the angle, then cosine, then apply the full formula: min_lr + 0.5 * (initial_lr - min_lr) * (1 + cos(angle)). (3) Round the result using round(..., 4) before returning.",
+      "references": [
+        "SGDR: Stochastic Gradient Descent with Warm Restarts (Loshchilov & Hutter, 2017)",
+        "PyTorch CosineAnnealingLR documentation",
+        "Learning rate scheduling best practices in deep learning"
+      ]
+    }
+  ]
+}

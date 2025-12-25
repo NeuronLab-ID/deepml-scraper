@@ -1,0 +1,464 @@
+{
+  "problem_id": 74,
+  "title": "Create Composite Hypervector for a Dataset Row",
+  "category": "Linear Algebra",
+  "difficulty": "medium",
+  "description": "## Task: Generate a Composite Hypervector Using Hyperdimensional Computing\n\nYour task is to implement the function `create_row_hv(row, dim, random_seeds)` to generate a composite hypervector for a given dataset row using Hyperdimensional Computing (HDC). Each feature in the row is represented by binding hypervectors for the feature name and its value. The hypervectors for the values are created using the same feature seed provided in the `random_seeds` dictionary to ensure reproducibility. All feature hypervectors are then bundled to create a composite hypervector for the row.\n\n### Input:\n- `row`: A dictionary representing a dataset row, where keys are feature names and values are their corresponding values.\n- `dim`: The dimensionality of the hypervectors.\n- `random_seeds`: A dictionary where keys are feature names and values are seeds to ensure reproducibility of hypervectors.\n\n### Output:\n- A composite hypervector representing the entire row.\n",
+  "example": {
+    "input": "row = {\"FeatureA\": \"value1\", \"FeatureB\": \"value2\"}\ndim = 5\nrandom_seeds = {\"FeatureA\": 42, \"FeatureB\": 7}\nprint(create_row_hv(row, dim, random_seeds))",
+    "output": "[ 1, -1,  1,  1,  1]",
+    "reasoning": "The composite hypervector is created by binding hypervectors for each feature and bundling them together."
+  },
+  "starter_code": "\nimport numpy as np\n\ndef create_row_hv(row, dim, random_seeds):\n\t# Write your code here\n\tpass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Hypervector Generation and Binary Representations",
+      "relation_to_problem": "Understanding how to generate reproducible random hypervectors with bipolar values is fundamental to creating the building blocks (feature and value hypervectors) needed for the composite hypervector.",
+      "prerequisites": [
+        "NumPy random number generation",
+        "Binary and bipolar vector representations",
+        "Basic linear algebra"
+      ],
+      "learning_objectives": [
+        "Generate reproducible random hypervectors using seed-based random number generation",
+        "Understand the mathematical properties of bipolar vectors in high-dimensional spaces",
+        "Implement vector normalization to bipolar values {-1, +1}"
+      ],
+      "math_content": {
+        "definition": "A hypervector $\\mathbf{h} \\in \\mathbb{H}^D$ is a high-dimensional vector of dimensionality $D$ where typically $D \\gg 1$ (commonly $D \\geq 1000$). For bipolar hypervectors, each component $h_i \\in \\{-1, +1\\}$ for $i = 1, 2, \\ldots, D$. The vector space $\\mathbb{H}^D$ forms a discrete metric space under the Hamming distance.",
+        "notation": "$\\mathbf{h} = [h_1, h_2, \\ldots, h_D]^T$ where $h_i \\in \\{-1, +1\\}$; $D$ = dimensionality of hypervector space; $\\mathbb{H}^D$ = hypervector space of dimension $D$",
+        "theorem": "**Theorem (Quasi-Orthogonality)**: For two randomly generated bipolar hypervectors $\\mathbf{h}_1, \\mathbf{h}_2 \\in \\mathbb{H}^D$, the expected normalized inner product approaches zero as $D \\to \\infty$: $$\\mathbb{E}\\left[\\frac{\\langle \\mathbf{h}_1, \\mathbf{h}_2 \\rangle}{D}\\right] = 0$$ with variance $\\sigma^2 \\approx \\frac{1}{D}$. This means randomly generated hypervectors are approximately orthogonal in high dimensions.",
+        "proof_sketch": "Consider $\\mathbf{h}_1, \\mathbf{h}_2$ with components independently drawn from $\\{-1, +1\\}$ with equal probability. The inner product is $\\langle \\mathbf{h}_1, \\mathbf{h}_2 \\rangle = \\sum_{i=1}^{D} h_{1,i} h_{2,i}$. Each product $h_{1,i} h_{2,i}$ is a random variable taking values $\\{-1, +1\\}$ with $P(h_{1,i} h_{2,i} = 1) = 0.5$ and $P(h_{1,i} h_{2,i} = -1) = 0.5$. Thus $\\mathbb{E}[h_{1,i} h_{2,i}] = 0$ and by linearity of expectation, $\\mathbb{E}[\\langle \\mathbf{h}_1, \\mathbf{h}_2 \\rangle] = 0$. By the Central Limit Theorem, the distribution of the normalized inner product converges to a normal distribution with mean 0 and variance $1/D$ as $D \\to \\infty$.",
+        "examples": [
+          "Example 1: Generate a random bipolar hypervector of dimension $D=5$ with seed 42. Using NumPy's random generator: First generate random floats in $[0, 1)$, then map values $< 0.5$ to $-1$ and values $\\geq 0.5$ to $+1$. Result: $\\mathbf{h} = [1, -1, 1, -1, 1]^T$",
+          "Example 2: Compute inner product of two random bipolar hypervectors with $D=10000$. Expected value: $\\approx 0$ with standard deviation $\\approx \\sqrt{10000} = 100$. Actual value typically falls within $[-300, 300]$, giving normalized inner product $\\approx 0 \\pm 0.03$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Bipolar Encoding Function",
+          "latex": "$\\text{bipolar}(x) = \\begin{cases} +1 & \\text{if } x \\geq 0.5 \\\\ -1 & \\text{if } x < 0.5 \\end{cases}$",
+          "description": "Converts uniform random values to bipolar representation"
+        },
+        {
+          "name": "Normalized Inner Product",
+          "latex": "$\\text{similarity}(\\mathbf{h}_1, \\mathbf{h}_2) = \\frac{\\langle \\mathbf{h}_1, \\mathbf{h}_2 \\rangle}{D}$",
+          "description": "Measures similarity between hypervectors, ranges from -1 (opposite) to +1 (identical)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to generate a reproducible random bipolar hypervector given a seed and dimensionality. This is the foundation for creating all hypervectors in HDC systems.",
+        "function_signature": "def generate_hypervector(dim: int, seed: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef generate_hypervector(dim: int, seed: int) -> np.ndarray:\n    \"\"\"\n    Generate a random bipolar hypervector of specified dimension.\n    \n    Args:\n        dim: Dimensionality of the hypervector\n        seed: Random seed for reproducibility\n    \n    Returns:\n        NumPy array of shape (dim,) with values in {-1, +1}\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "generate_hypervector(5, 42)",
+            "expected": "[1, -1, 1, -1, 1]",
+            "explanation": "With seed 42 and dimension 5, the random generator produces specific values that map to this bipolar pattern"
+          },
+          {
+            "input": "generate_hypervector(10, 7)",
+            "expected": "[-1, -1, 1, 1, -1, 1, 1, -1, 1, -1]",
+            "explanation": "Seed 7 produces a different but reproducible pattern"
+          },
+          {
+            "input": "np.all(np.isin(generate_hypervector(1000, 123), [-1, 1]))",
+            "expected": "True",
+            "explanation": "All elements must be either -1 or +1, regardless of dimension"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using global random state instead of creating a seeded generator, leading to non-reproducible results",
+        "Returning values of type float instead of int, causing downstream computation issues",
+        "Using threshold of 0 instead of 0.5 for uniform [0,1) random values, resulting in biased distribution",
+        "Not setting the seed before each generation, causing different results for the same input"
+      ],
+      "hint": "Use np.random.default_rng(seed) to create a random generator, then generate uniform random values and apply the bipolar encoding function. Ensure the output is an integer array.",
+      "references": [
+        "Hyperdimensional Computing: An Introduction to Computing in Distributed Representation with High-Dimensional Random Vectors (Kanerva, 2009)",
+        "NumPy random number generation documentation",
+        "Johnson-Lindenstrauss lemma and random projections"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Binding Operation: Element-wise Multiplication of Hypervectors",
+      "relation_to_problem": "The binding operation is used to associate each feature name with its corresponding value by creating a unique combined representation. This is essential for encoding feature-value pairs in the composite hypervector.",
+      "prerequisites": [
+        "Hypervector generation",
+        "Element-wise vector operations",
+        "Properties of bipolar arithmetic"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical properties of the binding operation in HDC",
+        "Implement element-wise multiplication for bipolar hypervectors",
+        "Recognize that binding creates dissimilar vectors from similar inputs (quasi-orthogonality preservation)",
+        "Understand the invertibility property of binding"
+      ],
+      "math_content": {
+        "definition": "The binding operation $\\odot: \\mathbb{H}^D \\times \\mathbb{H}^D \\to \\mathbb{H}^D$ for bipolar hypervectors is defined as element-wise multiplication: $$\\mathbf{c} = \\mathbf{h}_1 \\odot \\mathbf{h}_2 = [h_{1,1} \\cdot h_{2,1}, h_{1,2} \\cdot h_{2,2}, \\ldots, h_{1,D} \\cdot h_{2,D}]^T$$ where $h_{i,j} \\in \\{-1, +1\\}$ and therefore $c_j \\in \\{-1, +1\\}$.",
+        "notation": "$\\odot$ = binding operator (element-wise multiplication); $\\mathbf{c} = \\mathbf{h}_1 \\odot \\mathbf{h}_2$ = bound hypervector representing association between $\\mathbf{h}_1$ and $\\mathbf{h}_2$",
+        "theorem": "**Theorem (Properties of Binding)**:\n1. **Commutativity**: $\\mathbf{h}_1 \\odot \\mathbf{h}_2 = \\mathbf{h}_2 \\odot \\mathbf{h}_1$\n2. **Associativity**: $(\\mathbf{h}_1 \\odot \\mathbf{h}_2) \\odot \\mathbf{h}_3 = \\mathbf{h}_1 \\odot (\\mathbf{h}_2 \\odot \\mathbf{h}_3)$\n3. **Self-Inverse**: $\\mathbf{h} \\odot \\mathbf{h} = [1, 1, \\ldots, 1]^T = \\mathbf{1}$ (identity element)\n4. **Invertibility**: $\\mathbf{h}_1 \\odot (\\mathbf{h}_1 \\odot \\mathbf{h}_2) = \\mathbf{h}_2$\n5. **Dissimilarity**: If $\\mathbf{h}_1 \\perp \\mathbf{h}_2$ (quasi-orthogonal), then $\\mathbf{c} = \\mathbf{h}_1 \\odot \\mathbf{h}_2$ is quasi-orthogonal to both $\\mathbf{h}_1$ and $\\mathbf{h}_2$",
+        "proof_sketch": "Properties 1-4 follow directly from properties of multiplication in $\\{-1, +1\\}$: commutativity and associativity of multiplication, and $(-1) \\cdot (-1) = 1 \\cdot 1 = 1$ (self-inverse). For property 5, consider $\\langle \\mathbf{c}, \\mathbf{h}_1 \\rangle = \\sum_{i=1}^{D} (h_{1,i} \\cdot h_{2,i}) \\cdot h_{1,i} = \\sum_{i=1}^{D} h_{1,i}^2 \\cdot h_{2,i} = \\sum_{i=1}^{D} h_{2,i}$. Since $h_{2,i} \\in \\{-1, +1\\}$ are random, this sum has expectation 0 and variance $D$, giving normalized correlation $\\approx 0$.",
+        "examples": [
+          "Example 1: Bind two hypervectors representing 'Color' and 'Red'. $\\mathbf{h}_{color} = [1, -1, 1, 1, -1]^T$, $\\mathbf{h}_{red} = [-1, -1, 1, -1, 1]^T$. Result: $\\mathbf{h}_{color} \\odot \\mathbf{h}_{red} = [1 \\cdot (-1), (-1) \\cdot (-1), 1 \\cdot 1, 1 \\cdot (-1), (-1) \\cdot 1]^T = [-1, 1, 1, -1, -1]^T$",
+          "Example 2: Verify invertibility. Using vectors from Example 1: $\\mathbf{h}_{color} \\odot (\\mathbf{h}_{color} \\odot \\mathbf{h}_{red}) = \\mathbf{h}_{color} \\odot [-1, 1, 1, -1, -1]^T = [1 \\cdot (-1), (-1) \\cdot 1, 1 \\cdot 1, 1 \\cdot (-1), (-1) \\cdot (-1)]^T = [-1, -1, 1, -1, 1]^T = \\mathbf{h}_{red}$. The original value hypervector is recovered."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Binding Operation",
+          "latex": "$\\mathbf{c} = \\mathbf{h}_1 \\odot \\mathbf{h}_2 = [h_{1,1} h_{2,1}, h_{1,2} h_{2,2}, \\ldots, h_{1,D} h_{2,D}]^T$",
+          "description": "Element-wise multiplication creates an associative binding between two concepts"
+        },
+        {
+          "name": "Unbinding (Decoding)",
+          "latex": "$\\mathbf{h}_2 \\approx \\mathbf{h}_1 \\odot \\mathbf{c}$",
+          "description": "Recover one component by binding the result with the other component (exact for bipolar vectors)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the binding operation to associate two hypervectors. This operation will be used to bind feature names with their values to create unique feature-value representations.",
+        "function_signature": "def bind_hypervectors(hv1: np.ndarray, hv2: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef bind_hypervectors(hv1: np.ndarray, hv2: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Bind two hypervectors using element-wise multiplication.\n    \n    Args:\n        hv1: First bipolar hypervector\n        hv2: Second bipolar hypervector\n    \n    Returns:\n        Bound hypervector representing the association of hv1 and hv2\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "bind_hypervectors(np.array([1, -1, 1, -1, 1]), np.array([-1, -1, 1, 1, 1]))",
+            "expected": "[-1, 1, 1, -1, 1]",
+            "explanation": "Element-wise multiplication: [1*(-1), (-1)*(-1), 1*1, (-1)*1, 1*1] = [-1, 1, 1, -1, 1]"
+          },
+          {
+            "input": "bind_hypervectors(np.array([1, 1, -1]), np.array([1, 1, -1]))",
+            "expected": "[1, 1, 1]",
+            "explanation": "Binding a vector with itself yields the identity vector (all ones)"
+          },
+          {
+            "input": "hv1 = np.array([1, -1, 1, -1]); hv2 = np.array([-1, 1, -1, 1]); bound = bind_hypervectors(hv1, hv2); np.array_equal(bind_hypervectors(hv1, bound), hv2)",
+            "expected": "True",
+            "explanation": "Demonstrates invertibility: binding hv1 with the bound vector recovers hv2"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using matrix multiplication instead of element-wise multiplication (np.dot vs np.multiply or *)",
+        "Not checking that input hypervectors have the same dimension before binding",
+        "Forgetting that binding is its own inverse for bipolar vectors (binding twice with the same vector recovers the original)",
+        "Attempting to normalize the result of binding (not necessary for bipolar element-wise multiplication)"
+      ],
+      "hint": "For bipolar vectors, binding is simply element-wise multiplication using the * operator or np.multiply(). Ensure both vectors have the same shape.",
+      "references": [
+        "Vector Symbolic Architectures (Gayler, 2003)",
+        "Holographic Reduced Representations (Plate, 1995)",
+        "Binary Spatter Codes (Kanerva, 1996)"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Bundling Operation: Aggregating Multiple Hypervectors",
+      "relation_to_problem": "After binding each feature name with its value, we need to combine all these feature-value pairs into a single composite hypervector representing the entire row. The bundling operation performs this aggregation.",
+      "prerequisites": [
+        "Hypervector generation",
+        "Binding operation",
+        "Vector addition and normalization"
+      ],
+      "learning_objectives": [
+        "Understand bundling as a similarity-preserving aggregation operation",
+        "Implement vector summation for combining multiple hypervectors",
+        "Apply thresholding to convert real-valued sums back to bipolar representation",
+        "Recognize that bundling creates similarity between the result and inputs"
+      ],
+      "math_content": {
+        "definition": "The bundling operation $\\oplus: \\mathbb{H}^D \\times \\mathbb{H}^D \\to \\mathbb{H}^D$ aggregates multiple hypervectors through element-wise addition followed by normalization: $$\\mathbf{s} = \\mathbf{h}_1 \\oplus \\mathbf{h}_2 \\oplus \\cdots \\oplus \\mathbf{h}_n = \\text{normalize}\\left(\\sum_{i=1}^{n} \\mathbf{h}_i\\right)$$ where the normalization function $\\text{normalize}(\\mathbf{v})$ converts each component to bipolar form: $$\\text{normalize}(\\mathbf{v})_j = \\begin{cases} +1 & \\text{if } v_j > 0 \\\\ -1 & \\text{if } v_j < 0 \\\\ \\pm 1 & \\text{if } v_j = 0 \\text{ (randomly chosen)} \\end{cases}$$",
+        "notation": "$\\oplus$ = bundling operator (element-wise addition + normalization); $\\mathbf{s}$ = summed vector before normalization; $n$ = number of hypervectors being bundled",
+        "theorem": "**Theorem (Bundling Preserves Similarity)**: Let $\\mathbf{c} = \\mathbf{h}_1 \\oplus \\mathbf{h}_2 \\oplus \\cdots \\oplus \\mathbf{h}_n$ be the bundled hypervector. Then for each component hypervector $\\mathbf{h}_i$, the expected normalized correlation satisfies: $$\\mathbb{E}\\left[\\frac{\\langle \\mathbf{c}, \\mathbf{h}_i \\rangle}{D}\\right] \\approx \\frac{1}{n}$$ This shows that the bundled vector is similar to each component, with similarity decreasing as more vectors are bundled. For large $n$, the bundle approximates the average of all components.",
+        "proof_sketch": "Consider the sum before normalization: $\\mathbf{s} = \\sum_{k=1}^{n} \\mathbf{h}_k$. Each component $s_j = \\sum_{k=1}^{n} h_{k,j}$ where $h_{k,j} \\in \\{-1, +1\\}$. For a specific $\\mathbf{h}_i$, the correlation contribution is $h_{i,j} s_j = h_{i,j} (h_{i,j} + \\sum_{k \\neq i} h_{k,j}) = 1 + h_{i,j} \\sum_{k \\neq i} h_{k,j}$. The second term has expectation 0 since $h_{k,j}$ are independent random variables. Thus $\\mathbb{E}[h_{i,j} s_j] = 1$, giving $\\mathbb{E}[\\langle \\mathbf{h}_i, \\mathbf{s} \\rangle] = D$. After normalization, the correlation is approximately preserved when $n \\ll D$, scaling as $1/n$ for moderate $n$.",
+        "examples": [
+          "Example 1: Bundle two hypervectors. $\\mathbf{h}_1 = [1, -1, 1, -1, 1]^T$, $\\mathbf{h}_2 = [1, 1, -1, -1, 1]^T$. Sum: $\\mathbf{s} = [2, 0, 0, -2, 2]^T$. Normalized (sign function): $\\mathbf{c} = [1, \\pm 1, \\pm 1, -1, 1]^T$ (zero values assigned randomly to ±1)",
+          "Example 2: Bundle three hypervectors. $\\mathbf{h}_1 = [1, -1, 1]^T$, $\\mathbf{h}_2 = [-1, -1, 1]^T$, $\\mathbf{h}_3 = [1, 1, -1]^T$. Sum: $\\mathbf{s} = [1, -1, 1]^T$. All non-zero, so normalized: $\\mathbf{c} = [1, -1, 1]^T$. Note that $\\mathbf{c}$ is identical to $\\mathbf{h}_1$, showing that bundling can favor vectors that agree on more components.",
+          "Example 3: Bundle many random hypervectors. With $n = 100$ random bipolar hypervectors of dimension $D = 10000$, the sum at each position follows a binomial-like distribution centered near 0 with standard deviation $\\sqrt{n} \\approx 10$. The bundled vector will be quasi-orthogonal to any single random input vector (expected correlation $\\approx 0.01$)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Bundling Operation",
+          "latex": "$\\mathbf{c} = \\text{normalize}\\left(\\sum_{i=1}^{n} \\mathbf{h}_i\\right)$",
+          "description": "Aggregates multiple hypervectors into a single representative vector"
+        },
+        {
+          "name": "Sign Normalization",
+          "latex": "$\\text{normalize}(\\mathbf{v})_j = \\text{sign}(v_j) = \\begin{cases} +1 & v_j > 0 \\\\ -1 & v_j < 0 \\\\ \\pm 1 & v_j = 0 \\end{cases}$",
+          "description": "Converts real-valued vector to bipolar representation"
+        },
+        {
+          "name": "Expected Similarity After Bundling",
+          "latex": "$\\mathbb{E}\\left[\\text{similarity}(\\mathbf{c}, \\mathbf{h}_i)\\right] \\approx \\frac{1}{n}$",
+          "description": "The bundled vector has similarity 1/n with each component on average"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the bundling operation to combine multiple hypervectors into a single composite representation. This will aggregate all feature-value bindings into one row hypervector.",
+        "function_signature": "def bundle_hypervectors(hvs: list) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef bundle_hypervectors(hvs: list) -> np.ndarray:\n    \"\"\"\n    Bundle multiple hypervectors through summation and normalization.\n    \n    Args:\n        hvs: List of bipolar hypervectors (each is a numpy array)\n    \n    Returns:\n        Bundled bipolar hypervector representing the aggregate\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "bundle_hypervectors([np.array([1, -1, 1, -1, 1]), np.array([1, 1, -1, -1, 1])])",
+            "expected": "[1, 1 or -1, 1 or -1, -1, 1]",
+            "explanation": "Sum: [2, 0, 0, -2, 2]. Sign: [1, ±1, ±1, -1, 1]. Zero values can be assigned to either +1 or -1."
+          },
+          {
+            "input": "bundle_hypervectors([np.array([1, -1, 1]), np.array([-1, -1, 1]), np.array([1, 1, -1])])",
+            "expected": "[1, -1, 1]",
+            "explanation": "Sum: [1, -1, 1]. All non-zero, so sign is [1, -1, 1]"
+          },
+          {
+            "input": "bundle_hypervectors([np.array([1, 1, 1, 1])])",
+            "expected": "[1, 1, 1, 1]",
+            "explanation": "Bundling a single hypervector returns itself (after normalization which doesn't change it)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to normalize after summing, leaving real-valued vectors instead of bipolar",
+        "Using incorrect normalization (e.g., L2 normalization instead of sign function)",
+        "Not handling the zero case properly - zeros after summation should be assigned to ±1",
+        "Attempting to bundle an empty list without proper error handling",
+        "Summing without ensuring all hypervectors have the same dimension"
+      ],
+      "hint": "Use np.sum() with axis=0 to sum along columns if hvs is a 2D array, or sum a list of arrays. Then apply np.sign() for normalization. Handle zeros by replacing them with a random choice or consistently with +1.",
+      "references": [
+        "Superposition and interference in vector symbolic architectures",
+        "Capacity and error correction in holographic reduced representations",
+        "Sparse distributed memory and hyperdimensional computing"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Hash-Based Encoding: Deterministic Hypervector Generation from Strings",
+      "relation_to_problem": "Feature names and categorical values are strings that need to be converted to hypervectors. We must ensure that the same string always produces the same hypervector, requiring a deterministic encoding method based on hashing.",
+      "prerequisites": [
+        "Hypervector generation",
+        "Hash functions",
+        "String encoding"
+      ],
+      "learning_objectives": [
+        "Understand how to convert arbitrary strings to reproducible integer seeds",
+        "Implement hash-based encoding for categorical values",
+        "Ensure deterministic mapping from strings to hypervectors",
+        "Recognize the importance of avoiding hash collisions in HDC"
+      ],
+      "math_content": {
+        "definition": "Hash-based encoding is a deterministic function $h: \\Sigma^* \\to \\mathbb{H}^D$ that maps strings from alphabet $\\Sigma$ to hypervectors. This is implemented as $h(s) = \\text{generate\\_hypervector}(D, \\text{hash}(s))$ where $\\text{hash}: \\Sigma^* \\to \\mathbb{Z}$ is a hash function producing an integer seed. The key property is determinism: $h(s_1) = h(s_2)$ if and only if $s_1 = s_2$ (assuming no hash collisions).",
+        "notation": "$h(s)$ = hypervector encoding of string $s$; $\\Sigma^*$ = set of all strings over alphabet $\\Sigma$; $\\text{hash}(s)$ = integer hash value of string $s$",
+        "theorem": "**Theorem (Encoding Preservation)**: For a good hash function with negligible collision probability, the encoding function $h$ satisfies:\n1. **Determinism**: $\\forall s \\in \\Sigma^*$, multiple calls to $h(s)$ produce the same hypervector\n2. **Distinctness**: For $s_1 \\neq s_2$, the hypervectors $h(s_1)$ and $h(s_2)$ are quasi-orthogonal with high probability\n3. **Efficiency**: Computing $h(s)$ requires $O(|s| + D)$ time where $|s|$ is the length of string $s$\n\nThe collision probability for a good hash function mapping to $k$-bit integers is approximately $1/2^k$, which is negligible for $k \\geq 32$.",
+        "proof_sketch": "Property 1 follows from the deterministic nature of hash functions and seeded random number generation. Property 2 follows from the avalanche effect of good hash functions: small changes in input produce large changes in output, leading to different seeds and thus independently random hypervectors that are quasi-orthogonal. Property 3 follows from the $O(|s|)$ complexity of hash computation and $O(D)$ complexity of hypervector generation.",
+        "examples": [
+          "Example 1: Encode the string 'FeatureA' with dimension $D=5$. First, compute hash: $\\text{hash}('FeatureA') = 12345$ (example value). Then generate hypervector with seed 12345: $h('FeatureA') = [1, -1, 1, 1, -1]^T$. Subsequent calls with 'FeatureA' produce the same hypervector.",
+          "Example 2: Encode similar strings. $h('Color') = [1, -1, 1, -1, 1]^T$ and $h('Color2') = [-1, 1, -1, 1, -1]^T$. Despite similar input strings, the hypervectors are completely different (orthogonal in this case), demonstrating the avalanche property.",
+          "Example 3: Using Python's built-in hash. For string 'value1', hash('value1') might return a large integer like 8736492836483. Use this as seed: $h('value1') = \\text{generate\\_hypervector}(D, 8736492836483 \\mod 2^{32})$ to ensure the seed fits in a 32-bit integer range."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Hash-Based Encoding",
+          "latex": "$h(s) = \\text{generate\\_hypervector}(D, \\text{hash}(s) \\mod 2^{32})$",
+          "description": "Converts a string to a hypervector using its hash value as a seed"
+        },
+        {
+          "name": "Seed Normalization",
+          "latex": "$\\text{seed}(s) = |\\text{hash}(s)| \\mod (2^{31} - 1)$",
+          "description": "Ensures the hash value is a positive 32-bit integer suitable for seeding"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to encode a string as a hypervector using hash-based seeding. This will be used to convert feature names and categorical values to hypervectors.",
+        "function_signature": "def encode_string(string: str, dim: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef encode_string(string: str, dim: int) -> np.ndarray:\n    \"\"\"\n    Encode a string as a bipolar hypervector using hash-based seeding.\n    \n    Args:\n        string: The string to encode\n        dim: Dimensionality of the resulting hypervector\n    \n    Returns:\n        Bipolar hypervector representation of the string\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "encode_string('FeatureA', 5)",
+            "expected": "Consistent bipolar vector of length 5",
+            "explanation": "The same string should always produce the same hypervector"
+          },
+          {
+            "input": "np.array_equal(encode_string('test', 10), encode_string('test', 10))",
+            "expected": "True",
+            "explanation": "Demonstrates determinism: same string produces same hypervector"
+          },
+          {
+            "input": "np.array_equal(encode_string('test1', 10), encode_string('test2', 10))",
+            "expected": "False",
+            "explanation": "Different strings should produce different hypervectors with high probability"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using Python's built-in hash() without considering cross-platform consistency (hash values can differ between Python sessions)",
+        "Not handling negative hash values properly (some hash functions return negative integers)",
+        "Forgetting to modulo the hash to ensure it fits in the random seed range",
+        "Using the string directly as a seed instead of hashing it first",
+        "Not considering the possibility of hash collisions (though rare with good hash functions)"
+      ],
+      "hint": "Use Python's built-in hash() function or hashlib for consistent hashing. Convert the hash to a positive integer using abs() and modulo with a large prime or 2^31-1. Then use this as the seed for generate_hypervector from step 1.",
+      "references": [
+        "Universal hashing and perfect hash functions",
+        "Cryptographic hash functions (SHA-256, MD5)",
+        "Python hashlib documentation"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Feature-Value Association: Combining Names and Values through Binding",
+      "relation_to_problem": "Each feature in a dataset row consists of a name-value pair. We must create a unique hypervector for each pair by binding the feature name hypervector with the feature value hypervector, using the provided seed dictionary for reproducibility.",
+      "prerequisites": [
+        "Hypervector generation",
+        "Binding operation",
+        "Hash-based encoding"
+      ],
+      "learning_objectives": [
+        "Understand how to represent structured data (feature-value pairs) in hyperdimensional space",
+        "Implement the full encoding pipeline: string → seed → hypervector → binding",
+        "Use provided seeds for specific features to ensure reproducibility",
+        "Recognize that binding creates position-independent feature representations"
+      ],
+      "math_content": {
+        "definition": "A feature-value association in HDC represents a pair $(f, v)$ where $f$ is the feature name and $v$ is its value. The association hypervector is defined as: $$\\mathbf{a}_{(f,v)} = \\mathbf{h}_f \\odot \\mathbf{h}_v$$ where $\\mathbf{h}_f$ is the hypervector encoding of feature name $f$ (generated using a fixed seed from the seed dictionary), and $\\mathbf{h}_v$ is the hypervector encoding of value $v$ (generated using the same seed as $\\mathbf{h}_f$ to maintain consistency). This binding operation creates a unique representation that encodes both the feature identity and its value.",
+        "notation": "$\\mathbf{a}_{(f,v)}$ = association hypervector for feature-value pair $(f, v)$; $\\mathbf{h}_f$ = hypervector encoding of feature name; $\\mathbf{h}_v$ = hypervector encoding of feature value",
+        "theorem": "**Theorem (Feature-Value Retrieval)**: Given an association hypervector $\\mathbf{a}_{(f,v)} = \\mathbf{h}_f \\odot \\mathbf{h}_v$ and the feature name hypervector $\\mathbf{h}_f$, we can retrieve an approximation of the value hypervector by: $$\\mathbf{h}_v \\approx \\mathbf{h}_f \\odot \\mathbf{a}_{(f,v)}$$ For bipolar hypervectors, this retrieval is exact: $\\mathbf{h}_f \\odot \\mathbf{a}_{(f,v)} = \\mathbf{h}_f \\odot (\\mathbf{h}_f \\odot \\mathbf{h}_v) = (\\mathbf{h}_f \\odot \\mathbf{h}_f) \\odot \\mathbf{h}_v = \\mathbf{1} \\odot \\mathbf{h}_v = \\mathbf{h}_v$. This property enables querying composite hypervectors to extract feature information.",
+        "proof_sketch": "The proof follows from the algebraic properties of the binding operation established in step 2. Specifically, the associativity and self-inverse properties: $(\\mathbf{h}_f \\odot \\mathbf{h}_v) \\odot \\mathbf{h}_f = \\mathbf{h}_f \\odot (\\mathbf{h}_v \\odot \\mathbf{h}_f) = \\mathbf{h}_f \\odot (\\mathbf{h}_f \\odot \\mathbf{h}_v)$ by commutativity. Then $\\mathbf{h}_f \\odot \\mathbf{h}_f = \\mathbf{1}$, so $\\mathbf{1} \\odot \\mathbf{h}_v = \\mathbf{h}_v$.",
+        "examples": [
+          "Example 1: Encode feature-value pair ('Color', 'Red') with $D=5$ and seed dictionary {'Color': 42}. First, generate $\\mathbf{h}_{Color}$ using seed 42: $[1, -1, 1, -1, 1]^T$. Then encode 'Red' using the same seed 42: $\\mathbf{h}_{Red} = [-1, 1, -1, 1, -1]^T$. Bind them: $\\mathbf{a}_{(Color,Red)} = [1, -1, 1, -1, 1]^T \\odot [-1, 1, -1, 1, -1]^T = [-1, -1, -1, -1, -1]^T$.",
+          "Example 2: Multiple features from a row. Row: {'Age': '25', 'City': 'NYC'}, seeds: {'Age': 10, 'City': 20}, $D=4$. Generate $\\mathbf{h}_{Age}$ with seed 10, $\\mathbf{h}_{25}$ with seed 10, bind to get $\\mathbf{a}_{(Age,25)}$. Similarly generate $\\mathbf{a}_{(City,NYC)}$ with seed 20. These associations will be bundled in the next step.",
+          "Example 3: Retrieval demonstration. Using Example 1, retrieve value: $\\mathbf{h}_{Color} \\odot \\mathbf{a}_{(Color,Red)} = [1, -1, 1, -1, 1]^T \\odot [-1, -1, -1, -1, -1]^T = [-1, 1, -1, 1, -1]^T = \\mathbf{h}_{Red}$. The original value hypervector is exactly recovered."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Feature-Value Association",
+          "latex": "$\\mathbf{a}_{(f,v)} = \\mathbf{h}_f \\odot \\mathbf{h}_v = \\text{generate\\_hypervector}(D, \\text{seed}_f) \\odot \\text{generate\\_hypervector}(D, \\text{seed}_f)$",
+          "description": "Both feature name and value use the same seed for consistency"
+        },
+        {
+          "name": "Value Retrieval",
+          "latex": "$\\mathbf{h}_v = \\mathbf{h}_f \\odot \\mathbf{a}_{(f,v)}$",
+          "description": "Unbind using the feature name to recover the value hypervector"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to create a feature-value association hypervector. Given a feature name, its value, dimensionality, and a seed from the seed dictionary, generate and bind the appropriate hypervectors.",
+        "function_signature": "def create_feature_value_hv(feature_name: str, feature_value: str, dim: int, seed: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef create_feature_value_hv(feature_name: str, feature_value: str, dim: int, seed: int) -> np.ndarray:\n    \"\"\"\n    Create an association hypervector for a feature-value pair.\n    \n    Args:\n        feature_name: Name of the feature (e.g., 'Color')\n        feature_value: Value of the feature (e.g., 'Red')\n        dim: Dimensionality of hypervectors\n        seed: Random seed from the seed dictionary for this feature\n    \n    Returns:\n        Association hypervector representing the feature-value pair\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "create_feature_value_hv('FeatureA', 'value1', 5, 42)",
+            "expected": "Consistent bipolar vector of length 5",
+            "explanation": "Should generate hypervectors for both feature name and value using seed 42, then bind them"
+          },
+          {
+            "input": "hv1 = create_feature_value_hv('Color', 'Red', 10, 42); hv2 = create_feature_value_hv('Color', 'Red', 10, 42); np.array_equal(hv1, hv2)",
+            "expected": "True",
+            "explanation": "Same inputs should produce identical association hypervectors (reproducibility)"
+          },
+          {
+            "input": "hv1 = create_feature_value_hv('Color', 'Red', 10, 42); hv2 = create_feature_value_hv('Color', 'Blue', 10, 42); np.array_equal(hv1, hv2)",
+            "expected": "False",
+            "explanation": "Different values should produce different associations even with the same feature and seed"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using different seeds for the feature name and value (should use the same seed from the dictionary)",
+        "Using hash-based encoding instead of the provided seed from random_seeds dictionary",
+        "Forgetting to bind the feature name and value hypervectors (returning just one of them)",
+        "Not using the seed parameter consistently for both the feature and value encoding",
+        "Converting the feature_value to string before encoding (it's already a string)"
+      ],
+      "hint": "Generate two hypervectors: one for feature_name and one for feature_value, both using the same seed parameter. Then bind them together using the binding function from step 2.",
+      "references": [
+        "Semantic vectors and associative memories in HDC",
+        "Compositional semantics in vector symbolic architectures",
+        "Encoding structured data in hyperdimensional computing"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Composite Row Hypervector: Complete Integration",
+      "relation_to_problem": "This is the final step that combines all previous concepts. Given a complete dataset row with multiple features, we encode each feature-value pair using the provided seeds, then bundle all associations into a single composite hypervector representing the entire row.",
+      "prerequisites": [
+        "All previous sub-quests: hypervector generation, binding, bundling, hash encoding, feature-value association"
+      ],
+      "learning_objectives": [
+        "Integrate all HDC operations into a complete encoding pipeline",
+        "Process a dictionary of feature-value pairs systematically",
+        "Create a composite representation that preserves information about all features",
+        "Understand how the composite hypervector can be used for classification and similarity comparison"
+      ],
+      "math_content": {
+        "definition": "Given a dataset row represented as a dictionary $R = \\{(f_1, v_1), (f_2, v_2), \\ldots, (f_m, v_m)\\}$ with $m$ features and a seed dictionary $S = \\{f_1: s_1, f_2: s_2, \\ldots, f_m: s_m\\}$, the composite row hypervector is defined as: $$\\mathbf{H}_R = \\bigoplus_{i=1}^{m} \\mathbf{a}_{(f_i, v_i)} = \\text{normalize}\\left(\\sum_{i=1}^{m} (\\mathbf{h}_{f_i} \\odot \\mathbf{h}_{v_i})\\right)$$ where $\\mathbf{h}_{f_i} = \\text{generate\\_hypervector}(D, s_i)$ and $\\mathbf{h}_{v_i} = \\text{generate\\_hypervector}(D, s_i)$ both use seed $s_i$ from the seed dictionary. The composite hypervector $\\mathbf{H}_R \\in \\mathbb{H}^D$ is a single bipolar vector that encodes all feature-value information from the row.",
+        "notation": "$\\mathbf{H}_R$ = composite row hypervector; $R$ = dataset row (dictionary); $S$ = seed dictionary; $m$ = number of features; $\\bigoplus$ = bundling operator over multiple vectors",
+        "theorem": "**Theorem (Row Similarity and Feature Preservation)**: For two dataset rows $R_1$ and $R_2$ with composite hypervectors $\\mathbf{H}_{R_1}$ and $\\mathbf{H}_{R_2}$:\n1. **Similarity**: If $R_1$ and $R_2$ share $k$ out of $m$ feature-value pairs, then $$\\mathbb{E}[\\text{similarity}(\\mathbf{H}_{R_1}, \\mathbf{H}_{R_2})] \\approx \\frac{2k - m}{m}$$ This ranges from $-1$ (completely different) to $+1$ (identical).\n2. **Feature Recovery**: Given $\\mathbf{H}_R$ and a feature name $f_i$ with seed $s_i$, we can approximate the value by: $$\\mathbf{h}_{v_i} \\approx \\text{normalize}(\\mathbf{h}_{f_i} \\odot \\mathbf{H}_R)$$ The recovered hypervector will have highest similarity with the correct value hypervector among all possible values.\n3. **Robustness**: The composite hypervector is robust to noise and errors in individual feature encodings, with error correction capability proportional to dimensionality $D$.",
+        "proof_sketch": "For property 1, consider the inner product $\\langle \\mathbf{H}_{R_1}, \\mathbf{H}_{R_2} \\rangle$. Each matching feature-value pair contributes positively (approximately $D/m$ to the inner product), while non-matching pairs contribute randomly (approximately 0). Thus the expected inner product is $k \\cdot D/m - (m-k) \\cdot D/m = (2k-m)D/m$, giving normalized similarity $(2k-m)/m$. Property 2 follows from unbinding: $\\mathbf{h}_{f_i} \\odot \\mathbf{H}_R = \\mathbf{h}_{f_i} \\odot (\\mathbf{a}_{(f_i,v_i)} \\oplus \\cdots) = \\mathbf{h}_{v_i} \\oplus \\text{noise}$, where the noise comes from other features and decreases with larger $D$.",
+        "examples": [
+          "Example 1: Complete encoding. Row: {'FeatureA': 'value1', 'FeatureB': 'value2'}, seeds: {'FeatureA': 42, 'FeatureB': 7}, $D=5$. Step 1: Generate $\\mathbf{h}_{FeatureA}$ with seed 42: $[1, -1, 1, -1, 1]^T$. Generate $\\mathbf{h}_{value1}$ with seed 42: $[-1, 1, -1, 1, -1]^T$. Bind: $\\mathbf{a}_A = [-1, -1, -1, -1, -1]^T$. Step 2: Generate $\\mathbf{h}_{FeatureB}$ with seed 7: $[-1, -1, 1, 1, -1]^T$. Generate $\\mathbf{h}_{value2}$ with seed 7: $[1, 1, -1, -1, 1]^T$. Bind: $\\mathbf{a}_B = [-1, -1, -1, -1, -1]^T$. Step 3: Bundle: sum $= [-2, -2, -2, -2, -2]^T$, normalize: $\\mathbf{H}_R = [-1, -1, -1, -1, -1]^T$. This happens to be all -1 due to the specific random values.",
+          "Example 2: Similarity comparison. Row1: {'Color': 'Red', 'Size': 'Large'}, Row2: {'Color': 'Red', 'Size': 'Small'}, Row3: {'Color': 'Blue', 'Size': 'Large'}. After encoding all three rows, we expect: similarity($\\mathbf{H}_{Row1}$, $\\mathbf{H}_{Row2}$) $\\approx$ similarity($\\mathbf{H}_{Row1}$, $\\mathbf{H}_{Row3}$) $\\approx 0$ (one matching feature out of two gives $(2 \\cdot 1 - 2)/2 = 0$). But similarity($\\mathbf{H}_{Row1}$, $\\mathbf{H}_{Row1}$) $= 1$ (identical).",
+          "Example 3: Feature value retrieval. Given $\\mathbf{H}_R$ from Example 1 and feature name 'FeatureA' with seed 42, compute $\\mathbf{h}_{FeatureA} \\odot \\mathbf{H}_R = [1, -1, 1, -1, 1]^T \\odot [-1, -1, -1, -1, -1]^T = [-1, 1, -1, 1, -1]^T$. This matches $\\mathbf{h}_{value1}$ from Example 1, successfully retrieving the value."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Composite Row Hypervector",
+          "latex": "$\\mathbf{H}_R = \\text{normalize}\\left(\\sum_{i=1}^{m} (\\mathbf{h}_{f_i} \\odot \\mathbf{h}_{v_i})\\right)$",
+          "description": "Complete formula for encoding a dataset row with m features"
+        },
+        {
+          "name": "Row Similarity",
+          "latex": "$\\text{similarity}(\\mathbf{H}_{R_1}, \\mathbf{H}_{R_2}) = \\frac{\\langle \\mathbf{H}_{R_1}, \\mathbf{H}_{R_2} \\rangle}{D}$",
+          "description": "Measure of similarity between two dataset rows in hyperdimensional space"
+        },
+        {
+          "name": "Expected Similarity with k Matches",
+          "latex": "$\\mathbb{E}[\\text{similarity}] \\approx \\frac{2k - m}{m}$",
+          "description": "Expected similarity when k out of m feature-value pairs match"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete pipeline to create a composite row hypervector. This integrates all previous concepts: iterate through the row dictionary, use seeds from random_seeds, generate hypervectors for each feature-value pair, bind them, and bundle all associations into a single composite hypervector.",
+        "function_signature": "def create_row_hv(row: dict, dim: int, random_seeds: dict) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef create_row_hv(row: dict, dim: int, random_seeds: dict) -> np.ndarray:\n    \"\"\"\n    Generate a composite hypervector for a dataset row.\n    \n    Args:\n        row: Dictionary with feature names as keys and values as values\n        dim: Dimensionality of hypervectors\n        random_seeds: Dictionary mapping feature names to seeds\n    \n    Returns:\n        Composite bipolar hypervector representing the entire row\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "create_row_hv({'FeatureA': 'value1', 'FeatureB': 'value2'}, 5, {'FeatureA': 42, 'FeatureB': 7})",
+            "expected": "[1, -1, 1, 1, 1]",
+            "explanation": "The composite hypervector is created by generating and binding feature-value pairs, then bundling all associations with normalization"
+          },
+          {
+            "input": "hv1 = create_row_hv({'Color': 'Red'}, 10, {'Color': 42}); hv2 = create_row_hv({'Color': 'Red'}, 10, {'Color': 42}); np.array_equal(hv1, hv2)",
+            "expected": "True",
+            "explanation": "Same row and seeds produce identical composite hypervectors (determinism)"
+          },
+          {
+            "input": "len(create_row_hv({'A': '1', 'B': '2', 'C': '3'}, 100, {'A': 1, 'B': 2, 'C': 3}))",
+            "expected": "100",
+            "explanation": "Output dimension should match the dim parameter regardless of number of features"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not iterating through all features in the row dictionary",
+        "Using the wrong seed for each feature (must use random_seeds[feature_name])",
+        "Forgetting to bundle all feature-value associations (returning just one)",
+        "Not normalizing the final bundled result to bipolar values",
+        "Binding or bundling in the wrong order (bind first for each feature-value, then bundle all)",
+        "Not handling the case where a feature in the row is not in random_seeds (should raise an error or handle gracefully)"
+      ],
+      "hint": "Create a list to collect all feature-value association hypervectors. For each (feature_name, feature_value) pair in the row dictionary: (1) get the seed from random_seeds, (2) generate hypervectors for both the feature name and value using that seed, (3) bind them, (4) add to the list. Finally, bundle all associations and return the normalized result.",
+      "references": [
+        "Hyperdimensional computing for machine learning: A survey",
+        "Encoding data structures in hyperdimensional computing",
+        "Classification and regression using composite hypervectors",
+        "Robustness and interpretability in hyperdimensional computing"
+      ]
+    }
+  ]
+}

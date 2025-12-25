@@ -1,0 +1,511 @@
+{
+  "problem_id": 244,
+  "title": "Compute Total Probability using Law of Total Probability",
+  "category": "Probability",
+  "difficulty": "medium",
+  "description": "Implement a function to compute the total probability P(A) using the Law of Total Probability.\n\nThe Law of Total Probability allows us to calculate the probability of an event A by considering all possible scenarios (partition events) that could lead to A.\n\nGiven:\n- `priors`: A dictionary mapping partition event names to their probabilities P(Bi). These events must form a valid partition (mutually exclusive and exhaustive, summing to 1).\n- `conditionals`: A dictionary mapping the same partition event names to the conditional probability P(A|Bi).\n\nYour function should return P(A), the total probability of event A occurring.\n\n**Practical Context:**\nConsider a factory with multiple production lines. Each line produces a different proportion of total output (priors), and each line has a different defect rate (conditionals). The law of total probability helps us find the overall defect rate across all production.\n\nReturn the result rounded to 4 decimal places.",
+  "example": {
+    "input": "priors = {'B1': 0.3, 'B2': 0.7}, conditionals = {'B1': 0.2, 'B2': 0.5}",
+    "output": "0.41",
+    "reasoning": "Using the Law of Total Probability: P(A) = P(A|B1)*P(B1) + P(A|B2)*P(B2) = 0.2*0.3 + 0.5*0.7 = 0.06 + 0.35 = 0.41"
+  },
+  "starter_code": "def law_of_total_probability(priors: dict, conditionals: dict) -> float:\n    \"\"\"\n    Compute P(A) using the Law of Total Probability.\n    \n    Args:\n        priors: Dictionary mapping partition event names to P(Bi)\n        conditionals: Dictionary mapping partition event names to P(A|Bi)\n    \n    Returns:\n        float: The total probability P(A), rounded to 4 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Partitions of Sample Space",
+      "relation_to_problem": "The Law of Total Probability requires that partition events B₁, B₂, ..., Bₙ be mutually exclusive and exhaustive. This sub-quest teaches how to validate these conditions, which is essential for correctly applying the law.",
+      "prerequisites": [
+        "Basic set theory",
+        "Probability axioms",
+        "Sample space concepts"
+      ],
+      "learning_objectives": [
+        "Define mutually exclusive and exhaustive events formally",
+        "Verify that a collection of events forms a valid partition",
+        "Understand why partition probabilities must sum to 1",
+        "Implement validation logic for partition conditions"
+      ],
+      "math_content": {
+        "definition": "A collection of events $B_1, B_2, \\ldots, B_n$ forms a **partition** of the sample space $\\Omega$ if and only if: (1) **Mutually Exclusive**: $B_i \\cap B_j = \\emptyset$ for all $i \\neq j$, meaning no two events can occur simultaneously; (2) **Exhaustive**: $\\bigcup_{i=1}^{n} B_i = \\Omega$, meaning the union of all events covers the entire sample space; (3) **Non-empty**: $P(B_i) > 0$ for all $i$ (each event is possible).",
+        "notation": "$\\Omega$ = sample space; $B_i$ = partition event $i$; $\\cap$ = intersection (AND); $\\cup$ = union (OR); $\\emptyset$ = empty set; $P(B_i)$ = probability of event $B_i$",
+        "theorem": "**Partition Probability Theorem**: If $B_1, B_2, \\ldots, B_n$ form a partition of $\\Omega$, then $\\sum_{i=1}^{n} P(B_i) = 1$.",
+        "proof_sketch": "Since the events are exhaustive, $\\bigcup_{i=1}^{n} B_i = \\Omega$, and by the probability axiom $P(\\Omega) = 1$. Since the events are mutually exclusive, by the addition rule for disjoint events: $P(\\bigcup_{i=1}^{n} B_i) = \\sum_{i=1}^{n} P(B_i)$. Therefore, $\\sum_{i=1}^{n} P(B_i) = P(\\Omega) = 1$.",
+        "examples": [
+          "**Valid Partition**: Rolling a die: $B_1 = \\{1,2\\}$, $B_2 = \\{3,4\\}$, $B_3 = \\{5,6\\}$ with $P(B_1) = P(B_2) = P(B_3) = 1/3$. These are mutually exclusive (no overlap), exhaustive (cover all outcomes), and sum to 1.",
+          "**Invalid Partition**: $B_1 = \\{1,2,3\\}$, $B_2 = \\{3,4,5\\}$ are NOT mutually exclusive since $B_1 \\cap B_2 = \\{3\\} \\neq \\emptyset$.",
+          "**Invalid Partition**: $B_1 = \\{1,2\\}$, $B_2 = \\{3,4\\}$ with probabilities 0.4 and 0.5 are NOT exhaustive since they sum to 0.9 ≠ 1."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Partition Sum Property",
+          "latex": "$\\sum_{i=1}^{n} P(B_i) = 1$",
+          "description": "The probabilities of all partition events must sum to exactly 1. Use this to validate that the priors dictionary represents a valid partition."
+        },
+        {
+          "name": "Mutual Exclusivity Condition",
+          "latex": "$B_i \\cap B_j = \\emptyset \\text{ for all } i \\neq j$",
+          "description": "Events cannot overlap. In our implementation with dictionaries, distinct keys automatically ensure mutual exclusivity."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that validates whether a given dictionary of probabilities forms a valid partition. The function should check: (1) all probabilities are between 0 and 1, (2) the sum of all probabilities equals 1 (within a tolerance of 1e-9 for floating-point precision), and (3) all probabilities are positive (non-zero). Return True if valid, False otherwise.",
+        "function_signature": "def validate_partition(priors: dict) -> bool:",
+        "starter_code": "def validate_partition(priors: dict) -> bool:\n    \"\"\"\n    Validate that a dictionary of probabilities forms a valid partition.\n    \n    Args:\n        priors: Dictionary mapping event names to their probabilities\n    \n    Returns:\n        bool: True if valid partition, False otherwise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "validate_partition({'B1': 0.3, 'B2': 0.7})",
+            "expected": "True",
+            "explanation": "Probabilities are positive, in [0,1], and sum to 1.0 exactly."
+          },
+          {
+            "input": "validate_partition({'B1': 0.25, 'B2': 0.35, 'B3': 0.40})",
+            "expected": "True",
+            "explanation": "Three partition events with probabilities summing to 1.0."
+          },
+          {
+            "input": "validate_partition({'B1': 0.3, 'B2': 0.6})",
+            "expected": "False",
+            "explanation": "Sum is 0.9, not 1.0, so the partition is not exhaustive."
+          },
+          {
+            "input": "validate_partition({'B1': -0.2, 'B2': 1.2})",
+            "expected": "False",
+            "explanation": "B1 is negative (invalid probability) and B2 exceeds 1."
+          },
+          {
+            "input": "validate_partition({'B1': 0.0, 'B2': 1.0})",
+            "expected": "False",
+            "explanation": "B1 has zero probability, which violates the non-empty partition element requirement."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check for floating-point precision errors when summing probabilities (use abs(sum - 1.0) < 1e-9 instead of exact equality)",
+        "Allowing zero probabilities, which create degenerate partition elements",
+        "Not validating that all probabilities are in the valid range [0, 1]",
+        "Assuming an empty dictionary is a valid partition (it's not)"
+      ],
+      "hint": "Use Python's sum() function to add all values in the dictionary, then check if the absolute difference from 1.0 is smaller than a small tolerance value.",
+      "references": [
+        "Probability axioms (Kolmogorov axioms)",
+        "Set partitions in combinatorics",
+        "Floating-point arithmetic precision"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Conditional Probability and Its Properties",
+      "relation_to_problem": "The Law of Total Probability uses conditional probabilities P(A|Bᵢ) as a core component. Understanding conditional probability is essential for computing each term in the sum.",
+      "prerequisites": [
+        "Basic probability",
+        "Set intersection",
+        "Division of probabilities"
+      ],
+      "learning_objectives": [
+        "Define conditional probability formally using the ratio definition",
+        "Understand the interpretation of P(A|B) as 'probability of A given B has occurred'",
+        "Recognize that conditional probabilities must satisfy probability axioms",
+        "Implement validation for conditional probability dictionaries"
+      ],
+      "math_content": {
+        "definition": "The **conditional probability** of event $A$ given event $B$ has occurred is defined as: $$P(A|B) = \\frac{P(A \\cap B)}{P(B)}$$ provided that $P(B) > 0$. This represents the probability that $A$ occurs in the reduced sample space where $B$ is known to have occurred.",
+        "notation": "$P(A|B)$ = probability of $A$ given $B$; $P(A \\cap B)$ = probability of both $A$ and $B$ occurring; $P(B)$ = probability of $B$ (the conditioning event)",
+        "theorem": "**Properties of Conditional Probability**: For fixed conditioning event $B$ with $P(B) > 0$: (1) $0 \\leq P(A|B) \\leq 1$ for any event $A$; (2) $P(\\Omega|B) = 1$; (3) If $A_1, A_2, \\ldots$ are mutually exclusive, then $P(\\bigcup_{i} A_i | B) = \\sum_{i} P(A_i|B)$.",
+        "proof_sketch": "Property (1): Since $A \\cap B \\subseteq B$, we have $P(A \\cap B) \\leq P(B)$, thus $P(A|B) = \\frac{P(A \\cap B)}{P(B)} \\leq 1$. Property (2): $P(\\Omega|B) = \\frac{P(\\Omega \\cap B)}{P(B)} = \\frac{P(B)}{P(B)} = 1$. Property (3) follows from the addition rule applied to the numerator.",
+        "examples": [
+          "**Manufacturing Example**: If a product comes from Line 1 (event $B_1$) which produces 30% of all products, and 10% of Line 1's products are defective, then $P(\\text{defect}|B_1) = 0.10$. This is the conditional probability of a defect given the product came from Line 1.",
+          "**Dice Example**: Let $A$ = 'roll is even' = {2,4,6}, $B$ = 'roll is less than 5' = {1,2,3,4}. Then $A \\cap B = \\{2,4\\}$, so $P(A|B) = \\frac{P(A \\cap B)}{P(B)} = \\frac{2/6}{4/6} = \\frac{1}{2}$.",
+          "**Medical Testing**: If $P(\\text{positive test}|\\text{disease}) = 0.95$, this means 95% of people with the disease test positive."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Conditional Probability Definition",
+          "latex": "$P(A|B) = \\frac{P(A \\cap B)}{P(B)}$, $P(B) > 0$",
+          "description": "The fundamental definition. In the Law of Total Probability, we're given P(A|Bᵢ) directly for each partition element."
+        },
+        {
+          "name": "Multiplication Rule",
+          "latex": "$P(A \\cap B) = P(A|B) \\cdot P(B)$",
+          "description": "Rearrangement of the conditional probability definition. This is the form used in each term of the Law of Total Probability."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that validates whether a dictionary of conditional probabilities is valid. Each value in the dictionary should represent P(A|Bᵢ) for some event A and partition element Bᵢ. Check that: (1) all conditional probabilities are between 0 and 1 inclusive, (2) the dictionary is non-empty, and (3) the keys match between the conditionals dictionary and a given priors dictionary (ensuring we have conditional probabilities for each partition element).",
+        "function_signature": "def validate_conditionals(priors: dict, conditionals: dict) -> bool:",
+        "starter_code": "def validate_conditionals(priors: dict, conditionals: dict) -> bool:\n    \"\"\"\n    Validate that conditional probabilities are valid and aligned with priors.\n    \n    Args:\n        priors: Dictionary mapping partition event names to P(Bi)\n        conditionals: Dictionary mapping partition event names to P(A|Bi)\n    \n    Returns:\n        bool: True if valid conditional probabilities, False otherwise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "validate_conditionals({'B1': 0.3, 'B2': 0.7}, {'B1': 0.2, 'B2': 0.5})",
+            "expected": "True",
+            "explanation": "Both dictionaries have matching keys, and all conditional probabilities are in [0, 1]."
+          },
+          {
+            "input": "validate_conditionals({'B1': 0.5, 'B2': 0.5}, {'B1': 1.0, 'B2': 0.0})",
+            "expected": "True",
+            "explanation": "Conditional probabilities of 0 and 1 are valid (boundary cases)."
+          },
+          {
+            "input": "validate_conditionals({'B1': 0.4, 'B2': 0.6}, {'B1': 0.3, 'B3': 0.7})",
+            "expected": "False",
+            "explanation": "Keys don't match: priors has 'B2' but conditionals has 'B3' instead."
+          },
+          {
+            "input": "validate_conditionals({'B1': 0.3, 'B2': 0.7}, {'B1': -0.1, 'B2': 0.5})",
+            "expected": "False",
+            "explanation": "B1's conditional probability is negative, which is impossible."
+          },
+          {
+            "input": "validate_conditionals({'B1': 0.5, 'B2': 0.5}, {'B1': 0.3})",
+            "expected": "False",
+            "explanation": "Missing conditional probability for B2."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing P(A|B) with P(B|A) - these are generally different values (Bayes' theorem relates them)",
+        "Thinking conditional probabilities must sum to 1 across partition elements - they don't! Each P(A|Bᵢ) is independent",
+        "Forgetting that P(A|B) can be 0 or 1 (boundary cases are valid)",
+        "Not checking that the dictionary keys align between priors and conditionals"
+      ],
+      "hint": "Use set(priors.keys()) == set(conditionals.keys()) to check if both dictionaries have exactly the same keys. Then iterate through values to validate the range.",
+      "references": [
+        "Conditional probability definition",
+        "Multiplication rule of probability",
+        "Reduced sample space interpretation"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Computing Products of Probabilities",
+      "relation_to_problem": "Each term in the Law of Total Probability formula is a product P(A|Bᵢ)·P(Bᵢ). This sub-quest focuses on computing these individual products correctly, which are the building blocks of the final sum.",
+      "prerequisites": [
+        "Probability multiplication",
+        "Dictionary operations",
+        "Floating-point arithmetic"
+      ],
+      "learning_objectives": [
+        "Understand the multiplication rule P(A ∩ Bᵢ) = P(A|Bᵢ)·P(Bᵢ)",
+        "Compute products of probabilities with proper numerical precision",
+        "Create a dictionary or list of products for all partition elements",
+        "Recognize this step as computing P(A ∩ Bᵢ) for each partition element"
+      ],
+      "math_content": {
+        "definition": "The **joint probability** $P(A \\cap B_i)$ represents the probability that both events $A$ and $B_i$ occur simultaneously. By the multiplication rule derived from conditional probability: $$P(A \\cap B_i) = P(A|B_i) \\cdot P(B_i)$$ This expresses the joint probability as the product of the prior probability $P(B_i)$ and the conditional probability $P(A|B_i)$.",
+        "notation": "$P(A \\cap B_i)$ = joint probability of $A$ and $B_i$; $\\cdot$ denotes multiplication; $P(A|B_i)$ = conditional probability of $A$ given $B_i$; $P(B_i)$ = marginal (prior) probability of $B_i$",
+        "theorem": "**Multiplication Rule for Probabilities**: For any events $A$ and $B$ with $P(B) > 0$: $$P(A \\cap B) = P(A|B) \\cdot P(B) = P(B|A) \\cdot P(A)$$ This rule is symmetric and derives directly from the definition of conditional probability.",
+        "proof_sketch": "From the definition $P(A|B) = \\frac{P(A \\cap B)}{P(B)}$, multiply both sides by $P(B)$ to obtain $P(A \\cap B) = P(A|B) \\cdot P(B)$. The symmetric form follows from applying the same logic to $P(B|A)$.",
+        "examples": [
+          "**Factory Example**: If Line 1 produces 30% of products ($P(B_1) = 0.30$) and 10% of Line 1's products are defective ($P(\\text{defect}|B_1) = 0.10$), then the probability a random product is both from Line 1 AND defective is: $P(\\text{defect} \\cap B_1) = 0.10 \\times 0.30 = 0.03$ or 3%.",
+          "**Exam Example**: Student passes first exam with probability 0.3 ($P(G_1) = 0.3$). Given they pass the first, probability of passing second is 0.6 ($P(G_2|G_1) = 0.6$). Probability of passing both exams: $P(G_1 \\cap G_2) = 0.6 \\times 0.3 = 0.18$ or 18%.",
+          "**Numerical Precision**: When computing $0.2 \\times 0.3 = 0.06$, ensure the result maintains sufficient decimal places for later summation."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Probability Product for Partition Element",
+          "latex": "$P(A \\cap B_i) = P(A|B_i) \\cdot P(B_i)$",
+          "description": "Compute this product for each partition element Bᵢ. These products will be summed in the next step to get P(A)."
+        },
+        {
+          "name": "Product Bounds",
+          "latex": "$0 \\leq P(A \\cap B_i) \\leq \\min(P(A), P(B_i))$",
+          "description": "The joint probability cannot exceed either marginal probability. Use as a sanity check."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the product P(A|Bᵢ)·P(Bᵢ) for each partition element. Given two aligned dictionaries (priors and conditionals with the same keys), return a new dictionary mapping each partition element name to its corresponding product. This represents P(A ∩ Bᵢ) for each partition element.",
+        "function_signature": "def compute_products(priors: dict, conditionals: dict) -> dict:",
+        "starter_code": "def compute_products(priors: dict, conditionals: dict) -> dict:\n    \"\"\"\n    Compute P(A ∩ Bi) = P(A|Bi) * P(Bi) for each partition element.\n    \n    Args:\n        priors: Dictionary mapping partition event names to P(Bi)\n        conditionals: Dictionary mapping partition event names to P(A|Bi)\n    \n    Returns:\n        dict: Dictionary mapping partition event names to P(A ∩ Bi)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_products({'B1': 0.3, 'B2': 0.7}, {'B1': 0.2, 'B2': 0.5})",
+            "expected": "{'B1': 0.06, 'B2': 0.35}",
+            "explanation": "B1: 0.2 × 0.3 = 0.06; B2: 0.5 × 0.7 = 0.35. These are the joint probabilities P(A ∩ B₁) and P(A ∩ B₂)."
+          },
+          {
+            "input": "compute_products({'B1': 0.25, 'B2': 0.35, 'B3': 0.40}, {'B1': 0.10, 'B2': 0.60, 'B3': 0.30})",
+            "expected": "{'B1': 0.025, 'B2': 0.21, 'B3': 0.12}",
+            "explanation": "Three partition elements: 0.25×0.10=0.025, 0.35×0.60=0.21, 0.40×0.30=0.12."
+          },
+          {
+            "input": "compute_products({'B1': 1.0}, {'B1': 0.5})",
+            "expected": "{'B1': 0.5}",
+            "explanation": "Single partition element (trivial partition). Result: 1.0 × 0.5 = 0.5."
+          },
+          {
+            "input": "compute_products({'B1': 0.6, 'B2': 0.4}, {'B1': 0.0, 'B2': 1.0})",
+            "expected": "{'B1': 0.0, 'B2': 0.4}",
+            "explanation": "Boundary cases: 0.6×0.0=0.0 (event A impossible given B1), 0.4×1.0=0.4 (event A certain given B2)."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Dividing instead of multiplying - remember P(A ∩ Bi) = P(A|Bi) × P(Bi), not P(A|Bi) / P(Bi)",
+        "Swapping the order of priors and conditionals - while multiplication is commutative, maintaining clarity about which is which helps prevent conceptual errors",
+        "Forgetting to handle all keys in the dictionary - use dictionary comprehension or ensure iteration covers all elements",
+        "Losing precision by rounding too early - keep full floating-point precision until the final result"
+      ],
+      "hint": "Use a dictionary comprehension like {key: conditionals[key] * priors[key] for key in priors} to compute all products efficiently in one line.",
+      "references": [
+        "Joint probability distributions",
+        "Multiplication rule for dependent events",
+        "Dictionary comprehensions in Python"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Summation Over Partition Elements",
+      "relation_to_problem": "The Law of Total Probability requires summing all products P(A|Bᵢ)·P(Bᵢ) across the partition. This sub-quest teaches how to correctly aggregate the products computed in the previous step.",
+      "prerequisites": [
+        "Summation notation",
+        "Series convergence",
+        "Numerical summation"
+      ],
+      "learning_objectives": [
+        "Understand the summation operator ∑ in probability contexts",
+        "Compute the sum of products accurately with floating-point arithmetic",
+        "Recognize this sum as the marginal probability P(A)",
+        "Handle edge cases in summation (empty sums, single terms)"
+      ],
+      "math_content": {
+        "definition": "The **summation** over partition elements is the core of the Law of Total Probability. Given products $P(A \\cap B_i) = P(A|B_i) \\cdot P(B_i)$ for each partition element $B_i$, the **marginal probability** of event $A$ is: $$P(A) = \\sum_{i=1}^{n} P(A \\cap B_i) = \\sum_{i=1}^{n} P(A|B_i) \\cdot P(B_i)$$ This sum aggregates the probability of $A$ occurring through all possible partition paths.",
+        "notation": "$\\sum_{i=1}^{n}$ = summation from $i=1$ to $i=n$; $n$ = number of partition elements; $P(A)$ = marginal (total) probability of event $A$ (the final result)",
+        "theorem": "**Law of Total Probability (Full Statement)**: If $\\{B_1, B_2, \\ldots, B_n\\}$ forms a partition of the sample space $\\Omega$ (mutually exclusive and exhaustive with $\\sum_{i=1}^{n} P(B_i) = 1$), then for any event $A$: $$P(A) = \\sum_{i=1}^{n} P(A|B_i) \\cdot P(B_i)$$ This theorem decomposes the marginal probability into a weighted average of conditional probabilities, weighted by the partition probabilities.",
+        "proof_sketch": "Since $\\{B_1, \\ldots, B_n\\}$ partitions $\\Omega$, we have $A = A \\cap \\Omega = A \\cap (\\bigcup_{i=1}^{n} B_i) = \\bigcup_{i=1}^{n} (A \\cap B_i)$. The sets $A \\cap B_i$ are mutually exclusive (since the $B_i$ are), so by the addition rule: $P(A) = \\sum_{i=1}^{n} P(A \\cap B_i)$. Applying the multiplication rule to each term gives $P(A) = \\sum_{i=1}^{n} P(A|B_i) \\cdot P(B_i)$.",
+        "examples": [
+          "**Manufacturing Example**: Given products {B1: 0.06, B2: 0.35} from previous step, the total defect rate is: $P(\\text{defect}) = 0.06 + 0.35 = 0.41$ or 41%.",
+          "**Three-Line Factory**: Products {B1: 0.025, B2: 0.21, B3: 0.12} sum to: $P(\\text{defect}) = 0.025 + 0.21 + 0.12 = 0.355$ or 35.5%.",
+          "**Weighted Average Interpretation**: If $P(B_1)=0.3, P(B_2)=0.7$ and $P(A|B_1)=0.2, P(A|B_2)=0.5$, then $P(A) = 0.3(0.2) + 0.7(0.5) = 0.41$ is a weighted average of 0.2 and 0.5, weighted by partition probabilities."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Law of Total Probability",
+          "latex": "$P(A) = \\sum_{i=1}^{n} P(A|B_i) \\cdot P(B_i)$",
+          "description": "The complete formula. Sum all products computed in the previous step to obtain the final marginal probability."
+        },
+        {
+          "name": "Summation Bounds",
+          "latex": "$\\min_i P(A|B_i) \\leq P(A) \\leq \\max_i P(A|B_i)$",
+          "description": "The total probability P(A) lies between the minimum and maximum conditional probabilities. Use as a sanity check."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the sum of all values in a dictionary representing products P(A ∩ Bᵢ). Given a dictionary mapping partition element names to their corresponding products, return the sum of all values. This sum represents the total probability P(A) by the Law of Total Probability.",
+        "function_signature": "def sum_products(products: dict) -> float:",
+        "starter_code": "def sum_products(products: dict) -> float:\n    \"\"\"\n    Compute the sum of all products: P(A) = sum of P(A ∩ Bi) for all i.\n    \n    Args:\n        products: Dictionary mapping partition event names to P(A ∩ Bi)\n    \n    Returns:\n        float: The total probability P(A)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "sum_products({'B1': 0.06, 'B2': 0.35})",
+            "expected": "0.41",
+            "explanation": "Sum of two products: 0.06 + 0.35 = 0.41. This is P(A) computed via the Law of Total Probability."
+          },
+          {
+            "input": "sum_products({'B1': 0.025, 'B2': 0.21, 'B3': 0.12})",
+            "expected": "0.355",
+            "explanation": "Sum of three products: 0.025 + 0.21 + 0.12 = 0.355."
+          },
+          {
+            "input": "sum_products({'B1': 0.5})",
+            "expected": "0.5",
+            "explanation": "Single partition element (trivial case). The sum is just 0.5."
+          },
+          {
+            "input": "sum_products({'B1': 0.0, 'B2': 0.4})",
+            "expected": "0.4",
+            "explanation": "One product is 0 (event A impossible given B1), the other is 0.4. Total: 0.0 + 0.4 = 0.4."
+          },
+          {
+            "input": "sum_products({'B1': 0.15, 'B2': 0.25, 'B3': 0.30, 'B4': 0.10})",
+            "expected": "0.8",
+            "explanation": "Four partition elements: 0.15 + 0.25 + 0.30 + 0.10 = 0.8."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using max() or min() instead of sum() - we need the total, not an extreme value",
+        "Forgetting to handle empty dictionaries - should return 0.0 for an empty sum",
+        "Averaging instead of summing - don't divide by the number of elements",
+        "Rounding intermediate products before summing - maintain full precision until final result"
+      ],
+      "hint": "Python's built-in sum() function works on dictionary values: sum(products.values()) gives the total of all values.",
+      "references": [
+        "Summation notation and sigma algebra",
+        "Marginal probability from joint distributions",
+        "Weighted averages in probability"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Rounding and Numerical Precision in Probability",
+      "relation_to_problem": "The problem requires the result to be rounded to 4 decimal places. This sub-quest teaches proper rounding techniques and when to apply them to maintain numerical accuracy while presenting results in the required format.",
+      "prerequisites": [
+        "Floating-point representation",
+        "Rounding rules",
+        "Numerical precision"
+      ],
+      "learning_objectives": [
+        "Understand IEEE 754 floating-point representation and its limitations",
+        "Apply proper rounding rules to probability calculations",
+        "Recognize when to round (at the end) vs. maintain full precision (during computation)",
+        "Implement rounding to a specified number of decimal places"
+      ],
+      "math_content": {
+        "definition": "**Rounding** is the process of approximating a number to a specified precision. For a number $x$ and desired decimal places $d$, the **rounded value** $r(x, d)$ is the value with $d$ decimal places that minimizes $|x - r(x,d)|$. The standard **round-half-to-even** (banker's rounding) rule is used to break ties: if the digit at position $d+1$ is exactly 5 (with no further non-zero digits), round to the nearest even digit.",
+        "notation": "$r(x, d)$ = $x$ rounded to $d$ decimal places; $\\epsilon_{mach}$ = machine epsilon (smallest distinguishable difference); $\\delta$ = rounding error = $|x - r(x,d)|$",
+        "theorem": "**Rounding Error Bound**: For a number $x$ rounded to $d$ decimal places, the absolute rounding error satisfies: $$|x - r(x,d)| \\leq 0.5 \\times 10^{-d}$$ For example, rounding to 4 decimal places introduces a maximum error of $0.5 \\times 10^{-4} = 0.00005$.",
+        "proof_sketch": "The rounding process selects the nearest value at precision $d$. Adjacent values at this precision differ by $10^{-d}$. The maximum distance from any value to the nearest representable value is half this difference: $\\frac{10^{-d}}{2} = 0.5 \\times 10^{-d}$.",
+        "examples": [
+          "**Example 1**: $x = 0.41327$, rounded to 4 decimal places: $r(0.41327, 4) = 0.4133$ (fifth decimal is 7 ≥ 5, so round up).",
+          "**Example 2**: $x = 0.355$, rounded to 2 decimal places: $r(0.355, 2) = 0.36$ (using round-half-up) or $r(0.355, 2) = 0.36$ (using round-half-to-even, as 6 is even).",
+          "**Example 3**: The probability 0.41000000000000003 (due to floating-point error) should round to 0.4100 at 4 decimal places.",
+          "**Accumulation of Error**: If you round $0.025$ to $0.03$ and $0.355$ to $0.36$, then sum to get $0.39$, this differs from summing first ($0.025 + 0.355 = 0.38$) then rounding ($0.38$). Always compute with full precision first!"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Python Round Function",
+          "latex": "$r(x, d) = \\text{round}(x, d)$",
+          "description": "In Python, round(x, d) rounds float x to d decimal places using round-half-to-even."
+        },
+        {
+          "name": "Maximum Rounding Error",
+          "latex": "$|\\delta| \\leq 0.5 \\times 10^{-d}$",
+          "description": "The maximum error introduced by rounding to d decimal places. For d=4, max error is 0.00005."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a probability value (float) and rounds it to a specified number of decimal places. The function should handle edge cases like negative zero, very small numbers, and numbers that are already at the desired precision. Use Python's built-in round() function, which implements round-half-to-even.",
+        "function_signature": "def round_probability(value: float, decimals: int) -> float:",
+        "starter_code": "def round_probability(value: float, decimals: int) -> float:\n    \"\"\"\n    Round a probability value to specified decimal places.\n    \n    Args:\n        value: The probability value to round\n        decimals: Number of decimal places to round to\n    \n    Returns:\n        float: The rounded probability value\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "round_probability(0.41327, 4)",
+            "expected": "0.4133",
+            "explanation": "Fifth decimal is 7 ≥ 5, so round up the fourth decimal from 2 to 3."
+          },
+          {
+            "input": "round_probability(0.355, 2)",
+            "expected": "0.36",
+            "explanation": "Third decimal is 5. Using round-half-to-even, 5 is even so round up to 0.36 (Python 3 behavior)."
+          },
+          {
+            "input": "round_probability(0.41, 4)",
+            "expected": "0.41",
+            "explanation": "Value already has fewer than 4 decimal places. Result is 0.4100 represented as 0.41."
+          },
+          {
+            "input": "round_probability(0.999999, 4)",
+            "expected": "1.0",
+            "explanation": "Rounding to 4 places gives 1.0000, displayed as 1.0."
+          },
+          {
+            "input": "round_probability(0.00003, 4)",
+            "expected": "0.0",
+            "explanation": "Value is smaller than 0.00005, so rounds to 0.0000 (displayed as 0.0)."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Rounding intermediate results during computation - this accumulates errors. Only round the final answer!",
+        "Using truncation instead of rounding - truncation always rounds toward zero, which introduces bias",
+        "Forgetting that round() returns a float, not a string - 0.4100 is displayed as 0.41",
+        "Not understanding round-half-to-even behavior - Python 3's round(0.5, 0) gives 0, not 1"
+      ],
+      "hint": "Python's round(value, decimals) does exactly what's needed. Just call it with the appropriate arguments.",
+      "references": [
+        "IEEE 754 floating-point arithmetic",
+        "Numerical stability in scientific computing",
+        "Round-half-to-even (banker's rounding)"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Integrating Components: The Complete Law of Total Probability",
+      "relation_to_problem": "This final sub-quest combines all previous concepts to implement the complete Law of Total Probability. You'll validate inputs, compute products, sum them, and round the result - integrating every skill learned in previous sub-quests.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Function composition",
+        "Error handling"
+      ],
+      "learning_objectives": [
+        "Integrate validation, computation, and rounding into a complete solution",
+        "Apply the Law of Total Probability formula end-to-end",
+        "Understand the flow: validate → compute products → sum → round",
+        "Recognize this pattern as applicable to many probability problems"
+      ],
+      "math_content": {
+        "definition": "The **complete application** of the Law of Total Probability involves: (1) Verify that $\\{B_1, \\ldots, B_n\\}$ forms a valid partition ($\\sum P(B_i) = 1$, mutually exclusive, exhaustive); (2) For each partition element $B_i$, obtain the conditional probability $P(A|B_i)$; (3) Compute each product $P(A|B_i) \\cdot P(B_i)$; (4) Sum all products to get $P(A) = \\sum_{i=1}^{n} P(A|B_i) \\cdot P(B_i)$; (5) Round the result to the desired precision.",
+        "notation": "$\\{B_1, \\ldots, B_n\\}$ = partition of sample space; $P(B_i)$ = prior probabilities (given in 'priors'); $P(A|B_i)$ = conditional probabilities (given in 'conditionals'); $P(A)$ = marginal probability (output)",
+        "theorem": "**Law of Total Probability (Applied Form)**: Given a valid partition $\\{B_1, \\ldots, B_n\\}$ with known priors $P(B_i)$ and conditionals $P(A|B_i)$, the marginal probability of event $A$ is computed as: $$P(A) = \\sum_{i=1}^{n} P(A|B_i) \\cdot P(B_i)$$ This value represents the total probability of $A$ across all possible partition scenarios.",
+        "proof_sketch": "This is the synthesis of previous results: (1) Partition ensures events $B_i$ are mutually exclusive and exhaustive (Step 1); (2) Conditional probabilities are well-defined (Step 2); (3) Products $P(A|B_i) \\cdot P(B_i) = P(A \\cap B_i)$ by multiplication rule (Step 3); (4) Sum gives $P(A) = \\sum P(A \\cap B_i)$ by addition rule for disjoint events (Step 4); (5) Round for presentation (Step 5).",
+        "examples": [
+          "**Complete Example 1**: priors = {'B1': 0.3, 'B2': 0.7}, conditionals = {'B1': 0.2, 'B2': 0.5}. Validate: 0.3 + 0.7 = 1 ✓, all in [0,1] ✓. Products: {B1: 0.2×0.3=0.06, B2: 0.5×0.7=0.35}. Sum: 0.06 + 0.35 = 0.41. Round to 4 places: 0.4100 → 0.41.",
+          "**Complete Example 2**: priors = {'B1': 0.25, 'B2': 0.35, 'B3': 0.40}, conditionals = {'B1': 0.10, 'B2': 0.60, 'B3': 0.30}. Validate: 0.25+0.35+0.40=1 ✓. Products: {B1: 0.025, B2: 0.21, B3: 0.12}. Sum: 0.025+0.21+0.12=0.355. Round to 4 places: 0.3550 → 0.355.",
+          "**Connection to Real World**: This is exactly how we compute overall defect rates in manufacturing, disease prevalence across populations, or any marginal probability from conditional data."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Law of Total Probability Algorithm",
+          "latex": "$P(A) = \\text{round}\\left(\\sum_{i=1}^{n} P(A|B_i) \\cdot P(B_i), 4\\right)$",
+          "description": "The full formula with rounding. This is what your final implementation should compute."
+        },
+        {
+          "name": "Validation Conditions",
+          "latex": "$\\sum_{i=1}^{n} P(B_i) = 1 \\land \\forall i: 0 < P(B_i) \\leq 1 \\land 0 \\leq P(A|B_i) \\leq 1$",
+          "description": "All conditions that must be satisfied before applying the law. Use logical AND (∧) to combine conditions."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified version of the Law of Total Probability that assumes inputs are already validated. Given two dictionaries (priors and conditionals) with matching keys, compute P(A) = sum of P(A|Bi)·P(Bi) for all partition elements, and return the result rounded to 2 decimal places (simplified from 4 for this exercise). This integrates the product computation (Step 3), summation (Step 4), and rounding (Step 5) without the full validation.",
+        "function_signature": "def simplified_total_probability(priors: dict, conditionals: dict) -> float:",
+        "starter_code": "def simplified_total_probability(priors: dict, conditionals: dict) -> float:\n    \"\"\"\n    Compute P(A) using Law of Total Probability (simplified, assumes valid inputs).\n    \n    Args:\n        priors: Dictionary mapping partition event names to P(Bi)\n        conditionals: Dictionary mapping partition event names to P(A|Bi)\n    \n    Returns:\n        float: P(A) rounded to 2 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "simplified_total_probability({'B1': 0.3, 'B2': 0.7}, {'B1': 0.2, 'B2': 0.5})",
+            "expected": "0.41",
+            "explanation": "Products: 0.2×0.3=0.06, 0.5×0.7=0.35. Sum: 0.41. Rounded to 2 places: 0.41."
+          },
+          {
+            "input": "simplified_total_probability({'B1': 0.25, 'B2': 0.35, 'B3': 0.40}, {'B1': 0.10, 'B2': 0.60, 'B3': 0.30})",
+            "expected": "0.36",
+            "explanation": "Products: 0.025, 0.21, 0.12. Sum: 0.355. Rounded to 2 places: 0.36 (round half to even)."
+          },
+          {
+            "input": "simplified_total_probability({'B1': 1.0}, {'B1': 0.5})",
+            "expected": "0.5",
+            "explanation": "Single partition element: 0.5×1.0=0.5. Rounded to 2 places: 0.50 → 0.5."
+          },
+          {
+            "input": "simplified_total_probability({'B1': 0.5, 'B2': 0.5}, {'B1': 0.0, 'B2': 1.0})",
+            "expected": "0.5",
+            "explanation": "Products: 0.0×0.5=0.0, 1.0×0.5=0.5. Sum: 0.5. Rounded: 0.5."
+          },
+          {
+            "input": "simplified_total_probability({'B1': 0.33, 'B2': 0.67}, {'B1': 0.25, 'B2': 0.75})",
+            "expected": "0.59",
+            "explanation": "Products: 0.33×0.25=0.0825, 0.67×0.75=0.5025. Sum: 0.585. Rounded to 2 places: 0.59 (note: priors don't sum to exactly 1, but we assume valid inputs for this simplified version)."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing products and sums in separate loops instead of using efficient Python constructs like dictionary comprehensions or sum()",
+        "Rounding intermediate products instead of only the final sum",
+        "Forgetting to iterate over all partition elements - missing some terms in the sum",
+        "Hardcoding specific keys like 'B1', 'B2' instead of writing general code that works for any partition size",
+        "Returning the sum without rounding, or rounding to the wrong precision"
+      ],
+      "hint": "Combine concepts: use a dictionary comprehension or loop to compute products for all keys, use sum() to aggregate them, then use round() on the final result. One elegant solution: round(sum(conditionals[k] * priors[k] for k in priors), 2).",
+      "references": [
+        "Complete Law of Total Probability derivation",
+        "Marginal probability from joint distributions",
+        "Function composition and modular programming",
+        "Integration of validation and computation logic"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,555 @@
+{
+  "problem_id": 7,
+  "title": "Matrix Transformation ",
+  "category": "Linear Algebra",
+  "difficulty": "medium",
+  "description": "Write a Python function that transforms a given matrix A using the operation  $T^{-1} A S$, where T and S are invertible matrices. The function should first validate if the matrices T and S are invertible, and then perform the transformation. In cases where there is no solution return -1",
+  "example": {
+    "input": "A = [[1, 2], [3, 4]], T = [[2, 0], [0, 2]], S = [[1, 1], [0, 1]]",
+    "output": "[[0.5,1.5],[1.5,3.5]]",
+    "reasoning": "The matrices T and S are used to transform matrix A by computing $T^{-1}AS$."
+  },
+  "starter_code": "import numpy as np\n\ndef transform_matrix(A: list[list[int|float]], T: list[list[int|float]], S: list[list[int|float]]) -> list[list[int|float]]:\n\treturn transformed_matrix",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Matrix Determinants and Invertibility Conditions",
+      "relation_to_problem": "The problem requires checking if matrices T and S are invertible before performing the transformation T^(-1)AS. A matrix is invertible if and only if its determinant is non-zero.",
+      "prerequisites": [
+        "Matrix multiplication",
+        "Basic matrix operations",
+        "2×2 and 3×3 matrices"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of matrix determinant",
+        "Learn the relationship between determinant and invertibility",
+        "Compute determinants for 2×2 and n×n matrices",
+        "Apply invertibility tests to validate transformation matrices"
+      ],
+      "math_content": {
+        "definition": "The **determinant** is a scalar function that assigns to each square matrix $A \\in \\mathbb{R}^{n \\times n}$ a real number $\\det(A)$ or $|A|$ that encodes geometric and algebraic properties of the matrix. For a $2 \\times 2$ matrix $A = \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$, the determinant is defined as $\\det(A) = ad - bc$. For larger matrices, the determinant can be computed using Laplace expansion: $\\det(A) = \\sum_{j=1}^{n} (-1)^{i+j} a_{ij} \\det(M_{ij})$ where $M_{ij}$ is the $(i,j)$-minor of $A$.",
+        "notation": "$\\det(A)$ or $|A|$ = determinant of matrix $A$; $M_{ij}$ = minor obtained by deleting row $i$ and column $j$; $C_{ij} = (-1)^{i+j}\\det(M_{ij})$ = cofactor",
+        "theorem": "**Invertibility Theorem**: A square matrix $A \\in \\mathbb{R}^{n \\times n}$ is invertible if and only if $\\det(A) \\neq 0$. If $\\det(A) = 0$, the matrix is called **singular** or **non-invertible**.",
+        "proof_sketch": "The determinant measures the scaling factor of the linear transformation represented by $A$. If $\\det(A) = 0$, the transformation collapses some dimension to zero (maps to a lower-dimensional subspace), making it impossible to uniquely recover the original vector. Conversely, if $\\det(A) \\neq 0$, the transformation preserves dimension and is bijective, hence invertible. The determinant also appears in the denominator of the inverse formula: $A^{-1} = \\frac{1}{\\det(A)} \\text{adj}(A)$, which is undefined when $\\det(A) = 0$.",
+        "examples": [
+          "For $A = \\begin{pmatrix} 2 & 0 \\\\ 0 & 2 \\end{pmatrix}$: $\\det(A) = 2 \\cdot 2 - 0 \\cdot 0 = 4 \\neq 0$, so $A$ is invertible",
+          "For $B = \\begin{pmatrix} 1 & 2 \\\\ 2 & 4 \\end{pmatrix}$: $\\det(B) = 1 \\cdot 4 - 2 \\cdot 2 = 0$, so $B$ is singular (non-invertible)",
+          "For $C = \\begin{pmatrix} 1 & 1 \\\\ 0 & 1 \\end{pmatrix}$: $\\det(C) = 1 \\cdot 1 - 1 \\cdot 0 = 1 \\neq 0$, so $C$ is invertible"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "2×2 Determinant",
+          "latex": "$\\det\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} = ad - bc$",
+          "description": "Direct formula for 2×2 matrices - most efficient for small matrices"
+        },
+        {
+          "name": "Laplace Expansion",
+          "latex": "$\\det(A) = \\sum_{j=1}^{n} (-1)^{i+j} a_{ij} \\det(M_{ij})$",
+          "description": "General recursive method for computing determinants of n×n matrices by expanding along any row or column"
+        },
+        {
+          "name": "Invertibility Condition",
+          "latex": "$A \\text{ is invertible} \\Leftrightarrow \\det(A) \\neq 0$",
+          "description": "Necessary and sufficient condition for matrix invertibility"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that checks whether a given square matrix is invertible by computing its determinant. Return True if the matrix is invertible (determinant is non-zero), False otherwise. Handle both 2×2 and 3×3 matrices. Use a tolerance of 1e-10 for numerical comparisons to account for floating-point precision.",
+        "function_signature": "def is_invertible(matrix: list[list[float]]) -> bool:",
+        "starter_code": "import numpy as np\n\ndef is_invertible(matrix: list[list[float]]) -> bool:\n    # Your code here\n    # Compute the determinant\n    # Check if it's non-zero (use tolerance 1e-10)\n    pass",
+        "test_cases": [
+          {
+            "input": "is_invertible([[2, 0], [0, 2]])",
+            "expected": "True",
+            "explanation": "det = 4 ≠ 0, matrix is invertible (identity scaled by 2)"
+          },
+          {
+            "input": "is_invertible([[1, 2], [2, 4]])",
+            "expected": "False",
+            "explanation": "det = 0, rows are linearly dependent (second row is 2× first row)"
+          },
+          {
+            "input": "is_invertible([[1, 1], [0, 1]])",
+            "expected": "True",
+            "explanation": "det = 1 ≠ 0, upper triangular matrix with non-zero diagonal"
+          },
+          {
+            "input": "is_invertible([[1, 0, 0], [0, 1, 0], [0, 0, 1]])",
+            "expected": "True",
+            "explanation": "det = 1 ≠ 0, identity matrix is always invertible"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check for numerical precision issues - comparing determinants to exactly 0 instead of using a small tolerance (e.g., |det| < 1e-10)",
+        "Confusing singular matrices with zero matrices - a matrix can be non-zero but still have determinant 0",
+        "Incorrectly computing 3×3 determinants by forgetting alternating signs in cofactor expansion",
+        "Assuming rectangular (non-square) matrices can be invertible - only square matrices can have inverses"
+      ],
+      "hint": "Use NumPy's built-in linalg.det() function to compute determinants efficiently. Remember that floating-point arithmetic introduces small errors, so use np.abs(det) < tolerance instead of det == 0.",
+      "references": [
+        "Linear Algebra - Determinants and Matrix Inversion",
+        "Numerical stability in determinant computation",
+        "Geometric interpretation of determinants as volume scaling factors"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Computing Matrix Inverses via Adjugate Method",
+      "relation_to_problem": "To compute T^(-1)AS, we must first find the inverse of matrix T. The adjugate method provides an explicit formula for computing matrix inverses using determinants and cofactors.",
+      "prerequisites": [
+        "Matrix determinants",
+        "Matrix multiplication",
+        "Cofactor computation",
+        "Matrix transpose"
+      ],
+      "learning_objectives": [
+        "Understand the adjugate (adjoint) matrix construction",
+        "Derive and apply the inverse formula A^(-1) = (1/det(A)) × adj(A)",
+        "Compute cofactors and minors systematically",
+        "Verify inverse correctness using AA^(-1) = I"
+      ],
+      "math_content": {
+        "definition": "The **cofactor** $C_{ij}$ of element $a_{ij}$ in matrix $A$ is defined as $C_{ij} = (-1)^{i+j} \\det(M_{ij})$, where $M_{ij}$ is the minor obtained by deleting row $i$ and column $j$ from $A$. The **adjugate matrix** (or classical adjoint) $\\text{adj}(A)$ is the transpose of the cofactor matrix: $\\text{adj}(A) = [C_{ij}]^T$. For a $2 \\times 2$ matrix $A = \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$, the adjugate simplifies to $\\text{adj}(A) = \\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix}$.",
+        "notation": "$A^{-1}$ = inverse of matrix $A$; $\\text{adj}(A)$ = adjugate matrix; $C_{ij}$ = cofactor at position $(i,j)$; $M_{ij}$ = minor at position $(i,j)$; $I$ = identity matrix",
+        "theorem": "**Inverse Formula**: If $A$ is an invertible $n \\times n$ matrix (i.e., $\\det(A) \\neq 0$), then the inverse of $A$ is given by: $$A^{-1} = \\frac{1}{\\det(A)} \\text{adj}(A)$$ This inverse satisfies the fundamental property: $A A^{-1} = A^{-1} A = I$, where $I$ is the $n \\times n$ identity matrix.",
+        "proof_sketch": "The formula follows from the cofactor expansion theorem. When we multiply $A$ by its adjugate matrix, the diagonal entries produce $\\det(A)$ by cofactor expansion, while off-diagonal entries sum to zero due to expansion along a row using cofactors from a different row (producing the determinant of a matrix with repeated rows, which is zero). Thus $A \\cdot \\text{adj}(A) = \\det(A) \\cdot I$. Dividing both sides by $\\det(A)$ (valid since $\\det(A) \\neq 0$) yields $A \\cdot \\frac{1}{\\det(A)}\\text{adj}(A) = I$, establishing the inverse formula.",
+        "examples": [
+          "For $T = \\begin{pmatrix} 2 & 0 \\\\ 0 & 2 \\end{pmatrix}$: $\\det(T) = 4$, $\\text{adj}(T) = \\begin{pmatrix} 2 & 0 \\\\ 0 & 2 \\end{pmatrix}$, so $T^{-1} = \\frac{1}{4}\\begin{pmatrix} 2 & 0 \\\\ 0 & 2 \\end{pmatrix} = \\begin{pmatrix} 0.5 & 0 \\\\ 0 & 0.5 \\end{pmatrix}$",
+          "For $S = \\begin{pmatrix} 1 & 1 \\\\ 0 & 1 \\end{pmatrix}$: $\\det(S) = 1$, $\\text{adj}(S) = \\begin{pmatrix} 1 & -1 \\\\ 0 & 1 \\end{pmatrix}$, so $S^{-1} = \\begin{pmatrix} 1 & -1 \\\\ 0 & 1 \\end{pmatrix}$",
+          "Verification: $S \\cdot S^{-1} = \\begin{pmatrix} 1 & 1 \\\\ 0 & 1 \\end{pmatrix} \\begin{pmatrix} 1 & -1 \\\\ 0 & 1 \\end{pmatrix} = \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix} = I$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "General Inverse Formula",
+          "latex": "$A^{-1} = \\frac{1}{\\det(A)} \\text{adj}(A)$",
+          "description": "Applies to any invertible n×n matrix; requires computing determinant and adjugate"
+        },
+        {
+          "name": "2×2 Inverse Formula",
+          "latex": "$\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}^{-1} = \\frac{1}{ad-bc} \\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix}$",
+          "description": "Direct formula for 2×2 matrices - swap diagonal, negate off-diagonal, divide by determinant"
+        },
+        {
+          "name": "Cofactor Definition",
+          "latex": "$C_{ij} = (-1)^{i+j} \\det(M_{ij})$",
+          "description": "Signed minor used to construct the adjugate matrix; alternating sign pattern"
+        },
+        {
+          "name": "Inverse Verification",
+          "latex": "$A A^{-1} = A^{-1} A = I$",
+          "description": "Fundamental property that confirms correct inverse computation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the inverse of a square matrix using the adjugate method. First check if the matrix is invertible (determinant non-zero). If invertible, compute the adjugate matrix and apply the inverse formula. If not invertible, return -1. Support both 2×2 and 3×3 matrices.",
+        "function_signature": "def compute_matrix_inverse(matrix: list[list[float]]) -> list[list[float]] | int:",
+        "starter_code": "import numpy as np\n\ndef compute_matrix_inverse(matrix: list[list[float]]) -> list[list[float]] | int:\n    # Your code here\n    # Step 1: Check if matrix is invertible (det != 0)\n    # Step 2: If not invertible, return -1\n    # Step 3: Compute adjugate matrix\n    # Step 4: Apply formula: inverse = (1/det) * adj\n    # Step 5: Return as list of lists\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_matrix_inverse([[2, 0], [0, 2]])",
+            "expected": "[[0.5, 0.0], [0.0, 0.5]]",
+            "explanation": "Diagonal matrix inverse: reciprocal of each diagonal element"
+          },
+          {
+            "input": "compute_matrix_inverse([[1, 1], [0, 1]])",
+            "expected": "[[1.0, -1.0], [0.0, 1.0]]",
+            "explanation": "Upper triangular matrix with unit diagonal"
+          },
+          {
+            "input": "compute_matrix_inverse([[1, 2], [2, 4]])",
+            "expected": "-1",
+            "explanation": "Singular matrix (det=0), no inverse exists"
+          },
+          {
+            "input": "compute_matrix_inverse([[4, 7], [2, 6]])",
+            "expected": "[[0.6, -0.7], [-0.2, 0.4]]",
+            "explanation": "General 2×2 matrix: det=10, apply inverse formula"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check invertibility before computing the inverse - this leads to division by zero errors",
+        "Confusing adjugate with transpose - adjugate is the transpose of the cofactor matrix, not the transpose of the original matrix",
+        "Sign errors in cofactor computation - the (-1)^(i+j) alternating sign pattern must be applied correctly",
+        "Not converting NumPy arrays back to Python lists in the return value",
+        "Using floating-point equality checks instead of tolerance-based comparisons for determinant"
+      ],
+      "hint": "For efficiency, use np.linalg.inv() for the actual inverse computation after validating invertibility. Alternatively, for educational purposes, implement the 2×2 case using the direct formula (swap diagonal, negate off-diagonal, divide by determinant).",
+      "references": [
+        "Cofactor expansion and matrix minors",
+        "Adjugate matrix properties and computation",
+        "Numerical methods for matrix inversion (LU decomposition, Gaussian elimination)"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Matrix Multiplication and Associativity",
+      "relation_to_problem": "The transformation T^(-1)AS involves multiplying three matrices. Understanding matrix multiplication rules, dimensional compatibility, and associativity is essential for correctly computing the result.",
+      "prerequisites": [
+        "Matrix dimensions",
+        "Dot product",
+        "Linear combinations",
+        "Matrix-vector multiplication"
+      ],
+      "learning_objectives": [
+        "Master the formal definition of matrix multiplication",
+        "Understand dimensional compatibility requirements for matrix products",
+        "Apply the associative property to optimize multi-matrix products",
+        "Compute products of multiple matrices efficiently"
+      ],
+      "math_content": {
+        "definition": "For matrices $A \\in \\mathbb{R}^{m \\times n}$ and $B \\in \\mathbb{R}^{n \\times p}$, the **matrix product** $C = AB$ is defined as an $m \\times p$ matrix where each entry $c_{ij}$ is given by the dot product of the $i$-th row of $A$ with the $j$-th column of $B$: $$c_{ij} = \\sum_{k=1}^{n} a_{ik} b_{kj}$$ Matrix multiplication is only defined when the number of columns in $A$ equals the number of rows in $B$ (dimensional compatibility). The resulting matrix has dimensions $m \\times p$ (rows from first matrix, columns from second matrix).",
+        "notation": "$A \\in \\mathbb{R}^{m \\times n}$ = matrix $A$ with $m$ rows and $n$ columns; $a_{ij}$ = entry in row $i$, column $j$ of matrix $A$; $AB$ = matrix product of $A$ and $B$; $(AB)_{ij}$ = entry at position $(i,j)$ in product matrix",
+        "theorem": "**Associativity of Matrix Multiplication**: For matrices $A \\in \\mathbb{R}^{m \\times n}$, $B \\in \\mathbb{R}^{n \\times p}$, and $C \\in \\mathbb{R}^{p \\times q}$, the matrix product is associative: $$(AB)C = A(BC)$$ This means we can compute $ABC$ by first computing $AB$ then multiplying by $C$, or by first computing $BC$ then multiplying $A$ by the result. The choice can affect computational efficiency. **Note**: Matrix multiplication is generally NOT commutative: $AB \\neq BA$ in general.",
+        "proof_sketch": "To prove associativity, we show that the $(i,j)$-entry of $(AB)C$ equals the $(i,j)$-entry of $A(BC)$. For $(AB)C$: $[(AB)C]_{ij} = \\sum_{l=1}^{p} (AB)_{il} c_{lj} = \\sum_{l=1}^{p} \\left(\\sum_{k=1}^{n} a_{ik}b_{kl}\\right) c_{lj} = \\sum_{l=1}^{p} \\sum_{k=1}^{n} a_{ik}b_{kl}c_{lj}$. For $A(BC)$: $[A(BC)]_{ij} = \\sum_{k=1}^{n} a_{ik}(BC)_{kj} = \\sum_{k=1}^{n} a_{ik}\\left(\\sum_{l=1}^{p} b_{kl}c_{lj}\\right) = \\sum_{k=1}^{n} \\sum_{l=1}^{p} a_{ik}b_{kl}c_{lj}$. Since summation is commutative, these double sums are equal, establishing $(AB)C = A(BC)$.",
+        "examples": [
+          "Dimensional compatibility check: $A_{2\\times 3} \\cdot B_{3\\times 4}$ is valid (inner dimensions match), producing $C_{2\\times 4}$",
+          "For $A = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}$, $B = \\begin{pmatrix} 5 & 6 \\\\ 7 & 8 \\end{pmatrix}$: $AB = \\begin{pmatrix} 1(5)+2(7) & 1(6)+2(8) \\\\ 3(5)+4(7) & 3(6)+4(8) \\end{pmatrix} = \\begin{pmatrix} 19 & 22 \\\\ 43 & 50 \\end{pmatrix}$",
+          "Non-commutativity: $BA = \\begin{pmatrix} 23 & 34 \\\\ 31 & 46 \\end{pmatrix} \\neq AB$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Matrix Product Entry",
+          "latex": "$(AB)_{ij} = \\sum_{k=1}^{n} a_{ik} b_{kj}$",
+          "description": "Entry (i,j) of product is dot product of row i from A with column j from B"
+        },
+        {
+          "name": "Dimensional Compatibility",
+          "latex": "$A_{m \\times n} \\cdot B_{n \\times p} = C_{m \\times p}$",
+          "description": "Inner dimensions must match (n=n); result has outer dimensions (m×p)"
+        },
+        {
+          "name": "Associativity Property",
+          "latex": "$(AB)C = A(BC)$ for dimensionally compatible matrices",
+          "description": "Order of operations doesn't affect the result; allows computational optimization"
+        },
+        {
+          "name": "Identity Property",
+          "latex": "$AI = IA = A$ where $I$ is the identity matrix",
+          "description": "Identity matrix acts as multiplicative identity (analogous to 1 for scalars)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that multiplies three matrices A, B, and C in sequence (computing ABC). The function should: (1) Validate dimensional compatibility between consecutive matrices, (2) Return -1 if dimensions are incompatible, (3) Use associativity to compute the product efficiently. For this exercise, compute (AB)C.",
+        "function_signature": "def multiply_three_matrices(A: list[list[float]], B: list[list[float]], C: list[list[float]]) -> list[list[float]] | int:",
+        "starter_code": "import numpy as np\n\ndef multiply_three_matrices(A: list[list[float]], B: list[list[float]], C: list[list[float]]) -> list[list[float]] | int:\n    # Your code here\n    # Step 1: Check dimensional compatibility\n    # Step 2: Compute AB first\n    # Step 3: Compute (AB)C\n    # Step 4: Return result as list of lists\n    # Return -1 if dimensions are incompatible\n    pass",
+        "test_cases": [
+          {
+            "input": "multiply_three_matrices([[1, 2], [3, 4]], [[1, 0], [0, 1]], [[2, 0], [0, 2]])",
+            "expected": "[[2, 4], [6, 8]]",
+            "explanation": "A·I·(2I) = A·(2I) = 2A, scales the matrix by 2"
+          },
+          {
+            "input": "multiply_three_matrices([[1]], [[2]], [[3]])",
+            "expected": "[[6]]",
+            "explanation": "1×1 matrices: simple scalar multiplication 1·2·3 = 6"
+          },
+          {
+            "input": "multiply_three_matrices([[1, 2]], [[3], [4]], [[5, 6]])",
+            "expected": "[[55, 66]]",
+            "explanation": "(1×2)·(2×1)·(1×2) = (1×1)·(1×2) = (1×2), result: [11]·[5,6] = [55,66]"
+          },
+          {
+            "input": "multiply_three_matrices([[1, 2]], [[3, 4]], [[5], [6]])",
+            "expected": "-1",
+            "explanation": "Dimension mismatch: (1×2)·(1×2) is invalid, inner dimensions don't match"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Attempting to multiply matrices with incompatible dimensions without validation",
+        "Confusing row-column order when computing dot products for each entry",
+        "Assuming matrix multiplication is commutative (AB = BA) - this is generally false",
+        "Not converting the result back to a Python list of lists when using NumPy",
+        "Forgetting that matrix dimensions are (rows, columns), not (columns, rows)"
+      ],
+      "hint": "NumPy's @ operator or np.matmul() handles matrix multiplication efficiently and automatically checks dimensional compatibility. The operation (AB)C can be computed as (A @ B) @ C.",
+      "references": [
+        "Computational complexity of matrix multiplication (O(n³) for naive algorithm)",
+        "Strassen's algorithm for faster matrix multiplication",
+        "Block matrix multiplication for large-scale computations"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Similarity Transformations and Change of Basis",
+      "relation_to_problem": "The operation T^(-1)AS is a generalized similarity transformation that changes the basis representation of matrix A. Understanding this geometric interpretation reveals why both T and S must be invertible.",
+      "prerequisites": [
+        "Matrix transformations",
+        "Basis vectors",
+        "Linear independence",
+        "Matrix inverses"
+      ],
+      "learning_objectives": [
+        "Understand the geometric meaning of similarity transformations",
+        "Learn why T^(-1)AS represents a change of basis operation",
+        "Recognize the role of invertibility in preserving information",
+        "Connect algebraic operations to geometric transformations"
+      ],
+      "math_content": {
+        "definition": "A **similarity transformation** of a matrix $A \\in \\mathbb{R}^{n \\times n}$ is a transformation of the form $B = P^{-1}AP$ where $P$ is an invertible matrix. Two matrices $A$ and $B$ are called **similar** if there exists an invertible matrix $P$ such that $B = P^{-1}AP$. The generalized form $T^{-1}AS$ extends this concept by using two different invertible matrices $T$ and $S$, representing a change of basis in both the domain and codomain. When $A$ represents a linear transformation with respect to some basis, $T^{-1}AS$ represents the same linear transformation with respect to new bases.",
+        "notation": "$P^{-1}AP$ = similarity transformation (same matrix on both sides); $T^{-1}AS$ = generalized transformation (different matrices); $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ = change of basis matrix from basis $\\mathcal{B}$ to basis $\\mathcal{C}$",
+        "theorem": "**Invariance Under Similarity**: Similarity transformations preserve many important properties of matrices: (1) **Determinant**: $\\det(P^{-1}AP) = \\det(A)$, (2) **Trace**: $\\text{tr}(P^{-1}AP) = \\text{tr}(A)$, (3) **Eigenvalues**: $P^{-1}AP$ and $A$ have the same eigenvalues, (4) **Rank**: $\\text{rank}(P^{-1}AP) = \\text{rank}(A)$, (5) **Invertibility**: $A$ invertible $\\Leftrightarrow$ $P^{-1}AP$ invertible. These properties are called **similarity invariants**.",
+        "proof_sketch": "For determinant preservation: $\\det(P^{-1}AP) = \\det(P^{-1})\\det(A)\\det(P) = \\frac{1}{\\det(P)}\\det(A)\\det(P) = \\det(A)$. For the generalized form $T^{-1}AS$, if we consider $T$ and $S$ as change-of-basis matrices, then $T^{-1}$ converts from the new basis back to the standard basis, $A$ applies the transformation in the standard basis, and $S$ converts from standard basis to another new basis. This composition preserves the essential linear transformation while expressing it in different coordinate systems. The requirement that $T$ and $S$ be invertible ensures no information is lost during basis changes.",
+        "examples": [
+          "Diagonal similarity: If $P$ diagonalizes $A$, then $D = P^{-1}AP$ is diagonal. Example: $A = \\begin{pmatrix} 0 & 1 \\\\ -2 & -3 \\end{pmatrix}$ has eigenvalues $-1, -2$, so there exists $P$ such that $P^{-1}AP = \\begin{pmatrix} -1 & 0 \\\\ 0 & -2 \\end{pmatrix}$",
+          "Rotation equivalence: Different rotation matrices in different bases represent the same geometric rotation",
+          "For the problem: $T^{-1} = \\begin{pmatrix} 0.5 & 0 \\\\ 0 & 0.5 \\end{pmatrix}$, $A = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}$, $S = \\begin{pmatrix} 1 & 1 \\\\ 0 & 1 \\end{pmatrix}$ gives $T^{-1}AS = \\begin{pmatrix} 0.5 & 1.5 \\\\ 1.5 & 3.5 \\end{pmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Standard Similarity Transformation",
+          "latex": "$B = P^{-1}AP$ where $P$ is invertible",
+          "description": "Represents same linear transformation in a different basis; preserves eigenvalues"
+        },
+        {
+          "name": "Generalized Transformation",
+          "latex": "$A' = T^{-1}AS$ where $T, S$ are invertible",
+          "description": "Changes basis in both domain and codomain; used in the main problem"
+        },
+        {
+          "name": "Determinant Preservation",
+          "latex": "$\\det(P^{-1}AP) = \\det(A)$",
+          "description": "Similarity transformations preserve determinant (and hence invertibility)"
+        },
+        {
+          "name": "Change of Basis Formula",
+          "latex": "$[T]_{\\mathcal{C}} = [P]_{\\mathcal{C}}^{\\mathcal{B}} [T]_{\\mathcal{B}} [P]_{\\mathcal{B}}^{\\mathcal{C}}$",
+          "description": "Expresses transformation T in new basis C given representation in basis B"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that checks whether two matrices A and B are similar by attempting to find an invertible matrix P such that B = P^(-1)AP. For this simplified exercise, given matrices A, B, and a candidate P, verify if B = P^(-1)AP holds (within numerical tolerance 1e-9). Return True if the relationship holds, False otherwise. This builds intuition for similarity transformations.",
+        "function_signature": "def verify_similarity(A: list[list[float]], B: list[list[float]], P: list[list[float]]) -> bool:",
+        "starter_code": "import numpy as np\n\ndef verify_similarity(A: list[list[float]], B: list[list[float]], P: list[list[float]]) -> bool:\n    # Your code here\n    # Step 1: Check if P is invertible\n    # Step 2: Compute P^(-1)AP\n    # Step 3: Compare with B (use tolerance for floating point)\n    # Return True if B ≈ P^(-1)AP, False otherwise\n    pass",
+        "test_cases": [
+          {
+            "input": "verify_similarity([[2, 0], [0, 3]], [[2, 0], [0, 3]], [[1, 0], [0, 1]])",
+            "expected": "True",
+            "explanation": "Identity transformation: I^(-1)AI = A, so matrices are similar via identity"
+          },
+          {
+            "input": "verify_similarity([[1, 1], [0, 1]], [[1, 2], [0, 1]], [[1, 1], [0, 1]])",
+            "expected": "True",
+            "explanation": "Upper triangular matrices with same eigenvalues can be similar"
+          },
+          {
+            "input": "verify_similarity([[1, 0], [0, 1]], [[2, 0], [0, 2]], [[1, 0], [0, 1]])",
+            "expected": "False",
+            "explanation": "Different eigenvalues (1 vs 2) means matrices cannot be similar"
+          },
+          {
+            "input": "verify_similarity([[0, -1], [1, 0]], [[0, 1], [-1, 0]], [[0, 1], [1, 0]])",
+            "expected": "True",
+            "explanation": "Both represent 90° rotation, just in different bases"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check if P is invertible before attempting to compute P^(-1) - leads to errors",
+        "Using exact equality (==) instead of tolerance-based comparison (np.allclose) for floating-point matrices",
+        "Confusing the order of operations: B = P^(-1)AP is not the same as B = PAP^(-1)",
+        "Assuming all matrices of the same size are similar - only matrices with same eigenvalues (with multiplicities) can be similar",
+        "Not understanding that similarity is basis-dependent: same transformation, different representation"
+      ],
+      "hint": "Use np.allclose(B, P_inv @ A @ P, atol=1e-9) to check if matrices are approximately equal. Remember that numerical errors accumulate through multiple matrix operations.",
+      "references": [
+        "Diagonalization and eigenvalue decomposition",
+        "Change of basis matrices in linear algebra",
+        "Matrix similarity classes and canonical forms"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Numerical Stability and Error Handling in Matrix Operations",
+      "relation_to_problem": "Implementing T^(-1)AS requires careful handling of edge cases: checking invertibility, managing floating-point precision, validating dimensions, and returning -1 when no solution exists.",
+      "prerequisites": [
+        "Matrix inversion",
+        "Determinants",
+        "Floating-point arithmetic",
+        "Exception handling"
+      ],
+      "learning_objectives": [
+        "Understand numerical precision issues in matrix computations",
+        "Implement robust validation checks for matrix operations",
+        "Handle edge cases gracefully (singular matrices, dimension mismatches)",
+        "Apply tolerance-based comparisons for floating-point arithmetic"
+      ],
+      "math_content": {
+        "definition": "**Numerical stability** refers to the sensitivity of an algorithm's output to small perturbations in the input or rounding errors during computation. In matrix operations, **ill-conditioned matrices** are those where small changes in input lead to large changes in output. The **condition number** $\\kappa(A) = \\|A\\| \\|A^{-1}\\|$ quantifies this sensitivity: $\\kappa(A) = 1$ for orthogonal matrices (best case), while $\\kappa(A) \\to \\infty$ as $A$ approaches singularity (worst case). For practical computation, we use **tolerance-based comparisons**: instead of checking $\\det(A) = 0$, we check $|\\det(A)| < \\epsilon$ where $\\epsilon$ is a small threshold (e.g., $10^{-10}$).",
+        "notation": "$\\epsilon$ = tolerance threshold for numerical comparisons; $\\kappa(A)$ = condition number of $A$; $\\|\\cdot\\|$ = matrix norm (typically Frobenius or 2-norm); $\\text{fl}(x)$ = floating-point representation of real number $x$",
+        "theorem": "**Floating-Point Arithmetic Limitations**: Computer arithmetic uses finite precision (typically IEEE 754 double precision: 53-bit mantissa ≈ 16 decimal digits). This introduces **machine epsilon** $\\epsilon_{\\text{mach}} \\approx 2.22 \\times 10^{-16}$, the smallest number such that $1 + \\epsilon_{\\text{mach}} \\neq 1$ in floating-point arithmetic. **Error Propagation**: When computing $A^{-1}$, relative error is bounded by $\\frac{\\|\\Delta A^{-1}\\|}{\\|A^{-1}\\|} \\leq \\kappa(A) \\frac{\\|\\Delta A\\|}{\\|A\\|}$, showing that error is amplified by the condition number.",
+        "proof_sketch": "Floating-point numbers are represented as $\\pm m \\times 2^e$ where $m$ is the mantissa and $e$ is the exponent. With finite mantissa bits, not all real numbers can be represented exactly—most are rounded to nearest representable value. In matrix inversion, we solve $Ax = b$ to find $x = A^{-1}b$. Small errors in $A$ or $b$ propagate to $x$ with amplification proportional to $\\kappa(A)$. When $\\det(A) \\approx 0$, the matrix is nearly singular, making $\\kappa(A)$ very large and the inverse computation highly unstable. Therefore, we must check $|\\det(A)| < \\epsilon$ rather than exact zero to account for accumulated rounding errors.",
+        "examples": [
+          "Ill-conditioned example: $A = \\begin{pmatrix} 1 & 1 \\\\ 1 & 1.0001 \\end{pmatrix}$ has $\\det(A) = 0.0001$, very small but nonzero; tiny input changes cause large inverse changes",
+          "Tolerance comparison: $\\det(A) = 10^{-12}$ should be treated as effectively zero (use $\\epsilon = 10^{-10}$)",
+          "Dimension validation: Before computing $T^{-1}AS$, check that $T$ is square, $S$ is square, and columns of $T^{-1}$ match rows of $A$, columns of $A$ match rows of $S$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Condition Number",
+          "latex": "$\\kappa(A) = \\|A\\| \\|A^{-1}\\|$",
+          "description": "Measures sensitivity to perturbations; $\\kappa(A) \\geq 1$, smaller is better"
+        },
+        {
+          "name": "Tolerance Check for Singularity",
+          "latex": "$|\\det(A)| < \\epsilon \\implies$ treat $A$ as singular",
+          "description": "Practical invertibility test; typical $\\epsilon = 10^{-10}$ to $10^{-12}$"
+        },
+        {
+          "name": "Relative Error Bound",
+          "latex": "$\\frac{\\|\\Delta x\\|}{\\|x\\|} \\leq \\kappa(A) \\frac{\\|\\Delta b\\|}{\\|b\\|}$",
+          "description": "Error in solution amplified by condition number when solving Ax=b"
+        },
+        {
+          "name": "Matrix Norm Compatibility",
+          "latex": "$\\|AB\\| \\leq \\|A\\| \\|B\\|$",
+          "description": "Submultiplicative property used in error analysis"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a robust function that validates whether matrix transformation T^(-1)AS can be performed. The function should return a dictionary with validation results: (1) Check if T and S are square matrices, (2) Check if T and S are invertible (using tolerance 1e-10), (3) Check dimensional compatibility for multiplication T^(-1)AS, (4) Return {'valid': True} if all checks pass, or {'valid': False, 'reason': 'explanation'} if any check fails. This prepares for the final implementation.",
+        "function_signature": "def validate_transformation(A: list[list[float]], T: list[list[float]], S: list[list[float]]) -> dict:",
+        "starter_code": "import numpy as np\n\ndef validate_transformation(A: list[list[float]], T: list[list[float]], S: list[list[float]]) -> dict:\n    # Your code here\n    # Check 1: Are T and S square?\n    # Check 2: Are T and S invertible (det != 0 with tolerance)?\n    # Check 3: Are dimensions compatible for T^(-1)AS?\n    # Return {'valid': True} or {'valid': False, 'reason': '...'}\n    pass",
+        "test_cases": [
+          {
+            "input": "validate_transformation([[1, 2], [3, 4]], [[2, 0], [0, 2]], [[1, 1], [0, 1]])",
+            "expected": "{'valid': True}",
+            "explanation": "All matrices are 2×2, T and S are invertible (det≠0), dimensions compatible"
+          },
+          {
+            "input": "validate_transformation([[1, 2], [3, 4]], [[1, 2], [2, 4]], [[1, 0], [0, 1]])",
+            "expected": "{'valid': False, 'reason': 'Matrix T is not invertible'}",
+            "explanation": "T has det=0 (rows linearly dependent), cannot compute T^(-1)"
+          },
+          {
+            "input": "validate_transformation([[1, 2, 3]], [[1, 0], [0, 1]], [[1, 0], [0, 1]])",
+            "expected": "{'valid': False, 'reason': 'Dimension mismatch for multiplication'}",
+            "explanation": "A is 1×3, T^(-1) is 2×2, cannot multiply 2×2 with 1×3"
+          },
+          {
+            "input": "validate_transformation([[1, 2], [3, 4]], [[1, 0, 0], [0, 1, 0], [0, 0, 1]], [[1, 0], [0, 1]])",
+            "expected": "{'valid': False, 'reason': 'Dimension mismatch for multiplication'}",
+            "explanation": "T is 3×3, A is 2×2, incompatible dimensions"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using exact zero comparison (det==0) instead of tolerance-based check (abs(det)<1e-10)",
+        "Not validating that T and S are square before checking invertibility",
+        "Forgetting to check dimensional compatibility: T^(-1) must have same row count as A's column count",
+        "Allowing non-square matrices for T and S when they must be square to have inverses",
+        "Not providing informative error messages that help users understand what went wrong"
+      ],
+      "hint": "Build the validation incrementally: first check matrix shapes, then check determinants with tolerance, finally verify dimension compatibility for the product. Use NumPy's shape attribute and linalg.det() function.",
+      "references": [
+        "IEEE 754 floating-point standard",
+        "Numerical Linear Algebra by Trefethen and Bau",
+        "Matrix condition numbers and stability analysis"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Matrix Transformation Pipeline",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts to implement the full T^(-1)AS transformation with proper validation, error handling, and numerical stability considerations.",
+      "prerequisites": [
+        "Matrix inversion",
+        "Matrix multiplication",
+        "Determinant computation",
+        "Error handling",
+        "Numerical stability"
+      ],
+      "learning_objectives": [
+        "Synthesize all previous sub-quests into a complete solution pipeline",
+        "Implement the full T^(-1)AS transformation with all validation steps",
+        "Apply defensive programming practices for robust matrix operations",
+        "Convert between NumPy arrays and Python lists for function interface"
+      ],
+      "math_content": {
+        "definition": "The **complete matrix transformation pipeline** for computing $A' = T^{-1}AS$ consists of five sequential stages: (1) **Input Validation**: Verify all inputs are properly formatted matrices with compatible dimensions, (2) **Invertibility Check**: Compute $\\det(T)$ and $\\det(S)$ and verify both are non-zero (using tolerance), (3) **Inverse Computation**: Calculate $T^{-1}$ using stable numerical methods, (4) **Sequential Multiplication**: Compute $(T^{-1}A)$ first, then multiply result by $S$, (5) **Output Formatting**: Convert result to required format and return, or return $-1$ if any validation fails.",
+        "notation": "$A'$ = transformed matrix; $T^{-1}$ = inverse of $T$; $\\epsilon$ = tolerance threshold; $\\mathcal{O}(n^3)$ = cubic time complexity for matrix operations on $n \\times n$ matrices",
+        "theorem": "**Transformation Existence and Uniqueness**: The transformation $A' = T^{-1}AS$ exists and is unique if and only if: (1) $T$ and $S$ are square matrices, (2) $\\det(T) \\neq 0$ and $\\det(S) \\neq 0$ (both invertible), (3) The dimensions satisfy: if $T \\in \\mathbb{R}^{m \\times m}$, $A \\in \\mathbb{R}^{m \\times n}$, and $S \\in \\mathbb{R}^{n \\times n}$, then $A' \\in \\mathbb{R}^{m \\times n}$. When these conditions hold, the transformation is well-defined and computable.",
+        "proof_sketch": "Necessity: If $T$ or $S$ is singular, then $T^{-1}$ or $S^{-1}$ doesn't exist, making the transformation undefined. Dimensional compatibility requires matrix multiplication rules: $T^{-1} \\in \\mathbb{R}^{m \\times m}$, $A \\in \\mathbb{R}^{m \\times n}$, so $T^{-1}A \\in \\mathbb{R}^{m \\times n}$ is valid. Then $(T^{-1}A) \\in \\mathbb{R}^{m \\times n}$, $S \\in \\mathbb{R}^{n \\times n}$, so $(T^{-1}A)S \\in \\mathbb{R}^{m \\times n}$ is valid. Sufficiency: When all conditions hold, each operation is uniquely defined by matrix multiplication rules, giving a unique result. The computational complexity is dominated by matrix multiplication and inversion, both $\\mathcal{O}(n^3)$ for $n \\times n$ matrices.",
+        "examples": [
+          "Full pipeline example: Given $A = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}$, $T = \\begin{pmatrix} 2 & 0 \\\\ 0 & 2 \\end{pmatrix}$, $S = \\begin{pmatrix} 1 & 1 \\\\ 0 & 1 \\end{pmatrix}$: Step 1: $\\det(T)=4$, $\\det(S)=1$, both nonzero ✓; Step 2: $T^{-1} = \\begin{pmatrix} 0.5 & 0 \\\\ 0 & 0.5 \\end{pmatrix}$; Step 3: $T^{-1}A = \\begin{pmatrix} 0.5 & 1 \\\\ 1.5 & 2 \\end{pmatrix}$; Step 4: $(T^{-1}A)S = \\begin{pmatrix} 0.5 & 1.5 \\\\ 1.5 & 3.5 \\end{pmatrix}$",
+          "Failure case: $T = \\begin{pmatrix} 1 & 1 \\\\ 1 & 1 \\end{pmatrix}$ has $\\det(T) = 0$, pipeline returns $-1$ at invertibility check",
+          "Dimension mismatch: $A_{2\\times3}$, $T_{2\\times2}$, $S_{4\\times4}$ fails at validation: $T^{-1}A$ is valid but $(T^{-1}A)S$ requires $S$ to be $3\\times3$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Transformation",
+          "latex": "$A' = T^{-1}AS$ subject to invertibility conditions",
+          "description": "Main formula combining all previous concepts; requires validated inputs"
+        },
+        {
+          "name": "Computational Order",
+          "latex": "$A' = (T^{-1}A)S = T^{-1}(AS)$",
+          "description": "Either order works due to associativity; choose based on efficiency"
+        },
+        {
+          "name": "Dimension Requirement",
+          "latex": "$T_{m\\times m}, A_{m\\times n}, S_{n\\times n} \\implies A'_{m\\times n}$",
+          "description": "Dimension preservation: output has same dimensions as input A"
+        },
+        {
+          "name": "Validation Condition",
+          "latex": "$|\\det(T)| > \\epsilon \\land |\\det(S)| > \\epsilon \\implies$ proceed",
+          "description": "Combined invertibility check; return -1 if either fails"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete matrix transformation function that computes T^(-1)AS. Your implementation must: (1) Validate that T and S are square and invertible (return -1 if not), (2) Check dimensional compatibility for the multiplication (return -1 if incompatible), (3) Compute T^(-1) using NumPy, (4) Perform the multiplication (T^(-1))·A·S using associativity, (5) Return the result as a Python list of lists, (6) Use tolerance 1e-10 for invertibility checks. This is the culmination of all previous sub-quests.",
+        "function_signature": "def transform_matrix(A: list[list[float]], T: list[list[float]], S: list[list[float]]) -> list[list[float]] | int:",
+        "starter_code": "import numpy as np\n\ndef transform_matrix(A: list[list[float]], T: list[list[float]], S: list[list[float]]) -> list[list[float]] | int:\n    # Your code here\n    # Step 1: Convert inputs to NumPy arrays\n    # Step 2: Validate T and S are square\n    # Step 3: Check invertibility of T and S (det != 0)\n    # Step 4: Validate dimensional compatibility\n    # Step 5: Compute T^(-1)\n    # Step 6: Compute (T^(-1) * A) * S\n    # Step 7: Convert back to list of lists and return\n    # Return -1 if any validation fails\n    pass",
+        "test_cases": [
+          {
+            "input": "transform_matrix([[1, 2], [3, 4]], [[2, 0], [0, 2]], [[1, 1], [0, 1]])",
+            "expected": "[[0.5, 1.5], [1.5, 3.5]]",
+            "explanation": "Main problem example: T^(-1)=(0.5I), multiply through: result matches expected output"
+          },
+          {
+            "input": "transform_matrix([[1, 0], [0, 1]], [[1, 0], [0, 1]], [[1, 0], [0, 1]])",
+            "expected": "[[1.0, 0.0], [0.0, 1.0]]",
+            "explanation": "Identity transformation: I^(-1)·I·I = I, returns identity matrix"
+          },
+          {
+            "input": "transform_matrix([[1, 2], [3, 4]], [[1, 1], [1, 1]], [[1, 0], [0, 1]])",
+            "expected": "-1",
+            "explanation": "T is singular (det=0), cannot compute inverse, return -1"
+          },
+          {
+            "input": "transform_matrix([[1, 2], [3, 4]], [[1, 0], [0, 1]], [[1, 1], [1, 1]])",
+            "expected": "-1",
+            "explanation": "S is singular (det=0), cannot proceed with transformation, return -1"
+          },
+          {
+            "input": "transform_matrix([[5, 6]], [[2, 0], [0, 2]], [[3, 0], [0, 3]])",
+            "expected": "[[7.5, 9.0]]",
+            "explanation": "1×2 matrix A: (0.5I)·A·(3I) = 1.5·A = [[7.5, 9.0]]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking both T and S for invertibility before attempting inverse computation",
+        "Computing S^(-1) instead of just S (only T needs to be inverted in T^(-1)AS)",
+        "Forgetting to convert NumPy arrays back to Python lists for the return value",
+        "Using incorrect multiplication order: (T^(-1)S)A instead of (T^(-1)A)S",
+        "Not handling the -1 return case properly when validation fails",
+        "Assuming all inputs are already NumPy arrays without conversion"
+      ],
+      "hint": "Structure your code with clear validation at the beginning: check matrix types, check if T and S are square (shape[0]==shape[1]), check determinants with np.abs(np.linalg.det(T)) > 1e-10. Then use np.linalg.inv() for T^(-1) and @ operator for multiplication. Finally, use .tolist() to convert back to Python lists.",
+      "references": [
+        "Matrix transformation applications in computer graphics",
+        "Coordinate system transformations in physics",
+        "Basis change in quantum mechanics (similarity transformations of operators)"
+      ]
+    }
+  ]
+}

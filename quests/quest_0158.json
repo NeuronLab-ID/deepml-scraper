@@ -1,0 +1,511 @@
+{
+  "problem_id": 158,
+  "title": "Epsilon-Greedy Action Selection for n-Armed Bandit",
+  "category": "Reinforcement Learning",
+  "difficulty": "medium",
+  "description": "Implement the epsilon-greedy method for action selection in an n-armed bandit problem. Given a set of estimated action values (Q-values), select an action using the epsilon-greedy policy: with probability epsilon, choose a random action; with probability 1 - epsilon, choose the action with the highest estimated value.",
+  "example": {
+    "input": "Q = np.array([0.5, 2.3, 1.7])\nepsilon = 0.0\naction = epsilon_greedy(Q, epsilon)\nprint(action)",
+    "output": "1",
+    "reasoning": "With epsilon=0.0 (always greedy), the highest Q-value is 2.3 at index 1, so the function always returns 1."
+  },
+  "starter_code": "import numpy as np\n\ndef epsilon_greedy(Q, epsilon=0.1):\n    \"\"\"\n    Selects an action using epsilon-greedy policy.\n    Q: np.ndarray of shape (n,) -- estimated action values\n    epsilon: float in [0, 1]\n    Returns: int, selected action index\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Argmax and Greedy Selection in Action Spaces",
+      "relation_to_problem": "The greedy component of epsilon-greedy requires finding the action with maximum estimated value, which is the argmax operation. This is the exploitation mechanism.",
+      "prerequisites": [
+        "Basic Python",
+        "NumPy arrays",
+        "Array indexing"
+      ],
+      "learning_objectives": [
+        "Understand the argmax operation formally and its role in decision-making",
+        "Implement greedy action selection from Q-values",
+        "Handle ties in argmax correctly"
+      ],
+      "math_content": {
+        "definition": "Let $\\mathcal{A} = \\{a_1, a_2, \\ldots, a_n\\}$ be a finite action space and $Q: \\mathcal{A} \\rightarrow \\mathbb{R}$ be an estimated value function. The **greedy action** $a^*$ is defined as: $$a^* = \\arg\\max_{a \\in \\mathcal{A}} Q(a)$$ This selects the action with the highest estimated value, representing pure exploitation.",
+        "notation": "$Q(a)$ = estimated value of action $a$; $a^*$ = optimal action under current estimates; $\\arg\\max$ = argument that maximizes the function",
+        "theorem": "**Greedy Selection Theorem**: If $Q(a^*) > Q(a)$ for all $a \\neq a^*$, then $a^*$ is the unique greedy action. When multiple actions share the maximum value (ties), any of them may be selected as the greedy action.",
+        "proof_sketch": "By definition, $a^*$ satisfies $Q(a^*) \\geq Q(a)$ for all $a \\in \\mathcal{A}$. If the inequality is strict for all $a \\neq a^*$, uniqueness follows. When $Q(a_i) = Q(a_j) = \\max_{a} Q(a)$ for $i \\neq j$, both actions are equally greedy.",
+        "examples": [
+          "Example 1: $Q = [0.5, 2.3, 1.7]$ → $\\arg\\max Q = 1$ (unique maximum at index 1)",
+          "Example 2: $Q = [1.0, 3.0, 3.0, 2.0]$ → $\\arg\\max Q \\in \\{1, 2\\}$ (tie between indices 1 and 2)",
+          "Example 3: $Q = [0.0, 0.0, 0.0]$ → $\\arg\\max Q \\in \\{0, 1, 2\\}$ (all actions tied)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Greedy Action Selection",
+          "latex": "$a^* = \\arg\\max_{a \\in \\mathcal{A}} Q(a)$",
+          "description": "Selects the action with highest estimated value (pure exploitation)"
+        },
+        {
+          "name": "Tie-Breaking",
+          "latex": "$a^* \\in \\{a : Q(a) = \\max_{a' \\in \\mathcal{A}} Q(a')\\}$",
+          "description": "Set of all actions achieving the maximum value when ties exist"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that returns the index of the action with the highest Q-value. When multiple actions have the same maximum value, return the smallest index (this will be our tie-breaking convention for deterministic testing).",
+        "function_signature": "def greedy_action(Q: np.ndarray) -> int:",
+        "starter_code": "import numpy as np\n\ndef greedy_action(Q):\n    \"\"\"\n    Returns the index of the action with highest Q-value.\n    Q: np.ndarray of shape (n,) -- estimated action values\n    Returns: int, index of greedy action\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "greedy_action(np.array([0.5, 2.3, 1.7]))",
+            "expected": "1",
+            "explanation": "Index 1 has the maximum value 2.3"
+          },
+          {
+            "input": "greedy_action(np.array([1.0, 3.0, 3.0, 2.0]))",
+            "expected": "1",
+            "explanation": "Indices 1 and 2 both have value 3.0, return smallest index 1"
+          },
+          {
+            "input": "greedy_action(np.array([5.0]))",
+            "expected": "0",
+            "explanation": "Single action case, return index 0"
+          },
+          {
+            "input": "greedy_action(np.array([-1.0, -2.0, -3.0]))",
+            "expected": "0",
+            "explanation": "Works with negative values, -1.0 is the maximum"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using np.max() instead of np.argmax() - max returns the value, argmax returns the index",
+        "Not handling ties consistently - can lead to non-deterministic behavior",
+        "Forgetting that argmax returns the index, not the value itself",
+        "Not considering edge cases like single-action spaces or all negative values"
+      ],
+      "hint": "NumPy provides a built-in function for finding the index of the maximum value in an array. Think about what happens when there are multiple maximum values.",
+      "references": [
+        "NumPy argmax function",
+        "Greedy algorithms in decision theory",
+        "Exploitation in reinforcement learning"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Random Action Selection and Uniform Sampling",
+      "relation_to_problem": "The exploration component of epsilon-greedy requires selecting a random action uniformly from all available actions. This ensures unbiased exploration of the action space.",
+      "prerequisites": [
+        "NumPy arrays",
+        "Discrete uniform distribution",
+        "Basic probability"
+      ],
+      "learning_objectives": [
+        "Understand uniform random sampling from discrete action spaces",
+        "Implement random action selection with proper probability distribution",
+        "Recognize the role of exploration in avoiding local optima"
+      ],
+      "math_content": {
+        "definition": "Given a finite action space $\\mathcal{A} = \\{0, 1, \\ldots, n-1\\}$ with $|\\mathcal{A}| = n$ actions, **uniform random selection** chooses action $a$ with probability: $$P(a) = \\frac{1}{n} \\quad \\text{for all } a \\in \\mathcal{A}$$ This is a discrete uniform distribution over the action space, ensuring each action has equal probability of selection.",
+        "notation": "$P(a)$ = probability of selecting action $a$; $n = |\\mathcal{A}|$ = number of actions; $\\mathcal{U}(\\mathcal{A})$ = uniform distribution over action space",
+        "theorem": "**Uniform Sampling Theorem**: For a discrete uniform distribution over $n$ actions, the expected value of the number of times each action is selected in $N$ trials is $\\frac{N}{n}$, with variance $\\frac{N(n-1)}{n^2}$.",
+        "proof_sketch": "Each trial is a Bernoulli random variable with $p = \\frac{1}{n}$. Over $N$ trials, this follows a binomial distribution: $X_a \\sim \\text{Binomial}(N, \\frac{1}{n})$. Thus $E[X_a] = N \\cdot \\frac{1}{n} = \\frac{N}{n}$ and $\\text{Var}[X_a] = N \\cdot \\frac{1}{n} \\cdot (1 - \\frac{1}{n}) = \\frac{N(n-1)}{n^2}$.",
+        "examples": [
+          "Example 1: With 3 actions, each has probability $P(a) = \\frac{1}{3} \\approx 0.333$",
+          "Example 2: In 300 selections from 3 actions, expect each action ~100 times with variance $\\frac{300 \\cdot 2}{9} \\approx 66.67$",
+          "Example 3: Single action case ($n=1$): $P(a_0) = 1$ (deterministic, no exploration)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Discrete Uniform Probability",
+          "latex": "$P(a) = \\frac{1}{|\\mathcal{A}|}$",
+          "description": "Each action has equal probability under uniform sampling"
+        },
+        {
+          "name": "Expected Selection Count",
+          "latex": "$E[X_a] = \\frac{N}{n}$",
+          "description": "Expected number of times action $a$ is selected in $N$ trials"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that randomly selects an action index from a set of n actions, where n is determined by the length of the Q-value array. Each action should have equal probability of being selected. Use NumPy's random number generator for implementation.",
+        "function_signature": "def random_action(Q: np.ndarray) -> int:",
+        "starter_code": "import numpy as np\n\ndef random_action(Q):\n    \"\"\"\n    Randomly selects an action index uniformly.\n    Q: np.ndarray of shape (n,) -- used only to determine number of actions\n    Returns: int, randomly selected action index in range [0, n-1]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "random_action(np.array([1.0, 2.0, 3.0]))",
+            "expected": "0, 1, or 2 (each with probability 1/3)",
+            "explanation": "Returns a random index from {0, 1, 2} uniformly"
+          },
+          {
+            "input": "random_action(np.array([0.0]))",
+            "expected": "0",
+            "explanation": "Single action: always returns 0"
+          },
+          {
+            "input": "random_action(np.array([1.0, 1.0]))",
+            "expected": "0 or 1 (each with probability 0.5)",
+            "explanation": "Two actions: 50/50 chance for each"
+          },
+          {
+            "input": "# Run 1000 times with Q=[1,2,3,4,5] and verify distribution is approximately uniform",
+            "expected": "Each index appears roughly 200 times (within statistical variance)",
+            "explanation": "Over many trials, uniform distribution should be evident"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using Python's random module instead of NumPy's for consistency with array operations",
+        "Generating random floats instead of random integers for action indices",
+        "Not considering the range [0, n-1] properly - off-by-one errors",
+        "Ignoring the Q parameter completely - it's needed to determine the action space size",
+        "Using non-uniform sampling (e.g., weighted by Q-values)"
+      ],
+      "hint": "NumPy has a function to generate random integers within a specified range. The number of actions equals the length of the Q array.",
+      "references": [
+        "Discrete uniform distribution",
+        "NumPy random integer generation",
+        "Exploration in reinforcement learning"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Bernoulli Trials and Probabilistic Decision Making",
+      "relation_to_problem": "Epsilon-greedy uses a Bernoulli trial to decide between exploration and exploitation. Understanding this binary random decision is crucial for implementing the epsilon-greedy policy correctly.",
+      "prerequisites": [
+        "Probability theory basics",
+        "Bernoulli distribution",
+        "Random number generation"
+      ],
+      "learning_objectives": [
+        "Understand Bernoulli trials as binary random experiments",
+        "Implement probabilistic decision-making with a given probability parameter",
+        "Apply Bernoulli trials to action selection strategies"
+      ],
+      "math_content": {
+        "definition": "A **Bernoulli trial** is a random experiment with exactly two outcomes: success (1) or failure (0). The probability of success is $p \\in [0, 1]$. A random variable $X \\sim \\text{Bernoulli}(p)$ has probability mass function: $$P(X = 1) = p, \\quad P(X = 0) = 1 - p$$ In the epsilon-greedy context, $X = 1$ represents exploration (with $p = \\varepsilon$) and $X = 0$ represents exploitation (with probability $1 - \\varepsilon$).",
+        "notation": "$X \\sim \\text{Bernoulli}(p)$ = Bernoulli random variable with parameter $p$; $\\varepsilon$ = exploration probability; $p$ = success probability",
+        "theorem": "**Bernoulli Distribution Properties**: For $X \\sim \\text{Bernoulli}(p)$: (1) $E[X] = p$, (2) $\\text{Var}[X] = p(1-p)$, (3) Maximum variance occurs at $p = 0.5$, (4) $X$ is degenerate (deterministic) when $p \\in \\{0, 1\\}$.",
+        "proof_sketch": "(1) $E[X] = 1 \\cdot p + 0 \\cdot (1-p) = p$. (2) $E[X^2] = 1^2 \\cdot p + 0^2 \\cdot (1-p) = p$, so $\\text{Var}[X] = E[X^2] - (E[X])^2 = p - p^2 = p(1-p)$. (3) $\\frac{d}{dp}[p(1-p)] = 1 - 2p = 0 \\Rightarrow p = 0.5$. (4) When $p=0$: $P(X=0)=1$; when $p=1$: $P(X=1)=1$.",
+        "examples": [
+          "Example 1: $\\varepsilon = 0.1$ → explore with probability 0.1, exploit with probability 0.9",
+          "Example 2: $\\varepsilon = 0.0$ → always exploit (deterministic greedy policy)",
+          "Example 3: $\\varepsilon = 1.0$ → always explore (uniform random policy)",
+          "Example 4: $\\varepsilon = 0.5$ → maximum uncertainty, equal exploration and exploitation"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Bernoulli Probability Mass Function",
+          "latex": "$P(X = k) = p^k(1-p)^{1-k}, \\quad k \\in \\{0, 1\\}$",
+          "description": "Probability of outcome k in a Bernoulli trial"
+        },
+        {
+          "name": "Expected Value",
+          "latex": "$E[X] = p$",
+          "description": "Mean of Bernoulli distribution equals the success probability"
+        },
+        {
+          "name": "Variance",
+          "latex": "$\\text{Var}[X] = p(1-p)$",
+          "description": "Variance is maximized when p = 0.5"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs a Bernoulli trial: returns True with probability p and False with probability (1-p). This will be used to decide whether to explore or exploit in epsilon-greedy. The function should handle edge cases where p=0 (always False) and p=1 (always True).",
+        "function_signature": "def bernoulli_trial(p: float) -> bool:",
+        "starter_code": "import numpy as np\n\ndef bernoulli_trial(p):\n    \"\"\"\n    Performs a Bernoulli trial with success probability p.\n    p: float in [0, 1] -- probability of returning True\n    Returns: bool, True with probability p, False with probability (1-p)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "bernoulli_trial(0.0)",
+            "expected": "False",
+            "explanation": "With p=0, always returns False (never explore)"
+          },
+          {
+            "input": "bernoulli_trial(1.0)",
+            "expected": "True",
+            "explanation": "With p=1, always returns True (always explore)"
+          },
+          {
+            "input": "bernoulli_trial(0.5)",
+            "expected": "True or False (each with probability 0.5)",
+            "explanation": "50/50 chance, maximum entropy case"
+          },
+          {
+            "input": "# Run bernoulli_trial(0.3) 10000 times, count True outcomes",
+            "expected": "Approximately 3000 True outcomes (30%)",
+            "explanation": "Over many trials, empirical probability converges to p"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Comparing random float to p incorrectly (should be < p, not <= p for consistency)",
+        "Not handling edge cases p=0 and p=1 properly",
+        "Using integer random generation instead of float for the comparison",
+        "Forgetting that p represents the probability of True (exploration), not False",
+        "Not validating that p is in [0, 1] range"
+      ],
+      "hint": "Generate a random float between 0 and 1, then compare it to p. Think carefully about whether to use < or <= for the comparison.",
+      "references": [
+        "Bernoulli distribution",
+        "NumPy random uniform generation",
+        "Probabilistic decision-making"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "The Exploration-Exploitation Tradeoff",
+      "relation_to_problem": "Epsilon-greedy balances exploration (discovering potentially better actions) and exploitation (using current best knowledge). Understanding this tradeoff is fundamental to the algorithm's purpose and effectiveness.",
+      "prerequisites": [
+        "Expected value",
+        "Regret in decision theory",
+        "Convergence concepts"
+      ],
+      "learning_objectives": [
+        "Formalize the exploration-exploitation tradeoff mathematically",
+        "Understand the role of epsilon in controlling this tradeoff",
+        "Analyze the consequences of pure exploration vs pure exploitation"
+      ],
+      "math_content": {
+        "definition": "The **exploration-exploitation tradeoff** is the problem of choosing between: (1) **Exploitation**: selecting the action with highest estimated value $a^* = \\arg\\max_a Q(a)$ to maximize immediate reward, (2) **Exploration**: trying other actions to improve value estimates and potentially discover better actions. Define **cumulative regret** after $T$ steps as: $$R_T = \\sum_{t=1}^{T} (V^* - Q(a_t))$$ where $V^* = \\max_a Q^*(a)$ is the true optimal value and $a_t$ is the action selected at time $t$.",
+        "notation": "$V^*$ = true optimal value; $Q(a)$ = estimated value; $Q^*(a)$ = true value; $a_t$ = action at time $t$; $R_T$ = cumulative regret after $T$ steps; $\\varepsilon$ = exploration rate",
+        "theorem": "**Epsilon-Greedy Convergence**: An epsilon-greedy policy with constant $\\varepsilon > 0$ achieves sublinear regret $R_T = O(T)$ but does not converge to the optimal policy. With decaying $\\varepsilon_t \\to 0$ (such that $\\sum_t \\varepsilon_t = \\infty$ and $\\sum_t \\varepsilon_t^2 < \\infty$), the policy converges to optimal with probability 1.",
+        "proof_sketch": "With constant $\\varepsilon$, the policy explores with probability $\\varepsilon$ indefinitely, incurring regret proportional to $\\varepsilon T$. With decaying $\\varepsilon_t$, the first condition ensures sufficient exploration (all actions tried infinitely often), while the second ensures exploitation dominates asymptotically. By the law of large numbers, value estimates converge to true values, and greedy selection becomes optimal.",
+        "examples": [
+          "Example 1: Pure exploitation ($\\varepsilon=0$) may get stuck with suboptimal actions if initial estimates are poor",
+          "Example 2: Pure exploration ($\\varepsilon=1$) learns true values but never exploits this knowledge",
+          "Example 3: $\\varepsilon=0.1$ explores 10% of the time, balancing learning and performance",
+          "Example 4: Decaying $\\varepsilon_t = \\frac{1}{t}$ satisfies convergence conditions"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cumulative Regret",
+          "latex": "$R_T = \\sum_{t=1}^{T} (V^* - Q(a_t))$",
+          "description": "Total difference between optimal and actual rewards over T steps"
+        },
+        {
+          "name": "Epsilon-Greedy Policy",
+          "latex": "$\\pi(a) = \\begin{cases} 1 - \\varepsilon + \\frac{\\varepsilon}{|\\mathcal{A}|} & \\text{if } a = a^* \\\\ \\frac{\\varepsilon}{|\\mathcal{A}|} & \\text{otherwise} \\end{cases}$",
+          "description": "Probability of selecting each action under epsilon-greedy"
+        },
+        {
+          "name": "Decaying Epsilon Conditions",
+          "latex": "$\\sum_{t=1}^{\\infty} \\varepsilon_t = \\infty, \\quad \\sum_{t=1}^{\\infty} \\varepsilon_t^2 < \\infty$",
+          "description": "Conditions for convergence to optimal policy"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the probability of selecting each action under an epsilon-greedy policy. Given Q-values and epsilon, return an array of probabilities where the greedy action has higher probability and all actions share the exploration probability mass equally.",
+        "function_signature": "def epsilon_greedy_probabilities(Q: np.ndarray, epsilon: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef epsilon_greedy_probabilities(Q, epsilon):\n    \"\"\"\n    Calculates selection probability for each action under epsilon-greedy.\n    Q: np.ndarray of shape (n,) -- estimated action values\n    epsilon: float in [0, 1] -- exploration probability\n    Returns: np.ndarray of shape (n,) -- probability of selecting each action\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "epsilon_greedy_probabilities(np.array([1.0, 3.0, 2.0]), 0.0)",
+            "expected": "np.array([0.0, 1.0, 0.0])",
+            "explanation": "Pure exploitation: greedy action (index 1) has probability 1"
+          },
+          {
+            "input": "epsilon_greedy_probabilities(np.array([1.0, 3.0, 2.0]), 1.0)",
+            "expected": "np.array([0.333..., 0.333..., 0.333...])",
+            "explanation": "Pure exploration: all actions equally likely"
+          },
+          {
+            "input": "epsilon_greedy_probabilities(np.array([1.0, 3.0, 2.0]), 0.3)",
+            "expected": "np.array([0.1, 0.8, 0.1])",
+            "explanation": "Greedy action gets (1-0.3) + 0.3/3 = 0.8, others get 0.3/3 = 0.1"
+          },
+          {
+            "input": "# Verify probabilities sum to 1.0",
+            "expected": "Sum equals 1.0 for all valid inputs",
+            "explanation": "Probabilities must form a valid probability distribution"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that the greedy action gets both its exploitation share AND its exploration share",
+        "Not dividing epsilon equally among all actions for the exploration component",
+        "Not handling ties in greedy action (multiple actions with max Q-value)",
+        "Failing to validate that probabilities sum to 1.0",
+        "Incorrectly computing (1-epsilon) + epsilon/n instead of (1-epsilon) + epsilon/n for greedy action"
+      ],
+      "hint": "The greedy action receives probability mass from two sources: the exploitation component (1-epsilon) and its share of uniform exploration (epsilon/n). All actions receive epsilon/n from exploration.",
+      "references": [
+        "Multi-armed bandit problem",
+        "Regret bounds",
+        "Sutton & Barto Chapter 2"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Conditional Action Selection Logic",
+      "relation_to_problem": "Epsilon-greedy requires branching logic: IF explore THEN random action, ELSE greedy action. This conditional structure combines all previous concepts into the final algorithm.",
+      "prerequisites": [
+        "Bernoulli trials (Step 3)",
+        "Greedy selection (Step 1)",
+        "Random selection (Step 2)"
+      ],
+      "learning_objectives": [
+        "Implement conditional logic based on probabilistic outcomes",
+        "Combine exploration and exploitation mechanisms correctly",
+        "Handle the complete epsilon-greedy action selection algorithm"
+      ],
+      "math_content": {
+        "definition": "The **epsilon-greedy action selection** algorithm is defined as: $$a = \\begin{cases} \\text{random action from } \\mathcal{A} & \\text{with probability } \\varepsilon \\\\ \\arg\\max_{a' \\in \\mathcal{A}} Q(a') & \\text{with probability } 1 - \\varepsilon \\end{cases}$$ This can be implemented as: Sample $X \\sim \\text{Bernoulli}(\\varepsilon)$. If $X = 1$, select uniformly from $\\mathcal{A}$; if $X = 0$, select $\\arg\\max_{a'} Q(a')$.",
+        "notation": "$a$ = selected action; $\\mathcal{A}$ = action space; $Q(a)$ = estimated value of action $a$; $\\varepsilon$ = exploration parameter; $X$ = Bernoulli random variable",
+        "theorem": "**Epsilon-Greedy Selection Probability**: The probability of selecting action $a$ under epsilon-greedy is: $$\\pi(a \\mid Q, \\varepsilon) = \\begin{cases} (1 - \\varepsilon) + \\frac{\\varepsilon}{|\\mathcal{A}|} & \\text{if } a \\in \\arg\\max_{a'} Q(a') \\\\ \\frac{\\varepsilon}{|\\mathcal{A}|} & \\text{otherwise} \\end{cases}$$ This ensures every action has non-zero selection probability when $\\varepsilon > 0$.",
+        "proof_sketch": "Decompose selection probability: $\\pi(a) = P(\\text{explore})P(a \\mid \\text{explore}) + P(\\text{exploit})P(a \\mid \\text{exploit})$. For greedy action: $\\pi(a^*) = \\varepsilon \\cdot \\frac{1}{n} + (1-\\varepsilon) \\cdot 1 = \\frac{\\varepsilon}{n} + 1 - \\varepsilon$. For non-greedy actions: $\\pi(a) = \\varepsilon \\cdot \\frac{1}{n} + (1-\\varepsilon) \\cdot 0 = \\frac{\\varepsilon}{n}$.",
+        "examples": [
+          "Example 1: $Q = [0.5, 2.3, 1.7]$, $\\varepsilon=0.1$ → Action 1 selected with probability $0.9 + 0.1/3 \\approx 0.933$",
+          "Example 2: $Q = [1.0, 1.0]$, $\\varepsilon=0.2$ → Both actions selected with probability $0.8 + 0.2/2 = 0.9$ each... wait, this sums to 1.8! When there's a tie, each tied action gets $0.4 + 0.1 = 0.5$",
+          "Example 3: $\\varepsilon=0$ → Deterministic greedy (only exploitation)",
+          "Example 4: $\\varepsilon=1$ → Uniform random (only exploration)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Epsilon-Greedy Selection Rule",
+          "latex": "$a_t = \\begin{cases} \\text{uniform}(\\mathcal{A}) & \\text{w.p. } \\varepsilon \\\\ \\arg\\max_{a} Q_t(a) & \\text{w.p. } 1-\\varepsilon \\end{cases}$",
+          "description": "Core algorithm: explore randomly or exploit greedily"
+        },
+        {
+          "name": "Action Selection Probability",
+          "latex": "$\\pi(a) = (1-\\varepsilon)\\mathbb{1}_{a=a^*} + \\frac{\\varepsilon}{|\\mathcal{A}|}$",
+          "description": "Probability distribution over actions, where $\\mathbb{1}_{a=a^*}$ is indicator function"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified version of epsilon-greedy that returns which strategy was used: 'explore' or 'exploit'. Given Q-values and epsilon, perform a Bernoulli trial to decide, then return the strategy name. This helps verify the conditional logic is correct before implementing full action selection.",
+        "function_signature": "def epsilon_greedy_strategy(Q: np.ndarray, epsilon: float) -> str:",
+        "starter_code": "import numpy as np\n\ndef epsilon_greedy_strategy(Q, epsilon):\n    \"\"\"\n    Determines whether to explore or exploit using epsilon-greedy logic.\n    Q: np.ndarray of shape (n,) -- estimated action values\n    epsilon: float in [0, 1] -- exploration probability\n    Returns: str, either 'explore' or 'exploit'\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "epsilon_greedy_strategy(np.array([1.0, 2.0, 3.0]), 0.0)",
+            "expected": "'exploit'",
+            "explanation": "With epsilon=0, always exploit"
+          },
+          {
+            "input": "epsilon_greedy_strategy(np.array([1.0, 2.0, 3.0]), 1.0)",
+            "expected": "'explore'",
+            "explanation": "With epsilon=1, always explore"
+          },
+          {
+            "input": "# Run epsilon_greedy_strategy(Q, 0.3) 10000 times, count 'explore' outcomes",
+            "expected": "Approximately 3000 'explore' outcomes (30%)",
+            "explanation": "Over many trials, explore probability should match epsilon"
+          },
+          {
+            "input": "epsilon_greedy_strategy(np.array([5.0]), 0.5)",
+            "expected": "'explore' or 'exploit' (each 50%)",
+            "explanation": "Works with single action, strategy choice is independent of Q-values"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Inverting the condition (exploring when should exploit and vice versa)",
+        "Using Q-values in the decision instead of just epsilon (Q-values determine which action, not whether to explore)",
+        "Not handling epsilon=0 and epsilon=1 edge cases properly",
+        "Making the decision based on comparison with 1-epsilon instead of epsilon",
+        "Forgetting that this is a two-stage process: first decide strategy, then select action"
+      ],
+      "hint": "Use a Bernoulli trial with probability epsilon. If the trial succeeds (True), return 'explore'; otherwise return 'exploit'. The Q-values don't affect this decision.",
+      "references": [
+        "Conditional probability",
+        "Policy implementation in RL",
+        "Epsilon-greedy algorithm"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Epsilon-Greedy Implementation",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts: Bernoulli decision (Step 3), random action selection (Step 2), and greedy action selection (Step 1) to implement the full epsilon-greedy action selection algorithm.",
+      "prerequisites": [
+        "Greedy selection (Step 1)",
+        "Random selection (Step 2)",
+        "Bernoulli trials (Step 3)",
+        "Exploration-exploitation tradeoff (Step 4)",
+        "Conditional logic (Step 5)"
+      ],
+      "learning_objectives": [
+        "Integrate all components into complete epsilon-greedy implementation",
+        "Handle all edge cases (epsilon=0, epsilon=1, single action, ties)",
+        "Verify correctness through statistical testing of selection probabilities",
+        "Understand practical considerations for parameter tuning"
+      ],
+      "math_content": {
+        "definition": "The **complete epsilon-greedy action selection algorithm** is: $$\\text{EpsilonGreedy}(Q, \\varepsilon): \\mathcal{A} \\times [0,1] \\rightarrow \\mathcal{A}$$ Algorithm: (1) Sample $U \\sim \\text{Uniform}(0, 1)$, (2) If $U < \\varepsilon$: return $a \\sim \\text{Uniform}(\\mathcal{A})$, (3) Else: return $\\arg\\max_{a \\in \\mathcal{A}} Q(a)$. This produces a stochastic policy $\\pi(a \\mid Q, \\varepsilon)$ that balances exploration and exploitation.",
+        "notation": "$U$ = uniform random variable; $Q: \\mathcal{A} \\rightarrow \\mathbb{R}$ = action-value function; $\\varepsilon \\in [0,1]$ = exploration rate; $\\pi$ = resulting policy",
+        "theorem": "**Epsilon-Greedy Optimality Conditions**: (1) If $\\varepsilon = 0$ and $Q = Q^*$ (true values), epsilon-greedy is optimal. (2) For $\\varepsilon > 0$, the policy is $\\varepsilon$-greedy, guaranteeing exploration. (3) As $Q \\to Q^*$ and $\\varepsilon \\to 0$, the policy converges to optimal policy $\\pi^*$. (4) The expected immediate reward is: $\\mathbb{E}[R] = (1-\\varepsilon)Q(a^*) + \\varepsilon \\cdot \\frac{1}{|\\mathcal{A}|}\\sum_{a} Q(a)$.",
+        "proof_sketch": "(1) When $\\varepsilon=0$ and $Q=Q^*$, the policy always selects $a^* = \\arg\\max_a Q^*(a)$, which is optimal by definition. (4) Decompose expected reward by law of total expectation: $\\mathbb{E}[R] = P(\\text{exploit})\\mathbb{E}[R \\mid \\text{exploit}] + P(\\text{explore})\\mathbb{E}[R \\mid \\text{explore}] = (1-\\varepsilon)Q(a^*) + \\varepsilon \\cdot \\frac{1}{n}\\sum_a Q(a)$.",
+        "examples": [
+          "Example 1: $Q=[0.5, 2.3, 1.7]$, $\\varepsilon=0.0$ → Always returns 1 (pure exploitation)",
+          "Example 2: $Q=[1.0, 2.0, 3.0]$, $\\varepsilon=0.1$ → Returns 2 with ~93.3% probability, {0,1} with ~3.3% each",
+          "Example 3: $Q=[1.0, 1.0]$, $\\varepsilon=0.5$ → Each action with 50% probability (tie + exploration)",
+          "Example 4: Expected reward for $Q=[1.0, 2.0, 1.5]$, $\\varepsilon=0.2$: $0.8(2.0) + 0.2(1.5) = 1.9$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Algorithm",
+          "latex": "$a = \\begin{cases} \\arg\\max_{a'} Q(a') & \\text{if } U \\geq \\varepsilon \\\\ \\text{random}(\\mathcal{A}) & \\text{if } U < \\varepsilon \\end{cases}$",
+          "description": "Full epsilon-greedy selection based on uniform random draw U"
+        },
+        {
+          "name": "Expected Immediate Reward",
+          "latex": "$\\mathbb{E}[R] = (1-\\varepsilon)Q(a^*) + \\frac{\\varepsilon}{|\\mathcal{A}|}\\sum_{a \\in \\mathcal{A}} Q(a)$",
+          "description": "Expected reward under epsilon-greedy policy"
+        },
+        {
+          "name": "Greedy-in-the-Limit with Infinite Exploration (GLIE)",
+          "latex": "$\\lim_{t \\to \\infty} \\varepsilon_t = 0, \\quad \\sum_{t=1}^{\\infty} \\varepsilon_t = \\infty$",
+          "description": "Conditions for convergence to optimal policy with time-decaying epsilon"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete epsilon-greedy action selection function. Combine all previous concepts: use a Bernoulli trial to decide explore vs exploit, implement random action selection for exploration, and greedy action selection for exploitation. The function must handle all edge cases and return an action index.",
+        "function_signature": "def epsilon_greedy(Q: np.ndarray, epsilon: float = 0.1) -> int:",
+        "starter_code": "import numpy as np\n\ndef epsilon_greedy(Q, epsilon=0.1):\n    \"\"\"\n    Selects an action using epsilon-greedy policy.\n    Q: np.ndarray of shape (n,) -- estimated action values\n    epsilon: float in [0, 1] -- exploration probability\n    Returns: int, selected action index\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "epsilon_greedy(np.array([0.5, 2.3, 1.7]), 0.0)",
+            "expected": "1",
+            "explanation": "Epsilon=0: pure exploitation, always select action with highest Q-value"
+          },
+          {
+            "input": "epsilon_greedy(np.array([1.0, 2.0, 3.0]), 1.0)",
+            "expected": "0, 1, or 2 (each with probability 1/3)",
+            "explanation": "Epsilon=1: pure exploration, uniform random selection"
+          },
+          {
+            "input": "# Run epsilon_greedy([1.0, 5.0, 2.0], 0.3) 10000 times, count action 1 selections",
+            "expected": "Approximately 8000 times (0.7 + 0.3/3 ≈ 0.8)",
+            "explanation": "Greedy action selected with probability (1-epsilon) + epsilon/n"
+          },
+          {
+            "input": "epsilon_greedy(np.array([2.0, 2.0, 2.0]), 0.0)",
+            "expected": "0, 1, or 2 (implementation-dependent tie-breaking)",
+            "explanation": "All actions have equal Q-values, any is valid even with epsilon=0"
+          },
+          {
+            "input": "epsilon_greedy(np.array([1.0]), 0.5)",
+            "expected": "0",
+            "explanation": "Single action: always return 0 regardless of epsilon"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Swapping the exploration and exploitation branches in the conditional",
+        "Not using consistent random number generation between decision and action selection",
+        "Implementing random selection incorrectly (not uniform over all actions)",
+        "Implementing greedy selection incorrectly (not finding argmax properly)",
+        "Not handling edge cases: epsilon=0, epsilon=1, single action, all equal Q-values",
+        "Using different random seeds or states that break the probability guarantees"
+      ],
+      "hint": "Structure your solution in three parts: (1) Decide whether to explore using a Bernoulli trial, (2) If exploring, return a random action uniformly, (3) If exploiting, return the greedy action (argmax). You've implemented all these components in previous sub-quests.",
+      "references": [
+        "Sutton & Barto Section 2.3",
+        "Multi-armed bandit algorithms",
+        "Epsilon-greedy policy in reinforcement learning",
+        "Exploration strategies in RL"
+      ]
+    }
+  ]
+}

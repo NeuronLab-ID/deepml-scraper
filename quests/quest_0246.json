@@ -1,0 +1,555 @@
+{
+  "problem_id": 246,
+  "title": "Birthday Problem Probability",
+  "category": "Probability",
+  "difficulty": "medium",
+  "description": "Implement a function to calculate the probability that at least two people in a group of n people share the same birthday.\n\nThe Birthday Problem (also known as the Birthday Paradox) is a famous probability puzzle that demonstrates how intuition about probability can be misleading. It asks: in a group of n randomly chosen people, what is the probability that at least two of them share the same birthday?\n\nAssumptions:\n- Birthdays are uniformly distributed across all days\n- Each person's birthday is independent of others\n- The default year has 365 days (leap years ignored unless specified)\n\nYour function should:\n- Take n (number of people) and optionally days (number of days in a year, default 365)\n- Return the probability that at least two people share a birthday\n- Handle edge cases appropriately (n <= 1 means no possible match, n > days guarantees a match by the pigeonhole principle)\n\nReturn the result rounded to 4 decimal places.",
+  "example": {
+    "input": "birthday_problem(23)",
+    "output": "0.5073",
+    "reasoning": "For 23 people with 365 possible birthdays, we calculate P(no match) = (365/365) * (364/365) * (363/365) * ... * (343/365). This equals approximately 0.4927. Therefore, P(at least one match) = 1 - 0.4927 = 0.5073. This counter-intuitive result shows that with just 23 people, there is already more than 50% chance of a birthday match."
+  },
+  "starter_code": "def birthday_problem(n: int, days: int = 365) -> float:\n    \"\"\"\n    Calculate the probability that at least two people share the same birthday.\n    \n    Args:\n        n: Number of people in the group\n        days: Number of days in a year (default 365)\n    \n    Returns:\n        float: Probability of at least one shared birthday, rounded to 4 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Probability of Independent Events and the Multiplication Rule",
+      "relation_to_problem": "The birthday problem requires calculating the probability that all n people have different birthdays, which involves multiplying probabilities of independent events occurring sequentially.",
+      "prerequisites": [
+        "Basic probability concepts",
+        "Fractions and decimals",
+        "Understanding of events and sample spaces"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of independent events in probability theory",
+        "Apply the multiplication rule for independent events",
+        "Calculate joint probabilities using the product formula",
+        "Implement sequential probability calculations in code"
+      ],
+      "math_content": {
+        "definition": "Two events $A$ and $B$ are **independent** if and only if $P(A \\cap B) = P(A) \\cdot P(B)$. More generally, events $A_1, A_2, \\ldots, A_n$ are **mutually independent** if for every subset $\\{i_1, i_2, \\ldots, i_k\\} \\subseteq \\{1, 2, \\ldots, n\\}$, we have $P(A_{i_1} \\cap A_{i_2} \\cap \\cdots \\cap A_{i_k}) = P(A_{i_1}) \\cdot P(A_{i_2}) \\cdot \\ldots \\cdot P(A_{i_k})$.",
+        "notation": "$P(A)$ = probability of event $A$, $P(A \\cap B)$ = probability that both $A$ and $B$ occur, $A^c$ = complement of event $A$",
+        "theorem": "**Multiplication Rule for Independent Events**: If $A_1, A_2, \\ldots, A_n$ are mutually independent events, then $P(A_1 \\cap A_2 \\cap \\cdots \\cap A_n) = \\prod_{i=1}^{n} P(A_i) = P(A_1) \\cdot P(A_2) \\cdot \\ldots \\cdot P(A_n)$.",
+        "proof_sketch": "For two independent events: By definition, $P(A \\cap B) = P(A) \\cdot P(B)$. For $n$ events, we use induction. Base case: $n=2$ holds by definition. Inductive step: Assume true for $n=k$. For $n=k+1$, using the independence property and the inductive hypothesis: $P(A_1 \\cap \\cdots \\cap A_{k+1}) = P((A_1 \\cap \\cdots \\cap A_k) \\cap A_{k+1}) = P(A_1 \\cap \\cdots \\cap A_k) \\cdot P(A_{k+1}) = \\prod_{i=1}^{k+1} P(A_i)$.",
+        "examples": [
+          "Rolling two fair dice: $P(\\text{first die shows 6 AND second die shows 6}) = P(\\text{first die shows 6}) \\cdot P(\\text{second die shows 6}) = \\frac{1}{6} \\cdot \\frac{1}{6} = \\frac{1}{36}$",
+          "Three coin flips: $P(\\text{HHH}) = P(H_1) \\cdot P(H_2) \\cdot P(H_3) = \\frac{1}{2} \\cdot \\frac{1}{2} \\cdot \\frac{1}{2} = \\frac{1}{8}$",
+          "Sequential selection with replacement: Drawing 3 specific cards from a deck with replacement: $P = \\frac{1}{52} \\cdot \\frac{1}{52} \\cdot \\frac{1}{52} = \\frac{1}{140608}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Multiplication Rule",
+          "latex": "$P(A_1 \\cap A_2 \\cap \\cdots \\cap A_n) = \\prod_{i=1}^{n} P(A_i)$",
+          "description": "Use when events are independent and you need the probability that ALL events occur"
+        },
+        {
+          "name": "Product Notation",
+          "latex": "$\\prod_{i=1}^{n} x_i = x_1 \\cdot x_2 \\cdot \\ldots \\cdot x_n$",
+          "description": "Compact notation for multiplying a sequence of terms"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the probability of a sequence of independent events all occurring, given their individual probabilities. This builds toward calculating P(all different birthdays) in the birthday problem.",
+        "function_signature": "def independent_events_probability(probabilities: list[float]) -> float:",
+        "starter_code": "def independent_events_probability(probabilities: list[float]) -> float:\n    \"\"\"\n    Calculate the probability that all independent events occur.\n    \n    Args:\n        probabilities: List of individual event probabilities\n    \n    Returns:\n        float: Probability that all events occur (rounded to 6 decimal places)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "independent_events_probability([0.5, 0.5])",
+            "expected": "0.25",
+            "explanation": "Two independent events each with probability 0.5: 0.5 × 0.5 = 0.25"
+          },
+          {
+            "input": "independent_events_probability([1.0, 0.8, 0.6])",
+            "expected": "0.48",
+            "explanation": "Three events: 1.0 × 0.8 × 0.6 = 0.48. The first event is certain."
+          },
+          {
+            "input": "independent_events_probability([365/365, 364/365, 363/365])",
+            "expected": "0.991796",
+            "explanation": "First three people in birthday problem: probability all have different birthdays"
+          },
+          {
+            "input": "independent_events_probability([0.0, 0.5])",
+            "expected": "0.0",
+            "explanation": "If any event is impossible (probability 0), the joint probability is 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Adding probabilities instead of multiplying them (confusing with OR vs AND events)",
+        "Applying multiplication rule to dependent events without justification",
+        "Forgetting that if any probability is 0, the entire product is 0",
+        "Not rounding appropriately which can lead to floating-point precision issues"
+      ],
+      "hint": "Use a loop or the built-in product function to multiply all probabilities. Remember to initialize your result appropriately.",
+      "references": [
+        "Independent events in probability theory",
+        "Multiplication principle in combinatorics",
+        "Product notation and sigma notation"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Complementary Probability and the Complement Rule",
+      "relation_to_problem": "Computing P(at least one match) directly is complex due to overlapping cases. Instead, we compute P(no matches) and use P(at least one match) = 1 - P(no matches), which is the complement rule.",
+      "prerequisites": [
+        "Basic set theory",
+        "Sample spaces and events",
+        "Probability axioms"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition of complementary events",
+        "Apply the complement rule to simplify probability calculations",
+        "Recognize when complement approach is more efficient than direct calculation",
+        "Convert 'at least one' problems into 'none' problems"
+      ],
+      "math_content": {
+        "definition": "For any event $A$ in a sample space $\\Omega$, the **complement** of $A$, denoted $A^c$ or $\\bar{A}$, is the set of all outcomes in $\\Omega$ that are not in $A$. Formally: $A^c = \\{\\omega \\in \\Omega : \\omega \\notin A\\}$. The events $A$ and $A^c$ are **complementary events**.",
+        "notation": "$A^c$ or $\\bar{A}$ = complement of event $A$, $\\Omega$ = sample space (set of all possible outcomes), $P(A^c)$ = probability of the complement",
+        "theorem": "**Complement Rule**: For any event $A$, $P(A^c) = 1 - P(A)$, which equivalently gives $P(A) = 1 - P(A^c)$. This follows from the probability axioms: $P(A) + P(A^c) = P(A \\cup A^c) = P(\\Omega) = 1$.",
+        "proof_sketch": "Since $A$ and $A^c$ are disjoint (mutually exclusive), $A \\cap A^c = \\emptyset$, and their union is the entire sample space $A \\cup A^c = \\Omega$. By the addition rule for disjoint events: $P(A \\cup A^c) = P(A) + P(A^c)$. Since $P(\\Omega) = 1$ (certainty axiom), we have $P(A) + P(A^c) = 1$, thus $P(A^c) = 1 - P(A)$.",
+        "examples": [
+          "Rolling a die: Let $A$ = 'rolling a 6', then $A^c$ = 'not rolling a 6' = {1,2,3,4,5}. $P(A) = \\frac{1}{6}$, so $P(A^c) = 1 - \\frac{1}{6} = \\frac{5}{6}$",
+          "'At least one' problems: $P(\\text{at least one heads in 3 coin flips}) = 1 - P(\\text{no heads}) = 1 - P(\\text{TTT}) = 1 - \\frac{1}{8} = \\frac{7}{8}$. Direct calculation would require computing $P(\\text{exactly 1 heads}) + P(\\text{exactly 2 heads}) + P(\\text{exactly 3 heads})$.",
+          "Quality control: $P(\\text{at least one defective item in batch of 5}) = 1 - P(\\text{all 5 items are good})$. If each has 95% success rate: $1 - 0.95^5 = 1 - 0.7738 = 0.2262$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complement Rule",
+          "latex": "$P(A) = 1 - P(A^c)$",
+          "description": "Use when P(A^c) is easier to compute than P(A) directly"
+        },
+        {
+          "name": "At Least One Formula",
+          "latex": "$P(\\text{at least one}) = 1 - P(\\text{none})$",
+          "description": "Standard technique for 'at least one' probability problems"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that uses the complement rule to calculate the probability of 'at least one success' given the probability of a single success and the number of independent trials. This directly applies to the birthday problem structure.",
+        "function_signature": "def at_least_one_probability(p_none: float) -> float:",
+        "starter_code": "def at_least_one_probability(p_none: float) -> float:\n    \"\"\"\n    Calculate P(at least one event occurs) using the complement rule.\n    \n    Args:\n        p_none: Probability that NO events occur\n    \n    Returns:\n        float: Probability that at least one event occurs (rounded to 6 decimal places)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "at_least_one_probability(0.5)",
+            "expected": "0.5",
+            "explanation": "If P(none) = 0.5, then P(at least one) = 1 - 0.5 = 0.5"
+          },
+          {
+            "input": "at_least_one_probability(0.0)",
+            "expected": "1.0",
+            "explanation": "If P(none) = 0 (impossible to have none), then P(at least one) = 1 (certain)"
+          },
+          {
+            "input": "at_least_one_probability(1.0)",
+            "expected": "0.0",
+            "explanation": "If P(none) = 1 (certain to have none), then P(at least one) = 0 (impossible)"
+          },
+          {
+            "input": "at_least_one_probability(0.4927)",
+            "expected": "0.5073",
+            "explanation": "Birthday problem with 23 people: P(no matches) ≈ 0.4927, so P(at least one match) ≈ 0.5073"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to use the complement when 'at least one' appears in the problem",
+        "Confusing P(A) with P(A^c) and calculating 1 - P(A) instead of just using P(A)",
+        "Not recognizing that direct calculation of 'at least one' requires summing many cases (exactly 1, exactly 2, etc.)",
+        "Assuming complement works for non-exhaustive events (A and B must partition the sample space)"
+      ],
+      "hint": "The complement rule is simply: probability of something happening = 1 - probability of it not happening. This is a one-line calculation.",
+      "references": [
+        "Complement events and De Morgan's laws",
+        "Probability axioms (Kolmogorov axioms)",
+        "At least/at most probability problems"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Sequential Probability with Decreasing Sample Space",
+      "relation_to_problem": "In the birthday problem, each new person must avoid birthdays already taken. The probability changes with each person: first person has 365/365, second has 364/365, third has 363/365, etc. This is sampling without replacement.",
+      "prerequisites": [
+        "Conditional probability",
+        "Fractions and ratios",
+        "Understanding of sample space"
+      ],
+      "learning_objectives": [
+        "Calculate probabilities when the sample space changes with each event",
+        "Understand the concept of sampling without replacement",
+        "Apply sequential probability formulas where each probability depends on previous outcomes",
+        "Implement iterative probability calculations with changing denominators"
+      ],
+      "math_content": {
+        "definition": "**Sequential probability without replacement** occurs when selecting items from a population where each selection changes the composition of the remaining population. If we have $d$ distinct items and select $n$ items sequentially without replacement, the probability that all selected items are distinct is $\\frac{d}{d} \\cdot \\frac{d-1}{d} \\cdot \\frac{d-2}{d} \\cdots \\frac{d-n+1}{d} = \\prod_{i=0}^{n-1} \\frac{d-i}{d}$.",
+        "notation": "$d$ = total number of distinct items (days in year), $n$ = number of selections (people), $i$ = index of current selection (0-indexed)",
+        "theorem": "**Distinct Selection Probability**: The probability that $n$ items selected sequentially without replacement from $d$ distinct items are all different is: $P(\\text{all distinct}) = \\frac{d!}{(d-n)! \\cdot d^n} = \\prod_{i=0}^{n-1} \\frac{d-i}{d}$ for $n \\leq d$, and $P(\\text{all distinct}) = 0$ for $n > d$ by the pigeonhole principle.",
+        "proof_sketch": "Consider selecting items one at a time. For the first selection, all $d$ outcomes are 'new', so $P_1 = \\frac{d}{d} = 1$. For the second selection, $d-1$ outcomes avoid the first, so $P_2 = \\frac{d-1}{d}$. For the $k$-th selection, $d-k+1$ outcomes avoid the previous $k-1$, so $P_k = \\frac{d-k+1}{d}$. By independence (assuming uniform random selection), $P(\\text{all distinct}) = \\prod_{k=1}^{n} P_k = \\prod_{k=1}^{n} \\frac{d-k+1}{d} = \\prod_{i=0}^{n-1} \\frac{d-i}{d}$. The factorial form follows from $\\frac{d(d-1)(d-2)\\cdots(d-n+1)}{d^n} = \\frac{d!/(d-n)!}{d^n}$.",
+        "examples": [
+          "Drawing 2 cards without replacement: $P(\\text{both different suits}) = \\frac{52}{52} \\cdot \\frac{39}{52} = \\frac{39}{52} = 0.75$ (first card can be anything, second must be one of 39 cards from other 3 suits)",
+          "Selecting 3 people from 10 for distinct roles: $P(\\text{all different}) = \\frac{10}{10} \\cdot \\frac{9}{10} \\cdot \\frac{8}{10} = \\frac{720}{1000} = 0.72$",
+          "Birthday problem with 3 people and 365 days: $P(\\text{all different birthdays}) = \\frac{365}{365} \\cdot \\frac{364}{365} \\cdot \\frac{363}{365} \\approx 0.9918$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sequential Distinct Probability",
+          "latex": "$P(\\text{all distinct}) = \\prod_{i=0}^{n-1} \\frac{d-i}{d}$",
+          "description": "Probability that n selections from d items (without replacement) are all different"
+        },
+        {
+          "name": "Factorial Form",
+          "latex": "$P(\\text{all distinct}) = \\frac{d!}{(d-n)! \\cdot d^n}$",
+          "description": "Alternative expression using factorials, useful for combinatorial interpretation"
+        },
+        {
+          "name": "General Term",
+          "latex": "$P_i = \\frac{d-i}{d}$ for $i = 0, 1, \\ldots, n-1$",
+          "description": "Probability that the (i+1)-th selection is distinct from previous i selections"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the probability that n items selected sequentially from d distinct items are all different. This is the core calculation for P(no birthday matches).",
+        "function_signature": "def all_distinct_probability(n: int, d: int) -> float:",
+        "starter_code": "def all_distinct_probability(n: int, d: int) -> float:\n    \"\"\"\n    Calculate probability that n sequential selections from d items are all distinct.\n    \n    Args:\n        n: Number of selections (people)\n        d: Number of distinct items (days)\n    \n    Returns:\n        float: Probability all selections are distinct (rounded to 6 decimal places)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "all_distinct_probability(1, 365)",
+            "expected": "1.0",
+            "explanation": "With only 1 person, there are no conflicts possible, probability is 1"
+          },
+          {
+            "input": "all_distinct_probability(2, 365)",
+            "expected": "0.99726",
+            "explanation": "Two people: (365/365) × (364/365) = 364/365 ≈ 0.997260"
+          },
+          {
+            "input": "all_distinct_probability(3, 365)",
+            "expected": "0.991796",
+            "explanation": "Three people: 1 × (364/365) × (363/365) ≈ 0.991796"
+          },
+          {
+            "input": "all_distinct_probability(23, 365)",
+            "expected": "0.492703",
+            "explanation": "23 people: Product from i=0 to 22 of (365-i)/365 ≈ 0.492703"
+          },
+          {
+            "input": "all_distinct_probability(2, 2)",
+            "expected": "0.5",
+            "explanation": "2 selections from 2 items: (2/2) × (1/2) = 0.5"
+          },
+          {
+            "input": "all_distinct_probability(5, 3)",
+            "expected": "0.0",
+            "explanation": "Pigeonhole principle: 5 people, 3 days → guaranteed match, P(all distinct) = 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using the same denominator for all terms instead of keeping it constant at d",
+        "Forgetting to handle the edge case when n > d (should return 0 by pigeonhole principle)",
+        "Starting the product at i=1 instead of i=0, or using wrong indexing",
+        "Using factorial calculations for large n and d, which can cause numerical overflow (iterative multiplication is more stable)",
+        "Not initializing the probability to 1.0 before multiplying terms"
+      ],
+      "hint": "Loop from i=0 to n-1, and multiply the running product by (d-i)/d at each step. Consider edge cases before starting the loop.",
+      "references": [
+        "Sampling without replacement",
+        "Permutations and combinations",
+        "Pigeonhole principle",
+        "Falling factorials"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "The Pigeonhole Principle and Boundary Conditions",
+      "relation_to_problem": "When n > days (more people than available birthdays), a match is guaranteed. This is the pigeonhole principle. Proper handling of edge cases (n ≤ 1, n > days) is essential for a robust solution.",
+      "prerequisites": [
+        "Set theory",
+        "Basic logic",
+        "Proof techniques"
+      ],
+      "learning_objectives": [
+        "Understand the formal statement and proof of the pigeonhole principle",
+        "Identify when the pigeonhole principle applies in probability problems",
+        "Handle edge cases and boundary conditions in probability calculations",
+        "Implement conditional logic for special cases in algorithms"
+      ],
+      "math_content": {
+        "definition": "The **Pigeonhole Principle** (also called Dirichlet's principle) states: If $n$ items are placed into $m$ containers with $n > m$, then at least one container must contain more than one item. Formally: If $f: A \\to B$ is a function where $|A| > |B|$ (the cardinality of $A$ exceeds that of $B$), then $f$ is not injective (one-to-one); there exist distinct $a_1, a_2 \\in A$ such that $f(a_1) = f(a_2)$.",
+        "notation": "$n$ = number of items (pigeons), $m$ = number of containers (holes), $|A|$ = cardinality (size) of set $A$, $f: A \\to B$ = function from set $A$ to set $B$",
+        "theorem": "**Strong Pigeonhole Principle**: If $n$ items are distributed among $m$ containers, then at least one container contains at least $\\lceil n/m \\rceil$ items, where $\\lceil \\cdot \\rceil$ denotes the ceiling function. For the birthday problem: If $n > d$ (more people than days), then $P(\\text{at least one match}) = 1$.",
+        "proof_sketch": "Proof by contradiction: Assume $n > m$ and all containers have at most 1 item. Then the total number of items is at most $m \\cdot 1 = m < n$, contradicting the fact that we have $n$ items. Therefore, at least one container must have more than 1 item. Applied to birthdays: If $n$ people choose from $d$ days and $n > d$, by the pigeonhole principle, at least two people must share a birthday.",
+        "examples": [
+          "In a group of 367 people, at least two must share a birthday (assuming 366 possible birthdays including Feb 29). Here $n=367 > m=366$.",
+          "If you have 13 people in a room, at least two were born in the same month. Here $n=13 > m=12$.",
+          "Selecting 5 cards from a standard deck: at least two must be from the same suit, since $n=5 > m=4$ suits."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Pigeonhole Principle",
+          "latex": "$n > m \\implies \\text{at least one container has } \\geq 2 \\text{ items}$",
+          "description": "When items exceed containers, a collision is guaranteed"
+        },
+        {
+          "name": "Birthday Problem Edge Case",
+          "latex": "$n > d \\implies P(\\text{at least one match}) = 1$",
+          "description": "More people than days guarantees a birthday match"
+        },
+        {
+          "name": "Trivial Case",
+          "latex": "$n \\leq 1 \\implies P(\\text{at least one match}) = 0$",
+          "description": "Zero or one person cannot have a match"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that determines if a birthday match is guaranteed, impossible, or needs calculation, based on the pigeonhole principle and edge cases. Return 'guaranteed' if n > days, 'impossible' if n ≤ 1, or 'calculate' otherwise.",
+        "function_signature": "def birthday_case_check(n: int, days: int) -> str:",
+        "starter_code": "def birthday_case_check(n: int, days: int) -> str:\n    \"\"\"\n    Determine if birthday match is guaranteed, impossible, or needs calculation.\n    \n    Args:\n        n: Number of people\n        days: Number of days in year\n    \n    Returns:\n        str: 'guaranteed' if n > days, 'impossible' if n <= 1, 'calculate' otherwise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "birthday_case_check(0, 365)",
+            "expected": "'impossible'",
+            "explanation": "With 0 people, no matches are possible"
+          },
+          {
+            "input": "birthday_case_check(1, 365)",
+            "expected": "'impossible'",
+            "explanation": "With 1 person, no matches are possible (need at least 2 for a match)"
+          },
+          {
+            "input": "birthday_case_check(23, 365)",
+            "expected": "'calculate'",
+            "explanation": "23 < 365, so we need to calculate the probability"
+          },
+          {
+            "input": "birthday_case_check(366, 365)",
+            "expected": "'guaranteed'",
+            "explanation": "By pigeonhole principle: 366 people, 365 days → guaranteed match"
+          },
+          {
+            "input": "birthday_case_check(100, 50)",
+            "expected": "'guaranteed'",
+            "explanation": "100 > 50, pigeonhole principle applies"
+          },
+          {
+            "input": "birthday_case_check(2, 365)",
+            "expected": "'calculate'",
+            "explanation": "2 people is the minimum case that needs calculation"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check n ≤ 1 case (returning non-zero probability for 0 or 1 person)",
+        "Not applying pigeonhole principle when n > days (trying to calculate instead of returning 1)",
+        "Using n ≥ days instead of n > days for the pigeonhole condition (n = days does not guarantee match)",
+        "Treating n = 0 and n = 1 differently when both should return 0 probability"
+      ],
+      "hint": "Use if-elif-else conditions to check boundaries: first check if n ≤ 1, then if n > days, and finally handle the calculation case.",
+      "references": [
+        "Pigeonhole principle and its generalizations",
+        "Boundary condition analysis in algorithms",
+        "Edge cases in probability calculations"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Numerical Stability in Sequential Products",
+      "relation_to_problem": "When calculating products like (365/365) × (364/365) × ... × (343/365) for 23 people, naive implementations can suffer from numerical errors due to floating-point arithmetic. Understanding overflow, underflow, and precision is crucial for accurate results.",
+      "prerequisites": [
+        "Floating-point arithmetic",
+        "Computational complexity",
+        "Error analysis"
+      ],
+      "learning_objectives": [
+        "Understand floating-point representation and its limitations",
+        "Recognize numerical instability in iterative multiplication",
+        "Apply techniques to maintain precision in long products",
+        "Implement robust numerical algorithms with proper rounding"
+      ],
+      "math_content": {
+        "definition": "**Numerical stability** refers to an algorithm's sensitivity to rounding errors and perturbations in the input. An algorithm is **stable** if small errors in input or intermediate calculations produce small errors in the output. For probability calculations involving products of many terms near 1, multiplicative errors can accumulate: If each term has relative error $\\epsilon$, the product of $n$ terms has relative error approximately $n\\epsilon$ in the worst case.",
+        "notation": "$\\epsilon$ = machine epsilon (smallest $\\epsilon$ such that $1 + \\epsilon \\neq 1$ in floating-point), $fl(x)$ = floating-point representation of $x$, relative error = $|x_{exact} - x_{computed}|/|x_{exact}|$",
+        "theorem": "**Error Propagation in Products**: Let $p = \\prod_{i=1}^n x_i$ be the exact product and $\\hat{p} = \\prod_{i=1}^n (x_i(1+\\epsilon_i))$ be the computed product where $|\\epsilon_i| \\leq \\epsilon$ for all $i$. Then the relative error satisfies: $\\left|\\frac{p - \\hat{p}}{p}\\right| \\leq (1+\\epsilon)^n - 1 \\approx n\\epsilon$ for small $\\epsilon$. For Python's float64: $\\epsilon \\approx 2.22 \\times 10^{-16}$.",
+        "proof_sketch": "We have $\\hat{p}/p = \\prod_{i=1}^n (1+\\epsilon_i)$. In the worst case where all errors have the same sign: $\\hat{p}/p = (1+\\epsilon)^n$. Using Taylor expansion: $(1+\\epsilon)^n = 1 + n\\epsilon + O(n^2\\epsilon^2)$. For small $\\epsilon$ and moderate $n$, the relative error is approximately $n\\epsilon$. For the birthday problem with $n=100$, this gives error bound $\\approx 100 \\times 2.22 \\times 10^{-16} \\approx 2.22 \\times 10^{-14}$, which is acceptable.",
+        "examples": [
+          "Computing $0.9^{1000}$ directly: Each multiplication introduces error $\\epsilon \\approx 2.22 \\times 10^{-16}$. After 1000 multiplications, relative error $\\approx 1000\\epsilon \\approx 2.22 \\times 10^{-13}$, still very small.",
+          "Factorial overflow: Computing $365!$ directly causes overflow. Instead, use $\\prod_{i=0}^{n-1} \\frac{d-i}{d}$ which stays bounded in $[0,1]$.",
+          "Rounding: The probability 0.507297234 rounded to 4 decimal places is 0.5073. Use round(value, 4) in Python."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Relative Error Bound",
+          "latex": "$\\left|\\frac{x_{exact} - x_{computed}}{x_{exact}}\\right| \\leq n\\epsilon$",
+          "description": "Error bound for product of n terms with machine epsilon ε"
+        },
+        {
+          "name": "Stable Product Form",
+          "latex": "$\\prod_{i=0}^{n-1} \\frac{d-i}{d}$ instead of $\\frac{d!}{(d-n)! \\cdot d^n}$",
+          "description": "Iterative multiplication avoids factorial overflow and maintains values in [0,1]"
+        },
+        {
+          "name": "Rounding Formula",
+          "latex": "$\\text{round}(x, k) = \\frac{\\lfloor x \\cdot 10^k + 0.5 \\rfloor}{10^k}$",
+          "description": "Round x to k decimal places"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that safely computes a sequential product of fractions (numerators decrease, denominator constant) and rounds the result. This combines numerical stability with proper rounding for the birthday problem.",
+        "function_signature": "def stable_sequential_product(n: int, d: int, decimal_places: int) -> float:",
+        "starter_code": "def stable_sequential_product(n: int, d: int, decimal_places: int) -> float:\n    \"\"\"\n    Safely compute product of (d-0)/d × (d-1)/d × ... × (d-n+1)/d with rounding.\n    \n    Args:\n        n: Number of terms in product\n        d: Denominator (constant across all terms)\n        decimal_places: Number of decimal places for rounding\n    \n    Returns:\n        float: Product rounded to specified decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "stable_sequential_product(1, 365, 4)",
+            "expected": "1.0",
+            "explanation": "Product of single term (365/365) = 1.0"
+          },
+          {
+            "input": "stable_sequential_product(2, 365, 6)",
+            "expected": "0.99726",
+            "explanation": "(365/365) × (364/365) = 0.99726027... rounded to 6 decimals"
+          },
+          {
+            "input": "stable_sequential_product(23, 365, 6)",
+            "expected": "0.492703",
+            "explanation": "Product for 23 people, rounded to 6 decimal places"
+          },
+          {
+            "input": "stable_sequential_product(50, 365, 8)",
+            "expected": "0.02955720",
+            "explanation": "Product for 50 people, demonstrating precision with 8 decimal places"
+          },
+          {
+            "input": "stable_sequential_product(3, 5, 4)",
+            "expected": "0.48",
+            "explanation": "(5/5) × (4/5) × (3/5) = 0.48 exactly"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing large factorials explicitly, causing overflow for large n or d",
+        "Rounding intermediate results instead of only the final result (error accumulation)",
+        "Using integer division instead of float division (e.g., (d-i)/d must use floats)",
+        "Not initializing the product to 1.0 (float) which can cause type issues",
+        "Forgetting to round the final result to the specified decimal places"
+      ],
+      "hint": "Initialize a float variable to 1.0, multiply by each term (d-i)/d in a loop, then round the final result using Python's round() function.",
+      "references": [
+        "Floating-point arithmetic (IEEE 754 standard)",
+        "Numerical analysis and error propagation",
+        "Catastrophic cancellation and loss of significance"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Synthesizing the Birthday Problem Solution",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts: edge cases (pigeonhole principle), sequential probability with decreasing sample space, complement rule, and numerical stability to solve the complete birthday problem.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Function composition",
+        "Algorithm design"
+      ],
+      "learning_objectives": [
+        "Integrate multiple probability concepts into a cohesive solution",
+        "Apply the complete birthday problem algorithm",
+        "Validate solutions against known benchmarks",
+        "Understand the counter-intuitive nature of the birthday paradox"
+      ],
+      "math_content": {
+        "definition": "The **Birthday Problem** asks: Given $n$ people and $d$ equally likely birthdays, what is the probability that at least two people share a birthday? The solution combines several concepts: $P(\\text{match}) = 1 - P(\\text{no match}) = 1 - \\prod_{i=0}^{n-1}\\frac{d-i}{d}$ for $2 \\leq n \\leq d$, with special cases $P=0$ for $n \\leq 1$ and $P=1$ for $n > d$.",
+        "notation": "$n$ = number of people, $d$ = number of possible birthdays (typically 365), $P(\\text{match})$ = probability of at least one shared birthday",
+        "theorem": "**Birthday Problem Formula**: For $n$ people and $d$ days: $$P(\\text{at least one match}) = \\begin{cases} 0 & \\text{if } n \\leq 1 \\\\ 1 - \\prod_{i=0}^{n-1}\\frac{d-i}{d} & \\text{if } 1 < n \\leq d \\\\ 1 & \\text{if } n > d \\end{cases}$$ The probability exceeds 0.5 when $n \\geq 23$ for $d=365$, which is counter-intuitive since $23 \\ll 365$.",
+        "proof_sketch": "The direct calculation of $P(\\text{at least one match})$ requires considering all possible matching patterns: exactly one pair, two pairs, one triple, etc., which leads to complex inclusion-exclusion. Instead, we use the complement: $P(\\text{no match})$ means all $n$ birthdays are distinct. This is sequential selection without replacement: person 1 can have any of $d$ days, person 2 must avoid 1 day (probability $(d-1)/d$), person 3 must avoid 2 days (probability $(d-2)/d$), etc. The product gives $P(\\text{no match}) = \\prod_{i=0}^{n-1}\\frac{d-i}{d}$. Then $P(\\text{match}) = 1 - P(\\text{no match})$. For $n > d$, pigeonhole principle guarantees a match.",
+        "examples": [
+          "Classic case: $n=23, d=365$. $P(\\text{no match}) = \\prod_{i=0}^{22}\\frac{365-i}{365} \\approx 0.4927$. Thus $P(\\text{match}) \\approx 0.5073 > 0.5$.",
+          "Small group: $n=5, d=365$. $P(\\text{match}) = 1 - \\frac{365 \\cdot 364 \\cdot 363 \\cdot 362 \\cdot 361}{365^5} \\approx 0.0271$ (about 2.7%).",
+          "Guaranteed match: $n=366, d=365$. By pigeonhole principle, $P(\\text{match}) = 1$.",
+          "Intuition: With 23 people, there are $\\binom{23}{2} = 253$ pairs, each with probability $1/365 \\approx 0.0027$ of matching, giving expected number of matches $\\approx 253/365 \\approx 0.69$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Birthday Problem",
+          "latex": "$P(\\text{match}) = 1 - \\prod_{i=0}^{n-1}\\frac{d-i}{d}$ for $1 < n \\leq d$",
+          "description": "Main formula combining complement rule and sequential probability"
+        },
+        {
+          "name": "Number of Pairs",
+          "latex": "$\\binom{n}{2} = \\frac{n(n-1)}{2}$",
+          "description": "Number of possible pairs among n people; explains why probability grows quickly with n"
+        },
+        {
+          "name": "50% Threshold",
+          "latex": "$n^* \\approx 1.177\\sqrt{d}$",
+          "description": "Approximate number of people needed for 50% probability (for large d)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete birthday_problem function by integrating all concepts from previous sub-quests. Handle all edge cases, compute the probability using the complement rule and sequential products, and return properly rounded results.",
+        "function_signature": "def birthday_problem_complete(n: int, days: int = 365) -> float:",
+        "starter_code": "def birthday_problem_complete(n: int, days: int = 365) -> float:\n    \"\"\"\n    Calculate probability of at least one shared birthday (complete implementation).\n    \n    Args:\n        n: Number of people\n        days: Number of days in year (default 365)\n    \n    Returns:\n        float: Probability of at least one match, rounded to 4 decimal places\n    \"\"\"\n    # Your code here\n    # Hint: Use concepts from all previous sub-quests\n    # 1. Check edge cases (n <= 1 returns 0, n > days returns 1)\n    # 2. Calculate P(no match) using sequential product\n    # 3. Apply complement rule: P(match) = 1 - P(no match)\n    # 4. Round to 4 decimal places\n    pass",
+        "test_cases": [
+          {
+            "input": "birthday_problem_complete(0)",
+            "expected": "0.0",
+            "explanation": "Zero people cannot have a birthday match"
+          },
+          {
+            "input": "birthday_problem_complete(1)",
+            "expected": "0.0",
+            "explanation": "One person cannot have a birthday match"
+          },
+          {
+            "input": "birthday_problem_complete(2)",
+            "expected": "0.0027",
+            "explanation": "Two people: P(match) = 1 - (364/365) ≈ 0.0027"
+          },
+          {
+            "input": "birthday_problem_complete(23)",
+            "expected": "0.5073",
+            "explanation": "Classic case: 23 people gives just over 50% probability"
+          },
+          {
+            "input": "birthday_problem_complete(50)",
+            "expected": "0.9704",
+            "explanation": "50 people: very high probability of match (97%)"
+          },
+          {
+            "input": "birthday_problem_complete(366)",
+            "expected": "1.0",
+            "explanation": "Pigeonhole principle: 366 people, 365 days → guaranteed match"
+          },
+          {
+            "input": "birthday_problem_complete(10, 365)",
+            "expected": "0.1169",
+            "explanation": "10 people gives about 11.7% probability"
+          },
+          {
+            "input": "birthday_problem_complete(3, 10)",
+            "expected": "0.28",
+            "explanation": "Different year size: 3 people, 10 days → P = 1 - (10×9×8)/(10^3) = 0.28"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check edge cases before computing (n <= 1 and n > days)",
+        "Computing P(match) directly instead of using complement P(no match)",
+        "Using addition instead of multiplication for independent probabilities",
+        "Not rounding to exactly 4 decimal places as specified",
+        "Confusing 'at least one match' with 'exactly one match' (the former is much simpler)",
+        "Thinking the probability should be low because n << days (ignoring that we compare all pairs)"
+      ],
+      "hint": "Structure your solution: (1) Handle n <= 1 → return 0.0, (2) Handle n > days → return 1.0, (3) Initialize probability to 1.0, (4) Loop and multiply by (days-i)/days for i from 0 to n-1, (5) Return 1 minus this probability, rounded to 4 decimals.",
+      "references": [
+        "Birthday paradox and probability",
+        "Combinatorial probability problems",
+        "Taylor approximation: P(match) ≈ 1 - e^(-n²/(2d)) for small n",
+        "Applications in cryptography (collision attacks) and hash functions"
+      ]
+    }
+  ]
+}

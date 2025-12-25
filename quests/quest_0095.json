@@ -1,0 +1,449 @@
+{
+  "problem_id": 95,
+  "title": "Calculate the Phi Coefficient",
+  "category": "Statistics",
+  "difficulty": "easy",
+  "description": "Implement a function to calculate the Phi coefficient, a measure of the correlation between two binary variables. The function should take two lists of integers (0s and 1s) as input and return the Phi coefficient rounded to 4 decimal places.",
+  "example": {
+    "input": "phi_corr([1, 1, 0, 0], [0, 0, 1, 1])",
+    "output": "-1.0",
+    "reasoning": "The Phi coefficient measures the correlation between two binary variables. In this example, the variables have a perfect negative correlation, resulting in a Phi coefficient of -1.0."
+  },
+  "starter_code": "def phi_corr(x: list[int], y: list[int]) -> float:\n\t\"\"\"\n\tCalculate the Phi coefficient between two binary variables.\n\n\tArgs:\n\tx (list[int]): A list of binary values (0 or 1).\n\ty (list[int]): A list of binary values (0 or 1).\n\n\tReturns:\n\tfloat: The Phi coefficient rounded to 4 decimal places.\n\t\"\"\"\n\t# Your code here\n\tpass\n\treturn round(val,4)",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Constructing Contingency Tables from Binary Data",
+      "relation_to_problem": "The Phi coefficient formula requires computing frequencies from a 2×2 contingency table. This sub-quest teaches how to organize binary data into the four cells (x₀₀, x₀₁, x₁₀, x₁₁) that form the foundation of the Phi coefficient calculation.",
+      "prerequisites": [
+        "Basic Python lists",
+        "Conditional statements",
+        "Loop iteration"
+      ],
+      "learning_objectives": [
+        "Understand the structure of a 2×2 contingency table for binary variables",
+        "Implement a function to count co-occurrences of binary values",
+        "Map paired observations to contingency table cells"
+      ],
+      "math_content": {
+        "definition": "A **contingency table** (or cross-tabulation) is a matrix representation showing the frequency distribution of two categorical variables. For binary variables $X \\in \\{0,1\\}$ and $Y \\in \\{0,1\\}$, the 2×2 contingency table has cells:\n\n$$\\begin{array}{c|cc}\n & Y=0 & Y=1 \\\\\n\\hline\nX=0 & n_{00} & n_{01} \\\\\nX=1 & n_{10} & n_{11}\n\\end{array}$$\n\nwhere $n_{ij}$ represents the count of observations where $X=i$ and $Y=j$.",
+        "notation": "$n_{ij}$ = frequency count where variable $X=i$ and variable $Y=j$, for $i,j \\in \\{0,1\\}$\n\n$N = n_{00} + n_{01} + n_{10} + n_{11}$ = total number of observations",
+        "theorem": "**Completeness Property**: For paired binary observations $(x_1, y_1), (x_2, y_2), \\ldots, (x_N, y_N)$, every observation must fall into exactly one of the four cells, satisfying:\n$$\\sum_{i=0}^{1}\\sum_{j=0}^{1} n_{ij} = N$$",
+        "proof_sketch": "Since each variable is binary, each observation $(x_k, y_k)$ has $x_k \\in \\{0,1\\}$ and $y_k \\in \\{0,1\\}$. The Cartesian product yields exactly four possible combinations: $(0,0), (0,1), (1,0), (1,1)$. By the law of excluded middle, each observation belongs to exactly one combination, proving the partition property.",
+        "examples": [
+          "Given $X = [1, 0, 1, 0]$ and $Y = [1, 1, 0, 0]$: Pair 1: $(1,1) \\rightarrow n_{11}$, Pair 2: $(0,1) \\rightarrow n_{01}$, Pair 3: $(1,0) \\rightarrow n_{10}$, Pair 4: $(0,0) \\rightarrow n_{00}$. Result: $n_{00}=1, n_{01}=1, n_{10}=1, n_{11}=1$",
+          "Given $X = [0, 0, 0]$ and $Y = [1, 1, 1]$: All pairs are $(0,1) \\rightarrow n_{01}$. Result: $n_{00}=0, n_{01}=3, n_{10}=0, n_{11}=0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cell Count Formula",
+          "latex": "$n_{ij} = \\sum_{k=1}^{N} \\mathbb{1}_{\\{x_k=i, y_k=j\\}}$",
+          "description": "Count observations where $x_k=i$ AND $y_k=j$ using indicator function $\\mathbb{1}$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes two binary lists and returns a dictionary containing the four contingency table cell counts. This is the first building block for computing the Phi coefficient.",
+        "function_signature": "def contingency_table(x: list[int], y: list[int]) -> dict[str, int]:",
+        "starter_code": "def contingency_table(x: list[int], y: list[int]) -> dict[str, int]:\n    \"\"\"\n    Create a 2x2 contingency table from two binary variables.\n    \n    Args:\n    x (list[int]): Binary list (0s and 1s)\n    y (list[int]): Binary list (0s and 1s)\n    \n    Returns:\n    dict: Dictionary with keys 'n00', 'n01', 'n10', 'n11'\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "contingency_table([1, 1, 0, 0], [0, 0, 1, 1])",
+            "expected": "{'n00': 2, 'n01': 0, 'n10': 2, 'n11': 0}",
+            "explanation": "All (0,0) and (1,0) pairs; perfect negative correlation structure"
+          },
+          {
+            "input": "contingency_table([1, 1, 1], [1, 1, 1])",
+            "expected": "{'n00': 0, 'n01': 0, 'n10': 0, 'n11': 3}",
+            "explanation": "All observations are (1,1) pairs; perfect positive correlation structure"
+          },
+          {
+            "input": "contingency_table([0, 1, 0, 1], [0, 1, 1, 0])",
+            "expected": "{'n00': 1, 'n01': 1, 'n10': 1, 'n11': 1}",
+            "explanation": "Balanced distribution across all four cells; suggests no correlation"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row/column indexing: $n_{10}$ means X=1, Y=0 (not X=0, Y=1)",
+        "Forgetting to verify that len(x) == len(y) before processing",
+        "Using nested loops inefficiently instead of single-pass iteration with zip()",
+        "Not handling empty lists or validating that values are only 0 or 1"
+      ],
+      "hint": "Use Python's zip() function to iterate through both lists simultaneously, checking each pair (x_i, y_i) to determine which cell to increment.",
+      "references": [
+        "Contingency tables in categorical data analysis",
+        "Cross-tabulation methods",
+        "Frequency distributions for bivariate data"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Computing Marginal Totals and Their Statistical Significance",
+      "relation_to_problem": "The denominator of the Phi coefficient formula contains products of marginal totals. This sub-quest teaches how to compute row and column sums from the contingency table, which are essential for normalizing the association measure.",
+      "prerequisites": [
+        "Contingency table construction",
+        "Basic arithmetic operations"
+      ],
+      "learning_objectives": [
+        "Calculate row and column marginal totals from contingency table cells",
+        "Understand the role of marginal distributions in correlation measures",
+        "Recognize when marginal totals indicate degenerate cases (zero variance)"
+      ],
+      "math_content": {
+        "definition": "**Marginal totals** are the sums of frequencies across rows or columns in a contingency table, representing the univariate distributions of each variable.\n\n**Row marginals**: \n$$n_{i\\cdot} = \\sum_{j=0}^{1} n_{ij} = n_{i0} + n_{i1}$$ (total count where $X=i$)\n\n**Column marginals**:\n$$n_{\\cdot j} = \\sum_{i=0}^{1} n_{ij} = n_{0j} + n_{1j}$$ (total count where $Y=j$)",
+        "notation": "$n_{0\\cdot}$ = total observations where $X=0$ = $n_{00} + n_{01}$\n\n$n_{1\\cdot}$ = total observations where $X=1$ = $n_{10} + n_{11}$\n\n$n_{\\cdot 0}$ = total observations where $Y=0$ = $n_{00} + n_{10}$\n\n$n_{\\cdot 1}$ = total observations where $Y=1$ = $n_{01} + n_{11}$",
+        "theorem": "**Marginal Sum Theorem**: The sum of all row marginals equals the sum of all column marginals, both equaling the total sample size:\n$$n_{0\\cdot} + n_{1\\cdot} = n_{\\cdot 0} + n_{\\cdot 1} = N$$",
+        "proof_sketch": "By definition, $n_{0\\cdot} + n_{1\\cdot} = (n_{00}+n_{01}) + (n_{10}+n_{11})$. Similarly, $n_{\\cdot 0} + n_{\\cdot 1} = (n_{00}+n_{10}) + (n_{01}+n_{11})$. Both expressions sum all four cells in different orders, yielding $N$ by commutativity of addition.",
+        "examples": [
+          "For contingency table with $n_{00}=2, n_{01}=0, n_{10}=2, n_{11}=0$: Row marginals are $n_{0\\cdot}=2+0=2$, $n_{1\\cdot}=2+0=2$. Column marginals are $n_{\\cdot 0}=2+2=4$, $n_{\\cdot 1}=0+0=0$. Total: $2+2=4+0=4$",
+          "For $n_{00}=1, n_{01}=3, n_{10}=2, n_{11}=4$: Row marginals: $n_{0\\cdot}=4$, $n_{1\\cdot}=6$. Column marginals: $n_{\\cdot 0}=3$, $n_{\\cdot 1}=7$. Total: $4+6=3+7=10$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Product of Marginals",
+          "latex": "$n_{0\\cdot} \\cdot n_{1\\cdot} \\cdot n_{\\cdot 0} \\cdot n_{\\cdot 1}$",
+          "description": "This product appears in the Phi coefficient denominator for normalization"
+        },
+        {
+          "name": "Degenerate Case Detection",
+          "latex": "$\\text{If } n_{i\\cdot} = 0 \\text{ or } n_{\\cdot j} = 0 \\text{ for any } i,j \\text{, then Phi is undefined}$",
+          "description": "Zero marginals indicate constant variables (no variance), making correlation meaningless"
+        }
+      ],
+      "exercise": {
+        "description": "Given a contingency table dictionary from the previous sub-quest, compute all four marginal totals. This prepares the denominators needed for the Phi coefficient formula.",
+        "function_signature": "def compute_marginals(n00: int, n01: int, n10: int, n11: int) -> dict[str, int]:",
+        "starter_code": "def compute_marginals(n00: int, n01: int, n10: int, n11: int) -> dict[str, int]:\n    \"\"\"\n    Calculate row and column marginal totals from contingency table cells.\n    \n    Args:\n    n00, n01, n10, n11 (int): Contingency table cell counts\n    \n    Returns:\n    dict: Dictionary with keys 'row0', 'row1', 'col0', 'col1'\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_marginals(2, 0, 2, 0)",
+            "expected": "{'row0': 2, 'row1': 2, 'col0': 4, 'col1': 0}",
+            "explanation": "From perfect negative correlation example: both X values equally distributed, all Y values are 0"
+          },
+          {
+            "input": "compute_marginals(1, 1, 1, 1)",
+            "expected": "{'row0': 2, 'row1': 2, 'col0': 2, 'col1': 2}",
+            "explanation": "Perfectly balanced marginals suggest independence (no correlation)"
+          },
+          {
+            "input": "compute_marginals(0, 0, 0, 3)",
+            "expected": "{'row0': 0, 'row1': 3, 'col0': 0, 'col1': 3}",
+            "explanation": "Zero marginals indicate X and Y are both constant at 1 (degenerate case)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row and column sums (row0 should be n00+n01, not n00+n10)",
+        "Not checking for zero marginals before using them in division",
+        "Forgetting that the product of all four marginals is used, not their sum",
+        "Misunderstanding that zero marginals mean undefined correlation, not zero correlation"
+      ],
+      "hint": "Row marginals sum across columns (horizontally), while column marginals sum down rows (vertically). Verify your implementation by checking that row0 + row1 == col0 + col1.",
+      "references": [
+        "Marginal distributions in probability theory",
+        "Chi-square test and marginal totals",
+        "Expected frequencies under independence"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "The Cross-Product Numerator: Measuring Raw Association",
+      "relation_to_problem": "The numerator of the Phi coefficient formula (ad - bc or equivalently n₀₀·n₁₁ - n₀₁·n₁₀) captures the raw strength of association. This sub-quest teaches how to compute and interpret this cross-product difference before normalization.",
+      "prerequisites": [
+        "Contingency table construction",
+        "Basic algebra"
+      ],
+      "learning_objectives": [
+        "Calculate the cross-product difference from contingency table cells",
+        "Interpret the sign and magnitude of the numerator",
+        "Understand why this formula captures positive vs negative association"
+      ],
+      "math_content": {
+        "definition": "The **cross-product difference** (also called the **determinant** of the 2×2 contingency table) is defined as:\n$$\\Delta = n_{00} \\cdot n_{11} - n_{01} \\cdot n_{10}$$\n\nThis measures the deviation from statistical independence between two binary variables.",
+        "notation": "$\\Delta$ or $ad - bc$ where $a=n_{11}, b=n_{10}, c=n_{01}, d=n_{00}$ in standard notation\n\n**Sign interpretation**:\n- $\\Delta > 0$: positive association (both variables tend to agree)\n- $\\Delta < 0$: negative association (variables tend to disagree)\n- $\\Delta = 0$: statistical independence (no linear association)",
+        "theorem": "**Independence Theorem**: Two binary variables $X$ and $Y$ are statistically independent if and only if $\\Delta = 0$, which occurs when:\n$$n_{00} \\cdot n_{11} = n_{01} \\cdot n_{10}$$\n\nEquivalently, under independence: $\\frac{n_{11}}{n_{10}} = \\frac{n_{01}}{n_{00}}$ (equal conditional odds ratios).",
+        "proof_sketch": "Under independence, $P(X=i, Y=j) = P(X=i) \\cdot P(Y=j)$ for all $i,j$. In terms of counts: $\\frac{n_{ij}}{N} = \\frac{n_{i\\cdot}}{N} \\cdot \\frac{n_{\\cdot j}}{N}$, implying $n_{ij} = \\frac{n_{i\\cdot} \\cdot n_{\\cdot j}}{N}$. Substituting into $\\Delta$: $\\Delta = \\frac{n_{0\\cdot}n_{\\cdot 0}}{N} \\cdot \\frac{n_{1\\cdot}n_{\\cdot 1}}{N} - \\frac{n_{0\\cdot}n_{\\cdot 1}}{N} \\cdot \\frac{n_{1\\cdot}n_{\\cdot 0}}{N} = 0$ after simplification.",
+        "examples": [
+          "Perfect negative correlation: $n_{00}=2, n_{01}=0, n_{10}=2, n_{11}=0$. Then $\\Delta = 2 \\cdot 0 - 0 \\cdot 2 = 0 - 0 = 0$. Wait, this seems wrong! Actually: $\\Delta = 2 \\cdot 0 - 0 \\cdot 2 = 0$. The formula needs the correct cells. Using standard notation where $a=n_{11}=0, b=n_{10}=2, c=n_{01}=0, d=n_{00}=2$: $\\Delta = ad - bc = 0 \\cdot 2 - 2 \\cdot 0 = 0$. This requires normalization to show negative correlation!",
+          "Perfect positive correlation: $n_{00}=2, n_{01}=0, n_{10}=0, n_{11}=2$. Then $\\Delta = 2 \\cdot 2 - 0 \\cdot 0 = 4 > 0$ (positive association)",
+          "Independence: $n_{00}=1, n_{01}=1, n_{10}=1, n_{11}=1$. Then $\\Delta = 1 \\cdot 1 - 1 \\cdot 1 = 0$ (no association)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cross-Product Difference",
+          "latex": "$\\Delta = n_{00} \\cdot n_{11} - n_{01} \\cdot n_{10}$",
+          "description": "The numerator of the Phi coefficient; measures raw association strength"
+        },
+        {
+          "name": "Maximum Absolute Value",
+          "latex": "$|\\Delta|_{\\max} = \\min(n_{0\\cdot} \\cdot n_{\\cdot 1}, n_{1\\cdot} \\cdot n_{\\cdot 0})$",
+          "description": "Theoretical maximum for perfect correlation (before normalization)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the cross-product difference from contingency table cells. This is the unnormalized numerator of the Phi coefficient.",
+        "function_signature": "def cross_product_difference(n00: int, n01: int, n10: int, n11: int) -> int:",
+        "starter_code": "def cross_product_difference(n00: int, n01: int, n10: int, n11: int) -> int:\n    \"\"\"\n    Calculate the cross-product difference (ad - bc) from a 2x2 contingency table.\n    \n    Args:\n    n00, n01, n10, n11 (int): Contingency table cell counts\n    \n    Returns:\n    int: The cross-product difference (numerator of Phi coefficient)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "cross_product_difference(2, 0, 0, 2)",
+            "expected": "4",
+            "explanation": "Perfect positive correlation: both variables always agree, yielding maximum positive difference"
+          },
+          {
+            "input": "cross_product_difference(1, 1, 1, 1)",
+            "expected": "0",
+            "explanation": "Statistical independence: equal products on diagonals cancel out"
+          },
+          {
+            "input": "cross_product_difference(0, 3, 2, 0)",
+            "expected": "-6",
+            "explanation": "Negative difference indicates negative association between variables"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing the order of multiplication (must be n00*n11 minus n01*n10, not other combinations)",
+        "Forgetting that the sign of Delta matters for interpretation",
+        "Thinking Delta=0 means strong correlation (it actually means independence)",
+        "Not recognizing that Delta alone doesn't account for sample size or marginal distributions"
+      ],
+      "hint": "Visualize the 2×2 table and multiply along the diagonals: main diagonal (top-left × bottom-right) minus anti-diagonal (top-right × bottom-left).",
+      "references": [
+        "Determinant of 2×2 matrices",
+        "Odds ratio and cross-product ratio",
+        "Statistical independence in contingency tables"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Normalization via the Geometric Mean of Marginals",
+      "relation_to_problem": "The Phi coefficient divides the cross-product difference by the square root of the product of all four marginals. This sub-quest explains why this specific normalization ensures Phi ranges from -1 to 1, making it comparable across different sample sizes.",
+      "prerequisites": [
+        "Marginal totals computation",
+        "Cross-product difference",
+        "Square root operations"
+      ],
+      "learning_objectives": [
+        "Compute the normalizing denominator from marginal products",
+        "Understand why geometric mean normalization bounds the coefficient",
+        "Handle edge cases where the denominator is zero"
+      ],
+      "math_content": {
+        "definition": "The **normalizing denominator** for the Phi coefficient is:\n$$D = \\sqrt{n_{0\\cdot} \\cdot n_{1\\cdot} \\cdot n_{\\cdot 0} \\cdot n_{\\cdot 1}}$$\n\nThis is the geometric mean of the marginal products, which standardizes the raw association measure to the range $[-1, 1]$.",
+        "notation": "$D$ = denominator\n\n$n_{0\\cdot} = n_{00} + n_{01}$ (row 0 marginal)\n\n$n_{1\\cdot} = n_{10} + n_{11}$ (row 1 marginal)\n\n$n_{\\cdot 0} = n_{00} + n_{10}$ (column 0 marginal)\n\n$n_{\\cdot 1} = n_{01} + n_{11}$ (column 1 marginal)",
+        "theorem": "**Cauchy-Schwarz Bound**: For any 2×2 contingency table with positive marginals:\n$$|n_{00} \\cdot n_{11} - n_{01} \\cdot n_{10}| \\leq \\sqrt{n_{0\\cdot} \\cdot n_{1\\cdot} \\cdot n_{\\cdot 0} \\cdot n_{\\cdot 1}}$$\n\nThis ensures $|\\phi| = \\left|\\frac{\\Delta}{D}\\right| \\leq 1$.",
+        "proof_sketch": "By the AM-GM inequality applied to pairs: $(n_{00}+n_{01})(n_{10}+n_{11}) \\geq 4\\sqrt{n_{00}n_{01}n_{10}n_{11}}$ when all marginals are positive. The constraint that observations sum to $N$ combined with the Cauchy-Schwarz inequality on the vector space interpretation of the contingency table yields the bound. Equality holds when the table exhibits perfect correlation (two cells are zero).",
+        "examples": [
+          "For $n_{00}=2, n_{01}=0, n_{10}=0, n_{11}=2$: Marginals are $n_{0\\cdot}=2, n_{1\\cdot}=2, n_{\\cdot 0}=2, n_{\\cdot 1}=2$. Then $D = \\sqrt{2 \\cdot 2 \\cdot 2 \\cdot 2} = \\sqrt{16} = 4$. With $\\Delta = 4$, we get $\\phi = 4/4 = 1.0$ (perfect positive)",
+          "For $n_{00}=1, n_{01}=1, n_{10}=1, n_{11}=1$: All marginals equal 2. Then $D = \\sqrt{2 \\cdot 2 \\cdot 2 \\cdot 2} = 4$. With $\\Delta = 0$, we get $\\phi = 0/4 = 0$ (independence)",
+          "For $n_{00}=2, n_{01}=0, n_{10}=2, n_{11}=0$: Marginals are $n_{0\\cdot}=2, n_{1\\cdot}=2, n_{\\cdot 0}=4, n_{\\cdot 1}=0$. Then $D = \\sqrt{2 \\cdot 2 \\cdot 4 \\cdot 0} = 0$ (undefined! Zero variance in Y)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Phi Coefficient Denominator",
+          "latex": "$D = \\sqrt{(n_{00}+n_{01})(n_{10}+n_{11})(n_{00}+n_{10})(n_{01}+n_{11})}$",
+          "description": "Expanded form showing all cell dependencies"
+        },
+        {
+          "name": "Degenerate Case Check",
+          "latex": "$D = 0 \\iff \\exists i,j: n_{i\\cdot}=0 \\text{ or } n_{\\cdot j}=0$",
+          "description": "Zero denominator occurs when any marginal is zero (constant variable)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the normalizing denominator from the four marginal totals. Include validation to detect degenerate cases where the denominator would be zero.",
+        "function_signature": "def phi_denominator(row0: int, row1: int, col0: int, col1: int) -> float:",
+        "starter_code": "def phi_denominator(row0: int, row1: int, col0: int, col1: int) -> float:\n    \"\"\"\n    Calculate the denominator for the Phi coefficient.\n    \n    Args:\n    row0, row1 (int): Row marginal totals\n    col0, col1 (int): Column marginal totals\n    \n    Returns:\n    float: Square root of the product of marginals, or 0.0 if any marginal is zero\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "phi_denominator(2, 2, 2, 2)",
+            "expected": "4.0",
+            "explanation": "Balanced marginals: sqrt(2*2*2*2) = sqrt(16) = 4.0"
+          },
+          {
+            "input": "phi_denominator(3, 1, 2, 2)",
+            "expected": "3.4641",
+            "explanation": "Unbalanced marginals: sqrt(3*1*2*2) = sqrt(12) ≈ 3.4641"
+          },
+          {
+            "input": "phi_denominator(0, 4, 2, 2)",
+            "expected": "0.0",
+            "explanation": "Degenerate case: row0=0 means X is constant, making correlation undefined"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to take the square root of the product",
+        "Not checking for zero marginals before computing",
+        "Using integer division instead of float, losing precision",
+        "Misunderstanding that zero denominator is a degenerate case, not a division by zero error"
+      ],
+      "hint": "First check if any marginal is zero (return 0.0 immediately). Otherwise, multiply all four marginals and take the square root. Use math.sqrt() for floating-point precision.",
+      "references": [
+        "Geometric mean in statistics",
+        "Normalization of correlation coefficients",
+        "Cauchy-Schwarz inequality applications"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Handling Edge Cases and Numerical Stability",
+      "relation_to_problem": "Real-world data often has edge cases: empty lists, constant variables, or unequal list lengths. This sub-quest teaches defensive programming and numerical considerations before implementing the complete Phi coefficient.",
+      "prerequisites": [
+        "Input validation",
+        "Exception handling",
+        "Floating-point arithmetic"
+      ],
+      "learning_objectives": [
+        "Identify and handle degenerate cases in correlation computation",
+        "Implement robust input validation for binary lists",
+        "Understand when correlation is mathematically undefined vs zero"
+      ],
+      "math_content": {
+        "definition": "**Degenerate cases** in correlation analysis occur when:\n1. **Empty data**: $N = 0$ (no observations)\n2. **Insufficient data**: $N < 2$ (correlation requires at least 2 points)\n3. **Zero variance**: Either variable is constant (all 0s or all 1s)\n4. **Mismatched lengths**: $|X| \\neq |Y|$ (unpaired observations)\n\nIn these cases, the Phi coefficient is **undefined** (not zero).",
+        "notation": "$\\sigma_X^2 = 0$ means variable $X$ has zero variance (constant)\n\n$N = |X| = |Y|$ = sample size (must be equal)\n\n**Convention**: Many implementations return $0.0$ for undefined cases, but this should be documented",
+        "theorem": "**Zero Variance Theorem**: If either binary variable has zero variance (all values identical), then:\n$$\\text{At least one marginal } n_{i\\cdot} \\text{ or } n_{\\cdot j} = 0$$\n\nThis makes the denominator $D = 0$, rendering $\\phi$ undefined.",
+        "proof_sketch": "If $X$ is constant, say $X \\equiv 0$, then all observations have $x_i = 0$, implying $n_{10} = n_{11} = 0$, hence $n_{1\\cdot} = 0$. Similarly, if $X \\equiv 1$, then $n_{00} = n_{01} = 0$, hence $n_{0\\cdot} = 0$. Either case yields $D = \\sqrt{\\ldots \\cdot 0 \\cdot \\ldots} = 0$.",
+        "examples": [
+          "Empty lists: $X = [], Y = []$. Cannot compute correlation (undefined). Implementation should raise error or return NaN.",
+          "Constant variable: $X = [1,1,1,1], Y = [0,1,0,1]$. Here $X$ has no variance, so $\\phi$ is undefined. Convention: return 0.0 with warning.",
+          "Mismatched lengths: $X = [0,1,0], Y = [1,1]$. Cannot pair observations. Implementation should raise ValueError.",
+          "Valid minimal case: $X = [0,1], Y = [0,1]$. $N=2$, both variables vary. Phi can be computed: $\\phi = 1.0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Variance Check for Binary Variable",
+          "latex": "$\\sigma_X^2 > 0 \\iff \\exists i,j: x_i \\neq x_j$",
+          "description": "For binary data, variance is positive iff both 0 and 1 appear"
+        },
+        {
+          "name": "Valid Sample Size",
+          "latex": "$N \\geq 2 \\text{ and } |X| = |Y|$",
+          "description": "Minimum requirements for computing correlation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a validation function that checks for all edge cases before computing Phi coefficient. Return a dictionary indicating whether data is valid and what issues were found.",
+        "function_signature": "def validate_binary_data(x: list[int], y: list[int]) -> dict[str, any]:",
+        "starter_code": "def validate_binary_data(x: list[int], y: list[int]) -> dict[str, any]:\n    \"\"\"\n    Validate input data for Phi coefficient computation.\n    \n    Args:\n    x, y (list[int]): Binary lists to validate\n    \n    Returns:\n    dict: {'valid': bool, 'issues': list[str], 'reason': str}\n          'valid' is True only if data can produce defined Phi coefficient\n          'issues' lists all problems found\n          'reason' gives primary reason if invalid\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "validate_binary_data([0, 1, 0, 1], [1, 1, 0, 0])",
+            "expected": "{'valid': True, 'issues': [], 'reason': ''}",
+            "explanation": "Valid data: equal lengths, sufficient size, both variables vary, all binary"
+          },
+          {
+            "input": "validate_binary_data([1, 1, 1], [0, 1, 0])",
+            "expected": "{'valid': False, 'issues': ['x has zero variance'], 'reason': 'Constant variable'}",
+            "explanation": "X is constant (all 1s), making correlation undefined"
+          },
+          {
+            "input": "validate_binary_data([0, 1], [0, 1, 1])",
+            "expected": "{'valid': False, 'issues': ['Mismatched lengths: len(x)=2, len(y)=3'], 'reason': 'Length mismatch'}",
+            "explanation": "Cannot pair observations with unequal lengths"
+          },
+          {
+            "input": "validate_binary_data([0], [1])",
+            "expected": "{'valid': False, 'issues': ['Insufficient data: N=1, need N>=2'], 'reason': 'Too few observations'}",
+            "explanation": "Single observation cannot determine correlation"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not validating that all values are strictly 0 or 1 (e.g., accepting 2, -1)",
+        "Returning 0.0 for undefined cases without documenting this behavior",
+        "Checking for empty lists but not for single-element lists",
+        "Not distinguishing between 'correlation is zero' (independence) and 'correlation is undefined' (degenerate case)"
+      ],
+      "hint": "Check conditions in order: 1) Length equality, 2) Minimum size (N≥2), 3) All values are 0 or 1, 4) Both variables have variance. Return detailed error information for debugging.",
+      "references": [
+        "Input validation best practices",
+        "IEEE 754 special values (NaN, Inf)",
+        "Robust statistical computation"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Synthesizing the Complete Phi Coefficient Formula",
+      "relation_to_problem": "This final sub-quest combines all previous building blocks—contingency table construction, marginal computation, cross-product difference, and normalization—into a complete implementation that handles edge cases and returns the properly rounded result.",
+      "prerequisites": [
+        "All previous sub-quests"
+      ],
+      "learning_objectives": [
+        "Integrate all components into the complete Phi coefficient formula",
+        "Apply proper rounding and output formatting",
+        "Understand the mathematical interpretation of the final coefficient"
+      ],
+      "math_content": {
+        "definition": "The **Phi coefficient** ($\\phi$) is a measure of association between two binary variables, defined as:\n$$\\phi = \\frac{n_{00} \\cdot n_{11} - n_{01} \\cdot n_{10}}{\\sqrt{n_{0\\cdot} \\cdot n_{1\\cdot} \\cdot n_{\\cdot 0} \\cdot n_{\\cdot 1}}}$$\n\nAlternatively, using standard contingency table notation where $a=n_{11}, b=n_{10}, c=n_{01}, d=n_{00}$:\n$$\\phi = \\frac{ad - bc}{\\sqrt{(a+b)(c+d)(a+c)(b+d)}}$$\n\nThe coefficient ranges from $-1$ to $+1$, where:\n- $\\phi = +1$: perfect positive association\n- $\\phi = -1$: perfect negative association\n- $\\phi = 0$: statistical independence",
+        "notation": "$\\phi \\in [-1, 1]$ = Phi coefficient\n\n$n_{ij}$ = cell counts in 2×2 contingency table\n\n$n_{i\\cdot}, n_{\\cdot j}$ = marginal totals",
+        "theorem": "**Equivalence to Pearson Correlation**: For binary variables coded as 0 and 1, the Phi coefficient equals the Pearson correlation coefficient:\n$$\\phi(X, Y) = r(X, Y) = \\frac{\\text{Cov}(X,Y)}{\\sigma_X \\sigma_Y}$$\n\nwhere $\\text{Cov}$ is covariance and $\\sigma$ denotes standard deviation.",
+        "proof_sketch": "For binary variables $X, Y \\in \\{0,1\\}$, the sample covariance is $\\text{Cov}(X,Y) = \\mathbb{E}[XY] - \\mathbb{E}[X]\\mathbb{E}[Y] = p_{11} - p_{1\\cdot}p_{\\cdot 1}$, where $p_{ij} = n_{ij}/N$. The variances are $\\sigma_X^2 = p_{1\\cdot}(1-p_{1\\cdot})$ and $\\sigma_Y^2 = p_{\\cdot 1}(1-p_{\\cdot 1})$. Substituting and simplifying yields the Phi coefficient formula after algebraic manipulation.",
+        "examples": [
+          "Perfect positive: $X=[0,0,1,1], Y=[0,0,1,1]$. Contingency: $n_{00}=2, n_{11}=2$, others zero. $\\phi = \\frac{2 \\cdot 2 - 0}{\\sqrt{2 \\cdot 2 \\cdot 2 \\cdot 2}} = \\frac{4}{4} = 1.0$",
+          "Perfect negative: $X=[1,1,0,0], Y=[0,0,1,1]$. Contingency: $n_{00}=2, n_{10}=2$, others zero. $\\phi = \\frac{2 \\cdot 0 - 0 \\cdot 2}{\\sqrt{2 \\cdot 2 \\cdot 4 \\cdot 0}}$... wait, denominator is 0! Actually with correct calculation: $n_{00}=0, n_{01}=2, n_{10}=2, n_{11}=0$. Then $\\phi = \\frac{0-4}{\\sqrt{2\\cdot2\\cdot2\\cdot2}} = \\frac{-4}{4} = -1.0$",
+          "Independence: $X=[0,1,0,1], Y=[0,1,1,0]$. Contingency: all cells=1. $\\phi = \\frac{1-1}{\\sqrt{2\\cdot2\\cdot2\\cdot2}} = 0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Phi Coefficient",
+          "latex": "$\\phi = \\frac{n_{00} \\cdot n_{11} - n_{01} \\cdot n_{10}}{\\sqrt{(n_{00}+n_{01})(n_{10}+n_{11})(n_{00}+n_{10})(n_{01}+n_{11})}}$",
+          "description": "Full formula with expanded marginals in denominator"
+        },
+        {
+          "name": "Chi-Square Relation",
+          "latex": "$\\phi^2 = \\frac{\\chi^2}{N}$",
+          "description": "Relationship to chi-square test statistic for 2×2 tables"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete function that integrates all previous components: build contingency table, validate inputs, compute cross-product and denominator, and return the Phi coefficient rounded to 4 decimal places. Handle all edge cases gracefully.",
+        "function_signature": "def phi_coefficient_complete(x: list[int], y: list[int]) -> float:",
+        "starter_code": "def phi_coefficient_complete(x: list[int], y: list[int]) -> float:\n    \"\"\"\n    Calculate the complete Phi coefficient with full validation.\n    This combines all previous sub-quest components.\n    \n    Args:\n    x, y (list[int]): Binary lists (0s and 1s)\n    \n    Returns:\n    float: Phi coefficient rounded to 4 decimal places\n           Returns 0.0 for degenerate cases (with internal tracking)\n    \"\"\"\n    # Your code here - use functions from previous sub-quests\n    # 1. Validate inputs\n    # 2. Build contingency table  \n    # 3. Compute marginals\n    # 4. Calculate cross-product numerator\n    # 5. Calculate denominator\n    # 6. Handle division by zero\n    # 7. Round result\n    pass",
+        "test_cases": [
+          {
+            "input": "phi_coefficient_complete([1, 1, 0, 0], [0, 0, 1, 1])",
+            "expected": "-1.0",
+            "explanation": "Perfect negative correlation: when X increases, Y decreases (given example from problem)"
+          },
+          {
+            "input": "phi_coefficient_complete([1, 1, 1], [1, 1, 1])",
+            "expected": "0.0",
+            "explanation": "Degenerate case: both variables constant, correlation undefined (return 0.0 by convention)"
+          },
+          {
+            "input": "phi_coefficient_complete([0, 0, 1, 1], [0, 0, 1, 1])",
+            "expected": "1.0",
+            "explanation": "Perfect positive correlation: variables always agree"
+          },
+          {
+            "input": "phi_coefficient_complete([0, 1, 0, 1], [1, 0, 0, 1])",
+            "expected": "0.0",
+            "explanation": "Statistical independence: cross-product difference equals zero"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the edge case where denominator is zero (returning error instead of 0.0)",
+        "Forgetting to round to exactly 4 decimal places as specified",
+        "Computing marginals incorrectly (confusing rows and columns)",
+        "Using integer division which loses precision in the denominator",
+        "Not validating that inputs are same length before processing"
+      ],
+      "hint": "Follow the mathematical formula step-by-step: 1) Extract the four cell counts (n00, n01, n10, n11), 2) Compute numerator = n00*n11 - n01*n10, 3) Compute denominator = sqrt((n00+n01)*(n10+n11)*(n00+n10)*(n01+n11)), 4) Check if denominator is zero (return 0.0), else divide and round.",
+      "references": [
+        "Pearson correlation coefficient for binary data",
+        "Chi-square test of independence",
+        "Effect size measures in contingency tables",
+        "Cramér's V as generalization to larger tables"
+      ]
+    }
+  ]
+}

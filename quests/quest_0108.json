@@ -1,0 +1,507 @@
+{
+  "problem_id": 108,
+  "title": "Measure Disorder in Apple Colors",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "Implement a function that calculates the disorder in a basket of apples based on their colors, where each apple color is represented by an integer. The disorder must be 0 if all apples are the same color and must increase as the variety of colors increases. In particular:\n- [0,0,0,0] should yield 0.\n- [1,1,0,0] should have a higher disorder than [0,0,0,0].\n- [0,1,2,3] should have a higher disorder than [1,1,0,0].\n- [0,0,1,1,2,2,3,3] should have a higher disorder than [0,0,0,0,0,1,2,3].\n\nYou may use any method to measure disorder as long as these properties are satisfied.",
+  "example": {
+    "input": "disorder([1,1,0,0])",
+    "output": "0.5 #or any value from -inf till +inf",
+    "reasoning": "In the basket [1,1,0,0], there are two distinct colors each appearing with equal frequency (0.5)."
+  },
+  "starter_code": "def disorder(apples: list) -> float:\n\t\"\"\"\n\tCompute the disorder in a basket of apples.\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Proportions and Frequency Distributions",
+      "relation_to_problem": "Understanding proportions is fundamental to Gini impurity, as we need to calculate the relative frequency (proportion) of each apple color in the basket before computing disorder.",
+      "prerequisites": [
+        "Basic arithmetic",
+        "Division",
+        "Counting"
+      ],
+      "learning_objectives": [
+        "Define proportion as a relative frequency",
+        "Calculate proportions from discrete data",
+        "Verify that proportions sum to 1",
+        "Understand the relationship between counts and proportions"
+      ],
+      "math_content": {
+        "definition": "Given a dataset with $n$ total elements and $n_i$ elements of type $i$, the **proportion** $p_i$ of type $i$ is defined as: $$p_i = \\frac{n_i}{n}$$ where $n = \\sum_{j=1}^{k} n_j$ and $k$ is the number of distinct types. Proportions satisfy $0 \\leq p_i \\leq 1$ and $\\sum_{i=1}^{k} p_i = 1$.",
+        "notation": "$p_i$ = proportion of type $i$, $n_i$ = count of type $i$, $n$ = total count, $k$ = number of distinct types",
+        "theorem": "**Normalization Property**: For any finite dataset, the sum of all proportions equals 1: $$\\sum_{i=1}^{k} p_i = \\sum_{i=1}^{k} \\frac{n_i}{n} = \\frac{1}{n}\\sum_{i=1}^{k} n_i = \\frac{n}{n} = 1$$",
+        "proof_sketch": "Since every element belongs to exactly one type, the total of all type counts equals the dataset size: $\\sum_{i=1}^{k} n_i = n$. Dividing both sides by $n$ yields the normalization property.",
+        "examples": [
+          "Basket [1,1,0,0]: Color 0 appears 2 times, color 1 appears 2 times, total = 4. Thus $p_0 = 2/4 = 0.5$ and $p_1 = 2/4 = 0.5$.",
+          "Basket [0,0,0,1]: Color 0 appears 3 times, color 1 appears 1 time, total = 4. Thus $p_0 = 3/4 = 0.75$ and $p_1 = 1/4 = 0.25$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Proportion Formula",
+          "latex": "$p_i = \\frac{n_i}{n}$",
+          "description": "Calculate the proportion of category $i$ by dividing its count by the total count"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a list of apple colors (integers) and returns a dictionary mapping each color to its proportion in the basket. This is the first building block for computing disorder measures.",
+        "function_signature": "def calculate_proportions(apples: list) -> dict:",
+        "starter_code": "def calculate_proportions(apples: list) -> dict:\n    \"\"\"\n    Calculate the proportion of each apple color in the basket.\n    \n    Args:\n        apples: List of integers representing apple colors\n        \n    Returns:\n        Dictionary mapping each color to its proportion (0 to 1)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_proportions([1,1,0,0])",
+            "expected": "{0: 0.5, 1: 0.5}",
+            "explanation": "Two colors, each appearing twice out of 4 total apples"
+          },
+          {
+            "input": "calculate_proportions([0,0,0,0])",
+            "expected": "{0: 1.0}",
+            "explanation": "Single color appearing 4 times out of 4 total apples"
+          },
+          {
+            "input": "calculate_proportions([0,1,2,3])",
+            "expected": "{0: 0.25, 1: 0.25, 2: 0.25, 3: 0.25}",
+            "explanation": "Four distinct colors, each appearing once out of 4 total apples"
+          },
+          {
+            "input": "calculate_proportions([0,0,0,0,0,1,2,3])",
+            "expected": "{0: 0.625, 1: 0.125, 2: 0.125, 3: 0.125}",
+            "explanation": "Color 0 appears 5 times, others once each, out of 8 total apples"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to convert integer division to float division (in some languages)",
+        "Not handling empty lists",
+        "Rounding proportions prematurely, causing sum to not equal exactly 1.0",
+        "Using the number of distinct colors as denominator instead of total count"
+      ],
+      "hint": "Use Python's Counter from collections module to count occurrences efficiently, then divide each count by the total length of the list.",
+      "references": [
+        "Probability theory and frequency distributions",
+        "Descriptive statistics",
+        "Python Counter class"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Summation of Squared Terms",
+      "relation_to_problem": "The Gini impurity formula requires computing $\\sum_{i=1}^{k} p_i^2$. Understanding how to square individual proportions and sum them is essential for the disorder calculation.",
+      "prerequisites": [
+        "Proportions and Frequency Distributions",
+        "Exponentiation",
+        "Summation notation"
+      ],
+      "learning_objectives": [
+        "Understand summation notation $\\sum$",
+        "Apply squaring operations to terms in a sum",
+        "Calculate sum of squared proportions",
+        "Recognize mathematical properties of squared proportions"
+      ],
+      "math_content": {
+        "definition": "For a sequence of values $\\{p_1, p_2, \\ldots, p_k\\}$, the **sum of squares** is defined as: $$S = \\sum_{i=1}^{k} p_i^2 = p_1^2 + p_2^2 + \\cdots + p_k^2$$ Each term is squared individually before summation.",
+        "notation": "$\\sum_{i=1}^{k}$ = summation from $i=1$ to $i=k$, $p_i^2$ = the square of $p_i$",
+        "theorem": "**Bounds on Sum of Squared Proportions**: For proportions $p_1, p_2, \\ldots, p_k$ where $\\sum_{i=1}^{k} p_i = 1$ and $p_i \\geq 0$: $$\\frac{1}{k} \\leq \\sum_{i=1}^{k} p_i^2 \\leq 1$$ The minimum $1/k$ is achieved when all proportions are equal ($p_i = 1/k$ for all $i$), and the maximum 1 is achieved when one proportion equals 1 and all others are 0.",
+        "proof_sketch": "For the upper bound: If $p_j = 1$ and $p_i = 0$ for $i \\neq j$, then $\\sum p_i^2 = 1^2 = 1$. For the lower bound: By Cauchy-Schwarz inequality or Lagrange multipliers, subject to $\\sum p_i = 1$, the minimum of $\\sum p_i^2$ occurs at $p_i = 1/k$, giving $\\sum_{i=1}^{k}(1/k)^2 = k \\cdot (1/k^2) = 1/k$.",
+        "examples": [
+          "For $p_1 = 0.5, p_2 = 0.5$: $\\sum p_i^2 = 0.5^2 + 0.5^2 = 0.25 + 0.25 = 0.5$",
+          "For $p_1 = 1.0$: $\\sum p_i^2 = 1.0^2 = 1.0$",
+          "For $p_1 = 0.25, p_2 = 0.25, p_3 = 0.25, p_4 = 0.25$: $\\sum p_i^2 = 4 \\times 0.25^2 = 4 \\times 0.0625 = 0.25$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sum of Squares",
+          "latex": "$S = \\sum_{i=1}^{k} p_i^2$",
+          "description": "Square each proportion and sum all squared values"
+        },
+        {
+          "name": "Uniform Distribution Sum",
+          "latex": "$S_{\\text{uniform}} = k \\cdot \\left(\\frac{1}{k}\\right)^2 = \\frac{1}{k}$",
+          "description": "When all proportions are equal, the sum of squares equals $1/k$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a dictionary of proportions (from step 1) and returns the sum of squared proportions. This is a critical component needed to compute Gini impurity.",
+        "function_signature": "def sum_of_squared_proportions(proportions: dict) -> float:",
+        "starter_code": "def sum_of_squared_proportions(proportions: dict) -> float:\n    \"\"\"\n    Calculate the sum of squared proportions.\n    \n    Args:\n        proportions: Dictionary mapping categories to their proportions\n        \n    Returns:\n        Sum of all squared proportion values\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "sum_of_squared_proportions({0: 1.0})",
+            "expected": "1.0",
+            "explanation": "Single proportion: $1.0^2 = 1.0$. Maximum possible value."
+          },
+          {
+            "input": "sum_of_squared_proportions({0: 0.5, 1: 0.5})",
+            "expected": "0.5",
+            "explanation": "Two equal proportions: $0.5^2 + 0.5^2 = 0.25 + 0.25 = 0.5$"
+          },
+          {
+            "input": "sum_of_squared_proportions({0: 0.25, 1: 0.25, 2: 0.25, 3: 0.25})",
+            "expected": "0.25",
+            "explanation": "Four equal proportions: $4 \\times 0.25^2 = 4 \\times 0.0625 = 0.25$. This equals $1/k = 1/4$."
+          },
+          {
+            "input": "sum_of_squared_proportions({0: 0.625, 1: 0.125, 2: 0.125, 3: 0.125})",
+            "expected": "0.4375",
+            "explanation": "Unequal proportions: $0.625^2 + 0.125^2 + 0.125^2 + 0.125^2 = 0.390625 + 3(0.015625) = 0.4375$"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Summing the proportions first, then squaring the sum (incorrect order of operations)",
+        "Forgetting to square individual proportions before summing",
+        "Not iterating over all values in the dictionary",
+        "Confusing sum of squares with squared sum: $\\sum p_i^2 \\neq (\\sum p_i)^2$"
+      ],
+      "hint": "Iterate through the dictionary values, square each one, and accumulate the sum. You can use a list comprehension with sum().",
+      "references": [
+        "Summation notation and operations",
+        "Variance and standard deviation formulas (related concepts)",
+        "L2 norm in linear algebra"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "The Complement Operation and Impurity Transformation",
+      "relation_to_problem": "Gini impurity is defined as $G = 1 - \\sum p_i^2$, which transforms the sum of squares into a disorder measure. Understanding this complement transformation is crucial for interpreting the disorder metric.",
+      "prerequisites": [
+        "Sum of Squared Proportions",
+        "Basic algebra"
+      ],
+      "learning_objectives": [
+        "Understand the complement operation $1 - x$",
+        "Recognize how complementing inverts the interpretation of a metric",
+        "Apply the transformation to convert a 'purity' measure to a 'disorder' measure",
+        "Verify boundary conditions after transformation"
+      ],
+      "math_content": {
+        "definition": "The **complement** of a value $x$ in the interval $[0, 1]$ is defined as: $$c(x) = 1 - x$$ This operation reflects the value across the midpoint 0.5. The **Gini impurity transformation** applies this complement to the sum of squared proportions: $$G = 1 - \\sum_{i=1}^{k} p_i^2$$",
+        "notation": "$G$ = Gini impurity, $c(x) = 1 - x$ = complement function",
+        "theorem": "**Inversion of Bounds**: If $a \\leq x \\leq b$ where $x \\in [0,1]$, then applying the complement gives: $$(1-b) \\leq (1-x) \\leq (1-a)$$ For $\\sum p_i^2 \\in [1/k, 1]$, the Gini impurity satisfies: $$0 \\leq G \\leq 1 - \\frac{1}{k} = \\frac{k-1}{k}$$ The minimum disorder (0) occurs when $\\sum p_i^2 = 1$ (single category), and maximum disorder occurs when $\\sum p_i^2 = 1/k$ (uniform distribution).",
+        "proof_sketch": "Since $\\sum p_i^2 \\in [1/k, 1]$, subtracting from 1 reverses the bounds: when $\\sum p_i^2 = 1$ (maximum purity), $G = 1 - 1 = 0$ (minimum disorder). When $\\sum p_i^2 = 1/k$ (minimum purity), $G = 1 - 1/k$ (maximum disorder for $k$ categories).",
+        "examples": [
+          "Single category: $\\sum p_i^2 = 1 \\Rightarrow G = 1 - 1 = 0$ (no disorder)",
+          "Two equal categories: $\\sum p_i^2 = 0.5 \\Rightarrow G = 1 - 0.5 = 0.5$",
+          "Four equal categories: $\\sum p_i^2 = 0.25 \\Rightarrow G = 1 - 0.25 = 0.75$",
+          "Asymmetric distribution: $\\sum p_i^2 = 0.4375 \\Rightarrow G = 1 - 0.4375 = 0.5625$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gini Impurity Formula",
+          "latex": "$G = 1 - \\sum_{i=1}^{k} p_i^2$",
+          "description": "The complement of sum of squared proportions gives disorder measure"
+        },
+        {
+          "name": "Maximum Gini Impurity",
+          "latex": "$G_{\\max} = 1 - \\frac{1}{k} = \\frac{k-1}{k}$",
+          "description": "Achieved when all $k$ categories have equal proportions"
+        },
+        {
+          "name": "Minimum Gini Impurity",
+          "latex": "$G_{\\min} = 0$",
+          "description": "Achieved when only one category is present"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes the sum of squared proportions and returns the Gini impurity by applying the complement transformation. This function bridges the gap between computing proportions and measuring disorder.",
+        "function_signature": "def compute_gini_from_sum_of_squares(sum_of_squares: float) -> float:",
+        "starter_code": "def compute_gini_from_sum_of_squares(sum_of_squares: float) -> float:\n    \"\"\"\n    Compute Gini impurity from the sum of squared proportions.\n    \n    Args:\n        sum_of_squares: The value of sum(p_i^2) for all proportions\n        \n    Returns:\n        Gini impurity value (0 to 1)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_gini_from_sum_of_squares(1.0)",
+            "expected": "0.0",
+            "explanation": "When sum of squares is 1.0 (single category), disorder is 0: $G = 1 - 1 = 0$"
+          },
+          {
+            "input": "compute_gini_from_sum_of_squares(0.5)",
+            "expected": "0.5",
+            "explanation": "Two equal categories: $G = 1 - 0.5 = 0.5$"
+          },
+          {
+            "input": "compute_gini_from_sum_of_squares(0.25)",
+            "expected": "0.75",
+            "explanation": "Four equal categories: $G = 1 - 0.25 = 0.75$"
+          },
+          {
+            "input": "compute_gini_from_sum_of_squares(0.4375)",
+            "expected": "0.5625",
+            "explanation": "Asymmetric distribution: $G = 1 - 0.4375 = 0.5625$"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using $x - 1$ instead of $1 - x$ (wrong order of subtraction)",
+        "Forgetting that Gini impurity should be 0 for pure samples (single color)",
+        "Not understanding that higher sum of squares means lower disorder",
+        "Confusing 'purity' metrics (closer to 1 is more pure) with 'impurity' metrics (closer to 1 is more disordered)"
+      ],
+      "hint": "This is a simple one-line function: subtract the input from 1.",
+      "references": [
+        "Decision tree splitting criteria",
+        "Information theory and entropy",
+        "Classification and Regression Trees (CART)"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Properties of Disorder Measures and Monotonicity",
+      "relation_to_problem": "The problem specifies ordering requirements: disorder must increase with color variety. Understanding monotonicity and how to verify these properties ensures our disorder measure is valid.",
+      "prerequisites": [
+        "Gini Impurity",
+        "Proportions",
+        "Set theory basics"
+      ],
+      "learning_objectives": [
+        "Define monotonicity in the context of disorder measures",
+        "Understand why uniform distributions maximize disorder for fixed k",
+        "Verify that Gini impurity satisfies required ordering properties",
+        "Compare disorder values across different distributions"
+      ],
+      "math_content": {
+        "definition": "A **disorder measure** $D$ on a distribution with proportions $\\{p_1, \\ldots, p_k\\}$ must satisfy: 1. **Zero disorder for purity**: $D = 0$ when one $p_i = 1$ and all others are 0. 2. **Monotonicity in diversity**: For fixed $n$ elements, adding more distinct categories (increasing $k$) increases expected disorder. 3. **Maximum at uniform distribution**: For fixed $k$, disorder is maximized when $p_i = 1/k$ for all $i$.",
+        "notation": "$D$ = disorder measure, $k$ = number of distinct categories, $\\text{Uniform}(k)$ = uniform distribution over $k$ categories",
+        "theorem": "**Schur-Concavity of Gini Impurity**: Gini impurity $G = 1 - \\sum p_i^2$ is Schur-concave, meaning it increases when the distribution becomes 'more spread out' (more uniform). Formally, if distribution $\\mathbf{q}$ is majorized by distribution $\\mathbf{p}$ ($\\mathbf{p} \\prec \\mathbf{q}$), then $G(\\mathbf{p}) \\leq G(\\mathbf{q})$.",
+        "proof_sketch": "The function $f(p_i) = p_i^2$ is convex. By properties of convex functions, $\\sum p_i^2$ is minimized (hence $1 - \\sum p_i^2$ is maximized) when the distribution is uniform. Any deviation from uniformity increases $\\sum p_i^2$ and thus decreases $G$.",
+        "examples": [
+          "Comparing $k=1$ vs $k=2$: $G([1.0]) = 0 < G([0.5, 0.5]) = 0.5$. More categories increases disorder.",
+          "Comparing $k=2$ vs $k=4$ uniform: $G([0.5, 0.5]) = 0.5 < G([0.25]^4) = 0.75$.",
+          "Comparing uniform vs skewed for $k=4$: $G([0.25]^4) = 0.75 > G([0.625, 0.125, 0.125, 0.125]) = 0.5625$. Uniform distribution has higher disorder.",
+          "Verifying problem requirements: $0 < 0.5 < 0.75$ confirms $[0,0,0,0] < [1,1,0,0] < [0,1,2,3]$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Uniform Distribution Gini",
+          "latex": "$G_{\\text{uniform}}(k) = 1 - \\frac{1}{k} = \\frac{k-1}{k}$",
+          "description": "Maximum Gini impurity for $k$ categories"
+        },
+        {
+          "name": "Monotonicity Property",
+          "latex": "$k_1 < k_2 \\Rightarrow G_{\\text{uniform}}(k_1) < G_{\\text{uniform}}(k_2)$",
+          "description": "More categories means higher maximum disorder"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes two lists of apple colors and returns True if the first basket has lower disorder than the second, False otherwise. Use Gini impurity as the disorder measure. This validates understanding of ordering properties.",
+        "function_signature": "def compare_disorder(basket1: list, basket2: list) -> bool:",
+        "starter_code": "def compare_disorder(basket1: list, basket2: list) -> bool:\n    \"\"\"\n    Compare disorder between two baskets.\n    \n    Args:\n        basket1: First list of apple colors\n        basket2: Second list of apple colors\n        \n    Returns:\n        True if basket1 has strictly less disorder than basket2, False otherwise\n    \"\"\"\n    # Your code here\n    # Hint: You'll need to compute Gini impurity for each basket\n    pass",
+        "test_cases": [
+          {
+            "input": "compare_disorder([0,0,0,0], [1,1,0,0])",
+            "expected": "True",
+            "explanation": "Single color (G=0) has less disorder than two colors (G=0.5)"
+          },
+          {
+            "input": "compare_disorder([1,1,0,0], [0,1,2,3])",
+            "expected": "True",
+            "explanation": "Two colors (G=0.5) has less disorder than four colors (G=0.75)"
+          },
+          {
+            "input": "compare_disorder([0,0,0,0,0,1,2,3], [0,0,1,1,2,2,3,3])",
+            "expected": "True",
+            "explanation": "Skewed distribution (G≈0.5625) has less disorder than uniform (G=0.75)"
+          },
+          {
+            "input": "compare_disorder([0,1,2,3], [1,1,0,0])",
+            "expected": "False",
+            "explanation": "Four colors (G=0.75) has more disorder than two colors (G=0.5)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing disorder incorrectly by using counts instead of proportions",
+        "Reversing the comparison (returning True when first has more disorder)",
+        "Not handling edge cases like empty baskets",
+        "Assuming disorder depends only on number of distinct colors (ignoring distribution)"
+      ],
+      "hint": "Implement the full Gini impurity calculation (proportions → sum of squares → complement) for each basket, then compare the results.",
+      "references": [
+        "Majorization theory in mathematics",
+        "Shannon entropy vs Gini impurity comparison",
+        "Decision tree literature (CART, C4.5, ID3)"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Efficient Computation with Frequency Counting",
+      "relation_to_problem": "To implement the disorder function efficiently, we must count frequencies, compute proportions, and apply the Gini formula in a single streamlined process without redundant iterations.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Hash tables/dictionaries",
+        "Algorithm efficiency"
+      ],
+      "learning_objectives": [
+        "Implement efficient frequency counting using hash tables",
+        "Minimize number of passes through the data",
+        "Combine multiple operations into a single efficient algorithm",
+        "Handle edge cases (empty lists, single element)"
+      ],
+      "math_content": {
+        "definition": "An **efficient disorder computation algorithm** calculates Gini impurity in $O(n)$ time and $O(k)$ space, where $n$ is the number of elements and $k$ is the number of distinct categories. The algorithm consists of three phases: 1. **Counting phase**: Build frequency map in $O(n)$ time. 2. **Proportion phase**: Convert counts to proportions in $O(k)$ time. 3. **Aggregation phase**: Compute $\\sum p_i^2$ and apply complement in $O(k)$ time.",
+        "notation": "$n$ = dataset size, $k$ = number of distinct values, $O(\\cdot)$ = Big-O notation for time complexity",
+        "theorem": "**Optimality of Single-Pass Algorithms**: Any algorithm that computes a function of all $n$ elements must examine each element at least once, giving a lower bound of $\\Omega(n)$. The Gini impurity algorithm achieves this lower bound with a single pass for counting plus a single pass over the $k$ distinct values.",
+        "proof_sketch": "Phase 1 requires examining each of $n$ elements once to count frequencies: $O(n)$. Phase 2 computes $n_i/n$ for $k$ distinct values: $O(k)$. Phase 3 computes $\\sum(n_i/n)^2$ for $k$ values: $O(k)$. Total: $O(n + k + k) = O(n + k) = O(n)$ since $k \\leq n$.",
+        "examples": [
+          "For basket [1,1,0,0] with $n=4, k=2$: Count phase creates {0:2, 1:2}. Proportion phase: {0:0.5, 1:0.5}. Aggregation: $0.5^2 + 0.5^2 = 0.5$, then $G = 1 - 0.5 = 0.5$.",
+          "For basket [0,0,0,0] with $n=4, k=1$: Count: {0:4}. Proportion: {0:1.0}. Aggregation: $1.0^2 = 1.0$, then $G = 0$.",
+          "Edge case empty basket []: Count: {}, $k=0$. Define $G=0$ by convention (no disorder in empty set)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Direct Gini Computation",
+          "latex": "$G = 1 - \\sum_{i=1}^{k} \\left(\\frac{n_i}{n}\\right)^2 = 1 - \\frac{1}{n^2}\\sum_{i=1}^{k} n_i^2$",
+          "description": "Combine proportion computation with sum of squares"
+        },
+        {
+          "name": "Time Complexity",
+          "latex": "$T(n, k) = O(n + k) = O(n)$",
+          "description": "Linear time in dataset size"
+        }
+      ],
+      "exercise": {
+        "description": "Implement an efficient Gini impurity calculator that combines all previous concepts. The function should count frequencies, compute proportions, calculate sum of squared proportions, and apply the complement transformation in a single efficient implementation. Handle edge cases appropriately.",
+        "function_signature": "def gini_impurity(apples: list) -> float:",
+        "starter_code": "def gini_impurity(apples: list) -> float:\n    \"\"\"\n    Calculate Gini impurity efficiently.\n    \n    Args:\n        apples: List of integers representing apple colors\n        \n    Returns:\n        Gini impurity value (0.0 for pure, higher for more disorder)\n        \n    Edge cases:\n        - Empty list: return 0.0\n        - Single element: return 0.0\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "gini_impurity([])",
+            "expected": "0.0",
+            "explanation": "Empty basket has no disorder by convention"
+          },
+          {
+            "input": "gini_impurity([0,0,0,0])",
+            "expected": "0.0",
+            "explanation": "Single color: $G = 1 - 1.0^2 = 0$"
+          },
+          {
+            "input": "gini_impurity([1,1,0,0])",
+            "expected": "0.5",
+            "explanation": "Two equal colors: $G = 1 - (0.5^2 + 0.5^2) = 0.5$"
+          },
+          {
+            "input": "gini_impurity([0,1,2,3])",
+            "expected": "0.75",
+            "explanation": "Four equal colors: $G = 1 - 4(0.25^2) = 0.75$"
+          },
+          {
+            "input": "gini_impurity([0,0,1,1,2,2,3,3])",
+            "expected": "0.75",
+            "explanation": "Four equal colors: $G = 1 - 4(0.25^2) = 0.75$"
+          },
+          {
+            "input": "gini_impurity([0,0,0,0,0,1,2,3])",
+            "expected": "0.5625",
+            "explanation": "Skewed distribution: $G = 1 - (0.625^2 + 3 \\times 0.125^2) = 0.5625$"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Making multiple passes through the data unnecessarily",
+        "Not handling empty list edge case",
+        "Computing proportions in a separate loop from sum of squares (inefficient)",
+        "Integer division issues in some programming languages",
+        "Not using Counter or equivalent efficient counting structure"
+      ],
+      "hint": "Use Counter to get frequencies in one pass. Then iterate through the counts once to compute the sum of squared proportions directly. Finally apply the complement.",
+      "references": [
+        "Hash table data structures",
+        "Python collections.Counter",
+        "Algorithm analysis and Big-O notation"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Alternative Disorder Measures and Comparative Analysis",
+      "relation_to_problem": "The problem allows 'any method' that satisfies the ordering constraints. Understanding alternative measures (Shannon entropy, collision entropy) provides deeper insight into what makes a valid disorder metric.",
+      "prerequisites": [
+        "Gini Impurity",
+        "Logarithms",
+        "Information theory basics"
+      ],
+      "learning_objectives": [
+        "Understand Shannon entropy as an alternative disorder measure",
+        "Compare properties of different disorder metrics",
+        "Recognize when different metrics agree or disagree on ordering",
+        "Appreciate why Gini impurity is preferred in machine learning"
+      ],
+      "math_content": {
+        "definition": "**Shannon entropy** measures disorder using information theory: $$H = -\\sum_{i=1}^{k} p_i \\log_2(p_i)$$ where $0 \\log 0 \\equiv 0$ by convention. **Collision entropy** (order-2 Rényi entropy) is: $$H_2 = -\\log_2\\left(\\sum_{i=1}^{k} p_i^2\\right)$$ All three metrics (Gini, Shannon, Collision) satisfy: pure sample gives 0, uniform distribution gives maximum, increasing diversity increases disorder.",
+        "notation": "$H$ = Shannon entropy (bits), $H_2$ = collision entropy, $\\log_2$ = logarithm base 2, $G$ = Gini impurity",
+        "theorem": "**Ordering Consistency**: For distributions $\\mathbf{p}$ and $\\mathbf{q}$, if $\\mathbf{p}$ is 'more uniform' than $\\mathbf{q}$ in the majorization sense, then all three disorder measures agree on ordering: $$G(\\mathbf{p}) > G(\\mathbf{q}) \\iff H(\\mathbf{p}) > H(\\mathbf{q}) \\iff H_2(\\mathbf{p}) > H_2(\\mathbf{q})$$ This follows from the Schur-concavity of all three measures.",
+        "proof_sketch": "All three measures are symmetric (permutation-invariant) and Schur-concave functions. By properties of majorization, if $\\mathbf{p}$ majorizes $\\mathbf{q}$, then any Schur-concave function gives consistent ordering. However, the numerical values differ.",
+        "examples": [
+          "Two equal categories $[0.5, 0.5]$: $G = 0.5$, $H = 1$ bit, $H_2 = 1$ bit. Different values, same interpretation.",
+          "Four equal categories $[0.25]^4$: $G = 0.75$, $H = 2$ bits, $H_2 = 2$ bits.",
+          "Skewed $[0.625, 0.125, 0.125, 0.125]$: $G \\approx 0.5625$, $H \\approx 1.756$ bits, $H_2 \\approx 1.193$ bits.",
+          "All three correctly order: $[0,0,0,0] < [1,1,0,0] < [0,1,2,3]$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Shannon Entropy",
+          "latex": "$H = -\\sum_{i=1}^{k} p_i \\log_2(p_i)$",
+          "description": "Information-theoretic disorder measure (in bits)"
+        },
+        {
+          "name": "Gini Impurity (for comparison)",
+          "latex": "$G = 1 - \\sum_{i=1}^{k} p_i^2$",
+          "description": "Probabilistic disorder measure (unitless)"
+        },
+        {
+          "name": "Relationship",
+          "latex": "$H_2 = -\\log_2(1 - G)$",
+          "description": "Collision entropy relates to Gini impurity through logarithm"
+        }
+      ],
+      "exercise": {
+        "description": "Implement Shannon entropy as an alternative disorder measure and verify it produces the same ordering as Gini impurity for the test cases in the main problem. This reinforces understanding that multiple valid approaches exist.",
+        "function_signature": "def shannon_entropy(apples: list) -> float:",
+        "starter_code": "import math\n\ndef shannon_entropy(apples: list) -> float:\n    \"\"\"\n    Calculate Shannon entropy as a disorder measure.\n    \n    Args:\n        apples: List of integers representing apple colors\n        \n    Returns:\n        Shannon entropy value (0.0 for pure, higher for more disorder)\n        \n    Note:\n        Use base-2 logarithm. Handle 0*log(0) as 0.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "shannon_entropy([0,0,0,0])",
+            "expected": "0.0",
+            "explanation": "Single color: $H = -1.0 \\times \\log_2(1.0) = 0$"
+          },
+          {
+            "input": "shannon_entropy([1,1,0,0])",
+            "expected": "1.0",
+            "explanation": "Two equal colors: $H = -2(0.5 \\times \\log_2(0.5)) = 1$ bit"
+          },
+          {
+            "input": "shannon_entropy([0,1,2,3])",
+            "expected": "2.0",
+            "explanation": "Four equal colors: $H = -4(0.25 \\times \\log_2(0.25)) = 2$ bits"
+          },
+          {
+            "input": "shannon_entropy([0,0,1,1,2,2,3,3])",
+            "expected": "2.0",
+            "explanation": "Four equal colors: $H = 2$ bits (same as above)"
+          },
+          {
+            "input": "shannon_entropy([0,0,0,0,0,1,2,3])",
+            "expected": "1.7564707277410788",
+            "explanation": "Skewed: $H = -0.625\\log_2(0.625) - 3(0.125\\log_2(0.125)) \\approx 1.756$ bits. Less than uniform (2.0)."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the $0 \\log 0$ case (should be treated as 0, not NaN)",
+        "Using natural logarithm instead of base-2 logarithm (changes numerical values)",
+        "Forgetting the negative sign in the entropy formula",
+        "Dividing by k or n incorrectly when normalizing",
+        "Not verifying that entropy ordering matches Gini ordering for test cases"
+      ],
+      "hint": "Use math.log2() for base-2 logarithm. Check if proportion is 0 before computing p*log(p) to avoid math domain errors. Remember the negative sign.",
+      "references": [
+        "Claude Shannon's information theory papers",
+        "Rényi entropy family",
+        "Decision tree splitting criteria comparison (Gini vs Entropy)",
+        "Cover & Thomas: Elements of Information Theory"
+      ]
+    }
+  ]
+}

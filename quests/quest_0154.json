@@ -1,0 +1,581 @@
+{
+  "problem_id": 154,
+  "title": "ExponentialLR Learning Rate Scheduler",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "Write a Python class ExponentialLRScheduler to implement a learning rate scheduler based on the ExponentialLR strategy. Your class should have an __init__ method to initialize with an initial_lr (float) and gamma (float) parameter. It should also have a get_lr(self, epoch) method that returns the current learning rate for a given epoch (int). The learning rate should be decreased by gamma every epoch. The returned learning rate should be rounded to 4 decimal places. Only use standard Python.",
+  "example": {
+    "input": "scheduler = ExponentialLRScheduler(initial_lr=0.1, gamma=0.9)\nprint(f\"{scheduler.get_lr(epoch=0):.4f}\")\nprint(f\"{scheduler.get_lr(epoch=1):.4f}\")\nprint(f\"{scheduler.get_lr(epoch=2):.4f}\")\nprint(f\"{scheduler.get_lr(epoch=3):.4f}\")",
+    "output": "0.1000\n0.0900\n0.0810\n0.0729",
+    "reasoning": "The initial learning rate is 0.1. At epoch 1, it decays by 0.9 to 0.09. At epoch 2, it decays again to 0.081, and so on, decaying by gamma every single epoch. All results are rounded to 4 decimal places."
+  },
+  "starter_code": "class ExponentialLRScheduler:\n    def __init__(self, initial_lr, gamma):\n        # Initialize initial_lr and gamma\n        pass\n\n    def get_lr(self, epoch):\n        # Calculate and return the learning rate for the given epoch\n        pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Exponential Functions and Their Properties",
+      "relation_to_problem": "The ExponentialLR scheduler is based on exponential decay, requiring understanding of how exponential functions behave and how to compute powers efficiently.",
+      "prerequisites": [
+        "Basic arithmetic operations",
+        "Understanding of function notation"
+      ],
+      "learning_objectives": [
+        "Define exponential functions formally with proper mathematical notation",
+        "Understand the properties of exponential growth and decay",
+        "Compute exponential expressions with fractional bases",
+        "Apply exponential functions to model decay processes"
+      ],
+      "math_content": {
+        "definition": "An **exponential function** with base $b$ is a function of the form $f(x) = b^x$, where $b > 0$ and $b \\neq 1$. When $0 < b < 1$, the function exhibits **exponential decay**, meaning $f(x)$ decreases as $x$ increases. The function is defined for all real numbers $x \\in \\mathbb{R}$ and produces positive outputs $f(x) > 0$ for all $x$.",
+        "notation": "$b^x$ represents the exponential function where $b$ is the base and $x$ is the exponent. For discrete applications, $x \\in \\mathbb{N}_0 = \\{0, 1, 2, 3, \\ldots\\}$",
+        "theorem": "**Properties of Exponential Functions**: For any base $b > 0$ and exponents $m, n \\in \\mathbb{R}$: (1) $b^0 = 1$, (2) $b^{m+n} = b^m \\cdot b^n$, (3) $b^{m-n} = \\frac{b^m}{b^n}$, (4) $(b^m)^n = b^{mn}$, (5) If $0 < b < 1$, then $b^x$ is strictly decreasing.",
+        "proof_sketch": "Property (1) follows from the definition of exponentiation. Property (2) can be proven by counting: $b^{m+n}$ means multiplying $b$ by itself $m+n$ times, which equals multiplying $b$ by itself $m$ times, then $n$ more times. Property (5) follows from the fact that multiplying a positive number less than 1 by itself produces a smaller result.",
+        "examples": [
+          "Example 1: If $b = 0.9$ and $x = 0$, then $f(0) = 0.9^0 = 1$ (any non-zero number to the power 0 is 1)",
+          "Example 2: If $b = 0.9$ and $x = 1$, then $f(1) = 0.9^1 = 0.9$",
+          "Example 3: If $b = 0.9$ and $x = 2$, then $f(2) = 0.9^2 = 0.9 \\times 0.9 = 0.81$",
+          "Example 4: If $b = 0.9$ and $x = 3$, then $f(3) = 0.9^3 = 0.9 \\times 0.9 \\times 0.9 = 0.729$",
+          "Example 5: Decay sequence with $b = 0.5$: $0.5^0 = 1, 0.5^1 = 0.5, 0.5^2 = 0.25, 0.5^3 = 0.125$ (each term is half the previous)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Exponential Decay Formula",
+          "latex": "$y = b^x \\text{ where } 0 < b < 1$",
+          "description": "Use this to model any quantity that decreases by a constant multiplicative factor at each step"
+        },
+        {
+          "name": "Power Law Identity",
+          "latex": "$b^{x+1} = b^x \\cdot b$",
+          "description": "Shows that each successive power is the previous power multiplied by the base"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the value of an exponential decay function $f(x) = b^x$ for a given base $b$ (where $0 < b < 1$) and non-negative integer exponent $x$. Round the result to 4 decimal places. This is the fundamental operation needed for any exponential decay scheduler.",
+        "function_signature": "def exponential_decay(base: float, exponent: int) -> float:",
+        "starter_code": "def exponential_decay(base: float, exponent: int) -> float:\n    \"\"\"\n    Compute base raised to the power of exponent.\n    \n    Args:\n        base: A positive number less than 1 (decay factor)\n        exponent: A non-negative integer\n    \n    Returns:\n        The value of base^exponent rounded to 4 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "exponential_decay(0.9, 0)",
+            "expected": "1.0000",
+            "explanation": "Any number to the power 0 equals 1"
+          },
+          {
+            "input": "exponential_decay(0.9, 1)",
+            "expected": "0.9000",
+            "explanation": "0.9 to the power 1 is just 0.9"
+          },
+          {
+            "input": "exponential_decay(0.9, 2)",
+            "expected": "0.8100",
+            "explanation": "0.9 × 0.9 = 0.81"
+          },
+          {
+            "input": "exponential_decay(0.9, 3)",
+            "expected": "0.7290",
+            "explanation": "0.9 × 0.9 × 0.9 = 0.729"
+          },
+          {
+            "input": "exponential_decay(0.5, 4)",
+            "expected": "0.0625",
+            "explanation": "0.5^4 = 0.0625 (halving four times)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that any number to the power 0 equals 1, not 0",
+        "Confusing multiplication with exponentiation (e.g., thinking 0.9^3 = 0.9 × 3 = 2.7)",
+        "Not handling the base case (exponent = 0) correctly",
+        "Rounding too early in calculations, leading to accumulated errors",
+        "Using integer division instead of float operations"
+      ],
+      "hint": "Python's built-in ** operator or pow() function can compute exponentiation. Remember to round your final answer to 4 decimal places using the round() function.",
+      "references": [
+        "Exponential functions in calculus",
+        "Properties of exponents",
+        "Geometric sequences and series"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Scaling and Linear Transformations of Exponential Functions",
+      "relation_to_problem": "The learning rate scheduler multiplies an initial learning rate by an exponential decay factor, which is a scaled exponential function of the form $f(t) = c \\cdot b^t$.",
+      "prerequisites": [
+        "Exponential functions",
+        "Function composition",
+        "Scalar multiplication of functions"
+      ],
+      "learning_objectives": [
+        "Understand how to scale exponential functions by a constant factor",
+        "Apply the general form of scaled exponential decay $y = c \\cdot b^t$",
+        "Recognize that multiplying a function by a constant stretches/compresses its output vertically",
+        "Compute scaled exponential values for modeling real-world decay processes"
+      ],
+      "math_content": {
+        "definition": "A **scaled exponential function** has the form $f(t) = c \\cdot b^t$, where $c > 0$ is the **scaling factor** (or initial value), $b$ is the **base** with $0 < b < 1$ for decay, and $t \\geq 0$ is the independent variable. The value $c$ represents the function's value at $t=0$ since $f(0) = c \\cdot b^0 = c \\cdot 1 = c$. This is also called the **initial condition** of the exponential decay.",
+        "notation": "$f(t) = c \\cdot b^t$ where $c$ is the initial value, $b$ is the decay rate, and $t$ is time/step number",
+        "theorem": "**Scaling Theorem for Exponential Functions**: If $g(t) = b^t$ is an exponential function, then $f(t) = c \\cdot g(t) = c \\cdot b^t$ is a vertical scaling of $g$ by factor $c$. The function preserves the exponential decay rate but shifts the starting point to $c$ instead of 1. Specifically: (1) $f(0) = c$, (2) $\\frac{f(t+1)}{f(t)} = b$ for all $t$, (3) $f(t) = f(0) \\cdot b^t$.",
+        "proof_sketch": "Property (1): $f(0) = c \\cdot b^0 = c \\cdot 1 = c$. Property (2): $\\frac{f(t+1)}{f(t)} = \\frac{c \\cdot b^{t+1}}{c \\cdot b^t} = \\frac{c \\cdot b^t \\cdot b}{c \\cdot b^t} = b$. This shows the ratio between consecutive values is constant and equals $b$, independent of the scaling factor $c$. Property (3) follows directly from substituting the definition.",
+        "examples": [
+          "Example 1: With $c = 0.1$ and $b = 0.9$, at $t=0$: $f(0) = 0.1 \\times 0.9^0 = 0.1 \\times 1 = 0.1$",
+          "Example 2: With $c = 0.1$ and $b = 0.9$, at $t=1$: $f(1) = 0.1 \\times 0.9^1 = 0.1 \\times 0.9 = 0.09$",
+          "Example 3: With $c = 0.1$ and $b = 0.9$, at $t=2$: $f(2) = 0.1 \\times 0.9^2 = 0.1 \\times 0.81 = 0.081$",
+          "Example 4: With $c = 2.0$ and $b = 0.8$, at $t=0$: $f(0) = 2.0 \\times 0.8^0 = 2.0$",
+          "Example 5: With $c = 2.0$ and $b = 0.8$, at $t=1$: $f(1) = 2.0 \\times 0.8^1 = 1.6$",
+          "Example 6: Verification of constant ratio: In Example 2-3, $\\frac{f(1)}{f(0)} = \\frac{0.09}{0.1} = 0.9 = b$ and $\\frac{f(2)}{f(1)} = \\frac{0.081}{0.09} = 0.9 = b$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Scaled Exponential Decay",
+          "latex": "$f(t) = c \\cdot b^t$",
+          "description": "Models a quantity starting at value $c$ that decays by factor $b$ each time step"
+        },
+        {
+          "name": "Initial Value Property",
+          "latex": "$f(0) = c$",
+          "description": "The scaling factor $c$ is always the value at $t=0$"
+        },
+        {
+          "name": "Recursive Formulation",
+          "latex": "$f(t+1) = b \\cdot f(t)$",
+          "description": "Each successive value is the previous value multiplied by the base $b$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes scaled exponential decay $f(t) = c \\cdot b^t$, where $c$ is an initial value, $b$ is a decay factor ($0 < b < 1$), and $t$ is a non-negative integer time step. Round the result to 4 decimal places. This models how quantities like learning rates start at an initial value and decay over time.",
+        "function_signature": "def scaled_exponential_decay(initial_value: float, decay_rate: float, time_step: int) -> float:",
+        "starter_code": "def scaled_exponential_decay(initial_value: float, decay_rate: float, time_step: int) -> float:\n    \"\"\"\n    Compute scaled exponential decay: initial_value * (decay_rate ^ time_step).\n    \n    Args:\n        initial_value: The starting value at time_step = 0 (c)\n        decay_rate: The multiplicative decay factor per step (b), where 0 < b < 1\n        time_step: The time step number (t), a non-negative integer\n    \n    Returns:\n        The decayed value at the given time step, rounded to 4 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "scaled_exponential_decay(0.1, 0.9, 0)",
+            "expected": "0.1000",
+            "explanation": "At t=0: 0.1 × 0.9^0 = 0.1 × 1 = 0.1"
+          },
+          {
+            "input": "scaled_exponential_decay(0.1, 0.9, 1)",
+            "expected": "0.0900",
+            "explanation": "At t=1: 0.1 × 0.9^1 = 0.1 × 0.9 = 0.09"
+          },
+          {
+            "input": "scaled_exponential_decay(0.1, 0.9, 2)",
+            "expected": "0.0810",
+            "explanation": "At t=2: 0.1 × 0.9^2 = 0.1 × 0.81 = 0.081"
+          },
+          {
+            "input": "scaled_exponential_decay(0.1, 0.9, 3)",
+            "expected": "0.0729",
+            "explanation": "At t=3: 0.1 × 0.9^3 = 0.1 × 0.729 = 0.0729"
+          },
+          {
+            "input": "scaled_exponential_decay(2.0, 0.8, 2)",
+            "expected": "1.2800",
+            "explanation": "At t=2: 2.0 × 0.8^2 = 2.0 × 0.64 = 1.28"
+          },
+          {
+            "input": "scaled_exponential_decay(0.05, 0.95, 5)",
+            "expected": "0.0387",
+            "explanation": "At t=5: 0.05 × 0.95^5 = 0.05 × 0.7738 ≈ 0.0387"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing c * b * t instead of c * b^t (confusing multiplication with exponentiation)",
+        "Thinking the initial value is b instead of c",
+        "Not recognizing that f(0) must equal the initial_value parameter",
+        "Applying the decay rate incorrectly (e.g., subtracting instead of multiplying)",
+        "Forgetting to apply the scaling factor c to the exponential term"
+      ],
+      "hint": "Break the problem into two steps: first compute the exponential decay term b^t, then multiply by the scaling factor c. The order of operations matters in implementation but mathematically they commute.",
+      "references": [
+        "Linear transformations of functions",
+        "Exponential decay models in physics and economics",
+        "Geometric sequences with arbitrary starting terms"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Object-Oriented Programming: Class Design and Initialization",
+      "relation_to_problem": "The ExponentialLR scheduler is implemented as a class that stores initial parameters (initial_lr and gamma) and provides methods to compute learning rates. Understanding class structure is essential.",
+      "prerequisites": [
+        "Basic Python syntax",
+        "Function definitions",
+        "Understanding of variables and assignment"
+      ],
+      "learning_objectives": [
+        "Understand the purpose of classes in organizing related data and behavior",
+        "Define a class with the __init__ constructor method",
+        "Store instance variables using self to maintain state across method calls",
+        "Distinguish between instance variables and local variables"
+      ],
+      "math_content": {
+        "definition": "In object-oriented programming, a **class** is a blueprint for creating objects that encapsulate data (attributes) and behavior (methods). An **instance** of a class is a specific object created from that blueprint. The **constructor method** `__init__(self, ...)` is automatically called when creating a new instance and initializes the object's state. The parameter `self` refers to the instance being created and allows methods to access the instance's data.",
+        "notation": "`self.attribute` denotes an instance variable that belongs to a specific object and persists across method calls. `local_variable` without `self` exists only within a single method execution.",
+        "theorem": "**Encapsulation Principle**: A well-designed class groups related data and operations that act on that data. For a mathematical function $f(t; c, b) = c \\cdot b^t$ with fixed parameters $c$ and $b$, we can encapsulate these parameters as instance variables and provide a method to evaluate $f$ at any $t$. This creates a **parameterized function object** where the parameters are set once during initialization and the evaluation method takes only the independent variable.",
+        "proof_sketch": "Consider the scaled exponential decay $f(t) = c \\cdot b^t$. By fixing $c$ and $b$ at initialization, we create a family of functions indexed by these parameters. Each instance of our class represents one specific function from this family. The evaluation method computes the function value for variable $t$ while reusing the stored constants $c$ and $b$, avoiding redundant parameter passing.",
+        "examples": [
+          "Example 1: A class DecayFunction stores c=0.1 and b=0.9 as instance variables during __init__",
+          "Example 2: The instance variable self.initial_value = 0.1 persists and can be accessed in all methods",
+          "Example 3: When creating instance obj = DecayFunction(0.1, 0.9), the __init__ method receives self (the new object), c=0.1, and b=0.9",
+          "Example 4: Instance variables are accessed via self.variable_name, while local variables are just variable_name",
+          "Example 5: Multiple instances DecayFunction(0.1, 0.9) and DecayFunction(0.2, 0.8) have independent state"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Class Structure",
+          "latex": "$\\text{class} \\rightarrow \\text{__init__} \\rightarrow \\text{instance variables} \\rightarrow \\text{methods}$",
+          "description": "A class defines structure, __init__ sets initial state, instance variables store data, methods operate on that data"
+        }
+      ],
+      "exercise": {
+        "description": "Create a class called `DecayModel` that encapsulates a scaled exponential decay function. The class should have an `__init__` method that accepts two parameters: `initial_value` (float) and `decay_rate` (float), and stores them as instance variables `self.initial_value` and `self.decay_rate`. Then implement a method `compute(self, step)` that returns the scaled exponential decay value at the given step, rounded to 4 decimal places. This demonstrates storing mathematical parameters in a class and computing values on demand.",
+        "function_signature": "class DecayModel:\n    def __init__(self, initial_value: float, decay_rate: float):\n    def compute(self, step: int) -> float:",
+        "starter_code": "class DecayModel:\n    def __init__(self, initial_value: float, decay_rate: float):\n        \"\"\"\n        Initialize the decay model with fixed parameters.\n        \n        Args:\n            initial_value: The value at step 0\n            decay_rate: The multiplicative decay factor per step (0 < decay_rate < 1)\n        \"\"\"\n        # Store the parameters as instance variables\n        # Your code here\n        pass\n    \n    def compute(self, step: int) -> float:\n        \"\"\"\n        Compute the decay value at a given step.\n        \n        Args:\n            step: The time step (non-negative integer)\n        \n        Returns:\n            The value of initial_value * (decay_rate ^ step), rounded to 4 decimal places\n        \"\"\"\n        # Use self.initial_value and self.decay_rate to compute the result\n        # Your code here\n        pass",
+        "test_cases": [
+          {
+            "input": "model = DecayModel(0.1, 0.9); model.compute(0)",
+            "expected": "0.1000",
+            "explanation": "At step 0, the decay model returns the initial value: 0.1 × 0.9^0 = 0.1"
+          },
+          {
+            "input": "model = DecayModel(0.1, 0.9); model.compute(1)",
+            "expected": "0.0900",
+            "explanation": "At step 1: 0.1 × 0.9^1 = 0.09"
+          },
+          {
+            "input": "model = DecayModel(0.1, 0.9); model.compute(3)",
+            "expected": "0.0729",
+            "explanation": "At step 3: 0.1 × 0.9^3 = 0.0729"
+          },
+          {
+            "input": "model1 = DecayModel(0.1, 0.9); model2 = DecayModel(0.2, 0.8); model1.compute(1)",
+            "expected": "0.0900",
+            "explanation": "model1 has independent state: 0.1 × 0.9^1 = 0.09"
+          },
+          {
+            "input": "model1 = DecayModel(0.1, 0.9); model2 = DecayModel(0.2, 0.8); model2.compute(1)",
+            "expected": "0.1600",
+            "explanation": "model2 has different independent state: 0.2 × 0.8^1 = 0.16"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to use self when accessing instance variables (writing decay_rate instead of self.decay_rate)",
+        "Not storing parameters as instance variables in __init__ (they become local variables that disappear)",
+        "Confusing self (the instance) with other parameters",
+        "Forgetting the self parameter in method definitions",
+        "Trying to access instance variables before they're initialized in __init__",
+        "Creating local variables in __init__ instead of instance variables (missing self.)"
+      ],
+      "hint": "In __init__, use self.variable_name = parameter to store values. In compute, access them with self.variable_name. The self parameter automatically refers to the object instance.",
+      "references": [
+        "Object-oriented programming basics",
+        "Python class definitions",
+        "Instance variables vs local variables",
+        "The self parameter in Python"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Discrete-Time Exponential Decay Sequences",
+      "relation_to_problem": "Learning rate schedulers operate on discrete epochs (0, 1, 2, ...), not continuous time. Understanding discrete exponential sequences is crucial for implementing epoch-based scheduling.",
+      "prerequisites": [
+        "Exponential functions",
+        "Sequences and series",
+        "Integer indexing"
+      ],
+      "learning_objectives": [
+        "Define discrete-time exponential sequences formally",
+        "Distinguish between continuous and discrete exponential models",
+        "Compute terms of exponential sequences using the closed-form formula",
+        "Understand zero-indexing conventions in programming contexts",
+        "Analyze the rate of decay in discrete exponential sequences"
+      ],
+      "math_content": {
+        "definition": "A **discrete-time exponential decay sequence** is a sequence $\\{a_n\\}_{n=0}^{\\infty}$ where each term is given by $a_n = a_0 \\cdot r^n$ for $n \\in \\mathbb{N}_0 = \\{0, 1, 2, 3, \\ldots\\}$. Here, $a_0$ is the **initial term**, $r$ is the **common ratio** with $0 < r < 1$ for decay, and $n$ is the **index** or **discrete time step**. Unlike continuous exponential functions $f(t) = c \\cdot e^{-kt}$ defined for all real $t$, discrete sequences are only defined at integer indices.",
+        "notation": "$a_n$ denotes the $n$-th term of the sequence, with $n$ starting from 0 (zero-indexed). The sequence notation $\\{a_n\\}$ represents the entire ordered list: $a_0, a_1, a_2, a_3, \\ldots$",
+        "theorem": "**Geometric Sequence Characterization**: A sequence is a geometric sequence with ratio $r$ if and only if $\\frac{a_{n+1}}{a_n} = r$ for all $n \\geq 0$. Equivalently, $a_{n+1} = r \\cdot a_n$ (recursive formulation) or $a_n = a_0 \\cdot r^n$ (closed-form formulation). The closed form allows **direct computation** of any term without computing all previous terms.",
+        "proof_sketch": "Forward direction: If $a_n = a_0 \\cdot r^n$, then $\\frac{a_{n+1}}{a_n} = \\frac{a_0 \\cdot r^{n+1}}{a_0 \\cdot r^n} = \\frac{r^{n+1}}{r^n} = r^{(n+1)-n} = r^1 = r$. Backward direction: If $a_{n+1} = r \\cdot a_n$ for all $n$, then by induction: base case $a_0 = a_0 \\cdot r^0$, and if $a_k = a_0 \\cdot r^k$, then $a_{k+1} = r \\cdot a_k = r \\cdot (a_0 \\cdot r^k) = a_0 \\cdot r^{k+1}$. The closed form is essential for efficiency: computing $a_{100}$ directly is much faster than computing $a_0, a_1, \\ldots, a_{99}$ recursively.",
+        "examples": [
+          "Example 1: Sequence with $a_0 = 0.1$, $r = 0.9$, zero-indexed. $a_0 = 0.1 \\times 0.9^0 = 0.1$, $a_1 = 0.1 \\times 0.9^1 = 0.09$, $a_2 = 0.1 \\times 0.9^2 = 0.081$, $a_3 = 0.1 \\times 0.9^3 = 0.0729$",
+          "Example 2: Direct computation without recursion: $a_{10} = 0.1 \\times 0.9^{10} \\approx 0.0349$ (computed directly, no need for $a_1$ through $a_9$)",
+          "Example 3: Verification of geometric property: $\\frac{a_1}{a_0} = \\frac{0.09}{0.1} = 0.9 = r$, $\\frac{a_2}{a_1} = \\frac{0.081}{0.09} = 0.9 = r$",
+          "Example 4: Rapid decay with $r = 0.5$: $a_0 = 1$, $a_1 = 0.5$, $a_2 = 0.25$, $a_3 = 0.125$, $a_4 = 0.0625$ (halving each step)",
+          "Example 5: Slow decay with $r = 0.99$: $a_0 = 1$, $a_1 = 0.99$, $a_2 = 0.9801$, $a_{100} = 0.99^{100} \\approx 0.366$ (barely decreases initially)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Discrete Exponential Decay Sequence (Closed Form)",
+          "latex": "$a_n = a_0 \\cdot r^n, \\quad n \\in \\mathbb{N}_0$",
+          "description": "Direct formula to compute the n-th term without computing previous terms"
+        },
+        {
+          "name": "Discrete Exponential Decay Sequence (Recursive Form)",
+          "latex": "$a_{n+1} = r \\cdot a_n, \\quad a_0 \\text{ given}$",
+          "description": "Each term is the previous term multiplied by the common ratio r"
+        },
+        {
+          "name": "Zero-Indexing Convention",
+          "latex": "$n = 0 \\rightarrow a_0 = a_0 \\cdot r^0 = a_0$",
+          "description": "The sequence starts at index 0, which returns the initial value"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function `geometric_sequence_term(initial_term, ratio, index)` that computes the value of a geometric sequence at a given zero-indexed position using the closed-form formula $a_n = a_0 \\cdot r^n$. The function should work efficiently for any non-negative integer index (even large values like 100) by using direct computation rather than iteration. Round the result to 4 decimal places. This demonstrates the power of closed-form solutions for sequence problems.",
+        "function_signature": "def geometric_sequence_term(initial_term: float, ratio: float, index: int) -> float:",
+        "starter_code": "def geometric_sequence_term(initial_term: float, ratio: float, index: int) -> float:\n    \"\"\"\n    Compute the value of a geometric sequence at a specific index.\n    \n    The sequence is defined by: a_n = initial_term * (ratio ^ index)\n    where n is zero-indexed (starts at 0).\n    \n    Args:\n        initial_term: The first term of the sequence (a_0)\n        ratio: The common ratio between consecutive terms (r)\n        index: The zero-indexed position in the sequence (n >= 0)\n    \n    Returns:\n        The value at the given index, rounded to 4 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "geometric_sequence_term(0.1, 0.9, 0)",
+            "expected": "0.1000",
+            "explanation": "At index 0: a_0 = 0.1 × 0.9^0 = 0.1 (the initial term)"
+          },
+          {
+            "input": "geometric_sequence_term(0.1, 0.9, 1)",
+            "expected": "0.0900",
+            "explanation": "At index 1: a_1 = 0.1 × 0.9^1 = 0.09"
+          },
+          {
+            "input": "geometric_sequence_term(0.1, 0.9, 2)",
+            "expected": "0.0810",
+            "explanation": "At index 2: a_2 = 0.1 × 0.9^2 = 0.081"
+          },
+          {
+            "input": "geometric_sequence_term(0.1, 0.9, 3)",
+            "expected": "0.0729",
+            "explanation": "At index 3: a_3 = 0.1 × 0.9^3 = 0.0729"
+          },
+          {
+            "input": "geometric_sequence_term(0.1, 0.9, 10)",
+            "expected": "0.0349",
+            "explanation": "At index 10: a_10 = 0.1 × 0.9^10 ≈ 0.0349 (computed directly, efficiently)"
+          },
+          {
+            "input": "geometric_sequence_term(1.0, 0.5, 4)",
+            "expected": "0.0625",
+            "explanation": "At index 4: a_4 = 1.0 × 0.5^4 = 0.0625 (halving four times)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using one-indexing instead of zero-indexing (computing a_1 when asked for index 0)",
+        "Implementing iterative computation (loop from 0 to n) instead of direct closed-form",
+        "Confusing the index with the value (thinking index 3 means multiply by 3)",
+        "Off-by-one errors: computing ratio^(index+1) or ratio^(index-1) instead of ratio^index",
+        "Not handling index 0 correctly (should return initial_term, not 0)",
+        "Inefficient recursive implementation that recomputes previous terms"
+      ],
+      "hint": "Use the closed-form formula directly: multiply the initial term by the ratio raised to the power of the index. This requires only one exponentiation operation, making it efficient even for large indices.",
+      "references": [
+        "Geometric sequences and series",
+        "Closed-form vs recursive sequence formulas",
+        "Zero-indexing in computer science",
+        "Time complexity of iterative vs direct computation"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Numerical Precision and Rounding in Scientific Computing",
+      "relation_to_problem": "The ExponentialLR scheduler must return learning rates rounded to 4 decimal places. Understanding floating-point arithmetic and proper rounding is essential for numerical accuracy.",
+      "prerequisites": [
+        "Basic arithmetic",
+        "Decimal number system",
+        "Understanding of approximation"
+      ],
+      "learning_objectives": [
+        "Understand the difference between exact and approximate numerical representations",
+        "Apply proper rounding rules to decimal numbers",
+        "Use Python's round() function correctly with specified precision",
+        "Recognize when and why rounding is necessary in machine learning applications",
+        "Avoid common floating-point arithmetic pitfalls"
+      ],
+      "math_content": {
+        "definition": "**Rounding** is the process of approximating a number with more decimal places to one with fewer decimal places according to specific rules. **Rounding to $n$ decimal places** means finding the number with exactly $n$ digits after the decimal point that is closest to the original number. The standard rule (round-half-up or round-half-to-even) states: if the $(n+1)$-th decimal digit is less than 5, round down; if it's greater than 5, round up; if it's exactly 5, use a consistent tie-breaking rule (Python 3 uses round-half-to-even).",
+        "notation": "$\\text{round}(x, n)$ denotes rounding the number $x$ to $n$ decimal places. For example, $\\text{round}(0.12345, 4) = 0.1235$ and $\\text{round}(0.12344, 4) = 0.1234$.",
+        "theorem": "**Rounding Error Bound**: When rounding a number $x$ to $n$ decimal places to get $\\tilde{x}$, the absolute error is bounded: $|x - \\tilde{x}| \\leq \\frac{1}{2} \\times 10^{-n}$. For $n=4$ decimal places, the maximum error is $\\frac{1}{2} \\times 10^{-4} = 0.00005$. This means the rounded value is within $\\pm 0.00005$ of the true value.",
+        "proof_sketch": "The largest error occurs when the $(n+1)$-th digit is exactly 5 (midway between two representable values). In this case, rounding moves the value by exactly $0.5 \\times 10^{-n}$ in one direction. Any other digit (0-4 or 6-9) results in smaller error. For digits 0-4, we round down and the error is at most $0.4999... \\times 10^{-n} < 0.5 \\times 10^{-n}$. For digits 6-9, we round up and the error is at most $0.4999... \\times 10^{-n} < 0.5 \\times 10^{-n}$.",
+        "examples": [
+          "Example 1: $\\text{round}(0.12345, 4) = 0.1235$ because the 5th digit is 5, so we round up the 4th digit from 4 to 5",
+          "Example 2: $\\text{round}(0.12344, 4) = 0.1234$ because the 5th digit is 4 < 5, so we keep the 4th digit as 4",
+          "Example 3: $\\text{round}(0.9999, 4) = 0.9999$ (already has 4 decimal places, no change)",
+          "Example 4: $\\text{round}(0.999999, 4) = 1.0000$ because rounding cascades: 9→10 requires carrying",
+          "Example 5: $\\text{round}(0.08999, 4) = 0.0900$ (rounding to 4 places preserves trailing zeros)",
+          "Example 6: In Python 3, $\\text{round}(0.5, 0) = 0$ and $\\text{round}(1.5, 0) = 2$ (round-half-to-even: ties go to nearest even)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Rounding Function",
+          "latex": "$\\text{round}(x, n) = \\frac{\\lfloor x \\cdot 10^n + 0.5 \\rfloor}{10^n}$",
+          "description": "Mathematical definition: shift decimal point right by n places, add 0.5, floor, then shift back"
+        },
+        {
+          "name": "Maximum Rounding Error",
+          "latex": "$|x - \\text{round}(x, n)| \\leq \\frac{1}{2} \\times 10^{-n}$",
+          "description": "The rounded value is always within this tolerance of the true value"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function `compute_and_round(value, decimal_places)` that takes a floating-point number and returns it rounded to the specified number of decimal places. Then create a function `exponential_value_rounded(initial, rate, step, precision)` that computes $\\text{initial} \\times \\text{rate}^{\\text{step}}$ and rounds the result to `precision` decimal places. This practices the complete numerical computation pipeline: calculate then round.",
+        "function_signature": "def compute_and_round(value: float, decimal_places: int) -> float:\ndef exponential_value_rounded(initial: float, rate: float, step: int, precision: int) -> float:",
+        "starter_code": "def compute_and_round(value: float, decimal_places: int) -> float:\n    \"\"\"\n    Round a value to a specified number of decimal places.\n    \n    Args:\n        value: The number to round\n        decimal_places: Number of decimal places to round to\n    \n    Returns:\n        The rounded value\n    \"\"\"\n    # Your code here\n    pass\n\ndef exponential_value_rounded(initial: float, rate: float, step: int, precision: int) -> float:\n    \"\"\"\n    Compute initial * (rate ^ step) and round to specified precision.\n    \n    Args:\n        initial: Initial value\n        rate: Decay rate\n        step: Exponent (time step)\n        precision: Number of decimal places for rounding\n    \n    Returns:\n        The computed and rounded value\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_and_round(0.12345, 4)",
+            "expected": "0.1235",
+            "explanation": "5th digit is 5, round up: 0.12345 → 0.1235"
+          },
+          {
+            "input": "compute_and_round(0.12344, 4)",
+            "expected": "0.1234",
+            "explanation": "5th digit is 4 < 5, round down: 0.12344 → 0.1234"
+          },
+          {
+            "input": "exponential_value_rounded(0.1, 0.9, 0, 4)",
+            "expected": "0.1000",
+            "explanation": "0.1 × 0.9^0 = 0.1, rounded to 4 places is 0.1000"
+          },
+          {
+            "input": "exponential_value_rounded(0.1, 0.9, 1, 4)",
+            "expected": "0.0900",
+            "explanation": "0.1 × 0.9^1 = 0.09, rounded to 4 places is 0.0900"
+          },
+          {
+            "input": "exponential_value_rounded(0.1, 0.9, 3, 4)",
+            "expected": "0.0729",
+            "explanation": "0.1 × 0.9^3 = 0.0729 exactly, already at 4 decimal places"
+          },
+          {
+            "input": "exponential_value_rounded(0.1, 0.9, 10, 4)",
+            "expected": "0.0349",
+            "explanation": "0.1 × 0.9^10 = 0.034867844... → 0.0349 when rounded to 4 places"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Truncating instead of rounding (cutting off digits rather than rounding to nearest)",
+        "Rounding too early in calculations (round after all computations, not during)",
+        "Forgetting to specify the number of decimal places to round()",
+        "Assuming round() returns a string (it returns a float)",
+        "Not understanding Python's round-half-to-even behavior for ties",
+        "Rounding each intermediate calculation instead of only the final result (compounds errors)"
+      ],
+      "hint": "Python's built-in round(value, n) function does exactly what you need. Compute the full-precision result first, then round only the final answer to avoid accumulating rounding errors.",
+      "references": [
+        "Floating-point arithmetic",
+        "IEEE 754 standard",
+        "Numerical stability and error analysis",
+        "Python's round() function documentation"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Integration: Building a Complete Learning Rate Scheduler",
+      "relation_to_problem": "This sub-quest synthesizes all previous concepts—exponential decay, scaling, class design, discrete sequences, and rounding—to create a complete learning rate scheduler that directly solves the main problem.",
+      "prerequisites": [
+        "Exponential functions",
+        "Scaled exponential decay",
+        "Class-based design",
+        "Discrete sequences",
+        "Numerical rounding"
+      ],
+      "learning_objectives": [
+        "Integrate multiple mathematical concepts into a cohesive solution",
+        "Design a class that encapsulates the learning rate scheduling logic",
+        "Implement a method that computes learning rates using the exponential decay formula",
+        "Apply proper software engineering practices: initialization, encapsulation, and precision",
+        "Understand the complete workflow of a learning rate scheduler in machine learning"
+      ],
+      "math_content": {
+        "definition": "A **Learning Rate Scheduler** is a component in machine learning optimization that computes the learning rate $\\eta_t$ as a function of the training step or epoch $t$. The **ExponentialLR (Exponential Learning Rate)** scheduler implements the formula $\\eta_t = \\eta_0 \\cdot \\gamma^t$, where $\\eta_0$ is the initial learning rate, $\\gamma$ (gamma) is the decay rate with $0 < \\gamma < 1$, and $t \\in \\mathbb{N}_0$ is the epoch number (zero-indexed). This creates a discrete-time geometric sequence of learning rates that exponentially decays over training.",
+        "notation": "$\\eta_t$ = learning rate at epoch $t$; $\\eta_0$ = initial learning rate; $\\gamma$ = multiplicative decay factor per epoch; $t$ = epoch number starting from 0",
+        "theorem": "**Exponential Decay Convergence**: For ExponentialLR with $0 < \\gamma < 1$, the learning rate sequence $\\{\\eta_t\\}$ converges to 0 as $t \\to \\infty$: $\\lim_{t \\to \\infty} \\eta_t = \\lim_{t \\to \\infty} \\eta_0 \\cdot \\gamma^t = \\eta_0 \\cdot 0 = 0$. The rate of decay is controlled by $\\gamma$: values closer to 1 (e.g., 0.99) produce slow decay, while values further from 1 (e.g., 0.8) produce rapid decay. The **half-life** (epochs for learning rate to halve) is approximately $t_{1/2} = \\frac{\\ln(2)}{\\ln(1/\\gamma)} = \\frac{\\ln(2)}{-\\ln(\\gamma)}$.",
+        "proof_sketch": "Since $0 < \\gamma < 1$, we have $\\gamma^t \\to 0$ as $t \\to \\infty$ (fundamental property of exponential decay). Multiplying by the constant $\\eta_0 > 0$ preserves this limit: $\\eta_0 \\cdot \\gamma^t \\to \\eta_0 \\cdot 0 = 0$. For half-life, we solve $\\eta_0 \\cdot \\gamma^{t_{1/2}} = \\frac{\\eta_0}{2}$, which gives $\\gamma^{t_{1/2}} = \\frac{1}{2}$. Taking logarithms: $t_{1/2} \\ln(\\gamma) = \\ln(1/2) = -\\ln(2)$, so $t_{1/2} = \\frac{-\\ln(2)}{\\ln(\\gamma)} = \\frac{\\ln(2)}{-\\ln(\\gamma)}$.",
+        "examples": [
+          "Example 1: $\\eta_0 = 0.1$, $\\gamma = 0.9$. Epochs 0-3: $\\eta_0 = 0.1$, $\\eta_1 = 0.09$, $\\eta_2 = 0.081$, $\\eta_3 = 0.0729$",
+          "Example 2: Half-life for $\\gamma = 0.9$: $t_{1/2} = \\frac{\\ln(2)}{-\\ln(0.9)} \\approx \\frac{0.693}{0.105} \\approx 6.6$ epochs",
+          "Example 3: After 7 epochs with $\\eta_0 = 0.1$, $\\gamma = 0.9$: $\\eta_7 = 0.1 \\times 0.9^7 \\approx 0.0478$ (about half of initial)",
+          "Example 4: Rapid decay with $\\gamma = 0.5$: $\\eta_0 = 0.1$, $\\eta_1 = 0.05$, $\\eta_2 = 0.025$, $\\eta_3 = 0.0125$ (halves each epoch)",
+          "Example 5: Slow decay with $\\gamma = 0.995$: After 100 epochs, $\\eta_{100} = \\eta_0 \\times 0.995^{100} \\approx 0.606 \\times \\eta_0$ (still 60% of initial)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "ExponentialLR Formula",
+          "latex": "$\\eta_t = \\eta_0 \\cdot \\gamma^t$",
+          "description": "The learning rate at epoch t is the initial learning rate multiplied by gamma raised to the t-th power"
+        },
+        {
+          "name": "Decay Ratio",
+          "latex": "$\\frac{\\eta_{t+1}}{\\eta_t} = \\gamma$",
+          "description": "The ratio between consecutive learning rates is constant and equals gamma"
+        },
+        {
+          "name": "Half-Life Formula",
+          "latex": "$t_{1/2} = \\frac{\\ln(2)}{-\\ln(\\gamma)}$",
+          "description": "Number of epochs for the learning rate to reduce by half"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete `LearningRateScheduler` class that encapsulates the ExponentialLR strategy. The class should:\n1. Have an `__init__(self, initial_lr, gamma)` method that stores the initial learning rate and decay factor as instance variables\n2. Have a `get_lr(self, epoch)` method that computes and returns the learning rate for a given epoch using the formula $\\eta_\\text{epoch} = \\text{initial_lr} \\times \\gamma^\\text{epoch}$\n3. Round all returned learning rates to 4 decimal places\n4. Use zero-indexing (epoch 0 returns the initial learning rate)\n\nThis synthesizes all previous sub-quests: exponential functions (step 1), scaling (step 2), class design (step 3), discrete sequences (step 4), and rounding (step 5).",
+        "function_signature": "class LearningRateScheduler:\n    def __init__(self, initial_lr: float, gamma: float):\n    def get_lr(self, epoch: int) -> float:",
+        "starter_code": "class LearningRateScheduler:\n    def __init__(self, initial_lr: float, gamma: float):\n        \"\"\"\n        Initialize the ExponentialLR scheduler.\n        \n        Args:\n            initial_lr: The initial learning rate (η₀)\n            gamma: The multiplicative decay factor per epoch (γ), where 0 < γ < 1\n        \"\"\"\n        # Store initial_lr and gamma as instance variables\n        # Your code here\n        pass\n    \n    def get_lr(self, epoch: int) -> float:\n        \"\"\"\n        Compute the learning rate for a given epoch using exponential decay.\n        \n        Args:\n            epoch: The epoch number (zero-indexed, starting from 0)\n        \n        Returns:\n            The learning rate at the given epoch: initial_lr * (gamma ^ epoch),\n            rounded to 4 decimal places\n        \"\"\"\n        # Compute the learning rate using the exponential decay formula\n        # Round to 4 decimal places before returning\n        # Your code here\n        pass",
+        "test_cases": [
+          {
+            "input": "scheduler = LearningRateScheduler(0.1, 0.9); scheduler.get_lr(0)",
+            "expected": "0.1000",
+            "explanation": "At epoch 0: η₀ = 0.1 × 0.9^0 = 0.1 × 1 = 0.1"
+          },
+          {
+            "input": "scheduler = LearningRateScheduler(0.1, 0.9); scheduler.get_lr(1)",
+            "expected": "0.0900",
+            "explanation": "At epoch 1: η₁ = 0.1 × 0.9^1 = 0.09"
+          },
+          {
+            "input": "scheduler = LearningRateScheduler(0.1, 0.9); scheduler.get_lr(2)",
+            "expected": "0.0810",
+            "explanation": "At epoch 2: η₂ = 0.1 × 0.9^2 = 0.081"
+          },
+          {
+            "input": "scheduler = LearningRateScheduler(0.1, 0.9); scheduler.get_lr(3)",
+            "expected": "0.0729",
+            "explanation": "At epoch 3: η₃ = 0.1 × 0.9^3 = 0.0729"
+          },
+          {
+            "input": "scheduler = LearningRateScheduler(0.1, 0.9); scheduler.get_lr(10)",
+            "expected": "0.0349",
+            "explanation": "At epoch 10: η₁₀ = 0.1 × 0.9^10 ≈ 0.0349 (demonstrates direct computation)"
+          },
+          {
+            "input": "scheduler = LearningRateScheduler(0.05, 0.95); scheduler.get_lr(5)",
+            "expected": "0.0387",
+            "explanation": "Different parameters: 0.05 × 0.95^5 ≈ 0.0387"
+          },
+          {
+            "input": "scheduler = LearningRateScheduler(1.0, 0.5); scheduler.get_lr(3)",
+            "expected": "0.1250",
+            "explanation": "Rapid decay: 1.0 × 0.5^3 = 0.125 (halves each epoch)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not storing initial_lr and gamma as instance variables (self.initial_lr, self.gamma)",
+        "Using iterative computation instead of direct closed-form formula (inefficient)",
+        "Forgetting to round the result to 4 decimal places",
+        "Rounding intermediate calculations instead of only the final result",
+        "Off-by-one errors in epoch indexing (not handling epoch 0 correctly)",
+        "Confusing the order of operations: must compute exponentiation before multiplication",
+        "Not using self to access instance variables in get_lr method"
+      ],
+      "hint": "In __init__, store the parameters as instance variables using self. In get_lr, use the closed-form formula: self.initial_lr * (self.gamma ** epoch), then round to 4 decimal places. This directly applies all concepts from previous sub-quests.",
+      "references": [
+        "PyTorch's torch.optim.lr_scheduler.ExponentialLR",
+        "TensorFlow's tf.keras.optimizers.schedules.ExponentialDecay",
+        "Learning rate scheduling in deep learning",
+        "Hyperparameter optimization strategies"
+      ]
+    }
+  ]
+}

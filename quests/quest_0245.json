@@ -1,0 +1,540 @@
+{
+  "problem_id": 245,
+  "title": "Hypergeometric Distribution PMF",
+  "category": "Probability",
+  "difficulty": "medium",
+  "description": "Implement a function to calculate the probability mass function (PMF) of the hypergeometric distribution.\n\nThe hypergeometric distribution models the probability of obtaining exactly k successes in n draws, without replacement, from a finite population of size N that contains exactly K success states.\n\nThis distribution is commonly used in:\n- Quality control (sampling defective items from a batch)\n- Card games (drawing specific cards from a deck)\n- Lottery calculations\n- Ecological sampling (capture-recapture methods)\n\nGiven:\n- `N`: Total population size\n- `K`: Number of success states in the population\n- `n`: Number of draws (without replacement)\n- `k`: Number of observed successes\n\nYour function should return the probability P(X = k) of getting exactly k successes.\n\nNote: If k is outside the valid range of possible outcomes, return 0.0.\n\nReturn the result rounded to 4 decimal places.",
+  "example": {
+    "input": "hypergeometric_pmf(N=52, K=13, n=5, k=2)",
+    "output": "0.2743",
+    "reasoning": "Consider a standard 52-card deck with 13 hearts. We draw 5 cards without replacement and want the probability of exactly 2 hearts. Using the hypergeometric formula: P(X=2) = C(13,2) * C(39,3) / C(52,5) = 78 * 9139 / 2598960 = 712842 / 2598960 = 0.2743"
+  },
+  "starter_code": "def hypergeometric_pmf(N: int, K: int, n: int, k: int) -> float:\n    \"\"\"\n    Calculate the PMF of the hypergeometric distribution.\n    \n    Args:\n        N: Total population size\n        K: Number of success states in population\n        n: Number of draws (without replacement)\n        k: Number of observed successes\n    \n    Returns:\n        float: P(X = k), rounded to 4 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Factorial Computation and Mathematical Properties",
+      "relation_to_problem": "Factorials are the fundamental building blocks for calculating binomial coefficients, which appear in the numerator and denominator of the hypergeometric PMF formula.",
+      "prerequisites": [
+        "Basic arithmetic operations",
+        "Recursion concepts",
+        "Integer multiplication"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of the factorial function",
+        "Implement efficient factorial computation",
+        "Recognize edge cases (0! = 1) and constraints (non-negative integers)",
+        "Understand overflow issues with large factorials"
+      ],
+      "math_content": {
+        "definition": "The factorial of a non-negative integer $n$, denoted $n!$, is the product of all positive integers less than or equal to $n$. Formally: $$n! = \\begin{cases} 1 & \\text{if } n = 0 \\\\ n \\cdot (n-1)! & \\text{if } n > 0 \\end{cases}$$",
+        "notation": "$n! = n \\times (n-1) \\times (n-2) \\times \\cdots \\times 2 \\times 1$, with $0! = 1$ by convention",
+        "theorem": "**Recursive Property**: For all $n \\in \\mathbb{N}$, $n! = n \\cdot (n-1)!$ with base case $0! = 1$. This recursive definition allows for both iterative and recursive implementations.",
+        "proof_sketch": "The base case $0! = 1$ is defined by convention (empty product). For $n \\geq 1$, the product of integers from 1 to $n$ can be written as $n$ times the product from 1 to $(n-1)$, establishing the recursive relation.",
+        "examples": [
+          "$5! = 5 \\times 4 \\times 3 \\times 2 \\times 1 = 120$",
+          "$0! = 1$ (by definition)",
+          "$1! = 1$",
+          "$10! = 3,628,800$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Factorial Definition",
+          "latex": "$n! = \\prod_{i=1}^{n} i$",
+          "description": "Product notation for factorial, used when computing binomial coefficients"
+        },
+        {
+          "name": "Ratio of Factorials",
+          "latex": "$\\frac{n!}{k!} = n \\times (n-1) \\times \\cdots \\times (k+1)$ for $n \\geq k$",
+          "description": "Simplification used in binomial coefficient calculation to avoid overflow"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the factorial of a non-negative integer. This is the first step toward calculating binomial coefficients needed in the hypergeometric PMF.",
+        "function_signature": "def factorial(n: int) -> int:",
+        "starter_code": "def factorial(n: int) -> int:\n    \"\"\"\n    Calculate n! (n factorial)\n    \n    Args:\n        n: Non-negative integer\n    \n    Returns:\n        int: n!\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "factorial(0)",
+            "expected": "1",
+            "explanation": "0! = 1 by mathematical convention (empty product)"
+          },
+          {
+            "input": "factorial(1)",
+            "expected": "1",
+            "explanation": "1! = 1"
+          },
+          {
+            "input": "factorial(5)",
+            "expected": "120",
+            "explanation": "5! = 5 × 4 × 3 × 2 × 1 = 120"
+          },
+          {
+            "input": "factorial(10)",
+            "expected": "3628800",
+            "explanation": "10! = 3,628,800"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that 0! = 1 (not 0)",
+        "Using recursion without base case handling",
+        "Not handling negative inputs (factorials are undefined for negative integers)",
+        "Integer overflow for large n (n > 20 in most languages)"
+      ],
+      "hint": "Use an iterative approach with a loop to multiply numbers from 1 to n. Remember the special case for 0!",
+      "references": [
+        "Factorial function properties",
+        "Recursion vs iteration tradeoffs",
+        "Gamma function (continuous extension of factorial)"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Binomial Coefficients: Combinatorial Foundation",
+      "relation_to_problem": "The hypergeometric PMF formula contains three binomial coefficients: C(K,k), C(N-K,n-k), and C(N,n). Understanding how to compute binomial coefficients is essential for calculating the hypergeometric probability.",
+      "prerequisites": [
+        "Factorial computation",
+        "Integer division",
+        "Combinatorics basics"
+      ],
+      "learning_objectives": [
+        "Understand the combinatorial interpretation of binomial coefficients",
+        "Derive the formula for computing C(n,k)",
+        "Implement numerically stable binomial coefficient calculation",
+        "Recognize symmetry property: C(n,k) = C(n,n-k)"
+      ],
+      "math_content": {
+        "definition": "The binomial coefficient $\\binom{n}{k}$ (read as 'n choose k') represents the number of ways to choose $k$ items from $n$ distinct items without regard to order. Formally: $$\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$$ where $0 \\leq k \\leq n$ and $n, k \\in \\mathbb{N}_0$",
+        "notation": "$\\binom{n}{k}$, $C(n,k)$, or $_nC_k$ all denote the same binomial coefficient",
+        "theorem": "**Symmetry Property**: $\\binom{n}{k} = \\binom{n}{n-k}$ for all $0 \\leq k \\leq n$. **Pascal's Identity**: $\\binom{n}{k} = \\binom{n-1}{k-1} + \\binom{n-1}{k}$ for $1 \\leq k \\leq n-1$.",
+        "proof_sketch": "Symmetry: Choosing $k$ items to include is equivalent to choosing $n-k$ items to exclude. Pascal's Identity: Consider an element $x$. Subsets either contain $x$ (choose $k-1$ from remaining $n-1$) or don't (choose $k$ from remaining $n-1$).",
+        "examples": [
+          "$\\binom{5}{2} = \\frac{5!}{2!3!} = \\frac{120}{2 \\times 6} = 10$",
+          "$\\binom{52}{5} = 2,598,960$ (number of 5-card poker hands)",
+          "$\\binom{n}{0} = \\binom{n}{n} = 1$ for any $n$",
+          "$\\binom{13}{2} = \\frac{13 \\times 12}{2} = 78$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Binomial Coefficient Formula",
+          "latex": "$\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$",
+          "description": "Standard formula using factorials, forms the basis of the hypergeometric PMF"
+        },
+        {
+          "name": "Multiplicative Formula",
+          "latex": "$\\binom{n}{k} = \\frac{n \\times (n-1) \\times \\cdots \\times (n-k+1)}{k!}$",
+          "description": "More numerically stable form that reduces overflow risk"
+        },
+        {
+          "name": "Boundary Conditions",
+          "latex": "$\\binom{n}{0} = \\binom{n}{n} = 1$, $\\binom{n}{k} = 0$ if $k > n$",
+          "description": "Edge cases that must be handled correctly"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to compute the binomial coefficient C(n,k). This function will be used three times in the hypergeometric PMF calculation. Focus on numerical stability by computing the result without explicitly calculating full factorials.",
+        "function_signature": "def binomial_coefficient(n: int, k: int) -> int:",
+        "starter_code": "def binomial_coefficient(n: int, k: int) -> int:\n    \"\"\"\n    Calculate C(n,k) = n!/(k!(n-k)!)\n    \n    Args:\n        n: Total number of items\n        k: Number of items to choose\n    \n    Returns:\n        int: Number of ways to choose k items from n\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "binomial_coefficient(5, 2)",
+            "expected": "10",
+            "explanation": "C(5,2) = 5!/(2!3!) = 120/(2×6) = 10. There are 10 ways to choose 2 items from 5."
+          },
+          {
+            "input": "binomial_coefficient(13, 2)",
+            "expected": "78",
+            "explanation": "C(13,2) = 78. Used in the card example: choosing 2 hearts from 13."
+          },
+          {
+            "input": "binomial_coefficient(52, 5)",
+            "expected": "2598960",
+            "explanation": "C(52,5) = 2,598,960. Total number of 5-card hands from a 52-card deck."
+          },
+          {
+            "input": "binomial_coefficient(10, 0)",
+            "expected": "1",
+            "explanation": "C(n,0) = 1 for any n. There is exactly one way to choose nothing."
+          },
+          {
+            "input": "binomial_coefficient(10, 10)",
+            "expected": "1",
+            "explanation": "C(n,n) = 1. There is exactly one way to choose everything."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing n!, k!, and (n-k)! separately causing integer overflow for large values",
+        "Not handling edge cases: C(n,0) = 1, C(n,k) = 0 when k > n",
+        "Ignoring the symmetry property C(n,k) = C(n,n-k) which can reduce computation",
+        "Integer division issues when using formula incorrectly",
+        "Not validating that k ≤ n before computation"
+      ],
+      "hint": "Use the multiplicative formula: multiply n×(n-1)×...×(n-k+1) and divide by k! incrementally to avoid overflow. Consider using symmetry: if k > n-k, compute C(n,n-k) instead.",
+      "references": [
+        "Combinatorics and counting principles",
+        "Pascal's triangle",
+        "Dynamic programming approach for binomial coefficients"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Valid Range Constraints for Hypergeometric Distribution",
+      "relation_to_problem": "Before computing the hypergeometric PMF, we must determine if k is within the valid range. If k is outside the valid range, the probability is 0. Understanding these constraints ensures correct probability calculations.",
+      "prerequisites": [
+        "Set theory basics",
+        "Logical constraints",
+        "Max/min functions"
+      ],
+      "learning_objectives": [
+        "Derive the valid range for the number of successes k",
+        "Understand why lower bound is max(0, n-(N-K))",
+        "Understand why upper bound is min(n, K)",
+        "Implement range validation logic"
+      ],
+      "math_content": {
+        "definition": "For the hypergeometric distribution with parameters $(N, K, n, k)$, the support (valid range) of $k$ is the set of all integer values for which the probability is non-zero. This range is determined by physical constraints of the sampling process: $$\\mathcal{S} = \\{k \\in \\mathbb{Z} : \\max(0, n-(N-K)) \\leq k \\leq \\min(n, K)\\}$$",
+        "notation": "$k_{\\text{min}} = \\max(0, n-(N-K))$ and $k_{\\text{max}} = \\min(n, K)$ define the boundaries of the support",
+        "theorem": "**Support Constraint Theorem**: The probability $P(X=k) = 0$ if and only if $k \\notin \\mathcal{S}$. This is because: (1) We cannot draw more successes than exist: $k \\leq K$. (2) We cannot draw more successes than total draws: $k \\leq n$. (3) We cannot draw fewer failures than forced: $n-k \\leq N-K$, which gives $k \\geq n-(N-K)$. (4) Success count must be non-negative: $k \\geq 0$.",
+        "proof_sketch": "Upper bound: $k$ cannot exceed the number of successes in population ($K$) nor the sample size ($n$), so $k \\leq \\min(n,K)$. Lower bound: We draw $n$ items total. If $n > N-K$ (more draws than failures available), we must draw at least $n-(N-K)$ successes. Also $k \\geq 0$ always. Thus $k \\geq \\max(0, n-(N-K))$.",
+        "examples": [
+          "Example 1: $N=10, K=3, n=5$. Range: $k \\in [\\max(0,5-7), \\min(5,3)] = [0,3]$. We can get 0,1,2, or 3 successes.",
+          "Example 2: $N=20, K=5, n=18$. Range: $k \\in [\\max(0,18-15), \\min(18,5)] = [3,5]$. We must get at least 3 successes (not enough failures to avoid them).",
+          "Example 3: $N=52, K=13, n=5$. Range: $k \\in [\\max(0,5-39), \\min(5,13)] = [0,5]$. Drawing 5 cards, we can get 0 to 5 hearts.",
+          "Invalid example: $k=6$ when $n=5$ is impossible (can't draw 6 successes with only 5 draws)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Upper Bound Constraint",
+          "latex": "$k \\leq \\min(n, K)$",
+          "description": "Cannot draw more successes than: (a) the sample size n, or (b) total successes available K"
+        },
+        {
+          "name": "Lower Bound Constraint",
+          "latex": "$k \\geq \\max(0, n-(N-K))$",
+          "description": "Must draw at least: (a) zero successes, or (b) enough to account for insufficient failures"
+        },
+        {
+          "name": "Failure Constraint",
+          "latex": "$n - k \\leq N - K$",
+          "description": "The number of failures drawn cannot exceed failures in population; rearranges to lower bound"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that checks whether a given value of k is within the valid range for the hypergeometric distribution. This validation step is crucial before computing the PMF, as invalid k values should return probability 0.",
+        "function_signature": "def is_valid_k(N: int, K: int, n: int, k: int) -> bool:",
+        "starter_code": "def is_valid_k(N: int, K: int, n: int, k: int) -> bool:\n    \"\"\"\n    Check if k is in the valid range for hypergeometric distribution.\n    \n    Args:\n        N: Total population size\n        K: Number of success states in population\n        n: Number of draws\n        k: Number of observed successes to validate\n    \n    Returns:\n        bool: True if k is valid, False otherwise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "is_valid_k(52, 13, 5, 2)",
+            "expected": "True",
+            "explanation": "Drawing 5 cards from 52 (13 hearts), k=2 hearts is valid: 0 ≤ 2 ≤ min(5,13)=5"
+          },
+          {
+            "input": "is_valid_k(52, 13, 5, 6)",
+            "expected": "False",
+            "explanation": "Cannot draw 6 hearts when only drawing 5 cards total. k > n violates upper bound."
+          },
+          {
+            "input": "is_valid_k(10, 3, 8, 1)",
+            "expected": "True",
+            "explanation": "Valid: max(0, 8-7)=1 ≤ 1 ≤ min(8,3)=3"
+          },
+          {
+            "input": "is_valid_k(10, 3, 8, 0)",
+            "expected": "False",
+            "explanation": "Invalid: With only 7 failures available and drawing 8 items, must get at least 1 success. k < max(0,8-7)=1"
+          },
+          {
+            "input": "is_valid_k(20, 5, 4, -1)",
+            "expected": "False",
+            "explanation": "Negative k is never valid. k must be at least 0."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting the lower bound when n > N-K (forced successes case)",
+        "Only checking k ≤ n without checking k ≤ K",
+        "Not handling the max(0, n-(N-K)) correctly when n-(N-K) is negative",
+        "Confusing n (draws) with N (population)",
+        "Allowing negative k values"
+      ],
+      "hint": "Calculate k_min = max(0, n-(N-K)) and k_max = min(n, K). Return True only if k_min ≤ k ≤ k_max.",
+      "references": [
+        "Discrete distribution support",
+        "Sampling without replacement constraints",
+        "Logical constraint satisfaction"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Computing Hypergeometric Numerator: Success-Failure Combinations",
+      "relation_to_problem": "The numerator of the hypergeometric PMF formula, C(K,k) × C(N-K,n-k), counts favorable outcomes: ways to select k successes from K available AND (n-k) failures from (N-K) available. This is the key calculation for the probability.",
+      "prerequisites": [
+        "Binomial coefficients",
+        "Multiplication principle in combinatorics",
+        "Valid range constraints"
+      ],
+      "learning_objectives": [
+        "Understand the multiplication principle for independent choices",
+        "Interpret C(K,k) as ways to choose successes",
+        "Interpret C(N-K,n-k) as ways to choose failures",
+        "Combine both to count total favorable outcomes"
+      ],
+      "math_content": {
+        "definition": "The **favorable outcomes** in the hypergeometric distribution are the number of ways to draw exactly $k$ successes and $(n-k)$ failures from the population. By the multiplication principle: $$\\text{Favorable outcomes} = \\binom{K}{k} \\times \\binom{N-K}{n-k}$$ where $\\binom{K}{k}$ counts ways to select $k$ successes from $K$ available, and $\\binom{N-K}{n-k}$ counts ways to select $(n-k)$ failures from $(N-K)$ available.",
+        "notation": "$K$ = success states, $N-K$ = failure states, $k$ = successes drawn, $n-k$ = failures drawn",
+        "theorem": "**Multiplication Principle**: If a task can be decomposed into two independent subtasks with $m$ and $n$ outcomes respectively, the total number of outcomes is $m \\times n$. For hypergeometric sampling: selecting successes and failures are independent choices (once we decide which positions are successes, we independently decide which specific successes and failures).",
+        "proof_sketch": "Consider drawing $n$ items from population of $N$ items ($K$ successes, $N-K$ failures). To get exactly $k$ successes: (1) Choose which $k$ of the $K$ successes to include: $\\binom{K}{k}$ ways. (2) Choose which $(n-k)$ of the $(N-K)$ failures to include: $\\binom{N-K}{n-k}$ ways. By multiplication principle, total favorable outcomes = $\\binom{K}{k} \\times \\binom{N-K}{n-k}$.",
+        "examples": [
+          "Example: $N=52, K=13$ hearts, $n=5$ draws, $k=2$ hearts. Numerator = $\\binom{13}{2} \\times \\binom{39}{3} = 78 \\times 9139 = 712842$ ways to get exactly 2 hearts and 3 non-hearts.",
+          "Example: $N=20, K=5$ defective, $n=4$ sampled, $k=1$ defective. Numerator = $\\binom{5}{1} \\times \\binom{15}{3} = 5 \\times 455 = 2275$ ways.",
+          "Example: $N=10, K=4$ red balls, $n=3$ drawn, $k=0$ red. Numerator = $\\binom{4}{0} \\times \\binom{6}{3} = 1 \\times 20 = 20$ ways to draw 3 non-red balls."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Favorable Outcomes Formula",
+          "latex": "$\\binom{K}{k} \\times \\binom{N-K}{n-k}$",
+          "description": "Numerator of hypergeometric PMF; counts ways to get exactly k successes in n draws"
+        },
+        {
+          "name": "Multiplication Principle",
+          "latex": "$|A \\times B| = |A| \\times |B|$",
+          "description": "For independent choices A and B, total outcomes = product of individual outcomes"
+        },
+        {
+          "name": "Complementary Relationship",
+          "latex": "$k + (n-k) = n$",
+          "description": "Total draws equals successes plus failures; ensures consistency"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the numerator of the hypergeometric PMF formula. This function computes the number of favorable outcomes: ways to draw exactly k successes and (n-k) failures. You will need your binomial coefficient function from the previous sub-quest.",
+        "function_signature": "def hypergeometric_numerator(N: int, K: int, n: int, k: int) -> int:",
+        "starter_code": "def hypergeometric_numerator(N: int, K: int, n: int, k: int) -> int:\n    \"\"\"\n    Calculate the numerator of hypergeometric PMF: C(K,k) * C(N-K,n-k)\n    \n    Args:\n        N: Total population size\n        K: Number of success states in population\n        n: Number of draws\n        k: Number of observed successes\n    \n    Returns:\n        int: Number of favorable outcomes\n    \"\"\"\n    # Your code here\n    # Hint: Use your binomial_coefficient function from the previous exercise\n    pass",
+        "test_cases": [
+          {
+            "input": "hypergeometric_numerator(52, 13, 5, 2)",
+            "expected": "712842",
+            "explanation": "C(13,2) × C(39,3) = 78 × 9139 = 712842. Ways to get exactly 2 hearts and 3 non-hearts in 5 cards."
+          },
+          {
+            "input": "hypergeometric_numerator(20, 5, 4, 1)",
+            "expected": "2275",
+            "explanation": "C(5,1) × C(15,3) = 5 × 455 = 2275. Ways to get 1 defective and 3 non-defective items."
+          },
+          {
+            "input": "hypergeometric_numerator(10, 4, 3, 0)",
+            "expected": "20",
+            "explanation": "C(4,0) × C(6,3) = 1 × 20 = 20. Ways to draw 0 successes (3 failures only)."
+          },
+          {
+            "input": "hypergeometric_numerator(10, 4, 3, 3)",
+            "expected": "4",
+            "explanation": "C(4,3) × C(6,0) = 4 × 1 = 4. Ways to draw all 3 successes (0 failures)."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing C(K, k) × C(N-K, k) instead of C(N-K, n-k) - using k instead of n-k for failures",
+        "Forgetting to validate that n-k is non-negative and ≤ N-K",
+        "Computing C(N, k) instead of separately computing success and failure combinations",
+        "Integer overflow when multiplying large binomial coefficients",
+        "Not recognizing that if either binomial coefficient is 0, the result is 0"
+      ],
+      "hint": "Call your binomial_coefficient function twice: once for C(K,k) and once for C(N-K, n-k), then multiply the results. Make sure n-k is valid (non-negative and ≤ N-K).",
+      "references": [
+        "Multiplication principle in probability",
+        "Counting techniques in combinatorics",
+        "Conditional counting"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Total Possible Outcomes: Sample Space Size",
+      "relation_to_problem": "The denominator C(N,n) in the hypergeometric PMF represents the total number of ways to select n items from N, forming the sample space. The probability is the ratio of favorable outcomes (numerator) to total outcomes (denominator).",
+      "prerequisites": [
+        "Binomial coefficients",
+        "Sample space concept",
+        "Classical probability definition"
+      ],
+      "learning_objectives": [
+        "Understand sample space in the context of sampling without replacement",
+        "Recognize C(N,n) as the size of the sample space",
+        "Connect to classical probability: P(event) = |favorable| / |sample space|",
+        "Understand why order doesn't matter in combinations"
+      ],
+      "math_content": {
+        "definition": "The **sample space** $\\Omega$ for drawing $n$ items from a population of $N$ items (without replacement, unordered) consists of all possible subsets of size $n$. The size of this sample space is: $$|\\Omega| = \\binom{N}{n} = \\frac{N!}{n!(N-n)!}$$ This represents the denominator in the hypergeometric PMF formula.",
+        "notation": "$|\\Omega|$ denotes the cardinality (size) of the sample space, $\\Omega = $ set of all possible samples",
+        "theorem": "**Classical Probability**: For equally likely outcomes in a finite sample space, the probability of an event $E$ is: $$P(E) = \\frac{|E|}{|\\Omega|}$$ where $|E|$ is the number of favorable outcomes and $|\\Omega|$ is the total number of possible outcomes. For hypergeometric distribution: $$P(X=k) = \\frac{\\binom{K}{k}\\binom{N-K}{n-k}}{\\binom{N}{n}}$$",
+        "proof_sketch": "When drawing $n$ items from $N$ without replacement, each possible subset of size $n$ is equally likely (uniform distribution over subsets). The number of such subsets is $\\binom{N}{n}$ by definition of combinations. Therefore, any specific sample has probability $1/\\binom{N}{n}$, and an event $E$ containing $|E|$ samples has probability $|E|/\\binom{N}{n}$.",
+        "examples": [
+          "Example: Drawing 5 cards from 52. Sample space size = $\\binom{52}{5} = 2,598,960$ possible hands.",
+          "Example: Selecting 3 people from 10. Sample space size = $\\binom{10}{3} = 120$ possible committees.",
+          "Example: Drawing all items (n=N). Sample space size = $\\binom{N}{N} = 1$ (only one way to draw everything).",
+          "Lottery example: Choosing 6 numbers from 49. Sample space size = $\\binom{49}{6} = 13,983,816$ possible tickets."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sample Space Size",
+          "latex": "$|\\Omega| = \\binom{N}{n}$",
+          "description": "Total number of ways to choose n items from N; denominator of hypergeometric PMF"
+        },
+        {
+          "name": "Classical Probability Formula",
+          "latex": "$P(E) = \\frac{|E|}{|\\Omega|}$",
+          "description": "Probability equals favorable outcomes divided by total outcomes (for uniform distributions)"
+        },
+        {
+          "name": "Hypergeometric PMF Structure",
+          "latex": "$P(X=k) = \\frac{\\text{Numerator}}{\\text{Denominator}} = \\frac{\\binom{K}{k}\\binom{N-K}{n-k}}{\\binom{N}{n}}$",
+          "description": "Complete structure showing how numerator and denominator form the probability"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the total number of possible outcomes when drawing n items from a population of N items without replacement. This denominator will complete the hypergeometric PMF calculation.",
+        "function_signature": "def total_outcomes(N: int, n: int) -> int:",
+        "starter_code": "def total_outcomes(N: int, n: int) -> int:\n    \"\"\"\n    Calculate the total number of ways to choose n items from N.\n    This is the denominator in the hypergeometric PMF: C(N,n)\n    \n    Args:\n        N: Total population size\n        n: Number of draws\n    \n    Returns:\n        int: Total number of possible samples\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "total_outcomes(52, 5)",
+            "expected": "2598960",
+            "explanation": "C(52,5) = 2,598,960. Total number of 5-card poker hands from a 52-card deck."
+          },
+          {
+            "input": "total_outcomes(10, 3)",
+            "expected": "120",
+            "explanation": "C(10,3) = 120. Total ways to select 3 items from 10."
+          },
+          {
+            "input": "total_outcomes(20, 4)",
+            "expected": "4845",
+            "explanation": "C(20,4) = 4845. Used in quality control: selecting 4 items from batch of 20."
+          },
+          {
+            "input": "total_outcomes(100, 1)",
+            "expected": "100",
+            "explanation": "C(100,1) = 100. When drawing 1 item, there are N possible outcomes."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using permutations P(N,n) = N!/(N-n)! instead of combinations C(N,n) - order doesn't matter",
+        "Confusing n (draws) with N (population size)",
+        "Not recognizing this is just a binomial coefficient calculation",
+        "Attempting to compute N! directly for large N causing overflow",
+        "Forgetting that C(N,0) = 1 (one way to draw nothing)"
+      ],
+      "hint": "This is simply computing C(N,n) using your binomial_coefficient function. The sample space size is the total number of n-combinations from N items.",
+      "references": [
+        "Sample space in probability theory",
+        "Classical (Laplacian) probability",
+        "Combinations vs permutations"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Assembling the Complete Hypergeometric PMF",
+      "relation_to_problem": "This final sub-quest combines all previous concepts to implement the complete hypergeometric PMF formula. You will integrate range validation, numerator calculation, denominator calculation, and probability computation with proper rounding.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Floating-point division",
+        "Rounding operations"
+      ],
+      "learning_objectives": [
+        "Integrate all components: validation, numerator, and denominator",
+        "Compute probability as the ratio of favorable to total outcomes",
+        "Handle edge cases (invalid k returns 0.0)",
+        "Apply proper rounding to 4 decimal places",
+        "Understand the complete hypergeometric distribution formula"
+      ],
+      "math_content": {
+        "definition": "The **Hypergeometric Probability Mass Function (PMF)** gives the probability of obtaining exactly $k$ successes when drawing $n$ items without replacement from a finite population of size $N$ containing $K$ success states: $$P(X = k) = \\begin{cases} \\frac{\\binom{K}{k}\\binom{N-K}{n-k}}{\\binom{N}{n}} & \\text{if } \\max(0, n-(N-K)) \\leq k \\leq \\min(n,K) \\\\ 0 & \\text{otherwise} \\end{cases}$$",
+        "notation": "$X \\sim \\text{Hypergeometric}(N, K, n)$ denotes that random variable $X$ follows a hypergeometric distribution with parameters $N$, $K$, and $n$",
+        "theorem": "**PMF Properties**: (1) $P(X=k) \\geq 0$ for all $k$. (2) $\\sum_{k} P(X=k) = 1$ (probabilities sum to 1 over the support). (3) As $N \\to \\infty$ with $p = K/N$ fixed, the hypergeometric distribution converges to the binomial distribution $\\text{Binomial}(n, p)$.",
+        "proof_sketch": "The formula follows from classical probability: $P(X=k) = \\frac{\\text{favorable outcomes}}{\\text{total outcomes}}$. Favorable outcomes = ways to choose $k$ successes from $K$ AND $(n-k)$ failures from $(N-K)$ = $\\binom{K}{k}\\binom{N-K}{n-k}$. Total outcomes = ways to choose $n$ items from $N$ = $\\binom{N}{n}$. The ratio gives the probability.",
+        "examples": [
+          "Complete example: $N=52, K=13, n=5, k=2$. Check validity: $\\max(0,-34)=0 \\leq 2 \\leq \\min(5,13)=5$ ✓. Calculate: $P(X=2) = \\frac{\\binom{13}{2}\\binom{39}{3}}{\\binom{52}{5}} = \\frac{78 \\times 9139}{2598960} = \\frac{712842}{2598960} \\approx 0.2743$",
+          "Edge case: $N=10, K=3, n=5, k=6$. Invalid (k > min(5,3)=3), so $P(X=6) = 0.0$",
+          "Quality control: $N=50, K=5$ defective, $n=10$ sampled, $k=0$ defective. $P(X=0) = \\frac{\\binom{5}{0}\\binom{45}{10}}{\\binom{50}{10}} \\approx 0.3106$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Hypergeometric PMF",
+          "latex": "$P(X=k) = \\frac{\\binom{K}{k}\\binom{N-K}{n-k}}{\\binom{N}{n}}$",
+          "description": "The fundamental formula for hypergeometric probability, valid when k is in range"
+        },
+        {
+          "name": "Alternative Ratio Form",
+          "latex": "$P(X=k) = \\frac{\\text{C}(K,k) \\times \\text{C}(N-K,n-k)}{\\text{C}(N,n)}$",
+          "description": "Emphasizes the ratio of favorable to total outcomes"
+        },
+        {
+          "name": "Expected Value",
+          "latex": "$E[X] = n \\cdot \\frac{K}{N}$",
+          "description": "Mean number of successes expected; proportional to population success rate"
+        },
+        {
+          "name": "Variance",
+          "latex": "$\\text{Var}(X) = n \\cdot \\frac{K}{N} \\cdot \\frac{N-K}{N} \\cdot \\frac{N-n}{N-1}$",
+          "description": "Spread of the distribution; includes finite population correction factor"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete hypergeometric PMF function. This combines all previous sub-quests: validate k is in range, compute the numerator (favorable outcomes), compute the denominator (total outcomes), calculate the probability ratio, and round to 4 decimal places. If k is invalid, return 0.0.",
+        "function_signature": "def hypergeometric_pmf(N: int, K: int, n: int, k: int) -> float:",
+        "starter_code": "def hypergeometric_pmf(N: int, K: int, n: int, k: int) -> float:\n    \"\"\"\n    Calculate the PMF of the hypergeometric distribution.\n    \n    Args:\n        N: Total population size\n        K: Number of success states in population\n        n: Number of draws (without replacement)\n        k: Number of observed successes\n    \n    Returns:\n        float: P(X = k), rounded to 4 decimal places\n    \"\"\"\n    # Your code here\n    # Hint: Use functions from previous sub-quests:\n    # - is_valid_k() for validation\n    # - hypergeometric_numerator() for favorable outcomes\n    # - total_outcomes() for sample space size\n    pass",
+        "test_cases": [
+          {
+            "input": "hypergeometric_pmf(52, 13, 5, 2)",
+            "expected": "0.2743",
+            "explanation": "Drawing 5 cards, probability of exactly 2 hearts: C(13,2)×C(39,3)/C(52,5) = 712842/2598960 ≈ 0.2743"
+          },
+          {
+            "input": "hypergeometric_pmf(50, 5, 10, 0)",
+            "expected": "0.3106",
+            "explanation": "Drawing 10 items from 50 (5 defective), probability of 0 defective: C(5,0)×C(45,10)/C(50,10) ≈ 0.3106"
+          },
+          {
+            "input": "hypergeometric_pmf(10, 3, 5, 6)",
+            "expected": "0.0",
+            "explanation": "Invalid: k=6 > min(n=5, K=3)=3. Cannot draw 6 successes when only 3 exist or when drawing only 5 items."
+          },
+          {
+            "input": "hypergeometric_pmf(20, 8, 10, 4)",
+            "expected": "0.3483",
+            "explanation": "Balanced scenario: C(8,4)×C(12,6)/C(20,10) = 70×924/184756 ≈ 0.3483"
+          },
+          {
+            "input": "hypergeometric_pmf(100, 20, 10, 2)",
+            "expected": "0.2934",
+            "explanation": "Large population: probability of exactly 2 successes in 10 draws from population with 20% success rate"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not validating k range first - computing invalid probabilities instead of returning 0.0",
+        "Integer division instead of floating-point division (use / not //)",
+        "Rounding at intermediate steps instead of only at the final result",
+        "Confusing parameter order (N, K, n, k) - mixing up population vs sample sizes",
+        "Not handling numerical precision - using round(x, 4) correctly",
+        "Computing C(N,k) instead of C(N,n) for the denominator"
+      ],
+      "hint": "Structure: (1) Check if k is valid using range constraints - return 0.0 if not. (2) Compute numerator = C(K,k) × C(N-K,n-k). (3) Compute denominator = C(N,n). (4) Calculate probability = numerator / denominator. (5) Return round(probability, 4).",
+      "references": [
+        "Hypergeometric distribution applications",
+        "Sampling theory",
+        "Comparison with binomial and Poisson distributions",
+        "Fisher's exact test (uses hypergeometric distribution)"
+      ]
+    }
+  ]
+}

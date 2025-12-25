@@ -1,0 +1,436 @@
+{
+  "problem_id": 168,
+  "title": "Calculate Conditional Probability from Data",
+  "category": "Probability",
+  "difficulty": "easy",
+  "description": "Given a dataset of observations as a list of tuples, each tuple is of the form (X, Y), where X and Y are categorical variables (e.g., color, animal). Implement a function to compute the conditional probability $P(Y=y|X=x)$, the probability that Y equals a specific value y, given that X equals a specific value x.\n\n**Your Task:**\nWrite a function `conditional_probability(data, x, y)` that takes as input:\n- `data`: List of (X, Y) tuples.\n- `x`: Value for variable X to condition on.\n- `y`: Value for variable Y whose probability you want given X=x.\n\nThe function should return the probability $P(Y=y|X=x)$. Return 0.0 if there are no instances where X=x.\n\n**Example:**\n```python\ndata = [\n    ('red', 'cat'),\n    ('blue', 'dog'),\n    ('red', 'dog'),\n    ('red', 'cat'),\n    ('blue', 'cat'),\n    ('red', 'dog')\n]\nprint(conditional_probability(data, 'red', 'cat'))   # 0.5\nprint(conditional_probability(data, 'blue', 'cat'))  # 0.5\nprint(conditional_probability(data, 'green', 'cat')) # 0.0\n```\n\n**Reasoning:**\n- For X='red', there are 4 instances: 2 with Y='cat' and 2 with Y='dog'. So $P(Y=cat|X=red) = 2/4 = 0.5$.\n- For X='blue', 2 instances: 1 with Y='cat', 1 with Y='dog'. So $P(Y=cat|X=blue) = 1/2 = 0.5$.\n- For X='green', there are 0 instances, so output 0.0.",
+  "example": {
+    "input": "data = [('red', 'cat'), ('blue', 'dog'), ('red', 'dog'), ('red', 'cat'), ('blue', 'cat'), ('red', 'dog')]\nprint(conditional_probability(data, 'red', 'cat'))",
+    "output": "0.5",
+    "reasoning": "Out of 4 red observations, 2 are cat. So probability is 2/4 = 0.5."
+  },
+  "starter_code": "def conditional_probability(data, x, y):\n    \"\"\"\n    Returns the probability P(Y=y|X=x) from list of (X, Y) pairs.\n    Args:\n      data: List of (X, Y) tuples\n      x: value of X to condition on\n      y: value of Y to check\n    Returns:\n      float: conditional probability, rounded to 4 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Counting Outcomes in Categorical Data",
+      "relation_to_problem": "Understanding how to filter and count specific categories in data is the fundamental operation needed to calculate both the numerator (count of X=x and Y=y) and denominator (count of X=x) in the conditional probability formula.",
+      "prerequisites": [
+        "Basic Python data structures (lists, tuples)",
+        "Set theory notation",
+        "Counting principles"
+      ],
+      "learning_objectives": [
+        "Filter data based on specific categorical values",
+        "Count occurrences of events in a dataset",
+        "Understand the concept of event frequency in empirical data"
+      ],
+      "math_content": {
+        "definition": "Given a sample space $\\Omega$ containing $n$ observations, an **event** $A$ is a subset of $\\Omega$. The **frequency** of event $A$, denoted $n(A)$, is the number of outcomes in $\\Omega$ that satisfy the conditions defining $A$. For categorical data represented as tuples $(X, Y)$, we define events based on the values of variables: $A_x = \\{(x_i, y_i) \\in \\Omega : x_i = x\\}$ represents all observations where the first component equals $x$.",
+        "notation": "$n(A)$ = frequency (count) of event $A$; $\\Omega$ = sample space (dataset); $(x_i, y_i)$ = individual observation; $A_x$ = event where $X=x$",
+        "theorem": "**Counting Principle for Filtered Data**: If $S$ is a dataset and $P$ is a predicate (condition), then the count of elements satisfying $P$ equals $|\\{s \\in S : P(s) \\text{ is true}\\}|$. This can be computed by iterating through $S$ and incrementing a counter when $P(s)$ evaluates to true.",
+        "proof_sketch": "By definition of cardinality, the size of a set equals the number of distinct elements it contains. When filtering data, we construct a new set containing only elements satisfying the predicate. The cardinality of this filtered set is obtained by the bijection between elements and their count: starting from 0, each element contributes exactly 1 to the total count.",
+        "examples": [
+          "Given data = [('red', 'cat'), ('blue', 'dog'), ('red', 'dog')], count observations where X='red': We examine each tuple; ('red', 'cat') matches, ('blue', 'dog') doesn't match, ('red', 'dog') matches. Result: $n(X=\\text{red}) = 2$",
+          "Given data = [('A', 1), ('B', 2), ('A', 3), ('A', 2)], count observations where X='A' AND Y=2: Only ('A', 2) satisfies both conditions. Result: $n(X=A \\cap Y=2) = 1$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Event Frequency",
+          "latex": "$n(A) = |\\{\\omega \\in \\Omega : \\omega \\in A\\}|$",
+          "description": "Count the number of outcomes in sample space $\\Omega$ that belong to event $A$"
+        },
+        {
+          "name": "Filtered Count",
+          "latex": "$n(X=x) = |\\{(x_i, y_i) \\in \\text{data} : x_i = x\\}|$",
+          "description": "Count observations where the first component equals a specific value $x$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that counts how many tuples in a dataset have a specific value for their first component (X variable). This is the denominator in the conditional probability formula.",
+        "function_signature": "def count_x_occurrences(data: list, x: any) -> int:",
+        "starter_code": "def count_x_occurrences(data, x):\n    \"\"\"\n    Count the number of tuples where the first element equals x.\n    Args:\n      data: List of (X, Y) tuples\n      x: value to match in first position\n    Returns:\n      int: count of matching tuples\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "count_x_occurrences([('red', 'cat'), ('blue', 'dog'), ('red', 'dog')], 'red')",
+            "expected": "2",
+            "explanation": "Two tuples have 'red' as first element: ('red', 'cat') and ('red', 'dog')"
+          },
+          {
+            "input": "count_x_occurrences([('A', 1), ('B', 2), ('A', 3)], 'A')",
+            "expected": "2",
+            "explanation": "Two tuples have 'A' as first element"
+          },
+          {
+            "input": "count_x_occurrences([('red', 'cat'), ('blue', 'dog')], 'green')",
+            "expected": "0",
+            "explanation": "No tuples have 'green' as first element"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Counting all tuples instead of only those matching the condition",
+        "Using '==' to compare when the value might be of different types (though in this problem types are consistent)",
+        "Forgetting to return 0 when no matches are found",
+        "Accessing wrong tuple index (mixing up X and Y positions)"
+      ],
+      "hint": "Iterate through the data and use a counter variable. For each tuple, check if the first element equals the target value x.",
+      "references": [
+        "Python list comprehensions",
+        "Filtering operations in data structures",
+        "Basic counting in probability theory"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Joint Event Counting: Intersection of Two Categorical Events",
+      "relation_to_problem": "To calculate the numerator in $P(Y=y|X=x) = \\frac{n(X=x \\cap Y=y)}{n(X=x)}$, we must count observations where BOTH conditions are satisfied simultaneously. This represents the intersection of two events.",
+      "prerequisites": [
+        "Event frequency counting",
+        "Set theory intersections",
+        "Logical AND operations"
+      ],
+      "learning_objectives": [
+        "Understand the intersection of two events in categorical data",
+        "Implement compound filtering conditions",
+        "Recognize that joint events require both conditions to be true simultaneously"
+      ],
+      "math_content": {
+        "definition": "The **intersection** of two events $A$ and $B$, denoted $A \\cap B$, is the set of outcomes that belong to both $A$ and $B$. For categorical data with tuples $(x_i, y_i)$, the joint event $\\{X=x\\} \\cap \\{Y=y\\}$ is defined as: $$A_{x,y} = \\{(x_i, y_i) \\in \\Omega : x_i = x \\text{ AND } y_i = y\\}$$ The frequency of this joint event is $n(X=x \\cap Y=y) = |A_{x,y}|$.",
+        "notation": "$A \\cap B$ = intersection of events $A$ and $B$; $n(A \\cap B)$ = count of outcomes in both $A$ and $B$; $\\{X=x\\} \\cap \\{Y=y\\}$ = event where both conditions hold",
+        "theorem": "**Intersection Counting Principle**: For two predicates $P$ and $Q$ over a dataset $S$, the count of elements satisfying both is: $$n(P \\cap Q) = |\\{s \\in S : P(s) \\text{ AND } Q(s)\\}|$$ This equals the count when filtering requires BOTH conditions to be true, which is generally less than or equal to the count for either condition alone: $n(P \\cap Q) \\leq \\min(n(P), n(Q))$.",
+        "proof_sketch": "Since $A \\cap B \\subseteq A$ and $A \\cap B \\subseteq B$ by definition of intersection, every element counted in $n(A \\cap B)$ is also counted in both $n(A)$ and $n(B)$. Therefore, $n(A \\cap B) \\leq n(A)$ and $n(A \\cap B) \\leq n(B)$, which implies $n(A \\cap B) \\leq \\min(n(A), n(B))$. Equality holds when one event is a subset of the other.",
+        "examples": [
+          "Given data = [('red', 'cat'), ('red', 'dog'), ('blue', 'cat')], find $n(X=\\text{red} \\cap Y=\\text{cat})$: Only ('red', 'cat') satisfies both $X=\\text{red}$ AND $Y=\\text{cat}$. Result: 1",
+          "Given data = [('A', 1), ('B', 1), ('A', 1), ('A', 2)], find $n(X=A \\cap Y=1)$: Tuples ('A', 1) and ('A', 1) both satisfy the conditions. Result: 2",
+          "Verification of inequality: If $n(X=\\text{red}) = 2$ and $n(Y=\\text{cat}) = 2$, then $n(X=\\text{red} \\cap Y=\\text{cat}) = 1 \\leq \\min(2, 2) = 2$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Joint Event Frequency",
+          "latex": "$n(A \\cap B) = |\\{\\omega \\in \\Omega : \\omega \\in A \\text{ AND } \\omega \\in B\\}|$",
+          "description": "Count outcomes that satisfy both event A and event B simultaneously"
+        },
+        {
+          "name": "Categorical Joint Count",
+          "latex": "$n(X=x \\cap Y=y) = |\\{(x_i, y_i) \\in \\text{data} : x_i = x \\text{ AND } y_i = y\\}|$",
+          "description": "Count tuples where first component equals $x$ AND second component equals $y$"
+        },
+        {
+          "name": "Intersection Inequality",
+          "latex": "$n(A \\cap B) \\leq \\min(n(A), n(B))$",
+          "description": "The count of the intersection cannot exceed the count of either individual event"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that counts how many tuples satisfy BOTH conditions: first element equals x AND second element equals y. This represents the numerator in the conditional probability formula.",
+        "function_signature": "def count_joint_occurrence(data: list, x: any, y: any) -> int:",
+        "starter_code": "def count_joint_occurrence(data, x, y):\n    \"\"\"\n    Count tuples where first element equals x AND second element equals y.\n    Args:\n      data: List of (X, Y) tuples\n      x: value to match in first position\n      y: value to match in second position\n    Returns:\n      int: count of tuples matching both conditions\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "count_joint_occurrence([('red', 'cat'), ('red', 'dog'), ('blue', 'cat')], 'red', 'cat')",
+            "expected": "1",
+            "explanation": "Only ('red', 'cat') satisfies both X='red' AND Y='cat'"
+          },
+          {
+            "input": "count_joint_occurrence([('A', 1), ('A', 1), ('B', 1), ('A', 2)], 'A', 1)",
+            "expected": "2",
+            "explanation": "Two tuples ('A', 1) satisfy both conditions"
+          },
+          {
+            "input": "count_joint_occurrence([('red', 'cat'), ('blue', 'dog')], 'red', 'dog')",
+            "expected": "0",
+            "explanation": "No tuple has both X='red' AND Y='dog'"
+          },
+          {
+            "input": "count_joint_occurrence([('red', 'cat'), ('red', 'dog'), ('red', 'cat')], 'red', 'cat')",
+            "expected": "2",
+            "explanation": "Two tuples match: both ('red', 'cat') entries"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using OR instead of AND logic (counting tuples where EITHER condition is true)",
+        "Counting each condition separately and adding them (double-counting)",
+        "Forgetting that both conditions must be satisfied simultaneously",
+        "Not handling the case where the joint event never occurs (should return 0)"
+      ],
+      "hint": "You need both conditions to be true at the same time. Check that tuple[0] equals x AND tuple[1] equals y for each tuple.",
+      "references": [
+        "Set intersection in discrete mathematics",
+        "Compound boolean conditions",
+        "Venn diagrams for event visualization"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Empirical Probability from Frequency Data",
+      "relation_to_problem": "Before computing conditional probability, we must understand how to estimate probabilities from observed data. The relative frequency approach converts event counts into probability estimates, which forms the basis for data-driven probability calculations.",
+      "prerequisites": [
+        "Frequency counting",
+        "Basic division",
+        "Probability axioms",
+        "Sample spaces"
+      ],
+      "learning_objectives": [
+        "Understand the frequency interpretation of probability",
+        "Convert event counts to probability estimates",
+        "Recognize when probability is undefined (empty sample space)",
+        "Apply the fundamental probability formula to empirical data"
+      ],
+      "math_content": {
+        "definition": "**Empirical probability** (or relative frequency probability) estimates the probability of an event based on observed data. Given a sample space $\\Omega$ with $n(\\Omega)$ total observations and an event $A$ with frequency $n(A)$, the empirical probability is: $$P(A) = \\frac{n(A)}{n(\\Omega)}$$ This ratio represents the proportion of observations in which event $A$ occurred. As the sample size increases, by the Law of Large Numbers, $P(A)$ converges to the true theoretical probability.",
+        "notation": "$P(A)$ = probability of event $A$; $n(A)$ = frequency of event $A$; $n(\\Omega)$ = total number of observations; $\\hat{P}(A)$ = estimated probability (sometimes used to distinguish from theoretical probability)",
+        "theorem": "**Fundamental Probability Properties from Frequency**: For empirical probability calculated from frequencies, the following properties hold: (1) $0 \\leq P(A) \\leq 1$ for any event $A$, since $0 \\leq n(A) \\leq n(\\Omega)$. (2) $P(\\Omega) = 1$, since $n(\\Omega)/n(\\Omega) = 1$. (3) $P(\\emptyset) = 0$, since $n(\\emptyset) = 0$. (4) For disjoint events $A$ and $B$ (where $A \\cap B = \\emptyset$), $P(A \\cup B) = P(A) + P(B)$ because $n(A \\cup B) = n(A) + n(B)$.",
+        "proof_sketch": "Property (1): Since $A \\subseteq \\Omega$, we have $n(A) \\leq n(\\Omega)$, and by definition $n(A) \\geq 0$. Dividing by $n(\\Omega) > 0$ preserves the inequality: $0 \\leq n(A)/n(\\Omega) \\leq 1$. Property (4): If $A$ and $B$ are disjoint, no element is counted in both. Therefore, $n(A \\cup B) = n(A) + n(B)$. Dividing by $n(\\Omega)$ yields: $P(A \\cup B) = \\frac{n(A) + n(B)}{n(\\Omega)} = \\frac{n(A)}{n(\\Omega)} + \\frac{n(B)}{n(\\Omega)} = P(A) + P(B)$.",
+        "examples": [
+          "Roll a die 100 times, observe 18 fours. Empirical probability: $P(\\text{four}) = 18/100 = 0.18$. The theoretical probability is $1/6 \\approx 0.167$; with more rolls, the empirical probability would converge to this value.",
+          "Dataset of 50 weather observations: 15 rainy days, 35 non-rainy. $P(\\text{rain}) = 15/50 = 0.30$ or 30%.",
+          "Data = [('red', 'A'), ('blue', 'B'), ('red', 'C'), ('green', 'A')]. Total observations: 4. Frequency of X='red': 2. Therefore, $P(X=\\text{red}) = 2/4 = 0.5$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Empirical Probability Formula",
+          "latex": "$P(A) = \\frac{n(A)}{n(\\Omega)}$",
+          "description": "Probability equals the ratio of favorable outcomes to total outcomes in the dataset"
+        },
+        {
+          "name": "Relative Frequency",
+          "latex": "$P(A) = \\frac{\\text{count of event } A}{\\text{total count}}$",
+          "description": "Alternative formulation emphasizing the proportion interpretation"
+        },
+        {
+          "name": "Probability Bounds",
+          "latex": "$0 \\leq P(A) \\leq 1$",
+          "description": "All probabilities must lie in the interval [0, 1]"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the empirical probability of observing a specific value x in the first component of tuples. This builds toward understanding how probabilities are derived from data counts.",
+        "function_signature": "def calculate_probability(data: list, x: any) -> float:",
+        "starter_code": "def calculate_probability(data, x):\n    \"\"\"\n    Calculate P(X=x) from data.\n    Args:\n      data: List of (X, Y) tuples\n      x: value to find probability for\n    Returns:\n      float: probability of X=x, rounded to 4 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_probability([('red', 'A'), ('blue', 'B'), ('red', 'C'), ('red', 'D')], 'red')",
+            "expected": "0.75",
+            "explanation": "3 out of 4 observations have X='red', so P(X='red') = 3/4 = 0.75"
+          },
+          {
+            "input": "calculate_probability([('A', 1), ('B', 2), ('C', 3)], 'A')",
+            "expected": "0.3333",
+            "explanation": "1 out of 3 observations has X='A', so P(X='A') = 1/3 ≈ 0.3333"
+          },
+          {
+            "input": "calculate_probability([('red', 'cat'), ('blue', 'dog')], 'green')",
+            "expected": "0.0",
+            "explanation": "0 out of 2 observations have X='green', so P(X='green') = 0/2 = 0.0"
+          },
+          {
+            "input": "calculate_probability([('X', 1), ('X', 2), ('X', 3), ('X', 4)], 'X')",
+            "expected": "1.0",
+            "explanation": "All 4 observations have X='X', so P(X='X') = 4/4 = 1.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Dividing by the count of matching observations instead of total observations",
+        "Not handling empty datasets (would cause division by zero)",
+        "Forgetting to convert integer division to float division in Python 2 (less relevant in Python 3)",
+        "Not rounding the result to appropriate decimal places for cleaner output",
+        "Returning undefined or None instead of 0.0 when the event never occurs"
+      ],
+      "hint": "Use your counting function from step 1 for the numerator. The denominator is the total length of the dataset. Remember to handle the edge case where the dataset might be empty.",
+      "references": [
+        "Law of Large Numbers",
+        "Frequentist interpretation of probability",
+        "Probability axioms (Kolmogorov axioms)"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Conditional Probability: Mathematical Definition and Formula",
+      "relation_to_problem": "This is the core concept for the problem. Conditional probability $P(Y=y|X=x)$ represents the probability of Y=y within the restricted sample space where X=x. Understanding this formula and its interpretation is essential for solving the main problem.",
+      "prerequisites": [
+        "Empirical probability",
+        "Event counting",
+        "Joint events (intersections)",
+        "Sample space restriction"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of conditional probability",
+        "Interpret conditional probability as a restricted sample space",
+        "Apply the conditional probability formula to categorical data",
+        "Recognize when conditional probability is undefined"
+      ],
+      "math_content": {
+        "definition": "**Conditional probability** is the probability of event $B$ occurring given that event $A$ has occurred. It is denoted $P(B|A)$ (read \"probability of $B$ given $A$\") and formally defined as: $$P(B|A) = \\frac{P(A \\cap B)}{P(A)}$$ provided that $P(A) > 0$. When $P(A) = 0$, the conditional probability is **undefined**. For empirical data with frequencies: $$P(B|A) = \\frac{n(A \\cap B)}{n(A)}$$ This formula emerges from restricting the sample space to only those outcomes where $A$ occurs, then finding the proportion where $B$ also occurs.",
+        "notation": "$P(B|A)$ = conditional probability of $B$ given $A$; $P(A \\cap B)$ = joint probability of both $A$ and $B$; $n(A \\cap B)$ = count of outcomes in both $A$ and $B$; $n(A)$ = count of outcomes in $A$",
+        "theorem": "**Conditional Probability Properties**: (1) $0 \\leq P(B|A) \\leq 1$ for any events $A$ and $B$ with $P(A) > 0$. (2) $P(A|A) = 1$ (an event is certain given itself). (3) **Multiplication Rule**: $P(A \\cap B) = P(A) \\cdot P(B|A)$ (rearrangement of the definition). (4) If $A$ and $B$ are **independent**, then $P(B|A) = P(B)$ (knowing $A$ doesn't change the probability of $B$). (5) **In general**, $P(B|A) \\neq P(A|B)$ (conditional probabilities are not symmetric).",
+        "proof_sketch": "**Derivation from restricted sample space**: When we condition on event $A$, we restrict attention to only the $n(A)$ outcomes where $A$ occurs. Among these $n(A)$ outcomes, $n(A \\cap B)$ also satisfy event $B$. The proportion is $n(A \\cap B)/n(A)$. To connect to probabilities, divide both numerator and denominator by $n(\\Omega)$: $$\\frac{n(A \\cap B)/n(\\Omega)}{n(A)/n(\\Omega)} = \\frac{P(A \\cap B)}{P(A)}$$ This shows that conditional probability is the ratio of the joint probability to the conditioning event's probability. Property (2): $P(A|A) = \\frac{P(A \\cap A)}{P(A)} = \\frac{P(A)}{P(A)} = 1$ since $A \\cap A = A$.",
+        "examples": [
+          "**Dice example**: Roll a die. Event $A$ = \"roll is even\" = {2,4,6}, Event $B$ = \"roll is less than 4\" = {1,2,3}. $P(B|A) = P(\\text{roll is } 2 | \\text{roll is even})$. Given the roll is even, possible outcomes are {2,4,6}. Of these, only 2 is less than 4. So $P(B|A) = 1/3$. Verify with formula: $P(A \\cap B) = P(\\{2\\}) = 1/6$, $P(A) = 3/6 = 1/2$. Thus $P(B|A) = (1/6)/(1/2) = 1/3$ ✓",
+          "**Categorical data**: data = [('red','cat'), ('red','dog'), ('blue','cat'), ('red','cat')]. Find $P(Y=\\text{cat}|X=\\text{red})$. First, filter to $X=\\text{red}$: [('red','cat'), ('red','dog'), ('red','cat')]. Count: $n(X=\\text{red}) = 3$. Among these, count where $Y=\\text{cat}$: [('red','cat'), ('red','cat')], so $n(X=\\text{red} \\cap Y=\\text{cat}) = 2$. Therefore, $P(Y=\\text{cat}|X=\\text{red}) = 2/3 \\approx 0.6667$.",
+          "**Medical testing**: $P(\\text{positive test}|\\text{disease}) = 0.95$ (sensitivity). This is NOT the same as $P(\\text{disease}|\\text{positive test})$ (positive predictive value), which also depends on disease prevalence."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Conditional Probability Definition",
+          "latex": "$P(B|A) = \\frac{P(A \\cap B)}{P(A)}$",
+          "description": "The fundamental formula relating conditional, joint, and marginal probabilities"
+        },
+        {
+          "name": "Conditional Probability from Frequencies",
+          "latex": "$P(B|A) = \\frac{n(A \\cap B)}{n(A)}$",
+          "description": "Empirical version using counts from data; used when working with datasets"
+        },
+        {
+          "name": "Categorical Conditional Probability",
+          "latex": "$P(Y=y|X=x) = \\frac{n(X=x \\cap Y=y)}{n(X=x)}$",
+          "description": "Specific form for categorical variables: count joint occurrences divided by count of conditioning event"
+        },
+        {
+          "name": "Multiplication Rule",
+          "latex": "$P(A \\cap B) = P(A) \\cdot P(B|A)$",
+          "description": "Rearrangement useful for computing joint probabilities from conditional probabilities"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified version of conditional probability where you calculate P(Y=y|X=x), but with a constraint: assume the denominator count is always positive (provided as input). This isolates the conditional probability calculation from the edge case handling.",
+        "function_signature": "def conditional_prob_simple(count_x: int, count_x_and_y: int) -> float:",
+        "starter_code": "def conditional_prob_simple(count_x, count_x_and_y):\n    \"\"\"\n    Calculate conditional probability given counts.\n    Assumes count_x > 0.\n    Args:\n      count_x: number of observations where X=x (denominator)\n      count_x_and_y: number of observations where X=x AND Y=y (numerator)\n    Returns:\n      float: P(Y=y|X=x), rounded to 4 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "conditional_prob_simple(4, 2)",
+            "expected": "0.5",
+            "explanation": "P(Y=y|X=x) = 2/4 = 0.5. Out of 4 instances of X=x, 2 have Y=y."
+          },
+          {
+            "input": "conditional_prob_simple(3, 3)",
+            "expected": "1.0",
+            "explanation": "P(Y=y|X=x) = 3/3 = 1.0. All instances of X=x also have Y=y."
+          },
+          {
+            "input": "conditional_prob_simple(5, 0)",
+            "expected": "0.0",
+            "explanation": "P(Y=y|X=x) = 0/5 = 0.0. X=x occurs 5 times but never with Y=y."
+          },
+          {
+            "input": "conditional_prob_simple(6, 1)",
+            "expected": "0.1667",
+            "explanation": "P(Y=y|X=x) = 1/6 ≈ 0.1667. Out of 6 instances of X=x, only 1 has Y=y."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing P(B|A) with P(A|B) - these are different and generally unequal",
+        "Using the total dataset size as denominator instead of n(A) - this gives P(A∩B), not P(B|A)",
+        "Forgetting that conditional probability is undefined when P(A)=0 (will address in next step)",
+        "Computing P(A)·P(B) instead of using the conditional formula (assumes independence incorrectly)",
+        "Not recognizing that the numerator must be ≤ denominator (since A∩B ⊆ A)"
+      ],
+      "hint": "The formula is simply the ratio of two counts. The numerator is the count of joint occurrences, the denominator is the count of the conditioning event.",
+      "references": [
+        "Bayes' Theorem",
+        "Law of Total Probability",
+        "Independence vs. dependence",
+        "Restricted sample spaces"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Edge Case Handling: Undefined Conditional Probability",
+      "relation_to_problem": "When computing P(Y=y|X=x), if X=x never occurs in the data (count is 0), we cannot divide by zero. The problem specification requires returning 0.0 in this case. Understanding when conditional probability is undefined and how to handle it properly completes the solution.",
+      "prerequisites": [
+        "Conditional probability definition",
+        "Division by zero",
+        "Function error handling",
+        "Special case logic"
+      ],
+      "learning_objectives": [
+        "Recognize when conditional probability is mathematically undefined",
+        "Understand the convention of returning 0.0 for impossible conditions",
+        "Implement defensive programming with edge case checks",
+        "Synthesize all previous concepts to handle the complete problem"
+      ],
+      "math_content": {
+        "definition": "Conditional probability $P(B|A)$ is **undefined** when $P(A) = 0$ (equivalently, when $n(A) = 0$ in frequency-based calculations). Mathematically, we cannot divide by zero. Intuitively, we cannot condition on an event that never occurs - there is no restricted sample space to work with. Different contexts adopt different conventions: (1) Leave it undefined (most rigorous), (2) Return 0 by convention (often used in machine learning/data science), (3) Return a default value like 0.5 (uniform prior in Bayesian contexts), (4) Throw an error.",
+        "notation": "$P(B|A)$ undefined when $P(A) = 0$; $n(A) = 0 \\implies$ division by zero; $0/0$ is indeterminate form",
+        "theorem": "**Limiting Behavior**: As $P(A) \\to 0^+$, the conditional probability $P(B|A)$ can approach any value in $[0,1]$ depending on how $P(A \\cap B)$ approaches 0. There is no universal limit. **Convention in Data Science**: When computing conditional probabilities from data and the conditioning event has zero occurrences, a common convention is to return 0.0, interpreting this as \"the probability of anything given an impossible condition is treated as zero.\" This is practical but not mathematically rigorous.",
+        "proof_sketch": "**Why undefined**: The definition $P(B|A) = P(A \\cap B)/P(A)$ requires division by $P(A)$. When $P(A) = 0$, this operation is undefined in standard arithmetic. We cannot recover a meaningful value. **Practical convention**: In empirical settings where we compute $P(Y=y|X=x)$ and $X=x$ never appears in the training data, we have no information about the distribution of $Y$ when $X=x$. Returning 0.0 is a conservative choice that avoids making unfounded assumptions. Alternative: In Bayesian frameworks, one might use a prior distribution, but this requires additional information beyond the data.",
+        "examples": [
+          "**Zero denominator**: data = [('red','cat'), ('blue','dog')]. Calculate $P(Y=\\text{cat}|X=\\text{green})$. Filter to $X=\\text{green}$: empty list. $n(X=\\text{green}) = 0$. We cannot compute $n(X=\\text{green} \\cap Y=\\text{cat})/0$. By convention, return 0.0.",
+          "**Empty dataset**: data = []. Any conditional probability query has $n(X=x) = 0$, so return 0.0 for all queries.",
+          "**Comparison with defined case**: data = [('A',1), ('A',2), ('B',1)]. $P(Y=1|X=A) = 1/2 = 0.5$ (defined). But $P(Y=1|X=C) = ?/0$ → return 0.0 (undefined, use convention).",
+          "**Medical analogy**: What is the probability of recovery given a disease that doesn't exist? The question is meaningless (undefined), but for practical computation, we might return 0.0 to indicate no data."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Undefined Condition",
+          "latex": "$P(B|A) \\text{ undefined when } P(A) = 0 \\text{ or } n(A) = 0$",
+          "description": "Conditional probability cannot be computed when the conditioning event has zero probability"
+        },
+        {
+          "name": "Practical Convention",
+          "latex": "$P(Y=y|X=x) = 0.0 \\text{ when } n(X=x) = 0$",
+          "description": "Return 0.0 as a default value when the condition never occurs in the data"
+        },
+        {
+          "name": "Safe Division",
+          "latex": "$P(B|A) = \\begin{cases} \\frac{n(A \\cap B)}{n(A)} & \\text{if } n(A) > 0 \\\\ 0.0 & \\text{if } n(A) = 0 \\end{cases}$",
+          "description": "Piecewise definition handling both normal and edge cases"
+        }
+      ],
+      "exercise": {
+        "description": "Combine all previous concepts: count filtering, joint events, and conditional probability with proper edge case handling. Implement the complete conditional probability calculation that handles both normal cases and the zero-denominator case.",
+        "function_signature": "def safe_conditional_probability(data: list, x: any, y: any) -> float:",
+        "starter_code": "def safe_conditional_probability(data, x, y):\n    \"\"\"\n    Calculate P(Y=y|X=x) from data, handling edge cases.\n    Returns 0.0 when X=x never occurs.\n    Args:\n      data: List of (X, Y) tuples\n      x: value of X to condition on\n      y: value of Y to check\n    Returns:\n      float: conditional probability, rounded to 4 decimal places\n    \"\"\"\n    # Your code here\n    # Hint: Check if denominator is 0 before dividing\n    pass",
+        "test_cases": [
+          {
+            "input": "safe_conditional_probability([('red','cat'), ('red','dog'), ('red','cat'), ('blue','cat')], 'red', 'cat')",
+            "expected": "0.6667",
+            "explanation": "n(X='red') = 3, n(X='red' ∩ Y='cat') = 2, so P(Y='cat'|X='red') = 2/3 ≈ 0.6667"
+          },
+          {
+            "input": "safe_conditional_probability([('A',1), ('B',2), ('A',1)], 'A', 1)",
+            "expected": "1.0",
+            "explanation": "n(X='A') = 2, n(X='A' ∩ Y=1) = 2, so P(Y=1|X='A') = 2/2 = 1.0"
+          },
+          {
+            "input": "safe_conditional_probability([('red','cat'), ('blue','dog')], 'green', 'cat')",
+            "expected": "0.0",
+            "explanation": "n(X='green') = 0. Division by zero case: return 0.0 by convention"
+          },
+          {
+            "input": "safe_conditional_probability([], 'any', 'value')",
+            "expected": "0.0",
+            "explanation": "Empty dataset: n(X='any') = 0, return 0.0"
+          },
+          {
+            "input": "safe_conditional_probability([('X',1), ('X',2), ('X',3)], 'X', 4)",
+            "expected": "0.0",
+            "explanation": "n(X='X') = 3 but n(X='X' ∩ Y=4) = 0, so P(Y=4|X='X') = 0/3 = 0.0 (different from undefined case!)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking for zero denominator before division, causing runtime error",
+        "Returning None or undefined instead of 0.0 when required by problem specification",
+        "Confusing the case where P(B|A)=0 (A occurs but never with B) with undefined case (A never occurs)",
+        "Implementing complex try-except blocks when a simple if-check suffices",
+        "Not rounding the final result to required decimal places"
+      ],
+      "hint": "Calculate the denominator (count of X=x) first. If it's 0, immediately return 0.0. Otherwise, calculate the numerator (count of X=x AND Y=y) and return their ratio. Reuse your counting functions from earlier steps.",
+      "references": [
+        "Defensive programming",
+        "IEEE floating point standards",
+        "Smoothing techniques in probability estimation (Laplace smoothing)",
+        "Zero-frequency problem in NLP"
+      ]
+    }
+  ]
+}

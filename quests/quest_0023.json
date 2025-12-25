@@ -1,0 +1,419 @@
+{
+  "problem_id": 23,
+  "title": "Softmax Activation Function Implementation ",
+  "category": "Deep Learning",
+  "difficulty": "easy",
+  "description": "Write a Python function that computes the softmax activation for a given list of scores. The function should return the softmax values as a list, each rounded to four decimal places.",
+  "example": {
+    "input": "scores = [1, 2, 3]",
+    "output": "[0.0900, 0.2447, 0.6652]",
+    "reasoning": "The softmax function converts a list of values into a probability distribution. The probabilities are proportional to the exponential of each element divided by the sum of the exponentials of all elements in the list."
+  },
+  "starter_code": "import math\n\ndef softmax(scores: list[float]) -> list[float]:\n\t# Your code here\n\treturn probabilities",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding the Exponential Function and Its Properties",
+      "relation_to_problem": "The softmax function fundamentally relies on computing exponentials of input scores. Understanding exponential behavior, how to compute e^x in Python, and the properties of exponentials is the foundation for implementing the numerator of the softmax formula.",
+      "prerequisites": [
+        "Basic algebra",
+        "Understanding of functions",
+        "Python basics"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition and properties of the exponential function",
+        "Compute exponential values using Python's math library",
+        "Recognize how exponentials transform negative, zero, and positive inputs"
+      ],
+      "math_content": {
+        "definition": "The exponential function with base $e$ (Euler's number, approximately 2.71828) is denoted as $\\exp(x) = e^x$. For any real number $x \\in \\mathbb{R}$, the exponential function is defined as the infinite series: $$e^x = \\sum_{n=0}^{\\infty} \\frac{x^n}{n!} = 1 + x + \\frac{x^2}{2!} + \\frac{x^3}{3!} + \\cdots$$",
+        "notation": "$e \\approx 2.71828$ is Euler's constant; $e^x$ or $\\exp(x)$ denotes the exponential function",
+        "theorem": "**Key Properties of Exponential Function**: (1) $e^0 = 1$; (2) $e^x > 0$ for all $x \\in \\mathbb{R}$ (always positive); (3) $e^{x+y} = e^x \\cdot e^y$ (multiplicative property); (4) $e^{-x} = \\frac{1}{e^x}$ (reciprocal property); (5) The function is strictly increasing: if $x < y$ then $e^x < e^y$",
+        "proof_sketch": "From the series definition, $e^0 = 1 + 0 + 0 + \\cdots = 1$. Since each term in the series is positive for all $x$, the sum is always positive. The multiplicative property follows from combining two series and rearranging terms. The derivative $\\frac{d}{dx}e^x = e^x > 0$ proves the function is strictly increasing.",
+        "examples": [
+          "$e^0 = 1$ (any exponential of zero equals 1)",
+          "$e^1 = e \\approx 2.71828$",
+          "$e^2 \\approx 7.389$ (grows rapidly for positive inputs)",
+          "$e^{-1} = \\frac{1}{e} \\approx 0.368$ (decays toward zero for negative inputs)",
+          "$e^{10} \\approx 22026.47$ (exponential growth for large positive values)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Exponential Function",
+          "latex": "$e^x = \\exp(x)$",
+          "description": "Computes the exponential of x, always positive"
+        },
+        {
+          "name": "Exponential Sum Property",
+          "latex": "$e^{x+y} = e^x \\cdot e^y$",
+          "description": "Product rule for exponentials"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes a list of numbers and returns a list of their exponential values. This is the first step in computing softmax: transforming each score z_i into e^(z_i). Use Python's math.exp() function for computation.",
+        "function_signature": "def compute_exponentials(values: list[float]) -> list[float]:",
+        "starter_code": "import math\n\ndef compute_exponentials(values: list[float]) -> list[float]:\n    # Your code here: compute e^x for each x in values\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_exponentials([0])",
+            "expected": "[1.0]",
+            "explanation": "e^0 = 1 by definition"
+          },
+          {
+            "input": "compute_exponentials([1, 2])",
+            "expected": "[2.718..., 7.389...]",
+            "explanation": "e^1 ≈ 2.718 and e^2 ≈ 7.389"
+          },
+          {
+            "input": "compute_exponentials([-1, 0, 1])",
+            "expected": "[0.368..., 1.0, 2.718...]",
+            "explanation": "Negative exponents give values less than 1, zero gives 1, positive gives values greater than 1"
+          },
+          {
+            "input": "compute_exponentials([1, 2, 3])",
+            "expected": "[2.718..., 7.389..., 20.086...]",
+            "explanation": "This is the example from the main problem - computing exponentials is the first step"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to import math library",
+        "Using ** operator with wrong base (e.g., 2**x instead of math.exp(x))",
+        "Not iterating through all elements in the list",
+        "Returning a single value instead of a list"
+      ],
+      "hint": "Use a list comprehension or loop to apply math.exp() to each element in the input list",
+      "references": [
+        "Python math.exp() documentation",
+        "Properties of exponential functions",
+        "Euler's number e"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Computing Sums and Normalization Denominators",
+      "relation_to_problem": "The softmax formula requires dividing each exponential by the sum of all exponentials. This step teaches how to compute the denominator: Σe^(z_j) for all j. Understanding summation and accumulation is essential for the normalization step in softmax.",
+      "prerequisites": [
+        "Lists and iteration in Python",
+        "Arithmetic operations",
+        "Understanding of summation notation"
+      ],
+      "learning_objectives": [
+        "Understand mathematical summation notation Σ",
+        "Compute the sum of elements in a list using Python",
+        "Recognize that this sum serves as the normalization constant for probability distributions"
+      ],
+      "math_content": {
+        "definition": "Given a finite sequence of numbers $a_1, a_2, \\ldots, a_n$, the sum (denoted by the capital Greek letter Sigma, $\\Sigma$) is defined as: $$\\sum_{i=1}^{n} a_i = a_1 + a_2 + \\cdots + a_n$$ where $i$ is the index variable, 1 is the lower bound, and $n$ is the upper bound.",
+        "notation": "$\\sum_{i=1}^{n} a_i$ reads as 'the sum of $a_i$ from $i=1$ to $n$'; $n$ is the number of terms",
+        "theorem": "**Properties of Summation**: (1) Linearity: $\\sum_{i=1}^{n} (a_i + b_i) = \\sum_{i=1}^{n} a_i + \\sum_{i=1}^{n} b_i$; (2) Constant multiplication: $\\sum_{i=1}^{n} c \\cdot a_i = c \\sum_{i=1}^{n} a_i$ where $c$ is constant; (3) Sum of constants: $\\sum_{i=1}^{n} c = n \\cdot c$",
+        "proof_sketch": "Linearity follows from commutativity and associativity of addition: $(a_1 + b_1) + (a_2 + b_2) + \\cdots = (a_1 + a_2 + \\cdots) + (b_1 + b_2 + \\cdots)$. Constant multiplication follows from distributivity: $c \\cdot a_1 + c \\cdot a_2 + \\cdots = c(a_1 + a_2 + \\cdots)$.",
+        "examples": [
+          "$\\sum_{i=1}^{3} i = 1 + 2 + 3 = 6$",
+          "$\\sum_{i=1}^{4} 2^i = 2^1 + 2^2 + 2^3 + 2^4 = 2 + 4 + 8 + 16 = 30$",
+          "If exponentials are $[e^1, e^2, e^3] \\approx [2.718, 7.389, 20.086]$, then $\\sum_{j=1}^{3} e^{z_j} \\approx 2.718 + 7.389 + 20.086 = 30.193$",
+          "This sum becomes the denominator in softmax: each probability is $\\frac{e^{z_i}}{30.193}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Finite Sum",
+          "latex": "$\\sum_{i=1}^{n} a_i = a_1 + a_2 + \\cdots + a_n$",
+          "description": "Adds all elements from index 1 to n"
+        },
+        {
+          "name": "Softmax Denominator",
+          "latex": "$Z = \\sum_{j=1}^{K} e^{z_j}$",
+          "description": "The normalization constant for softmax, sum of all exponentials"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes the sum of all elements in a list. This represents computing the denominator in the softmax formula: Σe^(z_j). Given a list of exponential values, return their sum as a single float. This normalization constant ensures all probabilities sum to 1.",
+        "function_signature": "def sum_of_exponentials(exponentials: list[float]) -> float:",
+        "starter_code": "def sum_of_exponentials(exponentials: list[float]) -> float:\n    # Your code here: compute the sum of all values\n    pass",
+        "test_cases": [
+          {
+            "input": "sum_of_exponentials([1.0])",
+            "expected": "1.0",
+            "explanation": "Sum of a single element is itself"
+          },
+          {
+            "input": "sum_of_exponentials([1.0, 2.0, 3.0])",
+            "expected": "6.0",
+            "explanation": "1 + 2 + 3 = 6"
+          },
+          {
+            "input": "sum_of_exponentials([2.718, 7.389, 20.086])",
+            "expected": "30.193",
+            "explanation": "This is the sum of exponentials for [1, 2, 3]: e^1 + e^2 + e^3"
+          },
+          {
+            "input": "sum_of_exponentials([0.368, 1.0, 2.718])",
+            "expected": "4.086",
+            "explanation": "Sum of e^(-1) + e^0 + e^1, used as denominator for normalization"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using product instead of sum (multiplying instead of adding)",
+        "Forgetting to initialize accumulator variable to 0",
+        "Not handling empty list edge case",
+        "Returning list instead of a single sum value"
+      ],
+      "hint": "You can use Python's built-in sum() function or manually accumulate with a loop",
+      "references": [
+        "Summation notation",
+        "Python sum() function",
+        "Normalization in probability"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Probability Distributions and Normalization",
+      "relation_to_problem": "Softmax converts arbitrary scores into a valid probability distribution where all values are between 0 and 1, and sum to exactly 1. Understanding probability axioms and normalization is crucial for interpreting softmax outputs as class probabilities.",
+      "prerequisites": [
+        "Basic probability concepts",
+        "Fractions and division",
+        "Understanding of proportions"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition of a probability distribution",
+        "Learn how to normalize a set of values to create a probability distribution",
+        "Verify that normalized values satisfy probability axioms"
+      ],
+      "math_content": {
+        "definition": "A discrete probability distribution over a finite set of outcomes $\\{1, 2, \\ldots, K\\}$ is a function $P: \\{1, 2, \\ldots, K\\} \\rightarrow [0, 1]$ that assigns a probability $P(i)$ to each outcome $i$ such that: (1) **Non-negativity**: $P(i) \\geq 0$ for all $i \\in \\{1, \\ldots, K\\}$; (2) **Normalization**: $\\sum_{i=1}^{K} P(i) = 1$. When these conditions are satisfied, $\\{P(1), P(2), \\ldots, P(K)\\}$ forms a probability distribution.",
+        "notation": "$P(i)$ denotes the probability of outcome $i$; $K$ is the number of possible outcomes; $\\sum_{i=1}^{K} P(i) = 1$ is the normalization constraint",
+        "theorem": "**Normalization Theorem**: Given any set of non-negative values $\\{w_1, w_2, \\ldots, w_K\\}$ where $w_i > 0$ for all $i$ and $W = \\sum_{i=1}^{K} w_i > 0$, the normalized values $P(i) = \\frac{w_i}{W}$ form a valid probability distribution. **Proof**: (1) Since $w_i > 0$ and $W > 0$, we have $P(i) = \\frac{w_i}{W} > 0$ (non-negativity). (2) $\\sum_{i=1}^{K} P(i) = \\sum_{i=1}^{K} \\frac{w_i}{W} = \\frac{1}{W} \\sum_{i=1}^{K} w_i = \\frac{W}{W} = 1$ (normalization).",
+        "proof_sketch": "The key insight is that dividing each weight by the total sum preserves the relative proportions while ensuring the sum equals 1. The non-negativity of $w_i$ ensures $P(i) \\geq 0$, and factoring out $\\frac{1}{W}$ from the sum shows that the normalized values sum to 1.",
+        "examples": [
+          "Unnormalized weights: $[1, 2, 3]$. Sum: $W = 6$. Normalized: $P = [\\frac{1}{6}, \\frac{2}{6}, \\frac{3}{6}] = [0.167, 0.333, 0.500]$. Verify: $0.167 + 0.333 + 0.500 = 1.0$ ✓",
+          "Exponentials: $[e^1, e^2, e^3] \\approx [2.718, 7.389, 20.086]$. Sum: $W \\approx 30.193$. Normalized: $[\\frac{2.718}{30.193}, \\frac{7.389}{30.193}, \\frac{20.086}{30.193}] \\approx [0.090, 0.245, 0.665]$",
+          "Each value is now a valid probability: all are in $(0, 1)$ and sum to 1"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Normalization Formula",
+          "latex": "$P(i) = \\frac{w_i}{\\sum_{j=1}^{K} w_j}$",
+          "description": "Converts weights w_i into probabilities by dividing by total sum"
+        },
+        {
+          "name": "Probability Sum Constraint",
+          "latex": "$\\sum_{i=1}^{K} P(i) = 1$",
+          "description": "All probabilities must sum to exactly 1"
+        },
+        {
+          "name": "Probability Range",
+          "latex": "$0 \\leq P(i) \\leq 1$ for all $i$",
+          "description": "Each probability must be between 0 and 1"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes a list of non-negative weights and normalizes them into a probability distribution. Divide each weight by the sum of all weights. This is the core normalization step used in softmax: each exponential e^(z_i) is divided by Σe^(z_j). Return the normalized probabilities as a list.",
+        "function_signature": "def normalize_to_probabilities(weights: list[float]) -> list[float]:",
+        "starter_code": "def normalize_to_probabilities(weights: list[float]) -> list[float]:\n    # Your code here: divide each weight by the sum of all weights\n    pass",
+        "test_cases": [
+          {
+            "input": "normalize_to_probabilities([1.0])",
+            "expected": "[1.0]",
+            "explanation": "Single weight normalizes to probability 1.0"
+          },
+          {
+            "input": "normalize_to_probabilities([1.0, 1.0])",
+            "expected": "[0.5, 0.5]",
+            "explanation": "Equal weights give equal probabilities: 1/2 each"
+          },
+          {
+            "input": "normalize_to_probabilities([1, 2, 3])",
+            "expected": "[0.167, 0.333, 0.500]",
+            "explanation": "Weights sum to 6: 1/6, 2/6, 3/6"
+          },
+          {
+            "input": "normalize_to_probabilities([2.718, 7.389, 20.086])",
+            "expected": "[0.090, 0.245, 0.665]",
+            "explanation": "Normalizing exponentials of [1,2,3] - this is exactly what softmax does! Sum ≈ 30.193"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to compute the sum first before dividing",
+        "Dividing by the number of elements (n) instead of the sum of values",
+        "Not handling the case where sum might be zero (though softmax exponentials are always positive)",
+        "Modifying the original list instead of creating a new list of probabilities"
+      ],
+      "hint": "First compute the total sum W, then divide each element by W to get the normalized probability",
+      "references": [
+        "Probability axioms",
+        "Normalization in statistics",
+        "Discrete probability distributions"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Rounding and Numerical Precision in Scientific Computing",
+      "relation_to_problem": "The problem requires rounding each softmax probability to exactly 4 decimal places. Understanding floating-point precision, rounding rules, and how to format numerical output is essential for producing the exact expected output format.",
+      "prerequisites": [
+        "Floating-point numbers",
+        "Decimal representation",
+        "Python basic operations"
+      ],
+      "learning_objectives": [
+        "Understand floating-point representation and precision limitations",
+        "Learn the mathematical definition of rounding to n decimal places",
+        "Apply Python's round() function to format numerical output"
+      ],
+      "math_content": {
+        "definition": "Rounding a real number $x$ to $n$ decimal places produces a number $y$ of the form $y = \\frac{k}{10^n}$ where $k \\in \\mathbb{Z}$ is an integer chosen such that $|x - y|$ is minimized. Formally: $$\\text{round}_n(x) = \\frac{\\lfloor x \\cdot 10^n + 0.5 \\rfloor}{10^n}$$ where $\\lfloor \\cdot \\rfloor$ is the floor function (greatest integer less than or equal to the argument).",
+        "notation": "$\\text{round}_n(x)$ means round $x$ to $n$ decimal places; $10^n$ is the scaling factor for $n$ digits",
+        "theorem": "**Rounding Rule (Round Half Up)**: Let $d$ be the $(n+1)$-th digit after the decimal point. If $d < 5$, round down (truncate). If $d \\geq 5$, round up (increment the $n$-th digit). Examples: $\\text{round}_2(3.14159) = 3.14$ (third digit is 1 < 5, round down); $\\text{round}_2(3.14559) = 3.15$ (third digit is 5 ≥ 5, round up).",
+        "proof_sketch": "The round-half-up rule minimizes the expected rounding error for uniformly distributed fractional parts. Adding 0.5 before taking the floor effectively implements this rule: if the fractional part is ≥ 0.5, adding 0.5 pushes it past the next integer; if < 0.5, it stays below.",
+        "examples": [
+          "$\\text{round}_4(0.666666...) = 0.6667$ (fifth digit is 6 ≥ 5, round up)",
+          "$\\text{round}_4(0.090029...) = 0.0900$ (fifth digit is 2 < 5, round down, keep trailing zeros)",
+          "$\\text{round}_4(0.24472847...) = 0.2447$ (fifth digit is 2 < 5, round down)",
+          "$\\text{round}_4(0.66524096...) = 0.6652$ (fifth digit is 4 < 5, round down)",
+          "Python: round(0.666666, 4) returns 0.6667"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Rounding Formula",
+          "latex": "$\\text{round}_n(x) = \\frac{\\lfloor x \\cdot 10^n + 0.5 \\rfloor}{10^n}$",
+          "description": "Mathematical definition of rounding to n decimal places"
+        },
+        {
+          "name": "Scaling Factor",
+          "latex": "$10^n$",
+          "description": "Multiplier to shift n decimal places to integer positions"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes a list of floating-point numbers and rounds each to exactly 4 decimal places. This is the final formatting step in softmax: after computing probabilities, we round them for readable output. Use Python's round() function with 4 as the precision parameter.",
+        "function_signature": "def round_to_four_decimals(numbers: list[float]) -> list[float]:",
+        "starter_code": "def round_to_four_decimals(numbers: list[float]) -> list[float]:\n    # Your code here: round each number to 4 decimal places\n    pass",
+        "test_cases": [
+          {
+            "input": "round_to_four_decimals([0.666666])",
+            "expected": "[0.6667]",
+            "explanation": "Rounds up because fifth decimal is 6 ≥ 5"
+          },
+          {
+            "input": "round_to_four_decimals([0.090029, 0.244728, 0.665243])",
+            "expected": "[0.0900, 0.2447, 0.6652]",
+            "explanation": "These are the exact softmax outputs for [1,2,3] rounded to 4 decimals"
+          },
+          {
+            "input": "round_to_four_decimals([0.333333, 0.666667])",
+            "expected": "[0.3333, 0.6667]",
+            "explanation": "Standard rounding: 3333 rounds down, 6667 rounds up"
+          },
+          {
+            "input": "round_to_four_decimals([1.0])",
+            "expected": "[1.0]",
+            "explanation": "Whole numbers remain unchanged (though may display as 1.0)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using string formatting instead of actual rounding (e.g., f'{x:.4f}' creates string, not float)",
+        "Rounding to wrong number of decimal places (e.g., round(x, 2) instead of round(x, 4))",
+        "Forgetting to apply rounding to all elements in the list",
+        "Confusion between truncation and rounding (round vs floor)"
+      ],
+      "hint": "Use Python's built-in round(number, 4) function to round each number to 4 decimal places",
+      "references": [
+        "Floating-point arithmetic",
+        "IEEE 754 standard",
+        "Python round() function",
+        "Numerical precision"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Composing the Complete Softmax Function",
+      "relation_to_problem": "This final step synthesizes all previous concepts into the complete softmax implementation. You'll combine exponentials, summation, normalization, and rounding to transform raw scores into a probability distribution. This is the integration of all mathematical components learned in steps 1-4.",
+      "prerequisites": [
+        "Steps 1-4",
+        "Function composition",
+        "Understanding of mathematical pipelines"
+      ],
+      "learning_objectives": [
+        "Understand the complete mathematical definition of the softmax function",
+        "Integrate multiple computational steps into a single pipeline",
+        "Implement the full softmax transformation: scores → exponentials → normalization → probabilities"
+      ],
+      "math_content": {
+        "definition": "The **softmax activation function** (also called normalized exponential function) transforms a vector of real-valued scores $\\mathbf{z} = [z_1, z_2, \\ldots, z_K]^T \\in \\mathbb{R}^K$ into a probability distribution $\\boldsymbol{\\sigma}(\\mathbf{z}) = [\\sigma_1, \\sigma_2, \\ldots, \\sigma_K]^T$ where each component is defined as: $$\\sigma_i(\\mathbf{z}) = \\frac{e^{z_i}}{\\sum_{j=1}^{K} e^{z_j}}$$ This can be decomposed into three operations: (1) **Exponentiation**: compute $e^{z_i}$ for all $i$, (2) **Summation**: compute $Z = \\sum_{j=1}^{K} e^{z_j}$, (3) **Normalization**: compute $\\sigma_i = \\frac{e^{z_i}}{Z}$ for all $i$.",
+        "notation": "$\\mathbf{z} = [z_1, \\ldots, z_K]^T$ is the input vector (logits/scores); $\\sigma_i$ is the $i$-th output probability; $K$ is the number of classes; $e \\approx 2.71828$ is Euler's number",
+        "theorem": "**Softmax Output Properties**: For any input $\\mathbf{z} \\in \\mathbb{R}^K$, the softmax output $\\boldsymbol{\\sigma}(\\mathbf{z})$ satisfies: (1) **Positivity**: $\\sigma_i > 0$ for all $i \\in \\{1, \\ldots, K\\}$; (2) **Normalization**: $\\sum_{i=1}^{K} \\sigma_i = 1$; (3) **Bounded**: $0 < \\sigma_i < 1$ for all $i$; (4) **Order-preserving**: if $z_i > z_j$ then $\\sigma_i > \\sigma_j$ (monotonic). These properties guarantee that softmax outputs form a valid probability distribution.",
+        "proof_sketch": "(1) Since $e^{z_i} > 0$ and $Z = \\sum e^{z_j} > 0$, we have $\\sigma_i = \\frac{e^{z_i}}{Z} > 0$. (2) $\\sum_{i=1}^{K} \\sigma_i = \\sum_{i=1}^{K} \\frac{e^{z_i}}{Z} = \\frac{1}{Z} \\sum_{i=1}^{K} e^{z_i} = \\frac{Z}{Z} = 1$. (3) Since $e^{z_i} < Z$ (one term is less than the sum of all positive terms), we have $\\sigma_i < 1$. Combined with (1), we get $0 < \\sigma_i < 1$. (4) The exponential function is strictly increasing, so $z_i > z_j \\Rightarrow e^{z_i} > e^{z_j} \\Rightarrow \\frac{e^{z_i}}{Z} > \\frac{e^{z_j}}{Z}$.",
+        "examples": [
+          "**Example 1**: $\\mathbf{z} = [1, 2, 3]$. Step 1: exponentials $[e^1, e^2, e^3] \\approx [2.718, 7.389, 20.086]$. Step 2: sum $Z \\approx 30.193$. Step 3: divide $[\\frac{2.718}{30.193}, \\frac{7.389}{30.193}, \\frac{20.086}{30.193}] \\approx [0.0900, 0.2447, 0.6652]$. Verify: $0.0900 + 0.2447 + 0.6652 = 1.0$ ✓",
+          "**Example 2**: $\\mathbf{z} = [0, 0]$. Exponentials: $[1, 1]$. Sum: $2$. Softmax: $[0.5, 0.5]$ (equal inputs give equal probabilities)",
+          "**Example 3**: $\\mathbf{z} = [10, 0, -10]$. Exponentials: $[22026.47, 1.0, 0.000045]$. Sum: $\\approx 22027.47$. Softmax: $[\\approx 0.9999, \\approx 0.00005, \\approx 0.000002]$ (large positive score dominates)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Softmax Function",
+          "latex": "$\\sigma_i(\\mathbf{z}) = \\frac{e^{z_i}}{\\sum_{j=1}^{K} e^{z_j}}$",
+          "description": "Complete softmax formula for the i-th output"
+        },
+        {
+          "name": "Vector Form",
+          "latex": "$\\boldsymbol{\\sigma}(\\mathbf{z}) = \\frac{\\exp(\\mathbf{z})}{\\mathbf{1}^T \\exp(\\mathbf{z})}$",
+          "description": "Softmax in vector notation"
+        }
+      ],
+      "exercise": {
+        "description": "Now integrate all the steps you've learned! Write the complete softmax function that: (1) computes exponentials for all scores, (2) sums the exponentials, (3) divides each exponential by the sum to get probabilities, (4) rounds each probability to 4 decimal places. Do NOT look at the solution - combine your functions from steps 1-4. The pipeline is: scores → exponentials → normalization → rounding → probabilities.",
+        "function_signature": "def softmax(scores: list[float]) -> list[float]:",
+        "starter_code": "import math\n\ndef softmax(scores: list[float]) -> list[float]:\n    # Step 1: Compute exponentials (use math.exp)\n    # Step 2: Compute sum of exponentials\n    # Step 3: Divide each exponential by the sum (normalization)\n    # Step 4: Round each probability to 4 decimal places\n    pass",
+        "test_cases": [
+          {
+            "input": "softmax([1, 2, 3])",
+            "expected": "[0.0900, 0.2447, 0.6652]",
+            "explanation": "Main problem example: e^1/(e^1+e^2+e^3) ≈ 0.0900, e^2/(e^1+e^2+e^3) ≈ 0.2447, e^3/(e^1+e^2+e^3) ≈ 0.6652"
+          },
+          {
+            "input": "softmax([0, 0])",
+            "expected": "[0.5, 0.5]",
+            "explanation": "Equal scores produce equal probabilities: each gets probability 1/2"
+          },
+          {
+            "input": "softmax([1])",
+            "expected": "[1.0]",
+            "explanation": "Single score always gets probability 1.0"
+          },
+          {
+            "input": "softmax([-1, 0, 1])",
+            "expected": "[0.0900, 0.2447, 0.6652]",
+            "explanation": "Softmax is translation-invariant: shifting all scores by constant doesn't change output (compare to [0, 1, 2] or [1, 2, 3])"
+          },
+          {
+            "input": "softmax([0, 1])",
+            "expected": "[0.2689, 0.7311]",
+            "explanation": "e^0/(e^0+e^1) = 1/(1+e) ≈ 0.2689, e^1/(e^0+e^1) = e/(1+e) ≈ 0.7311"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to import math library at the top",
+        "Computing exponentials multiple times instead of storing them once",
+        "Dividing by the number of elements (len(scores)) instead of sum of exponentials",
+        "Not rounding the final output to 4 decimal places as required",
+        "Attempting to normalize before computing exponentials (wrong order of operations)",
+        "Returning values that don't sum to 1.0 (indicating normalization error)"
+      ],
+      "hint": "Break the problem into 4 sequential steps as outlined in your previous sub-quests. First compute all exponentials and store them in a list, then sum that list, then divide each exponential by the sum, finally round each result.",
+      "references": [
+        "Softmax activation in neural networks",
+        "Multi-class classification",
+        "Probability distributions in machine learning",
+        "Logistic regression generalization"
+      ]
+    }
+  ]
+}

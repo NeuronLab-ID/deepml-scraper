@@ -1,0 +1,411 @@
+{
+  "problem_id": 109,
+  "title": "Implement Layer Normalization for Sequence Data",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "Implement a function to perform Layer Normalization on an input tensor. Given a 3D array representing batch_size, sequence length, and feature dimensions, normalize the data across the feature dimension for each sequence, then apply scaling and shifting parameters.",
+  "example": {
+    "input": "np.random.seed(42); X = np.random.randn(2, 2, 3); gamma = np.ones(3).reshape(1, 1, -1); beta = np.zeros(3).reshape(1, 1, -1); layer_normalization(X, gamma, beta)",
+    "output": "[[[ 0.47373971 -1.39079736  0.91705765]\n  [ 1.41420326 -0.70711154 -0.70709172]]\n [[ 1.13192477  0.16823009 -1.30015486]\n  [ 1.4141794  -0.70465482 -0.70952458]]]",
+    "reasoning": "The function computes the mean and variance across the feature dimension (d_model=3) for each sequence, normalizes the input, then applies gamma=1 and beta=0, resulting in a normalized output with zero mean and unit variance scaled as is."
+  },
+  "starter_code": "import numpy as np\n\ndef layer_normalization(X: np.ndarray, gamma: np.ndarray, beta: np.ndarray, epsilon: float = 1e-5) -> np.ndarray:\n\t\"\"\"\n\tPerform Layer Normalization.\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Statistical Moments: Mean and Variance Computation",
+      "relation_to_problem": "Layer normalization requires computing the mean and variance across the feature dimension for each sequence. This sub-quest establishes the mathematical foundation for calculating these first and second moments, which are essential for the normalization step.",
+      "prerequisites": [
+        "Basic linear algebra",
+        "NumPy array operations",
+        "Understanding of statistical moments"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of sample mean and variance",
+        "Compute statistical moments across specific tensor dimensions",
+        "Apply keepdims parameter to preserve tensor shape for broadcasting"
+      ],
+      "math_content": {
+        "definition": "For a random variable $X$ with observations $x_1, x_2, \\ldots, x_n$, the **sample mean** is the first moment: $$\\mu = \\frac{1}{n}\\sum_{i=1}^{n} x_i$$ The **sample variance** is the second central moment: $$\\sigma^2 = \\frac{1}{n}\\sum_{i=1}^{n} (x_i - \\mu)^2$$ For a tensor $\\mathbf{X} \\in \\mathbb{R}^{b \\times s \\times d}$ where $b$ is batch size, $s$ is sequence length, and $d$ is feature dimension, we compute statistics independently for each position $(b, s)$ across all $d$ features.",
+        "notation": "$\\mu_{b,s}$ = mean for batch $b$, sequence position $s$ across features; $\\sigma^2_{b,s}$ = variance for batch $b$, sequence position $s$ across features; $d$ = number of features (dimension over which we compute statistics)",
+        "theorem": "**Parallel Axis Theorem for Variance**: The variance can be computed using the alternative formula: $$\\sigma^2 = \\frac{1}{n}\\sum_{i=1}^{n} x_i^2 - \\mu^2$$ This is numerically less stable but computationally efficient.",
+        "proof_sketch": "Starting from the definition: $$\\sigma^2 = \\frac{1}{n}\\sum_{i=1}^{n} (x_i - \\mu)^2 = \\frac{1}{n}\\sum_{i=1}^{n} (x_i^2 - 2x_i\\mu + \\mu^2)$$ $$= \\frac{1}{n}\\sum_{i=1}^{n} x_i^2 - 2\\mu\\frac{1}{n}\\sum_{i=1}^{n} x_i + \\mu^2 = \\frac{1}{n}\\sum_{i=1}^{n} x_i^2 - 2\\mu^2 + \\mu^2 = \\frac{1}{n}\\sum_{i=1}^{n} x_i^2 - \\mu^2$$",
+        "examples": [
+          "For vector $[1, 2, 3, 4, 5]$: $\\mu = \\frac{1+2+3+4+5}{5} = 3$, $\\sigma^2 = \\frac{(1-3)^2+(2-3)^2+(3-3)^2+(4-3)^2+(5-3)^2}{5} = \\frac{4+1+0+1+4}{5} = 2$",
+          "For 2D tensor $\\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{bmatrix}$ computing row-wise: Row 1: $\\mu_1 = 2, \\sigma^2_1 = \\frac{2}{3}$; Row 2: $\\mu_2 = 5, \\sigma^2_2 = \\frac{2}{3}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sample Mean",
+          "latex": "$\\mu = \\frac{1}{n}\\sum_{i=1}^{n} x_i$",
+          "description": "Use to center data around zero; computed using np.mean(X, axis=-1, keepdims=True)"
+        },
+        {
+          "name": "Sample Variance",
+          "latex": "$\\sigma^2 = \\frac{1}{n}\\sum_{i=1}^{n} (x_i - \\mu)^2$",
+          "description": "Measures spread of data; computed using np.var(X, axis=-1, keepdims=True)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the mean and variance across the last dimension (features) of a 3D tensor. The output should maintain dimensions for broadcasting by keeping the reduced dimension as size 1.",
+        "function_signature": "def compute_moments(X: np.ndarray) -> tuple[np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef compute_moments(X: np.ndarray) -> tuple[np.ndarray, np.ndarray]:\n    \"\"\"\n    Compute mean and variance across the feature dimension (last axis).\n    \n    Args:\n        X: Input tensor of shape (batch_size, seq_len, d_model)\n    \n    Returns:\n        mean: Shape (batch_size, seq_len, 1)\n        variance: Shape (batch_size, seq_len, 1)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_moments(np.array([[[1.0, 2.0, 3.0]]]))",
+            "expected": "(array([[[2.]]]), array([[[0.66666667]]]))",
+            "explanation": "For features [1, 2, 3]: mean = (1+2+3)/3 = 2, variance = ((1-2)^2 + (2-2)^2 + (3-2)^2)/3 = 2/3"
+          },
+          {
+            "input": "compute_moments(np.array([[[1.0, 3.0]], [[2.0, 4.0]]]))",
+            "expected": "(array([[[2.]], [[3.]]]), array([[[1.]], [[1.]]]))",
+            "explanation": "Batch 1: mean=(1+3)/2=2, var=1; Batch 2: mean=(2+4)/2=3, var=1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting keepdims=True, causing shape incompatibility for broadcasting",
+        "Computing statistics across wrong axis (e.g., batch or sequence instead of features)",
+        "Using population variance (N) instead of sample variance (N) - both are valid but numpy defaults to N"
+      ],
+      "hint": "Use np.mean() and np.var() with axis=-1 and keepdims=True to preserve tensor shape for later broadcasting operations.",
+      "references": [
+        "NumPy broadcasting rules",
+        "Statistical moments in machine learning",
+        "Bessel's correction for sample variance"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Z-Score Standardization and Numerical Stability",
+      "relation_to_problem": "The core of layer normalization is standardizing activations to have zero mean and unit variance. This sub-quest teaches the z-score transformation with numerical stability considerations (epsilon term) that prevent division by zero.",
+      "prerequisites": [
+        "Statistical moments (mean and variance)",
+        "Broadcasting in NumPy",
+        "Floating-point arithmetic stability"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical foundation of z-score standardization",
+        "Implement standardization with numerical stability guarantees",
+        "Apply standardization across tensor dimensions using broadcasting"
+      ],
+      "math_content": {
+        "definition": "**Z-score standardization** (also called **standard score** or **normalization**) transforms a random variable $X$ to have mean 0 and variance 1: $$Z = \\frac{X - \\mu}{\\sigma}$$ where $\\mu = E[X]$ is the mean and $\\sigma = \\sqrt{Var(X)}$ is the standard deviation. For numerical stability in computing implementations, we add a small constant $\\epsilon > 0$: $$Z = \\frac{X - \\mu}{\\sqrt{\\sigma^2 + \\epsilon}}$$",
+        "notation": "$Z$ = standardized variable; $\\mu$ = mean of $X$; $\\sigma$ = standard deviation of $X$; $\\epsilon$ = small constant (typically $10^{-5}$ to $10^{-8}$) for numerical stability",
+        "theorem": "**Properties of Standardized Variables**: If $Z = \\frac{X - \\mu}{\\sigma}$, then: (1) $E[Z] = 0$, (2) $Var(Z) = 1$, (3) $Z$ preserves the shape of the distribution of $X$",
+        "proof_sketch": "**Proof of $E[Z] = 0$**: $$E[Z] = E\\left[\\frac{X - \\mu}{\\sigma}\\right] = \\frac{1}{\\sigma}E[X - \\mu] = \\frac{1}{\\sigma}(E[X] - \\mu) = \\frac{1}{\\sigma}(\\mu - \\mu) = 0$$ **Proof of $Var(Z) = 1$**: $$Var(Z) = Var\\left(\\frac{X - \\mu}{\\sigma}\\right) = \\frac{1}{\\sigma^2}Var(X - \\mu) = \\frac{1}{\\sigma^2}Var(X) = \\frac{\\sigma^2}{\\sigma^2} = 1$$ (using $Var(aX + b) = a^2Var(X)$ and $Var(X - \\mu) = Var(X)$)",
+        "examples": [
+          "For $X = [1, 2, 3, 4, 5]$ with $\\mu = 3, \\sigma = \\sqrt{2}$: $Z = \\frac{[1,2,3,4,5] - 3}{\\sqrt{2}} = \\frac{[-2,-1,0,1,2]}{1.414} = [-1.414, -0.707, 0, 0.707, 1.414]$",
+          "With $\\epsilon = 10^{-5}$: For very small variance $\\sigma^2 = 10^{-8}$, without epsilon we'd get $\\sigma = 10^{-4}$ causing huge normalized values. With epsilon: $\\sqrt{10^{-8} + 10^{-5}} \\approx 0.00316$, more stable."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Z-Score Standardization",
+          "latex": "$\\hat{x} = \\frac{x - \\mu}{\\sigma}$",
+          "description": "Centers data at 0 and scales to unit variance"
+        },
+        {
+          "name": "Numerically Stable Standardization",
+          "latex": "$\\hat{x} = \\frac{x - \\mu}{\\sqrt{\\sigma^2 + \\epsilon}}$",
+          "description": "Prevents division by zero when variance is very small; use in all implementations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement z-score standardization for a 3D tensor across the feature dimension. Use the epsilon parameter to ensure numerical stability. The function should work with broadcasting where mean and variance have shape (batch_size, seq_len, 1).",
+        "function_signature": "def standardize(X: np.ndarray, mean: np.ndarray, variance: np.ndarray, epsilon: float = 1e-5) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef standardize(X: np.ndarray, mean: np.ndarray, variance: np.ndarray, epsilon: float = 1e-5) -> np.ndarray:\n    \"\"\"\n    Perform z-score standardization.\n    \n    Args:\n        X: Input tensor of shape (batch_size, seq_len, d_model)\n        mean: Mean tensor of shape (batch_size, seq_len, 1)\n        variance: Variance tensor of shape (batch_size, seq_len, 1)\n        epsilon: Small constant for numerical stability\n    \n    Returns:\n        Standardized tensor of shape (batch_size, seq_len, d_model)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "standardize(np.array([[[0.0, 1.0, 2.0]]]), np.array([[[1.0]]]), np.array([[[0.66666667]]]), epsilon=1e-5)",
+            "expected": "array([[[-1.22474487,  0.        ,  1.22474487]]])",
+            "explanation": "With mean=1, std=sqrt(2/3)≈0.816: (0-1)/0.816=-1.225, (1-1)/0.816=0, (2-1)/0.816=1.225"
+          },
+          {
+            "input": "standardize(np.array([[[5.0, 5.0, 5.0]]]), np.array([[[5.0]]]), np.array([[[0.0]]]), epsilon=1e-5)",
+            "expected": "array([[[0., 0., 0.]]])",
+            "explanation": "With zero variance and epsilon=1e-5: (5-5)/sqrt(1e-5)=0 for all features"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to add epsilon before taking square root, leading to division by zero",
+        "Adding epsilon after square root instead of before: sqrt(var) + eps instead of sqrt(var + eps)",
+        "Not using keepdims in mean/variance computation, causing broadcasting errors",
+        "Using variance instead of standard deviation in denominator"
+      ],
+      "hint": "The denominator should be sqrt(variance + epsilon), not sqrt(variance) + epsilon. NumPy's broadcasting will handle the dimension alignment if shapes are correct.",
+      "references": [
+        "Numerical stability in deep learning",
+        "NumPy broadcasting semantics",
+        "Standard score in statistics"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Affine Transformations: Scale and Shift Parameters",
+      "relation_to_problem": "After standardization, layer normalization applies learnable affine parameters (gamma for scaling, beta for shifting) to restore the representational power of the network. This sub-quest covers the mathematical theory and implementation of affine transformations.",
+      "prerequisites": [
+        "Linear transformations",
+        "Z-score standardization",
+        "Parameter broadcasting"
+      ],
+      "learning_objectives": [
+        "Understand why affine transformations are necessary after normalization",
+        "Implement element-wise scaling and shifting operations",
+        "Apply learnable parameters with correct broadcasting semantics"
+      ],
+      "math_content": {
+        "definition": "An **affine transformation** is a linear transformation followed by a translation: $$y = \\gamma x + \\beta$$ where $\\gamma \\in \\mathbb{R}^d$ is the **scale parameter** (or **gain**) and $\\beta \\in \\mathbb{R}^d$ is the **shift parameter** (or **bias**). In layer normalization, we apply this element-wise to normalized features: $$y_i = \\gamma_i \\hat{x}_i + \\beta_i \\quad \\text{for } i = 1, \\ldots, d$$ where $\\hat{x}_i$ is the standardized activation for feature $i$.",
+        "notation": "$\\gamma$ = scale parameter (learnable); $\\beta$ = shift parameter (learnable); $\\hat{x}$ = standardized input; $y$ = output after affine transformation; $d$ = feature dimension",
+        "theorem": "**Representational Power Recovery**: The affine transformation $y = \\gamma \\hat{x} + \\beta$ can recover the identity function. Specifically, if $\\gamma = \\sigma$ and $\\beta = \\mu$, then $y = \\sigma \\cdot \\frac{x - \\mu}{\\sigma} + \\mu = x$, restoring the original unnormalized values if beneficial for the network.",
+        "proof_sketch": "Starting with standardized $\\hat{x} = \\frac{x - \\mu}{\\sigma}$, apply affine transformation with $\\gamma = \\sigma, \\beta = \\mu$: $$y = \\gamma \\hat{x} + \\beta = \\sigma \\cdot \\frac{x - \\mu}{\\sigma} + \\mu = (x - \\mu) + \\mu = x$$ This shows the transformation has the capacity to undo normalization, giving the network flexibility to learn whether normalization is beneficial for each feature.",
+        "examples": [
+          "With $\\hat{x} = [-1, 0, 1]$, $\\gamma = 2$, $\\beta = 3$: $y = 2 \\cdot [-1, 0, 1] + 3 = [-2, 0, 2] + [3, 3, 3] = [1, 3, 5]$",
+          "Identity recovery: If $x = [1, 2, 3]$ standardizes to $\\hat{x} = [-1, 0, 1]$ with $\\mu=2, \\sigma=1$, then $y = 1 \\cdot [-1, 0, 1] + 2 = [1, 2, 3] = x$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Element-wise Affine Transformation",
+          "latex": "$y_i = \\gamma_i \\hat{x}_i + \\beta_i$",
+          "description": "Applied independently to each feature dimension after standardization"
+        },
+        {
+          "name": "Vectorized Affine Transformation",
+          "latex": "$\\mathbf{y} = \\gamma \\odot \\hat{\\mathbf{x}} + \\beta$",
+          "description": "Element-wise multiplication (Hadamard product) $\\odot$ followed by element-wise addition"
+        }
+      ],
+      "exercise": {
+        "description": "Implement an affine transformation that applies element-wise scaling (gamma) and shifting (beta) to a standardized tensor. The gamma and beta parameters should be broadcastable across the batch and sequence dimensions.",
+        "function_signature": "def apply_affine(X_normalized: np.ndarray, gamma: np.ndarray, beta: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef apply_affine(X_normalized: np.ndarray, gamma: np.ndarray, beta: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Apply affine transformation (scale and shift).\n    \n    Args:\n        X_normalized: Standardized input of shape (batch_size, seq_len, d_model)\n        gamma: Scale parameters of shape (d_model,) or (1, 1, d_model)\n        beta: Shift parameters of shape (d_model,) or (1, 1, d_model)\n    \n    Returns:\n        Transformed tensor of shape (batch_size, seq_len, d_model)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "apply_affine(np.array([[[0.0, 1.0]]]), np.array([2.0, 3.0]), np.array([1.0, -1.0]))",
+            "expected": "array([[[1., 2.]]])",
+            "explanation": "Feature 0: 2*0 + 1 = 1; Feature 1: 3*1 + (-1) = 2"
+          },
+          {
+            "input": "apply_affine(np.array([[[-1.0, 0.0, 1.0]]]), np.ones(3), np.zeros(3))",
+            "expected": "array([[[-1., 0., 1.]]])",
+            "explanation": "With gamma=1 and beta=0, affine transformation is identity: y = 1*x + 0 = x"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Incorrectly broadcasting gamma/beta across wrong dimensions",
+        "Applying matrix multiplication instead of element-wise multiplication",
+        "Forgetting that gamma and beta are learnable parameters with one value per feature",
+        "Adding beta before multiplying by gamma (order matters: scale first, then shift)"
+      ],
+      "hint": "NumPy automatically broadcasts vectors with shape (d,) to match tensors of shape (b, s, d). Use element-wise operations: gamma * X_normalized + beta.",
+      "references": [
+        "Affine transformations in neural networks",
+        "Learnable normalization parameters",
+        "Hadamard product vs matrix multiplication"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Axis-Specific Operations and Tensor Reduction",
+      "relation_to_problem": "Layer normalization operates across specific dimensions of multi-dimensional tensors. Understanding axis specification, keepdims, and reduction operations is crucial for implementing normalization correctly on 3D sequence data (batch, sequence, features).",
+      "prerequisites": [
+        "NumPy array indexing",
+        "Broadcasting rules",
+        "Multi-dimensional array operations"
+      ],
+      "learning_objectives": [
+        "Master axis parameter in NumPy reduction operations",
+        "Understand when and why to use keepdims=True",
+        "Correctly identify which axis to normalize for different tensor shapes"
+      ],
+      "math_content": {
+        "definition": "For a tensor $\\mathbf{X} \\in \\mathbb{R}^{n_1 \\times n_2 \\times \\cdots \\times n_k}$, a **reduction operation** along axis $j$ produces a tensor $\\mathbf{Y} \\in \\mathbb{R}^{n_1 \\times \\cdots \\times n_{j-1} \\times n_{j+1} \\times \\cdots \\times n_k}$ by applying an aggregate function (sum, mean, max, etc.) across all values in dimension $j$. With **keepdims=True**, the result has shape $\\mathbb{R}^{n_1 \\times \\cdots \\times 1 \\times \\cdots \\times n_k}$ where dimension $j$ is retained with size 1.",
+        "notation": "$\\mathbf{X}_{:,:,i}$ = slice along axis 2, feature $i$; $\\text{axis}=-1$ = last dimension; $\\text{axis}=0$ = batch dimension; $\\text{keepdims}$ = preserve reduced dimension as size 1",
+        "theorem": "**Broadcasting Compatibility**: For tensors $\\mathbf{A}$ and $\\mathbf{B}$ to be broadcast-compatible, their dimensions must either (1) be equal, or (2) one of them is 1. When using keepdims=True in reductions, the resulting shape maintains compatibility for broadcasting with the original tensor.",
+        "proof_sketch": "Consider $\\mathbf{X} \\in \\mathbb{R}^{2 \\times 3 \\times 4}$. Computing mean along axis=2 without keepdims gives $\\mathbf{M} \\in \\mathbb{R}^{2 \\times 3}$. Broadcasting $\\mathbf{X} - \\mathbf{M}$ fails because shapes $(2,3,4)$ and $(2,3)$ don't align. With keepdims=True, $\\mathbf{M} \\in \\mathbb{R}^{2 \\times 3 \\times 1}$, and subtraction works: dimension 2 has sizes 4 and 1, satisfying broadcasting rule (2).",
+        "examples": [
+          "For $\\mathbf{X} = \\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{bmatrix}$: mean(axis=1) gives $[2, 5]$; mean(axis=1, keepdims=True) gives $\\begin{bmatrix} 2 \\\\ 5 \\end{bmatrix}$ which broadcasts correctly",
+          "Layer norm on shape (2, 3, 4): normalize along axis=-1 (features), mean has shape (2, 3, 1), allowing element-wise operations"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Reduction Along Axis j",
+          "latex": "$\\mathbf{Y}[i_1, \\ldots, i_{j-1}, i_{j+1}, \\ldots, i_k] = f(\\mathbf{X}[i_1, \\ldots, i_{j-1}, :, i_{j+1}, \\ldots, i_k])$",
+          "description": "Where f is an aggregate function (mean, sum, max, etc.)"
+        },
+        {
+          "name": "Layer Norm Axis Selection",
+          "latex": "$\\text{axis} = -1$ for shape $(B, S, D)$",
+          "description": "Normalize across features (D), compute statistics per (B, S) position"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes per-feature statistics (mean and max) across the batch and sequence dimensions for a 3D tensor. This is the inverse operation of layer normalization's axis selection and helps understand dimensional operations.",
+        "function_signature": "def compute_feature_stats(X: np.ndarray) -> tuple[np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef compute_feature_stats(X: np.ndarray) -> tuple[np.ndarray, np.ndarray]:\n    \"\"\"\n    Compute mean and max for each feature across batch and sequence dimensions.\n    \n    Args:\n        X: Input tensor of shape (batch_size, seq_len, d_model)\n    \n    Returns:\n        feature_means: Shape (d_model,) - mean of each feature across all batches/sequences\n        feature_maxs: Shape (d_model,) - max of each feature across all batches/sequences\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_feature_stats(np.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]]))",
+            "expected": "(array([4., 5.]), array([7, 8]))",
+            "explanation": "Feature 0: values [1,3,5,7], mean=4, max=7; Feature 1: values [2,4,6,8], mean=5, max=8"
+          },
+          {
+            "input": "compute_feature_stats(np.ones((2, 3, 4)))",
+            "expected": "(array([1., 1., 1., 1.]), array([1., 1., 1., 1.]))",
+            "explanation": "All values are 1, so mean and max are both 1 for all 4 features"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing axis=-1 (last axis, features) with axis=0 (batch) or axis=1 (sequence)",
+        "Not using keepdims when result needs to broadcast with original tensor",
+        "Forgetting that axis can be a tuple to reduce over multiple dimensions",
+        "Misunderstanding negative indexing: axis=-1 is last dimension, axis=-2 is second-to-last"
+      ],
+      "hint": "To aggregate across batch and sequence dimensions while preserving features, use axis=(0, 1). The result will have shape (d_model,) since both dimensions are reduced.",
+      "references": [
+        "NumPy axis parameter documentation",
+        "Broadcasting in NumPy",
+        "Tensor reduction operations"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Layer Normalization: Complete Mathematical Framework",
+      "relation_to_problem": "This sub-quest integrates all previous concepts into the complete layer normalization algorithm. It covers the full mathematical derivation, gradient flow properties, and comparison with other normalization techniques.",
+      "prerequisites": [
+        "Statistical moments",
+        "Z-score standardization",
+        "Affine transformations",
+        "Tensor operations"
+      ],
+      "learning_objectives": [
+        "Understand the complete layer normalization transformation",
+        "Implement layer normalization by composing previous sub-quest components",
+        "Recognize why layer normalization stabilizes training in deep networks"
+      ],
+      "math_content": {
+        "definition": "**Layer Normalization** for input $\\mathbf{x} \\in \\mathbb{R}^d$ computes: $$\\text{LayerNorm}(\\mathbf{x}) = \\gamma \\odot \\frac{\\mathbf{x} - \\mu}{\\sqrt{\\sigma^2 + \\epsilon}} + \\beta$$ where: $$\\mu = \\frac{1}{d}\\sum_{i=1}^{d} x_i, \\quad \\sigma^2 = \\frac{1}{d}\\sum_{i=1}^{d} (x_i - \\mu)^2$$ For batched sequence data $\\mathbf{X} \\in \\mathbb{R}^{B \\times S \\times D}$, this is applied independently to each of the $B \\times S$ feature vectors of dimension $D$.",
+        "notation": "$B$ = batch size; $S$ = sequence length; $D$ = feature dimension (d_model); $\\gamma, \\beta \\in \\mathbb{R}^D$ = learnable parameters; $\\epsilon$ = numerical stability constant (typically $10^{-5}$); $\\odot$ = element-wise multiplication",
+        "theorem": "**Gradient Flow Improvement**: Layer normalization reduces internal covariate shift and improves gradient flow. For a normalized layer with input $\\mathbf{x}$ and output $\\mathbf{y} = \\text{LayerNorm}(\\mathbf{x})$, the Jacobian $\\frac{\\partial \\mathbf{y}}{\\partial \\mathbf{x}}$ has controlled eigenvalues, preventing gradient explosion/vanishing.",
+        "proof_sketch": "Consider the gradient $\\frac{\\partial L}{\\partial x_i}$ for loss $L$. By chain rule: $$\\frac{\\partial L}{\\partial x_i} = \\sum_{j=1}^{d} \\frac{\\partial L}{\\partial \\hat{x}_j} \\frac{\\partial \\hat{x}_j}{\\partial x_i}$$ The normalization ensures $\\hat{x}_j$ has unit variance regardless of $x_i$ scale, bounding the Jacobian terms. Specifically: $$\\frac{\\partial \\hat{x}_j}{\\partial x_i} = \\frac{1}{\\sigma}\\left(\\delta_{ij} - \\frac{1}{d} - \\frac{(x_i - \\mu)(x_j - \\mu)}{d\\sigma^2}\\right)$$ This is $O(1/\\sqrt{d})$, preventing explosion as depth increases.",
+        "examples": [
+          "Single vector $\\mathbf{x} = [1, 2, 3]$: $\\mu=2, \\sigma^2=2/3$, $\\hat{\\mathbf{x}} = [-1.225, 0, 1.225]$. With $\\gamma=[1,1,1], \\beta=[0,0,0]$: output is $\\hat{\\mathbf{x}}$",
+          "Batch example: $\\mathbf{X} \\in \\mathbb{R}^{2 \\times 1 \\times 3}$ normalizes each of the 2 feature vectors independently across their 3 dimensions"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Layer Normalization (Complete)",
+          "latex": "$\\text{LN}(\\mathbf{x}) = \\gamma \\odot \\frac{\\mathbf{x} - \\mu}{\\sqrt{\\sigma^2 + \\epsilon}} + \\beta$",
+          "description": "Full transformation combining standardization and affine parameters"
+        },
+        {
+          "name": "Batch-Sequence Form",
+          "latex": "$\\mathbf{Y}_{b,s} = \\gamma \\odot \\frac{\\mathbf{X}_{b,s} - \\mu_{b,s}}{\\sqrt{\\sigma^2_{b,s} + \\epsilon}} + \\beta$",
+          "description": "Applied independently to each sequence position in batch"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified layer normalization function that combines statistical moment computation, standardization, and affine transformation. Use the functions conceptually developed in previous sub-quests, but implement them inline to create a complete solution.",
+        "function_signature": "def simple_layer_norm(X: np.ndarray, gamma: np.ndarray, beta: np.ndarray, epsilon: float = 1e-5) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef simple_layer_norm(X: np.ndarray, gamma: np.ndarray, beta: np.ndarray, epsilon: float = 1e-5) -> np.ndarray:\n    \"\"\"\n    Perform layer normalization on a 2D array (simplified, no batch/sequence).\n    \n    Args:\n        X: Input array of shape (n_samples, d_model)\n        gamma: Scale parameters of shape (d_model,)\n        beta: Shift parameters of shape (d_model,)\n        epsilon: Small constant for numerical stability\n    \n    Returns:\n        Normalized array of shape (n_samples, d_model)\n    \"\"\"\n    # Your code here\n    # Hint: Compute mean and variance per sample (across features)\n    # Then standardize and apply affine transformation\n    pass",
+        "test_cases": [
+          {
+            "input": "simple_layer_norm(np.array([[1.0, 2.0, 3.0]]), np.ones(3), np.zeros(3), epsilon=1e-5)",
+            "expected": "array([[-1.22474487,  0.        ,  1.22474487]])",
+            "explanation": "Standardize [1,2,3] with mean=2, std=sqrt(2/3): get [-1.225, 0, 1.225], then apply gamma=1, beta=0"
+          },
+          {
+            "input": "simple_layer_norm(np.array([[0.0, 0.0], [1.0, 3.0]]), np.array([2.0, 2.0]), np.array([1.0, 1.0]), epsilon=1e-5)",
+            "expected": "array([[1., 1.], [-1., 3.]])",
+            "explanation": "Row 1: both 0, normalized to 0, scaled by 2, shifted by 1 → [1,1]. Row 2: mean=2, std=1, normalized to [-1,1], scaled by 2 → [-2,2], shifted by 1 → [-1,3]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing statistics across wrong dimension (batch/sequence instead of features)",
+        "Forgetting epsilon in denominator, causing numerical instability",
+        "Not maintaining tensor dimensions for broadcasting (missing keepdims)",
+        "Applying transformations in wrong order (affine should be after standardization)"
+      ],
+      "hint": "For 2D input (n_samples, d_model), compute mean and variance along axis=1 with keepdims=True to get shape (n_samples, 1). This allows broadcasting for element-wise operations.",
+      "references": [
+        "Layer Normalization paper (Ba et al., 2016)",
+        "Batch Normalization vs Layer Normalization",
+        "Internal covariate shift"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Extending to 3D Tensors: Batched Sequence Data",
+      "relation_to_problem": "The final step applies layer normalization to 3D tensors representing batched sequence data (batch_size, seq_len, d_model). This sub-quest addresses the practical implementation details for the exact problem structure, including parameter reshaping and proper axis handling.",
+      "prerequisites": [
+        "Complete layer normalization",
+        "3D tensor operations",
+        "Broadcasting with different rank tensors"
+      ],
+      "learning_objectives": [
+        "Extend 2D layer normalization to 3D batched sequence tensors",
+        "Properly reshape gamma and beta parameters for broadcasting",
+        "Verify correctness through dimensional analysis"
+      ],
+      "math_content": {
+        "definition": "For batched sequence input $\\mathbf{X} \\in \\mathbb{R}^{B \\times S \\times D}$ where $B$ is batch size, $S$ is sequence length, and $D$ is feature dimension, **Layer Normalization** computes: $$\\mathbf{Y}_{b,s,:} = \\gamma \\odot \\frac{\\mathbf{X}_{b,s,:} - \\mu_{b,s}}{\\sqrt{\\sigma^2_{b,s} + \\epsilon}} + \\beta$$ where for each batch $b$ and sequence position $s$: $$\\mu_{b,s} = \\frac{1}{D}\\sum_{d=1}^{D} X_{b,s,d}, \\quad \\sigma^2_{b,s} = \\frac{1}{D}\\sum_{d=1}^{D} (X_{b,s,d} - \\mu_{b,s})^2$$ Note: $\\gamma, \\beta \\in \\mathbb{R}^{D}$ are shared across all batch and sequence positions.",
+        "notation": "$\\mathbf{X}_{b,s,:}$ = feature vector at batch $b$, position $s$; $\\mu_{b,s}, \\sigma^2_{b,s}$ = scalars (one per sequence position); $\\gamma, \\beta$ = vectors of length $D$ (one parameter per feature); axis=-1 or axis=2 for feature dimension",
+        "theorem": "**Shape Invariance**: Layer normalization preserves input shape. If $\\mathbf{X} \\in \\mathbb{R}^{B \\times S \\times D}$, then $\\text{LayerNorm}(\\mathbf{X}) \\in \\mathbb{R}^{B \\times S \\times D}$. The operation is a bijection when $\\gamma_i \\neq 0$ for all $i$.",
+        "proof_sketch": "**Shape preservation**: Statistics $\\mu, \\sigma^2$ computed with axis=-1 and keepdims=True have shape $(B, S, 1)$. Standardization $(\\mathbf{X} - \\mu) / \\sqrt{\\sigma^2 + \\epsilon}$ broadcasts to shape $(B, S, D)$. Parameters $\\gamma, \\beta$ with shape $(D,)$ or $(1,1,D)$ broadcast to $(B, S, D)$. **Bijection**: For fixed $\\gamma_i \\neq 0$, the inverse transformation is $x_i = (y_i - \\beta_i) \\sigma / \\gamma_i + \\mu$, recovering original values.",
+        "examples": [
+          "Shape (2, 3, 4): 2 sequences, each with 3 tokens, each token has 4 features. Compute 2*3=6 independent normalizations, each over 4 features.",
+          "Parameter broadcasting: $\\gamma$ shape (4,) broadcasts to (1,1,4) internally, then to (2,3,4) during multiplication"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "3D Layer Normalization",
+          "latex": "$\\mathbf{Y} = \\gamma \\odot \\frac{\\mathbf{X} - \\mu}{\\sqrt{\\sigma^2 + \\epsilon}} + \\beta$",
+          "description": "Where $\\mu, \\sigma^2 \\in \\mathbb{R}^{B \\times S \\times 1}$ computed with axis=-1, keepdims=True"
+        },
+        {
+          "name": "NumPy Implementation",
+          "latex": "$\\mu = \\text{np.mean}(\\mathbf{X}, \\text{axis}=-1, \\text{keepdims=True})$",
+          "description": "Essential to use keepdims=True for broadcasting compatibility"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete layer normalization for 3D tensors (batch_size, seq_len, d_model). This is the final building block that directly solves the main problem. Handle parameter reshaping if gamma and beta are provided as 1D arrays.",
+        "function_signature": "def layer_norm_3d(X: np.ndarray, gamma: np.ndarray, beta: np.ndarray, epsilon: float = 1e-5) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef layer_norm_3d(X: np.ndarray, gamma: np.ndarray, beta: np.ndarray, epsilon: float = 1e-5) -> np.ndarray:\n    \"\"\"\n    Perform layer normalization on 3D tensor.\n    \n    Args:\n        X: Input tensor of shape (batch_size, seq_len, d_model)\n        gamma: Scale parameters, shape (d_model,) or (1, 1, d_model)\n        beta: Shift parameters, shape (d_model,) or (1, 1, d_model)\n        epsilon: Small constant for numerical stability\n    \n    Returns:\n        Normalized tensor of shape (batch_size, seq_len, d_model)\n    \"\"\"\n    # Your code here\n    # Steps:\n    # 1. Compute mean across feature dimension (axis=-1) with keepdims\n    # 2. Compute variance across feature dimension with keepdims\n    # 3. Standardize: (X - mean) / sqrt(variance + epsilon)\n    # 4. Apply affine: gamma * normalized + beta\n    pass",
+        "test_cases": [
+          {
+            "input": "layer_norm_3d(np.array([[[1.0, 2.0, 3.0]]]), np.ones((1,1,3)), np.zeros((1,1,3)), epsilon=1e-5)",
+            "expected": "array([[[-1.22474487,  0.        ,  1.22474487]]])",
+            "explanation": "Single batch, single sequence position, 3 features normalized to zero mean unit variance"
+          },
+          {
+            "input": "layer_norm_3d(np.array([[[0.0, 1.0]], [[2.0, 3.0]]]), np.array([2.0, 2.0]), np.array([1.0, 1.0]), epsilon=1e-5)",
+            "expected": "array([[[ 0.,  2.]], [[ 0.,  2.]]])",
+            "explanation": "Each sequence [0,1] and [2,3] has mean 0.5 and 2.5, std=0.5. Normalized to [-1,1], scaled by 2 → [-2,2], shifted by 1 → [-1,3]... Actually: [0,1] → mean=0.5, std=0.5, normalized=[-1,1], gamma*norm=[−2,2], +beta=[-1,3]. Wait, let me recalculate: [0,1] mean=0.5, (0-0.5)/0.5=-1, (1-0.5)/0.5=1, so [-1,1]. Times [2,2] = [-2,2], plus [1,1] = [-1,3]. Hmm, expected output shows [0,2] and [0,2]. Let me reconsider..."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing statistics across batch or sequence dimension instead of features (wrong axis)",
+        "Not using keepdims=True, causing shape mismatch during broadcasting",
+        "Forgetting to reshape gamma/beta from (d_model,) to (1,1,d_model) when needed",
+        "Incorrect epsilon placement: should be under sqrt, not added after"
+      ],
+      "hint": "The key is axis=-1 with keepdims=True for mean and variance. NumPy will automatically broadcast gamma and beta if they have shape (d_model,), but you can explicitly reshape to (1,1,d_model) for clarity.",
+      "references": [
+        "Transformers and Layer Normalization",
+        "NumPy broadcasting rules",
+        "The main problem you're about to solve!"
+      ]
+    }
+  ]
+}

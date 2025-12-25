@@ -1,0 +1,35 @@
+{
+  "description": "SW1wbGVtZW50IGFuIGVmZmljaWVudCBtZXRob2QgdG8gdXBkYXRlIHRoZSBtZWFuIHJld2FyZCBmb3IgYSBrLWFybWVkIGJhbmRpdCBhY3Rpb24gYWZ0ZXIgcmVjZWl2aW5nIGVhY2ggbmV3IHJld2FyZCwgKip3aXRob3V0IHN0b3JpbmcgdGhlIGZ1bGwgaGlzdG9yeSBvZiByZXdhcmRzKiouIEdpdmVuIHRoZSBwcmV2aW91cyBtZWFuIGVzdGltYXRlIChRX3ByZXYpLCB0aGUgbnVtYmVyIG9mIHRpbWVzIHRoZSBhY3Rpb24gaGFzIGJlZW4gc2VsZWN0ZWQgKGspLCBhbmQgYSBuZXcgcmV3YXJkIChSKSwgY29tcHV0ZSB0aGUgdXBkYXRlZCBtZWFuIHVzaW5nIHRoZSBpbmNyZW1lbnRhbCBmb3JtdWxhLgoKKipOb3RlOioqIFVzaW5nIGEgcmVndWxhciBtZWFuIHRoYXQgc3RvcmVzIGFsbCBwYXN0IHJld2FyZHMgd2lsbCBldmVudHVhbGx5IHJ1biBvdXQgb2YgbWVtb3J5LiBZb3VyIHNvbHV0aW9uIHNob3VsZCB1c2Ugb25seSB0aGUgcHJldmlvdXMgbWVhbiwgdGhlIGNvdW50LCBhbmQgdGhlIG5ldyByZXdhcmQu",
+  "id": "159",
+  "test_cases": [
+    {
+      "test": "Q = 0.0\nk = 1\nR = 5.0\nprint(round(incremental_mean(Q, k, R), 4))",
+      "expected_output": "5.0"
+    },
+    {
+      "test": "Q = 5.0\nk = 2\nR = 7.0\nprint(round(incremental_mean(Q, k, R), 4))",
+      "expected_output": "6.0"
+    }
+  ],
+  "difficulty": "medium",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "Q_prev = 2.0\nk = 2\nR = 6.0\nnew_Q = incremental_mean(Q_prev, k, R)\nprint(round(new_Q, 2))",
+    "output": "4.0",
+    "reasoning": "The updated mean is Q_prev + (1/k) * (R - Q_prev) = 2.0 + (1/2)*(6.0 - 2.0) = 2.0 + 2.0 = 4.0"
+  },
+  "category": "Reinforcement Learning",
+  "starter_code": "def incremental_mean(Q_prev, k, R):\n    \"\"\"\n    Q_prev: previous mean estimate (float)\n    k: number of times the action has been selected (int)\n    R: new observed reward (float)\n    Returns: new mean estimate (float)\n    \"\"\"\n    # Your code here\n    pass\n",
+  "title": "Incremental Mean for Online Reward Estimation",
+  "learn_section": "IyMjIEluY3JlbWVudGFsIE1lYW4gVXBkYXRlIFJ1bGUKClRoZSBpbmNyZW1lbnRhbCBtZWFuIGZvcm11bGEgbGV0cyB5b3UgdXBkYXRlIHlvdXIgZXN0aW1hdGUgb2YgdGhlIG1lYW4gYWZ0ZXIgZWFjaCBuZXcgb2JzZXJ2YXRpb24sICoqd2l0aG91dCBrZWVwaW5nIGFsbCBwcmV2aW91cyByZXdhcmRzIGluIG1lbW9yeSoqLiBGb3IgdGhlIGstdGggcmV3YXJkICRSX2skIGFuZCBwcmV2aW91cyBlc3RpbWF0ZSAkUV97a30kOgoKJCQKUV97aysxfSA9IFFfayArIFxmcmFjezF9e2t9IChSX2sgLSBRX2spCiQkCgpUaGlzIHNhdmVzIG1lbW9yeSBjb21wYXJlZCB0byB0aGUgcmVndWxhciBtZWFuLCB3aGljaCByZXF1aXJlcyBzdG9yaW5nIGFsbCBwYXN0IHJld2FyZHMgYW5kIHJlY2FsY3VsYXRpbmcgZWFjaCB0aW1lLiBUaGUgaW5jcmVtZW50YWwgcnVsZSBpcyBjcnVjaWFsIGZvciBvbmxpbmUgbGVhcm5pbmcgYW5kIGxhcmdlLXNjYWxlIHByb2JsZW1zIHdoZXJlIHN0b3JpbmcgYWxsIGRhdGEgaXMgaW1wcmFjdGljYWwu",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/moe18",
+      "name": "Moe Chabot"
+    }
+  ],
+  "description_decoded": "Implement an efficient method to update the mean reward for a k-armed bandit action after receiving each new reward, **without storing the full history of rewards**. Given the previous mean estimate (Q_prev), the number of times the action has been selected (k), and a new reward (R), compute the updated mean using the incremental formula.\n\n**Note:** Using a regular mean that stores all past rewards will eventually run out of memory. Your solution should use only the previous mean, the count, and the new reward.",
+  "learn_section_decoded": "### Incremental Mean Update Rule\n\nThe incremental mean formula lets you update your estimate of the mean after each new observation, **without keeping all previous rewards in memory**. For the k-th reward $R_k$ and previous estimate $Q_{k}$:\n\n$$\nQ_{k+1} = Q_k + \\frac{1}{k} (R_k - Q_k)\n$$\n\nThis saves memory compared to the regular mean, which requires storing all past rewards and recalculating each time. The incremental rule is crucial for online learning and large-scale problems where storing all data is impractical."
+}

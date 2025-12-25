@@ -1,0 +1,60 @@
+{
+  "description": "Q29tcHV0ZSB0aGUgbWVhbiBFbmQtUG9pbnQgRXJyb3IgKEVQRSkgYmV0d2VlbiBhIHByZWRpY3RlZCBvcHRpY2FsIGZsb3cgZmllbGQgYW5kIGl0cyBncm91bmQtdHJ1dGgsIG9wdGlvbmFsbHkgdXNpbmcgYW4gb2NjbHVzaW9uL3ZhbGlkaXR5IG1hc2sgYW5kIGFuIG91dGxpZXIgY2xpcCAobWF4X2Zsb3cpLiBZb3VyIGZ1bmN0aW9uIHNob3VsZCBpZ25vcmUgaW52YWxpZCB2YWx1ZXMgKE5hTi/CsUluZiksIHN1cHBvcnQgUHl0aG9uIGxpc3RzIG9yIE51bVB5IGFycmF5cyB3aXRoIHNoYXBlIChILCBXLCAyKSwgYW5kIHJldHVybiAtMSBpZiBpbnB1dHMgYXJlIG1hbGZvcm1lZCBvciBubyB2YWxpZCBwaXhlbHMgcmVtYWluLg==",
+  "id": "185",
+  "test_cases": [
+    {
+      "test": "print(round(flow_epe([[[1,0],[0,1]], [[-1,0],[0,-1]]],\n                       [[[0,0],[0,0]], [[0,0],[0,0]]]), 4))",
+      "expected_output": "1.0"
+    },
+    {
+      "test": "pred = [[[2,0],[0,2]], [[3,4],[0,0]]]\ngt   = [[[0,0],[0,0]], [[0,0],[0,0]]]\nmask = [[0,1],[1,0]]  # include (0,1) and (1,0)\nprint(round(flow_epe(pred, gt, mask=mask), 4))",
+      "expected_output": "3.5"
+    }
+  ],
+  "difficulty": "medium",
+  "pytorch_difficulty": "medium",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "pred = [[[1,0],[0,1]], [[-1,0],[0,-1]]]; gt = [[[0,0],[0,0]], [[0,0],[0,0]]]\nprint(round(flow_epe(pred, gt), 4))",
+    "output": "1.0",
+    "reasoning": "Each of the four pixels has EPE = 1, so the mean is 1.0."
+  },
+  "category": "Computer Vision",
+  "pytorch_starter_code": "aW1wb3J0IHRvcmNoCgpkZWYgZmxvd19lcGVfdG9yY2gocHJlZCwgZ3QsIG1hc2s9Tm9uZSwgbWF4X2Zsb3c9Tm9uZSkgLT4gdG9yY2guVGVuc29yOgogICAgIiIiCiAgICBDb21wdXRlIG1lYW4gRW5kLVBvaW50IEVycm9yIChFUEUpIGJldHdlZW4gcHJlZGljdGVkIGFuZCBncm91bmQtdHJ1dGggb3B0aWNhbCBmbG93LgoKICAgIEFyZ3M6CiAgICAgICAgcHJlZCwgZ3Q6IHRlbnNvcnMgb3IgYXJyYXktbGlrZXMgb2Ygc2hhcGUgKEgsIFcsIDIpLgogICAgICAgIG1hc2s6IG9wdGlvbmFsIHRlbnNvci9hcnJheSBicm9hZGNhc3RhYmxlIHRvIChILCBXKTsgMT1pbmNsdWRlLCAwPWlnbm9yZS4KICAgICAgICBtYXhfZmxvdzogb3B0aW9uYWwgZmxvYXQgdG8gY2xpcCBwZXItcGl4ZWwgRVBFLgoKICAgIFJldHVybnM6CiAgICAgICAgdG9yY2guVGVuc29yIHNjYWxhci4gUmV0dXJucyB0ZW5zb3IoLTEuMCkgb24gaW52YWxpZCBpbnB1dCBvciBpZiBubyB2YWxpZCBwaXhlbHMuCiAgICAiIiIKICAgIHAgPSB0b3JjaC5hc190ZW5zb3IocHJlZCwgZHR5cGU9dG9yY2guZmxvYXQzMikKICAgIGcgPSB0b3JjaC5hc190ZW5zb3IoZ3QsICAgZHR5cGU9dG9yY2guZmxvYXQzMikKCiAgICAjIFlvdXIgaW1wbGVtZW50YXRpb24gaGVyZQogICAgcGFzcw==",
+  "title": "Optical Flow EPE with Masks (OmniWorld-style metric)",
+  "createdAt": "September 21, 2025 at 12:54:29 PM UTUTC-4",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/moe18",
+      "name": "moe"
+    }
+  ],
+  "pytorch_test_cases": [
+    {
+      "test": "import torch\npred = torch.tensor([[[1.,0.],[0.,1.]], [[-1.,0.],[0.,-1.]]])\ngt   = torch.zeros_like(pred)\nprint(round(flow_epe_torch(pred, gt).item(), 4))",
+      "expected_output": "1.0"
+    },
+    {
+      "test": "import torch\npred = torch.tensor([[[2.,0.],[0.,2.]], [[3.,4.],[0.,0.]]])\ngt   = torch.zeros_like(pred)\nmask = torch.tensor([[0,1],[1,0]])\nprint(round(flow_epe_torch(pred, gt, mask=mask).item(), 4))",
+      "expected_output": "3.5"
+    },
+    {
+      "test": "import torch\n# Seeded but identical inputs -> zero error\ntorch.manual_seed(123)\nx = torch.randn(2,2,2)\nprint(round(flow_epe_torch(x, x).item(), 4))",
+      "expected_output": "0.0"
+    },
+    {
+      "test": "import torch\n# Seeded random with known offset -> constant EPE\ntorch.manual_seed(7)\nx = torch.randn(1,1,2)\ny = x + torch.tensor([3.0, 4.0])\nprint(round(flow_epe_torch(x, y).item(), 4))",
+      "expected_output": "5.0"
+    },
+    {
+      "test": "import torch\n# Outlier clipping\npred = torch.tensor([[[10.,0.],[1.,0.]], [[1.,0.],[1.,0.]]])\ngt   = torch.zeros_like(pred)\nprint(round(flow_epe_torch(pred, gt, max_flow=5).item(), 4))",
+      "expected_output": "2.0"
+    }
+  ],
+  "learn_section": "IyMgV2h5IHRoaXMgbWF0dGVycwpJbiA0RCB3b3JsZCBtb2RlbGluZyAoc3BhdGlvLXRlbXBvcmFsIHVuZGVyc3RhbmRpbmcpLCBkYXRhc2V0cyBsaWtlICoqT21uaVdvcmxkKiogcHJvdmlkZSBtdWx0aS1tb2RhbCBzdXBlcnZpc2lvbiAoUkdCLCBkZXB0aCwgcG9zZXMsIG9wdGljYWwgZmxvdywgbWFza3MpLiBPcHRpY2FsIGZsb3cgY29tcGFyZXMgcGl4ZWwgbW90aW9uIGJldHdlZW4gZnJhbWVzOyBhY2N1cmF0ZSBmbG93IGlzIHZpdGFsIGZvciBjYW1lcmEtY29udHJvbGxlZCB2aWRlbyBnZW5lcmF0aW9uIGFuZCBnZW9tZXRyeS1hd2FyZSBtb2RlbGluZy4KCiMjIE9wdGljYWwgRmxvdyAmIEVQRQpHaXZlbiBwcmVkaWN0ZWQgZmxvdyAkXGhhdHtcbWF0aGJme2Z9fSh4LHkpID0gW3VfcCwgdl9wXSQgYW5kIGdyb3VuZC10cnV0aCBmbG93ICRcbWF0aGJme2Z9KHgseSkgPSBbdV9nLCB2X2ddJCwgdGhlICoqRW5kLVBvaW50IEVycm9yIChFUEUpKiogYXQgcGl4ZWwgJCh4LHkpJCBpcyB0aGUgRXVjbGlkZWFuIGRpc3RhbmNlOgokJApcb3BlcmF0b3JuYW1le0VQRX0oeCx5KSA9IFxzcXJ0eyh1X3AgLSB1X2cpXjIgKyAodl9wIC0gdl9nKV4yfS4KJCQKVGhlICoqbWVhbiBFUEUqKiBvdmVyIHZhbGlkIHBpeGVscyAkXE9tZWdhJCBpczoKJCQKXG92ZXJsaW5le1xvcGVyYXRvcm5hbWV7RVBFfX0gPSBcZnJhY3sxfXt8XE9tZWdhfH0gXHN1bV97KHgseSlcaW5cT21lZ2F9IFxvcGVyYXRvcm5hbWV7RVBFfSh4LHkpLgokJAoKIyMjIFZhbGlkaXR5ICYgTWFza3MKLSAqKk1hc2tzKio6IEEgYmluYXJ5IG1hc2sgJE0oeCx5KSBcaW4gXHswLDFcfSQgaW5kaWNhdGVzIHdoZXRoZXIgYSBwaXhlbCBzaG91bGQgYmUgaW5jbHVkZWQgKDEpIG9yIGlnbm9yZWQgKDApLgotICoqSW52YWxpZCB2YWx1ZXMqKjogUGl4ZWxzIHdoZXJlIGVpdGhlciBwcmVkaWN0aW9uIG9yIGdyb3VuZC10cnV0aCBjb250YWlucyBOYU4vSW5mIHNob3VsZCBiZSBleGNsdWRlZC4KLSAqKkNsaXBwaW5nIChvcHRpb25hbCkqKjogVG8gcmVkdWNlIG91dGxpZXIgaW5mbHVlbmNlLCB5b3UgbWF5IGNhcCBlYWNoIHBlci1waXhlbCBFUEUgd2l0aCBhIHRocmVzaG9sZCAkXHRhdSQ6ICRcbWluKFxvcGVyYXRvcm5hbWV7RVBFfSwgXHRhdSkkLgoKIyMgUmVwcm9kdWNpYmlsaXR5IGluIHRlc3RzCldoZW4gcmFuZG9tbmVzcyBpcyB1c2VkIHRvIHN5bnRoZXNpemUgc21hbGwgaW5wdXRzLCBmaXggc2VlZHMgZm9yIGRldGVybWluaXNtOgotICoqTnVtUHkqKjogYG5wLnJhbmRvbS5zZWVkKDQyKWAKLSAqKlB5VG9yY2gqKjogYHRvcmNoLm1hbnVhbF9zZWVkKDQyKWAKLSAqKlRpbnlncmFkKio6IHNlZWQgTnVtUHkvUHl0aG9uIGFuZCB3cmFwIGFycmF5cyB3aXRoIGBUZW5zb3IoLi4uKWAuCgpSb3VuZCBmaW5hbCBwcmludGVkIHJlc3VsdHMgdXNpbmcgYHJvdW5kKHZhbHVlLCBrKWAgdG8gbWF0Y2ggZXhwZWN0ZWQgb3V0cHV0cy4=",
+  "starter_code": "from typing import Optional, Union\n\ntry:\n    import numpy as np\nexcept Exception:\n    np = None\n\nArrayLike = Union[list, \"np.ndarray\"]\n\ndef flow_epe(pred: ArrayLike,\n             gt: ArrayLike,\n             mask: Optional[ArrayLike] = None,\n             max_flow: Optional[float] = None) -> float:\n    \"\"\"\n    Compute mean End-Point Error (EPE) between predicted and ground-truth optical flow.\n\n    Args:\n        pred, gt: (H, W, 2) lists or NumPy arrays.\n        mask: optional (H, W) or broadcastable to (H, W); 1=include, 0=ignore.\n        max_flow: optional float; clip per-pixel EPE to this value.\n\n    Returns:\n        float: mean EPE over valid pixels. Returns -1 on invalid input or if no valid pixels.\n    \"\"\"\n    # Your implementation here\n    pass",
+  "description_decoded": "Compute the mean End-Point Error (EPE) between a predicted optical flow field and its ground-truth, optionally using an occlusion/validity mask and an outlier clip (max_flow). Your function should ignore invalid values (NaN/±Inf), support Python lists or NumPy arrays with shape (H, W, 2), and return -1 if inputs are malformed or no valid pixels remain.",
+  "learn_section_decoded": "## Why this matters\nIn 4D world modeling (spatio-temporal understanding), datasets like **OmniWorld** provide multi-modal supervision (RGB, depth, poses, optical flow, masks). Optical flow compares pixel motion between frames; accurate flow is vital for camera-controlled video generation and geometry-aware modeling.\n\n## Optical Flow & EPE\nGiven predicted flow $\\hat{\\mathbf{f}}(x,y) = [u_p, v_p]$ and ground-truth flow $\\mathbf{f}(x,y) = [u_g, v_g]$, the **End-Point Error (EPE)** at pixel $(x,y)$ is the Euclidean distance:\n$$\n\\operatorname{EPE}(x,y) = \\sqrt{(u_p - u_g)^2 + (v_p - v_g)^2}.\n$$\nThe **mean EPE** over valid pixels $\\Omega$ is:\n$$\n\\overline{\\operatorname{EPE}} = \\frac{1}{|\\Omega|} \\sum_{(x,y)\\in\\Omega} \\operatorname{EPE}(x,y).\n$$\n\n### Validity & Masks\n- **Masks**: A binary mask $M(x,y) \\in \\{0,1\\}$ indicates whether a pixel should be included (1) or ignored (0).\n- **Invalid values**: Pixels where either prediction or ground-truth contains NaN/Inf should be excluded.\n- **Clipping (optional)**: To reduce outlier influence, you may cap each per-pixel EPE with a threshold $\\tau$: $\\min(\\operatorname{EPE}, \\tau)$.\n\n## Reproducibility in tests\nWhen randomness is used to synthesize small inputs, fix seeds for determinism:\n- **NumPy**: `np.random.seed(42)`\n- **PyTorch**: `torch.manual_seed(42)`\n- **Tinygrad**: seed NumPy/Python and wrap arrays with `Tensor(...)`.\n\nRound final printed results using `round(value, k)` to match expected outputs."
+}

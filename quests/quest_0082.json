@@ -1,0 +1,492 @@
+{
+  "problem_id": 82,
+  "title": "Grayscale Image Contrast Calculator",
+  "category": "Computer Vision",
+  "difficulty": "easy",
+  "description": "Write a Python function to calculate the contrast of a grayscale image using the difference between the maximum and minimum pixel values.",
+  "example": {
+    "input": "img = np.array([[0, 50], [200, 255]])",
+    "output": "255",
+    "reasoning": "The function calculates contrast by finding the difference between the maximum (255) and minimum (0) pixel values in the image, resulting in a contrast of 255."
+  },
+  "starter_code": "import numpy as np\n\ndef calculate_contrast(img) -> int:\n\t\"\"\"\n\tCalculate the contrast of a grayscale image.\n\tArgs:\n\t\timg (numpy.ndarray): 2D array representing a grayscale image with pixel values between 0 and 255.\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Grayscale Image Representation and Pixel Values",
+      "relation_to_problem": "This concept establishes the foundational understanding of how grayscale images are represented as 2D arrays with discrete pixel values, which is essential for performing any mathematical operations on images including contrast calculation.",
+      "prerequisites": [
+        "Basic Python",
+        "Arrays/Matrices",
+        "Integer data types"
+      ],
+      "learning_objectives": [
+        "Understand how grayscale images are represented as 2D matrices",
+        "Identify valid pixel value ranges in 8-bit grayscale images",
+        "Access individual pixel values in a matrix representation",
+        "Distinguish between image dimensions and pixel intensity values"
+      ],
+      "math_content": {
+        "definition": "A grayscale image $I$ is formally represented as a discrete function $I: \\Omega \\to [0, L-1]$, where $\\Omega = \\{(i,j) | 0 \\leq i < M, 0 \\leq j < N\\}$ is the image domain with height $M$ and width $N$, and $L$ represents the number of distinct intensity levels. For 8-bit images, $L = 256$, giving pixel values in the range $[0, 255]$.",
+        "notation": "$I(i,j)$ = intensity value at pixel position $(i,j)$; $M$ = number of rows (height); $N$ = number of columns (width); $L$ = number of intensity levels (256 for 8-bit)",
+        "theorem": "**Discrete Image Representation Theorem**: Any continuous 2D luminance function can be approximated by a finite matrix of discrete intensity values through spatial and intensity quantization. The approximation error decreases as spatial resolution ($M \\times N$) and intensity resolution ($L$) increase.",
+        "proof_sketch": "Consider a continuous luminance function $f(x,y)$ defined on domain $[0,a] \\times [0,b]$. By sampling at regular intervals $\\Delta x = a/N$ and $\\Delta y = b/M$, we obtain discrete samples $f(i\\Delta y, j\\Delta x)$. Intensity quantization maps each continuous value to the nearest level in $\\{0, 1, ..., L-1\\}$. The resulting discrete representation $I(i,j)$ approximates $f(x,y)$ with bounded error proportional to $1/M$, $1/N$, and $1/L$.",
+        "examples": [
+          "A 2×2 grayscale image: $I = \\begin{bmatrix} 0 & 50 \\\\ 200 & 255 \\end{bmatrix}$ has $M=2$, $N=2$, with $I(0,0)=0$, $I(0,1)=50$, $I(1,0)=200$, $I(1,1)=255$",
+          "A uniform grayscale image with all pixels at mid-gray: $I(i,j) = 128$ for all $(i,j) \\in \\Omega$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Pixel Value Domain",
+          "latex": "$I(i,j) \\in [0, 255] \\cap \\mathbb{Z}$",
+          "description": "All pixel values must be integers in the range 0 to 255 for 8-bit grayscale images"
+        },
+        {
+          "name": "Image Dimensions",
+          "latex": "$I \\in \\mathbb{Z}^{M \\times N}$",
+          "description": "The image is a matrix of integers with M rows and N columns"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that validates and extracts basic properties of a grayscale image matrix. Given a numpy array, determine if it represents a valid grayscale image, and return its dimensions and the pixel value at a specified position.",
+        "function_signature": "def get_pixel_info(img: np.ndarray, row: int, col: int) -> dict:",
+        "starter_code": "import numpy as np\n\ndef get_pixel_info(img: np.ndarray, row: int, col: int) -> dict:\n    \"\"\"\n    Extract basic information about a grayscale image.\n    Args:\n        img: 2D numpy array representing grayscale image\n        row: row index to query\n        col: column index to query\n    Returns:\n        Dictionary with keys: 'height', 'width', 'pixel_value'\n        Returns None if indices are out of bounds\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "get_pixel_info(np.array([[0, 50], [200, 255]]), 1, 1)",
+            "expected": "{'height': 2, 'width': 2, 'pixel_value': 255}",
+            "explanation": "The image is 2×2, and the pixel at position (1,1) has value 255"
+          },
+          {
+            "input": "get_pixel_info(np.array([[100, 150, 200]]), 0, 2)",
+            "expected": "{'height': 1, 'width': 3, 'pixel_value': 200}",
+            "explanation": "The image is 1×3 (single row), and pixel at (0,2) is 200"
+          },
+          {
+            "input": "get_pixel_info(np.array([[10, 20], [30, 40]]), 2, 0)",
+            "expected": "None",
+            "explanation": "Row index 2 is out of bounds for a 2×2 image (valid indices are 0-1)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing image dimensions (M×N) with pixel values (0-255)",
+        "Using 1-based indexing instead of 0-based indexing for pixel positions",
+        "Not validating that pixel values are in the valid range [0, 255]",
+        "Assuming all numpy arrays are valid grayscale images without checking dimensions"
+      ],
+      "hint": "Use numpy's .shape attribute to get dimensions, and check bounds before accessing array elements",
+      "references": [
+        "Digital Image Processing fundamentals",
+        "NumPy array indexing",
+        "Matrix notation in linear algebra"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Finding Maximum Elements in Discrete Sets",
+      "relation_to_problem": "Computing the maximum pixel value is one of the two critical operations needed for the basic contrast formula $\\text{Contrast} = \\max(I) - \\min(I)$. Understanding extrema in discrete sets provides the mathematical foundation for this operation.",
+      "prerequisites": [
+        "Set theory basics",
+        "Order relations",
+        "Array traversal"
+      ],
+      "learning_objectives": [
+        "Define maximum elements in finite ordered sets formally",
+        "Compute maximum values in multi-dimensional arrays",
+        "Understand the relationship between global and local maxima",
+        "Apply supremum concepts to discrete integer sets"
+      ],
+      "math_content": {
+        "definition": "Let $S$ be a non-empty finite subset of $\\mathbb{R}$. An element $m \\in S$ is called the **maximum** of $S$ if $m \\geq x$ for all $x \\in S$. We denote this as $m = \\max(S) = \\max_{x \\in S} x$. For a grayscale image $I$, the global maximum is $I_{\\max} = \\max_{(i,j) \\in \\Omega} I(i,j)$.",
+        "notation": "$\\max(S)$ = maximum element of set $S$; $I_{\\max}$ = maximum pixel value in image $I$; $\\sup(S)$ = supremum (least upper bound) of $S$",
+        "theorem": "**Maximum Existence Theorem for Finite Sets**: Every non-empty finite subset $S$ of $\\mathbb{R}$ has a maximum element. Furthermore, for finite sets, $\\max(S) = \\sup(S)$, and the maximum is always attained (i.e., $\\exists x \\in S$ such that $x = \\max(S)$).",
+        "proof_sketch": "Proof by strong induction: Base case: If $|S|=1$, then $S=\\{x\\}$ and clearly $\\max(S)=x$. Inductive step: Assume the theorem holds for all sets with $n$ elements. For $S$ with $n+1$ elements, write $S = S' \\cup \\{x\\}$ where $|S'|=n$. By hypothesis, $m' = \\max(S')$ exists. Then $\\max(S) = \\max(m', x)$, which exists and is in $S$. By finite induction, the result holds for all finite sets.",
+        "examples": [
+          "For $S = \\{0, 50, 200, 255\\}$, we have $\\max(S) = 255$ since $255 \\geq x$ for all $x \\in S$",
+          "For image $I = \\begin{bmatrix} 10 & 30 \\\\ 20 & 25 \\end{bmatrix}$, the maximum $I_{\\max} = \\max\\{10, 30, 20, 25\\} = 30$",
+          "For a constant image where $I(i,j) = c$ for all pixels, $I_{\\max} = c$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Global Maximum Definition",
+          "latex": "$I_{\\max} = \\max_{(i,j) \\in \\Omega} I(i,j) = \\max\\{I(i,j) : 0 \\leq i < M, 0 \\leq j < N\\}$",
+          "description": "The maximum pixel value across the entire image domain"
+        },
+        {
+          "name": "Maximum Property",
+          "latex": "$I_{\\max} \\geq I(i,j)$ for all $(i,j) \\in \\Omega$",
+          "description": "The maximum value is greater than or equal to every pixel value"
+        },
+        {
+          "name": "Maximum Bound",
+          "latex": "$0 \\leq I_{\\max} \\leq 255$",
+          "description": "For 8-bit grayscale images, the maximum must be in the valid pixel range"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that finds the maximum pixel value in a grayscale image matrix. Additionally, return the coordinates (row, col) where this maximum value first occurs.",
+        "function_signature": "def find_max_pixel(img: np.ndarray) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef find_max_pixel(img: np.ndarray) -> tuple:\n    \"\"\"\n    Find the maximum pixel value in a grayscale image.\n    Args:\n        img: 2D numpy array representing grayscale image\n    Returns:\n        Tuple (max_value, row, col) where max_value is the maximum\n        pixel intensity, and (row, col) is the position of the first\n        occurrence of this maximum\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "find_max_pixel(np.array([[0, 50], [200, 255]]))",
+            "expected": "(255, 1, 1)",
+            "explanation": "Maximum value is 255, located at position (1,1)"
+          },
+          {
+            "input": "find_max_pixel(np.array([[100, 100], [100, 100]]))",
+            "expected": "(100, 0, 0)",
+            "explanation": "All pixels equal 100, so maximum is 100 at first position (0,0)"
+          },
+          {
+            "input": "find_max_pixel(np.array([[50, 200, 150], [100, 75, 200]]))",
+            "expected": "(200, 0, 1)",
+            "explanation": "Maximum 200 appears twice; return first occurrence at (0,1)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the case where multiple pixels have the maximum value",
+        "Returning local maxima instead of the global maximum",
+        "Confusing maximum value with the position/index where it occurs",
+        "Not considering single-pixel or single-row/column images as edge cases"
+      ],
+      "hint": "NumPy provides functions to find both the maximum value and its position efficiently. Consider using np.max() and np.argmax() or their equivalents.",
+      "references": [
+        "Order theory and supremum",
+        "Array reduction operations",
+        "Extrema in discrete mathematics"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Finding Minimum Elements in Discrete Sets",
+      "relation_to_problem": "Computing the minimum pixel value completes the second critical operation for the basic contrast formula. Understanding minima provides the complementary mathematical foundation to maxima.",
+      "prerequisites": [
+        "Set theory basics",
+        "Order relations",
+        "Maximum element concepts"
+      ],
+      "learning_objectives": [
+        "Define minimum elements in finite ordered sets formally",
+        "Compute minimum values in multi-dimensional arrays",
+        "Relate minimum to infimum in discrete contexts",
+        "Apply duality between maximum and minimum operations"
+      ],
+      "math_content": {
+        "definition": "Let $S$ be a non-empty finite subset of $\\mathbb{R}$. An element $m \\in S$ is called the **minimum** of $S$ if $m \\leq x$ for all $x \\in S$. We denote this as $m = \\min(S) = \\min_{x \\in S} x$. For a grayscale image $I$, the global minimum is $I_{\\min} = \\min_{(i,j) \\in \\Omega} I(i,j)$.",
+        "notation": "$\\min(S)$ = minimum element of set $S$; $I_{\\min}$ = minimum pixel value in image $I$; $\\inf(S)$ = infimum (greatest lower bound) of $S$",
+        "theorem": "**Min-Max Duality Theorem**: For any finite non-empty set $S \\subset \\mathbb{R}$, we have $\\min(S) = -\\max(-S)$ where $-S = \\{-x : x \\in S\\}$. Additionally, for any finite set, $\\min(S) = \\inf(S)$ and the minimum is always attained. Furthermore, $\\min(S) \\leq \\max(S)$ with equality if and only if $|S| = 1$.",
+        "proof_sketch": "The existence of minimum follows by the same inductive argument as for maximum. For the duality relation: Let $m = \\min(S)$. Then $m \\leq x$ for all $x \\in S$, which implies $-m \\geq -x$ for all $x \\in S$, hence $-m \\geq y$ for all $y \\in -S$, thus $-m = \\max(-S)$, giving $m = -\\max(-S)$. For the inequality $\\min(S) \\leq \\max(S)$: both extrema exist and belong to $S$, so $\\min(S) \\leq \\min(S) \\leq \\max(S)$. Equality holds iff all elements of $S$ are equal.",
+        "examples": [
+          "For $S = \\{0, 50, 200, 255\\}$, we have $\\min(S) = 0$ since $0 \\leq x$ for all $x \\in S$",
+          "For image $I = \\begin{bmatrix} 10 & 30 \\\\ 20 & 25 \\end{bmatrix}$, the minimum $I_{\\min} = \\min\\{10, 30, 20, 25\\} = 10$",
+          "For a constant image where $I(i,j) = c$, we have $I_{\\min} = c = I_{\\max}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Global Minimum Definition",
+          "latex": "$I_{\\min} = \\min_{(i,j) \\in \\Omega} I(i,j) = \\min\\{I(i,j) : 0 \\leq i < M, 0 \\leq j < N\\}$",
+          "description": "The minimum pixel value across the entire image domain"
+        },
+        {
+          "name": "Minimum Property",
+          "latex": "$I_{\\min} \\leq I(i,j)$ for all $(i,j) \\in \\Omega$",
+          "description": "The minimum value is less than or equal to every pixel value"
+        },
+        {
+          "name": "Extrema Ordering",
+          "latex": "$0 \\leq I_{\\min} \\leq I_{\\max} \\leq 255$",
+          "description": "The minimum and maximum satisfy this ordering in valid grayscale images"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that finds the minimum pixel value in a grayscale image matrix and returns both the minimum and maximum values together, along with verification that they satisfy the ordering property.",
+        "function_signature": "def find_extrema(img: np.ndarray) -> dict:",
+        "starter_code": "import numpy as np\n\ndef find_extrema(img: np.ndarray) -> dict:\n    \"\"\"\n    Find both minimum and maximum pixel values in a grayscale image.\n    Args:\n        img: 2D numpy array representing grayscale image\n    Returns:\n        Dictionary with keys: 'min', 'max', 'valid_ordering'\n        where 'valid_ordering' is True if min <= max\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "find_extrema(np.array([[0, 50], [200, 255]]))",
+            "expected": "{'min': 0, 'max': 255, 'valid_ordering': True}",
+            "explanation": "Minimum is 0, maximum is 255, and 0 ≤ 255 is satisfied"
+          },
+          {
+            "input": "find_extrema(np.array([[128, 128], [128, 128]]))",
+            "expected": "{'min': 128, 'max': 128, 'valid_ordering': True}",
+            "explanation": "All pixels are 128, so min = max = 128, and equality satisfies the ordering"
+          },
+          {
+            "input": "find_extrema(np.array([[75]]))",
+            "expected": "{'min': 75, 'max': 75, 'valid_ordering': True}",
+            "explanation": "Single pixel image: min = max = 75"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not verifying the min ≤ max property after computation",
+        "Assuming minimum is always 0 or maximum is always 255 (not true for all images)",
+        "Confusing the positions/indices of minimum and maximum with their values",
+        "Not handling single-element arrays correctly"
+      ],
+      "hint": "Use NumPy's built-in functions for efficiency. The ordering property should always be true for valid images.",
+      "references": [
+        "Order theory and infimum",
+        "Duality in optimization",
+        "Array reduction operations"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Computing Differences and Ranges in Ordered Sets",
+      "relation_to_problem": "The difference between maximum and minimum directly yields the basic contrast measure. Understanding range as a statistical concept provides the mathematical justification for using this simple metric.",
+      "prerequisites": [
+        "Minimum and maximum concepts",
+        "Basic arithmetic operations",
+        "Statistical dispersion measures"
+      ],
+      "learning_objectives": [
+        "Define the range of a dataset formally",
+        "Compute differences between extrema efficiently",
+        "Understand range as a measure of dispersion",
+        "Relate range to other statistical measures of spread"
+      ],
+      "math_content": {
+        "definition": "The **range** of a non-empty finite set $S \\subset \\mathbb{R}$ is defined as $R(S) = \\max(S) - \\min(S)$. For a grayscale image $I$, the pixel value range is $R(I) = I_{\\max} - I_{\\min}$. The range measures the spread or dispersion of values in the dataset and is always non-negative.",
+        "notation": "$R(S)$ = range of set $S$; $R(I)$ = range of pixel values in image $I$; $\\Delta I = I_{\\max} - I_{\\min}$ = alternative notation for range",
+        "theorem": "**Range Properties Theorem**: For any finite non-empty set $S \\subset \\mathbb{R}$, the range $R(S)$ satisfies: (1) $R(S) \\geq 0$ (non-negativity), (2) $R(S) = 0$ if and only if all elements of $S$ are equal, (3) For $S \\subset [a,b]$, we have $R(S) \\leq b - a$ (boundedness), (4) $R(S_1 \\cup S_2) \\geq \\max(R(S_1), R(S_2))$ (monotonicity).",
+        "proof_sketch": "(1) From the Min-Max theorem, $\\min(S) \\leq \\max(S)$, so $R(S) = \\max(S) - \\min(S) \\geq 0$. (2) $R(S) = 0 \\Rightarrow \\max(S) = \\min(S)$, which occurs iff all elements are equal. Conversely, if all elements equal $c$, then $\\max(S) = \\min(S) = c$, so $R(S) = 0$. (3) If $S \\subset [a,b]$, then $\\min(S) \\geq a$ and $\\max(S) \\leq b$, giving $R(S) = \\max(S) - \\min(S) \\leq b - a$. (4) $\\max(S_1 \\cup S_2) = \\max(\\max(S_1), \\max(S_2))$ and $\\min(S_1 \\cup S_2) = \\min(\\min(S_1), \\min(S_2))$, so the range can only increase or stay the same when sets are combined.",
+        "examples": [
+          "For $S = \\{0, 50, 200, 255\\}$: $R(S) = 255 - 0 = 255$",
+          "For $I = \\begin{bmatrix} 100 & 150 \\\\ 120 & 180 \\end{bmatrix}$: $R(I) = 180 - 100 = 80$",
+          "For uniform image with $I(i,j) = 128$: $R(I) = 128 - 128 = 0$ (zero contrast)",
+          "For maximum contrast image with only blacks and whites: $I \\in \\{0, 255\\}$ gives $R(I) = 255 - 0 = 255$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Range Definition",
+          "latex": "$R(I) = I_{\\max} - I_{\\min}$",
+          "description": "The basic formula for computing range from extrema"
+        },
+        {
+          "name": "Range Bounds for 8-bit Images",
+          "latex": "$0 \\leq R(I) \\leq 255$",
+          "description": "The range of an 8-bit grayscale image cannot exceed 255"
+        },
+        {
+          "name": "Basic Contrast Formula",
+          "latex": "$C_{\\text{basic}}(I) = I_{\\max} - I_{\\min} = R(I)$",
+          "description": "The simplest contrast metric equals the pixel value range"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes the range of pixel values in a grayscale image. Also return a classification of the contrast level: 'zero' if range is 0, 'low' if range < 64, 'medium' if 64 ≤ range < 192, and 'high' if range ≥ 192.",
+        "function_signature": "def compute_range(img: np.ndarray) -> dict:",
+        "starter_code": "import numpy as np\n\ndef compute_range(img: np.ndarray) -> dict:\n    \"\"\"\n    Compute the range of pixel values and classify contrast level.\n    Args:\n        img: 2D numpy array representing grayscale image\n    Returns:\n        Dictionary with keys: 'range', 'contrast_level'\n        where contrast_level is one of: 'zero', 'low', 'medium', 'high'\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_range(np.array([[0, 50], [200, 255]]))",
+            "expected": "{'range': 255, 'contrast_level': 'high'}",
+            "explanation": "Range is 255 - 0 = 255, which is ≥ 192, so contrast is high"
+          },
+          {
+            "input": "compute_range(np.array([[100, 120], [110, 130]]))",
+            "expected": "{'range': 30, 'contrast_level': 'low'}",
+            "explanation": "Range is 130 - 100 = 30, which is < 64, so contrast is low"
+          },
+          {
+            "input": "compute_range(np.array([[50, 50], [50, 50]]))",
+            "expected": "{'range': 0, 'contrast_level': 'zero'}",
+            "explanation": "All pixels are 50, so range is 0 and contrast is zero"
+          },
+          {
+            "input": "compute_range(np.array([[0, 150], [100, 200]]))",
+            "expected": "{'range': 200, 'contrast_level': 'high'}",
+            "explanation": "Range is 200 - 0 = 200, which is ≥ 192, so contrast is high"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing max - min incorrectly by using incorrect extrema",
+        "Not handling edge cases like single-pixel images or uniform images",
+        "Forgetting that range must be non-negative",
+        "Using floating-point arithmetic when integer arithmetic suffices for pixel values"
+      ],
+      "hint": "First find the minimum and maximum, then compute their difference. The classification thresholds divide the [0, 255] range into meaningful segments.",
+      "references": [
+        "Statistical dispersion measures",
+        "Range vs standard deviation",
+        "Image histogram analysis"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Contrast Metrics in Image Processing",
+      "relation_to_problem": "This synthesizes all previous concepts to understand why the range-based contrast metric is the simplest and most computationally efficient measure, while also understanding its limitations and alternatives like Michelson and RMS contrast.",
+      "prerequisites": [
+        "Grayscale image representation",
+        "Extrema computation",
+        "Range calculation",
+        "Basic statistics"
+      ],
+      "learning_objectives": [
+        "Compare different contrast metrics mathematically",
+        "Understand when to use basic contrast versus alternatives",
+        "Analyze computational complexity of contrast calculations",
+        "Connect mathematical definitions to practical image quality assessment"
+      ],
+      "math_content": {
+        "definition": "**Contrast** quantifies the perceptual difference between light and dark regions in an image. Three common metrics are: (1) **Basic/Range Contrast**: $C_{\\text{basic}}(I) = I_{\\max} - I_{\\min}$, (2) **Michelson Contrast**: $C_{\\text{Michelson}}(I) = \\frac{I_{\\max} - I_{\\min}}{I_{\\max} + I_{\\min}}$ (normalized, range $[0,1]$), (3) **RMS Contrast**: $C_{\\text{RMS}}(I) = \\sqrt{\\frac{1}{MN}\\sum_{i,j}(I(i,j) - \\mu)^2}$ where $\\mu = \\frac{1}{MN}\\sum_{i,j}I(i,j)$ is the mean intensity.",
+        "notation": "$C(I)$ = contrast of image $I$; $\\mu$ = mean pixel intensity; $\\sigma$ = standard deviation of pixel intensities; $M \\times N$ = image dimensions",
+        "theorem": "**Contrast Metric Relationships**: For a grayscale image $I$ with pixel values in $[0, L-1]$: (1) $0 \\leq C_{\\text{basic}}(I) \\leq L-1$, (2) $0 \\leq C_{\\text{Michelson}}(I) \\leq 1$, (3) $C_{\\text{RMS}}(I) \\leq C_{\\text{basic}}(I)/2$, (4) $C_{\\text{Michelson}}(I)$ is undefined when $I_{\\max} + I_{\\min} = 0$, (5) All three metrics equal zero if and only if the image is uniform (constant).",
+        "proof_sketch": "(1) Follows from $0 \\leq I_{\\min} \\leq I_{\\max} \\leq L-1$. (2) For the upper bound: $C_{\\text{Michelson}} = \\frac{I_{\\max} - I_{\\min}}{I_{\\max} + I_{\\min}} \\leq \\frac{I_{\\max} - I_{\\min}}{I_{\\max} - I_{\\min}} = 1$ (equality when $I_{\\min} = 0$). (3) The RMS contrast measures deviation from mean, which is bounded by half the range. (5) If image is uniform with value $c$, then $I_{\\max} = I_{\\min} = c$, so $C_{\\text{basic}} = 0$. The RMS contrast involves deviations from mean $\\mu = c$, giving $C_{\\text{RMS}} = 0$. Conversely, if $C_{\\text{basic}} = 0$, then all pixels equal the same value.",
+        "examples": [
+          "High contrast image $I = \\begin{bmatrix} 0 & 255 \\\\ 0 & 255 \\end{bmatrix}$: $C_{\\text{basic}} = 255$, $C_{\\text{Michelson}} = 1.0$",
+          "Low contrast image $I = \\begin{bmatrix} 120 & 130 \\\\ 125 & 135 \\end{bmatrix}$: $C_{\\text{basic}} = 15$, $C_{\\text{Michelson}} \\approx 0.059$",
+          "Uniform image $I = \\begin{bmatrix} 100 & 100 \\\\ 100 & 100 \\end{bmatrix}$: All contrast metrics equal 0"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Basic Contrast (Range-based)",
+          "latex": "$C_{\\text{basic}}(I) = I_{\\max} - I_{\\min}$",
+          "description": "Simplest metric; computational complexity O(MN); measures absolute intensity span"
+        },
+        {
+          "name": "Michelson Contrast",
+          "latex": "$C_{\\text{Michelson}}(I) = \\frac{I_{\\max} - I_{\\min}}{I_{\\max} + I_{\\min}}$",
+          "description": "Normalized metric in [0,1]; suitable for comparing images; requires $I_{\\max} + I_{\\min} > 0$"
+        },
+        {
+          "name": "RMS Contrast",
+          "latex": "$C_{\\text{RMS}}(I) = \\sqrt{\\frac{1}{MN}\\sum_{i=0}^{M-1}\\sum_{j=0}^{N-1}(I(i,j) - \\mu)^2}$",
+          "description": "Standard deviation-based; sensitive to overall pixel distribution; computational complexity O(MN)"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes all three contrast metrics (basic, Michelson, and RMS) for a grayscale image. Return them in a dictionary. Handle the special case where Michelson contrast is undefined.",
+        "function_signature": "def compute_all_contrasts(img: np.ndarray) -> dict:",
+        "starter_code": "import numpy as np\n\ndef compute_all_contrasts(img: np.ndarray) -> dict:\n    \"\"\"\n    Compute three different contrast metrics for a grayscale image.\n    Args:\n        img: 2D numpy array representing grayscale image\n    Returns:\n        Dictionary with keys: 'basic', 'michelson', 'rms'\n        'michelson' should be None if undefined (when max + min = 0)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_all_contrasts(np.array([[0, 50], [200, 255]]))",
+            "expected": "{'basic': 255, 'michelson': 1.0, 'rms': approximately 104.4}",
+            "explanation": "Basic: 255-0=255; Michelson: (255-0)/(255+0)=1.0; RMS: std of [0,50,200,255]"
+          },
+          {
+            "input": "compute_all_contrasts(np.array([[100, 100], [100, 100]]))",
+            "expected": "{'basic': 0, 'michelson': 0.0, 'rms': 0.0}",
+            "explanation": "Uniform image has zero contrast by all metrics"
+          },
+          {
+            "input": "compute_all_contrasts(np.array([[0, 0], [0, 0]]))",
+            "expected": "{'basic': 0, 'michelson': None, 'rms': 0.0}",
+            "explanation": "All black image: basic and RMS are 0, but Michelson is undefined (0/0)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the undefined Michelson contrast case (when max + min = 0)",
+        "Confusing RMS contrast with simple range-based contrast",
+        "Computing mean incorrectly for RMS contrast",
+        "Not using floating-point division for Michelson contrast",
+        "Forgetting to take the square root in RMS contrast formula"
+      ],
+      "hint": "Use NumPy's mean() and std() functions for RMS calculation. Check for division by zero before computing Michelson contrast.",
+      "references": [
+        "Image quality metrics",
+        "Perceptual contrast models",
+        "Computer vision fundamentals"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Implementing the Complete Contrast Calculator",
+      "relation_to_problem": "This final sub-quest synthesizes all previous concepts to implement a production-ready contrast calculator. It combines image validation, extrema finding, range computation, and returns the basic contrast metric as specified in the main problem.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "NumPy array operations",
+        "Function design principles"
+      ],
+      "learning_objectives": [
+        "Integrate multiple mathematical operations into a single function",
+        "Implement efficient array processing using NumPy",
+        "Handle edge cases and validate inputs",
+        "Apply the complete mathematical pipeline for contrast calculation"
+      ],
+      "math_content": {
+        "definition": "The **grayscale image contrast calculator** is a function $f: \\mathbb{Z}^{M \\times N} \\to \\mathbb{Z}$ defined by $f(I) = \\max_{(i,j) \\in \\Omega} I(i,j) - \\min_{(i,j) \\in \\Omega} I(i,j)$, where $I$ is a grayscale image with $M$ rows and $N$ columns. The function computes the basic (range-based) contrast in $O(MN)$ time complexity.",
+        "notation": "$f(I)$ = contrast calculation function; $\\Omega$ = image domain; $\\mathcal{O}(MN)$ = linear time complexity in number of pixels",
+        "theorem": "**Contrast Calculation Algorithm Properties**: The contrast calculation $C = f(I)$ satisfies: (1) **Correctness**: Returns $I_{\\max} - I_{\\min}$ for any valid image, (2) **Time Complexity**: $\\mathcal{O}(MN)$ where $MN$ is the total number of pixels, (3) **Space Complexity**: $\\mathcal{O}(1)$ additional space (excluding input), (4) **Monotonicity**: If every pixel in $I_1$ has a value between corresponding pixels of $I_2$ and $I_3$, then $f(I_2) \\leq f(I_1) \\leq f(I_3)$, (5) **Idempotency**: The result is deterministic and consistent for the same input.",
+        "proof_sketch": "(1) By construction, the algorithm finds global extrema and computes their difference, which equals the range. (2) Finding both minimum and maximum requires scanning all $MN$ pixels exactly once, giving $\\Theta(MN)$ time. (3) Only constant extra space is needed to store min, max, and result values. (4) Follows from the property that increasing the span of values cannot decrease the range. (5) The mathematical operations are deterministic.",
+        "examples": [
+          "For $I = \\begin{bmatrix} 0 & 50 \\\\ 200 & 255 \\end{bmatrix}$: Find $I_{\\max} = 255$, $I_{\\min} = 0$, compute $f(I) = 255 - 0 = 255$",
+          "For $I = \\begin{bmatrix} 128 \\end{bmatrix}$ (1×1 image): $I_{\\max} = I_{\\min} = 128$, so $f(I) = 0$",
+          "For $I = \\begin{bmatrix} 10 & 20 & 30 \\\\ 40 & 50 & 60 \\end{bmatrix}$: $I_{\\max} = 60$, $I_{\\min} = 10$, giving $f(I) = 50$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Contrast Algorithm",
+          "latex": "$C = f(I) = \\max_{(i,j)} I(i,j) - \\min_{(i,j)} I(i,j)$",
+          "description": "The complete calculation combining extrema finding and subtraction"
+        },
+        {
+          "name": "Algorithmic Complexity",
+          "latex": "$T(n) = \\Theta(n)$ where $n = M \\times N$",
+          "description": "Linear time in the number of pixels; optimal since all pixels must be examined"
+        },
+        {
+          "name": "Result Range",
+          "latex": "$C \\in [0, 255] \\cap \\mathbb{Z}$",
+          "description": "The contrast result is always a non-negative integer bounded by 255 for 8-bit images"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a robust contrast calculator that handles various edge cases. The function should validate that the input is a valid 2D array, compute the basic contrast using the extrema-based method, and return an integer result. Additionally, implement a helper function that describes the contrast quality.",
+        "function_signature": "def calculate_image_contrast(img: np.ndarray) -> dict:",
+        "starter_code": "import numpy as np\n\ndef calculate_image_contrast(img: np.ndarray) -> dict:\n    \"\"\"\n    Calculate comprehensive contrast information for a grayscale image.\n    Args:\n        img: 2D numpy array representing grayscale image with values in [0, 255]\n    Returns:\n        Dictionary with keys: 'contrast' (int), 'min_pixel' (int), \n        'max_pixel' (int), 'description' (str)\n        where description is one of: 'No contrast (uniform)', \n        'Low contrast', 'Medium contrast', 'High contrast'\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_image_contrast(np.array([[0, 50], [200, 255]]))",
+            "expected": "{'contrast': 255, 'min_pixel': 0, 'max_pixel': 255, 'description': 'High contrast'}",
+            "explanation": "Maximum contrast (255) with full range from black to white"
+          },
+          {
+            "input": "calculate_image_contrast(np.array([[100, 120], [110, 115]]))",
+            "expected": "{'contrast': 20, 'min_pixel': 100, 'max_pixel': 120, 'description': 'Low contrast'}",
+            "explanation": "Small range of only 20 levels indicates low contrast"
+          },
+          {
+            "input": "calculate_image_contrast(np.array([[75, 75], [75, 75]]))",
+            "expected": "{'contrast': 0, 'min_pixel': 75, 'max_pixel': 75, 'description': 'No contrast (uniform)'}",
+            "explanation": "All pixels identical results in zero contrast"
+          },
+          {
+            "input": "calculate_image_contrast(np.array([[0, 100, 200]]))",
+            "expected": "{'contrast': 200, 'min_pixel': 0, 'max_pixel': 200, 'description': 'High contrast'}",
+            "explanation": "Single-row image with high range (200) shows high contrast"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not validating that input is a 2D array before processing",
+        "Returning float instead of int for contrast value",
+        "Not handling single-pixel images (1×1 arrays)",
+        "Computing contrast incorrectly by using mean or median instead of extrema",
+        "Not providing informative descriptions of contrast levels"
+      ],
+      "hint": "Combine all concepts from previous sub-quests: validate input dimensions, find both extrema efficiently, compute difference, and classify the result. Use NumPy's optimized functions for best performance.",
+      "references": [
+        "Image processing pipelines",
+        "NumPy best practices",
+        "Algorithm implementation patterns",
+        "Software engineering for scientific computing"
+      ]
+    }
+  ]
+}

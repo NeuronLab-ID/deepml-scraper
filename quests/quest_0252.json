@@ -1,0 +1,494 @@
+{
+  "problem_id": 252,
+  "title": "Data Quality Scoring for ML Pipelines",
+  "category": "MLOps",
+  "difficulty": "medium",
+  "description": "In production ML systems, data quality is critical for model performance. Poor quality data can lead to model degradation, biased predictions, and system failures. You need to implement a data quality scoring function that evaluates incoming data against a defined schema.\n\nGiven a list of data records (dictionaries) and a schema definition, compute the following quality metrics:\n\n1. **Completeness**: Percentage of non-null values across all expected fields\n2. **Type Validity**: Percentage of values that match their expected data types (including null handling based on nullable flag)\n3. **Uniqueness Ratio**: Percentage of unique records in the dataset\n4. **Overall Score**: Weighted combination of metrics (40% completeness, 40% type validity, 20% uniqueness)\n\nThe schema is a dictionary where each key is a column name and the value is a specification with:\n- 'type': One of 'numeric', 'categorical', or 'boolean'\n- 'nullable': Boolean indicating if null values are acceptable\n\nFor type validity:\n- Numeric type accepts int and float (but not boolean)\n- Categorical type accepts strings\n- Boolean type accepts True/False only\n- If a value is None and the field is nullable, it counts as type-valid\n- If a value is None and the field is not nullable, it counts as type-invalid\n\nWrite a function `calculate_data_quality_score(data, schema)` that returns a dictionary with all four metrics. Return an empty dictionary if the input data is empty. All values should be rounded to 2 decimal places.",
+  "example": {
+    "input": "data = [{'age': 25, 'name': 'Alice', 'active': True}, {'age': 'thirty', 'name': 'Bob', 'active': False}, {'age': None, 'name': None, 'active': True}, {'age': 40, 'name': 'Dave', 'active': 'yes'}], schema = {'age': {'type': 'numeric', 'nullable': True}, 'name': {'type': 'categorical', 'nullable': True}, 'active': {'type': 'boolean', 'nullable': False}}",
+    "output": "{'completeness': 83.33, 'type_validity': 83.33, 'uniqueness_ratio': 100.0, 'overall_score': 86.67}",
+    "reasoning": "Total fields = 4 rows x 3 columns = 12. Non-null fields = 10 (row 3 has 2 nulls). Completeness = 10/12 = 83.33%. For type validity: row 1 has 3 valid, row 2 has 2 valid (age is string not numeric), row 3 has 3 valid (nulls are allowed), row 4 has 2 valid (active is string not boolean). Type validity = 10/12 = 83.33%. All 4 rows are unique, so uniqueness = 100%. Overall = 0.4*83.33 + 0.4*83.33 + 0.2*100 = 86.67%."
+  },
+  "starter_code": "def calculate_data_quality_score(data: list, schema: dict) -> dict:\n    \"\"\"\n    Calculate data quality metrics for ML pipeline monitoring.\n    \n    Args:\n        data: list of dictionaries representing rows of data\n        schema: dictionary defining expected columns and their types\n                {'column_name': {'type': 'numeric'|'categorical'|'boolean', 'nullable': True|False}}\n    \n    Returns:\n        dict with keys: 'completeness', 'type_validity', 'uniqueness_ratio', 'overall_score'\n        All values as percentages (0-100), rounded to 2 decimal places.\n    \"\"\"\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Completeness Metric: Measuring Data Presence",
+      "relation_to_problem": "Completeness is the first component metric (40% weight) in the overall data quality score. Understanding how to quantify missing values is essential for detecting incomplete data records in ML pipelines.",
+      "prerequisites": [
+        "Basic Python",
+        "Dictionary data structures",
+        "Percentage calculations"
+      ],
+      "learning_objectives": [
+        "Define completeness formally using set notation",
+        "Implement a function to count non-null values across structured data",
+        "Calculate percentage-based completeness metrics",
+        "Handle edge cases like empty datasets"
+      ],
+      "math_content": {
+        "definition": "Let $D = \\{r_1, r_2, ..., r_n\\}$ be a dataset of $n$ records, where each record $r_i$ is a mapping from fields to values. Let $F = \\{f_1, f_2, ..., f_m\\}$ be the set of expected fields defined by schema $S$. The **completeness metric** $C(D, S)$ is defined as:\n\n$$C(D, S) = \\frac{|\\{(r_i, f_j) : r_i \\in D, f_j \\in F, r_i[f_j] \\neq \\text{null}\\}|}{|D| \\cdot |F|} \\times 100\\%$$\n\nwhere $r_i[f_j]$ denotes the value of field $f_j$ in record $r_i$.",
+        "notation": "$D$ = dataset (list of records), $n = |D|$ = number of records, $F$ = set of expected fields, $m = |F|$ = number of fields, $r_i[f_j]$ = value at record $i$, field $j$, $\\text{null}$ = missing value indicator (None in Python)",
+        "theorem": "**Theorem (Completeness Bounds)**: For any dataset $D$ and schema $S$, the completeness metric satisfies $0 \\leq C(D, S) \\leq 100$, with $C(D, S) = 100$ if and only if no values are null.",
+        "proof_sketch": "The numerator counts non-null values: $0 \\leq \\text{numerator} \\leq |D| \\cdot |F|$. The denominator is $|D| \\cdot |F|$. Therefore, $0 \\leq \\frac{\\text{numerator}}{\\text{denominator}} \\leq 1$, which gives $0 \\leq C(D, S) \\leq 100$ after multiplying by 100. Equality $C(D, S) = 100$ holds if and only if the numerator equals the denominator, meaning all $|D| \\cdot |F|$ values are non-null.",
+        "examples": [
+          "Example 1: $D = [\\{age: 25, name: \\text{'Alice'}\\}, \\{age: 30, name: \\text{null}\\}]$, $F = \\{age, name\\}$. Non-null count = 3 (age:25, name:'Alice', age:30). Total = 2 records × 2 fields = 4. Completeness = $\\frac{3}{4} \\times 100\\% = 75\\%$.",
+          "Example 2: $D = [\\{x: 1, y: 2\\}, \\{x: 3, y: 4\\}]$, $F = \\{x, y\\}$. Non-null count = 4. Total = 4. Completeness = $\\frac{4}{4} \\times 100\\% = 100\\%$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Completeness Metric",
+          "latex": "$C(D, S) = \\frac{\\sum_{i=1}^{n} \\sum_{j=1}^{m} \\mathbb{1}_{r_i[f_j] \\neq \\text{null}}}{n \\cdot m} \\times 100\\%$",
+          "description": "Use when calculating the percentage of non-null values across all expected fields. $\\mathbb{1}$ is the indicator function: 1 if condition is true, 0 otherwise."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the completeness metric for a dataset. Given a list of data records (dictionaries) and a list of expected field names, compute what percentage of the expected values are non-null (not None). Return the result as a percentage rounded to 2 decimal places. If the dataset is empty, return 0.0.",
+        "function_signature": "def calculate_completeness(data: list, fields: list) -> float:",
+        "starter_code": "def calculate_completeness(data: list, fields: list) -> float:\n    \"\"\"\n    Calculate completeness metric as percentage of non-null values.\n    \n    Args:\n        data: List of dictionaries representing records\n        fields: List of expected field names\n    \n    Returns:\n        Completeness percentage (0-100), rounded to 2 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_completeness([{'age': 25, 'name': 'Alice'}, {'age': 30, 'name': None}], ['age', 'name'])",
+            "expected": "75.0",
+            "explanation": "3 non-null values out of 4 total expected values (2 records × 2 fields). 3/4 × 100 = 75.0%"
+          },
+          {
+            "input": "calculate_completeness([{'x': 1, 'y': 2}, {'x': 3, 'y': 4}], ['x', 'y'])",
+            "expected": "100.0",
+            "explanation": "All 4 values are non-null. 4/4 × 100 = 100.0%"
+          },
+          {
+            "input": "calculate_completeness([{'a': None, 'b': None}], ['a', 'b'])",
+            "expected": "0.0",
+            "explanation": "0 non-null values out of 2 total. 0/2 × 100 = 0.0%"
+          },
+          {
+            "input": "calculate_completeness([], ['field1', 'field2'])",
+            "expected": "0.0",
+            "explanation": "Empty dataset returns 0.0 by definition"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle empty datasets (division by zero)",
+        "Counting missing keys differently from None values - both should be treated as null",
+        "Not converting to percentage (leaving as a fraction 0-1)",
+        "Incorrect rounding or not rounding to 2 decimal places"
+      ],
+      "hint": "Use nested loops to iterate over records and fields. Count how many values satisfy the non-null condition. Remember that None is Python's null representation.",
+      "references": [
+        "Data quality dimensions in information systems",
+        "Missing data patterns in statistical analysis",
+        "Python None vs missing dictionary keys"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Type System Validation: Schema Conformance Checking",
+      "relation_to_problem": "Type validity is the second major component (40% weight) in the data quality score. This sub-quest teaches how to verify that data values conform to expected types, which is critical for preventing type errors in ML feature engineering.",
+      "prerequisites": [
+        "Python type system",
+        "isinstance() function",
+        "Boolean logic",
+        "Completeness metric from Step 1"
+      ],
+      "learning_objectives": [
+        "Define type validity formally using schema conformance",
+        "Implement type checking for numeric, categorical, and boolean types",
+        "Handle Python's type hierarchy (bool as subclass of int)",
+        "Integrate nullable constraints into type validation"
+      ],
+      "math_content": {
+        "definition": "Let $D = \\{r_1, ..., r_n\\}$ be a dataset and $S: F \\rightarrow T \\times \\{\\text{True}, \\text{False}\\}$ be a schema that maps each field $f \\in F$ to a type specification $(t, nullable)$ where $t \\in T = \\{\\text{numeric}, \\text{categorical}, \\text{boolean}\\}$ and $nullable$ indicates if null is permitted.\n\nDefine the **type validity predicate** $V(v, t, nullable)$ for value $v$, expected type $t$, and nullable flag:\n\n$$V(v, t, nullable) = \\begin{cases}\n\\text{True} & \\text{if } v = \\text{null} \\land nullable = \\text{True} \\\\\n\\text{False} & \\text{if } v = \\text{null} \\land nullable = \\text{False} \\\\\n\\text{TypeMatch}(v, t) & \\text{otherwise}\n\\end{cases}$$\n\nwhere $\\text{TypeMatch}(v, t)$ checks if value $v$ conforms to type $t$:\n\n$$\\text{TypeMatch}(v, t) = \\begin{cases}\n(v \\in \\mathbb{Z} \\cup \\mathbb{R}) \\land (v \\notin \\mathbb{B}) & \\text{if } t = \\text{numeric} \\\\\nv \\in \\Sigma^* & \\text{if } t = \\text{categorical} \\\\\nv \\in \\mathbb{B} & \\text{if } t = \\text{boolean}\n\\end{cases}$$\n\nHere $\\mathbb{Z}$ = integers, $\\mathbb{R}$ = real numbers, $\\mathbb{B} = \\{\\text{True}, \\text{False}\\}$ = booleans, $\\Sigma^*$ = strings.\n\nThe **type validity metric** is:\n\n$$TV(D, S) = \\frac{\\sum_{i=1}^{n} \\sum_{f \\in F} \\mathbb{1}_{V(r_i[f], S(f).type, S(f).nullable)}}{n \\cdot |F|} \\times 100\\%$$",
+        "notation": "$S(f)$ = schema specification for field $f$, $S(f).type$ = expected type, $S(f).nullable$ = nullable flag, $\\mathbb{1}_{condition}$ = indicator function (1 if true, 0 if false), $\\mathbb{Z}$ = integers, $\\mathbb{R}$ = reals, $\\mathbb{B}$ = booleans, $\\Sigma^*$ = set of all strings",
+        "theorem": "**Theorem (Type System Monotonicity)**: If schema $S_1$ is more permissive than $S_2$ (i.e., for all fields $f$, if $S_2(f).nullable = \\text{False}$ then $S_1(f).nullable = \\text{False}$, and types are identical), then $TV(D, S_1) \\geq TV(D, S_2)$ for any dataset $D$.",
+        "proof_sketch": "Consider the validation predicate $V$. For each value $v$ and field $f$: if $v \\neq \\text{null}$, then $V(v, S_1(f).type, S_1(f).nullable) = V(v, S_2(f).type, S_2(f).nullable)$ since types match. If $v = \\text{null}$ and $S_2(f).nullable = \\text{True}$, then both schemas accept it. If $v = \\text{null}$ and $S_2(f).nullable = \\text{False}$, then $S_1(f).nullable = \\text{False}$ by assumption, so both reject it. Therefore, every value valid under $S_2$ is valid under $S_1$, giving $TV(D, S_1) \\geq TV(D, S_2)$.",
+        "examples": [
+          "Example 1: $v = 25$, $t = \\text{numeric}$, $nullable = \\text{False}$. Since $25 \\in \\mathbb{Z}$ and $25 \\notin \\mathbb{B}$, we have $\\text{TypeMatch}(25, \\text{numeric}) = \\text{True}$. Thus $V(25, \\text{numeric}, \\text{False}) = \\text{True}$.",
+          "Example 2: $v = \\text{True}$, $t = \\text{numeric}$, $nullable = \\text{False}$. Although $\\text{True} \\in \\mathbb{Z}$ in Python (bool subclasses int), we have $\\text{True} \\in \\mathbb{B}$, so $\\text{TypeMatch}(\\text{True}, \\text{numeric}) = \\text{False}$.",
+          "Example 3: $v = \\text{null}$, $t = \\text{categorical}$, $nullable = \\text{True}$. The first case applies: $V(\\text{null}, \\text{categorical}, \\text{True}) = \\text{True}$.",
+          "Example 4: $v = \\text{'hello'}$, $t = \\text{categorical}$, $nullable = \\text{False}$. Since $\\text{'hello'} \\in \\Sigma^*$, we have $V(\\text{'hello'}, \\text{categorical}, \\text{False}) = \\text{True}$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Type Validity Metric",
+          "latex": "$TV(D, S) = \\frac{1}{n \\cdot |F|} \\sum_{i=1}^{n} \\sum_{f \\in F} \\mathbb{1}_{V(r_i[f], S(f).type, S(f).nullable)} \\times 100\\%$",
+          "description": "Calculate percentage of values that are type-valid according to schema. Each field-value pair is checked against its type specification and nullable constraint."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that validates whether a value conforms to a specified type with nullable handling. Given a value, an expected type ('numeric', 'categorical', or 'boolean'), and a nullable flag, return True if the value is valid and False otherwise. Rules: (1) If value is None and nullable is True, return True. (2) If value is None and nullable is False, return False. (3) For numeric type: accept int and float but NOT bool (even though bool is a subclass of int in Python). (4) For categorical type: accept only str. (5) For boolean type: accept only True or False.",
+        "function_signature": "def is_type_valid(value, expected_type: str, nullable: bool) -> bool:",
+        "starter_code": "def is_type_valid(value, expected_type: str, nullable: bool) -> bool:\n    \"\"\"\n    Check if a value conforms to expected type with nullable handling.\n    \n    Args:\n        value: The value to check (can be None, int, float, str, bool, etc.)\n        expected_type: One of 'numeric', 'categorical', 'boolean'\n        nullable: Whether None is acceptable\n    \n    Returns:\n        True if value is type-valid, False otherwise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "is_type_valid(25, 'numeric', False)",
+            "expected": "True",
+            "explanation": "25 is an int, which is numeric, and not a bool"
+          },
+          {
+            "input": "is_type_valid(True, 'numeric', False)",
+            "expected": "False",
+            "explanation": "True is bool, which should NOT be accepted as numeric despite isinstance(True, int) == True"
+          },
+          {
+            "input": "is_type_valid(None, 'categorical', True)",
+            "expected": "True",
+            "explanation": "None is acceptable when nullable is True"
+          },
+          {
+            "input": "is_type_valid(None, 'boolean', False)",
+            "expected": "False",
+            "explanation": "None is not acceptable when nullable is False"
+          },
+          {
+            "input": "is_type_valid('hello', 'categorical', False)",
+            "expected": "True",
+            "explanation": "Strings are valid for categorical type"
+          },
+          {
+            "input": "is_type_valid(False, 'boolean', False)",
+            "expected": "True",
+            "explanation": "False is a valid boolean value"
+          },
+          {
+            "input": "is_type_valid(3.14, 'numeric', True)",
+            "expected": "True",
+            "explanation": "Float values are valid for numeric type"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not excluding bool from numeric type checking - isinstance(True, int) returns True in Python, but bools should not count as numeric",
+        "Forgetting to check the nullable flag before rejecting None values",
+        "Using type() instead of isinstance() which can miss subclass relationships",
+        "Not handling all three type cases (numeric, categorical, boolean) correctly"
+      ],
+      "hint": "Check for None first based on the nullable flag. For the numeric type, you need to explicitly exclude bool even though isinstance(True, int) is True - check if the value is a bool first.",
+      "references": [
+        "Python type hierarchy",
+        "Schema validation in data pipelines",
+        "Type systems in programming languages",
+        "Boolean as integer subclass in Python"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Uniqueness Ratio: Detecting Data Duplication",
+      "relation_to_problem": "Uniqueness ratio contributes 20% to the overall data quality score. This metric detects duplicate records in ML pipelines, which can indicate data collection bugs or replay attacks that would compromise model training and evaluation.",
+      "prerequisites": [
+        "Set theory basics",
+        "Hash functions",
+        "Dictionary/record comparison",
+        "Previous metrics (completeness, type validity)"
+      ],
+      "learning_objectives": [
+        "Define uniqueness formally using cardinality of sets",
+        "Implement record-level deduplication using Python sets and tuples",
+        "Understand why dictionary hashing requires conversion to immutable types",
+        "Calculate uniqueness as a ratio metric"
+      ],
+      "math_content": {
+        "definition": "Let $D = \\{r_1, r_2, ..., r_n\\}$ be a multiset of records (allowing duplicates). Define the **unique set** $U(D)$ as:\n\n$$U(D) = \\{r : r \\in D\\}$$\n\nwhere set notation removes duplicate elements. Two records $r_i$ and $r_j$ are considered **equal** if and only if they map to identical values for all fields:\n\n$$r_i = r_j \\iff \\forall f \\in F: r_i[f] = r_j[f]$$\n\nThe **uniqueness ratio** $U_R(D)$ is defined as:\n\n$$U_R(D) = \\frac{|U(D)|}{|D|} \\times 100\\%$$\n\nwhere $|U(D)|$ is the cardinality of the unique set and $|D|$ is the total number of records.",
+        "notation": "$D$ = dataset (multiset), $n = |D|$ = total records (with duplicates), $U(D)$ = unique records (without duplicates), $|U(D)|$ = number of unique records, $r_i[f]$ = value of field $f$ in record $i$, $\\forall$ = for all",
+        "theorem": "**Theorem (Uniqueness Bounds)**: For any non-empty dataset $D$, the uniqueness ratio satisfies $\\frac{100}{|D|}\\% \\leq U_R(D) \\leq 100\\%$. The lower bound is achieved when all records are identical, and the upper bound when all records are unique.",
+        "proof_sketch": "Since $U(D)$ is derived from $D$ by removing duplicates, we have $1 \\leq |U(D)| \\leq |D|$. The minimum $|U(D)| = 1$ occurs when all records are identical (e.g., $D = \\{r, r, ..., r\\}$), giving $U_R(D) = \\frac{1}{|D|} \\times 100\\% = \\frac{100}{|D|}\\%$. The maximum $|U(D)| = |D|$ occurs when all records are distinct, giving $U_R(D) = \\frac{|D|}{|D|} \\times 100\\% = 100\\%$.",
+        "examples": [
+          "Example 1: $D = [\\{x: 1, y: 2\\}, \\{x: 1, y: 2\\}, \\{x: 3, y: 4\\}]$. We have $|D| = 3$ and $U(D) = \\{\\{x: 1, y: 2\\}, \\{x: 3, y: 4\\}\\}$, so $|U(D)| = 2$. Thus $U_R(D) = \\frac{2}{3} \\times 100\\% \\approx 66.67\\%$.",
+          "Example 2: $D = [\\{a: 5\\}, \\{a: 5\\}, \\{a: 5\\}]$. All records are identical, so $|U(D)| = 1$ and $U_R(D) = \\frac{1}{3} \\times 100\\% \\approx 33.33\\%$.",
+          "Example 3: $D = [\\{k: 1\\}, \\{k: 2\\}, \\{k: 3\\}]$. All records are unique, so $|U(D)| = 3$ and $U_R(D) = \\frac{3}{3} \\times 100\\% = 100\\%$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Uniqueness Ratio",
+          "latex": "$U_R(D) = \\frac{|\\{r : r \\in D\\}|}{|D|} \\times 100\\%$",
+          "description": "Calculate the percentage of unique records in a dataset. Use set operations to count distinct records, treating records as complete field-value mappings."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the uniqueness ratio for a list of records. Given a list of dictionaries, determine what percentage of records are unique (no exact duplicates). Two records are considered identical if all their key-value pairs match exactly. Return the result as a percentage rounded to 2 decimal places. If the dataset is empty, return 0.0. Note: Python dictionaries are not hashable, so you'll need to convert them to an immutable type (like frozenset or tuple) to use set operations.",
+        "function_signature": "def calculate_uniqueness_ratio(data: list) -> float:",
+        "starter_code": "def calculate_uniqueness_ratio(data: list) -> float:\n    \"\"\"\n    Calculate uniqueness ratio as percentage of unique records.\n    \n    Args:\n        data: List of dictionaries representing records\n    \n    Returns:\n        Uniqueness ratio percentage (0-100), rounded to 2 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_uniqueness_ratio([{'x': 1, 'y': 2}, {'x': 1, 'y': 2}, {'x': 3, 'y': 4}])",
+            "expected": "66.67",
+            "explanation": "2 unique records out of 3 total. 2/3 × 100 ≈ 66.67%"
+          },
+          {
+            "input": "calculate_uniqueness_ratio([{'a': 5}, {'a': 5}, {'a': 5}])",
+            "expected": "33.33",
+            "explanation": "1 unique record out of 3 total (all identical). 1/3 × 100 ≈ 33.33%"
+          },
+          {
+            "input": "calculate_uniqueness_ratio([{'k': 1}, {'k': 2}, {'k': 3}])",
+            "expected": "100.0",
+            "explanation": "All 3 records are unique. 3/3 × 100 = 100.0%"
+          },
+          {
+            "input": "calculate_uniqueness_ratio([])",
+            "expected": "0.0",
+            "explanation": "Empty dataset returns 0.0 by convention"
+          },
+          {
+            "input": "calculate_uniqueness_ratio([{'age': 25, 'name': 'Alice'}, {'age': 25, 'name': 'Alice'}])",
+            "expected": "50.0",
+            "explanation": "1 unique record out of 2 total (exact duplicate). 1/2 × 100 = 50.0%"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Trying to add dictionaries directly to a set - dictionaries are not hashable",
+        "Not handling empty datasets (division by zero)",
+        "Using tuple(dict.values()) which loses field names - two records with swapped fields would appear identical",
+        "Forgetting to convert to percentage or not rounding to 2 decimal places"
+      ],
+      "hint": "Convert each dictionary to a frozenset of its items (key-value pairs) to make it hashable, then use Python's set to count unique records. The frozenset preserves both keys and values for accurate comparison.",
+      "references": [
+        "Set theory and cardinality",
+        "Hashable types in Python",
+        "Duplicate detection algorithms",
+        "Data deduplication in databases"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Weighted Aggregation: Combining Multiple Metrics",
+      "relation_to_problem": "The overall data quality score combines completeness (40%), type validity (40%), and uniqueness (20%) using weighted aggregation. This sub-quest teaches how to properly combine multiple quality dimensions into a single actionable metric for monitoring thresholds.",
+      "prerequisites": [
+        "Linear combinations",
+        "Weighted averages",
+        "Normalization",
+        "All three previous metrics"
+      ],
+      "learning_objectives": [
+        "Define weighted aggregation formally using linear combinations",
+        "Understand the properties of convex combinations in metric aggregation",
+        "Implement weighted scoring with configurable weights",
+        "Validate that weights sum to 1 (probability simplex constraint)"
+      ],
+      "math_content": {
+        "definition": "Let $M = \\{m_1, m_2, ..., m_k\\}$ be a set of $k$ individual quality metrics, where each $m_i \\in [0, 100]$ represents a percentage score. Let $W = \\{w_1, w_2, ..., w_k\\}$ be a set of weights satisfying:\n\n$$\\sum_{i=1}^{k} w_i = 1 \\quad \\text{and} \\quad w_i \\geq 0 \\; \\forall i$$\n\nThe **weighted aggregate score** $A(M, W)$ is defined as the convex combination:\n\n$$A(M, W) = \\sum_{i=1}^{k} w_i \\cdot m_i$$\n\nFor the data quality problem, we have $k = 3$ metrics:\n- $m_1 = C(D, S)$ (completeness)\n- $m_2 = TV(D, S)$ (type validity)\n- $m_3 = U_R(D)$ (uniqueness ratio)\n\nWith standard weights $W = \\{0.4, 0.4, 0.2\\}$:\n\n$$\\text{Overall Score} = 0.4 \\cdot C + 0.4 \\cdot TV + 0.2 \\cdot U_R$$",
+        "notation": "$M = \\{m_1, ..., m_k\\}$ = set of metrics, $W = \\{w_1, ..., w_k\\}$ = weights (must sum to 1), $A(M, W)$ = aggregate score, $\\sum$ = summation operator, $\\forall$ = for all",
+        "theorem": "**Theorem (Convex Hull Property)**: If weights satisfy $\\sum_{i=1}^{k} w_i = 1$ and $w_i \\geq 0$ for all $i$, and each metric $m_i \\in [a, b]$, then the weighted aggregate satisfies $A(M, W) \\in [a, b]$.",
+        "proof_sketch": "Since $m_i \\geq a$ for all $i$, we have $A(M, W) = \\sum_{i=1}^{k} w_i m_i \\geq \\sum_{i=1}^{k} w_i a = a \\sum_{i=1}^{k} w_i = a \\cdot 1 = a$. Similarly, since $m_i \\leq b$ for all $i$, we have $A(M, W) = \\sum_{i=1}^{k} w_i m_i \\leq \\sum_{i=1}^{k} w_i b = b$. Therefore, $a \\leq A(M, W) \\leq b$. This shows that weighted aggregation preserves the range of the input metrics.",
+        "examples": [
+          "Example 1: $M = \\{80, 90, 100\\}$, $W = \\{0.4, 0.4, 0.2\\}$. Then $A(M, W) = 0.4(80) + 0.4(90) + 0.2(100) = 32 + 36 + 20 = 88$.",
+          "Example 2: $M = \\{75, 75, 50\\}$, $W = \\{0.5, 0.3, 0.2\\}$. Then $A(M, W) = 0.5(75) + 0.3(75) + 0.2(50) = 37.5 + 22.5 + 10 = 70$.",
+          "Example 3: All metrics equal. If $m_1 = m_2 = m_3 = m$, then $A(M, W) = w_1 m + w_2 m + w_3 m = m(w_1 + w_2 + w_3) = m \\cdot 1 = m$. The aggregate equals the common value."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Weighted Aggregate Score",
+          "latex": "$A(M, W) = \\sum_{i=1}^{k} w_i \\cdot m_i = w_1 m_1 + w_2 m_2 + \\cdots + w_k m_k$",
+          "description": "Linear combination of metrics weighted by importance. Weights must be non-negative and sum to 1. Used when multiple quality dimensions need to be combined into a single actionable score."
+        },
+        {
+          "name": "Constraint on Weights",
+          "latex": "$\\sum_{i=1}^{k} w_i = 1, \\quad w_i \\geq 0 \\; \\forall i$",
+          "description": "Weights must form a valid probability distribution (lie in the probability simplex). This ensures the aggregate score remains in the same range as individual metrics."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates a weighted aggregate score from multiple metrics. Given a list of metric values (percentages between 0 and 100) and a corresponding list of weights, compute the weighted sum. The weights are guaranteed to sum to 1.0 and be non-negative. Return the result rounded to 2 decimal places. This is a building block for combining completeness, type validity, and uniqueness into an overall quality score.",
+        "function_signature": "def calculate_weighted_score(metrics: list, weights: list) -> float:",
+        "starter_code": "def calculate_weighted_score(metrics: list, weights: list) -> float:\n    \"\"\"\n    Calculate weighted aggregate score from multiple metrics.\n    \n    Args:\n        metrics: List of metric values (percentages 0-100)\n        weights: List of weights (sum to 1.0, non-negative)\n    \n    Returns:\n        Weighted score, rounded to 2 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_weighted_score([80.0, 90.0, 100.0], [0.4, 0.4, 0.2])",
+            "expected": "88.0",
+            "explanation": "0.4(80) + 0.4(90) + 0.2(100) = 32 + 36 + 20 = 88.0"
+          },
+          {
+            "input": "calculate_weighted_score([75.0, 75.0, 50.0], [0.5, 0.3, 0.2])",
+            "expected": "70.0",
+            "explanation": "0.5(75) + 0.3(75) + 0.2(50) = 37.5 + 22.5 + 10 = 70.0"
+          },
+          {
+            "input": "calculate_weighted_score([100.0, 100.0, 100.0], [0.4, 0.4, 0.2])",
+            "expected": "100.0",
+            "explanation": "When all metrics are 100, weighted average is also 100"
+          },
+          {
+            "input": "calculate_weighted_score([83.33, 83.33, 100.0], [0.4, 0.4, 0.2])",
+            "expected": "86.67",
+            "explanation": "0.4(83.33) + 0.4(83.33) + 0.2(100) = 33.332 + 33.332 + 20 = 86.664, rounds to 86.67"
+          },
+          {
+            "input": "calculate_weighted_score([50.0], [1.0])",
+            "expected": "50.0",
+            "explanation": "Single metric with full weight returns itself"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not rounding to 2 decimal places at the end",
+        "Assuming weights are integers or percentages instead of decimals summing to 1",
+        "Using the wrong order for metrics and weights (make sure they align)",
+        "Not validating that metrics and weights lists have the same length"
+      ],
+      "hint": "Use Python's zip() function to pair each metric with its weight, then sum the products. The formula is straightforward: multiply each metric by its weight and add them all up.",
+      "references": [
+        "Weighted averages in statistics",
+        "Convex combinations",
+        "Multi-criteria decision analysis",
+        "Aggregate scoring in monitoring systems"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Integrating Type Validity with Completeness Analysis",
+      "relation_to_problem": "This sub-quest bridges type validity and completeness by implementing a combined metric calculator that handles both dimensions simultaneously. This is crucial because the main problem requires calculating both metrics over the same dataset with schema-aware validation.",
+      "prerequisites": [
+        "Completeness metric (Step 1)",
+        "Type validity (Step 2)",
+        "Schema parsing",
+        "Nested iteration patterns"
+      ],
+      "learning_objectives": [
+        "Implement simultaneous calculation of multiple metrics to avoid redundant iterations",
+        "Parse complex schema structures with nested specifications",
+        "Apply different validation rules per field based on schema",
+        "Optimize performance by single-pass iteration over data"
+      ],
+      "math_content": {
+        "definition": "Let $D = \\{r_1, ..., r_n\\}$ be a dataset and $S: F \\rightarrow (T \\times \\mathbb{B})$ be a schema mapping fields to type-nullable pairs. Define the **joint validation function** $J: (V \\times F \\times S) \\rightarrow \\mathbb{B}^2$ that simultaneously evaluates completeness and type validity:\n\n$$J(v, f, S) = (I_C(v), I_{TV}(v, f, S))$$\n\nwhere:\n- $I_C(v) = \\mathbb{1}_{v \\neq \\text{null}}$ is the completeness indicator\n- $I_{TV}(v, f, S) = \\mathbb{1}_{V(v, S(f).type, S(f).nullable)}$ is the type validity indicator\n\nThe joint calculation over dataset $D$ yields:\n\n$$C(D, S) = \\frac{\\sum_{i=1}^{n} \\sum_{f \\in F} I_C(r_i[f])}{n \\cdot |F|} \\times 100\\%$$\n\n$$TV(D, S) = \\frac{\\sum_{i=1}^{n} \\sum_{f \\in F} I_{TV}(r_i[f], f, S)}{n \\cdot |F|} \\times 100\\%$$\n\nKey insight: Both metrics share the same iteration structure (nested loops over records and fields), allowing computation in a single pass:\n\n$$\\text{For each } r_i \\in D, \\; \\text{for each } f \\in F: \\quad (c, t) = J(r_i[f], f, S)$$",
+        "notation": "$J(v, f, S)$ = joint validation function returning (completeness_valid, type_valid), $I_C$ = completeness indicator, $I_{TV}$ = type validity indicator, $\\mathbb{B} = \\{0, 1\\}$ = binary values, $\\mathbb{B}^2$ = pairs of binary values",
+        "theorem": "**Theorem (Independence of Completeness and Type Validity)**: For any value $v$ and field specification $S(f)$, the completeness indicator $I_C(v)$ and type validity indicator $I_{TV}(v, f, S)$ are statistically independent under uniform random data generation.",
+        "proof_sketch": "The completeness indicator $I_C(v)$ depends only on whether $v = \\text{null}$, while the type validity indicator $I_{TV}(v, f, S)$ depends on the type matching when $v \\neq \\text{null}$ or the nullable flag when $v = \\text{null}$. Under uniform random generation, the probability of $v = \\text{null}$ is independent of the type of $v$ when $v \\neq \\text{null}$. Therefore $P(I_C = 1 \\land I_{TV} = 1) = P(I_C = 1) \\cdot P(I_{TV} = 1)$, satisfying the definition of statistical independence.",
+        "examples": [
+          "Example 1: $v = 25$, $f = \\text{age}$, $S(\\text{age}) = (\\text{numeric}, \\text{False})$. Then $J(25, \\text{age}, S) = (1, 1)$ because $25 \\neq \\text{null}$ and $25$ is numeric.",
+          "Example 2: $v = \\text{None}$, $f = \\text{name}$, $S(\\text{name}) = (\\text{categorical}, \\text{True})$. Then $J(\\text{None}, \\text{name}, S) = (0, 1)$ because None fails completeness but is type-valid when nullable.",
+          "Example 3: $v = \\text{'thirty'}$, $f = \\text{age}$, $S(\\text{age}) = (\\text{numeric}, \\text{False})$. Then $J(\\text{'thirty'}, \\text{age}, S) = (1, 0)$ because the value is non-null but is a string, not numeric."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Single-Pass Joint Calculation",
+          "latex": "$\\text{counts} = \\{c: 0, tv: 0\\}; \\quad \\text{for } i \\in [1,n], f \\in F: \\quad \\text{counts.c} \\mathrel{+}= I_C(r_i[f]), \\; \\text{counts.tv} \\mathrel{+}= I_{TV}(r_i[f], f, S)$",
+          "description": "Accumulate both completeness and type validity counts in a single nested loop iteration. Dividing by total fields gives both metrics."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates both completeness and type validity metrics in a single pass over the data. Given a list of data records (dictionaries) and a schema (dictionary mapping field names to specifications with 'type' and 'nullable' keys), return a dictionary containing both 'completeness' and 'type_validity' as percentages rounded to 2 decimal places. If the dataset is empty, return {'completeness': 0.0, 'type_validity': 0.0}. Use the type validation logic from Step 2 and completeness logic from Step 1, but compute both in one iteration for efficiency.",
+        "function_signature": "def calculate_completeness_and_validity(data: list, schema: dict) -> dict:",
+        "starter_code": "def calculate_completeness_and_validity(data: list, schema: dict) -> dict:\n    \"\"\"\n    Calculate completeness and type validity metrics simultaneously.\n    \n    Args:\n        data: List of dictionaries representing records\n        schema: Dict mapping field names to {'type': str, 'nullable': bool}\n    \n    Returns:\n        Dict with 'completeness' and 'type_validity' percentages (0-100),\n        rounded to 2 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_completeness_and_validity([{'age': 25, 'name': 'Alice'}, {'age': None, 'name': 'Bob'}], {'age': {'type': 'numeric', 'nullable': True}, 'name': {'type': 'categorical', 'nullable': False}})",
+            "expected": "{'completeness': 75.0, 'type_validity': 100.0}",
+            "explanation": "Completeness: 3 non-null out of 4 = 75%. Type validity: age is valid (25 is numeric, None is nullable), name is valid (both are strings) = 4/4 = 100%"
+          },
+          {
+            "input": "calculate_completeness_and_validity([{'x': 1}, {'x': 'two'}, {'x': None}], {'x': {'type': 'numeric', 'nullable': False}})",
+            "expected": "{'completeness': 66.67, 'type_validity': 33.33}",
+            "explanation": "Completeness: 2 non-null out of 3 = 66.67%. Type validity: only first record is valid (1 is numeric), 'two' is string, None is not nullable = 1/3 = 33.33%"
+          },
+          {
+            "input": "calculate_completeness_and_validity([], {'field': {'type': 'boolean', 'nullable': True}})",
+            "expected": "{'completeness': 0.0, 'type_validity': 0.0}",
+            "explanation": "Empty dataset returns 0.0 for both metrics"
+          },
+          {
+            "input": "calculate_completeness_and_validity([{'flag': True}, {'flag': False}], {'flag': {'type': 'boolean', 'nullable': False}})",
+            "expected": "{'completeness': 100.0, 'type_validity': 100.0}",
+            "explanation": "All values present and all are valid booleans = 100% for both"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Iterating over the data twice (once for completeness, once for type validity) instead of combining into one pass",
+        "Not correctly accessing nested schema specifications (schema[field]['type'] and schema[field]['nullable'])",
+        "Forgetting to check if a field exists in a record (missing keys should be treated as None)",
+        "Not reusing the type validation logic from Step 2, leading to inconsistent behavior"
+      ],
+      "hint": "Create two counters: one for non-null values and one for type-valid values. In nested loops over records and schema fields, increment both counters based on the field value. At the end, divide both by total expected values.",
+      "references": [
+        "Single-pass algorithms",
+        "Multi-metric evaluation",
+        "Schema-driven validation",
+        "Computational efficiency in data pipelines"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Data Quality Score: Final Integration",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts - completeness, type validity, uniqueness, and weighted aggregation - into a complete data quality scoring system. This directly solves the main problem by combining all four required metrics.",
+      "prerequisites": [
+        "All previous steps (1-5)",
+        "Dictionary construction",
+        "Edge case handling",
+        "Return value formatting"
+      ],
+      "learning_objectives": [
+        "Integrate all individual metrics into a complete scoring function",
+        "Handle edge cases like empty datasets across all metrics",
+        "Structure return values as required by the problem specification",
+        "Apply the complete data quality framework to realistic ML pipeline scenarios"
+      ],
+      "math_content": {
+        "definition": "The **Complete Data Quality Score** $Q(D, S)$ is a 4-tuple of metrics:\n\n$$Q(D, S) = (C(D, S), TV(D, S), U_R(D), A(D, S))$$\n\nwhere:\n1. $C(D, S) = \\frac{\\sum_{i,f} \\mathbb{1}_{r_i[f] \\neq \\text{null}}}{n \\cdot |F|} \\times 100\\%$ (Completeness)\n2. $TV(D, S) = \\frac{\\sum_{i,f} \\mathbb{1}_{V(r_i[f], S(f).type, S(f).nullable)}}{n \\cdot |F|} \\times 100\\%$ (Type Validity)\n3. $U_R(D) = \\frac{|U(D)|}{|D|} \\times 100\\%$ (Uniqueness Ratio)\n4. $A(D, S) = w_1 C(D, S) + w_2 TV(D, S) + w_3 U_R(D)$ (Overall Score)\n\nwith standard weights $w_1 = 0.4$, $w_2 = 0.4$, $w_3 = 0.2$.\n\n**Edge Case Definition**: For empty dataset $D = \\emptyset$, define:\n\n$$Q(\\emptyset, S) = \\emptyset$$\n\nreturned as an empty dictionary in implementation.",
+        "notation": "$Q(D, S)$ = complete quality score tuple, $C$ = completeness, $TV$ = type validity, $U_R$ = uniqueness ratio, $A$ = weighted aggregate (overall score), $w_1, w_2, w_3$ = weights (0.4, 0.4, 0.2), $\\emptyset$ = empty set",
+        "theorem": "**Theorem (Monotonicity of Overall Score)**: If dataset $D_1$ has higher or equal values for each individual metric compared to $D_2$, then the overall score satisfies $A(D_1, S) \\geq A(D_2, S)$. Formally, if $C(D_1, S) \\geq C(D_2, S)$, $TV(D_1, S) \\geq TV(D_2, S)$, and $U_R(D_1) \\geq U_R(D_2)$, then $A(D_1, S) \\geq A(D_2, S)$.",
+        "proof_sketch": "By the definition of the weighted aggregate: $A(D_1, S) = w_1 C(D_1, S) + w_2 TV(D_1, S) + w_3 U_R(D_1)$ and $A(D_2, S) = w_1 C(D_2, S) + w_2 TV(D_2, S) + w_3 U_R(D_2)$. Taking the difference: $A(D_1, S) - A(D_2, S) = w_1(C(D_1, S) - C(D_2, S)) + w_2(TV(D_1, S) - TV(D_2, S)) + w_3(U_R(D_1) - U_R(D_2))$. Since all weights are non-negative and all metric differences are non-negative by assumption, each term is non-negative, giving $A(D_1, S) - A(D_2, S) \\geq 0$, thus $A(D_1, S) \\geq A(D_2, S)$.",
+        "examples": [
+          "Example 1: $D = [\\{age: 25, name: \\text{'Alice'}, active: \\text{True}\\}]$, $S = \\{age: (\\text{numeric}, \\text{False}), name: (\\text{categorical}, \\text{False}), active: (\\text{boolean}, \\text{False})\\}$. All values are present and type-valid, and uniqueness is 100%. Thus $Q(D, S) = (100, 100, 100, 100)$.",
+          "Example 2: $D = [\\{x: 1\\}, \\{x: 1\\}]$, $S = \\{x: (\\text{numeric}, \\text{False})\\}$. Completeness and type validity are both 100%, but uniqueness is 50% (1 unique record out of 2). Overall = $0.4(100) + 0.4(100) + 0.2(50) = 90$. Thus $Q(D, S) = (100, 100, 50, 90)$.",
+          "Example 3: Problem's given example. $D$ has 4 records with mixed quality issues. Calculations yield $Q(D, S) = (83.33, 83.33, 100, 86.67)$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Quality Score",
+          "latex": "$Q(D, S) = \\left(\\frac{\\sum \\mathbb{1}_{\\text{non-null}}}{n|F|} \\times 100, \\frac{\\sum \\mathbb{1}_{\\text{type-valid}}}{n|F|} \\times 100, \\frac{|U(D)|}{n} \\times 100, 0.4C + 0.4TV + 0.2U_R\\right)$",
+          "description": "Complete data quality score comprising four metrics: completeness, type validity, uniqueness ratio, and weighted overall score. All percentages rounded to 2 decimal places."
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete data quality scoring function that combines all previous sub-quests. Given a list of data records and a schema, calculate completeness, type validity, uniqueness ratio, and overall score (weighted 40%-40%-20%). Return a dictionary with keys 'completeness', 'type_validity', 'uniqueness_ratio', and 'overall_score', with all values as percentages rounded to 2 decimal places. Return an empty dictionary if the input data is empty. This is a simplified version of the main problem that builds directly toward the final solution without requiring you to implement the complete function signature.",
+        "function_signature": "def calculate_quality_metrics(data: list, schema: dict) -> dict:",
+        "starter_code": "def calculate_quality_metrics(data: list, schema: dict) -> dict:\n    \"\"\"\n    Calculate complete data quality score with all four metrics.\n    \n    Args:\n        data: List of dictionaries representing records\n        schema: Dict mapping field names to {'type': str, 'nullable': bool}\n    \n    Returns:\n        Dict with 'completeness', 'type_validity', 'uniqueness_ratio', \n        and 'overall_score', all as percentages (0-100) rounded to 2 decimals.\n        Returns empty dict {} if data is empty.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_quality_metrics([{'age': 25, 'name': 'Alice', 'active': True}, {'age': 'thirty', 'name': 'Bob', 'active': False}, {'age': None, 'name': None, 'active': True}, {'age': 40, 'name': 'Dave', 'active': 'yes'}], {'age': {'type': 'numeric', 'nullable': True}, 'name': {'type': 'categorical', 'nullable': True}, 'active': {'type': 'boolean', 'nullable': False}})",
+            "expected": "{'completeness': 83.33, 'type_validity': 83.33, 'uniqueness_ratio': 100.0, 'overall_score': 86.67}",
+            "explanation": "10 non-null out of 12 = 83.33%. 10 type-valid out of 12 = 83.33%. All 4 records unique = 100%. Overall = 0.4*83.33 + 0.4*83.33 + 0.2*100 = 86.67%"
+          },
+          {
+            "input": "calculate_quality_metrics([{'x': 1}, {'x': 2}, {'x': 1}], {'x': {'type': 'numeric', 'nullable': False}})",
+            "expected": "{'completeness': 100.0, 'type_validity': 100.0, 'uniqueness_ratio': 66.67, 'overall_score': 93.33}",
+            "explanation": "All values present and valid. 2 unique out of 3 records = 66.67%. Overall = 0.4*100 + 0.4*100 + 0.2*66.67 = 93.33%"
+          },
+          {
+            "input": "calculate_quality_metrics([], {})",
+            "expected": "{}",
+            "explanation": "Empty dataset returns empty dictionary"
+          },
+          {
+            "input": "calculate_quality_metrics([{'flag': True}, {'flag': True}], {'flag': {'type': 'boolean', 'nullable': False}})",
+            "expected": "{'completeness': 100.0, 'type_validity': 100.0, 'uniqueness_ratio': 50.0, 'overall_score': 90.0}",
+            "explanation": "Perfect completeness and validity. 1 unique out of 2 = 50%. Overall = 0.4*100 + 0.4*100 + 0.2*50 = 90.0%"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not returning an empty dictionary for empty input data",
+        "Calculating metrics in multiple passes instead of optimizing for efficiency",
+        "Incorrect weight application in overall score (should be 0.4, 0.4, 0.2)",
+        "Forgetting to round all four metrics to 2 decimal places",
+        "Not handling missing fields in records (should treat as None/null)"
+      ],
+      "hint": "Combine the functions from previous steps: use Step 5's combined completeness/validity calculation, Step 3's uniqueness calculation, and Step 4's weighted aggregation. Make sure to handle the empty dataset edge case first.",
+      "references": [
+        "MLOps data quality frameworks",
+        "Production ML monitoring",
+        "Composite metric design",
+        "Data validation pipelines"
+      ]
+    }
+  ]
+}

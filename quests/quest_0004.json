@@ -1,0 +1,385 @@
+{
+  "problem_id": 4,
+  "title": "Calculate Mean by Row or Column",
+  "category": "Linear Algebra",
+  "difficulty": "easy",
+  "description": "Write a Python function that calculates the mean of a matrix either by row or by column, based on a given mode. The function should take a matrix (list of lists) and a mode ('row' or 'column') as input and return a list of means according to the specified mode.",
+  "example": {
+    "input": "matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]], mode = 'column'",
+    "output": "[4.0, 5.0, 6.0]",
+    "reasoning": "Calculating the mean of each column results in [(1+4+7)/3, (2+5+8)/3, (3+6+9)/3]."
+  },
+  "starter_code": "def calculate_matrix_mean(matrix: list[list[float]], mode: str) -> list[float]:\n\treturn means",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Matrix Indexing and Element Access",
+      "relation_to_problem": "Understanding how to access individual elements using row and column indices is fundamental to iterating through matrix rows and columns for mean calculation",
+      "prerequisites": [
+        "Basic Python lists",
+        "Nested data structures",
+        "Zero-based indexing"
+      ],
+      "learning_objectives": [
+        "Master matrix element access using double indexing notation $a_{ij}$",
+        "Understand the relationship between mathematical notation and Python list indexing",
+        "Extract specific rows and columns from a matrix programmatically"
+      ],
+      "math_content": {
+        "definition": "A matrix $A \\in \\mathbb{R}^{m \\times n}$ is a rectangular array of numbers arranged in $m$ rows and $n$ columns. Each element is uniquely identified by its position $(i,j)$ where $i \\in \\{1,2,\\ldots,m\\}$ denotes the row index and $j \\in \\{1,2,\\ldots,n\\}$ denotes the column index. We denote the element at position $(i,j)$ as $a_{ij}$ or $A[i,j]$.",
+        "notation": "$A = [a_{ij}]_{m \\times n}$ represents an $m \\times n$ matrix where $a_{ij}$ is the element in row $i$ and column $j$. Note: Mathematical notation uses 1-based indexing, while Python uses 0-based indexing.",
+        "theorem": "Matrix Dimension Theorem: For a matrix $A \\in \\mathbb{R}^{m \\times n}$, the valid index ranges are $1 \\leq i \\leq m$ for rows and $1 \\leq j \\leq n$ for columns (in mathematical notation), or $0 \\leq i < m$ and $0 \\leq j < n$ in programming contexts.",
+        "proof_sketch": "The dimensions $m$ and $n$ define the bounds of the array structure. Any index outside these bounds refers to a non-existent position, violating the definition of the matrix as a finite rectangular array.",
+        "examples": [
+          "For $A = \\begin{bmatrix} 2 & 4 & 6 \\\\ 8 & 10 & 12 \\end{bmatrix}$, we have $a_{11} = 2$, $a_{12} = 4$, $a_{21} = 8$, and $a_{23} = 12$",
+          "The first row is $[a_{11}, a_{12}, a_{13}] = [2, 4, 6]$, the second column is $[a_{12}, a_{22}]^T = [4, 10]^T$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Row Vector Extraction",
+          "latex": "$\\mathbf{r}_i = [a_{i1}, a_{i2}, \\ldots, a_{in}]$",
+          "description": "Extracts all elements from row $i$ as a vector"
+        },
+        {
+          "name": "Column Vector Extraction",
+          "latex": "$\\mathbf{c}_j = [a_{1j}, a_{2j}, \\ldots, a_{mj}]^T$",
+          "description": "Extracts all elements from column $j$ as a column vector"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that extracts a specific row or column from a matrix. This is the first building block for accessing data needed to compute means.",
+        "function_signature": "def extract_row_or_column(matrix: list[list[float]], index: int, mode: str) -> list[float]:",
+        "starter_code": "def extract_row_or_column(matrix: list[list[float]], index: int, mode: str) -> list[float]:\n    # Extract row if mode='row', column if mode='column'\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "extract_row_or_column([[1, 2, 3], [4, 5, 6], [7, 8, 9]], 1, 'row')",
+            "expected": "[4, 5, 6]",
+            "explanation": "Row at index 1 (second row in 0-based indexing) contains elements [4, 5, 6]"
+          },
+          {
+            "input": "extract_row_or_column([[1, 2, 3], [4, 5, 6], [7, 8, 9]], 2, 'column')",
+            "expected": "[3, 6, 9]",
+            "explanation": "Column at index 2 (third column) contains the third element from each row: [3, 6, 9]"
+          },
+          {
+            "input": "extract_row_or_column([[10, 20], [30, 40], [50, 60]], 0, 'column')",
+            "expected": "[10, 30, 50]",
+            "explanation": "First column (index 0) contains [10, 30, 50]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row and column indices - remember that rows are horizontal (left-to-right) and columns are vertical (top-to-bottom)",
+        "Mixing 0-based (Python) and 1-based (mathematical) indexing conventions",
+        "Attempting to access indices beyond matrix dimensions without bounds checking"
+      ],
+      "hint": "For row extraction, access matrix[index] directly. For column extraction, iterate through all rows and collect the element at the specified column index.",
+      "references": [
+        "Matrix notation",
+        "Nested list traversal in Python",
+        "List comprehensions"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Arithmetic Mean and Summation",
+      "relation_to_problem": "The core operation in calculating row/column means is computing the arithmetic mean, which requires summing elements and dividing by the count",
+      "prerequisites": [
+        "Summation notation",
+        "Division and floating-point arithmetic",
+        "List iteration"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of arithmetic mean",
+        "Implement summation using Python built-in functions",
+        "Apply mean calculation to vectors (preparation for matrix rows/columns)"
+      ],
+      "math_content": {
+        "definition": "The arithmetic mean (or average) of a finite set of numbers $\\{x_1, x_2, \\ldots, x_n\\}$ is defined as: $$\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n} x_i = \\frac{x_1 + x_2 + \\cdots + x_n}{n}$$ where $n$ is the number of elements and $\\sum$ denotes summation.",
+        "notation": "$\\bar{x}$ (x-bar) or $\\mu$ represents the mean. $\\sum_{i=1}^{n} x_i$ means sum all $x_i$ from $i=1$ to $i=n$.",
+        "theorem": "Mean as Linear Functional: The mean operator is linear, meaning for constants $a, b$ and datasets $X, Y$: $\\overline{aX + bY} = a\\bar{x} + b\\bar{y}$",
+        "proof_sketch": "$$\\overline{aX + bY} = \\frac{1}{n}\\sum_{i=1}^{n}(ax_i + by_i) = \\frac{a}{n}\\sum_{i=1}^{n}x_i + \\frac{b}{n}\\sum_{i=1}^{n}y_i = a\\bar{x} + b\\bar{y}$$ by distributivity of summation.",
+        "examples": [
+          "Mean of $\\{2, 4, 6, 8\\}$: $\\bar{x} = \\frac{2+4+6+8}{4} = \\frac{20}{4} = 5.0$",
+          "Mean of $\\{1, 3, 5, 7, 9\\}$: $\\bar{x} = \\frac{1+3+5+7+9}{5} = \\frac{25}{5} = 5.0$",
+          "Mean of single element $\\{42\\}$: $\\bar{x} = \\frac{42}{1} = 42.0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Arithmetic Mean",
+          "latex": "$\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n} x_i$",
+          "description": "The fundamental formula for calculating the average of $n$ numbers"
+        },
+        {
+          "name": "Alternative Form",
+          "latex": "$\\bar{x} = \\frac{\\text{sum of all values}}{\\text{number of values}}$",
+          "description": "Intuitive representation of the mean"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to calculate the arithmetic mean of a list of numbers. This operation will be applied to each row or column in the final problem.",
+        "function_signature": "def calculate_mean(values: list[float]) -> float:",
+        "starter_code": "def calculate_mean(values: list[float]) -> float:\n    # Calculate and return the arithmetic mean\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_mean([1, 2, 3, 4, 5])",
+            "expected": "3.0",
+            "explanation": "Sum is 15, count is 5, so mean is 15/5 = 3.0"
+          },
+          {
+            "input": "calculate_mean([10, 20, 30])",
+            "expected": "20.0",
+            "explanation": "Sum is 60, count is 3, so mean is 60/3 = 20.0"
+          },
+          {
+            "input": "calculate_mean([2.5, 3.5, 4.0])",
+            "expected": "3.333...",
+            "explanation": "Sum is 10.0, count is 3, so mean is 10.0/3 ≈ 3.333"
+          },
+          {
+            "input": "calculate_mean([7])",
+            "expected": "7.0",
+            "explanation": "Single element: mean equals the element itself"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Integer division in Python 2 vs Python 3 - always ensure floating-point division",
+        "Not handling empty lists (though the problem guarantees non-empty matrices)",
+        "Accumulating floating-point rounding errors when summing many values"
+      ],
+      "hint": "Use Python's built-in sum() function for the numerator and len() for the denominator. Make sure the result is a float.",
+      "references": [
+        "Descriptive statistics",
+        "Central tendency measures",
+        "Python numeric types"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Matrix Dimensions and Shape Analysis",
+      "relation_to_problem": "Determining the number of rows and columns is essential for knowing how many means to compute and how many elements contribute to each mean",
+      "prerequisites": [
+        "Matrix definition",
+        "List length operations",
+        "Rectangular array properties"
+      ],
+      "learning_objectives": [
+        "Extract matrix dimensions programmatically",
+        "Understand the relationship between matrix shape and iteration bounds",
+        "Validate matrix structure (rectangular property)"
+      ],
+      "math_content": {
+        "definition": "A matrix $A$ has dimensions $m \\times n$ (read as '$m$ by $n$') where $m$ represents the number of rows and $n$ represents the number of columns. We write $A \\in \\mathbb{R}^{m \\times n}$ to denote that $A$ is a real-valued matrix with these dimensions.",
+        "notation": "$\\text{dim}(A) = (m, n)$ or $A \\in \\mathbb{R}^{m \\times n}$ denotes the dimensions. Sometimes written as $\\text{shape}(A) = (m, n)$ in computational contexts.",
+        "theorem": "Rectangular Property: A valid matrix must have all rows of equal length. Formally, for matrix $A = [\\mathbf{r}_1, \\mathbf{r}_2, \\ldots, \\mathbf{r}_m]^T$ where $\\mathbf{r}_i$ are row vectors, we must have $|\\mathbf{r}_1| = |\\mathbf{r}_2| = \\cdots = |\\mathbf{r}_m| = n$.",
+        "proof_sketch": "By definition, a matrix is a rectangular array. If rows had different lengths, the column structure would be undefined (some columns would have missing elements), violating the bijective mapping from index pairs $(i,j)$ to matrix elements.",
+        "examples": [
+          "$A = \\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{bmatrix}$ has dimensions $2 \\times 3$ (2 rows, 3 columns)",
+          "$B = \\begin{bmatrix} 7 & 8 \\\\ 9 & 10 \\\\ 11 & 12 \\end{bmatrix}$ has dimensions $3 \\times 2$ (3 rows, 2 columns)",
+          "A column vector $\\mathbf{v} = \\begin{bmatrix} 1 \\\\ 2 \\\\ 3 \\end{bmatrix}$ is a $3 \\times 1$ matrix"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Row Count",
+          "latex": "$m = \\text{number of rows}$",
+          "description": "Determines how many row means can be computed, or how many elements contribute to each column mean"
+        },
+        {
+          "name": "Column Count",
+          "latex": "$n = \\text{number of columns}$",
+          "description": "Determines how many column means can be computed, or how many elements contribute to each row mean"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that returns the dimensions of a matrix as a tuple (num_rows, num_columns). Understanding dimensions is crucial for determining iteration bounds when computing means.",
+        "function_signature": "def get_matrix_dimensions(matrix: list[list[float]]) -> tuple[int, int]:",
+        "starter_code": "def get_matrix_dimensions(matrix: list[list[float]]) -> tuple[int, int]:\n    # Return (number of rows, number of columns)\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "get_matrix_dimensions([[1, 2, 3], [4, 5, 6]])",
+            "expected": "(2, 3)",
+            "explanation": "Matrix has 2 rows and 3 columns"
+          },
+          {
+            "input": "get_matrix_dimensions([[1], [2], [3], [4]])",
+            "expected": "(4, 1)",
+            "explanation": "Matrix has 4 rows and 1 column (column vector)"
+          },
+          {
+            "input": "get_matrix_dimensions([[10, 20, 30, 40]])",
+            "expected": "(1, 4)",
+            "explanation": "Matrix has 1 row and 4 columns (row vector)"
+          },
+          {
+            "input": "get_matrix_dimensions([[5, 10], [15, 20], [25, 30]])",
+            "expected": "(3, 2)",
+            "explanation": "Matrix has 3 rows and 2 columns"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row count with column count - remember rows are 'horizontal layers' and columns are 'vertical slices'",
+        "Assuming square matrices - matrices can have $m \\neq n$",
+        "Not checking for empty matrices or ragged arrays (though the problem guarantees well-formed matrices)"
+      ],
+      "hint": "The number of rows equals the length of the outer list. The number of columns equals the length of any single row (first row is convenient).",
+      "references": [
+        "Matrix shape",
+        "Array dimensions",
+        "Tensor rank"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Row-wise Aggregation and Vector Operations",
+      "relation_to_problem": "Computing row means requires applying the mean operation independently to each row vector, demonstrating the 'row' mode of the main problem",
+      "prerequisites": [
+        "Row extraction (Step 1)",
+        "Mean calculation (Step 2)",
+        "Matrix dimensions (Step 3)"
+      ],
+      "learning_objectives": [
+        "Apply aggregation functions across matrix rows",
+        "Generate a vector of row statistics",
+        "Understand dimensional reduction from $m \\times n$ to $m \\times 1$"
+      ],
+      "math_content": {
+        "definition": "The row mean vector $\\boldsymbol{\\mu}_{\\text{row}} \\in \\mathbb{R}^m$ of a matrix $A \\in \\mathbb{R}^{m \\times n}$ is defined as: $$\\boldsymbol{\\mu}_{\\text{row}} = \\begin{bmatrix} \\mu_{r_1} \\\\ \\mu_{r_2} \\\\ \\vdots \\\\ \\mu_{r_m} \\end{bmatrix} \\text{ where } \\mu_{r_i} = \\frac{1}{n}\\sum_{j=1}^{n} a_{ij}$$ Each component $\\mu_{r_i}$ is the arithmetic mean of row $i$.",
+        "notation": "$\\mu_{r_i}$ denotes the mean of row $i$. The subscript $r$ indicates 'row', and the index $i$ specifies which row.",
+        "theorem": "Row Mean Dimensional Reduction: Computing row means reduces an $m \\times n$ matrix to an $m$-dimensional vector, preserving the number of rows while aggregating across columns.",
+        "proof_sketch": "Each row $i$ contains $n$ elements. Computing one mean per row produces exactly $m$ mean values (one for each row). The column dimension is eliminated through summation, leaving only the row dimension intact.",
+        "examples": [
+          "For $A = \\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{bmatrix}$: Row 1 mean = $(1+2+3)/3 = 2.0$, Row 2 mean = $(4+5+6)/3 = 5.0$, giving $\\boldsymbol{\\mu}_{\\text{row}} = \\begin{bmatrix} 2.0 \\\\ 5.0 \\end{bmatrix}$",
+          "For $B = \\begin{bmatrix} 10 & 20 \\\\ 30 & 40 \\\\ 50 & 60 \\end{bmatrix}$: Row means are $[15.0, 35.0, 55.0]^T$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Row Mean Formula",
+          "latex": "$\\mu_{r_i} = \\frac{1}{n}\\sum_{j=1}^{n} a_{ij}$",
+          "description": "Mean of the $i$-th row, summing over all column indices $j$"
+        },
+        {
+          "name": "Matrix Notation",
+          "latex": "$\\boldsymbol{\\mu}_{\\text{row}} = A \\cdot \\frac{1}{n}\\mathbf{1}_n$",
+          "description": "Row means as matrix-vector product with normalized ones vector"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the mean of each row in a matrix, returning a list of row means. This directly implements one half of the final problem.",
+        "function_signature": "def calculate_row_means(matrix: list[list[float]]) -> list[float]:",
+        "starter_code": "def calculate_row_means(matrix: list[list[float]]) -> list[float]:\n    # Calculate mean for each row\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_row_means([[1, 2, 3], [4, 5, 6], [7, 8, 9]])",
+            "expected": "[2.0, 5.0, 8.0]",
+            "explanation": "Row 1: (1+2+3)/3=2.0, Row 2: (4+5+6)/3=5.0, Row 3: (7+8+9)/3=8.0"
+          },
+          {
+            "input": "calculate_row_means([[10, 20], [30, 40]])",
+            "expected": "[15.0, 35.0]",
+            "explanation": "Row 1: (10+20)/2=15.0, Row 2: (30+40)/2=35.0"
+          },
+          {
+            "input": "calculate_row_means([[5, 10, 15, 20]])",
+            "expected": "[12.5]",
+            "explanation": "Single row: (5+10+15+20)/4=12.5"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to divide by the number of columns (not rows) when computing row means",
+        "Iterating over columns instead of rows",
+        "Not storing results in the correct order"
+      ],
+      "hint": "Iterate through each row, apply the mean calculation from Step 2 to that row, and collect the results in a list.",
+      "references": [
+        "Row-wise operations",
+        "Broadcasting in NumPy",
+        "Axis parameter in aggregation functions"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Column-wise Aggregation and Transposed Operations",
+      "relation_to_problem": "Computing column means requires extracting each column as a vector and applying the mean operation, demonstrating the 'column' mode and completing the solution toolkit",
+      "prerequisites": [
+        "Column extraction (Step 1)",
+        "Mean calculation (Step 2)",
+        "Matrix dimensions (Step 3)",
+        "Row-wise operations (Step 4)"
+      ],
+      "learning_objectives": [
+        "Apply aggregation functions across matrix columns",
+        "Generate a vector of column statistics",
+        "Understand dimensional reduction from $m \\times n$ to $1 \\times n$",
+        "Combine row and column operations to solve mode-dependent problems"
+      ],
+      "math_content": {
+        "definition": "The column mean vector $\\boldsymbol{\\mu}_{\\text{col}} \\in \\mathbb{R}^n$ of a matrix $A \\in \\mathbb{R}^{m \\times n}$ is defined as: $$\\boldsymbol{\\mu}_{\\text{col}} = \\begin{bmatrix} \\mu_{c_1} & \\mu_{c_2} & \\cdots & \\mu_{c_n} \\end{bmatrix} \\text{ where } \\mu_{c_j} = \\frac{1}{m}\\sum_{i=1}^{m} a_{ij}$$ Each component $\\mu_{c_j}$ is the arithmetic mean of column $j$.",
+        "notation": "$\\mu_{c_j}$ denotes the mean of column $j$. The subscript $c$ indicates 'column', and the index $j$ specifies which column. Note the summation is over row indices $i$.",
+        "theorem": "Column Mean Dimensional Reduction: Computing column means reduces an $m \\times n$ matrix to an $n$-dimensional vector, preserving the number of columns while aggregating across rows.",
+        "proof_sketch": "Each column $j$ contains $m$ elements (one from each row). Computing one mean per column produces exactly $n$ mean values (one for each column). The row dimension is eliminated through summation over the row index $i$, leaving only the column dimension intact.",
+        "examples": [
+          "For $A = \\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\\\ 7 & 8 & 9 \\end{bmatrix}$: Column 1 mean = $(1+4+7)/3 = 4.0$, Column 2 mean = $(2+5+8)/3 = 5.0$, Column 3 mean = $(3+6+9)/3 = 6.0$, giving $\\boldsymbol{\\mu}_{\\text{col}} = [4.0, 5.0, 6.0]$",
+          "For $B = \\begin{bmatrix} 2 & 4 & 6 & 8 \\\\ 1 & 3 & 5 & 7 \\end{bmatrix}$: Column means are $[(2+1)/2, (4+3)/2, (6+5)/2, (8+7)/2] = [1.5, 3.5, 5.5, 7.5]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Column Mean Formula",
+          "latex": "$\\mu_{c_j} = \\frac{1}{m}\\sum_{i=1}^{m} a_{ij}$",
+          "description": "Mean of the $j$-th column, summing over all row indices $i$"
+        },
+        {
+          "name": "Matrix Notation",
+          "latex": "$\\boldsymbol{\\mu}_{\\text{col}} = \\frac{1}{m}\\mathbf{1}_m^T \\cdot A$",
+          "description": "Column means as matrix-vector product with normalized row ones vector"
+        },
+        {
+          "name": "Duality with Row Means",
+          "latex": "$\\boldsymbol{\\mu}_{\\text{col}}(A) = \\boldsymbol{\\mu}_{\\text{row}}(A^T)^T$",
+          "description": "Column means of $A$ equal the transposed row means of $A^T$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the mean of each column in a matrix, returning a list of column means. Combined with row means from Step 4, this provides all components needed for the main problem.",
+        "function_signature": "def calculate_column_means(matrix: list[list[float]]) -> list[float]:",
+        "starter_code": "def calculate_column_means(matrix: list[list[float]]) -> list[float]:\n    # Calculate mean for each column\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_column_means([[1, 2, 3], [4, 5, 6], [7, 8, 9]])",
+            "expected": "[4.0, 5.0, 6.0]",
+            "explanation": "Column 1: (1+4+7)/3=4.0, Column 2: (2+5+8)/3=5.0, Column 3: (3+6+9)/3=6.0"
+          },
+          {
+            "input": "calculate_column_means([[10, 20], [30, 40], [50, 60]])",
+            "expected": "[30.0, 40.0]",
+            "explanation": "Column 1: (10+30+50)/3=30.0, Column 2: (20+40+60)/3=40.0"
+          },
+          {
+            "input": "calculate_column_means([[5], [10], [15], [20]])",
+            "expected": "[12.5]",
+            "explanation": "Single column: (5+10+15+20)/4=12.5"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to divide by the number of rows (not columns) when computing column means",
+        "Confusing the iteration structure - must iterate through column indices in the outer loop and row indices in the inner loop",
+        "Mixing up which dimension to aggregate over - column means aggregate over rows"
+      ],
+      "hint": "Iterate through each column index, extract all elements from that column across all rows (using concepts from Step 1), then apply the mean calculation from Step 2.",
+      "references": [
+        "Column-wise operations",
+        "Matrix transpose",
+        "Axis parameter in NumPy operations",
+        "Vectorization strategies"
+      ]
+    }
+  ]
+}

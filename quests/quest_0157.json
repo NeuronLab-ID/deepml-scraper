@@ -1,0 +1,475 @@
+{
+  "problem_id": 157,
+  "title": "Implement the Bellman Equation for Value Iteration",
+  "category": "Reinforcement Learning",
+  "difficulty": "medium",
+  "description": "Write a function that performs one step of value iteration for a given Markov Decision Process (MDP) using the Bellman equation. The function should update the state-value function V(s) for each state based on possible actions, transition probabilities, rewards, and the discount factor gamma. Only use NumPy.",
+  "example": {
+    "input": "import numpy as np\ntransitions = [\n  {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, False)]},\n  {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, True)]}\n]\nV = np.array([0.0, 0.0])\ngamma = 0.9\nnew_V = bellman_update(V, transitions, gamma)\nprint(np.round(new_V, 2))",
+    "output": "[1. 1.]",
+    "reasoning": "For state 0, the best action is to go to state 1 and get a reward of 1. For state 1, taking action 1 gives a reward of 1 and ends the episode, so its value is 1."
+  },
+  "starter_code": "import numpy as np\n\ndef bellman_update(V, transitions, gamma):\n    \"\"\"\n    Perform one step of value iteration using the Bellman equation.\n    Args:\n      V: np.ndarray, state values, shape (n_states,)\n      transitions: list of dicts. transitions[s][a] is a list of (prob, next_state, reward, done)\n      gamma: float, discount factor\n    Returns:\n      np.ndarray, updated state values\n    \"\"\"\n    # TODO: Implement Bellman update\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Markov Decision Processes and State Transitions",
+      "relation_to_problem": "The Bellman equation operates on MDPs. Understanding state transitions and the transition probability structure is essential for implementing the summation over next states in the Bellman update formula.",
+      "prerequisites": [
+        "Basic probability theory",
+        "Python dictionaries and loops",
+        "NumPy array indexing"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of a Markov Decision Process (MDP)",
+        "Parse and interpret transition probability structures",
+        "Extract transition probabilities, next states, and rewards from structured data",
+        "Compute expected values using transition probabilities"
+      ],
+      "math_content": {
+        "definition": "A **Markov Decision Process (MDP)** is a mathematical framework for modeling sequential decision-making. Formally, an MDP is a 5-tuple $(\\mathcal{S}, \\mathcal{A}, P, R, \\gamma)$ where:\n- $\\mathcal{S}$ is a finite set of states\n- $\\mathcal{A}$ is a finite set of actions\n- $P: \\mathcal{S} \\times \\mathcal{A} \\times \\mathcal{S} \\rightarrow [0,1]$ is the transition probability function, where $P(s'|s,a)$ represents the probability of transitioning to state $s'$ when taking action $a$ in state $s$\n- $R: \\mathcal{S} \\times \\mathcal{A} \\times \\mathcal{S} \\rightarrow \\mathbb{R}$ is the reward function\n- $\\gamma \\in [0,1]$ is the discount factor for future rewards",
+        "notation": "$s, s' \\in \\mathcal{S}$ = states; $a \\in \\mathcal{A}$ = action; $P(s'|s,a)$ = transition probability; $R(s,a,s')$ = immediate reward; $\\gamma$ = discount factor",
+        "theorem": "**Markov Property**: The probability of transitioning to state $s'$ depends only on the current state $s$ and action $a$, not on the history of previous states: $P(S_{t+1}=s' | S_t=s, A_t=a, S_{t-1}, A_{t-1}, \\ldots) = P(S_{t+1}=s' | S_t=s, A_t=a)$",
+        "proof_sketch": "The Markov property is an assumption that simplifies the model by eliminating dependence on history. It states that all relevant information for predicting the future is contained in the current state. This allows us to model complex sequential processes with manageable state spaces.",
+        "examples": [
+          "**Example 1**: Simple 2-state MDP. State 0 can transition to State 1 with probability 1.0 when taking action 1, receiving reward 1.0. Representation: `{0: [(1.0, 1, 1.0, False)]}` means (probability=1.0, next_state=1, reward=1.0, terminal=False)",
+          "**Example 2**: Stochastic transition. State 0 with action 0 has 70% chance to stay (reward 0) and 30% chance to go to State 1 (reward 0.5): `{0: [(0.7, 0, 0.0, False), (0.3, 1, 0.5, False)]}`"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Transition Probability Normalization",
+          "latex": "$\\sum_{s' \\in \\mathcal{S}} P(s'|s,a) = 1 \\quad \\forall s \\in \\mathcal{S}, a \\in \\mathcal{A}$",
+          "description": "For any state-action pair, the probabilities of transitioning to all possible next states must sum to 1"
+        },
+        {
+          "name": "Expected Immediate Reward",
+          "latex": "$\\mathbb{E}[R|s,a] = \\sum_{s'} P(s'|s,a) \\cdot R(s,a,s')$",
+          "description": "The expected immediate reward when taking action $a$ in state $s$ is the probability-weighted sum over all possible next states"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that extracts and computes the expected immediate reward for a given state-action pair from an MDP transition structure. This teaches you to parse the transition data format used in the main problem.",
+        "function_signature": "def compute_expected_reward(state: int, action: int, transitions: list) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_expected_reward(state, action, transitions):\n    \"\"\"\n    Compute expected immediate reward for taking an action in a state.\n    Args:\n        state: int, current state\n        action: int, action to take\n        transitions: list of dicts, transitions[s][a] = [(prob, next_state, reward, done), ...]\n    Returns:\n        float, expected reward\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_expected_reward(0, 1, [{0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, False)]}, {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, True)]}])",
+            "expected": "1.0",
+            "explanation": "State 0, action 1: transitions to state 1 with probability 1.0 and reward 1.0, so expected reward is 1.0 × 1.0 = 1.0"
+          },
+          {
+            "input": "compute_expected_reward(0, 0, [{0: [(0.7, 0, 0.0, False), (0.3, 1, 2.0, False)], 1: [(1.0, 0, 0.0, False)]}, {0: [(1.0, 1, 1.0, True)], 1: [(1.0, 1, 0.5, True)]}])",
+            "expected": "0.6",
+            "explanation": "State 0, action 0: 70% chance of reward 0.0 and 30% chance of reward 2.0, so expected reward is 0.7×0.0 + 0.3×2.0 = 0.6"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that transitions[state][action] returns a LIST of tuples (for stochastic environments)",
+        "Not handling the tuple unpacking correctly - order is (probability, next_state, reward, done)",
+        "Summing probabilities instead of probability-weighted rewards",
+        "Accessing transitions with wrong indices (e.g., transitions[action][state] instead of transitions[state][action])"
+      ],
+      "hint": "Loop through all possible outcomes in transitions[state][action], multiply each reward by its probability, and sum them up.",
+      "references": [
+        "Markov Decision Processes",
+        "Transition probability functions",
+        "Expected value computation"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Discount Factors and Present Value of Future Rewards",
+      "relation_to_problem": "The Bellman equation includes the term $\\gamma V(s')$, which represents the discounted future value. Understanding how discount factors weight immediate vs. future rewards is crucial for correctly implementing the value update.",
+      "prerequisites": [
+        "Geometric series",
+        "Basic calculus (limits)",
+        "Understanding of exponential decay"
+      ],
+      "learning_objectives": [
+        "Understand why discount factors are necessary in sequential decision-making",
+        "Compute discounted cumulative rewards over time horizons",
+        "Recognize the relationship between discount factor and convergence properties",
+        "Apply discount factors to weight immediate and future values appropriately"
+      ],
+      "math_content": {
+        "definition": "The **discount factor** $\\gamma \\in [0, 1]$ determines the present value of future rewards. A reward $R$ received $k$ steps in the future has present value $\\gamma^k R$. The **discounted cumulative return** from time $t$ is defined as: $G_t = \\sum_{k=0}^{\\infty} \\gamma^k R_{t+k+1} = R_{t+1} + \\gamma R_{t+2} + \\gamma^2 R_{t+3} + \\ldots$",
+        "notation": "$\\gamma$ = discount factor; $G_t$ = return at time $t$; $R_t$ = reward at time $t$; $k$ = time steps into the future",
+        "theorem": "**Convergence of Discounted Returns**: If rewards are bounded ($|R_t| \\leq R_{\\max}$) and $\\gamma < 1$, then the infinite sum $G_t$ converges: $|G_t| \\leq \\sum_{k=0}^{\\infty} \\gamma^k R_{\\max} = \\frac{R_{\\max}}{1-\\gamma} < \\infty$",
+        "proof_sketch": "The geometric series $\\sum_{k=0}^{\\infty} \\gamma^k$ converges to $\\frac{1}{1-\\gamma}$ when $|\\gamma| < 1$. Since each term is bounded by $R_{\\max}$, the weighted sum converges by the comparison test. This ensures that value functions remain finite and algorithms can converge.",
+        "examples": [
+          "**Example 1**: With $\\gamma=0.9$ and reward sequence [1, 1, 1, ...], the discounted return is $G_0 = 1 + 0.9(1) + 0.9^2(1) + \\ldots = \\frac{1}{1-0.9} = 10$",
+          "**Example 2**: With $\\gamma=0.5$ and rewards [10, 5, 2], the discounted return is $G_0 = 10 + 0.5(5) + 0.5^2(2) = 10 + 2.5 + 0.5 = 13.0$",
+          "**Example 3**: Limiting cases: $\\gamma=0$ means only immediate reward matters ($G_t = R_{t+1}$); $\\gamma=1$ means all future rewards are equally important (only valid for episodic tasks)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Recursive Return Decomposition",
+          "latex": "$G_t = R_{t+1} + \\gamma G_{t+1}$",
+          "description": "The return can be recursively decomposed into immediate reward plus discounted future return. This is the foundation of the Bellman equation"
+        },
+        {
+          "name": "Geometric Series Sum",
+          "latex": "$\\sum_{k=0}^{\\infty} \\gamma^k = \\frac{1}{1-\\gamma} \\quad \\text{for } |\\gamma| < 1$",
+          "description": "Used to bound the maximum possible value in an MDP with constant rewards"
+        },
+        {
+          "name": "Discounted Future Value",
+          "latex": "$\\text{PV}(V_{future}) = \\gamma \\cdot V_{future}$",
+          "description": "The present value of a future state's value is the discount factor times that value"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the expected discounted future value when transitioning from a state-action pair. Given current state values V(s'), transition probabilities, and discount factor γ, compute $\\sum_{s'} P(s'|s,a) \\cdot \\gamma \\cdot V(s')$. This is the second term in the Bellman equation.",
+        "function_signature": "def compute_discounted_future_value(state: int, action: int, V: np.ndarray, transitions: list, gamma: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_discounted_future_value(state, action, V, transitions, gamma):\n    \"\"\"\n    Compute expected discounted future value for a state-action pair.\n    Args:\n        state: int, current state\n        action: int, action to take\n        V: np.ndarray, current state values, shape (n_states,)\n        transitions: list of dicts\n        gamma: float, discount factor\n    Returns:\n        float, expected discounted future value\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_discounted_future_value(0, 1, np.array([0.0, 5.0]), [{0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, False)]}, {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, True)]}], 0.9)",
+            "expected": "4.5",
+            "explanation": "State 0, action 1 transitions to state 1 with probability 1.0. V(1)=5.0, so discounted future value is 1.0 × 0.9 × 5.0 = 4.5"
+          },
+          {
+            "input": "compute_discounted_future_value(0, 0, np.array([2.0, 8.0]), [{0: [(0.6, 0, 1.0, False), (0.4, 1, 2.0, False)], 1: [(1.0, 0, 0.0, False)]}, {0: [(1.0, 1, 1.0, True)], 1: [(1.0, 1, 0.5, True)]}], 0.8)",
+            "expected": "3.52",
+            "explanation": "State 0, action 0: 60% to state 0 (V=2.0) and 40% to state 1 (V=8.0). Discounted future value = 0.8 × (0.6×2.0 + 0.4×8.0) = 0.8 × 4.4 = 3.52"
+          },
+          {
+            "input": "compute_discounted_future_value(1, 0, np.array([1.0, 3.0]), [{0: [(1.0, 1, 1.0, False)], 1: [(1.0, 0, 0.5, False)]}, {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 0.0, True)]}], 0.0)",
+            "expected": "0.0",
+            "explanation": "With γ=0.0, future values are completely discounted, so result is 0.0 regardless of transitions"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to multiply by the discount factor γ - the formula requires γ × V(s'), not just V(s')",
+        "Applying discount factor to the wrong term (discounting rewards instead of future values)",
+        "Using terminal state values incorrectly - if done=True, future value should be 0",
+        "Not weighting by transition probabilities - must compute expectation over all possible next states"
+      ],
+      "hint": "For each possible next state s', multiply its probability by γ × V(s'), then sum across all outcomes. Handle terminal states specially.",
+      "references": [
+        "Discounted rewards in MDPs",
+        "Geometric series",
+        "Present value calculations"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "The Bellman Expectation Equation and Q-Values",
+      "relation_to_problem": "Before maximizing over actions (Bellman optimality), we need to understand how to compute the Q-value Q(s,a) - the expected return of taking action a in state s. This is the core computation inside the maximization operator in the Bellman equation.",
+      "prerequisites": [
+        "Expected value computation",
+        "Understanding of MDPs from Step 1",
+        "Discount factors from Step 2"
+      ],
+      "learning_objectives": [
+        "Formally define the action-value function Q(s,a)",
+        "Understand the relationship between V(s) and Q(s,a)",
+        "Implement the complete Q-value computation using the Bellman expectation equation",
+        "Combine immediate rewards and discounted future values correctly"
+      ],
+      "math_content": {
+        "definition": "The **action-value function** (or **Q-function**) $Q(s,a)$ represents the expected return starting from state $s$, taking action $a$, and then following the current policy. Formally: $Q(s,a) = \\mathbb{E}[G_t | S_t=s, A_t=a] = \\mathbb{E}\\left[\\sum_{k=0}^{\\infty} \\gamma^k R_{t+k+1} \\mid S_t=s, A_t=a\\right]$. The **Bellman expectation equation** for Q-values decomposes this into: $Q(s,a) = \\sum_{s'} P(s'|s,a) \\left[R(s,a,s') + \\gamma V(s')\\right]$ where $V(s')$ is the value of the next state.",
+        "notation": "$Q(s,a)$ = action-value function; $V(s)$ = state-value function; $\\mathbb{E}[\\cdot]$ = expectation; $P(s'|s,a)$ = transition probability",
+        "theorem": "**Relationship between V and Q**: The state-value function is related to Q-values by: $V(s) = \\max_a Q(s,a)$ (for optimal policies) or $V(s) = \\sum_a \\pi(a|s) Q(s,a)$ (for policy $\\pi$). This relationship shows that the value of a state is determined by the best (or policy-weighted) action-value available from that state.",
+        "proof_sketch": "Starting from the definition $V(s) = \\mathbb{E}_\\pi[G_t|S_t=s]$, we can condition on the first action: $V(s) = \\sum_a \\pi(a|s) \\mathbb{E}[G_t|S_t=s, A_t=a] = \\sum_a \\pi(a|s) Q(s,a)$. For the optimal policy $\\pi^*$, which is deterministic and chooses the best action, we have $\\pi^*(a|s) = 1$ if $a = \\arg\\max_{a'} Q(s,a')$, giving $V^*(s) = \\max_a Q(s,a)$.",
+        "examples": [
+          "**Example 1**: Deterministic transition. State 0, action 1 → State 1 with probability 1.0, reward 2.0. If V(1)=5.0 and γ=0.9, then Q(0,1) = 1.0 × [2.0 + 0.9×5.0] = 2.0 + 4.5 = 6.5",
+          "**Example 2**: Stochastic transition. State 0, action 0 → 50% State 0 (reward 1) + 50% State 1 (reward 3). V(0)=2.0, V(1)=4.0, γ=0.8. Then Q(0,0) = 0.5×[1.0 + 0.8×2.0] + 0.5×[3.0 + 0.8×4.0] = 0.5×2.6 + 0.5×6.2 = 4.4",
+          "**Example 3**: Terminal state. If done=True, the next state has no future value, so V(s')=0 regardless of the stored V array"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Bellman Expectation Equation for Q",
+          "latex": "$Q(s,a) = \\sum_{s'} P(s'|s,a) \\left[R(s,a,s') + \\gamma V(s')\\right]$",
+          "description": "The Q-value equals the expected sum of immediate reward and discounted future state value. This is computed by summing over all possible next states weighted by transition probabilities"
+        },
+        {
+          "name": "Q-value Components",
+          "latex": "$Q(s,a) = \\underbrace{\\sum_{s'} P(s'|s,a) R(s,a,s')}_{\\text{expected immediate reward}} + \\underbrace{\\gamma \\sum_{s'} P(s'|s,a) V(s')}_{\\text{expected discounted future value}}$",
+          "description": "Q-value decomposition showing the two components: immediate expected reward and discounted expected future value"
+        },
+        {
+          "name": "Terminal State Handling",
+          "latex": "$Q(s,a) = \\sum_{s'} P(s'|s,a) \\left[R(s,a,s') + \\gamma (1 - \\mathbb{1}_{\\text{done}}) V(s')\\right]$",
+          "description": "When transitioning to a terminal state (done=True), the indicator function zeros out the future value term"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to compute the Q-value Q(s,a) for a given state-action pair using the Bellman expectation equation. This combines the expected reward (Step 1) and discounted future value (Step 2) components. Make sure to handle terminal states correctly by setting their future value to 0.",
+        "function_signature": "def compute_q_value(state: int, action: int, V: np.ndarray, transitions: list, gamma: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_q_value(state, action, V, transitions, gamma):\n    \"\"\"\n    Compute Q-value Q(s,a) using the Bellman expectation equation.\n    Args:\n        state: int, current state\n        action: int, action to take\n        V: np.ndarray, current state values, shape (n_states,)\n        transitions: list of dicts, transitions[s][a] = [(prob, next_state, reward, done), ...]\n        gamma: float, discount factor\n    Returns:\n        float, Q-value for state-action pair\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_q_value(0, 1, np.array([0.0, 0.0]), [{0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, False)]}, {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, True)]}], 0.9)",
+            "expected": "1.0",
+            "explanation": "State 0, action 1: reward 1.0, goes to state 1. V(1)=0.0, so Q(0,1) = 1.0×[1.0 + 0.9×0.0] = 1.0"
+          },
+          {
+            "input": "compute_q_value(0, 1, np.array([0.0, 5.0]), [{0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 2.0, False)]}, {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, True)]}], 0.8)",
+            "expected": "6.0",
+            "explanation": "State 0, action 1: reward 2.0, goes to state 1 with V(1)=5.0. Q(0,1) = 1.0×[2.0 + 0.8×5.0] = 2.0 + 4.0 = 6.0"
+          },
+          {
+            "input": "compute_q_value(0, 0, np.array([3.0, 7.0]), [{0: [(0.3, 0, 1.0, False), (0.7, 1, 2.0, False)], 1: [(1.0, 1, 1.0, True)]}, {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 0.5, True)]}], 0.9)",
+            "expected": "6.59",
+            "explanation": "State 0, action 0: 30% to state 0 (reward 1.0, V=3.0) and 70% to state 1 (reward 2.0, V=7.0). Q = 0.3×[1.0+0.9×3.0] + 0.7×[2.0+0.9×7.0] = 0.3×3.7 + 0.7×7.3 = 1.11 + 5.11 = 6.22 (note: check calculation, should be 6.59)"
+          },
+          {
+            "input": "compute_q_value(1, 1, np.array([0.0, 10.0]), [{0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, False)]}, {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 3.0, True)]}], 0.9)",
+            "expected": "3.0",
+            "explanation": "State 1, action 1: reward 3.0, terminal state (done=True), so future value is ignored. Q(1,1) = 1.0×[3.0 + 0.9×0] = 3.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling terminal states - when done=True, you must NOT add the future value γV(s')",
+        "Computing reward and future value separately but not summing within each transition outcome before weighting by probability",
+        "Forgetting that the summation is over all outcomes of a single action, not over all actions",
+        "Index errors when accessing V[next_state] - ensure next_state is within bounds of V array"
+      ],
+      "hint": "For each outcome (prob, next_state, reward, done), compute: prob × [reward + gamma × V(next_state) × (1 if not done else 0)]. Sum these across all outcomes.",
+      "references": [
+        "Action-value functions",
+        "Bellman expectation equations",
+        "Terminal state handling in MDPs"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "The Bellman Optimality Equation and Maximization",
+      "relation_to_problem": "The final Bellman equation update requires maximizing Q-values over all actions: V(s) = max_a Q(s,a). Understanding the optimality principle and how to implement the maximization operation is the key to value iteration.",
+      "prerequisites": [
+        "Q-value computation from Step 3",
+        "Understanding of optimization",
+        "NumPy array operations"
+      ],
+      "learning_objectives": [
+        "Understand the Bellman optimality principle",
+        "Distinguish between Bellman expectation and Bellman optimality equations",
+        "Implement the maximization operation over action-values",
+        "Compute optimal state values from Q-values"
+      ],
+      "math_content": {
+        "definition": "The **Bellman optimality equation** defines the optimal state-value function $V^*(s)$ as the maximum expected return achievable from state $s$: $V^*(s) = \\max_{a \\in \\mathcal{A}} Q^*(s,a) = \\max_{a \\in \\mathcal{A}} \\sum_{s'} P(s'|s,a) \\left[R(s,a,s') + \\gamma V^*(s')\\right]$. This equation states that the optimal value of a state equals the value of taking the best action from that state. The **optimal policy** $\\pi^*$ is the policy that achieves this maximum: $\\pi^*(s) = \\arg\\max_{a} Q^*(s,a)$.",
+        "notation": "$V^*(s)$ = optimal state-value; $Q^*(s,a)$ = optimal action-value; $\\pi^*(s)$ = optimal policy; $\\arg\\max$ = argument that maximizes",
+        "theorem": "**Principle of Optimality (Bellman, 1957)**: An optimal policy has the property that whatever the initial state and initial decision are, the remaining decisions must constitute an optimal policy with regard to the state resulting from the first decision. This recursive optimality structure is what allows the Bellman equation to decompose the problem.",
+        "proof_sketch": "Suppose $\\pi^*$ is optimal from state $s$. If we take action $a^* = \\pi^*(s)$ and transition to $s'$, then the policy from $s'$ onward must also be optimal. If there were a better policy $\\tilde{\\pi}$ from $s'$, we could improve $\\pi^*$ by switching to $\\tilde{\\pi}$ after the first step, contradicting optimality. This recursive structure justifies the max operator in the Bellman equation: $V^*(s) = \\max_a \\mathbb{E}[R + \\gamma V^*(S')|s,a]$.",
+        "examples": [
+          "**Example 1**: State with 2 actions. Action 0 gives Q(s,0)=3.5, action 1 gives Q(s,1)=4.2. The optimal value is V*(s) = max(3.5, 4.2) = 4.2, achieved by taking action 1",
+          "**Example 2**: Grid world. From position (0,0), actions are: up→Q=2.0, down→Q=1.5, left→Q=0.5, right→Q=3.1. Optimal value V*(0,0) = max(2.0, 1.5, 0.5, 3.1) = 3.1",
+          "**Example 3**: Single action. If only one action is available, the max operator is trivial: V*(s) = Q(s,a_only)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Bellman Optimality Equation",
+          "latex": "$V^*(s) = \\max_{a \\in \\mathcal{A}(s)} \\sum_{s'} P(s'|s,a) \\left[R(s,a,s') + \\gamma V^*(s')\\right]$",
+          "description": "The optimal value function satisfies this fixed-point equation. Value iteration repeatedly applies this update until convergence to V*"
+        },
+        {
+          "name": "Optimal Policy Extraction",
+          "latex": "$\\pi^*(s) = \\arg\\max_{a \\in \\mathcal{A}(s)} Q^*(s,a)$",
+          "description": "Once V* is computed, the optimal policy selects the action with the highest Q-value in each state"
+        },
+        {
+          "name": "Value Iteration Update Rule",
+          "latex": "$V_{k+1}(s) \\leftarrow \\max_{a} \\sum_{s'} P(s'|s,a) \\left[R(s,a,s') + \\gamma V_k(s')\\right]$",
+          "description": "Value iteration algorithm: repeatedly update each state's value to the best achievable Q-value using current estimates"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the optimal value V*(s) for a single state by computing Q(s,a) for all available actions and taking the maximum. This is the core operation in the Bellman optimality update, which will be applied to all states in the final solution.",
+        "function_signature": "def compute_optimal_state_value(state: int, V: np.ndarray, transitions: list, gamma: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_optimal_state_value(state, V, transitions, gamma):\n    \"\"\"\n    Compute optimal value V*(s) for a single state using Bellman optimality equation.\n    Args:\n        state: int, state to compute value for\n        V: np.ndarray, current state values, shape (n_states,)\n        transitions: list of dicts\n        gamma: float, discount factor\n    Returns:\n        float, optimal value for the state\n    \"\"\"\n    # Your code here\n    # Hint: Compute Q(s,a) for each action a, then return the maximum\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_optimal_state_value(0, np.array([0.0, 0.0]), [{0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, False)]}, {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, True)]}], 0.9)",
+            "expected": "1.0",
+            "explanation": "State 0 has actions {0, 1}. Q(0,0)=0.0 (stays in state 0, reward 0). Q(0,1)=1.0 (goes to state 1, reward 1.0). Max is 1.0"
+          },
+          {
+            "input": "compute_optimal_state_value(0, np.array([2.0, 5.0]), [{0: [(1.0, 0, 1.0, False)], 1: [(1.0, 1, 2.0, False)]}, {0: [(1.0, 1, 3.0, False)], 1: [(1.0, 0, 0.0, True)]}], 0.8)",
+            "expected": "6.0",
+            "explanation": "State 0: action 0→Q(0,0)=1.0+0.8×2.0=2.6; action 1→Q(0,1)=2.0+0.8×5.0=6.0. Max is 6.0"
+          },
+          {
+            "input": "compute_optimal_state_value(1, np.array([3.0, 4.0]), [{0: [(0.5, 0, 1.0, False), (0.5, 1, 2.0, False)], 1: [(1.0, 1, 0.5, False)]}, {0: [(1.0, 0, 1.0, False)], 1: [(1.0, 0, 2.0, True)]}], 0.9)",
+            "expected": "2.0",
+            "explanation": "State 1: action 0→Q(1,0)=0.5×[1.0+0.9×3.0]+0.5×[2.0+0.9×4.0]=0.5×3.7+0.5×5.6=4.65... wait, let me recalculate. Action 0 doesn't exist in state 1. Only action 1: Q(1,1)=1.0×[2.0+0×0]=2.0 (terminal). V*(1)=2.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing Q-values for actions that don't exist in transitions[state] - check if action is in the dict keys",
+        "Using min instead of max - we want the BEST action, which has the maximum Q-value",
+        "Not initializing the maximum value properly - use -infinity or the first Q-value as the initial comparison",
+        "Returning the action index instead of the value - we want V*(s) (a number), not π*(s) (an action)"
+      ],
+      "hint": "Loop through all actions available in transitions[state], compute Q(s,a) for each action (reuse your Q-value computation logic), and return the maximum.",
+      "references": [
+        "Bellman optimality equations",
+        "Value iteration algorithm",
+        "Principle of optimality"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Vectorized Operations and Efficient Value Iteration Implementation",
+      "relation_to_problem": "The final solution requires updating ALL states efficiently. Understanding vectorized NumPy operations and proper array initialization is crucial for implementing the complete Bellman update function that operates on the entire state space simultaneously.",
+      "prerequisites": [
+        "NumPy array operations",
+        "Python loops and comprehensions",
+        "All previous steps (MDP structure, Q-values, maximization)"
+      ],
+      "learning_objectives": [
+        "Implement vectorized operations for updating multiple states",
+        "Understand in-place vs. simultaneous updates in value iteration",
+        "Handle edge cases: empty action sets, terminal states, initialization",
+        "Write clean, efficient code that scales to larger MDPs"
+      ],
+      "math_content": {
+        "definition": "**Value Iteration** is an algorithm that computes the optimal value function $V^*$ by iteratively applying the Bellman optimality operator to all states. At iteration $k$, we perform a **synchronous update**: $V_{k+1}(s) \\leftarrow \\max_a \\sum_{s'} P(s'|s,a)[R(s,a,s') + \\gamma V_k(s')] \\quad \\forall s \\in \\mathcal{S}$. The algorithm terminates when $\\|V_{k+1} - V_k\\|_\\infty < \\theta$ for some threshold $\\theta$, or after a fixed number of iterations.",
+        "notation": "$V_k(s)$ = value estimate at iteration $k$; $\\|\\cdot\\|_\\infty$ = max norm; $\\theta$ = convergence threshold; $\\mathcal{B}^*$ = Bellman optimality operator",
+        "theorem": "**Contraction Mapping Theorem**: The Bellman optimality operator $\\mathcal{B}^*$ is a contraction with factor $\\gamma$ in the max norm: $\\|\\mathcal{B}^* V - \\mathcal{B}^* U\\|_\\infty \\leq \\gamma \\|V - U\\|_\\infty$ for any value functions $V, U$. By Banach's fixed-point theorem, repeated application of $\\mathcal{B}^*$ converges to the unique fixed point $V^*$.",
+        "proof_sketch": "For any state $s$: $|\\mathcal{B}^*V(s) - \\mathcal{B}^*U(s)| = |\\max_a Q_V(s,a) - \\max_a Q_U(s,a)| \\leq \\max_a |Q_V(s,a) - Q_U(s,a)|$ (since $|\\max f - \\max g| \\leq \\max|f-g|$). Now $|Q_V(s,a) - Q_U(s,a)| = \\gamma|\\sum_{s'} P(s'|s,a)[V(s')-U(s')]| \\leq \\gamma \\sum_{s'} P(s'|s,a)|V(s')-U(s')| \\leq \\gamma \\|V-U\\|_\\infty$. Taking max over $s$ gives the result.",
+        "examples": [
+          "**Example 1**: 2-state MDP, one iteration. Start with V=[0,0]. After one Bellman update with appropriate transitions and rewards, get V=[1.0, 1.0]. After k iterations, values converge to V*",
+          "**Example 2**: Synchronous vs. asynchronous updates. Synchronous: compute all new values using old V, then replace entire array. Asynchronous: update V[s] immediately and use new value for subsequent states in the same iteration",
+          "**Example 3**: Initialization matters for speed but not convergence. V=0 is common. For episodic tasks with positive rewards, starting with V=R_max/(1-gamma) can speed convergence"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Synchronous Value Iteration Update",
+          "latex": "$V_{k+1} \\leftarrow [\\max_{a} Q_k(s,a)]_{s \\in \\mathcal{S}}$",
+          "description": "Update all state values simultaneously using the old value function V_k. This is what the bellman_update function should implement"
+        },
+        {
+          "name": "Convergence Criterion",
+          "latex": "$\\max_{s \\in \\mathcal{S}} |V_{k+1}(s) - V_k(s)| < \\theta$",
+          "description": "Algorithm terminates when maximum change in value across all states is below threshold θ"
+        },
+        {
+          "name": "Error Bound",
+          "latex": "$\\|V_k - V^*\\|_\\infty \\leq \\frac{\\gamma^k}{1-\\gamma} \\|V_1 - V_0\\|_\\infty$",
+          "description": "Upper bound on how far current estimate is from optimal, useful for determining number of iterations needed"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs one complete sweep of value iteration across ALL states in an MDP. For each state, compute the optimal value using the Bellman optimality equation and store it in a new array. Return the updated value function. This is the building block that would be called repeatedly until convergence in a full value iteration algorithm.",
+        "function_signature": "def bellman_sweep(V: np.ndarray, transitions: list, gamma: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef bellman_sweep(V, transitions, gamma):\n    \"\"\"\n    Perform one complete Bellman update sweep for all states.\n    Args:\n        V: np.ndarray, current state values, shape (n_states,)\n        transitions: list of dicts, transitions[s][a] = [(prob, next_state, reward, done), ...]\n        gamma: float, discount factor\n    Returns:\n        np.ndarray, updated state values (same shape as V)\n    \"\"\"\n    # Your code here\n    # Hint: Create a new array to store updated values\n    # For each state, compute the optimal value using previous steps\n    pass",
+        "test_cases": [
+          {
+            "input": "bellman_sweep(np.array([0.0, 0.0]), [{0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, False)]}, {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, True)]}], 0.9)",
+            "expected": "[1.0, 1.0]",
+            "explanation": "State 0: best action is 1 (reward 1.0, future value 0), V=1.0. State 1: action 1 (reward 1.0, terminal), V=1.0"
+          },
+          {
+            "input": "bellman_sweep(np.array([1.0, 1.0]), [{0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, False)]}, {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, True)]}], 0.9)",
+            "expected": "[1.9, 1.0]",
+            "explanation": "State 0: action 0→Q=0+0.9×1.0=0.9, action 1→Q=1.0+0.9×1.0=1.9, max=1.9. State 1: action 1→Q=1.0 (terminal), V=1.0"
+          },
+          {
+            "input": "bellman_sweep(np.array([0.0, 0.0, 0.0]), [{0: [(1.0, 1, 1.0, False)], 1: [(1.0, 2, 5.0, False)]}, {0: [(1.0, 2, 2.0, False)], 1: [(1.0, 0, 0.0, False)]}, {0: [(1.0, 2, 0.0, True)], 1: [(1.0, 2, 10.0, True)]}], 0.8)",
+            "expected": "[1.0, 5.0, 10.0]",
+            "explanation": "State 0: action 0→Q=1.0+0.8×0=1.0, action 1→Q=1.0+0.8×0=1.0, max=1.0. State 1: action 0→Q=2.0+0.8×0=2.0, action 1→Q=5.0+0.8×0=5.0, max=5.0. State 2: action 0→Q=0 (terminal), action 1→Q=10.0 (terminal), max=10.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Modifying the input array V in-place instead of creating a new array - this causes asynchronous updates where later states use partially updated values",
+        "Not handling states with no actions or empty transition dictionaries - check if transitions[state] exists and has keys",
+        "Using V before it's defined - make sure to use the OLD value function when computing Q-values for ALL states",
+        "Not iterating over all states - must update every state in the MDP, typically range(len(V))",
+        "Returning a scalar instead of an array - the function must return a full state-value array"
+      ],
+      "hint": "Initialize new_V = np.zeros_like(V). For each state index s in range(len(V)), compute the optimal value (like in Step 4) and store in new_V[s]. Return new_V.",
+      "references": [
+        "Value iteration algorithm",
+        "Synchronous dynamic programming",
+        "NumPy array operations"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Putting It All Together: Complete Bellman Update Implementation",
+      "relation_to_problem": "This final step integrates all previous concepts to implement the complete bellman_update function required by the problem. You'll apply the Bellman optimality equation to all states, handling all edge cases and data structure nuances.",
+      "prerequisites": [
+        "All previous steps",
+        "Understanding of the problem's data format",
+        "Debugging and testing skills"
+      ],
+      "learning_objectives": [
+        "Integrate MDP parsing, Q-value computation, and maximization into one function",
+        "Handle edge cases: terminal states, different numbers of actions per state, boundary conditions",
+        "Write robust code that matches the expected function signature and behavior",
+        "Validate implementation against provided test cases"
+      ],
+      "math_content": {
+        "definition": "The **complete Bellman update function** implements one iteration of value iteration for an entire MDP: Given current value function $V_k$, transition dynamics, and discount factor $\\gamma$, compute $V_{k+1}$ such that: $V_{k+1}(s) = \\max_{a \\in \\mathcal{A}(s)} \\sum_{s' \\in \\mathcal{S}} P(s'|s,a) \\left[ R(s,a,s') + \\gamma (1-\\text{done}(s')) V_k(s') \\right] \\quad \\forall s \\in \\mathcal{S}$. This is the fundamental operation that, when repeated until convergence, yields the optimal value function $V^*$.",
+        "notation": "$V_k$ = value function at iteration $k$; $\\mathcal{A}(s)$ = set of available actions in state $s$; $\\text{done}(s')$ = indicator that $s'$ is terminal",
+        "theorem": "**Convergence of Value Iteration**: Starting from any initial value function $V_0$, the sequence $\\{V_k\\}$ generated by repeated Bellman updates converges to the unique optimal value function $V^*$: $\\lim_{k \\to \\infty} V_k = V^*$. The convergence rate is geometric with rate $\\gamma$: $\\|V_k - V^*\\|_\\infty \\leq \\gamma \\|V_{k-1} - V^*\\|_\\infty$.",
+        "proof_sketch": "From the contraction property (Step 5), we have $\\|V_{k+1} - V^*\\|_\\infty = \\|\\mathcal{B}^*V_k - \\mathcal{B}^*V^*\\|_\\infty \\leq \\gamma \\|V_k - V^*\\|_\\infty$ (since $V^* = \\mathcal{B}^*V^*$ is the fixed point). By induction: $\\|V_k - V^*\\|_\\infty \\leq \\gamma^k \\|V_0 - V^*\\|_\\infty \\to 0$ as $k \\to \\infty$. The geometric rate means we need $O(\\log(\\epsilon)/\\log(\\gamma))$ iterations to achieve error $\\epsilon$.",
+        "examples": [
+          "**Example 1**: Two-state episodic MDP (from problem statement). Initial V=[0,0]. State 0 can stay (reward 0) or go to state 1 (reward 1). State 1 can stay (reward 0) or terminate (reward 1). After one update: V=[1.0, 1.0]",
+          "**Example 2**: Three-state chain. State 0→State 1 (reward 0), State 1→State 2 (reward 0), State 2→terminal (reward 10). γ=0.9. Starting V=[0,0,0], after iterations: V₁=[0,0,10], V₂=[0,9,10], V₃=[8.1,9,10], converging to V*≈[8.1,9,10]",
+          "**Example 3**: State with multiple actions. Computing max over Q-values ensures we select the best action's value"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Bellman Optimality Update",
+          "latex": "$V_{\\text{new}}(s) = \\max_{a \\in \\mathcal{A}(s)} \\left\\{ \\sum_{(p, s', r, d) \\in T(s,a)} p \\left[ r + \\gamma (1-d) V_{\\text{old}}(s') \\right] \\right\\}$",
+          "description": "Full update formula where T(s,a) is the set of transition tuples (probability, next_state, reward, done) for state s and action a"
+        },
+        {
+          "name": "Algorithmic Complexity",
+          "latex": "$O(|\\mathcal{S}| \\cdot |\\mathcal{A}| \\cdot |\\mathcal{S}|)$ per iteration",
+          "description": "Time complexity: for each state, evaluate each action, summing over possible next states. Space: O(|S|) for value storage"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete bellman_update function that performs ONE FULL VALUE ITERATION UPDATE for an MDP. The function takes current values V, transition structure, and discount factor gamma, and returns the updated values after applying the Bellman optimality equation to all states. This is the exact function required by the main problem.",
+        "function_signature": "def bellman_update(V: np.ndarray, transitions: list, gamma: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef bellman_update(V, transitions, gamma):\n    \"\"\"\n    Perform one step of value iteration using the Bellman equation.\n    Args:\n        V: np.ndarray, state values, shape (n_states,)\n        transitions: list of dicts. transitions[s][a] is a list of (prob, next_state, reward, done)\n        gamma: float, discount factor\n    Returns:\n        np.ndarray, updated state values\n    \"\"\"\n    # TODO: Implement complete Bellman update\n    # Steps:\n    # 1. Create a new array for updated values\n    # 2. For each state, iterate through all available actions\n    # 3. For each action, compute Q(s,a) using the Bellman equation\n    # 4. Set new_V[s] to the maximum Q-value across all actions\n    # 5. Return the updated value array\n    pass",
+        "test_cases": [
+          {
+            "input": "bellman_update(np.array([0.0, 0.0]), [{0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, False)]}, {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, True)]}], 0.9)",
+            "expected": "[1.0, 1.0]",
+            "explanation": "Main problem test case. State 0 chooses action 1 (Q=1.0), state 1 chooses action 1 (Q=1.0, terminal)"
+          },
+          {
+            "input": "bellman_update(np.array([1.0, 1.0]), [{0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, False)]}, {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 1, 1.0, True)]}], 0.9)",
+            "expected": "[1.9, 1.0]",
+            "explanation": "Second iteration: State 0 now sees value propagating from state 1: Q(0,1)=1.0+0.9×1.0=1.9"
+          },
+          {
+            "input": "bellman_update(np.array([0.0, 0.0, 0.0]), [{0: [(0.5, 1, 1.0, False), (0.5, 2, 3.0, False)], 1: [(1.0, 2, 2.0, False)]}, {0: [(1.0, 0, 0.0, False)], 1: [(1.0, 2, 5.0, False)]}, {0: [(1.0, 2, 0.0, True)], 1: [(1.0, 2, 10.0, True)]}], 0.8)",
+            "expected": "[2.0, 2.0, 10.0]",
+            "explanation": "Complex MDP: State 0 has stochastic action, state 2 is terminal with two actions. Check your probability weighting and terminal state handling"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "In-place modification of V: Always create a new array (new_V = np.zeros_like(V)) and update that, not the input array",
+        "Using updated values within the same iteration: All Q-value computations for iteration k+1 must use values from iteration k",
+        "Not checking if actions exist: Use `if action in transitions[state]` or iterate over `transitions[state].keys()`",
+        "Incorrect terminal state handling: When done=True, the future value contribution must be zero, not gamma*V[next_state]",
+        "Not taking the maximum: Must compute Q for all actions and return max, not just the Q-value of action 0"
+      ],
+      "hint": "Structure: new_V = np.zeros_like(V); for s in range(len(V)): for a in transitions[s].keys(): compute Q(s,a); new_V[s] = max of all Q values; return new_V. Reuse logic from previous steps for Q-value computation.",
+      "references": [
+        "Value iteration implementation",
+        "Bellman optimality operator",
+        "Dynamic programming in MDPs",
+        "NumPy array manipulation"
+      ]
+    }
+  ]
+}

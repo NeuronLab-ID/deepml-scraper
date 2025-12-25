@@ -1,0 +1,60 @@
+{
+  "description": "V3JpdGUgYSBQeXRob24gZnVuY3Rpb24gdGhhdCBjb21wdXRlcyB0aGUgSGVzc2lhbiBtYXRyaXggb2YgYSBzY2FsYXItdmFsdWVkIGZ1bmN0aW9uIGF0IGEgZ2l2ZW4gcG9pbnQuIFRoZSBIZXNzaWFuIG1hdHJpeCBjb250YWlucyBhbGwgc2Vjb25kLW9yZGVyIHBhcnRpYWwgZGVyaXZhdGl2ZXMgYW5kIGlzIGVzc2VudGlhbCBmb3Igb3B0aW1pemF0aW9uIGFsZ29yaXRobXMgbGlrZSBOZXd0b24ncyBtZXRob2QsIGFzIHdlbGwgYXMgZm9yIGFuYWx5emluZyB0aGUgY3VydmF0dXJlIG9mIGxvc3Mgc3VyZmFjZXMgaW4gbWFjaGluZSBsZWFybmluZy4gWW91ciBmdW5jdGlvbiBzaG91bGQgdXNlIGZpbml0ZSBkaWZmZXJlbmNlcyB0byBudW1lcmljYWxseSBhcHByb3hpbWF0ZSB0aGUgSGVzc2lhbiBmb3IgYW55IGFyYml0cmFyeSBmdW5jdGlvbi4=",
+  "id": "218",
+  "test_cases": [
+    {
+      "test": "def f(p): return p[0]**2 + p[1]**2\nresult = compute_hessian(f, [0.0, 0.0])\nprint([[round(v, 4) for v in row] for row in result])",
+      "expected_output": "[[2.0, 0.0], [0.0, 2.0]]"
+    },
+    {
+      "test": "def f(p): return p[0]**2 + 2*p[0]*p[1] + 3*p[1]**2\nresult = compute_hessian(f, [1.0, 1.0])\nprint([[round(v, 4) for v in row] for row in result])",
+      "expected_output": "[[2.0, 2.0], [2.0, 6.0]]"
+    }
+  ],
+  "difficulty": "medium",
+  "pytorch_difficulty": "medium",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "f(x, y) = x^2 + y^2, point = [0.0, 0.0]",
+    "output": "[[2.0, 0.0], [0.0, 2.0]]",
+    "reasoning": "For f(x,y) = x^2 + y^2: The second derivative with respect to x is 2, the second derivative with respect to y is 2, and the mixed partial derivatives are 0. This gives us H = [[2, 0], [0, 2]], which indicates the function has positive curvature in all directions (it's a paraboloid)."
+  },
+  "category": "Deep Learning",
+  "pytorch_starter_code": "aW1wb3J0IHRvcmNoCmZyb20gdHlwaW5nIGltcG9ydCBDYWxsYWJsZQoKZGVmIGNvbXB1dGVfaGVzc2lhbihmOiBDYWxsYWJsZVtbdG9yY2guVGVuc29yXSwgdG9yY2guVGVuc29yXSwgcG9pbnQ6IHRvcmNoLlRlbnNvcikgLT4gdG9yY2guVGVuc29yOgogICAgIiIiCiAgICBDb21wdXRlIHRoZSBIZXNzaWFuIG1hdHJpeCB1c2luZyBQeVRvcmNoIGF1dG9ncmFkLgogICAgCiAgICBBcmdzOgogICAgICAgIGY6IEEgc2NhbGFyIGZ1bmN0aW9uIHRoYXQgdGFrZXMgYSB0ZW5zb3IgYW5kIHJldHVybnMgYSBzY2FsYXIgdGVuc29yCiAgICAgICAgcG9pbnQ6IFRoZSBwb2ludCBhdCB3aGljaCB0byBjb21wdXRlIHRoZSBIZXNzaWFuCiAgICAgICAgCiAgICBSZXR1cm5zOgogICAgICAgIFRoZSBIZXNzaWFuIG1hdHJpeCBhcyBhIHRlbnNvcgogICAgIiIiCiAgICAjIFlvdXIgY29kZSBoZXJlIC0gdXNlIHRvcmNoLmF1dG9ncmFkLmZ1bmN0aW9uYWwuaGVzc2lhbiBvciBtYW51YWwgZG91YmxlIGJhY2t3YXJkCiAgICBwYXNz",
+  "title": "Compute the Hessian Matrix",
+  "createdAt": "November 30, 2025 at 10:07:37 PM UTC-0500",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/Open-Deep-ML",
+      "name": "Deep-ML"
+    }
+  ],
+  "pytorch_test_cases": [
+    {
+      "test": "import torch\ndef f(p): return p[0]**2 + p[1]**2\nresult = compute_hessian(f, torch.tensor([0.0, 0.0]))\nprint([[round(v, 4) for v in row.tolist()] for row in result])",
+      "expected_output": "[[2.0, 0.0], [0.0, 2.0]]"
+    },
+    {
+      "test": "import torch\ndef f(p): return p[0]**2 + 2*p[0]*p[1] + 3*p[1]**2\nresult = compute_hessian(f, torch.tensor([1.0, 1.0]))\nprint([[round(v, 4) for v in row.tolist()] for row in result])",
+      "expected_output": "[[2.0, 2.0], [2.0, 6.0]]"
+    },
+    {
+      "test": "import torch\ndef f(p): return torch.sin(p[0]) * torch.cos(p[1])\nresult = compute_hessian(f, torch.tensor([0.0, 0.0]))\nprint([[round(v, 4) for v in row.tolist()] for row in result])",
+      "expected_output": "[[0.0, 0.0], [0.0, 0.0]]"
+    },
+    {
+      "test": "import torch\nimport math\ndef f(p): return torch.sin(p[0]) * torch.cos(p[1])\nresult = compute_hessian(f, torch.tensor([math.pi/2, 0.0]))\nprint([[round(v, 4) for v in row.tolist()] for row in result])",
+      "expected_output": "[[-1.0, 0.0], [0.0, -1.0]]"
+    },
+    {
+      "test": "import torch\ndef f(p): return p[0]**2 + p[1]**2 + p[2]**2\nresult = compute_hessian(f, torch.tensor([0.0, 0.0, 0.0]))\nprint([[round(v, 4) for v in row.tolist()] for row in result])",
+      "expected_output": "[[2.0, 0.0, 0.0], [0.0, 2.0, 0.0], [0.0, 0.0, 2.0]]"
+    }
+  ],
+  "learn_section": "IyMgVGhlIEhlc3NpYW4gTWF0cml4CgojIyMgRGVmaW5pdGlvbgoKVGhlIEhlc3NpYW4gbWF0cml4IGlzIHRoZSBzcXVhcmUgbWF0cml4IG9mIHNlY29uZC1vcmRlciBwYXJ0aWFsIGRlcml2YXRpdmVzIG9mIGEgc2NhbGFyLXZhbHVlZCBmdW5jdGlvbi4gRm9yIGEgZnVuY3Rpb24gJGY6IFxtYXRoYmJ7Un1ebiBccmlnaHRhcnJvdyBcbWF0aGJie1J9JCwgdGhlIEhlc3NpYW4gJEgkIGlzIGFuICRuIFx0aW1lcyBuJCBtYXRyaXg6CgokJApIID0gXGJlZ2lue3BtYXRyaXh9ClxmcmFje1xwYXJ0aWFsXjIgZn17XHBhcnRpYWwgeF8xXjJ9ICYgXGZyYWN7XHBhcnRpYWxeMiBmfXtccGFydGlhbCB4XzEgXHBhcnRpYWwgeF8yfSAmIFxjZG90cyAmIFxmcmFje1xwYXJ0aWFsXjIgZn17XHBhcnRpYWwgeF8xIFxwYXJ0aWFsIHhfbn0gXFwKXGZyYWN7XHBhcnRpYWxeMiBmfXtccGFydGlhbCB4XzIgXHBhcnRpYWwgeF8xfSAmIFxmcmFje1xwYXJ0aWFsXjIgZn17XHBhcnRpYWwgeF8yXjJ9ICYgXGNkb3RzICYgXGZyYWN7XHBhcnRpYWxeMiBmfXtccGFydGlhbCB4XzIgXHBhcnRpYWwgeF9ufSBcXApcdmRvdHMgJiBcdmRvdHMgJiBcZGRvdHMgJiBcdmRvdHMgXFwKXGZyYWN7XHBhcnRpYWxeMiBmfXtccGFydGlhbCB4X24gXHBhcnRpYWwgeF8xfSAmIFxmcmFje1xwYXJ0aWFsXjIgZn17XHBhcnRpYWwgeF9uIFxwYXJ0aWFsIHhfMn0gJiBcY2RvdHMgJiBcZnJhY3tccGFydGlhbF4yIGZ9e1xwYXJ0aWFsIHhfbl4yfQpcZW5ke3BtYXRyaXh9CiQkCgojIyMgU3ltbWV0cnkKCkZvciBmdW5jdGlvbnMgd2l0aCBjb250aW51b3VzIHNlY29uZCBkZXJpdmF0aXZlcyAoU2Nod2FyeidzIHRoZW9yZW0pLCB0aGUgSGVzc2lhbiBpcyBzeW1tZXRyaWM6CiQkXGZyYWN7XHBhcnRpYWxeMiBmfXtccGFydGlhbCB4X2kgXHBhcnRpYWwgeF9qfSA9IFxmcmFje1xwYXJ0aWFsXjIgZn17XHBhcnRpYWwgeF9qIFxwYXJ0aWFsIHhfaX0kJAoKIyMjIE51bWVyaWNhbCBDb21wdXRhdGlvbiB3aXRoIEZpbml0ZSBEaWZmZXJlbmNlcwoKV2hlbiB3ZSBkb24ndCBoYXZlIGFuIGFuYWx5dGljYWwgZm9ybSwgd2UgY2FuIGFwcHJveGltYXRlIHRoZSBIZXNzaWFuIG51bWVyaWNhbGx5OgoKKipEaWFnb25hbCBlbGVtZW50cyAoc2Vjb25kIGRlcml2YXRpdmVzKToqKgokJFxmcmFje1xwYXJ0aWFsXjIgZn17XHBhcnRpYWwgeF9pXjJ9IFxhcHByb3ggXGZyYWN7Zih4ICsgaCBlX2kpIC0gMmYoeCkgKyBmKHggLSBoIGVfaSl9e2heMn0kJAoKKipPZmYtZGlhZ29uYWwgZWxlbWVudHMgKG1peGVkIHBhcnRpYWxzKToqKgokJFxmcmFje1xwYXJ0aWFsXjIgZn17XHBhcnRpYWwgeF9pIFxwYXJ0aWFsIHhfan0gXGFwcHJveCBcZnJhY3tmKHggKyBoIGVfaSArIGggZV9qKSAtIGYoeCArIGggZV9pIC0gaCBlX2opIC0gZih4IC0gaCBlX2kgKyBoIGVfaikgKyBmKHggLSBoIGVfaSAtIGggZV9qKX17NGheMn0kJAoKd2hlcmUgJGVfaSQgaXMgdGhlIHVuaXQgdmVjdG9yIGluIHRoZSAkaSQtdGggZGlyZWN0aW9uLgoKIyMjIEV4YW1wbGU6IFF1YWRyYXRpYyBGdW5jdGlvbgoKRm9yICRmKHgsIHkpID0gYXheMiArIGJ4eSArIGN5XjIkOgoKJCRIID0gXGJlZ2lue3BtYXRyaXh9IDJhICYgYiBcXCBiICYgMmMgXGVuZHtwbWF0cml4fSQkCgojIyMgQXBwbGljYXRpb25zIGluIE1hY2hpbmUgTGVhcm5pbmcKCjEuICoqTmV3dG9uJ3MgTWV0aG9kKio6IFVzZXMgdGhlIEhlc3NpYW4gZm9yIHNlY29uZC1vcmRlciBvcHRpbWl6YXRpb246CiAgICQkeF97bisxfSA9IHhfbiAtIEheey0xfSBcbmFibGEgZiQkCgoyLiAqKkFuYWx5emluZyBDcml0aWNhbCBQb2ludHMqKjoKICAgLSBJZiAkSCQgaXMgcG9zaXRpdmUgZGVmaW5pdGUgKGFsbCBlaWdlbnZhbHVlcyA+IDApOiBsb2NhbCBtaW5pbXVtCiAgIC0gSWYgJEgkIGlzIG5lZ2F0aXZlIGRlZmluaXRlIChhbGwgZWlnZW52YWx1ZXMgPCAwKTogbG9jYWwgbWF4aW11bQogICAtIElmICRIJCBoYXMgbWl4ZWQgc2lnbnM6IHNhZGRsZSBwb2ludAoKMy4gKipMb3NzIFN1cmZhY2UgQW5hbHlzaXMqKjogVW5kZXJzdGFuZGluZyB0aGUgY3VydmF0dXJlIG9mIG5ldXJhbCBuZXR3b3JrIGxvc3MgbGFuZHNjYXBlcyBoZWxwcyBleHBsYWluIG9wdGltaXphdGlvbiBkeW5hbWljcy4KCjQuICoqTGFwbGFjZSBBcHByb3hpbWF0aW9uKio6IFVzZXMgdGhlIEhlc3NpYW4gZm9yIEJheWVzaWFuIGluZmVyZW5jZS4KCiMjIyBDb21wdXRhdGlvbmFsIENvbnNpZGVyYXRpb25zCgotIENvbXB1dGluZyB0aGUgZnVsbCBIZXNzaWFuIHJlcXVpcmVzICRPKG5eMikkIGZ1bmN0aW9uIGV2YWx1YXRpb25zCi0gRm9yIGxhcmdlIG5ldXJhbCBuZXR3b3JrcywgdGhpcyBpcyBvZnRlbiBpbXByYWN0aWNhbAotIEFsdGVybmF0aXZlczogSGVzc2lhbi12ZWN0b3IgcHJvZHVjdHMsIGRpYWdvbmFsIGFwcHJveGltYXRpb25zLCBvciBxdWFzaS1OZXd0b24gbWV0aG9kcyAoQkZHUywgTC1CRkdTKQ==",
+  "starter_code": "from typing import Callable\n\ndef compute_hessian(f: Callable[[list[float]], float], point: list[float], h: float = 1e-5) -> list[list[float]]:\n\t\"\"\"\n\tCompute the Hessian matrix of function f at the given point using finite differences.\n\t\n\tArgs:\n\t\tf: A scalar function that takes a list of floats and returns a float\n\t\tpoint: The point at which to compute the Hessian (list of coordinates)\n\t\th: Step size for finite differences (default: 1e-5)\n\t\t\n\tReturns:\n\t\tThe Hessian matrix as a list of lists (n x n where n = len(point))\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "description_decoded": "Write a Python function that computes the Hessian matrix of a scalar-valued function at a given point. The Hessian matrix contains all second-order partial derivatives and is essential for optimization algorithms like Newton's method, as well as for analyzing the curvature of loss surfaces in machine learning. Your function should use finite differences to numerically approximate the Hessian for any arbitrary function.",
+  "learn_section_decoded": "## The Hessian Matrix\n\n### Definition\n\nThe Hessian matrix is the square matrix of second-order partial derivatives of a scalar-valued function. For a function $f: \\mathbb{R}^n \\rightarrow \\mathbb{R}$, the Hessian $H$ is an $n \\times n$ matrix:\n\n$$\nH = \\begin{pmatrix}\n\\frac{\\partial^2 f}{\\partial x_1^2} & \\frac{\\partial^2 f}{\\partial x_1 \\partial x_2} & \\cdots & \\frac{\\partial^2 f}{\\partial x_1 \\partial x_n} \\\\\n\\frac{\\partial^2 f}{\\partial x_2 \\partial x_1} & \\frac{\\partial^2 f}{\\partial x_2^2} & \\cdots & \\frac{\\partial^2 f}{\\partial x_2 \\partial x_n} \\\\\n\\vdots & \\vdots & \\ddots & \\vdots \\\\\n\\frac{\\partial^2 f}{\\partial x_n \\partial x_1} & \\frac{\\partial^2 f}{\\partial x_n \\partial x_2} & \\cdots & \\frac{\\partial^2 f}{\\partial x_n^2}\n\\end{pmatrix}\n$$\n\n### Symmetry\n\nFor functions with continuous second derivatives (Schwarz's theorem), the Hessian is symmetric:\n$$\\frac{\\partial^2 f}{\\partial x_i \\partial x_j} = \\frac{\\partial^2 f}{\\partial x_j \\partial x_i}$$\n\n### Numerical Computation with Finite Differences\n\nWhen we don't have an analytical form, we can approximate the Hessian numerically:\n\n**Diagonal elements (second derivatives):**\n$$\\frac{\\partial^2 f}{\\partial x_i^2} \\approx \\frac{f(x + h e_i) - 2f(x) + f(x - h e_i)}{h^2}$$\n\n**Off-diagonal elements (mixed partials):**\n$$\\frac{\\partial^2 f}{\\partial x_i \\partial x_j} \\approx \\frac{f(x + h e_i + h e_j) - f(x + h e_i - h e_j) - f(x - h e_i + h e_j) + f(x - h e_i - h e_j)}{4h^2}$$\n\nwhere $e_i$ is the unit vector in the $i$-th direction.\n\n### Example: Quadratic Function\n\nFor $f(x, y) = ax^2 + bxy + cy^2$:\n\n$$H = \\begin{pmatrix} 2a & b \\\\ b & 2c \\end{pmatrix}$$\n\n### Applications in Machine Learning\n\n1. **Newton's Method**: Uses the Hessian for second-order optimization:\n   $$x_{n+1} = x_n - H^{-1} \\nabla f$$\n\n2. **Analyzing Critical Points**:\n   - If $H$ is positive definite (all eigenvalues > 0): local minimum\n   - If $H$ is negative definite (all eigenvalues < 0): local maximum\n   - If $H$ has mixed signs: saddle point\n\n3. **Loss Surface Analysis**: Understanding the curvature of neural network loss landscapes helps explain optimization dynamics.\n\n4. **Laplace Approximation**: Uses the Hessian for Bayesian inference.\n\n### Computational Considerations\n\n- Computing the full Hessian requires $O(n^2)$ function evaluations\n- For large neural networks, this is often impractical\n- Alternatives: Hessian-vector products, diagonal approximations, or quasi-Newton methods (BFGS, L-BFGS)"
+}

@@ -1,0 +1,546 @@
+{
+  "problem_id": 120,
+  "title": "Bhattacharyya Distance Between Two Distributions",
+  "category": "Statistics",
+  "difficulty": "easy",
+  "description": "Implement a function to calculate the Bhattacharyya distance between two probability distributions. The function should take two lists representing discrete probability distributions `p` and `q`, and return the Bhattacharyya distance rounded to 4 decimal places. If the inputs have different lengths or are empty, return 0.0.",
+  "example": {
+    "input": "p = [0.1, 0.2, 0.3, 0.4], q = [0.4, 0.3, 0.2, 0.1]",
+    "output": "0.1166",
+    "reasoning": "The Bhattacharyya coefficient is calculated as the sum of element-wise square roots of the product of p and q, giving BC = 0.8898. The distance is then -log(0.8898) = 0.1166."
+  },
+  "starter_code": "import numpy as np\n\ndef bhattacharyya_distance(p: list[float], q: list[float]) -> float:\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Discrete Probability Distributions",
+      "relation_to_problem": "The Bhattacharyya distance operates on probability distributions. Understanding what constitutes a valid discrete probability distribution is essential for validating inputs and interpreting the distance metric correctly.",
+      "prerequisites": [
+        "Basic algebra",
+        "Sum notation"
+      ],
+      "learning_objectives": [
+        "Define discrete probability distributions formally",
+        "Verify normalization conditions for probability distributions",
+        "Implement validation logic for probability vectors"
+      ],
+      "math_content": {
+        "definition": "A **discrete probability distribution** over a finite sample space $\\Omega = \\{x_1, x_2, \\ldots, x_n\\}$ is a function $P: \\Omega \\rightarrow [0, 1]$ that assigns probabilities to each outcome such that: (1) $P(x_i) \\geq 0$ for all $i$, and (2) $\\sum_{i=1}^{n} P(x_i) = 1$. The second condition is called the **normalization condition**.",
+        "notation": "$P(x_i)$ = probability of outcome $x_i$; $n$ = size of sample space; $\\sum_{i=1}^{n}$ = summation over all outcomes",
+        "theorem": "**Theorem (Properties of Probability)**: For any discrete probability distribution $P$: (1) $0 \\leq P(x_i) \\leq 1$ for all $i$, (2) $P(\\Omega) = \\sum_{i=1}^{n} P(x_i) = 1$, (3) For disjoint events $A, B$: $P(A \\cup B) = P(A) + P(B)$.",
+        "proof_sketch": "Property (1) follows from the definition requiring non-negative probabilities bounded by 1. Property (2) is the normalization axiom ensuring total probability equals 1. Property (3) follows from additivity: if $A$ and $B$ share no outcomes, the probability of their union equals the sum of individual probabilities.",
+        "examples": [
+          "Valid distribution: $P = [0.25, 0.25, 0.25, 0.25]$ (uniform over 4 outcomes, sum = 1.0)",
+          "Invalid distribution: $P = [0.3, 0.4, 0.5]$ (sum = 1.2 > 1, violates normalization)",
+          "Invalid distribution: $P = [0.5, -0.1, 0.6]$ (negative probability violates non-negativity)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Normalization Condition",
+          "latex": "$\\sum_{i=1}^{n} P(x_i) = 1$",
+          "description": "Use to verify that a given vector represents a valid probability distribution"
+        },
+        {
+          "name": "Non-negativity Constraint",
+          "latex": "$P(x_i) \\geq 0 \\quad \\forall i \\in \\{1, \\ldots, n\\}$",
+          "description": "Use to check that all probability values are non-negative"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that validates whether a list of numbers represents a valid discrete probability distribution. Return True if the list is non-empty, all values are non-negative, and the sum equals 1.0 (within tolerance 1e-6), otherwise return False.",
+        "function_signature": "def is_valid_distribution(p: list[float]) -> bool:",
+        "starter_code": "def is_valid_distribution(p: list[float]) -> bool:\n    # Your code here\n    # Check: non-empty, all non-negative, sum equals 1.0\n    pass",
+        "test_cases": [
+          {
+            "input": "is_valid_distribution([0.25, 0.25, 0.25, 0.25])",
+            "expected": "True",
+            "explanation": "All values non-negative and sum to 1.0 exactly"
+          },
+          {
+            "input": "is_valid_distribution([0.1, 0.2, 0.3, 0.4])",
+            "expected": "True",
+            "explanation": "Valid distribution with varying probabilities summing to 1.0"
+          },
+          {
+            "input": "is_valid_distribution([0.5, 0.6])",
+            "expected": "False",
+            "explanation": "Sum exceeds 1.0 (violates normalization)"
+          },
+          {
+            "input": "is_valid_distribution([0.5, -0.1, 0.6])",
+            "expected": "False",
+            "explanation": "Contains negative value (violates non-negativity)"
+          },
+          {
+            "input": "is_valid_distribution([])",
+            "expected": "False",
+            "explanation": "Empty list is not a valid distribution"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check for empty lists before validation",
+        "Using exact equality (==) instead of tolerance-based comparison for floating-point sums",
+        "Not validating both non-negativity AND normalization conditions",
+        "Assuming that values close to but not exactly 1.0 are invalid (numerical precision issues)"
+      ],
+      "hint": "Use the sum() function for normalization checking and the all() function with a generator expression for non-negativity checking. Account for floating-point precision with absolute difference comparison.",
+      "references": [
+        "Probability axioms (Kolmogorov)",
+        "Discrete random variables",
+        "Floating-point arithmetic precision"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Element-wise Operations and the Product Rule",
+      "relation_to_problem": "Computing the Bhattacharyya coefficient requires element-wise multiplication of two probability distributions. This sub-quest teaches the fundamental operation needed to combine two distributions point-by-point.",
+      "prerequisites": [
+        "Array/list indexing",
+        "Loops or list comprehensions"
+      ],
+      "learning_objectives": [
+        "Understand element-wise operations on vectors",
+        "Implement element-wise multiplication of two lists",
+        "Handle edge cases with mismatched list lengths"
+      ],
+      "math_content": {
+        "definition": "Given two vectors $\\mathbf{p} = [p_1, p_2, \\ldots, p_n]$ and $\\mathbf{q} = [q_1, q_2, \\ldots, q_n]$ of equal length $n$, the **element-wise product** (also called **Hadamard product**) is defined as: $\\mathbf{p} \\odot \\mathbf{q} = [p_1 \\cdot q_1, p_2 \\cdot q_2, \\ldots, p_n \\cdot q_n]$. Each element in the result is the product of corresponding elements from the input vectors.",
+        "notation": "$\\mathbf{p} \\odot \\mathbf{q}$ = Hadamard product; $p_i \\cdot q_i$ = scalar multiplication of i-th elements; $n$ = vector dimension",
+        "theorem": "**Theorem (Properties of Hadamard Product)**: For vectors $\\mathbf{p}, \\mathbf{q}, \\mathbf{r}$ of equal dimension: (1) Commutativity: $\\mathbf{p} \\odot \\mathbf{q} = \\mathbf{q} \\odot \\mathbf{p}$, (2) Associativity: $(\\mathbf{p} \\odot \\mathbf{q}) \\odot \\mathbf{r} = \\mathbf{p} \\odot (\\mathbf{q} \\odot \\mathbf{r})$, (3) Distributivity over addition: $\\mathbf{p} \\odot (\\mathbf{q} + \\mathbf{r}) = (\\mathbf{p} \\odot \\mathbf{q}) + (\\mathbf{p} \\odot \\mathbf{r})$.",
+        "proof_sketch": "Commutativity follows from scalar multiplication commutativity: $p_i \\cdot q_i = q_i \\cdot p_i$ for all $i$. Associativity follows from $(p_i \\cdot q_i) \\cdot r_i = p_i \\cdot (q_i \\cdot r_i)$ for scalars. Distributivity follows from the distributive law of scalar arithmetic: $p_i \\cdot (q_i + r_i) = p_i \\cdot q_i + p_i \\cdot r_i$ applied element-wise.",
+        "examples": [
+          "Simple case: $[2, 3] \\odot [4, 5] = [2 \\cdot 4, 3 \\cdot 5] = [8, 15]$",
+          "With probabilities: $[0.1, 0.4, 0.5] \\odot [0.3, 0.2, 0.5] = [0.03, 0.08, 0.25]$",
+          "With zeros: $[0.5, 0, 0.5] \\odot [0.2, 0.3, 0.5] = [0.1, 0, 0.25]$ (zero propagates)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Element-wise Product",
+          "latex": "$(\\mathbf{p} \\odot \\mathbf{q})_i = p_i \\cdot q_i$",
+          "description": "Use to compute the product of corresponding elements at position i"
+        },
+        {
+          "name": "Dimensionality Requirement",
+          "latex": "$\\text{len}(\\mathbf{p}) = \\text{len}(\\mathbf{q}) = n$",
+          "description": "Both vectors must have the same length for element-wise operations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the element-wise product of two lists of floats. If the lists have different lengths or either is empty, return an empty list. Otherwise, return a new list where each element is the product of corresponding elements from the input lists.",
+        "function_signature": "def elementwise_product(p: list[float], q: list[float]) -> list[float]:",
+        "starter_code": "def elementwise_product(p: list[float], q: list[float]) -> list[float]:\n    # Your code here\n    # Return empty list if lengths differ or lists are empty\n    # Otherwise return [p[0]*q[0], p[1]*q[1], ...]\n    pass",
+        "test_cases": [
+          {
+            "input": "elementwise_product([1.0, 2.0, 3.0], [4.0, 5.0, 6.0])",
+            "expected": "[4.0, 10.0, 18.0]",
+            "explanation": "Each element is the product: 1*4=4, 2*5=10, 3*6=18"
+          },
+          {
+            "input": "elementwise_product([0.1, 0.2, 0.3, 0.4], [0.4, 0.3, 0.2, 0.1])",
+            "expected": "[0.04, 0.06, 0.06, 0.04]",
+            "explanation": "Products of probability values at each position"
+          },
+          {
+            "input": "elementwise_product([1.0, 2.0], [3.0, 4.0, 5.0])",
+            "expected": "[]",
+            "explanation": "Different lengths return empty list"
+          },
+          {
+            "input": "elementwise_product([], [1.0, 2.0])",
+            "expected": "[]",
+            "explanation": "Empty input list returns empty list"
+          },
+          {
+            "input": "elementwise_product([0.5, 0, 0.5], [0.2, 0.8, 0])",
+            "expected": "[0.1, 0.0, 0.0]",
+            "explanation": "Zero values propagate in multiplication"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Attempting to use matrix multiplication instead of element-wise multiplication",
+        "Not checking if list lengths match before iterating",
+        "Modifying input lists instead of creating a new output list",
+        "Using range(len()) unnecessarily instead of zip() for parallel iteration"
+      ],
+      "hint": "Use zip() to iterate over both lists simultaneously, or use list comprehension with indexing. Check list lengths first to handle the edge cases cleanly.",
+      "references": [
+        "Hadamard product",
+        "Vector operations",
+        "NumPy element-wise operations"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Square Root Operations on Vectors",
+      "relation_to_problem": "The Bhattacharyya coefficient requires taking the square root of each element in the product of two distributions. This sub-quest teaches the square root transformation, which is crucial for the BC formula.",
+      "prerequisites": [
+        "Element-wise operations",
+        "Square root function"
+      ],
+      "learning_objectives": [
+        "Apply square root function element-wise to vectors",
+        "Understand the mathematical properties of square root on probabilities",
+        "Handle numerical precision in square root computations"
+      ],
+      "math_content": {
+        "definition": "The **element-wise square root** of a vector $\\mathbf{v} = [v_1, v_2, \\ldots, v_n]$ is defined as: $\\sqrt{\\mathbf{v}} = [\\sqrt{v_1}, \\sqrt{v_2}, \\ldots, \\sqrt{v_n}]$, where $\\sqrt{v_i}$ denotes the principal (non-negative) square root of $v_i$. This operation is only defined when $v_i \\geq 0$ for all $i$.",
+        "notation": "$\\sqrt{\\mathbf{v}}$ = element-wise square root; $\\sqrt{v_i}$ = square root of i-th element; $\\mathbf{v} \\geq 0$ means $v_i \\geq 0$ for all $i$",
+        "theorem": "**Theorem (Properties of Square Root)**: For non-negative scalars $a, b \\geq 0$: (1) $\\sqrt{a \\cdot b} = \\sqrt{a} \\cdot \\sqrt{b}$ (multiplicativity), (2) $\\sqrt{a^2} = |a| = a$ (when $a \\geq 0$), (3) $0 \\leq \\sqrt{a} \\leq a$ when $0 \\leq a \\leq 1$ (square root of probabilities), (4) $(\\sqrt{a})^2 = a$ (inverse property).",
+        "proof_sketch": "Property (1): By definition, $\\sqrt{a} \\cdot \\sqrt{b}$ squared equals $a \\cdot b$, so it is the square root of $a \\cdot b$. Property (2): Since $a \\geq 0$, $|a| = a$, and $(|a|)^2 = a^2$. Property (3): For $0 \\leq a \\leq 1$, we have $a^2 \\leq a$, so taking square roots (monotonic increasing function): $a \\leq \\sqrt{a}$ is false; rather, squaring both sides of $\\sqrt{a} \\leq a$ gives $a \\leq a^2$ which is false for $0 < a < 1$. Actually, for $0 \\leq a \\leq 1$: $a \\leq \\sqrt{a}$ rearranges to $a^2 \\leq a$, i.e., $a(a-1) \\leq 0$, true when $a \\in [0,1]$. Property (4) is the definition of square root.",
+        "examples": [
+          "Basic: $\\sqrt{[4, 9, 16]} = [2, 3, 4]$",
+          "Probabilities: $\\sqrt{[0.25, 0.16, 0.09]} = [0.5, 0.4, 0.3]$",
+          "With zero: $\\sqrt{[0.04, 0, 0.36]} = [0.2, 0, 0.6]$",
+          "Identity: $\\sqrt{[1.0, 1.0]} = [1.0, 1.0]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Element-wise Square Root",
+          "latex": "$(\\sqrt{\\mathbf{v}})_i = \\sqrt{v_i}$",
+          "description": "Apply square root to each element independently"
+        },
+        {
+          "name": "Multiplicativity of Square Root",
+          "latex": "$\\sqrt{p_i \\cdot q_i} = \\sqrt{p_i} \\cdot \\sqrt{q_i}$",
+          "description": "The square root of a product equals the product of square roots (key for BC computation)"
+        },
+        {
+          "name": "Domain Restriction",
+          "latex": "$v_i \\geq 0 \\quad \\forall i$",
+          "description": "All elements must be non-negative for real square root"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the element-wise square root of the element-wise product of two probability distributions. If the lists have different lengths or are empty, return an empty list. Otherwise, compute p[i]*q[i] for each position i, then take the square root of each product, returning the resulting list.",
+        "function_signature": "def sqrt_product(p: list[float], q: list[float]) -> list[float]:",
+        "starter_code": "import math\n\ndef sqrt_product(p: list[float], q: list[float]) -> list[float]:\n    # Your code here\n    # Return empty list if lengths differ or empty\n    # Otherwise return [sqrt(p[0]*q[0]), sqrt(p[1]*q[1]), ...]\n    pass",
+        "test_cases": [
+          {
+            "input": "sqrt_product([4.0, 9.0, 16.0], [1.0, 4.0, 9.0])",
+            "expected": "[2.0, 6.0, 12.0]",
+            "explanation": "sqrt(4*1)=2, sqrt(9*4)=6, sqrt(16*9)=12"
+          },
+          {
+            "input": "sqrt_product([0.25, 0.25, 0.25, 0.25], [0.25, 0.25, 0.25, 0.25])",
+            "expected": "[0.25, 0.25, 0.25, 0.25]",
+            "explanation": "sqrt(0.25*0.25) = sqrt(0.0625) = 0.25 for each position"
+          },
+          {
+            "input": "sqrt_product([0.1, 0.2, 0.3, 0.4], [0.4, 0.3, 0.2, 0.1])",
+            "expected": "[0.2, 0.244949, 0.244949, 0.2]",
+            "explanation": "sqrt(0.1*0.4)=0.2, sqrt(0.2*0.3)≈0.244949, sqrt(0.3*0.2)≈0.244949, sqrt(0.4*0.1)=0.2"
+          },
+          {
+            "input": "sqrt_product([1.0, 0, 1.0], [1.0, 1.0, 0])",
+            "expected": "[1.0, 0.0, 0.0]",
+            "explanation": "sqrt(1*1)=1, sqrt(0*1)=0, sqrt(1*0)=0"
+          },
+          {
+            "input": "sqrt_product([0.5, 0.5], [0.3, 0.3, 0.4])",
+            "expected": "[]",
+            "explanation": "Different lengths return empty list"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Taking square root before multiplication instead of after: sqrt(p[i]) * sqrt(q[i]) gives the same result but is less efficient",
+        "Forgetting to import math.sqrt or numpy.sqrt",
+        "Not handling the case where the product might be exactly zero",
+        "Using integer division or truncation instead of floating-point arithmetic"
+      ],
+      "hint": "You can compute this in one pass: for each index i, compute p[i]*q[i], then immediately take its square root. Use math.sqrt() or equivalently raise to the power 0.5.",
+      "references": [
+        "Square root function properties",
+        "Geometric mean",
+        "Probability transformations"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Summation and the Bhattacharyya Coefficient",
+      "relation_to_problem": "The Bhattacharyya coefficient (BC) is the sum of the element-wise square roots of products. This sub-quest teaches how to compute BC, which is the key intermediate value needed before computing the final distance.",
+      "prerequisites": [
+        "Element-wise product",
+        "Square root operations",
+        "Summation"
+      ],
+      "learning_objectives": [
+        "Define and compute the Bhattacharyya coefficient formally",
+        "Understand the mathematical interpretation of BC as a similarity measure",
+        "Implement efficient summation of vector elements"
+      ],
+      "math_content": {
+        "definition": "The **Bhattacharyya coefficient** (BC) between two discrete probability distributions $P = [p_1, \\ldots, p_n]$ and $Q = [q_1, \\ldots, q_n]$ is defined as: $BC(P, Q) = \\sum_{i=1}^{n} \\sqrt{p_i \\cdot q_i}$. It measures the amount of overlap between two distributions, with values in the range $[0, 1]$.",
+        "notation": "$BC(P, Q)$ = Bhattacharyya coefficient; $\\sum_{i=1}^{n}$ = summation over all $n$ elements; $\\sqrt{p_i \\cdot q_i}$ = geometric mean at position $i$",
+        "theorem": "**Theorem (Properties of Bhattacharyya Coefficient)**: For probability distributions $P, Q$: (1) $0 \\leq BC(P, Q) \\leq 1$, (2) $BC(P, Q) = 1$ if and only if $P = Q$ (identical distributions), (3) $BC(P, Q) = BC(Q, P)$ (symmetry), (4) $BC(P, Q) = 0$ if $P$ and $Q$ have disjoint support (no overlap).",
+        "proof_sketch": "Property (1): Since $0 \\leq p_i, q_i \\leq 1$ and $\\sum p_i = \\sum q_i = 1$, we have $\\sqrt{p_i \\cdot q_i} \\leq \\sqrt{p_i \\cdot p_i} = p_i$ by AM-GM inequality. Thus $BC(P,Q) = \\sum \\sqrt{p_i q_i} \\leq \\sum \\frac{p_i + q_i}{2}$. Actually, by Cauchy-Schwarz: $(\\sum \\sqrt{p_i q_i})^2 \\leq (\\sum p_i)(\\sum q_i) = 1 \\cdot 1 = 1$, so $BC \\leq 1$. For $BC \\geq 0$, each term is non-negative. Property (2): $BC = 1$ requires $\\sqrt{p_i q_i} = p_i$ for all $i$ (since $\\sum p_i = 1$), which gives $q_i = p_i$. Property (3): follows from commutativity of multiplication. Property (4): If supports are disjoint, then for each $i$, at least one of $p_i$ or $q_i$ is zero, so all products are zero.",
+        "examples": [
+          "Identical distributions: $P = [0.5, 0.5]$, $Q = [0.5, 0.5]$ gives $BC = \\sqrt{0.25} + \\sqrt{0.25} = 0.5 + 0.5 = 1.0$",
+          "Opposite distributions: $P = [1.0, 0]$, $Q = [0, 1.0]$ gives $BC = \\sqrt{0} + \\sqrt{0} = 0$",
+          "Partial overlap: $P = [0.1, 0.2, 0.3, 0.4]$, $Q = [0.4, 0.3, 0.2, 0.1]$ gives $BC = \\sqrt{0.04} + \\sqrt{0.06} + \\sqrt{0.06} + \\sqrt{0.04} = 0.2 + 0.245 + 0.245 + 0.2 \\approx 0.8899$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Bhattacharyya Coefficient",
+          "latex": "$BC(P, Q) = \\sum_{i=1}^{n} \\sqrt{p_i \\cdot q_i}$",
+          "description": "Sum of square roots of element-wise products; measures distribution overlap"
+        },
+        {
+          "name": "Bounds of BC",
+          "latex": "$0 \\leq BC(P, Q) \\leq 1$",
+          "description": "BC is maximized (=1) for identical distributions, minimized (=0) for disjoint distributions"
+        },
+        {
+          "name": "Cauchy-Schwarz Bound",
+          "latex": "$BC(P, Q) = \\sum \\sqrt{p_i q_i} \\leq \\sqrt{\\sum p_i \\sum q_i} = 1$",
+          "description": "Theoretical upper bound derived from Cauchy-Schwarz inequality"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the Bhattacharyya coefficient between two probability distributions. Return the sum of sqrt(p[i]*q[i]) for all i. If the lists have different lengths or are empty, return 0.0.",
+        "function_signature": "def bhattacharyya_coefficient(p: list[float], q: list[float]) -> float:",
+        "starter_code": "import math\n\ndef bhattacharyya_coefficient(p: list[float], q: list[float]) -> float:\n    # Your code here\n    # Return 0.0 if lengths differ or empty\n    # Otherwise return sum of sqrt(p[i]*q[i]) for all i\n    pass",
+        "test_cases": [
+          {
+            "input": "bhattacharyya_coefficient([0.5, 0.5], [0.5, 0.5])",
+            "expected": "1.0",
+            "explanation": "Identical distributions: sqrt(0.25) + sqrt(0.25) = 0.5 + 0.5 = 1.0"
+          },
+          {
+            "input": "bhattacharyya_coefficient([1.0, 0.0], [0.0, 1.0])",
+            "expected": "0.0",
+            "explanation": "Disjoint distributions: sqrt(0) + sqrt(0) = 0"
+          },
+          {
+            "input": "bhattacharyya_coefficient([0.1, 0.2, 0.3, 0.4], [0.4, 0.3, 0.2, 0.1])",
+            "expected": "0.889898",
+            "explanation": "sqrt(0.04) + sqrt(0.06) + sqrt(0.06) + sqrt(0.04) ≈ 0.889898"
+          },
+          {
+            "input": "bhattacharyya_coefficient([0.25, 0.25, 0.25, 0.25], [0.25, 0.25, 0.25, 0.25])",
+            "expected": "1.0",
+            "explanation": "Uniform identical distributions: 4 * sqrt(0.0625) = 4 * 0.25 = 1.0"
+          },
+          {
+            "input": "bhattacharyya_coefficient([0.3, 0.7], [0.8, 0.2])",
+            "expected": "0.863784",
+            "explanation": "sqrt(0.24) + sqrt(0.14) ≈ 0.489898 + 0.374166 ≈ 0.864064"
+          },
+          {
+            "input": "bhattacharyya_coefficient([0.5], [0.5, 0.5])",
+            "expected": "0.0",
+            "explanation": "Different lengths return 0.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing the arithmetic mean instead of taking square roots: (p[i] + q[i])/2 is incorrect",
+        "Forgetting to sum all terms and returning only the last computed value",
+        "Not handling edge cases (empty or mismatched lengths) by returning 0.0",
+        "Using integer arithmetic instead of floating-point, causing precision loss"
+      ],
+      "hint": "Build on the previous sub-quest: compute sqrt(p[i]*q[i]) for each i, then sum all these values. You can use sum() with a list comprehension or generator expression for efficiency.",
+      "references": [
+        "Bhattacharyya coefficient",
+        "Distribution similarity measures",
+        "Cauchy-Schwarz inequality"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Logarithmic Transformation and Distance Metrics",
+      "relation_to_problem": "The Bhattacharyya distance is obtained by applying a negative natural logarithm to the BC. This transformation converts a similarity measure (BC ∈ [0,1]) into a distance metric (BD ∈ [0,∞)), where larger values indicate greater dissimilarity.",
+      "prerequisites": [
+        "Logarithm properties",
+        "Bhattacharyya coefficient"
+      ],
+      "learning_objectives": [
+        "Understand the natural logarithm and its properties",
+        "Transform similarity measures into distance metrics using logarithms",
+        "Handle numerical edge cases in logarithmic computations"
+      ],
+      "math_content": {
+        "definition": "The **natural logarithm** $\\ln(x)$ is the inverse function of the exponential $e^x$, defined for $x > 0$. It satisfies $\\ln(e^x) = x$ and $e^{\\ln(x)} = x$. The **Bhattacharyya distance** is defined as: $BD(P, Q) = -\\ln(BC(P, Q))$, where $BC(P, Q)$ is the Bhattacharyya coefficient.",
+        "notation": "$\\ln(x)$ = natural logarithm (base $e$); $e \\approx 2.71828$ = Euler's number; $BD$ = Bhattacharyya distance; $BC$ = Bhattacharyya coefficient",
+        "theorem": "**Theorem (Properties of Natural Logarithm)**: For $x, y > 0$: (1) $\\ln(x \\cdot y) = \\ln(x) + \\ln(y)$ (product rule), (2) $\\ln(x/y) = \\ln(x) - \\ln(y)$ (quotient rule), (3) $\\ln(x^a) = a \\ln(x)$ (power rule), (4) $\\ln(1) = 0$ and $\\ln(e) = 1$, (5) $\\ln(x) < 0$ when $0 < x < 1$ and $\\ln(x) > 0$ when $x > 1$.",
+        "proof_sketch": "Property (1): Let $\\ln(x) = a$ and $\\ln(y) = b$, so $x = e^a$ and $y = e^b$. Then $x \\cdot y = e^a \\cdot e^b = e^{a+b}$, so $\\ln(x \\cdot y) = a + b = \\ln(x) + \\ln(y)$. Property (2) follows from (1) with $y^{-1}$. Property (3): $\\ln(x^a) = \\ln(\\underbrace{x \\cdot x \\cdots x}_{a \\text{ times}}) = a \\ln(x)$ by repeated application of (1). Properties (4) and (5) follow from the definition and monotonicity of $\\ln$.",
+        "examples": [
+          "Perfect similarity: $BC = 1.0 \\Rightarrow BD = -\\ln(1.0) = 0$ (identical distributions have zero distance)",
+          "No overlap: $BC = 0.0 \\Rightarrow BD = -\\ln(0.0) = +\\infty$ (completely disjoint distributions)",
+          "Partial overlap: $BC \\approx 0.8899 \\Rightarrow BD = -\\ln(0.8899) \\approx -(-0.1166) = 0.1166$",
+          "Note: $BC \\in [0, 1]$ maps to $BD \\in [0, \\infty)$ via $BD = -\\ln(BC)$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Bhattacharyya Distance",
+          "latex": "$BD(P, Q) = -\\ln(BC(P, Q)) = -\\ln\\left(\\sum_{i=1}^{n} \\sqrt{p_i \\cdot q_i}\\right)$",
+          "description": "Negative log transform converts similarity (BC) to distance (BD)"
+        },
+        {
+          "name": "Distance-Similarity Inversion",
+          "latex": "$BC = e^{-BD}$ equivalently $BD = -\\ln(BC)$",
+          "description": "The two measures are inverse-related through exponential/logarithm"
+        },
+        {
+          "name": "Distance Bounds",
+          "latex": "$0 \\leq BD(P, Q) < \\infty$",
+          "description": "BD equals 0 for identical distributions, increases without bound as overlap decreases"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that converts a Bhattacharyya coefficient (BC) value into a Bhattacharyya distance (BD). The function should take a float BC in range [0, 1] and return -ln(BC). Handle the edge case where BC = 0 by returning a large finite value (e.g., 1e10) instead of infinity.",
+        "function_signature": "def bc_to_distance(bc: float) -> float:",
+        "starter_code": "import math\n\ndef bc_to_distance(bc: float) -> float:\n    # Your code here\n    # Return -ln(bc)\n    # Handle bc = 0 case by returning large finite value\n    pass",
+        "test_cases": [
+          {
+            "input": "bc_to_distance(1.0)",
+            "expected": "0.0",
+            "explanation": "-ln(1.0) = 0, identical distributions have zero distance"
+          },
+          {
+            "input": "bc_to_distance(0.889898)",
+            "expected": "0.1166",
+            "explanation": "-ln(0.889898) ≈ 0.1166 (example from problem)"
+          },
+          {
+            "input": "bc_to_distance(0.5)",
+            "expected": "0.6931",
+            "explanation": "-ln(0.5) = ln(2) ≈ 0.6931"
+          },
+          {
+            "input": "bc_to_distance(0.367879)",
+            "expected": "1.0",
+            "explanation": "-ln(e^(-1)) = -(-1) = 1.0"
+          },
+          {
+            "input": "bc_to_distance(0.0)",
+            "expected": "1e10",
+            "explanation": "Disjoint distributions: BC=0 should return large finite value, not infinity"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting the negative sign: ln(BC) instead of -ln(BC) gives negative distances",
+        "Not handling BC=0 case, causing math domain error or returning infinity",
+        "Using log10 or log2 instead of natural logarithm ln (math.log in Python)",
+        "Attempting to compute logarithm of negative BC values without validation"
+      ],
+      "hint": "Use math.log() for natural logarithm. Check if BC is zero before computing the logarithm to avoid math domain errors. Remember the negative sign in the formula.",
+      "references": [
+        "Natural logarithm",
+        "Distance metrics vs similarity measures",
+        "Information theory",
+        "Kullback-Leibler divergence (related concept)"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Integration: Complete Bhattacharyya Distance Implementation",
+      "relation_to_problem": "This final sub-quest combines all previous concepts to implement the complete Bhattacharyya distance computation with proper input validation, edge case handling, and output formatting.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Input validation",
+        "Rounding operations"
+      ],
+      "learning_objectives": [
+        "Integrate multiple mathematical operations into a single pipeline",
+        "Implement robust input validation and error handling",
+        "Apply proper numerical formatting to output",
+        "Optimize computation for efficiency"
+      ],
+      "math_content": {
+        "definition": "The **complete Bhattacharyya distance algorithm** for discrete probability distributions $P = [p_1, \\ldots, p_n]$ and $Q = [q_1, \\ldots, q_n]$ proceeds as follows: (1) Validate inputs (same length, non-empty), (2) Compute element-wise products $w_i = p_i \\cdot q_i$, (3) Apply element-wise square root $s_i = \\sqrt{w_i}$, (4) Sum to get BC: $BC = \\sum_{i=1}^{n} s_i$, (5) Transform to distance: $BD = -\\ln(BC)$, (6) Round to required precision.",
+        "notation": "$P, Q$ = input probability distributions; $n$ = dimension; $w_i$ = products; $s_i$ = square roots; $BC$ = coefficient; $BD$ = distance",
+        "theorem": "**Theorem (Bhattacharyya Distance Properties)**: The Bhattacharyya distance $BD(P, Q)$ satisfies: (1) **Non-negativity**: $BD(P, Q) \\geq 0$, (2) **Identity**: $BD(P, Q) = 0 \\iff P = Q$, (3) **Symmetry**: $BD(P, Q) = BD(Q, P)$. Note: BD is NOT a true metric because it does not satisfy the triangle inequality in general, but it is a valid divergence measure.",
+        "proof_sketch": "Property (1): Since $0 \\leq BC \\leq 1$, we have $-\\ln(BC) \\geq -\\ln(1) = 0$. Property (2): $BD = 0 \\iff -\\ln(BC) = 0 \\iff BC = 1 \\iff P = Q$ (from BC properties). Property (3): Follows from symmetry of BC. Triangle inequality: For general distributions, $BD(P, R) + BD(R, Q) \\not\\geq BD(P, Q)$ may fail, so BD is a divergence but not a metric in the strict sense.",
+        "examples": [
+          "Complete example: $P = [0.1, 0.2, 0.3, 0.4]$, $Q = [0.4, 0.3, 0.2, 0.1]$. Products: $[0.04, 0.06, 0.06, 0.04]$. Square roots: $[0.2, 0.245, 0.245, 0.2]$. BC = $0.890$. BD = $-\\ln(0.890) = 0.1166$ (rounded to 4 decimals).",
+          "Edge case: Different lengths $P = [0.5, 0.5]$, $Q = [0.3, 0.3, 0.4]$ returns $0.0$ (invalid input).",
+          "Edge case: Empty inputs $P = []$, $Q = []$ returns $0.0$ (invalid input).",
+          "Edge case: Disjoint distributions $P = [1, 0]$, $Q = [0, 1]$ gives $BC = 0$, handle with large finite value in distance."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Bhattacharyya Distance Formula",
+          "latex": "$BD(P, Q) = -\\ln\\left(\\sum_{i=1}^{n} \\sqrt{p_i \\cdot q_i}\\right)$",
+          "description": "Single formula combining all operations: product, square root, sum, and negative log"
+        },
+        {
+          "name": "Rounding Formula",
+          "latex": "$BD_{\\text{rounded}} = \\text{round}(BD, 4)$",
+          "description": "Round the result to 4 decimal places for output"
+        },
+        {
+          "name": "Error Handling",
+          "latex": "$BD = 0.0$ if $n_P \\neq n_Q$ or $n_P = 0$",
+          "description": "Return 0.0 for invalid inputs (different lengths or empty)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete Bhattacharyya distance function that integrates all previous concepts. The function should: (1) validate that inputs are non-empty and have the same length (return 0.0 if not), (2) compute the Bhattacharyya coefficient as the sum of sqrt(p[i]*q[i]), (3) convert to distance using -ln(BC), (4) handle BC=0 by returning a large value instead of infinity, and (5) round the result to 4 decimal places. DO NOT simply call previous helper functions - implement the computation efficiently in a single function.",
+        "function_signature": "def compute_bhattacharyya_distance(p: list[float], q: list[float]) -> float:",
+        "starter_code": "import math\n\ndef compute_bhattacharyya_distance(p: list[float], q: list[float]) -> float:\n    # Your code here\n    # Step 1: Validate inputs (same length, non-empty)\n    # Step 2: Compute BC = sum of sqrt(p[i]*q[i])\n    # Step 3: Handle BC=0 case\n    # Step 4: Compute BD = -ln(BC)\n    # Step 5: Round to 4 decimal places\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_bhattacharyya_distance([0.1, 0.2, 0.3, 0.4], [0.4, 0.3, 0.2, 0.1])",
+            "expected": "0.1166",
+            "explanation": "Main problem example: BC ≈ 0.8899, BD = -ln(0.8899) ≈ 0.1166"
+          },
+          {
+            "input": "compute_bhattacharyya_distance([0.5, 0.5], [0.5, 0.5])",
+            "expected": "0.0",
+            "explanation": "Identical distributions: BC = 1.0, BD = 0.0"
+          },
+          {
+            "input": "compute_bhattacharyya_distance([1.0, 0.0], [0.0, 1.0])",
+            "expected": "1e10",
+            "explanation": "Disjoint distributions: BC = 0, return large finite value"
+          },
+          {
+            "input": "compute_bhattacharyya_distance([0.25, 0.25, 0.25, 0.25], [0.25, 0.25, 0.25, 0.25])",
+            "expected": "0.0",
+            "explanation": "Uniform identical distributions: BC = 1.0, BD = 0.0"
+          },
+          {
+            "input": "compute_bhattacharyya_distance([0.6, 0.4], [0.3, 0.7])",
+            "expected": "0.1335",
+            "explanation": "BC = sqrt(0.18) + sqrt(0.28) ≈ 0.9539, BD ≈ 0.1335"
+          },
+          {
+            "input": "compute_bhattacharyya_distance([0.5, 0.5], [0.3, 0.3, 0.4])",
+            "expected": "0.0",
+            "explanation": "Different lengths return 0.0"
+          },
+          {
+            "input": "compute_bhattacharyya_distance([], [0.5, 0.5])",
+            "expected": "0.0",
+            "explanation": "Empty input returns 0.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not validating inputs at the beginning, causing errors later in computation",
+        "Computing intermediate lists unnecessarily instead of accumulating the sum directly",
+        "Forgetting to round to exactly 4 decimal places using round() function",
+        "Not handling the BC=0 edge case before attempting logarithm",
+        "Using inefficient nested loops instead of a single pass through the data",
+        "Forgetting to return 0.0 for invalid inputs as specified in the problem"
+      ],
+      "hint": "You can compute BC in a single pass using sum() with a generator expression. Check for empty or mismatched lengths first. Handle BC=0 before computing logarithm. Use round(value, 4) for the final result.",
+      "references": [
+        "Algorithm design",
+        "Pipeline processing",
+        "Numerical stability",
+        "Production code best practices"
+      ]
+    }
+  ]
+}

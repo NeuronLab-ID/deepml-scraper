@@ -1,0 +1,398 @@
+{
+  "problem_id": 30,
+  "title": "Batch Iterator for Dataset",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "Implement a batch iterable function that samples in a numpy array X and an optional numpy array y. The function should return batches of a specified size. If y is provided, the function should return batches of (X, y) pairs; otherwise, it should return batches of X only.",
+  "example": {
+    "input": "X = np.array([[1, 2], \n                  [3, 4], \n                  [5, 6], \n                  [7, 8], \n                  [9, 10]])\n    y = np.array([1, 2, 3, 4, 5])\n    batch_size = 2\n    batch_iterator(X, y, batch_size)",
+    "output": "[[[[1, 2], [3, 4]], [1, 2]],\n     [[[5, 6], [7, 8]], [3, 4]],\n     [[[9, 10]], [5]]]",
+    "reasoning": "The dataset X contains 5 samples, and we are using a batch size of 2. Therefore, the function will divide the dataset into 3 batches. The first two batches will contain 2 samples each, and the last batch will contain the remaining sample. The corresponding values from y are also included in each batch."
+  },
+  "starter_code": "import numpy as np\n\ndef batch_iterator(X, y=None, batch_size=64):\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Array Indexing and Slicing in NumPy",
+      "relation_to_problem": "The batch iterator must extract contiguous sub-arrays from the dataset using array slicing. Understanding NumPy's indexing mechanisms is essential for partitioning data into batches.",
+      "prerequisites": [
+        "Basic Python syntax",
+        "Understanding of arrays",
+        "Integer arithmetic"
+      ],
+      "learning_objectives": [
+        "Master NumPy array indexing notation and semantics",
+        "Understand slice objects and their mathematical interpretation",
+        "Apply indexing to extract contiguous subarrays",
+        "Handle edge cases with boundary indices"
+      ],
+      "math_content": {
+        "definition": "Let $A \\in \\mathbb{R}^{n \\times d}$ be a matrix representing a dataset with $n$ samples and $d$ features. A slice operation $A[i:j]$ extracts a contiguous subarray where $i, j \\in \\mathbb{Z}$ and $0 \\leq i < j \\leq n$. Formally, the slice $A[i:j]$ is defined as: $$A[i:j] = \\{A_k : k \\in \\mathbb{Z}, i \\leq k < j\\}$$ This returns a view (not a copy) of the original array containing elements from index $i$ (inclusive) to index $j$ (exclusive).",
+        "notation": "$A[i:j]$ = subarray from index $i$ to $j-1$, $|A[i:j]| = j - i$ = number of elements in slice",
+        "theorem": "**Theorem (Slice Composition)**: For any array $A$ of length $n$ and valid indices $0 \\leq i < j < k \\leq n$, we have: $$A[i:k] = A[i:j] \\oplus A[j:k]$$ where $\\oplus$ denotes concatenation. This property ensures that sequential slices partition the array completely.",
+        "proof_sketch": "By definition, $A[i:j]$ contains indices $\\{i, i+1, \\ldots, j-1\\}$ and $A[j:k]$ contains $\\{j, j+1, \\ldots, k-1\\}$. Since these index sets are disjoint and consecutive, their union is $\\{i, i+1, \\ldots, k-1\\} = A[i:k]$. The concatenation preserves order, completing the proof.",
+        "examples": [
+          "For $A = [10, 20, 30, 40, 50]$ with $n=5$: $A[0:2] = [10, 20]$, $A[2:5] = [30, 40, 50]$",
+          "Boundary case: $A[3:5] = [40, 50]$ (last 2 elements), $A[4:5] = [50]$ (single element)",
+          "Empty slice: $A[3:3] = []$ (when $i=j$, slice is empty)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Slice Length Formula",
+          "latex": "$|A[i:j]| = \\max(0, j - i)$",
+          "description": "Compute the number of elements in a slice. Returns 0 when $j \\leq i$."
+        },
+        {
+          "name": "Index Bounds",
+          "latex": "$0 \\leq i < j \\leq n$",
+          "description": "Valid slice indices must satisfy these inequalities to avoid index errors."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that extracts a contiguous subarray from a NumPy array given start and end indices. This is a fundamental building block for batch extraction.",
+        "function_signature": "def extract_slice(arr: np.ndarray, start: int, end: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef extract_slice(arr: np.ndarray, start: int, end: int) -> np.ndarray:\n    \"\"\"\n    Extract elements from arr[start:end].\n    \n    Args:\n        arr: Input array of shape (n, ...)\n        start: Starting index (inclusive)\n        end: Ending index (exclusive)\n    \n    Returns:\n        Subarray containing elements from index start to end-1\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "extract_slice(np.array([1, 2, 3, 4, 5]), 0, 2)",
+            "expected": "np.array([1, 2])",
+            "explanation": "Extract first 2 elements: indices 0 and 1"
+          },
+          {
+            "input": "extract_slice(np.array([[1, 2], [3, 4], [5, 6]]), 1, 3)",
+            "expected": "np.array([[3, 4], [5, 6]])",
+            "explanation": "For 2D arrays, slicing applies to the first dimension (rows)"
+          },
+          {
+            "input": "extract_slice(np.array([10, 20, 30]), 2, 3)",
+            "expected": "np.array([30])",
+            "explanation": "Single element slice at the boundary"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing inclusive vs exclusive end index (Python uses exclusive upper bound)",
+        "Attempting to slice with $j > n$ without handling bounds (Python handles gracefully, but understanding is important)",
+        "Not recognizing that slicing creates a view, not a copy (memory efficiency consideration)"
+      ],
+      "hint": "Use NumPy's built-in slicing notation. The syntax arr[start:end] naturally handles boundary cases.",
+      "references": [
+        "NumPy indexing documentation",
+        "Array views vs copies",
+        "Time complexity of slicing operations"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Ceiling Division and Batch Count Computation",
+      "relation_to_problem": "To partition a dataset of size $N$ into batches of size $B$, we must compute the number of batches $K = \\lceil N/B \\rceil$. This ensures all data points are included, even when $N$ is not divisible by $B$.",
+      "prerequisites": [
+        "Integer division",
+        "Modular arithmetic",
+        "Ceiling function"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition of the ceiling function",
+        "Derive the formula for computing number of batches",
+        "Implement ceiling division using only integer operations",
+        "Handle edge cases where dataset size is not divisible by batch size"
+      ],
+      "math_content": {
+        "definition": "The ceiling function $\\lceil x \\rceil: \\mathbb{R} \\rightarrow \\mathbb{Z}$ maps a real number to the smallest integer greater than or equal to $x$: $$\\lceil x \\rceil = \\min\\{n \\in \\mathbb{Z} : n \\geq x\\}$$ For positive integers $N$ (dataset size) and $B$ (batch size), the number of batches required is: $$K = \\left\\lceil \\frac{N}{B} \\right\\rceil$$ This ensures that all $N$ samples are distributed across $K$ batches, where the last batch may contain fewer than $B$ samples.",
+        "notation": "$N$ = total number of samples, $B$ = batch size, $K$ = number of batches, $N \\mod B$ = remainder when $N$ divided by $B$",
+        "theorem": "**Theorem (Batch Count Formula)**: For positive integers $N$ and $B$, the number of batches is: $$K = \\left\\lceil \\frac{N}{B} \\right\\rceil = \\left\\lfloor \\frac{N + B - 1}{B} \\right\\rfloor = \\left\\lfloor \\frac{N - 1}{B} \\right\\rfloor + 1$$ Furthermore, if $N \\mod B = 0$, then $K = N/B$ (perfect division); otherwise $K = \\lfloor N/B \\rfloor + 1$.",
+        "proof_sketch": "Let $N = qB + r$ where $q = \\lfloor N/B \\rfloor$ and $r = N \\mod B$ with $0 \\leq r < B$ (division algorithm). If $r = 0$, then $N/B = q$ is an integer, so $\\lceil N/B \\rceil = q$. If $r > 0$, then $q < N/B < q+1$, thus $\\lceil N/B \\rceil = q + 1$. This can be expressed as $K = \\lfloor N/B \\rfloor + \\mathbb{1}_{r > 0}$ where $\\mathbb{1}_{r > 0}$ is the indicator function. The alternative formula $(N + B - 1)/B$ works because adding $B-1$ to the numerator ensures the result rounds up when there's any remainder.",
+        "examples": [
+          "$N = 100$, $B = 32$: $K = \\lceil 100/32 \\rceil = \\lceil 3.125 \\rceil = 4$ batches",
+          "$N = 64$, $B = 32$: $K = \\lceil 64/32 \\rceil = \\lceil 2 \\rceil = 2$ batches (perfect division)",
+          "$N = 5$, $B = 2$: $K = \\lceil 5/2 \\rceil = \\lceil 2.5 \\rceil = 3$ batches (last batch has 1 sample)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Ceiling Division (Integer Arithmetic)",
+          "latex": "$\\left\\lceil \\frac{N}{B} \\right\\rceil = \\left\\lfloor \\frac{N + B - 1}{B} \\right\\rfloor$",
+          "description": "Compute ceiling division using only integer operations, avoiding floating-point arithmetic."
+        },
+        {
+          "name": "Last Batch Size",
+          "latex": "$|\\mathcal{B}_K| = \\begin{cases} B & \\text{if } N \\mod B = 0 \\\\ N \\mod B & \\text{otherwise} \\end{cases}$",
+          "description": "The last batch contains the remainder samples, or full batch size if $N$ is divisible by $B$."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the number of batches needed to partition a dataset of size N using batch size B. Also compute the size of the last batch.",
+        "function_signature": "def compute_batch_info(N: int, batch_size: int) -> tuple[int, int]:",
+        "starter_code": "def compute_batch_info(N: int, batch_size: int) -> tuple[int, int]:\n    \"\"\"\n    Compute the number of batches and size of the last batch.\n    \n    Args:\n        N: Total number of samples in dataset\n        batch_size: Number of samples per batch\n    \n    Returns:\n        (num_batches, last_batch_size): Total number of batches and size of final batch\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_batch_info(100, 32)",
+            "expected": "(4, 4)",
+            "explanation": "100 = 3*32 + 4, so we need 4 batches with last batch containing 4 samples"
+          },
+          {
+            "input": "compute_batch_info(64, 32)",
+            "expected": "(2, 32)",
+            "explanation": "Perfect division: 64 = 2*32, so 2 full batches"
+          },
+          {
+            "input": "compute_batch_info(5, 2)",
+            "expected": "(3, 1)",
+            "explanation": "5 = 2*2 + 1, so 3 batches with last batch having 1 sample"
+          },
+          {
+            "input": "compute_batch_info(1, 10)",
+            "expected": "(1, 1)",
+            "explanation": "When N < batch_size, we have 1 batch of size N"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using floating-point division and rounding, which can introduce numerical errors",
+        "Forgetting to handle the case when N < batch_size (should return 1 batch)",
+        "Computing last_batch_size incorrectly when N is divisible by batch_size (should be batch_size, not 0)",
+        "Not using the efficient formula (N + batch_size - 1) // batch_size for ceiling division"
+      ],
+      "hint": "Use integer division and the modulo operator. The formula (N + batch_size - 1) // batch_size computes ceiling division without floating-point operations.",
+      "references": [
+        "Integer division algorithms",
+        "Modular arithmetic",
+        "Ceiling and floor functions"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Iterator Protocol and Generator Functions",
+      "relation_to_problem": "The batch iterator must yield batches lazily (on-demand) rather than materializing all batches in memory. Python's iterator protocol and generator functions enable memory-efficient iteration over large datasets.",
+      "prerequisites": [
+        "Python functions",
+        "Understanding of memory management",
+        "Control flow (loops)"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical concept of lazy evaluation",
+        "Master Python's iterator protocol and the yield keyword",
+        "Implement generator functions for memory-efficient iteration",
+        "Distinguish between eager and lazy evaluation strategies"
+      ],
+      "math_content": {
+        "definition": "An iterator is a stateful object that produces a sequence of values on demand. Formally, let $\\mathcal{S} = (s_1, s_2, \\ldots, s_n)$ be a finite sequence. An iterator $\\mathcal{I}$ over $\\mathcal{S}$ maintains a position index $i$ and provides two operations: (1) **next()**: Returns $s_i$ and advances $i \\leftarrow i+1$. When $i > n$, raises StopIteration exception. (2) **hasNext()**: Returns true if $i \\leq n$, false otherwise. A generator function uses the yield keyword to implement the iterator protocol implicitly, creating an iterator without managing state explicitly.",
+        "notation": "$\\mathcal{I}$ = iterator object, $s_i$ = $i$-th element in sequence, $i$ = current position (internal state), yield = keyword that produces a value and suspends execution",
+        "theorem": "**Theorem (Memory Efficiency of Generators)**: Let $\\mathcal{S}$ be a sequence of $n$ elements, each of size $m$ bytes. Eager evaluation requires $O(nm)$ memory to store all elements. A generator-based iterator requires $O(m)$ memory (constant space) as it produces one element at a time. The space complexity reduction is: $$\\text{Space Savings} = \\frac{O(nm) - O(m)}{O(nm)} = 1 - \\frac{1}{n} \\approx 1 \\text{ for large } n$$",
+        "proof_sketch": "In eager evaluation, all $n$ elements must be materialized in memory simultaneously, requiring $nm$ bytes. In lazy evaluation with generators, only the current element and minimal state (iterator position) are stored. The generator computes each element on-demand, discarding previous elements. For large $n$, the space savings approaches 100%. This is critical for datasets that exceed available RAM.",
+        "examples": [
+          "Eager: `batches = [X[i:i+B] for i in range(0, N, B)]` creates all batches immediately (memory: $O(N)$)",
+          "Lazy: `def gen(): for i in range(0, N, B): yield X[i:i+B]` produces batches on-demand (memory: $O(B)$)",
+          "Generator state: After yielding batch $k$, execution suspends; state preserves position for next iteration"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Generator Function Definition",
+          "latex": "$\\text{gen}() = \\{\\text{yield } f(i) : i \\in \\mathcal{I}\\}$",
+          "description": "A generator function contains yield statements that produce values lazily."
+        },
+        {
+          "name": "Space Complexity",
+          "latex": "$\\text{Space}_{\\text{generator}} = O(1) \\text{ vs } \\text{Space}_{\\text{list}} = O(n)$",
+          "description": "Generators use constant memory regardless of sequence length."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a generator function that yields sequential integers from start to end in batches of specified size. This teaches the yield mechanism without the complexity of array operations.",
+        "function_signature": "def batch_range_generator(start: int, end: int, batch_size: int):",
+        "starter_code": "def batch_range_generator(start: int, end: int, batch_size: int):\n    \"\"\"\n    Generate batches of integers from start to end-1.\n    \n    Args:\n        start: Starting integer (inclusive)\n        end: Ending integer (exclusive)\n        batch_size: Number of integers per batch\n    \n    Yields:\n        List of integers in each batch\n    \n    Example:\n        list(batch_range_generator(0, 7, 3)) -> [[0,1,2], [3,4,5], [6]]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "list(batch_range_generator(0, 5, 2))",
+            "expected": "[[0, 1], [2, 3], [4]]",
+            "explanation": "Integers 0-4 divided into batches of 2, last batch has 1 element"
+          },
+          {
+            "input": "list(batch_range_generator(10, 16, 3))",
+            "expected": "[[10, 11, 12], [13, 14, 15]]",
+            "explanation": "Perfect division: 6 integers (10-15) into 2 batches of 3"
+          },
+          {
+            "input": "list(batch_range_generator(0, 2, 5))",
+            "expected": "[[0, 1]]",
+            "explanation": "When range < batch_size, return single batch with all elements"
+          },
+          {
+            "input": "next(batch_range_generator(0, 10, 3))",
+            "expected": "[0, 1, 2]",
+            "explanation": "Using next() retrieves only first batch without computing others (lazy evaluation)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using return instead of yield (return terminates the function; yield suspends it)",
+        "Creating a list of all batches then iterating (defeats the purpose of lazy evaluation)",
+        "Not handling the last batch correctly when total elements not divisible by batch_size",
+        "Confusing generator objects with lists (generators can only be iterated once)"
+      ],
+      "hint": "Use a for loop with range(start, end, batch_size) to iterate through starting positions. For each position, yield a batch using list slicing or list comprehension.",
+      "references": [
+        "Python generator functions",
+        "Iterator protocol",
+        "Lazy evaluation",
+        "yield statement semantics"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Simultaneous Iteration Over Multiple Arrays",
+      "relation_to_problem": "The batch iterator must optionally handle paired data (X, y). When y is provided, batches must contain synchronized slices from both arrays. This requires understanding how to maintain correspondence between features and labels during batching.",
+      "prerequisites": [
+        "Array indexing",
+        "Tuple unpacking",
+        "Conditional logic"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical concept of paired datasets",
+        "Implement synchronized slicing of multiple arrays",
+        "Handle optional parameters in function design",
+        "Maintain data correspondence during batching"
+      ],
+      "math_content": {
+        "definition": "A supervised learning dataset consists of feature-label pairs $\\mathscr{D} = \\{(x_i, y_i)\\}_{i=1}^{N}$ where $x_i \\in \\mathcal{X}$ represents features and $y_i \\in \\mathcal{Y}$ represents labels. When batching, we must preserve the pairing: for batch $\\mathcal{B}_k$ with indices $\\mathcal{I}_k = \\{i_1, i_2, \\ldots, i_B\\}$, the feature batch is $X_k = (x_{i_1}, x_{i_2}, \\ldots, x_{i_B})$ and the label batch is $y_k = (y_{i_1}, y_{i_2}, \\ldots, y_{i_B})$. The correspondence property requires: $$\\forall j \\in [1, B]: X_k[j] \\text{ corresponds to } y_k[j]$$ This ensures the $j$-th feature in the batch matches the $j$-th label.",
+        "notation": "$X \\in \\mathbb{R}^{N \\times d}$ = feature matrix, $y \\in \\mathbb{R}^N$ or $y \\in \\{1, \\ldots, C\\}^N$ = label vector, $(X_k, y_k)$ = $k$-th batch pair, $\\mathcal{I}_k$ = set of indices in batch $k$",
+        "theorem": "**Theorem (Index Preservation)**: Let $X$ and $y$ be arrays of length $N$. For any slice operation defined by indices $[i:j]$ where $0 \\leq i < j \\leq N$, the slices $X[i:j]$ and $y[i:j]$ preserve the original correspondence: $$\\forall k \\in [0, j-i): X[i:j][k] = X[i+k] \\text{ and } y[i:j][k] = y[i+k]$$ This property ensures that simultaneous slicing maintains the feature-label pairing required for supervised learning.",
+        "proof_sketch": "Array slicing $A[i:j]$ creates a view containing elements $A[i], A[i+1], \\ldots, A[j-1]$ in order. When applied to both $X$ and $y$ with identical indices, the $k$-th element of $X[i:j]$ is $X[i+k]$ and the $k$-th element of $y[i:j]$ is $y[i+k]$. Since the index offset $k$ is the same for both arrays, the correspondence is preserved. This relies on Python's consistent indexing semantics across arrays.",
+        "examples": [
+          "$X = [[1,2], [3,4], [5,6]]$, $y = [0, 1, 0]$: batch $X[0:2], y[0:2]$ gives $([[1,2], [3,4]], [0, 1])$",
+          "Verification: $X[0:2][0] = [1,2]$ pairs with $y[0:2][0] = 0$ (correct)",
+          "Optional labels: When $y = \\text{None}$, return only $X$ batches for unsupervised learning tasks"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Paired Batch Extraction",
+          "latex": "$(X_k, y_k) = (X[i_k:i_{k+1}], y[i_k:i_{k+1}])$ where $i_k = k \\cdot B$",
+          "description": "Extract corresponding slices from both arrays using the same indices."
+        },
+        {
+          "name": "Conditional Return Type",
+          "latex": "$\\text{batch}_k = \\begin{cases} (X_k, y_k) & \\text{if } y \\neq \\text{None} \\\\ X_k & \\text{otherwise} \\end{cases}$",
+          "description": "Return tuple of (X, y) when labels provided, otherwise just X."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that yields synchronized batches from two arrays X and y. If y is None, yield only X batches. This is the core logic for handling optional labels in the batch iterator.",
+        "function_signature": "def paired_batch_generator(X: np.ndarray, y: np.ndarray = None, batch_size: int = 2):",
+        "starter_code": "import numpy as np\n\ndef paired_batch_generator(X: np.ndarray, y: np.ndarray = None, batch_size: int = 2):\n    \"\"\"\n    Generate batches from X and optionally y.\n    \n    Args:\n        X: Feature array of shape (N, ...)\n        y: Optional label array of shape (N,)\n        batch_size: Number of samples per batch\n    \n    Yields:\n        If y is provided: tuple (X_batch, y_batch)\n        If y is None: X_batch only\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "list(paired_batch_generator(np.array([[1,2], [3,4], [5,6]]), np.array([10, 20, 30]), 2))",
+            "expected": "[(np.array([[1,2], [3,4]]), np.array([10, 20])), (np.array([[5,6]]), np.array([30]))]",
+            "explanation": "With labels: returns tuples of (X_batch, y_batch)"
+          },
+          {
+            "input": "list(paired_batch_generator(np.array([[1,2], [3,4]]), None, 2))",
+            "expected": "[np.array([[1,2], [3,4]])]",
+            "explanation": "Without labels: returns only X batches"
+          },
+          {
+            "input": "next(paired_batch_generator(np.array([[1], [2], [3], [4], [5]]), np.array([0, 1, 0, 1, 0]), 3))",
+            "expected": "(np.array([[1], [2], [3]]), np.array([0, 1, 0]))",
+            "explanation": "First batch of 3 samples from both arrays"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking if y is None before trying to slice it (causes NoneType error)",
+        "Using different indices for X and y slicing (breaks correspondence)",
+        "Returning [X_batch, y_batch] instead of (X_batch, y_batch) tuple",
+        "Not handling the case where y is provided but has incorrect length (should validate N)"
+      ],
+      "hint": "Use an if statement to check if y is None. When yielding batches, use tuple notation (X_batch, y_batch) for paired data and just X_batch when y is None.",
+      "references": [
+        "Supervised vs unsupervised learning",
+        "NumPy array broadcasting",
+        "Optional function parameters",
+        "Tuple packing and unpacking"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Complete Batch Iterator Implementation with List Conversion",
+      "relation_to_problem": "The final batch iterator must combine all previous concepts: compute batch count, generate batches lazily, handle optional labels, and convert batches to lists for consistent output format. This step integrates all building blocks.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Understanding of type conversion",
+        "Python list operations"
+      ],
+      "learning_objectives": [
+        "Synthesize all previous concepts into a complete iterator",
+        "Understand when to convert NumPy arrays to lists for output",
+        "Handle all edge cases: last batch size, optional labels, single sample",
+        "Implement the full iterator protocol for the batch iterator problem"
+      ],
+      "math_content": {
+        "definition": "A complete batch iterator $\\mathcal{B}_{iter}: \\mathscr{D} \\times \\mathbb{N} \\rightarrow \\{\\mathcal{B}_1, \\ldots, \\mathcal{B}_K\\}$ takes a dataset $\\mathscr{D} = \\{z_i\\}_{i=1}^{N}$ and batch size $B$, and returns an iterator that yields $K = \\lceil N/B \\rceil$ batches where: $$\\mathcal{B}_k = \\begin{cases} \\{z_{(k-1)B+1}, \\ldots, z_{kB}\\} & \\text{if } k < K \\\\ \\{z_{(K-1)B+1}, \\ldots, z_N\\} & \\text{if } k = K \\end{cases}$$ Each batch satisfies $|\\mathcal{B}_k| = B$ for $k < K$ and $|\\mathcal{B}_K| = N - (K-1)B = N \\mod B$ (or $B$ if $N \\mod B = 0$). The iterator must satisfy: (1) **Completeness**: $\\bigcup_{k=1}^{K} \\mathcal{B}_k = \\mathscr{D}$, (2) **Disjointness**: $\\mathcal{B}_i \\cap \\mathcal{B}_j = \\emptyset$ for $i \\neq j$, (3) **Order preservation**: elements within each batch maintain their original order.",
+        "notation": "$\\mathcal{B}_{iter}$ = batch iterator function, $K$ = total batches, $B$ = batch size, $N$ = dataset size, $\\mathcal{B}_k$ = $k$-th batch, $z_i = (x_i, y_i)$ = data sample",
+        "theorem": "**Theorem (Partition Completeness)**: The batch iterator creates a valid partition of $\\mathscr{D}$. Every sample appears in exactly one batch, and all samples are covered: $$\\left|\\bigcup_{k=1}^{K} \\mathcal{B}_k\\right| = \\sum_{k=1}^{K} |\\mathcal{B}_k| = (K-1)B + |\\mathcal{B}_K| = (K-1)B + (N - (K-1)B) = N = |\\mathscr{D}|$$",
+        "proof_sketch": "By construction, batch $k$ contains samples with indices in $[(k-1)B, \\min(kB, N))$. For $k \\in [1, K-1]$, we have $|\\mathcal{B}_k| = kB - (k-1)B = B$. For $k = K$, we have $|\\mathcal{B}_K| = N - (K-1)B$. Since $K = \\lceil N/B \\rceil$, we know $(K-1)B < N \\leq KB$, thus $0 < |\\mathcal{B}_K| \\leq B$. The index ranges are consecutive and non-overlapping: $[0, B), [B, 2B), \\ldots, [(K-1)B, N)$. Their union is $[0, N)$, covering all $N$ samples exactly once.",
+        "examples": [
+          "$N=5$, $B=2$: $K=3$ batches. $\\mathcal{B}_1 = \\{z_0, z_1\\}$, $\\mathcal{B}_2 = \\{z_2, z_3\\}$, $\\mathcal{B}_3 = \\{z_4\\}$",
+          "Verification: $|\\mathcal{B}_1| + |\\mathcal{B}_2| + |\\mathcal{B}_3| = 2 + 2 + 1 = 5 = N$ ✓",
+          "List conversion: NumPy arrays must be converted to Python lists for output format compliance"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Batch Index Range",
+          "latex": "$\\mathcal{I}_k = [(k-1)B, \\min(kB, N))$ for $k \\in [1, K]$",
+          "description": "The index range for batch $k$ ensures we don't exceed dataset size $N$."
+        },
+        {
+          "name": "Array to List Conversion",
+          "latex": "$\\mathcal{B}_k^{\\text{list}} = \\text{tolist}(\\mathcal{B}_k^{\\text{array}})$",
+          "description": "Convert NumPy arrays to Python lists using .tolist() method for output format."
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete batch iterator that combines all concepts: compute batches, handle optional labels, use generators for memory efficiency, and convert outputs to lists. The output format should match the problem specification exactly.",
+        "function_signature": "def batch_iterator(X: np.ndarray, y: np.ndarray = None, batch_size: int = 64):",
+        "starter_code": "import numpy as np\n\ndef batch_iterator(X: np.ndarray, y: np.ndarray = None, batch_size: int = 64):\n    \"\"\"\n    Create a batch iterator for dataset X with optional labels y.\n    \n    Args:\n        X: Feature array of shape (N, d) where N is samples, d is features\n        y: Optional label array of shape (N,)\n        batch_size: Number of samples per batch (default 64)\n    \n    Yields:\n        If y is provided: [X_batch_list, y_batch_list] where both are Python lists\n        If y is None: X_batch_list (Python list)\n    \n    Example:\n        X = np.array([[1, 2], [3, 4], [5, 6]])\n        y = np.array([1, 2, 3])\n        list(batch_iterator(X, y, 2)) -> [[[[1,2],[3,4]], [1,2]], [[[5,6]], [3]]]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "list(batch_iterator(np.array([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]]), np.array([1, 2, 3, 4, 5]), 2))",
+            "expected": "[[[[1, 2], [3, 4]], [1, 2]], [[[5, 6], [7, 8]], [3, 4]], [[[9, 10]], [5]]]",
+            "explanation": "5 samples with batch_size=2 yields 3 batches: [2, 2, 1]. Each batch is [X_list, y_list]."
+          },
+          {
+            "input": "list(batch_iterator(np.array([[1, 2], [3, 4]]), None, 2))",
+            "expected": "[[[1, 2], [3, 4]]]",
+            "explanation": "Without labels, return only X batches as lists. 2 samples fit in 1 batch."
+          },
+          {
+            "input": "list(batch_iterator(np.array([[10], [20], [30]]), np.array([0, 1, 0]), 5))",
+            "expected": "[[[[10], [20], [30]], [0, 1, 0]]]",
+            "explanation": "When N < batch_size, all samples fit in one batch."
+          },
+          {
+            "input": "len(list(batch_iterator(np.array([[i] for i in range(100)]), None, 32)))",
+            "expected": "4",
+            "explanation": "100 samples with batch_size=32 requires 4 batches (ceil(100/32)=4)."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to convert NumPy arrays to lists using .tolist() method",
+        "Returning (X_batch, y_batch) tuple instead of [X_batch, y_batch] list for paired data",
+        "Not using a generator (using list comprehension defeats memory efficiency)",
+        "Incorrect handling of last batch when N is not divisible by batch_size",
+        "Not validating that X and y have the same length when y is provided"
+      ],
+      "hint": "Combine concepts from previous sub-quests: (1) Loop through indices in steps of batch_size, (2) Use yield for lazy evaluation, (3) Slice X (and y if provided) at each iteration, (4) Convert slices to lists with .tolist(), (5) Return [X_list, y_list] if y exists, else X_list.",
+      "references": [
+        "Complete iterator implementation patterns",
+        "NumPy to Python list conversion",
+        "Generator best practices",
+        "Production ML data pipelines"
+      ]
+    }
+  ]
+}

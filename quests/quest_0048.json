@@ -1,0 +1,503 @@
+{
+  "problem_id": 48,
+  "title": "Implement Reduced Row Echelon Form (RREF) Function",
+  "category": "Linear Algebra",
+  "difficulty": "medium",
+  "description": "In this problem, your task is to implement a function that converts a given matrix into its Reduced Row Echelon Form (RREF). The RREF of a matrix is a special form where each leading entry in a row is 1, and all other elements in the column containing the leading 1 are zeros, except for the leading 1 itself.\n\nHowever, there are some additional details to keep in mind:\n\n- Diagonal entries can be 0 if the matrix is reducible (i.e., the row corresponding to that position can be eliminated entirely).\n- Some rows may consist entirely of zeros.\n- If a column contains a pivot (a leading 1), all other entries in that column should be zero.\n\nYour task is to implement the RREF algorithm, which must handle these cases and convert any given matrix into its RREF.\n\n",
+  "example": {
+    "input": "import numpy as np\n\nmatrix = np.array([\n    [1, 2, -1, -4],\n    [2, 3, -1, -11],\n    [-2, 0, -3, 22]\n])\n\nrref_matrix = rref(matrix)\nprint(rref_matrix)",
+    "output": "# array([\n#    [ 1.  0.  0. -8.],\n#    [ 0.  1.  0.  1.],\n#    [-0. -0.  1. -2.]\n# ])",
+    "reasoning": "The given matrix is converted to its Reduced Row Echelon Form (RREF) where each leading entry is 1, and all other entries in the leading columns are zero."
+  },
+  "starter_code": "import numpy as np\n\ndef rref(matrix):\n\tYour code here\n\tpass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Elementary Row Operations and Matrix Equivalence",
+      "relation_to_problem": "Row operations are the fundamental building blocks for the RREF algorithm. Understanding how to implement swap, scale, and add operations correctly is essential for transforming any matrix into RREF.",
+      "prerequisites": [
+        "Matrix indexing",
+        "Basic arithmetic operations",
+        "Understanding of matrix dimensions"
+      ],
+      "learning_objectives": [
+        "Implement the three elementary row operations on matrices",
+        "Understand why these operations preserve solution sets",
+        "Apply row operations without modifying original matrices"
+      ],
+      "math_content": {
+        "definition": "Elementary row operations are reversible transformations on matrices that preserve the solution set of linear systems. For a matrix $A$ with rows denoted $R_i$, the three elementary operations are: (1) **Row Swap**: $R_i \\leftrightarrow R_j$ exchanges rows $i$ and $j$; (2) **Scalar Multiplication**: $cR_i \\to R_i$ where $c \\neq 0$ multiplies row $i$ by non-zero scalar $c$; (3) **Row Addition**: $R_i + cR_j \\to R_i$ adds $c$ times row $j$ to row $i$.",
+        "notation": "$R_i$ = row $i$ of matrix, $a_{ij}$ = entry at row $i$, column $j$, $c$ = scalar constant",
+        "theorem": "**Theorem (Row Operation Equivalence)**: If matrix $B$ is obtained from matrix $A$ by a finite sequence of elementary row operations, then the systems $A\\mathbf{x} = \\mathbf{b}$ and $B\\mathbf{x} = \\mathbf{b}$ have identical solution sets.",
+        "proof_sketch": "Each elementary operation is reversible: (1) swapping rows twice returns to original; (2) multiplying by $c$ then $1/c$ is identity; (3) adding $cR_j$ then $-cR_j$ is identity. Since each operation is invertible and preserves equality of linear equations, the solution set remains unchanged.",
+        "examples": [
+          "Given $A = \\begin{bmatrix} 2 & 4 \\\\ 1 & 3 \\end{bmatrix}$, applying $R_1 \\leftrightarrow R_2$ yields $\\begin{bmatrix} 1 & 3 \\\\ 2 & 4 \\end{bmatrix}$",
+          "Applying $\\frac{1}{2}R_1 \\to R_1$ to $\\begin{bmatrix} 2 & 4 \\\\ 1 & 3 \\end{bmatrix}$ yields $\\begin{bmatrix} 1 & 2 \\\\ 1 & 3 \\end{bmatrix}$",
+          "Applying $R_2 - 2R_1 \\to R_2$ to $\\begin{bmatrix} 1 & 2 \\\\ 2 & 4 \\end{bmatrix}$ yields $\\begin{bmatrix} 1 & 2 \\\\ 0 & 0 \\end{bmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Row Swap Operation",
+          "latex": "$R_i \\leftrightarrow R_j$",
+          "description": "Exchange all entries between rows $i$ and $j$"
+        },
+        {
+          "name": "Scalar Multiplication",
+          "latex": "$R_i \\to cR_i \\implies a_{ik}^{\\text{new}} = c \\cdot a_{ik}^{\\text{old}}$ for all columns $k$",
+          "description": "Multiply every entry in row $i$ by scalar $c \\neq 0$"
+        },
+        {
+          "name": "Row Addition",
+          "latex": "$R_i \\to R_i + cR_j \\implies a_{ik}^{\\text{new}} = a_{ik}^{\\text{old}} + c \\cdot a_{jk}$ for all columns $k$",
+          "description": "Add $c$ times each entry of row $j$ to corresponding entry in row $i$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement three functions that perform elementary row operations on a matrix. Each function should take a matrix (as numpy array), relevant row indices, and scalar (where applicable), then return a NEW matrix with the operation applied. This builds the foundation for RREF by establishing the basic operations.",
+        "function_signature": "def row_swap(matrix: np.ndarray, row1: int, row2: int) -> np.ndarray:\ndef row_scale(matrix: np.ndarray, row: int, scalar: float) -> np.ndarray:\ndef row_add(matrix: np.ndarray, target_row: int, source_row: int, scalar: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef row_swap(matrix, row1, row2):\n    # Create a copy to avoid modifying original\n    # Swap row1 and row2\n    pass\n\ndef row_scale(matrix, row, scalar):\n    # Create a copy\n    # Multiply row by scalar\n    pass\n\ndef row_add(matrix, target_row, source_row, scalar):\n    # Create a copy\n    # Add scalar * source_row to target_row\n    pass",
+        "test_cases": [
+          {
+            "input": "row_swap(np.array([[1, 2], [3, 4]]), 0, 1)",
+            "expected": "np.array([[3, 4], [1, 2]])",
+            "explanation": "Rows 0 and 1 are exchanged"
+          },
+          {
+            "input": "row_scale(np.array([[2, 4, 6]]), 0, 0.5)",
+            "expected": "np.array([[1.0, 2.0, 3.0]])",
+            "explanation": "Row 0 is multiplied by 0.5, dividing all entries by 2"
+          },
+          {
+            "input": "row_add(np.array([[1, 2], [3, 4]]), 1, 0, -3)",
+            "expected": "np.array([[1, 2], [0, -2]])",
+            "explanation": "Add -3 times row 0 to row 1: [3, 4] + (-3)[1, 2] = [0, -2]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Modifying the original matrix instead of creating a copy",
+        "Forgetting that row_add should modify target_row, not source_row",
+        "Using integer division when scaling rows, losing precision",
+        "Incorrect indexing (0-based vs 1-based)"
+      ],
+      "hint": "Use np.copy() to create a copy of the matrix before modifying it. For row operations, you can use array slicing: matrix[i] to access row i.",
+      "references": [
+        "Elementary row operations and matrix equivalence",
+        "Numpy array copying and slicing",
+        "Linear system preservation under row operations"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Pivot Selection and Partial Pivoting Strategy",
+      "relation_to_problem": "Finding pivots correctly is crucial for RREF algorithm progression. Partial pivoting (selecting the largest absolute value) ensures numerical stability and prevents division by near-zero values that cause errors.",
+      "prerequisites": [
+        "Elementary row operations",
+        "Matrix traversal",
+        "Absolute value comparison"
+      ],
+      "learning_objectives": [
+        "Identify pivot positions in a given column below a specified row",
+        "Implement partial pivoting to select numerically stable pivots",
+        "Handle cases where no valid pivot exists (all zeros)"
+      ],
+      "math_content": {
+        "definition": "A **pivot** in column $j$ starting from row $r$ is the entry $a_{pj}$ where $p \\geq r$ and $a_{pj} \\neq 0$. The **pivot row** is the row containing the pivot. In **partial pivoting**, we select the pivot as $a_{pj}$ where $p = \\arg\\max_{i \\geq r} |a_{ij}|$, choosing the entry with maximum absolute value to minimize numerical error.",
+        "notation": "$a_{ij}$ = matrix entry at row $i$, column $j$; $|a_{ij}|$ = absolute value; $\\epsilon$ = tolerance threshold (e.g., $10^{-10}$)",
+        "theorem": "**Theorem (Numerical Stability)**: Selecting pivots with maximum absolute value (partial pivoting) minimizes the propagation of rounding errors in floating-point arithmetic. For pivot $p$ in column $j$, choosing $|a_{pj}| = \\max_{i \\geq r} |a_{ij}|$ ensures that scaling factors $|a_{ij}/a_{pj}| \\leq 1$ for all subsequent eliminations.",
+        "proof_sketch": "When eliminating entries below pivot $a_{pj}$, we compute $R_i \\to R_i - \\frac{a_{ij}}{a_{pj}}R_p$. The multiplier $\\frac{a_{ij}}{a_{pj}}$ has absolute value $\\leq 1$ when $|a_{pj}|$ is maximal, preventing amplification of rounding errors. Without partial pivoting, small pivots create large multipliers that magnify numerical inaccuracies.",
+        "examples": [
+          "In column $\\begin{bmatrix} 0.001 \\\\ 1.0 \\\\ 0.5 \\end{bmatrix}$, partial pivoting selects row 1 (value 1.0) as pivot, not row 0",
+          "In column $\\begin{bmatrix} 0 \\\\ -3 \\\\ 2 \\end{bmatrix}$, the maximum absolute value is 3, so row 1 is selected as pivot",
+          "In column $\\begin{bmatrix} 10^{-12} \\\\ 0 \\\\ 10^{-15} \\end{bmatrix}$ with tolerance $\\epsilon = 10^{-10}$, all values are treated as zero, so no pivot exists"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Pivot Selection Criterion",
+          "latex": "$p = \\arg\\max_{i \\geq r} |a_{ij}|$ subject to $|a_{ij}| > \\epsilon$",
+          "description": "Select row $p$ with largest absolute value in column $j$ at or below row $r$, exceeding tolerance $\\epsilon$"
+        },
+        {
+          "name": "Zero Detection with Tolerance",
+          "latex": "$a_{ij} \\approx 0 \\iff |a_{ij}| \\leq \\epsilon$ where $\\epsilon = 10^{-10}$",
+          "description": "Treat values smaller than tolerance as zero to handle floating-point errors"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that finds the best pivot row in a given column, starting from a specified row and searching downward. Use partial pivoting strategy: return the row index with the maximum absolute value, or -1 if no suitable pivot exists (all values below tolerance). This is critical for the RREF forward elimination phase.",
+        "function_signature": "def find_pivot(matrix: np.ndarray, col: int, start_row: int, tolerance: float = 1e-10) -> int:",
+        "starter_code": "import numpy as np\n\ndef find_pivot(matrix, col, start_row, tolerance=1e-10):\n    # Search from start_row to end of matrix\n    # Find row with maximum absolute value in column col\n    # Return row index, or -1 if all values < tolerance\n    pass",
+        "test_cases": [
+          {
+            "input": "find_pivot(np.array([[1, 2], [3, 5], [2, 4]]), col=0, start_row=0)",
+            "expected": "1",
+            "explanation": "Row 1 has maximum absolute value (3) in column 0 starting from row 0"
+          },
+          {
+            "input": "find_pivot(np.array([[0, 1], [0, 2], [0, 3]]), col=0, start_row=0)",
+            "expected": "-1",
+            "explanation": "All values in column 0 are zero, no valid pivot exists"
+          },
+          {
+            "input": "find_pivot(np.array([[1, 2], [3, 4], [-5, 6]]), col=0, start_row=1)",
+            "expected": "2",
+            "explanation": "Starting from row 1, row 2 has maximum absolute value (|-5| = 5) in column 0"
+          },
+          {
+            "input": "find_pivot(np.array([[1e-12, 2], [1e-11, 4]]), col=0, start_row=0, tolerance=1e-10)",
+            "expected": "-1",
+            "explanation": "All values in column 0 are below tolerance 1e-10, treated as zero"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Comparing values directly instead of absolute values (missing negative pivots)",
+        "Not handling the case where all values are below tolerance",
+        "Searching the entire column instead of only from start_row downward",
+        "Forgetting to use tolerance for zero detection with floating-point numbers",
+        "Returning the value instead of the row index"
+      ],
+      "hint": "Iterate through rows from start_row to the end, track both the maximum absolute value found and its row index. Use np.abs() for absolute values.",
+      "references": [
+        "Partial pivoting in Gaussian elimination",
+        "Numerical stability in linear algebra",
+        "Floating-point arithmetic and tolerance thresholds"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Forward Elimination to Row Echelon Form (REF)",
+      "relation_to_problem": "Forward elimination transforms a matrix into Row Echelon Form (REF), which is halfway to RREF. This phase creates the staircase pattern of leading ones and zeros below pivots, which is essential before back-substitution.",
+      "prerequisites": [
+        "Elementary row operations",
+        "Pivot selection",
+        "Matrix traversal with multiple indices"
+      ],
+      "learning_objectives": [
+        "Implement forward elimination algorithm to achieve REF",
+        "Create leading ones by scaling pivot rows",
+        "Eliminate entries below pivots to create zeros",
+        "Handle columns with no valid pivots (skip to next column)"
+      ],
+      "math_content": {
+        "definition": "A matrix is in **Row Echelon Form (REF)** if: (1) All zero rows are at the bottom; (2) The first non-zero entry (leading entry) in each non-zero row is 1; (3) The leading 1 in row $i+1$ is to the right of the leading 1 in row $i$ (staircase pattern). REF is achieved through **forward elimination**: systematically creating leading ones and eliminating entries below them column-by-column.",
+        "notation": "$L_i$ = column index of leading 1 in row $i$; $L_1 < L_2 < \\cdots < L_r$ for $r$ non-zero rows",
+        "theorem": "**Theorem (REF Existence)**: Every matrix can be transformed into Row Echelon Form using a finite sequence of elementary row operations. The number of leading ones equals the rank of the matrix.",
+        "proof_sketch": "Process columns left-to-right. For column $j$, if a non-zero entry exists at or below current row $r$, select pivot using partial pivoting, swap to position $(r,j)$, scale to create leading 1, then eliminate below. If column $j$ is all zeros below row $r$, skip to column $j+1$. Since each step either advances the row or column pointer and matrix is finite, algorithm terminates with REF.",
+        "examples": [
+          "Forward elimination on $\\begin{bmatrix} 2 & 4 & 6 \\\\ 1 & 3 & 5 \\end{bmatrix}$: Swap rows, scale row 0 by $1/1$, eliminate below: $\\begin{bmatrix} 1 & 3 & 5 \\\\ 0 & -2 & -4 \\end{bmatrix}$, scale row 1: $\\begin{bmatrix} 1 & 3 & 5 \\\\ 0 & 1 & 2 \\end{bmatrix}$ (REF)",
+          "Matrix $\\begin{bmatrix} 0 & 1 & 2 \\\\ 0 & 0 & 3 \\end{bmatrix}$ processed: Leading 1 at $(0,1)$, leading 1 at $(1,2)$ after scaling",
+          "Singular case: $\\begin{bmatrix} 1 & 2 \\\\ 2 & 4 \\end{bmatrix} \\to \\begin{bmatrix} 1 & 2 \\\\ 0 & 0 \\end{bmatrix}$ (REF with zero row)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Creating Leading One",
+          "latex": "$R_r \\to \\frac{1}{a_{rj}}R_r$ where $a_{rj}$ is the pivot",
+          "description": "Scale pivot row by reciprocal of pivot value to make leading entry equal to 1"
+        },
+        {
+          "name": "Elimination Below Pivot",
+          "latex": "$R_i \\to R_i - a_{ij}R_r$ for all $i > r$",
+          "description": "For each row below pivot row $r$, subtract $a_{ij}$ times the pivot row to create zero at position $(i,j)$"
+        },
+        {
+          "name": "REF Condition",
+          "latex": "$a_{ij} = 0$ for all $i > r$ and $j = L_r$ where $L_r$ is the pivot column in row $r$",
+          "description": "All entries below leading ones must be zero"
+        }
+      ],
+      "exercise": {
+        "description": "Implement forward elimination to convert a matrix to Row Echelon Form (REF). Process columns left-to-right, maintaining a current_row pointer. For each column: find pivot, swap if needed, scale to create leading 1, then eliminate all entries below. Skip columns with no pivot. Return the transformed matrix in REF.",
+        "function_signature": "def forward_elimination(matrix: np.ndarray, tolerance: float = 1e-10) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef forward_elimination(matrix, tolerance=1e-10):\n    # Create working copy\n    # Initialize current_row = 0\n    # For each column:\n    #   Find pivot using find_pivot\n    #   If pivot exists:\n    #     Swap pivot row to current_row position\n    #     Scale current_row to make pivot = 1\n    #     Eliminate all entries below pivot\n    #     Increment current_row\n    # Return REF matrix\n    pass",
+        "test_cases": [
+          {
+            "input": "forward_elimination(np.array([[2.0, 4.0], [1.0, 3.0]]))",
+            "expected": "np.array([[1.0, 2.0], [0.0, 1.0]])",
+            "explanation": "First pivot in col 0: swap rows, scale [2,4] by 0.5 → [1,2], eliminate below → [0,1], then second pivot at (1,1) already scaled"
+          },
+          {
+            "input": "forward_elimination(np.array([[1.0, 2.0, 3.0], [2.0, 4.0, 6.0], [1.0, 1.0, 2.0]]))",
+            "expected": "np.array([[1.0, 2.0, 3.0], [0.0, 1.0, 1.0], [0.0, 0.0, 0.0]])",
+            "explanation": "Pivot col 0: eliminate below [1,2,3]. Pivot col 1: row 1 has [0,-1,-1], scale by -1 → [0,1,1]. Row 2 becomes zeros."
+          },
+          {
+            "input": "forward_elimination(np.array([[0.0, 1.0, 2.0], [0.0, 0.0, 3.0]]))",
+            "expected": "np.array([[0.0, 1.0, 2.0], [0.0, 0.0, 1.0]])",
+            "explanation": "Col 0 has no pivot (all zeros), skip. Col 1: pivot at (0,1), already 1. Col 2: pivot at (1,2), scale by 1/3."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not maintaining a separate current_row pointer (processing wrong rows)",
+        "Forgetting to increment current_row after finding a pivot",
+        "Attempting to process rows beyond matrix dimensions",
+        "Not skipping columns that have no valid pivot",
+        "Eliminating entries above the pivot (that's for back-substitution)",
+        "Modifying the original matrix instead of a copy"
+      ],
+      "hint": "Use nested loops: outer loop for columns, inner operations for each column (find pivot, swap, scale, eliminate). Track current_row separately from the column index.",
+      "references": [
+        "Gaussian elimination algorithm",
+        "Row Echelon Form definition and properties",
+        "Forward elimination phase in linear system solving"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Back-Substitution to Reduced Row Echelon Form (RREF)",
+      "relation_to_problem": "Back-substitution completes the RREF transformation by eliminating entries ABOVE pivots. This creates the final form where each pivot column has zeros everywhere except the pivot position, enabling direct solution reading.",
+      "prerequisites": [
+        "Row Echelon Form",
+        "Pivot identification",
+        "Row operations"
+      ],
+      "learning_objectives": [
+        "Understand the difference between REF and RREF",
+        "Implement back-substitution to eliminate above pivots",
+        "Process pivots from bottom-right to top-left",
+        "Recognize when a matrix is already in RREF"
+      ],
+      "math_content": {
+        "definition": "A matrix is in **Reduced Row Echelon Form (RREF)** if it satisfies all REF conditions AND: (4) Each column containing a leading 1 (pivot column) has zeros in ALL other positions. **Back-substitution** is the process of eliminating entries above pivots by processing rows from bottom to top, using row operations $R_i \\to R_i - a_{ij}R_r$ where $r > i$ and $a_{rj}$ is a pivot.",
+        "notation": "$P_r$ = column index of pivot in row $r$; pivot value $a_{r,P_r} = 1$ in REF",
+        "theorem": "**Theorem (RREF Uniqueness)**: Every matrix has a unique Reduced Row Echelon Form. Regardless of the sequence of elementary row operations applied, the final RREF is always identical.",
+        "proof_sketch": "REF is not unique (different pivot selection orders yield different REFs), but the additional constraint that pivot columns have zeros everywhere except the pivot position eliminates all degrees of freedom. The pivot positions are determined by the rank and column dependencies of the original matrix, which are invariants. Once pivot positions are fixed, the requirement that each pivot column is a standard basis vector $\\mathbf{e}_i$ uniquely determines all entries.",
+        "examples": [
+          "REF $\\begin{bmatrix} 1 & 3 & 5 \\\\ 0 & 1 & 2 \\end{bmatrix}$ has pivot at $(1,1)$. Back-substitute: $R_0 \\to R_0 - 3R_1 = \\begin{bmatrix} 1 & 0 & -1 \\\\ 0 & 1 & 2 \\end{bmatrix}$ (RREF)",
+          "REF $\\begin{bmatrix} 1 & 2 & 0 \\\\ 0 & 0 & 1 \\\\ 0 & 0 & 0 \\end{bmatrix}$ is already in RREF (pivot columns 0,2 have no non-zero entries above pivots)",
+          "Three-row case: $\\begin{bmatrix} 1 & 2 & 3 \\\\ 0 & 1 & 4 \\\\ 0 & 0 & 1 \\end{bmatrix}$ → eliminate above $(2,2)$ → $\\begin{bmatrix} 1 & 2 & 0 \\\\ 0 & 1 & 0 \\\\ 0 & 0 & 1 \\end{bmatrix}$ → eliminate above $(1,1)$ → $\\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & 1 & 0 \\\\ 0 & 0 & 1 \\end{bmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Finding Pivot Column in Row",
+          "latex": "$P_r = \\min\\{j : a_{rj} = 1 \\text{ and } a_{ij} = 0 \\text{ for all } i > r\\}$",
+          "description": "The pivot in row $r$ (in REF) is the leftmost 1 with zeros below it"
+        },
+        {
+          "name": "Elimination Above Pivot",
+          "latex": "$R_i \\to R_i - a_{i,P_r}R_r$ for all $i < r$",
+          "description": "For each row above pivot row $r$, subtract the appropriate multiple of row $r$ to create zero at position $(i, P_r)$"
+        },
+        {
+          "name": "RREF Pivot Column Condition",
+          "latex": "$a_{i,P_r} = \\begin{cases} 1 & \\text{if } i = r \\\\ 0 & \\text{if } i \\neq r \\end{cases}$",
+          "description": "Each pivot column is a standard basis vector"
+        }
+      ],
+      "exercise": {
+        "description": "Implement back-substitution to convert a matrix in REF to RREF. Process rows from bottom to top. For each row, find its pivot column (first non-zero entry, which should be 1 if input is valid REF). Then eliminate all non-zero entries above this pivot by subtracting appropriate multiples of the current row from rows above. Return the RREF matrix.",
+        "function_signature": "def back_substitution(matrix: np.ndarray, tolerance: float = 1e-10) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef back_substitution(matrix, tolerance=1e-10):\n    # Create working copy\n    # Process rows from bottom to top\n    # For each row r:\n    #   Find pivot column P_r (first non-zero entry)\n    #   If pivot exists:\n    #     For each row i above r:\n    #       Eliminate: R_i = R_i - matrix[i, P_r] * R_r\n    # Return RREF matrix\n    pass",
+        "test_cases": [
+          {
+            "input": "back_substitution(np.array([[1.0, 3.0, 5.0], [0.0, 1.0, 2.0]]))",
+            "expected": "np.array([[1.0, 0.0, -1.0], [0.0, 1.0, 2.0]])",
+            "explanation": "Row 1 has pivot at column 1. Eliminate above: R0 = R0 - 3*R1 = [1,3,5] - 3*[0,1,2] = [1,0,-1]"
+          },
+          {
+            "input": "back_substitution(np.array([[1.0, 0.0, 2.0], [0.0, 1.0, 3.0], [0.0, 0.0, 1.0]]))",
+            "expected": "np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])",
+            "explanation": "Row 2 pivot at col 2: eliminate above in rows 0,1. Then row 1 pivot at col 1: eliminate in row 0. Result is identity matrix."
+          },
+          {
+            "input": "back_substitution(np.array([[1.0, 2.0, 0.0], [0.0, 0.0, 1.0], [0.0, 0.0, 0.0]]))",
+            "expected": "np.array([[1.0, 2.0, 0.0], [0.0, 0.0, 1.0], [0.0, 0.0, 0.0]])",
+            "explanation": "Row 1 has pivot at col 2, but row 0 already has 0 there. Row 0 pivot at col 0, nothing above. Already in RREF."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Processing rows from top to bottom instead of bottom to top",
+        "Not identifying the correct pivot column (using wrong column index)",
+        "Attempting to eliminate the pivot itself (should only eliminate above, not in the pivot row)",
+        "Handling zero rows incorrectly (they should be skipped)",
+        "Using tolerance incorrectly when identifying pivots in REF (pivots should be exactly 1)"
+      ],
+      "hint": "Use range(len(matrix)-1, -1, -1) to iterate rows from bottom to top. To find pivot column, iterate through columns until you find a non-zero entry (or use np.argmax(np.abs(row) > tolerance)).",
+      "references": [
+        "Back-substitution in linear systems",
+        "RREF uniqueness theorem",
+        "Reduced Row Echelon Form properties"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Matrix Rank and Degeneracy Detection",
+      "relation_to_problem": "Understanding rank and degeneracy helps handle edge cases in RREF: zero rows, dependent columns, and non-square matrices. The rank determines solution structure and validates the RREF result.",
+      "prerequisites": [
+        "Linear independence",
+        "RREF structure",
+        "Pivot counting"
+      ],
+      "learning_objectives": [
+        "Calculate matrix rank from RREF",
+        "Identify pivot and free columns",
+        "Understand the relationship between rank, nullity, and matrix dimensions",
+        "Classify matrices by rank (full rank, rank deficient)"
+      ],
+      "math_content": {
+        "definition": "The **rank** of matrix $A$, denoted $\\text{rank}(A)$, is the dimension of its column space, equal to the maximum number of linearly independent columns (or rows). In RREF, $\\text{rank}(A)$ equals the number of non-zero rows (equivalently, the number of pivots). A **pivot column** contains a leading 1; a **free column** does not. The **nullity** is $\\text{nullity}(A) = n - \\text{rank}(A)$ for $n$ columns.",
+        "notation": "$r = \\text{rank}(A)$, $m \\times n$ = matrix dimensions, $\\mathcal{C}(A)$ = column space, $\\mathcal{N}(A)$ = null space",
+        "theorem": "**Rank-Nullity Theorem**: For any $m \\times n$ matrix $A$, $\\text{rank}(A) + \\text{nullity}(A) = n$. This fundamental theorem connects the dimensions of the column space and null space.",
+        "proof_sketch": "RREF has $r = \\text{rank}(A)$ pivot columns and $n-r$ free columns. Each free column corresponds to a free variable, generating one basis vector for $\\mathcal{N}(A)$. Thus $\\dim(\\mathcal{N}(A)) = n-r$. Since column space dimension is $r$ by definition, we have $r + (n-r) = n$.",
+        "examples": [
+          "RREF $\\begin{bmatrix} 1 & 0 & 2 \\\\ 0 & 1 & 3 \\\\ 0 & 0 & 0 \\end{bmatrix}$: 2 non-zero rows, so rank = 2. Pivot columns: 0,1. Free column: 2. Nullity = 3-2 = 1.",
+          "Identity matrix $I_n$ has rank $n$ (full rank): all columns are pivot columns, nullity = 0",
+          "Zero matrix has rank 0: no non-zero rows, all columns are free, nullity = $n$",
+          "Matrix $\\begin{bmatrix} 1 & 2 \\\\ 2 & 4 \\\\ 3 & 6 \\end{bmatrix}$ has RREF $\\begin{bmatrix} 1 & 2 \\\\ 0 & 0 \\\\ 0 & 0 \\end{bmatrix}$, rank = 1 (rank deficient)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Rank from RREF",
+          "latex": "$\\text{rank}(A) = \\#\\{\\text{non-zero rows in RREF}(A)\\}$",
+          "description": "Count the number of rows that are not entirely zero in the RREF"
+        },
+        {
+          "name": "Rank-Nullity Theorem",
+          "latex": "$\\text{rank}(A) + \\text{nullity}(A) = n$",
+          "description": "For $m \\times n$ matrix, sum of column space and null space dimensions equals number of columns"
+        },
+        {
+          "name": "Full Rank Condition",
+          "latex": "$A$ is full rank $\\iff \\text{rank}(A) = \\min(m,n)$",
+          "description": "Matrix achieves maximum possible rank for its dimensions"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that analyzes a matrix in RREF and returns its rank, list of pivot column indices, and list of free column indices. A non-zero row has at least one entry with absolute value greater than tolerance. A pivot column is identified by finding the column of each leading 1. This analysis validates RREF structure and prepares for solution extraction.",
+        "function_signature": "def analyze_rref(matrix: np.ndarray, tolerance: float = 1e-10) -> tuple[int, list[int], list[int]]:",
+        "starter_code": "import numpy as np\n\ndef analyze_rref(matrix, tolerance=1e-10):\n    # Returns: (rank, pivot_columns, free_columns)\n    # Count non-zero rows for rank\n    # For each non-zero row, find pivot column (first non-zero entry)\n    # Free columns are those not in pivot_columns\n    pass",
+        "test_cases": [
+          {
+            "input": "analyze_rref(np.array([[1.0, 0.0, 2.0], [0.0, 1.0, 3.0], [0.0, 0.0, 0.0]]))",
+            "expected": "(2, [0, 1], [2])",
+            "explanation": "2 non-zero rows (rank=2). Pivots in columns 0 and 1. Column 2 is free (no pivot)."
+          },
+          {
+            "input": "analyze_rref(np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]))",
+            "expected": "(3, [0, 1, 2], [])",
+            "explanation": "3 non-zero rows, full rank. All columns are pivot columns, no free columns."
+          },
+          {
+            "input": "analyze_rref(np.array([[0.0, 1.0, 2.0], [0.0, 0.0, 0.0]]))",
+            "expected": "(1, [1], [0, 2])",
+            "explanation": "1 non-zero row. Pivot at column 1. Columns 0 and 2 are free."
+          },
+          {
+            "input": "analyze_rref(np.array([[0.0, 0.0], [0.0, 0.0]]))",
+            "expected": "(0, [], [0, 1])",
+            "explanation": "Zero matrix: rank 0, no pivots, all columns free."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Counting rows instead of non-zero rows for rank",
+        "Not using tolerance when detecting zero rows (floating-point errors)",
+        "Assuming pivot columns are always the first k columns (they can be any columns)",
+        "Forgetting to check all entries in a row to determine if it's a zero row",
+        "Not handling the empty list case when rank is 0 or n"
+      ],
+      "hint": "To check if a row is non-zero, use np.any(np.abs(row) > tolerance). To find the pivot column in a row, find the first index where |entry| > tolerance.",
+      "references": [
+        "Matrix rank and its computation",
+        "Rank-Nullity theorem",
+        "Linear independence and basis",
+        "Solution spaces of linear systems"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete RREF Algorithm Integration",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts into the complete RREF algorithm. You combine pivot selection, forward elimination, back-substitution, and numerical stability to transform any matrix into its unique RREF.",
+      "prerequisites": [
+        "Elementary row operations",
+        "Pivot selection with partial pivoting",
+        "Forward elimination",
+        "Back-substitution",
+        "Rank analysis"
+      ],
+      "learning_objectives": [
+        "Integrate all RREF components into a complete algorithm",
+        "Handle edge cases: zero matrices, singular matrices, non-square matrices",
+        "Apply numerical tolerance consistently throughout",
+        "Validate RREF output meets all four RREF conditions"
+      ],
+      "math_content": {
+        "definition": "The **Complete RREF Algorithm** transforms any $m \\times n$ matrix $A$ into its unique RREF through two phases: (1) **Forward Elimination**: Process columns left-to-right, finding pivots with partial pivoting, creating leading 1s, and eliminating below to achieve REF; (2) **Back-Substitution**: Process pivot rows bottom-to-top, eliminating above each pivot to achieve RREF. Numerical tolerance $\\epsilon$ (typically $10^{-10}$) handles floating-point precision.",
+        "notation": "$A^{\\text{RREF}}$ = RREF of matrix $A$, $\\epsilon$ = numerical tolerance threshold",
+        "theorem": "**Theorem (RREF Algorithm Correctness)**: Given any matrix $A$, the complete RREF algorithm produces a unique matrix $A^{\\text{RREF}}$ satisfying: (1) all zero rows at bottom; (2) each leading entry is 1; (3) leading 1s in descending column positions; (4) each pivot column has zeros in all other positions. Furthermore, $A$ and $A^{\\text{RREF}}$ are row equivalent.",
+        "proof_sketch": "Forward elimination establishes conditions (1)-(3) by construction: pivots are chosen left-to-right and top-to-bottom, scaled to 1, with zeros created below. This achieves REF. Back-substitution enforces condition (4) by eliminating above each pivot bottom-to-top. Since only elementary row operations are used, $A$ and $A^{\\text{RREF}}$ are row equivalent. Uniqueness follows from the RREF uniqueness theorem.",
+        "examples": [
+          "Full example: $A = \\begin{bmatrix} 2 & 1 & -1 \\\\ -3 & -1 & 2 \\\\ -2 & 1 & 2 \\end{bmatrix}$ → Forward elim → REF → Back-sub → $\\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & 1 & 0 \\\\ 0 & 0 & 1 \\end{bmatrix}$ (full rank)",
+          "Rank-deficient: $A = \\begin{bmatrix} 1 & 2 & 3 \\\\ 2 & 4 & 6 \\end{bmatrix}$ → RREF = $\\begin{bmatrix} 1 & 2 & 3 \\\\ 0 & 0 & 0 \\end{bmatrix}$ (rank 1)",
+          "Non-square: $A = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\\\ 5 & 6 \\end{bmatrix}$ → RREF = $\\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\\\ 0 & 0 \\end{bmatrix}$ (rank 2, overdetermined)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete RREF Algorithm",
+          "latex": "$A^{\\text{RREF}} = \\text{BackSub}(\\text{ForwardElim}(A, \\epsilon), \\epsilon)$",
+          "description": "Apply forward elimination to get REF, then back-substitution to get RREF"
+        },
+        {
+          "name": "Computational Complexity",
+          "latex": "$O(m \\cdot n \\cdot \\min(m,n))$",
+          "description": "Time complexity for $m \\times n$ matrix, dominated by nested loops over rows and columns"
+        },
+        {
+          "name": "RREF Verification",
+          "latex": "$A^{\\text{RREF}}$ valid $\\iff$ conditions (1)-(4) all satisfied",
+          "description": "Check all four RREF defining conditions to verify correctness"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete RREF function by integrating forward elimination and back-substitution. The function should: (1) create a working copy with float type, (2) apply forward elimination to achieve REF, (3) apply back-substitution to achieve RREF, (4) clean up near-zero values below tolerance. Test on various matrices including square, rectangular, full rank, and rank deficient cases.",
+        "function_signature": "def rref(matrix: np.ndarray, tolerance: float = 1e-10) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef rref(matrix, tolerance=1e-10):\n    # Convert to float and create working copy\n    # Apply forward elimination\n    # Apply back-substitution  \n    # Clean up: set values < tolerance to exactly 0\n    # Return RREF matrix\n    pass",
+        "test_cases": [
+          {
+            "input": "rref(np.array([[1, 2, -1, -4], [2, 3, -1, -11], [-2, 0, -3, 22]]))",
+            "expected": "np.array([[1.0, 0.0, 0.0, -8.0], [0.0, 1.0, 0.0, 1.0], [0.0, 0.0, 1.0, -2.0]])",
+            "explanation": "3x4 augmented matrix reduces to identity-like form with solution column, full rank system"
+          },
+          {
+            "input": "rref(np.array([[2, 4, 6], [1, 2, 3]]))",
+            "expected": "np.array([[1.0, 2.0, 3.0], [0.0, 0.0, 0.0]])",
+            "explanation": "Rank deficient: second row is multiple of first, reduces to one non-zero row"
+          },
+          {
+            "input": "rref(np.array([[0, 1, 2], [0, 0, 3]]))",
+            "expected": "np.array([[0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])",
+            "explanation": "First column is zero (free variable), pivots in columns 1 and 2"
+          },
+          {
+            "input": "rref(np.array([[1, 2, 3], [2, 4, 6], [3, 6, 9]]))",
+            "expected": "np.array([[1.0, 2.0, 3.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])",
+            "explanation": "All rows are multiples of first row, rank 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not converting integer matrices to float before operations (causes integer division errors)",
+        "Forgetting to create a copy, modifying the input matrix",
+        "Not cleaning up near-zero values at the end (returning values like 1e-15 instead of 0)",
+        "Incorrect tolerance handling leading to wrong pivot selection",
+        "Not handling the case where current_row exceeds matrix dimensions",
+        "Applying operations in wrong order (back-substitution before forward elimination)"
+      ],
+      "hint": "Structure your solution to call previously implemented functions: use your forward_elimination and back_substitution functions. Use matrix.astype(float) for type conversion, and np.where(np.abs(matrix) < tolerance, 0, matrix) to clean up near-zeros.",
+      "references": [
+        "Complete Gaussian elimination algorithm",
+        "RREF applications in solving linear systems",
+        "Numerical linear algebra best practices",
+        "Matrix rank and solution space structure"
+      ]
+    }
+  ]
+}

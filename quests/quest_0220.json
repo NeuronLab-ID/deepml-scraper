@@ -1,0 +1,535 @@
+{
+  "problem_id": 220,
+  "title": "Derivative of Cross-Entropy Loss w.r.t. Logits",
+  "category": "Calculus",
+  "difficulty": "medium",
+  "description": "Write a Python function that computes the derivative (gradient) of the cross-entropy loss with respect to the input logits. Given a vector of logits (raw model outputs before softmax) and a target class index, return the gradient vector. This gradient is fundamental for training neural network classifiers and has an elegant closed-form solution.",
+  "example": {
+    "input": "logits = [1.0, 2.0, 3.0], target = 0",
+    "output": "[-0.91, 0.2447, 0.6652]",
+    "reasoning": "First compute softmax: p = [0.09, 0.2447, 0.6652]. The one-hot target vector is y = [1, 0, 0]. The gradient is simply p - y = [0.09 - 1, 0.2447 - 0, 0.6652 - 0] = [-0.91, 0.2447, 0.6652]. The negative gradient for class 0 indicates we should increase that logit to reduce loss."
+  },
+  "starter_code": "def cross_entropy_derivative(logits: list[float], target: int) -> list[float]:\n\t\"\"\"\n\tCompute the derivative of cross-entropy loss with respect to logits.\n\t\n\tArgs:\n\t\tlogits: Raw model outputs (before softmax)\n\t\ttarget: Index of the true class (0-indexed)\n\t\t\n\tReturns:\n\t\tGradient vector where gradient[i] = dL/d(logits[i])\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Exponential Functions and Softmax Normalization",
+      "relation_to_problem": "The softmax function transforms logits into probabilities. Understanding its computation is essential because the cross-entropy derivative formula involves softmax values: ∇L = softmax(z) - y.",
+      "prerequisites": [
+        "Exponential functions",
+        "Summation notation",
+        "Vector operations"
+      ],
+      "learning_objectives": [
+        "Compute the exponential function for vectors element-wise",
+        "Implement normalization to convert arbitrary values into a probability distribution",
+        "Understand numerical stability issues with exponentials"
+      ],
+      "math_content": {
+        "definition": "The **softmax function** $\\sigma: \\mathbb{R}^K \\to (0,1)^K$ transforms a vector of real-valued logits into a probability distribution over $K$ classes. For logits $\\mathbf{z} = [z_1, z_2, \\ldots, z_K]^T$, the softmax is defined as: $$\\sigma(\\mathbf{z})_i = \\frac{e^{z_i}}{\\sum_{j=1}^{K} e^{z_j}}$$ where $\\sigma(\\mathbf{z})_i$ represents the predicted probability for class $i$.",
+        "notation": "$\\mathbf{z} \\in \\mathbb{R}^K$ = logit vector (raw scores), $\\sigma(\\mathbf{z})_i \\in (0,1)$ = probability for class $i$, $\\sum_{i=1}^{K} \\sigma(\\mathbf{z})_i = 1$ (probability constraint)",
+        "theorem": "**Softmax Properties**: For any logit vector $\\mathbf{z} \\in \\mathbb{R}^K$: (1) $\\sigma(\\mathbf{z})_i > 0$ for all $i$, (2) $\\sum_{i=1}^{K} \\sigma(\\mathbf{z})_i = 1$, (3) $\\arg\\max_i z_i = \\arg\\max_i \\sigma(\\mathbf{z})_i$ (preserves ordering), (4) As $z_i \\to \\infty$, $\\sigma(\\mathbf{z})_i \\to 1$",
+        "proof_sketch": "Property (1) follows from $e^{z_i} > 0$ for all real $z_i$. Property (2): $\\sum_i \\sigma(\\mathbf{z})_i = \\sum_i \\frac{e^{z_i}}{S} = \\frac{1}{S}\\sum_i e^{z_i} = \\frac{S}{S} = 1$ where $S = \\sum_j e^{z_j}$. Property (3): If $z_i > z_j$ then $e^{z_i} > e^{z_j}$, so $\\frac{e^{z_i}}{S} > \\frac{e^{z_j}}{S}$. Property (4): As $z_i \\to \\infty$, $e^{z_i}$ dominates the sum $S$, so $\\sigma(\\mathbf{z})_i \\to 1$.",
+        "examples": [
+          "**Example 1**: For $\\mathbf{z} = [1, 2, 3]$, compute $S = e^1 + e^2 + e^3 = 2.718 + 7.389 + 20.086 = 30.193$. Then $\\sigma(\\mathbf{z}) = [\\frac{2.718}{30.193}, \\frac{7.389}{30.193}, \\frac{20.086}{30.193}] = [0.090, 0.245, 0.665]$. Note: highest logit (3) gives highest probability (0.665).",
+          "**Example 2**: For uniform logits $\\mathbf{z} = [2, 2, 2]$, all exponentials are equal: $e^2 = 7.389$. So $\\sigma(\\mathbf{z}) = [\\frac{7.389}{3 \\times 7.389}, \\frac{7.389}{3 \\times 7.389}, \\frac{7.389}{3 \\times 7.389}] = [0.333, 0.333, 0.333]$ (uniform distribution).",
+          "**Example 3 (Numerical Stability)**: For large logits $\\mathbf{z} = [1000, 1001, 1002]$, computing $e^{1000}$ causes overflow. Use the **log-sum-exp trick**: subtract $z_{\\max} = 1002$ to get $\\mathbf{z}' = [-2, -1, 0]$, then $\\sigma(\\mathbf{z}') = [0.090, 0.245, 0.665]$ (same as Example 1!)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Softmax Function",
+          "latex": "$\\sigma(\\mathbf{z})_i = \\frac{e^{z_i}}{\\sum_{j=1}^{K} e^{z_j}}$",
+          "description": "Converts logits to probabilities. Use for all classification problems."
+        },
+        {
+          "name": "Log-Sum-Exp Trick",
+          "latex": "$\\log\\left(\\sum_j e^{z_j}\\right) = z_{\\max} + \\log\\left(\\sum_j e^{z_j - z_{\\max}}\\right)$",
+          "description": "Numerical stability: prevents overflow by subtracting maximum logit before exponentiation."
+        }
+      ],
+      "exercise": {
+        "description": "Implement the softmax function that converts a vector of logits into a probability distribution. Your implementation must be numerically stable (handle large logit values without overflow).",
+        "function_signature": "def softmax(logits: list[float]) -> list[float]:",
+        "starter_code": "def softmax(logits: list[float]) -> list[float]:\n    \"\"\"\n    Compute softmax probabilities from logits with numerical stability.\n    \n    Args:\n        logits: List of raw scores (can be any real numbers)\n        \n    Returns:\n        List of probabilities that sum to 1.0\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "softmax([1.0, 2.0, 3.0])",
+            "expected": "[0.09003057, 0.24472847, 0.66524096]",
+            "explanation": "Standard case: compute exp of each element, divide by sum. Probabilities sum to 1."
+          },
+          {
+            "input": "softmax([0.0, 0.0, 0.0])",
+            "expected": "[0.33333333, 0.33333333, 0.33333333]",
+            "explanation": "Uniform logits produce uniform probabilities (each class equally likely)."
+          },
+          {
+            "input": "softmax([1000.0, 1001.0, 1002.0])",
+            "expected": "[0.09003057, 0.24472847, 0.66524096]",
+            "explanation": "Large logits test numerical stability. Must use log-sum-exp trick to avoid overflow. Result identical to [1,2,3] due to translation invariance."
+          },
+          {
+            "input": "softmax([-5.0, 0.0, 5.0])",
+            "expected": "[0.00066929, 0.04731416, 0.95201655]",
+            "explanation": "Mixed positive/negative logits. Large positive logit (5.0) dominates, giving probability near 1."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not using log-sum-exp trick for numerical stability - causes overflow with large logits",
+        "Forgetting to normalize by the sum - probabilities won't sum to 1",
+        "Using regular max instead of subtracting max in log-sum-exp",
+        "Not handling empty input or single-element vectors",
+        "Computing exponentials multiple times instead of storing intermediate results"
+      ],
+      "hint": "First find the maximum logit value. Subtract it from all logits before computing exponentials. This keeps numbers manageable while producing identical results due to softmax's translation invariance: σ(z) = σ(z + c) for any constant c.",
+      "references": [
+        "Translation invariance of softmax",
+        "Numerical stability in machine learning",
+        "LogSumExp trick derivation",
+        "Exponential function properties"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "One-Hot Encoding and Probability Vectors",
+      "relation_to_problem": "The cross-entropy derivative formula is p - y, where y is the one-hot encoded target. Understanding one-hot encoding is essential for implementing the gradient computation correctly.",
+      "prerequisites": [
+        "Vector representation",
+        "Indicator functions",
+        "Discrete probability distributions"
+      ],
+      "learning_objectives": [
+        "Convert categorical labels to one-hot encoded vectors",
+        "Understand the mathematical properties of one-hot vectors",
+        "Recognize the connection between one-hot encoding and probability distributions"
+      ],
+      "math_content": {
+        "definition": "A **one-hot encoded vector** for a categorical variable with $K$ classes is a vector $\\mathbf{y} \\in \\{0, 1\\}^K$ where exactly one component equals 1 and all others equal 0. Formally, for true class $c \\in \\{0, 1, \\ldots, K-1\\}$: $$y_i = \\delta_{ic} = \\begin{cases} 1 & \\text{if } i = c \\\\ 0 & \\text{if } i \\neq c \\end{cases}$$ where $\\delta_{ic}$ is the Kronecker delta function.",
+        "notation": "$c$ = true class index (0-indexed), $\\mathbf{y} \\in \\{0,1\\}^K$ = one-hot vector, $y_c = 1$ (indicator for correct class), $\\sum_{i=0}^{K-1} y_i = 1$ (exactly one 1)",
+        "theorem": "**One-Hot Vector Properties**: For a one-hot vector $\\mathbf{y}$ representing class $c$: (1) $\\|\\mathbf{y}\\|_1 = \\sum_i |y_i| = 1$ (L1 norm), (2) $\\|\\mathbf{y}\\|_2 = \\sqrt{\\sum_i y_i^2} = 1$ (L2 norm), (3) $\\mathbf{y} \\cdot \\mathbf{y} = 1$ (idempotent), (4) $\\mathbf{y}$ represents a degenerate probability distribution with all mass on class $c$.",
+        "proof_sketch": "Property (1): Since exactly one $y_i = 1$ and rest are 0, $\\sum_i |y_i| = |1| + 0 + \\cdots + 0 = 1$. Property (2): $\\sum_i y_i^2 = 1^2 + 0^2 + \\cdots + 0^2 = 1$, so $\\sqrt{1} = 1$. Property (3): Dot product $\\mathbf{y} \\cdot \\mathbf{y} = \\sum_i y_i^2 = 1$. Property (4): $\\mathbf{y}$ satisfies probability axioms: $y_i \\geq 0$ for all $i$ and $\\sum_i y_i = 1$, representing certainty about class $c$.",
+        "examples": [
+          "**Example 1**: 3 classes, true class is 0: $\\mathbf{y} = [1, 0, 0]^T$. This means 'class 0 with 100% certainty'.",
+          "**Example 2**: 4 classes, true class is 2: $\\mathbf{y} = [0, 0, 1, 0]^T$. The '1' is in position 2 (0-indexed).",
+          "**Example 3**: Dot product with probability vector $\\mathbf{p} = [0.1, 0.3, 0.6]$ and $\\mathbf{y} = [0, 0, 1]$: $\\mathbf{p} \\cdot \\mathbf{y} = 0.1(0) + 0.3(0) + 0.6(1) = 0.6$. This extracts the predicted probability for the true class!",
+          "**Example 4**: Subtraction $\\mathbf{p} - \\mathbf{y}$ where $\\mathbf{p} = [0.2, 0.3, 0.5]$ and $\\mathbf{y} = [1, 0, 0]$: $\\mathbf{p} - \\mathbf{y} = [-0.8, 0.3, 0.5]$. Negative for true class (needs more probability), positive for others (have too much probability)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "One-Hot Encoding",
+          "latex": "$y_i = \\delta_{ic} = \\begin{cases} 1 & \\text{if } i = c \\\\ 0 & \\text{otherwise} \\end{cases}$",
+          "description": "Converts class index c to a binary vector with a single 1 at position c."
+        },
+        {
+          "name": "Class Extraction",
+          "latex": "$\\mathbf{p} \\cdot \\mathbf{y} = \\sum_i p_i y_i = p_c$",
+          "description": "Dot product of probability vector with one-hot vector extracts probability of true class."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that converts a class index to a one-hot encoded vector. The function should handle various numbers of classes and validate inputs.",
+        "function_signature": "def one_hot_encode(target: int, num_classes: int) -> list[float]:",
+        "starter_code": "def one_hot_encode(target: int, num_classes: int) -> list[float]:\n    \"\"\"\n    Convert a class index to a one-hot encoded vector.\n    \n    Args:\n        target: The true class index (0-indexed)\n        num_classes: Total number of classes\n        \n    Returns:\n        A list where position 'target' is 1.0 and all others are 0.0\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "one_hot_encode(0, 3)",
+            "expected": "[1.0, 0.0, 0.0]",
+            "explanation": "Class 0 out of 3 classes: first position is 1, rest are 0."
+          },
+          {
+            "input": "one_hot_encode(2, 4)",
+            "expected": "[0.0, 0.0, 1.0, 0.0]",
+            "explanation": "Class 2 out of 4 classes: third position (index 2) is 1, rest are 0."
+          },
+          {
+            "input": "one_hot_encode(0, 1)",
+            "expected": "[1.0]",
+            "explanation": "Single class case (trivial classification): vector has one element equal to 1."
+          },
+          {
+            "input": "one_hot_encode(5, 10)",
+            "expected": "[0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]",
+            "explanation": "Class 5 out of 10 classes: position 5 is 1 (6th element in 0-indexed list)."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using 1-indexed instead of 0-indexed class labels",
+        "Not validating that target is within valid range [0, num_classes-1]",
+        "Creating vectors with all zeros or multiple ones",
+        "Using int instead of float (may cause type issues in later computations)",
+        "Forgetting to handle edge cases like num_classes = 1"
+      ],
+      "hint": "Create a vector of zeros with length num_classes, then set the element at index 'target' to 1.0. Make sure to validate that target is in the valid range.",
+      "references": [
+        "Kronecker delta function",
+        "Categorical encoding methods",
+        "Indicator random variables",
+        "One-hot vs label encoding"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Cross-Entropy Loss: Measuring Prediction Quality",
+      "relation_to_problem": "Cross-entropy loss quantifies how well predictions match the truth. We need to understand what we're taking the derivative of before computing the gradient for backpropagation.",
+      "prerequisites": [
+        "Logarithms",
+        "Information theory basics",
+        "Expected value",
+        "Softmax function",
+        "One-hot encoding"
+      ],
+      "learning_objectives": [
+        "Compute cross-entropy loss between probability distributions",
+        "Understand why cross-entropy is the natural loss for classification",
+        "Recognize the connection between cross-entropy and log-likelihood",
+        "Handle numerical issues with logarithms of small probabilities"
+      ],
+      "math_content": {
+        "definition": "The **cross-entropy loss** between a true distribution $\\mathbf{y}$ and predicted distribution $\\mathbf{p}$ is: $$L(\\mathbf{p}, \\mathbf{y}) = -\\sum_{i=1}^{K} y_i \\log(p_i)$$ For classification with one-hot encoded $\\mathbf{y}$ where $y_c = 1$ for true class $c$, this simplifies to: $$L(\\mathbf{p}, c) = -\\log(p_c)$$ where $p_c = \\sigma(\\mathbf{z})_c$ is the predicted probability for the true class.",
+        "notation": "$\\mathbf{y} \\in \\{0,1\\}^K$ = true distribution (one-hot), $\\mathbf{p} \\in (0,1)^K$ = predicted probabilities (softmax output), $c$ = true class index, $L \\in [0, \\infty)$ = loss value (0 = perfect, $\\infty$ = worst)",
+        "theorem": "**Properties of Cross-Entropy Loss**: (1) $L \\geq 0$ with equality iff $p_c = 1$ (perfect prediction), (2) $L \\to \\infty$ as $p_c \\to 0$ (confident wrong prediction), (3) $L$ is convex in $\\mathbf{p}$, (4) $L$ equals negative log-likelihood of the true class, (5) $L$ is minimized when $\\mathbf{p} = \\mathbf{y}$.",
+        "proof_sketch": "Property (1): $L = -\\log(p_c)$ where $p_c \\in (0,1]$. Since $\\log(x) \\leq 0$ for $x \\in (0,1]$ with equality iff $x=1$, we have $-\\log(p_c) \\geq 0$ with equality iff $p_c = 1$. Property (2): As $p_c \\to 0^+$, $\\log(p_c) \\to -\\infty$, so $-\\log(p_c) \\to \\infty$. Property (3): $-\\log(p_c)$ is convex because its second derivative $\\frac{1}{p_c^2} > 0$. Property (4): For data $(x, c)$ with model $P(y=c|x) = p_c$, the log-likelihood is $\\log P(c|x) = \\log(p_c)$, so $L = -\\log(p_c)$ is the negative log-likelihood. Property (5): The unique minimizer of $-\\sum_i y_i \\log(p_i)$ subject to $\\sum_i p_i = 1$ is $p_i = y_i$ (shown via Lagrange multipliers).",
+        "examples": [
+          "**Example 1**: Perfect prediction. True class: 0, predictions: $\\mathbf{p} = [1.0, 0.0, 0.0]$. Then $L = -\\log(1.0) = 0$ (minimum loss).",
+          "**Example 2**: Reasonable prediction. True class: 1, predictions: $\\mathbf{p} = [0.2, 0.7, 0.1]$. Then $L = -\\log(0.7) = 0.357$ (moderate loss).",
+          "**Example 3**: Poor prediction. True class: 2, predictions: $\\mathbf{p} = [0.5, 0.4, 0.1]$. Then $L = -\\log(0.1) = 2.303$ (high loss, model is confident but wrong).",
+          "**Example 4**: Very poor prediction. True class: 0, predictions: $\\mathbf{p} = [0.01, 0.5, 0.49]$. Then $L = -\\log(0.01) = 4.605$ (very high loss, model assigns very low probability to true class).",
+          "**Example 5**: Computing from logits. Logits $\\mathbf{z} = [2, 1, 0.1]$, true class: 0. First: $\\mathbf{p} = \\text{softmax}(\\mathbf{z}) = [0.659, 0.242, 0.099]$. Then: $L = -\\log(0.659) = 0.417$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cross-Entropy Loss (General)",
+          "latex": "$L(\\mathbf{p}, \\mathbf{y}) = -\\sum_{i=1}^{K} y_i \\log(p_i)$",
+          "description": "Measures divergence between true distribution y and predicted distribution p. Use for general probability distributions."
+        },
+        {
+          "name": "Cross-Entropy Loss (Classification)",
+          "latex": "$L(\\mathbf{p}, c) = -\\log(p_c)$",
+          "description": "Simplified form for one-hot encoded labels. Only depends on predicted probability of true class c."
+        },
+        {
+          "name": "Cross-Entropy from Logits",
+          "latex": "$L(\\mathbf{z}, c) = -z_c + \\log\\left(\\sum_{j=1}^{K} e^{z_j}\\right)$",
+          "description": "Numerically stable form that computes loss directly from logits without explicit softmax."
+        }
+      ],
+      "exercise": {
+        "description": "Implement cross-entropy loss computation. Given predicted probabilities and a target class index, compute the loss. Include a numerical stability check to handle cases where predicted probability for true class is very small.",
+        "function_signature": "def cross_entropy_loss(probabilities: list[float], target: int) -> float:",
+        "starter_code": "def cross_entropy_loss(probabilities: list[float], target: int) -> float:\n    \"\"\"\n    Compute cross-entropy loss for a single sample.\n    \n    Args:\n        probabilities: Predicted probability distribution (should sum to ~1.0)\n        target: Index of true class (0-indexed)\n        \n    Returns:\n        Loss value (0 = perfect prediction, higher = worse)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "cross_entropy_loss([1.0, 0.0, 0.0], 0)",
+            "expected": "0.0",
+            "explanation": "Perfect prediction: probability 1.0 for true class gives loss of -log(1.0) = 0."
+          },
+          {
+            "input": "cross_entropy_loss([0.09003057, 0.24472847, 0.66524096], 0)",
+            "expected": "2.4076",
+            "explanation": "Poor prediction: model assigns only 9% to true class 0. Loss = -log(0.09003) ≈ 2.408."
+          },
+          {
+            "input": "cross_entropy_loss([0.33333333, 0.33333333, 0.33333333], 1)",
+            "expected": "1.0986",
+            "explanation": "Uniform prediction: model is uncertain (33% for each class). Loss = -log(1/3) ≈ 1.099."
+          },
+          {
+            "input": "cross_entropy_loss([0.1, 0.8, 0.1], 1)",
+            "expected": "0.2231",
+            "explanation": "Good prediction: model assigns 80% to true class 1. Loss = -log(0.8) ≈ 0.223."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Taking log of 0 (undefined) - add small epsilon for numerical stability",
+        "Using log base 10 instead of natural log (ln)",
+        "Computing loss over all classes instead of just the true class for one-hot labels",
+        "Not validating that probabilities sum to approximately 1.0",
+        "Forgetting that lower loss is better (not higher)",
+        "Returning negative loss (should be positive: -log, not log)"
+      ],
+      "hint": "For one-hot encoded targets, you only need the probability of the true class. Extract probabilities[target] and compute -log of it. Use math.log for natural logarithm. Consider adding a small epsilon (1e-15) to prevent log(0).",
+      "references": [
+        "Information theory and entropy",
+        "Kullback-Leibler divergence",
+        "Maximum likelihood estimation",
+        "Log loss vs cross-entropy terminology",
+        "Numerical stability in loss computation"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Partial Derivatives and the Chain Rule in Vector Calculus",
+      "relation_to_problem": "Computing ∂L/∂z_i requires understanding how loss depends on logits through the softmax function. The chain rule is essential for backpropagation through composed functions.",
+      "prerequisites": [
+        "Single-variable calculus",
+        "Partial derivatives",
+        "Vector notation",
+        "Function composition"
+      ],
+      "learning_objectives": [
+        "Apply the chain rule to composite functions involving vectors",
+        "Compute partial derivatives of scalar functions with respect to vector components",
+        "Understand the Jacobian matrix for vector-valued functions",
+        "Recognize when simplifications occur in derivative computations"
+      ],
+      "math_content": {
+        "definition": "The **chain rule for multivariable functions** states: If $y = f(u)$ and $u = g(x)$ where $u \\in \\mathbb{R}^m$ and $y \\in \\mathbb{R}$, then: $$\\frac{\\partial y}{\\partial x_i} = \\sum_{j=1}^{m} \\frac{\\partial y}{\\partial u_j} \\cdot \\frac{\\partial u_j}{\\partial x_i}$$ For cross-entropy with softmax: $L = f(\\mathbf{p})$ where $\\mathbf{p} = \\sigma(\\mathbf{z})$, so: $$\\frac{\\partial L}{\\partial z_i} = \\sum_{k=1}^{K} \\frac{\\partial L}{\\partial p_k} \\cdot \\frac{\\partial p_k}{\\partial z_i}$$",
+        "notation": "$\\frac{\\partial f}{\\partial x_i}$ = partial derivative of $f$ w.r.t. $x_i$ (holding other variables constant), $\\nabla f = [\\frac{\\partial f}{\\partial x_1}, \\ldots, \\frac{\\partial f}{\\partial x_n}]^T$ = gradient vector, $\\frac{\\partial \\mathbf{g}}{\\partial \\mathbf{x}}$ = Jacobian matrix with entry $(i,j) = \\frac{\\partial g_i}{\\partial x_j}$",
+        "theorem": "**Softmax Jacobian**: For softmax function $\\mathbf{p} = \\sigma(\\mathbf{z})$, the Jacobian is: $$\\frac{\\partial p_k}{\\partial z_i} = p_k(\\delta_{ki} - p_i) = \\begin{cases} p_k(1 - p_k) & \\text{if } k = i \\\\ -p_k p_i & \\text{if } k \\neq i \\end{cases}$$ where $\\delta_{ki}$ is the Kronecker delta. This can be written compactly as: $$\\frac{\\partial \\mathbf{p}}{\\partial \\mathbf{z}} = \\text{diag}(\\mathbf{p}) - \\mathbf{p}\\mathbf{p}^T$$",
+        "proof_sketch": "For $p_k = \\frac{e^{z_k}}{S}$ where $S = \\sum_j e^{z_j}$, use quotient rule: $$\\frac{\\partial p_k}{\\partial z_i} = \\frac{\\frac{\\partial e^{z_k}}{\\partial z_i} \\cdot S - e^{z_k} \\cdot \\frac{\\partial S}{\\partial z_i}}{S^2}$$\n\n**Case 1** ($k = i$): $\\frac{\\partial e^{z_k}}{\\partial z_i} = e^{z_i}$ and $\\frac{\\partial S}{\\partial z_i} = e^{z_i}$, so: $$\\frac{\\partial p_i}{\\partial z_i} = \\frac{e^{z_i} \\cdot S - e^{z_i} \\cdot e^{z_i}}{S^2} = \\frac{e^{z_i}}{S}\\left(1 - \\frac{e^{z_i}}{S}\\right) = p_i(1 - p_i)$$\n\n**Case 2** ($k \\neq i$): $\\frac{\\partial e^{z_k}}{\\partial z_i} = 0$ and $\\frac{\\partial S}{\\partial z_i} = e^{z_i}$, so: $$\\frac{\\partial p_k}{\\partial z_i} = \\frac{0 \\cdot S - e^{z_k} \\cdot e^{z_i}}{S^2} = -\\frac{e^{z_k}}{S} \\cdot \\frac{e^{z_i}}{S} = -p_k p_i$$",
+        "examples": [
+          "**Example 1**: For $\\mathbf{p} = [0.2, 0.5, 0.3]$, compute $\\frac{\\partial p_1}{\\partial z_1} = p_1(1-p_1) = 0.2(1-0.2) = 0.16$. This represents how much $p_1$ changes when we increase $z_1$.",
+          "**Example 2**: For same $\\mathbf{p}$, compute cross-derivative $\\frac{\\partial p_2}{\\partial z_1} = -p_2 p_1 = -0.5 \\times 0.2 = -0.1$. When $z_1$ increases, $p_2$ decreases (probabilities must sum to 1).",
+          "**Example 3**: Full Jacobian for $\\mathbf{p} = [0.5, 0.3, 0.2]$: $$J = \\begin{bmatrix} 0.25 & -0.15 & -0.10 \\\\ -0.15 & 0.21 & -0.06 \\\\ -0.10 & -0.06 & 0.16 \\end{bmatrix}$$ Diagonal: $p_i(1-p_i)$, off-diagonal: $-p_i p_j$. Note rows sum to 0 (probability constraint).",
+          "**Example 4**: Chain rule application. If $L = -\\log(p_2)$, then $\\frac{\\partial L}{\\partial p_2} = -\\frac{1}{p_2}$. For $\\mathbf{p} = [0.2, 0.5, 0.3]$: $$\\frac{\\partial L}{\\partial z_1} = \\frac{\\partial L}{\\partial p_2} \\cdot \\frac{\\partial p_2}{\\partial z_1} = -\\frac{1}{0.5} \\times (-0.1) = 0.2$$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Multivariable Chain Rule",
+          "latex": "$\\frac{\\partial y}{\\partial x_i} = \\sum_{j} \\frac{\\partial y}{\\partial u_j} \\cdot \\frac{\\partial u_j}{\\partial x_i}$",
+          "description": "For composite functions y = f(u(x)), sum over intermediate variables. Essential for backpropagation."
+        },
+        {
+          "name": "Softmax Diagonal Derivative",
+          "latex": "$\\frac{\\partial p_i}{\\partial z_i} = p_i(1 - p_i)$",
+          "description": "Derivative of softmax component w.r.t. its own logit. Always positive, maximized at p_i = 0.5."
+        },
+        {
+          "name": "Softmax Off-Diagonal Derivative",
+          "latex": "$\\frac{\\partial p_k}{\\partial z_i} = -p_k p_i \\quad (k \\neq i)$",
+          "description": "Derivative of softmax component w.r.t. different logit. Always negative (increasing one decreases others)."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the Jacobian matrix of the softmax function. This matrix contains all partial derivatives ∂p_k/∂z_i and is crucial for understanding how the gradient flows through softmax.",
+        "function_signature": "def softmax_jacobian(probabilities: list[float]) -> list[list[float]]:",
+        "starter_code": "def softmax_jacobian(probabilities: list[float]) -> list[list[float]]:\n    \"\"\"\n    Compute the Jacobian matrix of softmax function.\n    \n    Args:\n        probabilities: Softmax output probabilities (already computed)\n        \n    Returns:\n        K×K Jacobian matrix where entry [k][i] = ∂p_k/∂z_i\n        - Diagonal elements: p_k(1 - p_k)\n        - Off-diagonal: -p_k * p_i\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "softmax_jacobian([1.0])",
+            "expected": "[[0.0]]",
+            "explanation": "Single class: p=1, so ∂p/∂z = 1(1-1) = 0. No gradient flow (already certain)."
+          },
+          {
+            "input": "softmax_jacobian([0.5, 0.5])",
+            "expected": "[[0.25, -0.25], [-0.25, 0.25]]",
+            "explanation": "Uniform binary: diagonal is 0.5(1-0.5)=0.25, off-diagonal is -0.5×0.5=-0.25. Symmetric matrix."
+          },
+          {
+            "input": "softmax_jacobian([0.2, 0.5, 0.3])",
+            "expected": "[[0.16, -0.1, -0.06], [-0.1, 0.25, -0.15], [-0.06, -0.15, 0.21]]",
+            "explanation": "3-class: diagonal uses p_i(1-p_i), off-diagonal uses -p_i*p_j. Each row sums to 0 (constraint)."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing full Jacobian when only gradient vector is needed (inefficient)",
+        "Forgetting the negative sign in off-diagonal terms",
+        "Confusing row/column indexing in Jacobian (entry [k][i] is ∂p_k/∂z_i)",
+        "Not recognizing that each row sums to 0 (consequence of probability normalization)",
+        "Using probabilities instead of logits as input (Jacobian is w.r.t. logits)",
+        "Applying chain rule incorrectly (wrong order of multiplication)"
+      ],
+      "hint": "Create a K×K matrix. For diagonal elements (i==k), use p_i(1-p_i). For off-diagonal elements (i≠k), use -p_k*p_i. You can verify correctness by checking that each row sums to approximately 0.",
+      "references": [
+        "Jacobian matrix definition",
+        "Chain rule in vector calculus",
+        "Quotient rule for derivatives",
+        "Matrix calculus notation",
+        "Backpropagation algorithm"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Combining Components: Gradient of Loss with Respect to Probabilities",
+      "relation_to_problem": "Before computing ∂L/∂z_i, we need ∂L/∂p_k (the upstream gradient). This step computes how loss changes with respect to softmax outputs, which feeds into the chain rule.",
+      "prerequisites": [
+        "Cross-entropy loss",
+        "Partial derivatives",
+        "Logarithmic differentiation",
+        "One-hot encoding"
+      ],
+      "learning_objectives": [
+        "Compute the gradient of cross-entropy loss with respect to predicted probabilities",
+        "Understand the upstream gradient in backpropagation terminology",
+        "Recognize the sparsity pattern when using one-hot encoded labels",
+        "Apply logarithmic differentiation correctly"
+      ],
+      "math_content": {
+        "definition": "The **gradient of cross-entropy loss with respect to softmax probabilities** is the vector of partial derivatives: $$\\frac{\\partial L}{\\partial \\mathbf{p}} = \\left[\\frac{\\partial L}{\\partial p_1}, \\frac{\\partial L}{\\partial p_2}, \\ldots, \\frac{\\partial L}{\\partial p_K}\\right]^T$$ For cross-entropy $L = -\\sum_i y_i \\log(p_i)$ with one-hot encoded $\\mathbf{y}$: $$\\frac{\\partial L}{\\partial p_k} = -\\frac{y_k}{p_k}$$",
+        "notation": "$\\frac{\\partial L}{\\partial p_k}$ = upstream gradient (how loss changes with probability $p_k$), $y_k \\in \\{0,1\\}$ = one-hot component, $p_k \\in (0,1)$ = predicted probability",
+        "theorem": "**Cross-Entropy Gradient Properties**: For $L = -\\sum_i y_i \\log(p_i)$ with one-hot $\\mathbf{y}$ (true class $c$): (1) $\\frac{\\partial L}{\\partial p_c} = -\\frac{1}{p_c}$ (gradient only nonzero at true class), (2) $\\frac{\\partial L}{\\partial p_k} = 0$ for $k \\neq c$ (gradient zero for non-true classes), (3) As $p_c \\to 0$, $|\\frac{\\partial L}{\\partial p_c}| \\to \\infty$ (large gradient when very wrong), (4) As $p_c \\to 1$, $\\frac{\\partial L}{\\partial p_c} \\to -1$ (small gradient when nearly correct).",
+        "proof_sketch": "For $L = -\\sum_i y_i \\log(p_i)$, apply partial derivative w.r.t. $p_k$: $$\\frac{\\partial L}{\\partial p_k} = -\\sum_i y_i \\frac{\\partial \\log(p_i)}{\\partial p_k} = -\\sum_i y_i \\cdot \\frac{1}{p_i} \\cdot \\frac{\\partial p_i}{\\partial p_k}$$ Since $\\frac{\\partial p_i}{\\partial p_k} = \\delta_{ik}$ (treating probabilities as independent variables): $$= -\\sum_i y_i \\cdot \\frac{1}{p_i} \\cdot \\delta_{ik} = -\\frac{y_k}{p_k}$$ For one-hot encoding where $y_c = 1$ and $y_k = 0$ for $k \\neq c$: $$\\frac{\\partial L}{\\partial p_k} = \\begin{cases} -\\frac{1}{p_c} & \\text{if } k = c \\\\ 0 & \\text{if } k \\neq c \\end{cases}$$",
+        "examples": [
+          "**Example 1**: $\\mathbf{p} = [0.8, 0.15, 0.05]$, true class $c=0$ (so $\\mathbf{y} = [1,0,0]$). Gradients: $\\frac{\\partial L}{\\partial p_0} = -\\frac{1}{0.8} = -1.25$, $\\frac{\\partial L}{\\partial p_1} = 0$, $\\frac{\\partial L}{\\partial p_2} = 0$. Only the true class contributes.",
+          "**Example 2**: Poor prediction: $\\mathbf{p} = [0.1, 0.6, 0.3]$, true class $c=0$. Gradient: $\\frac{\\partial L}{\\partial p_0} = -\\frac{1}{0.1} = -10$. Large negative gradient pushes to increase $p_0$.",
+          "**Example 3**: Perfect prediction: $\\mathbf{p} = [1.0, 0.0, 0.0]$, true class $c=0$. Gradient: $\\frac{\\partial L}{\\partial p_0} = -\\frac{1}{1.0} = -1$. Even at perfection, gradient is finite (approaches but never reaches 0).",
+          "**Example 4**: Gradient vector form: For true class $c=2$ and $\\mathbf{p} = [0.2, 0.3, 0.5]$: $$\\nabla_\\mathbf{p} L = \\left[0, 0, -\\frac{1}{0.5}\\right]^T = [0, 0, -2]^T$$ Sparse vector with single nonzero entry at true class position."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cross-Entropy Gradient (General)",
+          "latex": "$\\frac{\\partial L}{\\partial p_k} = -\\frac{y_k}{p_k}$",
+          "description": "Gradient of cross-entropy w.r.t. probabilities. For one-hot y, only nonzero at true class."
+        },
+        {
+          "name": "Cross-Entropy Gradient (One-Hot)",
+          "latex": "$\\frac{\\partial L}{\\partial p_k} = \\begin{cases} -\\frac{1}{p_c} & k=c \\\\ 0 & k \\neq c \\end{cases}$",
+          "description": "Simplified form for classification. Negative reciprocal at true class, zero elsewhere."
+        },
+        {
+          "name": "Logarithmic Derivative",
+          "latex": "$\\frac{d}{dx}\\log(x) = \\frac{1}{x}$",
+          "description": "Fundamental derivative used in cross-entropy gradient computation."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the gradient of cross-entropy loss with respect to predicted probabilities. Return a vector where most entries are zero (only the true class position is nonzero).",
+        "function_signature": "def loss_gradient_wrt_probabilities(probabilities: list[float], target: int) -> list[float]:",
+        "starter_code": "def loss_gradient_wrt_probabilities(probabilities: list[float], target: int) -> list[float]:\n    \"\"\"\n    Compute gradient of cross-entropy loss w.r.t. probabilities.\n    \n    Args:\n        probabilities: Predicted probability distribution\n        target: Index of true class (0-indexed)\n        \n    Returns:\n        Gradient vector ∂L/∂p where entry[target] = -1/p_target, others = 0\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "loss_gradient_wrt_probabilities([0.5, 0.3, 0.2], 0)",
+            "expected": "[-2.0, 0.0, 0.0]",
+            "explanation": "True class is 0 with p=0.5. Gradient at position 0 is -1/0.5 = -2.0, others are 0."
+          },
+          {
+            "input": "loss_gradient_wrt_probabilities([0.1, 0.8, 0.1], 1)",
+            "expected": "[0.0, -1.25, 0.0]",
+            "explanation": "True class is 1 with p=0.8. Gradient at position 1 is -1/0.8 = -1.25, others are 0."
+          },
+          {
+            "input": "loss_gradient_wrt_probabilities([0.33333333, 0.33333333, 0.33333333], 2)",
+            "expected": "[0.0, 0.0, -3.0]",
+            "explanation": "True class is 2 with p=1/3. Gradient at position 2 is -1/(1/3) = -3.0, others are 0."
+          },
+          {
+            "input": "loss_gradient_wrt_probabilities([0.01, 0.5, 0.49], 0)",
+            "expected": "[-100.0, 0.0, 0.0]",
+            "explanation": "True class is 0 but p=0.01 (very wrong). Large gradient -1/0.01 = -100 signals big correction needed."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing gradient for all classes instead of just the true class (wastes computation)",
+        "Forgetting the negative sign: should be -1/p_c, not 1/p_c",
+        "Dividing by 0 when probability is exactly 0 (add epsilon for safety)",
+        "Returning scalar instead of vector (must return full gradient vector)",
+        "Computing gradient w.r.t. logits instead of probabilities (wrong step)",
+        "Using log(p) instead of -1/p for the gradient"
+      ],
+      "hint": "Create a vector of zeros with the same length as probabilities. Set the entry at index 'target' to -1.0 / probabilities[target]. All other entries remain zero. This is the upstream gradient needed for backpropagation.",
+      "references": [
+        "Upstream and downstream gradients",
+        "Backpropagation algorithm structure",
+        "Sparse gradient vectors",
+        "Chain rule composition"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "The Elegant Result: Complete Gradient Derivation and Implementation",
+      "relation_to_problem": "This final step combines all previous concepts using the chain rule to derive the remarkably simple gradient formula ∂L/∂z_i = p_i - y_i. You'll implement the complete solution.",
+      "prerequisites": [
+        "Softmax",
+        "One-hot encoding",
+        "Cross-entropy loss",
+        "Chain rule",
+        "Softmax Jacobian",
+        "Loss gradient w.r.t. probabilities"
+      ],
+      "learning_objectives": [
+        "Apply the multivariable chain rule to combine upstream and downstream gradients",
+        "Derive the simplified gradient formula through algebraic manipulation",
+        "Implement the final gradient computation efficiently",
+        "Understand why the formula is independent of the Jacobian structure",
+        "Verify the gradient using multiple test cases"
+      ],
+      "math_content": {
+        "definition": "The **gradient of cross-entropy loss with respect to logits** is: $$\\frac{\\partial L}{\\partial z_i} = \\sum_{k=1}^{K} \\frac{\\partial L}{\\partial p_k} \\cdot \\frac{\\partial p_k}{\\partial z_i}$$ which simplifies remarkably to: $$\\frac{\\partial L}{\\partial z_i} = p_i - y_i = \\sigma(\\mathbf{z})_i - y_i$$ In vector notation: $$\\nabla_{\\mathbf{z}} L = \\mathbf{p} - \\mathbf{y} = \\sigma(\\mathbf{z}) - \\mathbf{y}$$",
+        "notation": "$\\mathbf{z} \\in \\mathbb{R}^K$ = logits, $\\mathbf{p} = \\sigma(\\mathbf{z}) \\in (0,1)^K$ = softmax probabilities, $\\mathbf{y} \\in \\{0,1\\}^K$ = one-hot target, $\\nabla_{\\mathbf{z}} L \\in \\mathbb{R}^K$ = gradient vector",
+        "theorem": "**Cross-Entropy Softmax Gradient Simplification**: For cross-entropy loss $L = -\\sum_i y_i \\log(p_i)$ with softmax $\\mathbf{p} = \\sigma(\\mathbf{z})$ and one-hot encoded $\\mathbf{y}$, the gradient simplifies from the complex chain rule expression involving the Jacobian to the elegant form: $$\\frac{\\partial L}{\\partial z_i} = p_i - y_i$$ This holds for all $i \\in \\{1, \\ldots, K\\}$ simultaneously.",
+        "proof_sketch": "Start with chain rule: $$\\frac{\\partial L}{\\partial z_i} = \\sum_{k=1}^{K} \\frac{\\partial L}{\\partial p_k} \\cdot \\frac{\\partial p_k}{\\partial z_i}$$ Substitute known components: $$= \\sum_{k=1}^{K} \\left(-\\frac{y_k}{p_k}\\right) \\cdot p_k(\\delta_{ki} - p_i)$$ Simplify: $$= -\\sum_{k=1}^{K} y_k(\\delta_{ki} - p_i) = -y_i + p_i\\sum_{k=1}^{K} y_k$$ Since $\\sum_k y_k = 1$ (one-hot): $$= -y_i + p_i = p_i - y_i$$ The complexity of the Jacobian cancels out beautifully! Intuitively: for the true class ($y_i=1$), gradient is $p_i - 1$ (negative, pushes logit up). For wrong classes ($y_i=0$), gradient is $p_i - 0 = p_i$ (positive, pushes logit down).",
+        "examples": [
+          "**Example 1**: $\\mathbf{z} = [1, 2, 3]$, true class $c=0$. First compute $\\mathbf{p} = \\sigma(\\mathbf{z}) = [0.09, 0.245, 0.665]$, $\\mathbf{y} = [1, 0, 0]$. Then $\\nabla L = \\mathbf{p} - \\mathbf{y} = [-0.91, 0.245, 0.665]$. Negative for true class (increase its logit), positive for others (decrease their logits).",
+          "**Example 2**: Perfect prediction. $\\mathbf{z} = [100, -100, -100]$ gives $\\mathbf{p} \\approx [1, 0, 0]$. For true class 0: $\\nabla L \\approx [0, 0, 0]$. No gradient because prediction is perfect!",
+          "**Example 3**: Uniform prediction. $\\mathbf{z} = [0, 0, 0]$ gives $\\mathbf{p} = [1/3, 1/3, 1/3]$. For true class 1: $\\mathbf{y} = [0, 1, 0]$, so $\\nabla L = [-1/3, -2/3, -1/3]$. Largest magnitude at true class.",
+          "**Example 4**: Very wrong prediction. $\\mathbf{z} = [5, 6, 7]$ gives $\\mathbf{p} = [0.09, 0.244, 0.666]$. For true class 0: $\\nabla L = [-0.91, 0.244, 0.666]$. Model confident in wrong answer (class 2), so large positive gradient there to correct it.",
+          "**Example 5**: Verification via chain rule. For $\\mathbf{p} = [0.2, 0.5, 0.3]$, true class 1. Compute manually:\n- $\\frac{\\partial L}{\\partial \\mathbf{p}} = [0, -2, 0]$ (from step 5)\n- Jacobian row 1: $[\\frac{\\partial p_0}{\\partial z_1}, \\frac{\\partial p_1}{\\partial z_1}, \\frac{\\partial p_2}{\\partial z_1}] = [-0.1, 0.25, -0.15]$\n- $\\frac{\\partial L}{\\partial z_1} = [0, -2, 0] \\cdot [-0.1, 0.25, -0.15]^T = -2 \\times 0.25 = -0.5$\n- Direct: $p_1 - y_1 = 0.5 - 1 = -0.5$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cross-Entropy Softmax Gradient (Vector)",
+          "latex": "$\\nabla_{\\mathbf{z}} L = \\mathbf{p} - \\mathbf{y} = \\sigma(\\mathbf{z}) - \\mathbf{y}$",
+          "description": "The main result: gradient is simply predicted probabilities minus true probabilities. Use this for backpropagation in neural networks."
+        },
+        {
+          "name": "Cross-Entropy Softmax Gradient (Component)",
+          "latex": "$\\frac{\\partial L}{\\partial z_i} = p_i - y_i$",
+          "description": "Component-wise form. For true class: p_i - 1 (negative). For wrong classes: p_i - 0 = p_i (positive)."
+        },
+        {
+          "name": "Gradient Magnitude Interpretation",
+          "latex": "$|\\nabla L| = \\sqrt{\\sum_i (p_i - y_i)^2}$",
+          "description": "L2 norm of gradient measures total error. Large when prediction far from truth."
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete derivative of cross-entropy loss with respect to logits. This is the main problem solution: combine softmax, one-hot encoding, and the elegant gradient formula p - y to compute how loss changes with each logit value.",
+        "function_signature": "def cross_entropy_derivative(logits: list[float], target: int) -> list[float]:",
+        "starter_code": "def cross_entropy_derivative(logits: list[float], target: int) -> list[float]:\n    \"\"\"\n    Compute the derivative of cross-entropy loss with respect to logits.\n    \n    This combines:\n    1. Softmax: convert logits to probabilities\n    2. One-hot encoding: represent true class\n    3. Gradient formula: p - y\n    \n    Args:\n        logits: Raw model outputs (before softmax)\n        target: Index of the true class (0-indexed)\n        \n    Returns:\n        Gradient vector where gradient[i] = dL/d(logits[i]) = p[i] - y[i]\n        - For true class: p[target] - 1 (negative, increase logit)\n        - For other classes: p[i] - 0 (positive, decrease logit)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "cross_entropy_derivative([1.0, 2.0, 3.0], 0)",
+            "expected": "[-0.91, 0.2447, 0.6652]",
+            "explanation": "Logits [1,2,3] -> probabilities [0.09, 0.2447, 0.6652] via softmax. True class 0 -> y=[1,0,0]. Gradient: p-y = [-0.91, 0.2447, 0.6652]. Model assigns low probability to true class, so large negative gradient to increase its logit."
+          },
+          {
+            "input": "cross_entropy_derivative([0.0, 0.0, 0.0], 1)",
+            "expected": "[0.3333, -0.6667, 0.3333]",
+            "explanation": "Uniform logits -> uniform probabilities [1/3, 1/3, 1/3]. True class 1 -> y=[0,1,0]. Gradient: [1/3-0, 1/3-1, 1/3-0] = [0.333, -0.667, 0.333]. Model uncertain, gradient pushes toward true class."
+          },
+          {
+            "input": "cross_entropy_derivative([5.0, 1.0, 0.1], 0)",
+            "expected": "[-0.0179, 0.0050, 0.0129]",
+            "explanation": "Model very confident in class 0 (logit=5). Softmax gives p≈[0.982, 0.005, 0.013]. True class is 0, so gradient ≈ [-0.018, 0.005, 0.013]. Small gradient because prediction nearly correct."
+          },
+          {
+            "input": "cross_entropy_derivative([1.0, 5.0, 0.1], 0)",
+            "expected": "[-0.9820, 0.9775, 0.0045]",
+            "explanation": "Model very confident in class 1 (logit=5) but truth is class 0. Softmax gives p≈[0.018, 0.9775, 0.0045]. Gradient: [-0.982, 0.9775, 0.0045]. Large negative at true class, large positive at wrong confident class."
+          },
+          {
+            "input": "cross_entropy_derivative([-10.0, -10.0, -10.0], 2)",
+            "expected": "[0.3333, 0.3333, -0.6667]",
+            "explanation": "Large negative logits still produce uniform distribution due to softmax translation invariance. Same as [0,0,0] case with different target."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing full Jacobian matrix instead of using direct formula (huge waste)",
+        "Forgetting to apply softmax first (must compute probabilities from logits)",
+        "Using wrong sign: gradient should be p - y, not y - p",
+        "Not handling numerical stability in softmax (use log-sum-exp trick)",
+        "Returning scalar loss instead of gradient vector",
+        "Thinking gradient at true class should be positive (it's negative to increase that logit)"
+      ],
+      "hint": "This is simpler than you think! Step 1: Compute probabilities using softmax from step 1. Step 2: Create one-hot vector from step 2. Step 3: Subtract: gradient = probabilities - one_hot. That's it! The complexity of chain rule and Jacobian all cancels out.",
+      "references": [
+        "Backpropagation in neural networks",
+        "Why cross-entropy with softmax is natural",
+        "Gradient descent and optimization",
+        "Numerical stability in deep learning",
+        "PyTorch nn.CrossEntropyLoss implementation"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,504 @@
+{
+  "problem_id": 248,
+  "title": "Calculate Model Inference Statistics for Monitoring",
+  "category": "MLOps",
+  "difficulty": "easy",
+  "description": "In production ML systems, monitoring model inference performance is essential for maintaining service quality. Given a list of inference latency measurements (in milliseconds), compute key statistics that are commonly used in MLOps dashboards:\n\n1. **Throughput**: The number of requests that can be processed per second (assuming single-threaded sequential processing)\n2. **Average Latency**: The mean latency across all measurements\n3. **Percentiles (p50, p95, p99)**: The latency values below which 50%, 95%, and 99% of requests fall\n\nWrite a function `calculate_inference_stats(latencies_ms)` that takes a list of latency measurements and returns a dictionary with the computed statistics. Use linear interpolation for percentile calculations.\n\nIf the input list is empty, return an empty dictionary.",
+  "example": {
+    "input": "latencies_ms = [10, 20, 30, 40, 50]",
+    "output": "{'throughput_per_sec': 33.33, 'avg_latency_ms': 30.0, 'p50_ms': 30.0, 'p95_ms': 48.0, 'p99_ms': 49.6}",
+    "reasoning": "With 5 latency measurements [10, 20, 30, 40, 50], the average latency is 30ms. Throughput is calculated as 1000/30 = 33.33 requests/sec. The p50 (median) is 30ms. For p95, we calculate index 0.95 * 4 = 3.8, interpolating between positions 3 and 4 gives 40 + 0.8*(50-40) = 48ms. Similarly, p99 uses index 3.96 giving 49.6ms."
+  },
+  "starter_code": "def calculate_inference_stats(latencies_ms: list) -> dict:\n    \"\"\"\n    Calculate inference statistics for model monitoring.\n    \n    Args:\n        latencies_ms: list of latency measurements in milliseconds\n    \n    Returns:\n        dict with keys: 'throughput_per_sec', 'avg_latency_ms', 'p50_ms', 'p95_ms', 'p99_ms'\n        All values rounded to 2 decimal places.\n    \"\"\"\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Arithmetic Mean and Its Properties in Statistical Monitoring",
+      "relation_to_problem": "The arithmetic mean is fundamental to calculating average latency and throughput metrics. Understanding its mathematical properties ensures correct computation of the expected value of latency measurements, which directly feeds into throughput calculation (1000/avg_latency).",
+      "prerequisites": [
+        "Basic algebra",
+        "Summation notation"
+      ],
+      "learning_objectives": [
+        "Define the arithmetic mean formally using summation notation",
+        "Understand the mean as a measure of central tendency",
+        "Implement robust mean calculation handling edge cases",
+        "Recognize the relationship between mean and throughput in performance metrics"
+      ],
+      "math_content": {
+        "definition": "Let $X = \\{x_1, x_2, \\ldots, x_n\\}$ be a finite set of real-valued observations. The **arithmetic mean** (or sample mean) is defined as: $$\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n} x_i = \\frac{x_1 + x_2 + \\cdots + x_n}{n}$$ where $n \\in \\mathbb{N}^+$ is the sample size and $x_i \\in \\mathbb{R}^+$ for latency measurements.",
+        "notation": "$\\bar{x}$ = sample mean (pronounced 'x-bar'); $n$ = number of observations; $\\sum$ = summation operator",
+        "theorem": "**Theorem (Linearity of Expectation)**: For constants $a, b \\in \\mathbb{R}$ and random variables $X$, we have $E[aX + b] = aE[X] + b$. This extends to finite sums: $E\\left[\\sum_{i=1}^{n} X_i\\right] = \\sum_{i=1}^{n} E[X_i]$.",
+        "proof_sketch": "The mean satisfies key properties: (1) **Translation invariance**: adding a constant $c$ to all values increases the mean by $c$; (2) **Scaling**: multiplying all values by $k$ multiplies the mean by $k$; (3) **Minimizes squared deviations**: $\\bar{x} = \\arg\\min_{a} \\sum_{i=1}^{n}(x_i - a)^2$. Proof: Take derivative with respect to $a$, set to zero, solving gives $a = \\bar{x}$.",
+        "examples": [
+          "Example 1: For latencies $[10, 20, 30]$ ms, $\\bar{x} = \\frac{10+20+30}{3} = \\frac{60}{3} = 20$ ms",
+          "Example 2: For latencies $[5, 5, 5, 100]$ ms, $\\bar{x} = \\frac{115}{4} = 28.75$ ms (note how outlier affects mean)",
+          "Example 3: Empty set has undefined mean (division by zero), requiring special handling in implementation"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Arithmetic Mean",
+          "latex": "$\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n} x_i$",
+          "description": "Use for calculating average latency from measurements. Requires $n > 0$."
+        },
+        {
+          "name": "Computational Formula (Numerically Stable)",
+          "latex": "$\\bar{x} = \\bar{x}_{prev} + \\frac{x_n - \\bar{x}_{prev}}{n}$",
+          "description": "Incremental update formula useful for streaming data to avoid overflow"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to calculate the arithmetic mean of a list of positive numbers. This builds the foundation for average latency calculation. Handle the empty list case by returning None. Round the result to 2 decimal places.",
+        "function_signature": "def calculate_mean(values: list) -> float:",
+        "starter_code": "def calculate_mean(values: list) -> float:\n    \"\"\"\n    Calculate the arithmetic mean of a list of numbers.\n    \n    Args:\n        values: list of numeric values\n    \n    Returns:\n        float: mean rounded to 2 decimal places, or None if list is empty\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_mean([10, 20, 30, 40, 50])",
+            "expected": "30.0",
+            "explanation": "Sum is 150, divided by 5 gives 30.0"
+          },
+          {
+            "input": "calculate_mean([5.5, 10.5, 15.5])",
+            "expected": "10.5",
+            "explanation": "Sum is 31.5, divided by 3 gives 10.5"
+          },
+          {
+            "input": "calculate_mean([100])",
+            "expected": "100.0",
+            "explanation": "Single element has mean equal to itself"
+          },
+          {
+            "input": "calculate_mean([])",
+            "expected": "None",
+            "explanation": "Empty list has no defined mean"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Integer division: Using // instead of / in Python 2 or forgetting to convert to float",
+        "Not handling empty list: Attempting division by zero leads to runtime error",
+        "Numerical overflow: For very large datasets, sum may overflow (use incremental formula)",
+        "Rounding prematurely: Rounding intermediate calculations reduces precision"
+      ],
+      "hint": "Use the built-in sum() function for clarity, but remember to check if the list is empty before dividing.",
+      "references": [
+        "Sample mean vs population mean (unbiased estimator)",
+        "Welford's online algorithm for numerical stability",
+        "Central limit theorem and why means matter in monitoring"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Throughput Calculation via Reciprocal Relationships",
+      "relation_to_problem": "Throughput is inversely proportional to average latency. Understanding this reciprocal relationship allows us to convert average latency into requests per second, a critical MLOps monitoring metric.",
+      "prerequisites": [
+        "Arithmetic mean",
+        "Unit conversion",
+        "Reciprocal functions"
+      ],
+      "learning_objectives": [
+        "Understand the inverse relationship between latency and throughput",
+        "Perform dimensional analysis for unit conversion (ms to seconds)",
+        "Derive throughput formula from first principles",
+        "Handle edge cases where average latency is zero or undefined"
+      ],
+      "math_content": {
+        "definition": "**Throughput** $\\lambda$ is defined as the rate of successful processing, measured in requests per unit time. For sequential single-threaded processing with constant average latency $\\bar{t}$, throughput is: $$\\lambda = \\frac{1}{\\bar{t}}$$ where $\\bar{t}$ is in seconds. When latency is measured in milliseconds: $$\\lambda_{\\text{req/sec}} = \\frac{1000}{\\bar{t}_{\\text{ms}}}$$",
+        "notation": "$\\lambda$ = throughput (requests/second); $\\bar{t}$ = average latency; $1000$ = conversion factor from milliseconds to seconds",
+        "theorem": "**Theorem (Little's Law)**: For a stable queuing system, $L = \\lambda W$, where $L$ is the average number of items in the system, $\\lambda$ is the arrival rate, and $W$ is the average time an item spends in the system. For single-threaded processing with $L=1$: $\\lambda = \\frac{1}{W}$.",
+        "proof_sketch": "Dimensional analysis: If one request takes $\\bar{t}$ milliseconds, then in 1 second (1000 ms), the number of requests completed is $\\frac{1000 \\text{ ms}}{\\bar{t} \\text{ ms/req}} = \\frac{1000}{\\bar{t}}$ requests. This assumes no queuing delay and sequential processing.",
+        "examples": [
+          "Example 1: Average latency = 20 ms. Throughput = $\\frac{1000}{20} = 50$ requests/second",
+          "Example 2: Average latency = 100 ms. Throughput = $\\frac{1000}{100} = 10$ requests/second (slower service)",
+          "Example 3: Average latency = 5 ms. Throughput = $\\frac{1000}{5} = 200$ requests/second (faster service)",
+          "Example 4: If latencies vary [10, 20, 30] ms, first compute $\\bar{t} = 20$ ms, then throughput = 50 req/s"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Throughput from Latency (ms)",
+          "latex": "$\\lambda = \\frac{1000}{\\bar{t}_{\\text{ms}}}$",
+          "description": "Convert average latency in milliseconds to throughput in requests per second"
+        },
+        {
+          "name": "Average Service Time",
+          "latex": "$\\bar{t} = \\frac{1}{\\lambda}$",
+          "description": "Inverse relationship: lower latency means higher throughput"
+        }
+      ],
+      "exercise": {
+        "description": "Given a list of latency measurements in milliseconds, calculate the theoretical maximum throughput (requests per second) for single-threaded sequential processing. First compute the average latency, then convert to throughput. Return None for empty lists. Round to 2 decimal places.",
+        "function_signature": "def calculate_throughput(latencies_ms: list) -> float:",
+        "starter_code": "def calculate_throughput(latencies_ms: list) -> float:\n    \"\"\"\n    Calculate throughput from latency measurements.\n    \n    Args:\n        latencies_ms: list of latency measurements in milliseconds\n    \n    Returns:\n        float: throughput in requests/second rounded to 2 decimal places,\n               or None if list is empty\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_throughput([10, 20, 30, 40, 50])",
+            "expected": "33.33",
+            "explanation": "Average latency = 30ms, throughput = 1000/30 = 33.33 req/s"
+          },
+          {
+            "input": "calculate_throughput([100])",
+            "expected": "10.0",
+            "explanation": "Average latency = 100ms, throughput = 1000/100 = 10.0 req/s"
+          },
+          {
+            "input": "calculate_throughput([5, 5, 5, 5])",
+            "expected": "200.0",
+            "explanation": "Average latency = 5ms, throughput = 1000/5 = 200.0 req/s"
+          },
+          {
+            "input": "calculate_throughput([])",
+            "expected": "None",
+            "explanation": "Empty list has no defined throughput"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting unit conversion: Using latency in ms directly as 1/latency gives wrong units",
+        "Using sum instead of average: Throughput depends on average latency, not total",
+        "Confusing parallel vs sequential: This formula assumes single-threaded processing",
+        "Not handling zero latency: If average latency is 0 (impossible in practice), division by zero occurs"
+      ],
+      "hint": "Build on your mean calculation from the previous quest. The conversion factor 1000 comes from milliseconds in a second.",
+      "references": [
+        "Little's Law in queuing theory",
+        "Amdahl's Law for parallel speedup",
+        "Performance monitoring best practices in distributed systems"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Order Statistics and Sorting Fundamentals",
+      "relation_to_problem": "Percentile calculations require sorted data. Understanding order statistics provides the mathematical foundation for identifying values at specific positions in a sorted distribution, which is essential for p50, p95, and p99 calculations.",
+      "prerequisites": [
+        "Set theory",
+        "Comparison operations",
+        "Array indexing"
+      ],
+      "learning_objectives": [
+        "Define order statistics formally",
+        "Understand the sorting requirement for percentile computation",
+        "Implement efficient sorting for latency data",
+        "Recognize the time complexity of sorting algorithms"
+      ],
+      "math_content": {
+        "definition": "Given a sample $X = \\{x_1, x_2, \\ldots, x_n\\}$, the **order statistics** are the sample values arranged in ascending order: $$X_{(1)} \\leq X_{(2)} \\leq \\cdots \\leq X_{(n)}$$ where $X_{(k)}$ denotes the $k$-th smallest value. $X_{(1)} = \\min(X)$ is the minimum and $X_{(n)} = \\max(X)$ is the maximum.",
+        "notation": "$X_{(k)}$ = $k$-th order statistic (the $k$-th smallest value); $X_{(1)}$ = minimum; $X_{(n)}$ = maximum",
+        "theorem": "**Theorem (Sorting Lower Bound)**: Any comparison-based sorting algorithm requires $\\Omega(n \\log n)$ comparisons in the worst case to sort $n$ elements. Optimal algorithms like mergesort and heapsort achieve $O(n \\log n)$ time complexity.",
+        "proof_sketch": "The proof uses decision tree analysis: there are $n!$ possible permutations of $n$ elements. A comparison-based sort must distinguish between all permutations. A binary decision tree has at most $2^h$ leaves at height $h$. Thus $2^h \\geq n!$, giving $h \\geq \\log_2(n!) = \\Omega(n \\log n)$ by Stirling's approximation.",
+        "examples": [
+          "Example 1: For $X = \\{30, 10, 50, 20, 40\\}$, the order statistics are: $X_{(1)}=10, X_{(2)}=20, X_{(3)}=30, X_{(4)}=40, X_{(5)}=50$",
+          "Example 2: For $X = \\{5, 5, 5\\}$, we have $X_{(1)}=X_{(2)}=X_{(3)}=5$ (duplicates are allowed)",
+          "Example 3: Median is $X_{(\\lceil n/2 \\rceil)}$ for odd $n$ or average of $X_{(n/2)}$ and $X_{(n/2+1)}$ for even $n$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Order Statistic Definition",
+          "latex": "$X_{(k)} = k\\text{-th smallest element of } \\{x_1, \\ldots, x_n\\}$",
+          "description": "After sorting in ascending order, $X_{(k)}$ is at index $k-1$ (0-indexed)"
+        },
+        {
+          "name": "Median (Odd n)",
+          "latex": "$\\text{median} = X_{\\left(\\frac{n+1}{2}\\right)}$",
+          "description": "Middle value for odd sample sizes"
+        },
+        {
+          "name": "Median (Even n)",
+          "latex": "$\\text{median} = \\frac{X_{(n/2)} + X_{(n/2+1)}}{2}$",
+          "description": "Average of two middle values for even sample sizes"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a list of numbers and returns the sorted list along with the minimum (1st order statistic) and maximum (nth order statistic). This prepares data for percentile calculations. Return a dictionary with keys 'sorted', 'min', 'max'.",
+        "function_signature": "def compute_order_statistics(values: list) -> dict:",
+        "starter_code": "def compute_order_statistics(values: list) -> dict:\n    \"\"\"\n    Sort values and extract minimum and maximum.\n    \n    Args:\n        values: list of numeric values\n    \n    Returns:\n        dict with keys:\n            - 'sorted': sorted list of values\n            - 'min': minimum value\n            - 'max': maximum value\n        Returns empty dict if input is empty\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_order_statistics([30, 10, 50, 20, 40])",
+            "expected": "{'sorted': [10, 20, 30, 40, 50], 'min': 10, 'max': 50}",
+            "explanation": "Sorting gives [10,20,30,40,50], min=10, max=50"
+          },
+          {
+            "input": "compute_order_statistics([5])",
+            "expected": "{'sorted': [5], 'min': 5, 'max': 5}",
+            "explanation": "Single element is both min and max"
+          },
+          {
+            "input": "compute_order_statistics([100, 50, 75, 50])",
+            "expected": "{'sorted': [50, 50, 75, 100], 'min': 50, 'max': 100}",
+            "explanation": "Duplicates are preserved in sorted order"
+          },
+          {
+            "input": "compute_order_statistics([])",
+            "expected": "{}",
+            "explanation": "Empty list returns empty dictionary"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Mutating original list: sorted() returns new list, list.sort() modifies in-place",
+        "Assuming no duplicates: Order statistics work with repeated values",
+        "Wrong indexing: Forgetting 0-based indexing when mapping $X_{(k)}$ to array positions",
+        "Not handling empty list: min/max on empty list raises ValueError"
+      ],
+      "hint": "Use Python's built-in sorted() function which implements Timsort (O(n log n) worst case). Remember to handle the empty list case.",
+      "references": [
+        "Quickselect algorithm for k-th order statistic in O(n) average time",
+        "Median of medians algorithm for O(n) worst-case selection",
+        "Comparison-based sorting lower bound proof"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Percentile Theory and Linear Interpolation Method",
+      "relation_to_problem": "Percentiles (p50, p95, p99) are the core metrics for understanding latency distribution in production systems. Linear interpolation ensures precise percentile values even when the exact percentage doesn't correspond to an integer index.",
+      "prerequisites": [
+        "Order statistics",
+        "Linear functions",
+        "Array indexing"
+      ],
+      "learning_objectives": [
+        "Define percentiles rigorously using order statistics",
+        "Understand when and why interpolation is necessary",
+        "Derive the linear interpolation formula for percentiles",
+        "Implement percentile calculation with proper rounding"
+      ],
+      "math_content": {
+        "definition": "The **$p$-th percentile** $P_p$ of a dataset is the value below which $p$ percent of the data falls. Formally, for $p \\in [0, 100]$ and sorted data $X_{(1)}, \\ldots, X_{(n)}$: $$P_p = X_{(k)}$$ where $k$ is determined by the percentile method. Using **linear interpolation** (R-7/Type 7 method), the position index is: $$i = \\frac{p}{100} \\cdot (n - 1)$$ and the percentile is computed as: $$P_p = X_{(\\lfloor i \\rfloor + 1)} + (i - \\lfloor i \\rfloor) \\cdot (X_{(\\lceil i \\rceil + 1)} - X_{(\\lfloor i \\rfloor + 1)})$$ where $\\lfloor \\cdot \\rfloor$ is floor and $\\lceil \\cdot \\rceil$ is ceiling (adjusting for 1-based order statistics).",
+        "notation": "$P_p$ = $p$-th percentile; $i$ = fractional index position; $n$ = sample size; $\\lfloor i \\rfloor$ = largest integer $\\leq i$; $\\lceil i \\rceil$ = smallest integer $\\geq i$",
+        "theorem": "**Theorem (Linear Interpolation Consistency)**: The linear interpolation method for percentiles satisfies: (1) $P_0 = X_{(1)}$ (minimum), (2) $P_{100} = X_{(n)}$ (maximum), (3) $P_p$ is monotonically increasing in $p$, and (4) For uniform spacing, $P_p$ is a linear function of $p$.",
+        "proof_sketch": "For $p=0$: $i = 0 \\cdot (n-1) = 0$, so $P_0 = X_{(1)} + 0 \\cdot (X_{(1)} - X_{(1)}) = X_{(1)}$. For $p=100$: $i = 1 \\cdot (n-1) = n-1$, giving $P_{100} = X_{(n)}$. Monotonicity follows from the fact that $i$ increases with $p$ and interpolation between adjacent order statistics is linear.",
+        "examples": [
+          "Example 1: For sorted data $[10, 20, 30, 40, 50]$ (n=5), compute $P_{50}$: $i = 0.5 \\cdot 4 = 2.0$, so $P_{50} = X_{(3)} = 30$ (exact index)",
+          "Example 2: For same data, compute $P_{95}$: $i = 0.95 \\cdot 4 = 3.8$. Interpolate between $X_{(4)}=40$ and $X_{(5)}=50$: $P_{95} = 40 + 0.8 \\cdot (50-40) = 40 + 8 = 48$",
+          "Example 3: For $[10, 20]$ (n=2), compute $P_{50}$: $i = 0.5 \\cdot 1 = 0.5$. Interpolate: $P_{50} = 10 + 0.5 \\cdot (20-10) = 15$",
+          "Example 4: $P_{99}$ for $[10, 20, 30, 40, 50]$: $i = 0.99 \\cdot 4 = 3.96$, giving $P_{99} = 40 + 0.96 \\cdot 10 = 49.6$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Percentile Index",
+          "latex": "$i = \\frac{p}{100} \\cdot (n - 1)$",
+          "description": "Fractional position for p-th percentile in 0-indexed array of n elements"
+        },
+        {
+          "name": "Linear Interpolation",
+          "latex": "$P_p = X_{\\lfloor i \\rfloor} + (i - \\lfloor i \\rfloor) \\cdot (X_{\\lceil i \\rceil} - X_{\\lfloor i \\rfloor})$",
+          "description": "Interpolate between adjacent values when index is non-integer (using 0-based indexing)"
+        },
+        {
+          "name": "Interpolation Weight",
+          "latex": "$w = i - \\lfloor i \\rfloor$",
+          "description": "Fractional part of index, ranges from 0 to 1"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to calculate a single percentile from a list of values using linear interpolation. The function should take the data and the desired percentile (0-100) and return the interpolated value rounded to 2 decimal places. Handle edge cases for empty lists.",
+        "function_signature": "def calculate_percentile(values: list, p: float) -> float:",
+        "starter_code": "def calculate_percentile(values: list, p: float) -> float:\n    \"\"\"\n    Calculate the p-th percentile using linear interpolation.\n    \n    Args:\n        values: list of numeric values (will be sorted internally)\n        p: percentile to compute (0-100)\n    \n    Returns:\n        float: p-th percentile rounded to 2 decimal places,\n               or None if list is empty\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_percentile([10, 20, 30, 40, 50], 50)",
+            "expected": "30.0",
+            "explanation": "Median: i=2.0, exact position at index 2 (third element)"
+          },
+          {
+            "input": "calculate_percentile([10, 20, 30, 40, 50], 95)",
+            "expected": "48.0",
+            "explanation": "i=3.8, interpolate: 40 + 0.8*(50-40) = 48.0"
+          },
+          {
+            "input": "calculate_percentile([10, 20, 30, 40, 50], 99)",
+            "expected": "49.6",
+            "explanation": "i=3.96, interpolate: 40 + 0.96*(50-40) = 49.6"
+          },
+          {
+            "input": "calculate_percentile([15], 50)",
+            "expected": "15.0",
+            "explanation": "Single element dataset has all percentiles equal to that value"
+          },
+          {
+            "input": "calculate_percentile([], 50)",
+            "expected": "None",
+            "explanation": "Empty list has no defined percentiles"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Off-by-one errors: Confusing 0-based array indexing with 1-based order statistics notation",
+        "Wrong interpolation formula: Using (i+1) instead of fractional part of i",
+        "Not sorting first: Percentiles require sorted data",
+        "Integer division: Ensure floating-point division when computing fractional index",
+        "Boundary cases: For p=0 or p=100, should return min or max without interpolation"
+      ],
+      "hint": "First sort the data. Compute the fractional index i = p/100 * (n-1). Use math.floor() to get lower index and interpolate between floor and ceiling positions.",
+      "references": [
+        "Nine percentile calculation methods in statistical software (Hyndman & Fan, 1996)",
+        "Quantile function in probability theory",
+        "SLA monitoring and percentile-based alerting strategies"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Multiple Percentile Computation and Efficiency",
+      "relation_to_problem": "Production monitoring systems need to compute multiple percentiles (p50, p95, p99) simultaneously from the same dataset. Understanding how to optimize this computation by sorting once and reusing the sorted array is crucial for efficient implementation.",
+      "prerequisites": [
+        "Percentile calculation",
+        "Algorithm complexity",
+        "Function composition"
+      ],
+      "learning_objectives": [
+        "Optimize multiple percentile calculations through shared sorting",
+        "Understand the computational complexity trade-offs",
+        "Implement batch percentile computation efficiently",
+        "Apply DRY principle to avoid redundant calculations"
+      ],
+      "math_content": {
+        "definition": "For a set of percentiles $\\mathcal{P} = \\{p_1, p_2, \\ldots, p_m\\}$ and dataset $X$ with $n$ elements, the **batch percentile computation** produces: $$\\{P_{p_1}, P_{p_2}, \\ldots, P_{p_m}\\}$$ where each $P_{p_j}$ is computed using the same sorted array $X_{(1)}, \\ldots, X_{(n)}$. This optimization reduces time complexity from $O(m \\cdot n \\log n)$ to $O(n \\log n + m)$.",
+        "notation": "$\\mathcal{P}$ = set of percentile values to compute; $m$ = number of percentiles; $O(\\cdot)$ = Big-O notation for time complexity",
+        "theorem": "**Theorem (Batch Processing Efficiency)**: Computing $m$ percentiles from the same dataset by sorting once requires $O(n \\log n + m)$ time, compared to $O(m \\cdot n \\log n)$ for independent computations. The speedup factor approaches $m$ as $n$ grows large.",
+        "proof_sketch": "Independent computation: Each of $m$ percentiles requires sorting ($O(n \\log n)$) plus interpolation ($O(1)$), totaling $O(m \\cdot n \\log n)$. Batch computation: Sort once ($O(n \\log n)$), then compute $m$ interpolations ($O(m)$), totaling $O(n \\log n + m)$. For large $n$ and fixed $m$, both are $O(n \\log n)$, but batch has lower constant factor.",
+        "examples": [
+          "Example 1: For data $[10,20,30,40,50]$, compute $\\{P_{50}, P_{95}, P_{99}\\}$. Sort once: $[10,20,30,40,50]$. Then: $P_{50}=30.0$, $P_{95}=48.0$, $P_{99}=49.6$",
+          "Example 2: Complexity analysis with n=1000, m=3: Independent = $3 \\cdot 1000 \\log 1000 \\approx 30,000$ ops. Batch = $1000 \\log 1000 + 3 \\approx 10,000$ ops (3x speedup)",
+          "Example 3: In production monitoring, computing p50/p90/p95/p99 simultaneously (m=4) from logs is standard practice"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Batch Percentile Time Complexity",
+          "latex": "$T(n,m) = O(n \\log n + m)$",
+          "description": "Sort once, then compute m percentiles with constant-time lookups each"
+        },
+        {
+          "name": "Speedup Factor",
+          "latex": "$S = \\frac{m \\cdot n \\log n}{n \\log n + m} \\approx m \\text{ for large } n$",
+          "description": "Performance improvement of batch vs independent computation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes multiple percentiles efficiently from a single dataset. The function should take a list of values and a list of percentile values to compute, returning a dictionary mapping each percentile to its value. Sort the data once and reuse for all percentile calculations. Round all results to 2 decimal places.",
+        "function_signature": "def calculate_multiple_percentiles(values: list, percentiles: list) -> dict:",
+        "starter_code": "def calculate_multiple_percentiles(values: list, percentiles: list) -> dict:\n    \"\"\"\n    Calculate multiple percentiles efficiently from a dataset.\n    \n    Args:\n        values: list of numeric values\n        percentiles: list of percentile values to compute (0-100)\n    \n    Returns:\n        dict mapping percentile to its value, e.g., {50: 30.0, 95: 48.0}\n        Returns empty dict if values list is empty\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_multiple_percentiles([10, 20, 30, 40, 50], [50, 95, 99])",
+            "expected": "{50: 30.0, 95: 48.0, 99: 49.6}",
+            "explanation": "Three percentiles computed from single sorted array"
+          },
+          {
+            "input": "calculate_multiple_percentiles([5, 15, 25, 35], [50])",
+            "expected": "{50: 20.0}",
+            "explanation": "Single percentile: i=1.5, interpolate 15+0.5*(25-15)=20"
+          },
+          {
+            "input": "calculate_multiple_percentiles([100], [0, 50, 100])",
+            "expected": "{0: 100.0, 50: 100.0, 100: 100.0}",
+            "explanation": "Single value: all percentiles equal that value"
+          },
+          {
+            "input": "calculate_multiple_percentiles([], [50, 95])",
+            "expected": "{}",
+            "explanation": "Empty dataset returns empty result"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Sorting multiple times: Re-sorting for each percentile wastes O(n log n) operations",
+        "Not reusing sorted array: Creating new sorted copies instead of referencing same array",
+        "Modifying during iteration: Don't sort in-place if you need original data",
+        "Forgetting to handle empty input: Both empty values and empty percentiles list"
+      ],
+      "hint": "Sort the values once at the start, then iterate through the percentiles list, computing each one using the same sorted array. You can reuse the interpolation logic from the previous quest.",
+      "references": [
+        "Amortized analysis of batch operations",
+        "Streaming percentile algorithms (t-digest, P² algorithm)",
+        "Trade-offs between exact and approximate percentiles in monitoring systems"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Integrated Statistical Dashboard Metrics",
+      "relation_to_problem": "This final quest combines mean calculation, throughput derivation, and multiple percentile computation into a cohesive monitoring dashboard. Understanding how these metrics interact provides complete visibility into system performance.",
+      "prerequisites": [
+        "Arithmetic mean",
+        "Throughput calculation",
+        "Multiple percentile computation",
+        "Dictionary data structures"
+      ],
+      "learning_objectives": [
+        "Integrate multiple statistical computations into unified output",
+        "Understand relationships between different monitoring metrics",
+        "Handle edge cases consistently across all metrics",
+        "Design clear API contracts for monitoring functions"
+      ],
+      "math_content": {
+        "definition": "A **statistical monitoring dashboard** for ML inference systems combines complementary metrics: $$\\text{Dashboard} = \\{\\lambda, \\bar{t}, P_{50}, P_{95}, P_{99}\\}$$ where $\\lambda$ = throughput (requests/sec), $\\bar{t}$ = average latency (ms), and $P_p$ = percentiles (ms). These metrics satisfy: (1) $\\lambda = 1000/\\bar{t}$, (2) $P_{50} \\leq \\bar{t}$ typically (median below mean for right-skewed distributions), (3) $P_{50} \\leq P_{95} \\leq P_{99}$ (monotonicity).",
+        "notation": "$\\lambda$ = throughput; $\\bar{t}$ = mean latency; $P_{50}$ = median; $P_{95}, P_{99}$ = tail latencies for SLA monitoring",
+        "theorem": "**Theorem (Metric Consistency)**: For valid inference latency data: (1) All values are non-negative: $x_i \\geq 0$, (2) Percentiles are ordered: $P_{p_1} \\leq P_{p_2}$ when $p_1 < p_2$, (3) Median is robust to outliers while mean is sensitive, (4) Throughput decreases as mean latency increases.",
+        "proof_sketch": "From order statistics: percentiles are values from sorted array, hence monotonic. Median $P_{50}$ minimizes absolute deviations while mean minimizes squared deviations. For right-skewed latency distributions (common in practice due to occasional slowdowns), mean > median. Throughput relationship follows directly from $\\lambda = 1000/\\bar{t}$.",
+        "examples": [
+          "Example 1: Latencies $[10,20,30,40,50]$ ms give: $\\bar{t}=30$, $\\lambda=33.33$ req/s, $P_{50}=30$, $P_{95}=48$, $P_{99}=49.6$ (symmetric distribution)",
+          "Example 2: Latencies $[10,10,10,10,100]$ ms give: $\\bar{t}=28$, $\\lambda=35.71$ req/s, $P_{50}=10$, $P_{95}=82$, $P_{99}=93.6$ (right-skewed: median < mean)",
+          "Example 3: Why percentiles matter: System with $\\bar{t}=20$ms might have $P_{99}=500$ms, meaning 1% of users experience severe delays",
+          "Example 4: Empty input must produce empty output (no partial metrics)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Dashboard Formula",
+          "latex": "$\\{\\lambda = \\frac{1000}{\\bar{t}}, \\bar{t} = \\frac{1}{n}\\sum_{i=1}^n x_i, P_{50}, P_{95}, P_{99}\\}$",
+          "description": "All metrics computed from single latency dataset"
+        },
+        {
+          "name": "Expected Ordering (Right-Skewed)",
+          "latex": "$P_{50} \\leq \\bar{t} \\leq P_{95} \\leq P_{99}$",
+          "description": "Typical relationship for latency distributions with occasional outliers"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified version of the main problem that combines throughput, mean, and one percentile (p50). Given latency measurements, return a dictionary with 'throughput_per_sec', 'avg_latency_ms', and 'p50_ms'. All values should be rounded to 2 decimal places. Return empty dict for empty input. This builds toward the full solution without revealing it.",
+        "function_signature": "def calculate_basic_stats(latencies_ms: list) -> dict:",
+        "starter_code": "def calculate_basic_stats(latencies_ms: list) -> dict:\n    \"\"\"\n    Calculate basic monitoring statistics: throughput, average, and median.\n    \n    Args:\n        latencies_ms: list of latency measurements in milliseconds\n    \n    Returns:\n        dict with keys:\n            - 'throughput_per_sec': requests per second (float)\n            - 'avg_latency_ms': average latency (float)\n            - 'p50_ms': median latency (float)\n        All values rounded to 2 decimal places.\n        Returns empty dict if input is empty.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_basic_stats([10, 20, 30, 40, 50])",
+            "expected": "{'throughput_per_sec': 33.33, 'avg_latency_ms': 30.0, 'p50_ms': 30.0}",
+            "explanation": "Mean=30, throughput=1000/30=33.33, median (i=2.0)=30"
+          },
+          {
+            "input": "calculate_basic_stats([10, 10, 10, 10, 100])",
+            "expected": "{'throughput_per_sec': 35.71, 'avg_latency_ms': 28.0, 'p50_ms': 10.0}",
+            "explanation": "Mean=28, throughput=35.71, median=10 (right-skewed distribution)"
+          },
+          {
+            "input": "calculate_basic_stats([50])",
+            "expected": "{'throughput_per_sec': 20.0, 'avg_latency_ms': 50.0, 'p50_ms': 50.0}",
+            "explanation": "Single value: all metrics equal or derived from that value"
+          },
+          {
+            "input": "calculate_basic_stats([])",
+            "expected": "{}",
+            "explanation": "Empty input produces empty output"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Inconsistent empty handling: Some metrics return None, others skip - be consistent",
+        "Computing from unsorted data: Percentiles require sorting",
+        "Wrong dictionary keys: Exact key names matter for API contracts",
+        "Rounding too early: Round final results, not intermediate calculations",
+        "Not validating metric relationships: Sanity check that p50 ≤ p95 ≤ p99"
+      ],
+      "hint": "Combine functions from previous quests: calculate mean, convert to throughput, sort once, then compute p50. Return all three in a dictionary with specified keys. The main problem extends this to include p95 and p99.",
+      "references": [
+        "RED method for monitoring: Rate, Errors, Duration",
+        "SLI/SLO design using percentile-based objectives",
+        "Observability best practices for production ML systems",
+        "Latency distribution characteristics in microservices architectures"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,521 @@
+{
+  "problem_id": 14,
+  "title": "Linear Regression Using Normal Equation",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "Write a Python function that performs linear regression using the normal equation. The function should take a matrix X (features) and a vector y (target) as input, and return the coefficients of the linear regression model. Round your answer to four decimal places, -0.0 is a valid result for rounding a very small number.",
+  "example": {
+    "input": "X = [[1, 1], [1, 2], [1, 3]], y = [1, 2, 3]",
+    "output": "[0.0, 1.0]",
+    "reasoning": "The linear model is y = 0.0 + 1.0*x, perfectly fitting the input data."
+  },
+  "starter_code": "import numpy as np\ndef linear_regression_normal_equation(X: list[list[float]], y: list[float]) -> list[float]:\n\t# Your code here, make sure to round\n\treturn theta",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Matrix Transpose and Matrix Multiplication",
+      "relation_to_problem": "The normal equation θ = (X^T X)^(-1) X^T y requires computing the transpose of the design matrix X and performing matrix multiplication, which are fundamental operations for constructing the Gram matrix X^T X.",
+      "prerequisites": [
+        "Basic linear algebra",
+        "Matrix notation",
+        "Vector operations"
+      ],
+      "learning_objectives": [
+        "Understand the definition and properties of matrix transpose",
+        "Compute matrix-matrix and matrix-vector products",
+        "Recognize when matrix multiplication is defined based on dimensions",
+        "Apply these operations to construct the Gram matrix needed for normal equation"
+      ],
+      "math_content": {
+        "definition": "For a matrix $\\mathbf{A} \\in \\mathbb{R}^{m \\times n}$, the **transpose** $\\mathbf{A}^T \\in \\mathbb{R}^{n \\times m}$ is defined by $(\\mathbf{A}^T)_{ij} = \\mathbf{A}_{ji}$ for all $i, j$. That is, the element in row $i$ and column $j$ of $\\mathbf{A}^T$ equals the element in row $j$ and column $i$ of $\\mathbf{A}$.\n\n**Matrix Multiplication**: Given $\\mathbf{A} \\in \\mathbb{R}^{m \\times n}$ and $\\mathbf{B} \\in \\mathbb{R}^{n \\times p}$, their product $\\mathbf{C} = \\mathbf{AB} \\in \\mathbb{R}^{m \\times p}$ has elements: $$c_{ij} = \\sum_{k=1}^{n} a_{ik}b_{kj}$$\n\nMatrix multiplication is only defined when the number of columns in the first matrix equals the number of rows in the second matrix.",
+        "notation": "$\\mathbf{A}^T$ = transpose of matrix $\\mathbf{A}$; $\\mathbf{AB}$ = matrix product of $\\mathbf{A}$ and $\\mathbf{B}$; $\\mathbf{A} \\in \\mathbb{R}^{m \\times n}$ means $\\mathbf{A}$ has $m$ rows and $n$ columns with real entries",
+        "theorem": "**Properties of Transpose**: For matrices $\\mathbf{A}$ and $\\mathbf{B}$ of compatible dimensions: (1) $(\\mathbf{A}^T)^T = \\mathbf{A}$; (2) $(\\mathbf{A} + \\mathbf{B})^T = \\mathbf{A}^T + \\mathbf{B}^T$; (3) $(\\mathbf{AB})^T = \\mathbf{B}^T\\mathbf{A}^T$ (reverses order); (4) $(c\\mathbf{A})^T = c\\mathbf{A}^T$ for scalar $c$",
+        "proof_sketch": "For property (3): Let $\\mathbf{C} = \\mathbf{AB}$. Then $(\\mathbf{C}^T)_{ij} = c_{ji} = \\sum_k a_{jk}b_{ki}$. Now $(\\mathbf{B}^T\\mathbf{A}^T)_{ij} = \\sum_k (\\mathbf{B}^T)_{ik}(\\mathbf{A}^T)_{kj} = \\sum_k b_{ki}a_{jk} = \\sum_k a_{jk}b_{ki}$, proving equality.",
+        "examples": [
+          "Example 1: $\\mathbf{A} = \\begin{bmatrix}1 & 2 \\\\ 3 & 4\\end{bmatrix}$ has transpose $\\mathbf{A}^T = \\begin{bmatrix}1 & 3 \\\\ 2 & 4\\end{bmatrix}$",
+          "Example 2: $\\mathbf{A} = \\begin{bmatrix}1 & 2\\end{bmatrix}$ (1×2) and $\\mathbf{B} = \\begin{bmatrix}3 \\\\ 4\\end{bmatrix}$ (2×1), then $\\mathbf{AB} = [1(3) + 2(4)] = [11]$ (1×1)",
+          "Example 3: $\\mathbf{A}^T\\mathbf{A}$ for column vector $\\mathbf{A} = \\begin{bmatrix}1 \\\\ 2 \\\\ 3\\end{bmatrix}$ gives $\\mathbf{A}^T\\mathbf{A} = [1, 2, 3]\\begin{bmatrix}1 \\\\ 2 \\\\ 3\\end{bmatrix} = 1^2 + 2^2 + 3^2 = 14$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Transpose Definition",
+          "latex": "$(\\mathbf{A}^T)_{ij} = \\mathbf{A}_{ji}$",
+          "description": "Use to flip rows and columns of a matrix"
+        },
+        {
+          "name": "Matrix Multiplication",
+          "latex": "$c_{ij} = \\sum_{k=1}^{n} a_{ik}b_{kj}$",
+          "description": "Compute dot product of row i from first matrix with column j from second matrix"
+        },
+        {
+          "name": "Gram Matrix",
+          "latex": "$\\mathbf{X}^T\\mathbf{X}$",
+          "description": "Produces a square symmetric matrix used in the normal equation; dimension is (n×n) where n is number of features"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the Gram matrix X^T X for a given matrix X. This is the first crucial step in the normal equation computation.",
+        "function_signature": "def compute_gram_matrix(X: list[list[float]]) -> list[list[float]]:",
+        "starter_code": "def compute_gram_matrix(X: list[list[float]]) -> list[list[float]]:\n    \"\"\"\n    Compute X^T X (Gram matrix) for input matrix X.\n    \n    Args:\n        X: m x n matrix (list of lists)\n    \n    Returns:\n        n x n symmetric matrix X^T X\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_gram_matrix([[1, 2], [3, 4], [5, 6]])",
+            "expected": "[[35, 44], [44, 56]]",
+            "explanation": "X is 3×2, so X^T is 2×3, and X^T X is 2×2. First element: 1²+3²+5² = 35; Top-right: 1·2+3·4+5·6 = 44; etc."
+          },
+          {
+            "input": "compute_gram_matrix([[1, 0], [0, 1]])",
+            "expected": "[[1, 0], [0, 1]]",
+            "explanation": "For an identity-like matrix, X^T X equals the identity matrix since columns are orthonormal"
+          },
+          {
+            "input": "compute_gram_matrix([[1], [2], [3]])",
+            "expected": "[[14]]",
+            "explanation": "Single column vector: X^T X gives the sum of squares 1² + 2² + 3² = 14 as a 1×1 matrix"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row-column order: Remember (A^T)_ij = A_ji, not A_ij",
+        "Attempting to multiply incompatible matrices: Always check that inner dimensions match (m×n · n×p is valid)",
+        "Forgetting that X^T X produces a SQUARE matrix even when X is not square",
+        "Computing X X^T instead of X^T X (these produce different dimension matrices unless X is square)"
+      ],
+      "hint": "The Gram matrix X^T X is always square and symmetric. Think of each element as the dot product between pairs of columns from the original matrix X.",
+      "references": [
+        "Gram matrix properties and positive semi-definiteness",
+        "Matrix multiplication algorithms and computational complexity",
+        "Applications of X^T X in least squares and covariance matrices"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Matrix Inversion and Solving Linear Systems",
+      "relation_to_problem": "The normal equation requires computing (X^T X)^(-1), the inverse of the Gram matrix. This inverse is then used to solve for the optimal coefficients θ that minimize the squared error in linear regression.",
+      "prerequisites": [
+        "Matrix multiplication",
+        "Determinants",
+        "Linear independence",
+        "Gaussian elimination"
+      ],
+      "learning_objectives": [
+        "Understand when a matrix is invertible and the concept of non-singularity",
+        "Compute the inverse of small matrices using analytical formulas",
+        "Recognize the role of matrix inversion in solving linear systems Ax = b",
+        "Apply numerical methods to compute matrix inverses for regression problems"
+      ],
+      "math_content": {
+        "definition": "A square matrix $\\mathbf{A} \\in \\mathbb{R}^{n \\times n}$ is **invertible** (or non-singular) if there exists a matrix $\\mathbf{A}^{-1} \\in \\mathbb{R}^{n \\times n}$ such that: $$\\mathbf{A}\\mathbf{A}^{-1} = \\mathbf{A}^{-1}\\mathbf{A} = \\mathbf{I}_n$$ where $\\mathbf{I}_n$ is the $n \\times n$ identity matrix.\n\n**Necessary and Sufficient Conditions**: A matrix $\\mathbf{A}$ is invertible if and only if: (1) $\\det(\\mathbf{A}) \\neq 0$; (2) The columns (or rows) of $\\mathbf{A}$ are linearly independent; (3) $\\mathbf{A}$ has full rank (rank($\\mathbf{A}$) = $n$); (4) The null space of $\\mathbf{A}$ contains only the zero vector.",
+        "notation": "$\\mathbf{A}^{-1}$ = inverse of matrix $\\mathbf{A}$; $\\det(\\mathbf{A})$ = determinant of $\\mathbf{A}$; $\\mathbf{I}_n$ = $n \\times n$ identity matrix; rank($\\mathbf{A}$) = dimension of column space",
+        "theorem": "**Inverse of 2×2 Matrix**: For $\\mathbf{A} = \\begin{bmatrix}a & b \\\\ c & d\\end{bmatrix}$, if $\\det(\\mathbf{A}) = ad - bc \\neq 0$, then: $$\\mathbf{A}^{-1} = \\frac{1}{ad-bc}\\begin{bmatrix}d & -b \\\\ -c & a\\end{bmatrix}$$\n\n**Properties of Matrix Inverse**: (1) $(\\mathbf{A}^{-1})^{-1} = \\mathbf{A}$; (2) $(\\mathbf{AB})^{-1} = \\mathbf{B}^{-1}\\mathbf{A}^{-1}$ (reverses order); (3) $(\\mathbf{A}^T)^{-1} = (\\mathbf{A}^{-1})^T$; (4) $\\det(\\mathbf{A}^{-1}) = 1/\\det(\\mathbf{A})$",
+        "proof_sketch": "For the 2×2 formula, verify by direct computation: $\\mathbf{A}\\mathbf{A}^{-1} = \\begin{bmatrix}a & b \\\\ c & d\\end{bmatrix} \\cdot \\frac{1}{ad-bc}\\begin{bmatrix}d & -b \\\\ -c & a\\end{bmatrix} = \\frac{1}{ad-bc}\\begin{bmatrix}ad-bc & 0 \\\\ 0 & ad-bc\\end{bmatrix} = \\mathbf{I}_2$.",
+        "examples": [
+          "Example 1: $\\mathbf{A} = \\begin{bmatrix}4 & 7 \\\\ 2 & 6\\end{bmatrix}$. $\\det(\\mathbf{A}) = 4(6) - 7(2) = 10 \\neq 0$, so $\\mathbf{A}^{-1} = \\frac{1}{10}\\begin{bmatrix}6 & -7 \\\\ -2 & 4\\end{bmatrix} = \\begin{bmatrix}0.6 & -0.7 \\\\ -0.2 & 0.4\\end{bmatrix}$",
+          "Example 2: Identity matrix $\\mathbf{I}_n$ is its own inverse since $\\mathbf{I}_n \\mathbf{I}_n = \\mathbf{I}_n$",
+          "Example 3: Solving $\\mathbf{Ax} = \\mathbf{b}$ for $\\mathbf{x}$: If $\\mathbf{A}$ is invertible, multiply both sides by $\\mathbf{A}^{-1}$ to get $\\mathbf{x} = \\mathbf{A}^{-1}\\mathbf{b}$. This is exactly the structure of the normal equation solution."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "2×2 Matrix Inverse",
+          "latex": "$\\mathbf{A}^{-1} = \\frac{1}{\\det(\\mathbf{A})}\\begin{bmatrix}d & -b \\\\ -c & a\\end{bmatrix}$ for $\\mathbf{A} = \\begin{bmatrix}a & b \\\\ c & d\\end{bmatrix}$",
+          "description": "Analytical formula for inverting 2×2 matrices; swap diagonal, negate off-diagonal, divide by determinant"
+        },
+        {
+          "name": "Solution to Linear System",
+          "latex": "$\\mathbf{x} = \\mathbf{A}^{-1}\\mathbf{b}$",
+          "description": "When solving $\\mathbf{Ax} = \\mathbf{b}$ with invertible $\\mathbf{A}$, the unique solution is obtained by left-multiplying by the inverse"
+        },
+        {
+          "name": "Determinant of 2×2",
+          "latex": "$\\det\\begin{bmatrix}a & b \\\\ c & d\\end{bmatrix} = ad - bc$",
+          "description": "Check invertibility: matrix is invertible if and only if determinant is non-zero"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the inverse of a 2×2 matrix using the analytical formula. This builds toward computing (X^T X)^(-1) in the normal equation. Return None if the matrix is not invertible (determinant is zero or very close to zero).",
+        "function_signature": "def invert_2x2_matrix(A: list[list[float]]) -> list[list[float]] | None:",
+        "starter_code": "def invert_2x2_matrix(A: list[list[float]]) -> list[list[float]] | None:\n    \"\"\"\n    Compute the inverse of a 2×2 matrix.\n    \n    Args:\n        A: 2×2 matrix [[a, b], [c, d]]\n    \n    Returns:\n        The inverse matrix, or None if not invertible\n    \"\"\"\n    # Your code here\n    # Hint: Check if determinant is close to zero (use threshold like 1e-10)\n    pass",
+        "test_cases": [
+          {
+            "input": "invert_2x2_matrix([[4, 7], [2, 6]])",
+            "expected": "[[0.6, -0.7], [-0.2, 0.4]]",
+            "explanation": "det = 4·6 - 7·2 = 10. Inverse: (1/10)·[[6, -7], [-2, 4]] = [[0.6, -0.7], [-0.2, 0.4]]"
+          },
+          {
+            "input": "invert_2x2_matrix([[1, 0], [0, 1]])",
+            "expected": "[[1.0, 0.0], [0.0, 1.0]]",
+            "explanation": "Identity matrix is its own inverse"
+          },
+          {
+            "input": "invert_2x2_matrix([[2, 4], [1, 2]])",
+            "expected": "None",
+            "explanation": "det = 2·2 - 4·1 = 0, so matrix is singular (not invertible). Rows are linearly dependent."
+          },
+          {
+            "input": "invert_2x2_matrix([[3, 0], [0, 2]])",
+            "expected": "[[0.3333, 0.0], [0.0, 0.5]]",
+            "explanation": "Diagonal matrix: inverse is [1/3, 0; 0, 1/2]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check if determinant is zero before attempting inversion (leads to division by zero)",
+        "Confusing the pattern: swap diagonal elements (a↔d), negate off-diagonal (b, c change sign)",
+        "Not using numerical tolerance when checking for zero determinant (floating point precision issues)",
+        "Attempting to invert non-square matrices (only square matrices can have inverses)",
+        "In the normal equation context: not recognizing that X^T X can be singular when features are linearly dependent (multicollinearity)"
+      ],
+      "hint": "For regression, X^T X is singular when columns of X are linearly dependent. This happens when you have redundant features (e.g., one feature is an exact multiple of another). Always check the determinant before inverting.",
+      "references": [
+        "Gaussian elimination and LU decomposition for larger matrices",
+        "Numerical stability in matrix inversion",
+        "Condition number and ill-conditioned matrices",
+        "Pseudo-inverse for handling singular matrices in regression"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Least Squares Optimization and the Cost Function",
+      "relation_to_problem": "The normal equation is derived by minimizing the sum of squared residuals (cost function). Understanding this optimization problem explains WHY the normal equation formula works and what problem it solves.",
+      "prerequisites": [
+        "Linear regression model",
+        "Residuals and errors",
+        "Calculus (derivatives)",
+        "Vector norms"
+      ],
+      "learning_objectives": [
+        "Define the cost function for linear regression (sum of squared residuals)",
+        "Understand why minimizing squared error is a natural objective",
+        "Derive the condition for minimizing the cost function using calculus",
+        "Connect the optimization condition to the normal equation structure"
+      ],
+      "math_content": {
+        "definition": "**Linear Regression Model**: Given training data $(\\mathbf{x}^{(i)}, y^{(i)})$ for $i = 1, \\ldots, m$, where $\\mathbf{x}^{(i)} \\in \\mathbb{R}^n$ is a feature vector and $y^{(i)} \\in \\mathbb{R}$ is the target, we seek parameters $\\boldsymbol{\\theta} \\in \\mathbb{R}^n$ such that the prediction: $$\\hat{y}^{(i)} = \\boldsymbol{\\theta}^T \\mathbf{x}^{(i)} = \\theta_0 x_0^{(i)} + \\theta_1 x_1^{(i)} + \\cdots + \\theta_{n-1}x_{n-1}^{(i)}$$ is close to the true value $y^{(i)}$. Here $x_0^{(i)} = 1$ for all $i$ to account for the intercept term.\n\n**Residual**: The residual for the $i$-th example is $r^{(i)} = y^{(i)} - \\hat{y}^{(i)} = y^{(i)} - \\boldsymbol{\\theta}^T \\mathbf{x}^{(i)}$.\n\n**Cost Function (Residual Sum of Squares)**: $$J(\\boldsymbol{\\theta}) = \\frac{1}{2m}\\sum_{i=1}^{m}(r^{(i)})^2 = \\frac{1}{2m}\\sum_{i=1}^{m}(y^{(i)} - \\boldsymbol{\\theta}^T\\mathbf{x}^{(i)})^2 = \\frac{1}{2m}\\|\\mathbf{y} - \\mathbf{X}\\boldsymbol{\\theta}\\|^2$$ where $\\mathbf{X} \\in \\mathbb{R}^{m \\times n}$ is the design matrix with rows $\\mathbf{x}^{(i)T}$ and $\\mathbf{y} \\in \\mathbb{R}^m$ is the target vector.",
+        "notation": "$\\boldsymbol{\\theta}$ = parameter vector; $\\mathbf{X}$ = design matrix (m samples × n features); $\\mathbf{y}$ = target vector; $\\hat{\\mathbf{y}} = \\mathbf{X}\\boldsymbol{\\theta}$ = predictions; $J(\\boldsymbol{\\theta})$ = cost function; $\\|\\cdot\\|$ = Euclidean norm",
+        "theorem": "**Normal Equation from Optimization**: The cost function $J(\\boldsymbol{\\theta})$ is minimized when: $$\\mathbf{X}^T\\mathbf{X}\\boldsymbol{\\theta} = \\mathbf{X}^T\\mathbf{y}$$ This is the **normal equation**. If $\\mathbf{X}^T\\mathbf{X}$ is invertible, the unique minimizer is: $$\\boldsymbol{\\theta}^* = (\\mathbf{X}^T\\mathbf{X})^{-1}\\mathbf{X}^T\\mathbf{y}$$",
+        "proof_sketch": "Expand the cost function: $J(\\boldsymbol{\\theta}) = \\frac{1}{2m}(\\mathbf{y} - \\mathbf{X}\\boldsymbol{\\theta})^T(\\mathbf{y} - \\mathbf{X}\\boldsymbol{\\theta}) = \\frac{1}{2m}[\\mathbf{y}^T\\mathbf{y} - 2\\boldsymbol{\\theta}^T\\mathbf{X}^T\\mathbf{y} + \\boldsymbol{\\theta}^T\\mathbf{X}^T\\mathbf{X}\\boldsymbol{\\theta}]$. Taking the gradient with respect to $\\boldsymbol{\\theta}$: $$\\nabla_{\\boldsymbol{\\theta}} J = \\frac{1}{m}[-\\mathbf{X}^T\\mathbf{y} + \\mathbf{X}^T\\mathbf{X}\\boldsymbol{\\theta}]$$ Setting $\\nabla_{\\boldsymbol{\\theta}} J = \\mathbf{0}$ yields $\\mathbf{X}^T\\mathbf{X}\\boldsymbol{\\theta} = \\mathbf{X}^T\\mathbf{y}$. Since $\\mathbf{X}^T\\mathbf{X}$ is positive semi-definite and the second derivative (Hessian) is $\\mathbf{X}^T\\mathbf{X}$, this is indeed a minimum when $\\mathbf{X}^T\\mathbf{X}$ is positive definite.",
+        "examples": [
+          "Example 1: For data points $(1, 2), (2, 4), (3, 5)$ with features $\\mathbf{X} = [[1, 1], [1, 2], [1, 3]]$ and targets $\\mathbf{y} = [2, 4, 5]$, the cost function measures how well the line $\\theta_0 + \\theta_1 x$ fits the data.",
+          "Example 2: If $\\boldsymbol{\\theta} = [1, 1]$, predictions are $\\hat{\\mathbf{y}} = [2, 3, 4]$, residuals are $[0, 1, 1]$, and $J(\\boldsymbol{\\theta}) = \\frac{1}{6}(0^2 + 1^2 + 1^2) = \\frac{1}{3} \\approx 0.333$.",
+          "Example 3: The optimal $\\boldsymbol{\\theta}^*$ minimizes this cost, meaning no other choice of parameters yields a smaller sum of squared residuals."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cost Function (Matrix Form)",
+          "latex": "$J(\\boldsymbol{\\theta}) = \\frac{1}{2m}\\|\\mathbf{y} - \\mathbf{X}\\boldsymbol{\\theta}\\|^2$",
+          "description": "Measures the total squared error between predictions X·θ and actual values y; factor 1/2m is for mathematical convenience"
+        },
+        {
+          "name": "Gradient of Cost Function",
+          "latex": "$\\nabla_{\\boldsymbol{\\theta}} J = \\frac{1}{m}\\mathbf{X}^T(\\mathbf{X}\\boldsymbol{\\theta} - \\mathbf{y})$",
+          "description": "Direction of steepest increase; setting to zero finds the minimum"
+        },
+        {
+          "name": "Optimality Condition (Normal Equation)",
+          "latex": "$\\mathbf{X}^T\\mathbf{X}\\boldsymbol{\\theta} = \\mathbf{X}^T\\mathbf{y}$",
+          "description": "The parameters that minimize cost satisfy this equation; derived by setting gradient to zero"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the cost function J(θ) for given parameters θ, design matrix X, and target vector y. This helps you understand what quantity the normal equation is minimizing.",
+        "function_signature": "def compute_cost(X: list[list[float]], y: list[float], theta: list[float]) -> float:",
+        "starter_code": "def compute_cost(X: list[list[float]], y: list[float], theta: list[float]) -> float:\n    \"\"\"\n    Compute the cost function J(theta) = (1/2m) * sum((y - X*theta)^2)\n    \n    Args:\n        X: m × n design matrix\n        y: m-dimensional target vector\n        theta: n-dimensional parameter vector\n    \n    Returns:\n        The cost (mean squared error with factor 1/2)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_cost([[1, 1], [1, 2], [1, 3]], [2, 4, 5], [1, 1])",
+            "expected": "0.3333",
+            "explanation": "Predictions: [2, 3, 4]. Residuals: [0, 1, 1]. Cost: (1/6)(0² + 1² + 1²) = 1/3 ≈ 0.3333"
+          },
+          {
+            "input": "compute_cost([[1, 1], [1, 2], [1, 3]], [1, 2, 3], [0, 1])",
+            "expected": "0.0",
+            "explanation": "Perfect fit: θ=[0,1] gives predictions [1, 2, 3] matching y exactly, so cost is 0"
+          },
+          {
+            "input": "compute_cost([[1, 0], [1, 1]], [1, 2], [0, 0])",
+            "expected": "1.25",
+            "explanation": "Predictions: [0, 0]. Residuals: [1, 2]. Cost: (1/4)(1² + 2²) = 5/4 = 1.25"
+          },
+          {
+            "input": "compute_cost([[1, 2], [1, 4]], [3, 5], [1, 1])",
+            "expected": "0.0",
+            "explanation": "Predictions: [1+2=3, 1+4=5] match y=[3,5], so cost is 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting the factor 1/(2m) in the cost function (affects scale but not the location of minimum)",
+        "Computing predictions incorrectly: remember it's X·θ, not θ·X",
+        "Not squaring the residuals (taking absolute value instead leads to a different optimization problem)",
+        "Thinking the cost can be negative (squared values are always non-negative; minimum cost is 0 for perfect fit)",
+        "Confusing the cost function J(θ) with the residual vector (r = y - Xθ); the cost is a single number, residuals form a vector"
+      ],
+      "hint": "The cost function is always non-negative and equals zero if and only if X·θ = y exactly (perfect fit). The normal equation finds the θ that makes this cost as small as possible.",
+      "references": [
+        "Gradient descent as an alternative optimization method",
+        "Mean Squared Error (MSE) vs Root Mean Squared Error (RMSE)",
+        "R² coefficient of determination for evaluating fit quality",
+        "Maximum likelihood interpretation of least squares under Gaussian noise"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Design Matrix Construction with Intercept Term",
+      "relation_to_problem": "In linear regression, we model y = θ₀ + θ₁x₁ + ... + θₙxₙ where θ₀ is the intercept. To use matrix notation y = Xθ, we must augment the feature matrix with a column of ones, creating the proper design matrix.",
+      "prerequisites": [
+        "Linear regression model",
+        "Matrix notation",
+        "Intercept vs slope parameters"
+      ],
+      "learning_objectives": [
+        "Understand the role of the intercept (bias) term in linear models",
+        "Learn how to construct the design matrix by prepending a column of ones",
+        "Recognize the dimension changes: n features become (n+1) parameters including intercept",
+        "Apply this construction correctly before using the normal equation"
+      ],
+      "math_content": {
+        "definition": "**Affine Linear Model**: A linear regression model with intercept has the form: $$\\hat{y} = \\theta_0 + \\theta_1 x_1 + \\theta_2 x_2 + \\cdots + \\theta_n x_n$$ where $\\theta_0$ is the **intercept** (or bias) and $\\theta_1, \\ldots, \\theta_n$ are the **slopes** for each feature.\n\n**Design Matrix with Intercept**: To express this in matrix form $\\hat{\\mathbf{y}} = \\mathbf{X}\\boldsymbol{\\theta}$, we construct the design matrix $\\mathbf{X} \\in \\mathbb{R}^{m \\times (n+1)}$ by prepending a column of ones to the original feature matrix: $$\\mathbf{X} = \\begin{bmatrix} 1 & x_1^{(1)} & x_2^{(1)} & \\cdots & x_n^{(1)} \\\\ 1 & x_1^{(2)} & x_2^{(2)} & \\cdots & x_n^{(2)} \\\\ \\vdots & \\vdots & \\vdots & \\ddots & \\vdots \\\\ 1 & x_1^{(m)} & x_2^{(m)} & \\cdots & x_n^{(m)} \\end{bmatrix}$$ and $\\boldsymbol{\\theta} = [\\theta_0, \\theta_1, \\ldots, \\theta_n]^T \\in \\mathbb{R}^{n+1}$.",
+        "notation": "$\\theta_0$ = intercept/bias term; $x_0 = 1$ = dummy feature for intercept; $\\mathbf{X}_{:,0}$ = first column of all ones; $n$ = number of original features; $(n+1)$ = dimension of parameter vector including intercept",
+        "theorem": "**Intercept Interpretation**: The intercept $\\theta_0$ represents the expected value of $y$ when all features are zero: $\\mathbb{E}[y | x_1 = 0, \\ldots, x_n = 0] = \\theta_0$. \n\n**Centering Alternative**: If features are mean-centered (subtract mean from each feature), the intercept equals the mean of the target: $\\theta_0 = \\bar{y}$. This is because the regression line passes through the point $(\\bar{x}_1, \\ldots, \\bar{x}_n, \\bar{y})$.",
+        "proof_sketch": "Consider the model without explicit intercept: if we use $\\mathbf{X}$ without the ones column, we force the regression line through the origin, which is typically incorrect. By adding the ones column, we allow a vertical shift (intercept) that minimizes error. The first component of $(\\mathbf{X}^T\\mathbf{X})^{-1}\\mathbf{X}^T\\mathbf{y}$ then naturally captures this optimal shift.",
+        "examples": [
+          "Example 1: For data with features $X_{\\text{orig}} = [[1], [2], [3]]$ (one feature), we construct $\\mathbf{X} = [[1, 1], [1, 2], [1, 3]]$ (m=3 rows, n+1=2 columns). Parameter vector has 2 elements: $\\boldsymbol{\\theta} = [\\theta_0, \\theta_1]$.",
+          "Example 2: For two features $X_{\\text{orig}} = [[2, 3], [4, 5]]$, design matrix becomes $\\mathbf{X} = [[1, 2, 3], [1, 4, 5]]$ (m=2 rows, n+1=3 columns). Model: $\\hat{y} = \\theta_0 + \\theta_1(2 \\text{ or } 4) + \\theta_2(3 \\text{ or } 5)$.",
+          "Example 3: If the problem statement provides X already including the intercept column (first column is all ones), do NOT add another column of ones—use X as given."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Affine Model in Matrix Form",
+          "latex": "$\\hat{\\mathbf{y}} = \\mathbf{X}\\boldsymbol{\\theta}$ where $\\mathbf{X}_{:,0} = \\mathbf{1}_m$",
+          "description": "First column of X is all ones to account for intercept; remaining columns are original features"
+        },
+        {
+          "name": "Design Matrix Augmentation",
+          "latex": "$\\mathbf{X} = [\\mathbf{1}_m \\mid \\mathbf{X}_{\\text{orig}}]$",
+          "description": "Horizontally concatenate column of ones with original feature matrix"
+        },
+        {
+          "name": "Parameter Vector Structure",
+          "latex": "$\\boldsymbol{\\theta} = [\\theta_0, \\theta_1, \\ldots, \\theta_n]^T \\in \\mathbb{R}^{n+1}$",
+          "description": "First element is intercept, remaining n elements are slopes for n features"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that adds an intercept column (column of ones) to a feature matrix. This is a preprocessing step required before applying the normal equation in most regression problems.",
+        "function_signature": "def add_intercept(X: list[list[float]]) -> list[list[float]]:",
+        "starter_code": "def add_intercept(X: list[list[float]]) -> list[list[float]]:\n    \"\"\"\n    Add a column of ones as the first column of X to account for intercept.\n    \n    Args:\n        X: m × n feature matrix (without intercept)\n    \n    Returns:\n        m × (n+1) design matrix with intercept column\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "add_intercept([[1], [2], [3]])",
+            "expected": "[[1, 1], [1, 2], [1, 3]]",
+            "explanation": "Original matrix is 3×1, result is 3×2 with first column all ones"
+          },
+          {
+            "input": "add_intercept([[2, 3], [4, 5], [6, 7]])",
+            "expected": "[[1, 2, 3], [1, 4, 5], [1, 6, 7]]",
+            "explanation": "Original matrix is 3×2, result is 3×3 with prepended column of ones"
+          },
+          {
+            "input": "add_intercept([[5]])",
+            "expected": "[[1, 5]]",
+            "explanation": "Single data point with one feature becomes 1×2 matrix"
+          },
+          {
+            "input": "add_intercept([[0, 0], [0, 0]])",
+            "expected": "[[1, 0, 0], [1, 0, 0]]",
+            "explanation": "Even if original features are zero, intercept column is still ones"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Adding the intercept column at the end instead of the beginning (convention is to put it first, though mathematically equivalent if you track indices correctly)",
+        "Forgetting to add the intercept column when the problem statement says X doesn't include it yet (read problem carefully)",
+        "Adding an intercept column when X already has one (double-counting the intercept)",
+        "Not adjusting expectations for output dimensions: if X is m×n, output should be m×(n+1)",
+        "Confusing the intercept column (all ones) with a column of zeros"
+      ],
+      "hint": "In the main linear regression problem, check if X already has an intercept column by examining if the first column is all ones. If not, you need to add it before applying the normal equation.",
+      "references": [
+        "Centered data and the relationship between intercept and mean",
+        "Regression through the origin (when to omit the intercept)",
+        "Regularization and the intercept term (typically intercept is not penalized)",
+        "Standardization vs normalization in preprocessing"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Assembling the Normal Equation Solution",
+      "relation_to_problem": "This step combines all previous concepts to implement the complete normal equation formula θ = (X^T X)^(-1) X^T y, which directly solves the linear regression problem in one computation.",
+      "prerequisites": [
+        "Matrix transpose and multiplication",
+        "Matrix inversion",
+        "Design matrix with intercept",
+        "Understanding of least squares"
+      ],
+      "learning_objectives": [
+        "Combine X^T X computation, matrix inversion, and matrix-vector multiplication",
+        "Implement the normal equation formula step-by-step",
+        "Understand the computational order: compute Gram matrix, invert it, then multiply",
+        "Handle edge cases like singular matrices and verify solution correctness"
+      ],
+      "math_content": {
+        "definition": "**The Normal Equation Solution**: Given a design matrix $\\mathbf{X} \\in \\mathbb{R}^{m \\times (n+1)}$ (including intercept column) and target vector $\\mathbf{y} \\in \\mathbb{R}^m$, the optimal least squares parameter vector is: $$\\boldsymbol{\\theta}^* = (\\mathbf{X}^T\\mathbf{X})^{-1}\\mathbf{X}^T\\mathbf{y}$$ This formula provides the closed-form solution to $\\min_{\\boldsymbol{\\theta}} \\|\\mathbf{y} - \\mathbf{X}\\boldsymbol{\\theta}\\|^2$.",
+        "notation": "$\\boldsymbol{\\theta}^* \\in \\mathbb{R}^{n+1}$ = optimal parameters; $\\mathbf{X}^T\\mathbf{X} \\in \\mathbb{R}^{(n+1) \\times (n+1)}$ = Gram matrix (must be invertible); $\\mathbf{X}^T\\mathbf{y} \\in \\mathbb{R}^{n+1}$ = moment vector",
+        "theorem": "**Uniqueness and Existence**: (1) If $\\mathbf{X}$ has full column rank (columns are linearly independent), then $\\mathbf{X}^T\\mathbf{X}$ is positive definite and invertible, guaranteeing a unique solution. (2) If $\\mathbf{X}$ does not have full column rank (multicollinearity), then $\\mathbf{X}^T\\mathbf{X}$ is singular, and infinitely many solutions exist (use pseudo-inverse or regularization). (3) The solution $\\boldsymbol{\\theta}^*$ satisfies the normal equation: $\\mathbf{X}^T\\mathbf{X}\\boldsymbol{\\theta}^* = \\mathbf{X}^T\\mathbf{y}$.",
+        "proof_sketch": "We've shown that $\\boldsymbol{\\theta}^*$ minimizes $J(\\boldsymbol{\\theta})$ by verifying $\\nabla_{\\boldsymbol{\\theta}}J|_{\\boldsymbol{\\theta}^*} = \\mathbf{0}$. The second derivative (Hessian) is $\\mathbf{H} = \\mathbf{X}^T\\mathbf{X}$, which is positive semi-definite (and positive definite when $\\mathbf{X}$ has full rank), confirming $\\boldsymbol{\\theta}^*$ is a global minimum.",
+        "examples": [
+          "Example 1: For $\\mathbf{X} = [[1, 1], [1, 2], [1, 3]]$ and $\\mathbf{y} = [1, 2, 3]$: First compute $\\mathbf{X}^T\\mathbf{X} = [[3, 6], [6, 14]]$ and $\\mathbf{X}^T\\mathbf{y} = [6, 14]$. Then $(\\mathbf{X}^T\\mathbf{X})^{-1} = [[7/3, -1], [-1, 1/2]]$. Finally $\\boldsymbol{\\theta}^* = [[7/3, -1], [-1, 1/2]] \\cdot [6, 14] = [0, 1]$. So the model is $y = 0 + 1 \\cdot x$.",
+          "Example 2: Verification: With $\\boldsymbol{\\theta} = [0, 1]$, predictions are $\\mathbf{X}\\boldsymbol{\\theta} = [1, 2, 3]$, which exactly matches $\\mathbf{y}$, confirming perfect fit (cost = 0).",
+          "Example 3: If $\\mathbf{X}$ has linearly dependent columns (e.g., second column is 2× the third), $\\mathbf{X}^T\\mathbf{X}$ will be singular. Attempting to invert it will fail or produce numerical errors."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Normal Equation (Complete)",
+          "latex": "$\\boldsymbol{\\theta}^* = (\\mathbf{X}^T\\mathbf{X})^{-1}\\mathbf{X}^T\\mathbf{y}$",
+          "description": "Closed-form solution for linear regression; directly computes optimal parameters without iteration"
+        },
+        {
+          "name": "Computational Steps",
+          "latex": "$\\mathbf{G} = \\mathbf{X}^T\\mathbf{X}$; $\\mathbf{G}^{-1}$; $\\mathbf{m} = \\mathbf{X}^T\\mathbf{y}$; $\\boldsymbol{\\theta} = \\mathbf{G}^{-1}\\mathbf{m}$",
+          "description": "Break down into: (1) compute Gram matrix, (2) invert it, (3) compute moment vector, (4) multiply"
+        },
+        {
+          "name": "Moore-Penrose Pseudo-inverse",
+          "latex": "$\\boldsymbol{\\theta}^* = \\mathbf{X}^{\\dagger}\\mathbf{y}$ where $\\mathbf{X}^{\\dagger} = (\\mathbf{X}^T\\mathbf{X})^{-1}\\mathbf{X}^T$",
+          "description": "Alternative notation; X† is the pseudo-inverse, useful when X^T X might be singular"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified normal equation solver for 2×2 systems (two parameters: intercept and one slope). This combines your previous work on matrix operations to solve linear regression, building toward the full solution.",
+        "function_signature": "def normal_equation_2x2(X: list[list[float]], y: list[float]) -> list[float] | None:",
+        "starter_code": "def normal_equation_2x2(X: list[list[float]], y: list[float]) -> list[float] | None:\n    \"\"\"\n    Solve linear regression using normal equation for 2D parameter space.\n    Assumes X is m × 2 (includes intercept column) and y is length m.\n    \n    Args:\n        X: Design matrix with intercept (m × 2)\n        y: Target vector (length m)\n    \n    Returns:\n        Parameter vector [θ₀, θ₁] or None if X^T X is singular\n    \"\"\"\n    # Step 1: Compute X^T X (should be 2×2)\n    # Step 2: Compute X^T y (should be 2×1)\n    # Step 3: Invert X^T X\n    # Step 4: Multiply (X^T X)^(-1) with X^T y\n    pass",
+        "test_cases": [
+          {
+            "input": "normal_equation_2x2([[1, 1], [1, 2], [1, 3]], [1, 2, 3])",
+            "expected": "[0.0, 1.0]",
+            "explanation": "Perfect linear fit: y = 0 + 1·x. X^T X = [[3,6],[6,14]], X^T y = [6,14], solution is [0,1]"
+          },
+          {
+            "input": "normal_equation_2x2([[1, 1], [1, 2], [1, 3]], [2, 4, 5])",
+            "expected": "[0.6667, 1.5]",
+            "explanation": "Best fit line through points (1,2), (2,4), (3,5) is approximately y = 0.667 + 1.5x"
+          },
+          {
+            "input": "normal_equation_2x2([[1, 0], [1, 0]], [5, 3])",
+            "expected": "None",
+            "explanation": "X has linearly dependent columns (second column is all zeros for features), X^T X is singular"
+          },
+          {
+            "input": "normal_equation_2x2([[1, 2], [1, 4]], [3, 5])",
+            "expected": "[1.0, 1.0]",
+            "explanation": "Two points determine line exactly: y = 1 + 1·x passes through (2,3) and (4,5)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing matrix operations in wrong order: must compute X^T X and X^T y separately before combining",
+        "Attempting to invert X directly instead of X^T X (X is typically not square and cannot be inverted)",
+        "Not checking if X^T X is invertible before calling inversion function (leads to errors on singular matrices)",
+        "Dimension mismatches: ensure X is m×(n+1), X^T X is (n+1)×(n+1), X^T y is (n+1)×1, and result θ is (n+1)×1",
+        "Forgetting to include the intercept column in X before applying the formula"
+      ],
+      "hint": "For the full problem, you'll extend this to handle n×n systems instead of just 2×2. The logic is identical, but you'll need a general matrix inversion method (NumPy provides np.linalg.inv or np.linalg.solve).",
+      "references": [
+        "QR decomposition for numerically stable least squares",
+        "Singular Value Decomposition (SVD) for pseudo-inverse computation",
+        "Regularized regression (Ridge, Lasso) to handle multicollinearity",
+        "Computational complexity: O(n²m) for X^T X plus O(n³) for inversion"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Numerical Considerations and Rounding",
+      "relation_to_problem": "The problem requires rounding results to four decimal places and handling edge cases like very small numbers that round to -0.0. Understanding numerical precision is crucial for correct implementation and testing.",
+      "prerequisites": [
+        "Floating-point arithmetic",
+        "Numerical stability",
+        "Normal equation implementation"
+      ],
+      "learning_objectives": [
+        "Understand floating-point representation and precision limits",
+        "Apply proper rounding to match expected output format",
+        "Handle special cases like -0.0 vs 0.0 in floating-point arithmetic",
+        "Recognize when numerical errors might affect matrix inversion"
+      ],
+      "math_content": {
+        "definition": "**Floating-Point Rounding**: Given a real number $x$ and a precision level (e.g., 4 decimal places), **rounding** produces the nearest representable value at that precision: $$\\text{round}(x, d) = \\frac{\\lfloor x \\cdot 10^d + 0.5 \\rfloor}{10^d}$$ where $d$ is the number of decimal places.\n\n**Signed Zero**: In IEEE 754 floating-point standard, there exist both $+0.0$ and $-0.0$. These are distinct representations but compare as equal: $+0.0 = -0.0$ (mathematically). A very small negative number (e.g., $-10^{-10}$) rounds to $-0.0$ when rounded to 4 decimal places.",
+        "notation": "$\\text{round}(x, d)$ = round $x$ to $d$ decimal places; $\\epsilon_{\\text{mach}}$ = machine epsilon (smallest representable difference); $-0.0$ = negative zero (distinct from $+0.0$ in representation only)",
+        "theorem": "**Numerical Stability of Normal Equation**: The condition number $\\kappa(\\mathbf{X}^T\\mathbf{X}) = \\kappa(\\mathbf{X})^2$ determines how sensitive the solution is to perturbations in the data. If $\\kappa(\\mathbf{X})$ is large (ill-conditioned), small errors in $\\mathbf{X}$ or $\\mathbf{y}$ can cause large errors in $\\boldsymbol{\\theta}^*$. **Solution**: Use numerically stable methods like QR decomposition or SVD instead of explicitly computing $(\\mathbf{X}^T\\mathbf{X})^{-1}$ for ill-conditioned problems.",
+        "proof_sketch": "The relative error in the solution satisfies: $$\\frac{\\|\\Delta\\boldsymbol{\\theta}\\|}{\\|\\boldsymbol{\\theta}\\|} \\leq \\kappa(\\mathbf{X}^T\\mathbf{X}) \\cdot \\frac{\\|\\Delta\\mathbf{y}\\|}{\\|\\mathbf{y}\\|}$$ showing that error is amplified by the condition number. For normal equation, this amplification is squared compared to more stable methods.",
+        "examples": [
+          "Example 1: $x = 0.123456$ rounded to 4 decimals: $\\text{round}(0.123456, 4) = 0.1235$ (round up since next digit is 5)",
+          "Example 2: $x = -0.00003$ rounded to 4 decimals: $\\text{round}(-0.00003, 4) = -0.0$ (negative zero is valid per problem statement)",
+          "Example 3: If $\\boldsymbol{\\theta} = [0.66666..., 1.49999...]$, rounding to 4 decimals gives $[0.6667, 1.5000]$ or simply $[0.6667, 1.5]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Rounding Formula",
+          "latex": "$\\text{round}(x, d) = \\frac{\\lfloor x \\cdot 10^d + 0.5 \\rfloor}{10^d}$",
+          "description": "Multiply by 10^d, add 0.5, take floor, divide by 10^d; implements standard rounding"
+        },
+        {
+          "name": "Python Rounding",
+          "latex": "$\\texttt{round}(x, d)$ or $\\texttt{np.round}(x, d)$",
+          "description": "Built-in functions for rounding; note Python uses banker's rounding (round half to even)"
+        },
+        {
+          "name": "Condition Number",
+          "latex": "$\\kappa(\\mathbf{A}) = \\|\\mathbf{A}\\| \\cdot \\|\\mathbf{A}^{-1}\\|$",
+          "description": "Measures how much errors are amplified; $\\kappa \\approx 1$ is well-conditioned, $\\kappa \\gg 1$ is ill-conditioned"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes the output of the normal equation solution and applies proper rounding to 4 decimal places, ensuring the output matches the expected format (handling -0.0 correctly).",
+        "function_signature": "def round_parameters(theta: list[float], decimals: int = 4) -> list[float]:",
+        "starter_code": "def round_parameters(theta: list[float], decimals: int = 4) -> list[float]:\n    \"\"\"\n    Round each parameter to the specified number of decimal places.\n    \n    Args:\n        theta: Parameter vector (can contain very small values)\n        decimals: Number of decimal places (default 4)\n    \n    Returns:\n        Rounded parameter vector\n    \"\"\"\n    # Your code here\n    # Note: Python's round() handles -0.0 correctly\n    pass",
+        "test_cases": [
+          {
+            "input": "round_parameters([0.666666, 1.499999], 4)",
+            "expected": "[0.6667, 1.5]",
+            "explanation": "0.666666 rounds to 0.6667 (round up), 1.499999 rounds to 1.5"
+          },
+          {
+            "input": "round_parameters([1.23456789, -0.00001], 4)",
+            "expected": "[1.2346, -0.0]",
+            "explanation": "First rounds to 1.2346; second is very small negative, rounds to -0.0 (valid per problem)"
+          },
+          {
+            "input": "round_parameters([0.0, 1.0], 4)",
+            "expected": "[0.0, 1.0]",
+            "explanation": "Already at proper precision, no change"
+          },
+          {
+            "input": "round_parameters([0.99995, -0.99995], 4)",
+            "expected": "[1.0, -1.0]",
+            "explanation": "Both round away from zero: 0.99995 → 1.0 and -0.99995 → -1.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using truncation instead of rounding (e.g., int(x*10000)/10000 doesn't round correctly)",
+        "Being surprised by -0.0 in output (it's valid and the problem explicitly allows it)",
+        "Not rounding at all, leading to test failures due to precision mismatches",
+        "Rounding intermediate calculations instead of only the final result (can accumulate errors)",
+        "Forgetting that some values might naturally be very close to integers after rounding (e.g., 1.0 not 0.9999)"
+      ],
+      "hint": "For the main problem, apply rounding as the very last step after computing θ = (X^T X)^(-1) X^T y. Use Python's built-in round() function or NumPy's np.round() for each component of the parameter vector.",
+      "references": [
+        "IEEE 754 floating-point standard",
+        "Catastrophic cancellation and loss of significance",
+        "Numerical recipes for stable linear algebra computations",
+        "When to use iterative methods (gradient descent) vs direct methods (normal equation)"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,438 @@
+{
+  "problem_id": 228,
+  "title": "Budget-Constrained RL Loss",
+  "category": "Reinforcement Learning",
+  "difficulty": "medium",
+  "description": "Implement the budget-constrained reinforcement learning loss function from the Kimi K2 paper. In K2's RL training, a 'Budget Control' mechanism penalizes responses that exceed a token budget to improve inference efficiency. The base RL loss uses a squared advantage form with KL regularization. Your task is to implement the complete loss computation including the budget penalty.",
+  "example": {
+    "input": "rewards = [[1.0, 0.5]], log_probs = [[-1.0, -1.5]], old_log_probs = [[-1.2, -1.3]], response_lengths = [[150, 80]], token_budget = 100, kl_coef = 0.1, budget_penalty_coef = 0.01",
+    "output": "0.0004",
+    "reasoning": "First response (150 tokens) exceeds budget (100) by 50, so penalty = -0.01 * 50 = -0.5. Adjusted rewards become [0.5, 0.5]. Baseline = 0.5, so advantages = [0.0, 0.0]. KL terms = 0.1 * [0.2, -0.2] = [0.02, -0.02]. Loss = mean((0-0.02)², (0-(-0.02))²) = 0.0004"
+  },
+  "starter_code": "import numpy as np\n\ndef rl_budget_loss(\n    rewards: np.ndarray,\n    log_probs: np.ndarray,\n    old_log_probs: np.ndarray,\n    response_lengths: np.ndarray,\n    token_budget: int,\n    kl_coef: float,\n    budget_penalty_coef: float\n) -> float:\n    \"\"\"\n    Compute the budget-constrained RL loss.\n    \n    The loss combines:\n    1. Budget penalty for responses exceeding token_budget\n    2. Advantage estimation (adjusted reward - baseline)\n    3. KL regularization between current and old policy\n    \n    Loss formula: E[(advantage - kl_term)^2]\n    \n    Args:\n        rewards: Shape (batch_size, K) - rewards for K samples per prompt\n        log_probs: Shape (batch_size, K) - log π_θ(y|x) current policy\n        old_log_probs: Shape (batch_size, K) - log π_old(y|x) old policy\n        response_lengths: Shape (batch_size, K) - token lengths of responses\n        token_budget: Maximum allowed tokens before penalty\n        kl_coef: τ coefficient for KL regularization\n        budget_penalty_coef: λ coefficient for budget penalty\n        \n    Returns:\n        Scalar loss value (float)\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Computing Budget Penalties with Max Function",
+      "relation_to_problem": "The budget-constrained RL loss requires computing penalties for responses that exceed a token budget. This sub-quest teaches how to apply penalties only when lengths exceed thresholds, which is the first step in adjusting rewards.",
+      "prerequisites": [
+        "Basic Python",
+        "NumPy arrays",
+        "Element-wise operations"
+      ],
+      "learning_objectives": [
+        "Understand the max(0, x) clipping function and its gradient properties",
+        "Implement element-wise penalty computation for multi-dimensional arrays",
+        "Apply penalty coefficients to scaled excesses"
+      ],
+      "math_content": {
+        "definition": "A **budget penalty function** is a piecewise function that penalizes values exceeding a threshold $B$. Formally, for a response of length $L$ with budget $B$ and penalty coefficient $\\lambda > 0$, the penalty is defined as: $$p(L) = \\lambda \\cdot \\max(0, L - B)$$ This is a one-sided penalty function that is zero when $L \\leq B$ and linear in the excess when $L > B$.",
+        "notation": "$L$ = response length (tokens), $B$ = budget threshold (tokens), $\\lambda$ = penalty coefficient (penalty per excess token), $p(L)$ = penalty value",
+        "theorem": "**Rectified Linear Penalty**: The function $f(x) = \\max(0, x)$ is continuous, non-negative, and has the property that $f(x) = 0$ for all $x \\leq 0$ and $f(x) = x$ for all $x > 0$. Its derivative is $f'(x) = \\mathbb{1}_{x>0}$, where $\\mathbb{1}$ is the indicator function.",
+        "proof_sketch": "The max function selects the larger of two values. When $x \\leq 0$, we have $\\max(0, x) = 0$. When $x > 0$, we have $\\max(0, x) = x$. The derivative follows from the definition of the Heaviside step function.",
+        "examples": [
+          "Example 1: If $L = 150$, $B = 100$, $\\lambda = 0.01$, then $p(150) = 0.01 \\cdot \\max(0, 150-100) = 0.01 \\cdot 50 = 0.5$",
+          "Example 2: If $L = 80$, $B = 100$, $\\lambda = 0.01$, then $p(80) = 0.01 \\cdot \\max(0, 80-100) = 0.01 \\cdot 0 = 0$ (no penalty since within budget)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Budget Penalty",
+          "latex": "$p(L) = \\lambda \\cdot \\max(0, L - B)$",
+          "description": "Use this to compute the penalty for a single response. Returns 0 if within budget, otherwise returns penalty proportional to excess."
+        },
+        {
+          "name": "Adjusted Reward",
+          "latex": "$r_{\\text{eff}}(x, y) = r(x, y) - p(L)$",
+          "description": "Subtract the penalty from the raw reward to get the effective reward used in advantage calculation."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes budget penalties for a batch of responses. Given an array of response lengths, a token budget, and a penalty coefficient, return an array of penalties. Responses within budget should have zero penalty; responses exceeding the budget should be penalized proportionally to the excess.",
+        "function_signature": "def compute_budget_penalties(response_lengths: np.ndarray, token_budget: int, budget_penalty_coef: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_budget_penalties(response_lengths: np.ndarray, token_budget: int, budget_penalty_coef: float) -> np.ndarray:\n    \"\"\"\n    Compute budget penalties for responses.\n    \n    Args:\n        response_lengths: Shape (batch_size, K) - token lengths\n        token_budget: Maximum allowed tokens\n        budget_penalty_coef: Penalty per excess token\n    \n    Returns:\n        Array of penalties with same shape as input\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_budget_penalties(np.array([[150, 80]]), 100, 0.01)",
+            "expected": "np.array([[0.5, 0.0]])",
+            "explanation": "First response exceeds budget by 50 tokens (penalty = 0.01 * 50 = 0.5), second is within budget (penalty = 0)"
+          },
+          {
+            "input": "compute_budget_penalties(np.array([[200, 150], [50, 100]]), 100, 0.02)",
+            "expected": "np.array([[2.0, 1.0], [0.0, 0.0]])",
+            "explanation": "Penalties are [0.02*100=2.0, 0.02*50=1.0] for first row, [0, 0] for second row"
+          },
+          {
+            "input": "compute_budget_penalties(np.array([[100]]), 100, 0.01)",
+            "expected": "np.array([[0.0]])",
+            "explanation": "Response exactly at budget receives no penalty (max(0, 100-100) = 0)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to use element-wise operations with NumPy arrays (using Python's built-in max instead of np.maximum)",
+        "Applying penalty even when within budget (not using max(0, ...))",
+        "Incorrectly computing the excess (confusing L - B with B - L)"
+      ],
+      "hint": "NumPy's np.maximum() function performs element-wise maximum between arrays and scalars. Use it to clip negative values to zero.",
+      "references": [
+        "Rectified Linear Units (ReLU)",
+        "Piecewise linear functions",
+        "NumPy broadcasting"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Baseline Estimation and Advantage Computation",
+      "relation_to_problem": "The RL loss uses group-relative advantages, where each response's advantage is its reward minus the mean reward across all K samples for the same prompt. This sub-quest teaches how to compute baselines and advantages, which form the core of the policy gradient.",
+      "prerequisites": [
+        "Computing means along specific axes",
+        "NumPy broadcasting",
+        "Understanding of variance reduction in RL"
+      ],
+      "learning_objectives": [
+        "Compute per-prompt baselines by averaging across the sample dimension",
+        "Calculate advantages as deviations from the baseline",
+        "Understand why baseline subtraction reduces gradient variance without introducing bias"
+      ],
+      "math_content": {
+        "definition": "In reinforcement learning, the **advantage function** measures how much better an action is compared to the average action from the same state. For a prompt $x$ with $K$ sampled responses, the advantage of response $i$ is: $$A_i(x) = r_{\\text{eff}}(x, y_i) - \\bar{r}(x)$$ where $\\bar{r}(x) = \\frac{1}{K}\\sum_{j=1}^{K} r_{\\text{eff}}(x, y_j)$ is the **baseline** (mean reward for prompt $x$).",
+        "notation": "$A_i(x)$ = advantage of response $i$ to prompt $x$, $\\bar{r}(x)$ = baseline (mean reward), $r_{\\text{eff}}(x, y_i)$ = effective reward (after budget penalty), $K$ = number of samples per prompt",
+        "theorem": "**Baseline Invariance Theorem**: Subtracting a baseline $b(x)$ that depends only on the state (prompt) $x$ does not change the expected gradient of the policy, but reduces its variance. Formally, $$\\mathbb{E}_{y \\sim \\pi_\\theta(\\cdot|x)}[\\nabla_\\theta \\log \\pi_\\theta(y|x) \\cdot b(x)] = 0$$ This means the baseline doesn't introduce bias but can significantly reduce variance.",
+        "proof_sketch": "The expectation factors as $b(x) \\cdot \\mathbb{E}_y[\\nabla_\\theta \\log \\pi_\\theta(y|x)]$. Using the log-derivative trick, $\\nabla_\\theta \\log \\pi_\\theta(y|x) = \\frac{\\nabla_\\theta \\pi_\\theta(y|x)}{\\pi_\\theta(y|x)}$. Thus the expectation becomes $b(x) \\cdot \\nabla_\\theta \\mathbb{E}_y[\\pi_\\theta(y|x)] = b(x) \\cdot \\nabla_\\theta 1 = 0$ since probabilities sum to 1.",
+        "examples": [
+          "Example 1: For rewards $[1.0, 0.5, 0.3]$, baseline $\\bar{r} = \\frac{1.0 + 0.5 + 0.3}{3} = 0.6$, advantages are $[1.0-0.6, 0.5-0.6, 0.3-0.6] = [0.4, -0.1, -0.3]$",
+          "Example 2: If all rewards are equal $[0.5, 0.5, 0.5]$, then baseline is $0.5$ and all advantages are $[0, 0, 0]$ (no preference between responses)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Baseline",
+          "latex": "$\\bar{r}(x) = \\frac{1}{K}\\sum_{j=1}^{K} r_{\\text{eff}}(x, y_j)$",
+          "description": "Compute the mean of effective rewards across all K samples for each prompt. This is computed per prompt (axis=1 for shape (batch_size, K))."
+        },
+        {
+          "name": "Advantage",
+          "latex": "$A_i(x) = r_{\\text{eff}}(x, y_i) - \\bar{r}(x)$",
+          "description": "Subtract baseline from each effective reward. Use broadcasting to subtract the per-prompt baseline from all samples."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes advantages from rewards. Given a 2D array of effective rewards (batch_size, K), compute the baseline for each prompt (mean across K samples) and then compute advantages as the deviation from the baseline. The sum of advantages for each prompt should be zero.",
+        "function_signature": "def compute_advantages(effective_rewards: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_advantages(effective_rewards: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute advantages using baseline subtraction.\n    \n    Args:\n        effective_rewards: Shape (batch_size, K) - rewards after budget penalty\n    \n    Returns:\n        advantages: Shape (batch_size, K) - advantages for each response\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_advantages(np.array([[1.0, 0.5]]))",
+            "expected": "np.array([[0.25, -0.25]])",
+            "explanation": "Baseline = (1.0 + 0.5)/2 = 0.75, advantages = [1.0-0.75, 0.5-0.75] = [0.25, -0.25]"
+          },
+          {
+            "input": "compute_advantages(np.array([[0.5, 0.5], [1.0, 0.0]]))",
+            "expected": "np.array([[0.0, 0.0], [0.5, -0.5]])",
+            "explanation": "First prompt: baseline=0.5, advantages=[0,0]. Second prompt: baseline=0.5, advantages=[0.5,-0.5]"
+          },
+          {
+            "input": "compute_advantages(np.array([[2.0, 1.0, 0.0]]))",
+            "expected": "np.array([[1.0, 0.0, -1.0]])",
+            "explanation": "Baseline = (2.0+1.0+0.0)/3 = 1.0, advantages = [2-1, 1-1, 0-1] = [1, 0, -1]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing baseline across wrong axis (averaging over prompts instead of samples)",
+        "Not using keepdims=True when computing mean, causing broadcasting errors",
+        "Forgetting that advantages must sum to zero for each prompt (good sanity check)"
+      ],
+      "hint": "Use np.mean() with axis=1 and keepdims=True to compute per-prompt baselines that broadcast correctly when subtracting.",
+      "references": [
+        "REINFORCE algorithm",
+        "Policy gradient methods",
+        "Variance reduction in Monte Carlo estimation"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "KL Divergence Regularization in Policy Optimization",
+      "relation_to_problem": "The budget-constrained RL loss includes a KL regularization term to prevent the policy from changing too rapidly. This sub-quest teaches how to compute the KL contribution using log probabilities, which stabilizes training and prevents catastrophic forgetting.",
+      "prerequisites": [
+        "Logarithms",
+        "KL divergence",
+        "Understanding of policy gradients"
+      ],
+      "learning_objectives": [
+        "Understand the role of KL regularization in preventing policy collapse",
+        "Compute KL terms from log probabilities (numerical stability)",
+        "Apply regularization coefficients to control the strength of the constraint"
+      ],
+      "math_content": {
+        "definition": "The **Kullback-Leibler (KL) divergence** from distribution $Q$ to distribution $P$ is a measure of how much $P$ differs from $Q$: $$D_{KL}(P \\| Q) = \\mathbb{E}_{x \\sim P}\\left[\\log\\frac{P(x)}{Q(x)}\\right] = \\mathbb{E}_{x \\sim P}[\\log P(x) - \\log Q(x)]$$ In RL policy optimization, we regularize the new policy $\\pi_\\theta$ to stay close to the old policy $\\pi_{\\text{old}}$ by penalizing large KL divergences.",
+        "notation": "$\\pi_\\theta(y|x)$ = current policy probability, $\\pi_{\\text{old}}(y|x)$ = old policy probability, $\\tau$ = KL coefficient (temperature), $\\text{KL}_i = \\log\\pi_\\theta(y_i|x) - \\log\\pi_{\\text{old}}(y_i|x)$ = approximate KL term per sample",
+        "theorem": "**KL Divergence via Log Probabilities**: For discrete distributions or when approximating with samples, the KL divergence can be computed as: $$D_{KL}(\\pi_\\theta \\| \\pi_{\\text{old}}) \\approx \\log\\pi_\\theta(y|x) - \\log\\pi_{\\text{old}}(y|x)$$ when $y$ is sampled from $\\pi_\\theta$. This approximation is unbiased and computationally efficient.",
+        "proof_sketch": "The expectation over $\\pi_\\theta$ is approximated by Monte Carlo sampling. For a single sample $y \\sim \\pi_\\theta(\\cdot|x)$, the KL term is $\\log\\pi_\\theta(y|x) - \\log\\pi_{\\text{old}}(y|x)$. Computing in log-space avoids numerical underflow when probabilities are very small.",
+        "examples": [
+          "Example 1: If $\\log\\pi_\\theta(y|x) = -1.0$ and $\\log\\pi_{\\text{old}}(y|x) = -1.2$, then KL term = $-1.0 - (-1.2) = 0.2$ (positive means new policy assigns higher probability)",
+          "Example 2: With $\\tau = 0.1$, KL term = 0.2, the regularization contribution is $0.1 \\times 0.2 = 0.02$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "KL Regularization Term",
+          "latex": "$\\text{KL}_i = \\tau \\cdot (\\log\\pi_\\theta(y_i|x) - \\log\\pi_{\\text{old}}(y_i|x))$",
+          "description": "Compute the scaled KL contribution for each sample. Positive values penalize increasing probability; negative values penalize decreasing probability."
+        },
+        {
+          "name": "Combined Loss Component",
+          "latex": "$(A_i - \\text{KL}_i)^2$",
+          "description": "The squared difference between advantage and KL term forms the per-sample loss. This penalizes both overestimation (positive) and underestimation (negative)."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes KL regularization terms from log probabilities. Given current and old log probabilities for each sample, and a KL coefficient, return the scaled KL terms. Remember that KL is computed as the difference of log probabilities, not the ratio of probabilities (for numerical stability).",
+        "function_signature": "def compute_kl_terms(log_probs: np.ndarray, old_log_probs: np.ndarray, kl_coef: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_kl_terms(log_probs: np.ndarray, old_log_probs: np.ndarray, kl_coef: float) -> np.ndarray:\n    \"\"\"\n    Compute KL regularization terms.\n    \n    Args:\n        log_probs: Shape (batch_size, K) - log probabilities from current policy\n        old_log_probs: Shape (batch_size, K) - log probabilities from old policy\n        kl_coef: Regularization coefficient tau\n    \n    Returns:\n        kl_terms: Shape (batch_size, K) - scaled KL contributions\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_kl_terms(np.array([[-1.0, -1.5]]), np.array([[-1.2, -1.3]]), 0.1)",
+            "expected": "np.array([[0.02, -0.02]])",
+            "explanation": "KL terms = 0.1 * [(-1.0-(-1.2)), (-1.5-(-1.3))] = 0.1 * [0.2, -0.2] = [0.02, -0.02]"
+          },
+          {
+            "input": "compute_kl_terms(np.array([[-2.0], [-3.0]]), np.array([[-2.0], [-3.0]]), 0.5)",
+            "expected": "np.array([[0.0], [0.0]])",
+            "explanation": "When log probs are identical, KL term is 0 (no policy change)"
+          },
+          {
+            "input": "compute_kl_terms(np.array([[-1.0, -2.0]]), np.array([[-0.5, -2.5]]), 0.2)",
+            "expected": "np.array([[-0.1, 0.1]])",
+            "explanation": "KL terms = 0.2 * [(-1.0-(-0.5)), (-2.0-(-2.5))] = 0.2 * [-0.5, 0.5] = [-0.1, 0.1]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing exp(log_probs) first and then taking ratio (numerically unstable and unnecessary)",
+        "Confusing the order: should be log_probs - old_log_probs, not the reverse",
+        "Forgetting to multiply by kl_coef to get the scaled regularization term"
+      ],
+      "hint": "Since inputs are already log probabilities, you only need subtraction and scalar multiplication. No exponentials needed!",
+      "references": [
+        "Trust Region Policy Optimization (TRPO)",
+        "Proximal Policy Optimization (PPO)",
+        "KL divergence in information theory"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Squared Loss for Continuous Optimization",
+      "relation_to_problem": "Unlike PPO's clipped objective, the K2 paper uses a squared loss $(A_i - \\text{KL}_i)^2$. This sub-quest teaches why squared loss provides smooth gradients and how to compute the mean squared error across all samples.",
+      "prerequisites": [
+        "Mean squared error",
+        "Gradient descent",
+        "Loss function properties"
+      ],
+      "learning_objectives": [
+        "Understand the properties of squared loss (convexity, smoothness)",
+        "Compute element-wise squared differences and aggregate them",
+        "Recognize why squared loss naturally penalizes both positive and negative errors equally"
+      ],
+      "math_content": {
+        "definition": "The **mean squared error (MSE)** loss for a set of predictions $\\hat{y}_i$ and targets $y_i$ is: $$L_{MSE} = \\frac{1}{n}\\sum_{i=1}^{n}(\\hat{y}_i - y_i)^2$$ In the K2 RL formulation, the loss is the MSE where the 'prediction' is the KL term and the 'target' is the advantage: $$L_{RL} = \\mathbb{E}[(A_i - \\text{KL}_i)^2]$$",
+        "notation": "$A_i$ = advantage of sample $i$, $\\text{KL}_i$ = KL regularization term for sample $i$, $n$ = total number of samples (batch_size × K)",
+        "theorem": "**Squared Loss Properties**: The function $f(x) = x^2$ is (1) convex, meaning any local minimum is a global minimum; (2) infinitely differentiable with $f'(x) = 2x$; (3) symmetric around zero, penalizing positive and negative errors equally; (4) strongly convex, ensuring unique minimizers.",
+        "proof_sketch": "Convexity follows from the second derivative $f''(x) = 2 > 0$ for all $x$. Symmetry is immediate from $(-x)^2 = x^2$. The gradient $2x$ is proportional to the error, providing larger updates when far from optimum.",
+        "examples": [
+          "Example 1: If advantage = 0.4 and KL term = 0.02, loss contribution = $(0.4 - 0.02)^2 = (0.38)^2 = 0.1444$",
+          "Example 2: If advantage = -0.1 and KL term = -0.02, loss contribution = $(-0.1 - (-0.02))^2 = (-0.08)^2 = 0.0064$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Per-Sample Loss",
+          "latex": "$\\ell_i = (A_i - \\text{KL}_i)^2$",
+          "description": "Compute the squared difference for each sample. This is always non-negative."
+        },
+        {
+          "name": "Mean Loss",
+          "latex": "$L = \\frac{1}{n}\\sum_{i=1}^{n} \\ell_i$",
+          "description": "Average the per-sample losses over all samples in the batch. For shape (batch_size, K), n = batch_size * K."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the mean squared loss between advantages and KL terms. Given two arrays of the same shape representing advantages and KL regularization terms, compute the squared difference for each element and return the mean over all elements.",
+        "function_signature": "def compute_squared_loss(advantages: np.ndarray, kl_terms: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_squared_loss(advantages: np.ndarray, kl_terms: np.ndarray) -> float:\n    \"\"\"\n    Compute mean squared loss between advantages and KL terms.\n    \n    Args:\n        advantages: Shape (batch_size, K) - advantage values\n        kl_terms: Shape (batch_size, K) - KL regularization terms\n    \n    Returns:\n        Scalar loss value (mean of squared differences)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_squared_loss(np.array([[0.0, 0.0]]), np.array([[0.02, -0.02]]))",
+            "expected": "0.0004",
+            "explanation": "Losses = [(0-0.02)^2, (0-(-0.02))^2] = [0.0004, 0.0004], mean = 0.0004"
+          },
+          {
+            "input": "compute_squared_loss(np.array([[1.0], [2.0]]), np.array([[0.5], [1.0]]))",
+            "expected": "0.625",
+            "explanation": "Losses = [(1.0-0.5)^2, (2.0-1.0)^2] = [0.25, 1.0], mean = (0.25+1.0)/2 = 0.625"
+          },
+          {
+            "input": "compute_squared_loss(np.array([[0.3, -0.3]]), np.array([[0.1, -0.1]]))",
+            "expected": "0.08",
+            "explanation": "Losses = [(0.3-0.1)^2, (-0.3-(-0.1))^2] = [0.04, 0.04], mean = 0.04"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Squaring each array separately then subtracting (wrong: should subtract first, then square)",
+        "Taking mean along wrong axis (should be mean over all elements, not per-prompt)",
+        "Returning the sum instead of the mean"
+      ],
+      "hint": "Compute (advantages - kl_terms)^2 element-wise, then use np.mean() without specifying an axis to average over all elements.",
+      "references": [
+        "Mean squared error",
+        "L2 loss",
+        "Gradient descent convergence"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Multi-Step Pipeline Integration",
+      "relation_to_problem": "The complete budget-constrained RL loss combines all previous steps: computing penalties, adjusting rewards, calculating advantages, computing KL terms, and aggregating the squared loss. This sub-quest teaches how to chain these operations correctly.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Function composition",
+        "Debugging multi-step computations"
+      ],
+      "learning_objectives": [
+        "Chain multiple transformations in the correct order",
+        "Handle intermediate shapes and broadcasting correctly",
+        "Verify correctness by checking expected properties at each stage"
+      ],
+      "math_content": {
+        "definition": "The **complete budget-constrained RL loss** is computed through a sequence of transformations: $$L_{RL}(\\theta) = \\mathbb{E}_x\\left[\\frac{1}{K}\\sum_{i=1}^{K}\\left(A_i(x) - \\tau \\cdot \\log\\frac{\\pi_\\theta(y_i|x)}{\\pi_{old}(y_i|x)}\\right)^2\\right]$$ where the advantage $A_i(x)$ is computed from budget-adjusted rewards: $$A_i(x) = [r(x,y_i) - \\lambda \\cdot \\max(0, L_i - B)] - \\bar{r}(x)$$",
+        "notation": "$r(x,y_i)$ = raw reward, $L_i$ = response length, $B$ = token budget, $\\lambda$ = budget penalty coefficient, $\\tau$ = KL coefficient, $\\bar{r}(x)$ = baseline, $K$ = samples per prompt",
+        "theorem": "**Composition of Affine and Nonlinear Maps**: The loss function $L$ is a composition $L = f_4 \\circ f_3 \\circ f_2 \\circ f_1$ where: (1) $f_1$ applies budget penalties (piecewise linear); (2) $f_2$ computes advantages (affine); (3) $f_3$ subtracts KL terms (affine); (4) $f_4$ computes squared loss (quadratic). The overall function is differentiable almost everywhere.",
+        "proof_sketch": "Each component function is differentiable except at the boundary $L_i = B$ where the max function has a non-differentiable kink. In practice, this set has measure zero and doesn't affect gradient-based optimization. The composition inherits differentiability from its components.",
+        "examples": [
+          "Example: rewards=[[1.0, 0.5]], lengths=[[150, 80]], budget=100, λ=0.01, τ=0.1, log_probs=[[-1.0,-1.5]], old_log_probs=[[-1.2,-1.3]]. (1) Penalties=[0.5, 0], (2) Effective rewards=[0.5, 0.5], (3) Baseline=0.5, (4) Advantages=[0, 0], (5) KL terms=[0.02, -0.02], (6) Loss=mean([0.0004, 0.0004])=0.0004"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Pipeline Stages",
+          "latex": "$\\text{penalties} \\rightarrow \\text{effective rewards} \\rightarrow \\text{advantages} \\rightarrow \\text{loss}$",
+          "description": "Follow this sequence: (1) compute penalties from lengths, (2) adjust rewards, (3) compute baseline and advantages, (4) compute KL terms, (5) compute squared loss."
+        },
+        {
+          "name": "Sanity Checks",
+          "latex": "$\\sum_{i=1}^{K} A_i(x) = 0$ for each prompt $x$",
+          "description": "Advantages must sum to zero per prompt. Use this to verify correctness of baseline computation."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the budget-constrained RL loss by integrating all previous steps. Given raw rewards, log probabilities, response lengths, and hyperparameters, compute: (1) budget penalties, (2) effective rewards (raw - penalties), (3) advantages (effective reward - baseline), (4) KL terms, (5) squared loss between advantages and KL terms. Return the scalar loss value.",
+        "function_signature": "def rl_budget_loss_integrated(rewards: np.ndarray, log_probs: np.ndarray, old_log_probs: np.ndarray, response_lengths: np.ndarray, token_budget: int, kl_coef: float, budget_penalty_coef: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef rl_budget_loss_integrated(rewards: np.ndarray, log_probs: np.ndarray, old_log_probs: np.ndarray, response_lengths: np.ndarray, token_budget: int, kl_coef: float, budget_penalty_coef: float) -> float:\n    \"\"\"\n    Compute the integrated budget-constrained RL loss.\n    \n    Args:\n        rewards: Shape (batch_size, K) - raw rewards\n        log_probs: Shape (batch_size, K) - current policy log probs\n        old_log_probs: Shape (batch_size, K) - old policy log probs\n        response_lengths: Shape (batch_size, K) - token lengths\n        token_budget: Budget threshold\n        kl_coef: KL regularization coefficient\n        budget_penalty_coef: Budget penalty coefficient\n    \n    Returns:\n        Scalar loss value\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "rl_budget_loss_integrated(np.array([[1.0, 0.5]]), np.array([[-1.0, -1.5]]), np.array([[-1.2, -1.3]]), np.array([[150, 80]]), 100, 0.1, 0.01)",
+            "expected": "0.0004",
+            "explanation": "Penalties=[0.5,0], eff_rewards=[0.5,0.5], baseline=0.5, advantages=[0,0], KL=[0.02,-0.02], loss=mean([0.0004,0.0004])=0.0004"
+          },
+          {
+            "input": "rl_budget_loss_integrated(np.array([[2.0, 1.0]]), np.array([[-1.0, -1.0]]), np.array([[-1.0, -1.0]]), np.array([[50, 50]]), 100, 0.1, 0.01)",
+            "expected": "0.25",
+            "explanation": "No penalties (both within budget), eff_rewards=[2.0,1.0], baseline=1.5, advantages=[0.5,-0.5], KL=[0,0], loss=mean([0.25,0.25])=0.25"
+          },
+          {
+            "input": "rl_budget_loss_integrated(np.array([[1.0]]), np.array([[-2.0]]), np.array([[-1.5]]), np.array([[200]]), 100, 0.2, 0.01)",
+            "expected": "0.0625",
+            "explanation": "Penalty=1.0, eff_reward=0.0, advantage=0.0 (single sample), KL=0.2*(-0.5)=-0.1, loss=(0-(-0.1))^2=0.01. Note: single sample baseline equals itself."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing steps in wrong order (e.g., computing advantages before applying budget penalties)",
+        "Broadcasting errors when subtracting baseline from effective rewards (forgetting keepdims)",
+        "Not verifying that advantages sum to zero per prompt (good debugging check)",
+        "Confusing which log_probs go first in KL computation"
+      ],
+      "hint": "Reuse concepts from all previous sub-quests. Verify intermediate results: (1) penalties >= 0, (2) advantages sum to ~0 per prompt, (3) final loss >= 0.",
+      "references": [
+        "Policy gradient methods",
+        "REINFORCE with baseline",
+        "Regularized optimization"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Numerical Stability and Edge Case Handling",
+      "relation_to_problem": "In practice, RL loss computation must handle edge cases like single-sample batches, identical rewards, and numerical precision issues. This final sub-quest teaches defensive programming and validation techniques for production-ready implementations.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Numerical analysis basics",
+        "Testing and validation"
+      ],
+      "learning_objectives": [
+        "Handle edge cases where K=1 (single sample per prompt)",
+        "Deal with degenerate cases (all rewards identical)",
+        "Ensure numerical stability in squared loss computation",
+        "Add assertions and validations for input data"
+      ],
+      "math_content": {
+        "definition": "A numerically stable algorithm produces results with small relative error even when inputs are subject to rounding errors or have extreme magnitudes. For the RL loss, key stability concerns are: (1) log-space computation for probabilities, (2) handling division by zero when K=1, (3) avoiding catastrophic cancellation in subtraction.",
+        "notation": "$\\epsilon_{\\text{machine}}$ = machine epsilon (smallest representable difference), $\\text{cond}(f)$ = condition number of function $f$ (sensitivity to input perturbations)",
+        "theorem": "**Log-Space Stability**: Computing $\\log(p_1/p_2) = \\log p_1 - \\log p_2$ is more stable than computing $\\log(p_1/p_2)$ directly, because it avoids potential overflow/underflow when probabilities are very small (e.g., $p_1 = 10^{-300}$).",
+        "proof_sketch": "If $p_1 = 10^{-300}$ and $p_2 = 10^{-301}$, then $p_1/p_2 = 10$ is representable, but computing $p_1$ and $p_2$ in standard floating point may underflow to zero. In log-space, $\\log p_1 - \\log p_2 = -300\\ln(10) - (-301\\ln(10)) = \\ln(10)$ is computed accurately.",
+        "examples": [
+          "Example 1: Single sample (K=1): advantage = reward - reward = 0 always. Loss depends only on KL term.",
+          "Example 2: All rewards equal: all advantages = 0. Loss = mean(KL_i^2), purely regularization."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Single Sample Case",
+          "latex": "$K=1 \\Rightarrow A_1 = r_1 - r_1 = 0$",
+          "description": "When only one sample per prompt, baseline equals that sample, so advantage is always zero. Loss becomes mean(KL_i^2)."
+        },
+        {
+          "name": "Validation Invariants",
+          "latex": "$L \\geq 0$, $\\sum_i A_i = 0$ per prompt, penalties $\\geq 0$",
+          "description": "Use these properties to validate correctness: loss is non-negative, advantages sum to zero, penalties are non-negative."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a robust version of the budget-constrained RL loss with input validation and edge case handling. Add checks for: (1) input shapes match, (2) token_budget > 0, (3) coefficients are non-negative. Handle the K=1 case correctly (advantage is zero). Include a final sanity check that the loss is non-negative.",
+        "function_signature": "def rl_budget_loss_robust(rewards: np.ndarray, log_probs: np.ndarray, old_log_probs: np.ndarray, response_lengths: np.ndarray, token_budget: int, kl_coef: float, budget_penalty_coef: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef rl_budget_loss_robust(rewards: np.ndarray, log_probs: np.ndarray, old_log_probs: np.ndarray, response_lengths: np.ndarray, token_budget: int, kl_coef: float, budget_penalty_coef: float) -> float:\n    \"\"\"\n    Compute budget-constrained RL loss with validation and edge case handling.\n    \n    Args:\n        rewards: Shape (batch_size, K)\n        log_probs: Shape (batch_size, K)\n        old_log_probs: Shape (batch_size, K)\n        response_lengths: Shape (batch_size, K)\n        token_budget: Positive integer\n        kl_coef: Non-negative float\n        budget_penalty_coef: Non-negative float\n    \n    Returns:\n        Scalar loss value (guaranteed >= 0)\n    \"\"\"\n    # Add input validation here\n    \n    # Your implementation here (can reuse previous sub-quest logic)\n    \n    # Add output validation\n    \n    pass",
+        "test_cases": [
+          {
+            "input": "rl_budget_loss_robust(np.array([[1.0]]), np.array([[-1.0]]), np.array([[-1.0]]), np.array([[100]]), 100, 0.1, 0.01)",
+            "expected": "0.0",
+            "explanation": "K=1, no penalty (at budget), no KL difference (identical log probs), advantage=0, loss=0"
+          },
+          {
+            "input": "rl_budget_loss_robust(np.array([[2.0, 2.0, 2.0]]), np.array([[-1.0, -1.0, -1.0]]), np.array([[-1.0, -1.0, -1.0]]), np.array([[50, 50, 50]]), 100, 0.1, 0.01)",
+            "expected": "0.0",
+            "explanation": "All rewards identical (advantages=0), all log probs identical (KL=0), loss=0"
+          },
+          {
+            "input": "rl_budget_loss_robust(np.array([[1.0, 0.5]]), np.array([[-1.0, -1.5]]), np.array([[-1.2, -1.3]]), np.array([[150, 80]]), 100, 0.1, 0.01)",
+            "expected": "0.0004",
+            "explanation": "Same as earlier test case, verifying robustness doesn't change correct behavior"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling K=1 case (attempting to compute variance with single sample)",
+        "Forgetting that squared loss is always non-negative (good validation check)",
+        "Not checking input shapes match before operations",
+        "Allowing negative hyperparameters (budget_penalty_coef < 0 doesn't make sense)"
+      ],
+      "hint": "Start with assertions to validate inputs. For K=1, advantages will be zero (baseline equals the single reward). Use assert loss >= -1e-10 to catch numerical errors (allowing small negative due to floating point).",
+      "references": [
+        "Numerical stability",
+        "Defensive programming",
+        "IEEE 754 floating point",
+        "Unit testing best practices"
+      ]
+    }
+  ]
+}

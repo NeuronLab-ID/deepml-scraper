@@ -1,0 +1,479 @@
+{
+  "problem_id": 17,
+  "title": "K-Means Clustering",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "Your task is to write a Python function that implements the k-Means clustering algorithm. This function should take specific inputs and produce a list of final centroids. k-Means clustering is a method used to partition `n` points into `k` clusters. The goal is to group similar points together and represent each group by its center (called the *centroid*).\n\n### Function Inputs:\n\n- `points`: A list of points, where each point is a tuple of coordinates (e.g., `(x, y)` for 2D points)\n- `k`: An integer representing the number of clusters to form\n- `initial_centroids`: A list of initial centroid points, each a tuple of coordinates\n- `max_iterations`: An integer representing the maximum number of iterations to perform\n\n### Function Output:\n\nA list of the final centroids of the clusters, where each centroid is rounded to the nearest fourth decimal.\n\n",
+  "example": {
+    "input": "points = [(1, 2), (1, 4), (1, 0), (10, 2), (10, 4), (10, 0)], k = 2, initial_centroids = [(1, 1), (10, 1)], max_iterations = 10",
+    "output": "[(1, 2), (10, 2)]",
+    "reasoning": "Given the initial centroids and a maximum of 10 iterations,\n        the points are clustered around these points, and the centroids are\n        updated to the mean of the assigned points, resulting in the final\n        centroids which approximate the means of the two clusters.\n        The exact number of iterations needed may vary,\n        but the process will stop after 10 iterations at most."
+  },
+  "starter_code": "def k_means_clustering(points: list[tuple[float, float]], k: int, initial_centroids: list[tuple[float, float]], max_iterations: int) -> list[tuple[float, float]]:\n\t# Your code here\n\treturn final_centroids",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Euclidean Distance in Vector Spaces",
+      "relation_to_problem": "K-Means requires computing distances between points and centroids to determine cluster assignments. The Euclidean distance is the fundamental metric used in the assignment step of the algorithm.",
+      "prerequisites": [
+        "Basic algebra",
+        "Understanding of coordinate systems",
+        "Square roots"
+      ],
+      "learning_objectives": [
+        "Define and compute Euclidean distance between points in $\\mathbb{R}^d$",
+        "Understand the geometric interpretation of distance metrics",
+        "Implement efficient distance calculations in Python"
+      ],
+      "math_content": {
+        "definition": "The Euclidean distance (or $L_2$ norm) between two points $\\mathbf{p} = (p_1, p_2, \\ldots, p_d)$ and $\\mathbf{q} = (q_1, q_2, \\ldots, q_d)$ in $d$-dimensional space $\\mathbb{R}^d$ is defined as: $$d(\\mathbf{p}, \\mathbf{q}) = \\sqrt{\\sum_{i=1}^{d} (p_i - q_i)^2}$$",
+        "notation": "$\\mathbf{p}, \\mathbf{q} \\in \\mathbb{R}^d$ = points in d-dimensional space; $d(\\mathbf{p}, \\mathbf{q})$ = Euclidean distance; $\\|\\mathbf{v}\\|_2 = \\sqrt{\\sum_{i=1}^{d} v_i^2}$ = Euclidean norm",
+        "theorem": "**Metric Space Properties**: The Euclidean distance satisfies the metric space axioms: (1) Non-negativity: $d(\\mathbf{p}, \\mathbf{q}) \\geq 0$, with equality iff $\\mathbf{p} = \\mathbf{q}$. (2) Symmetry: $d(\\mathbf{p}, \\mathbf{q}) = d(\\mathbf{q}, \\mathbf{p})$. (3) Triangle inequality: $d(\\mathbf{p}, \\mathbf{r}) \\leq d(\\mathbf{p}, \\mathbf{q}) + d(\\mathbf{q}, \\mathbf{r})$.",
+        "proof_sketch": "Non-negativity follows from the fact that we sum squares (always $\\geq 0$). Symmetry is immediate since $(p_i - q_i)^2 = (q_i - p_i)^2$. The triangle inequality follows from the Cauchy-Schwarz inequality applied to the difference vectors.",
+        "examples": [
+          "For 2D points $\\mathbf{p} = (1, 2)$ and $\\mathbf{q} = (4, 6)$: $d(\\mathbf{p}, \\mathbf{q}) = \\sqrt{(1-4)^2 + (2-6)^2} = \\sqrt{9 + 16} = \\sqrt{25} = 5$",
+          "For 3D points $\\mathbf{p} = (0, 0, 0)$ and $\\mathbf{q} = (1, 1, 1)$: $d(\\mathbf{p}, \\mathbf{q}) = \\sqrt{1^2 + 1^2 + 1^2} = \\sqrt{3} \\approx 1.732$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Euclidean Distance (2D)",
+          "latex": "$d = \\sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$",
+          "description": "Use for computing distance between two 2D points, which is required for the K-Means assignment step"
+        },
+        {
+          "name": "Squared Euclidean Distance",
+          "latex": "$d^2 = \\sum_{i=1}^{d} (p_i - q_i)^2$",
+          "description": "Often used in optimization since it avoids the square root computation and preserves ordering"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the Euclidean distance between two points in 2D space. This is a fundamental building block for K-Means clustering, where you'll need to calculate distances between data points and centroids.",
+        "function_signature": "def euclidean_distance(point1: tuple[float, float], point2: tuple[float, float]) -> float:",
+        "starter_code": "import math\n\ndef euclidean_distance(point1: tuple[float, float], point2: tuple[float, float]) -> float:\n    # Your code here\n    # Calculate the Euclidean distance between two 2D points\n    pass",
+        "test_cases": [
+          {
+            "input": "euclidean_distance((0, 0), (3, 4))",
+            "expected": "5.0",
+            "explanation": "Using the formula: sqrt((3-0)^2 + (4-0)^2) = sqrt(9 + 16) = sqrt(25) = 5"
+          },
+          {
+            "input": "euclidean_distance((1, 2), (4, 6))",
+            "expected": "5.0",
+            "explanation": "sqrt((4-1)^2 + (6-2)^2) = sqrt(9 + 16) = 5"
+          },
+          {
+            "input": "euclidean_distance((0, 0), (1, 1))",
+            "expected": "1.4142135623730951",
+            "explanation": "sqrt(1^2 + 1^2) = sqrt(2) ≈ 1.414"
+          },
+          {
+            "input": "euclidean_distance((5, 5), (5, 5))",
+            "expected": "0.0",
+            "explanation": "Distance from a point to itself is always 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to take the square root after summing squared differences",
+        "Not handling negative coordinates correctly (remember to square the differences first)",
+        "Mixing up the order of subtraction (doesn't matter due to squaring, but be consistent)",
+        "Using integer division instead of float, causing precision loss"
+      ],
+      "hint": "Use the math.sqrt() function or the ** 0.5 operator to compute square roots in Python.",
+      "references": [
+        "Metric spaces",
+        "Vector norms",
+        "Distance functions in machine learning"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Nearest Neighbor Search and Argmin Operations",
+      "relation_to_problem": "In K-Means assignment step, each point must be assigned to its nearest centroid. This requires finding the minimum distance among all centroids and identifying which centroid achieves that minimum.",
+      "prerequisites": [
+        "Euclidean distance computation",
+        "Basic Python iteration",
+        "Comparison operations"
+      ],
+      "learning_objectives": [
+        "Understand the argmin operation and its role in optimization",
+        "Implement nearest neighbor search for a single point",
+        "Learn to track both minimum values and their indices simultaneously"
+      ],
+      "math_content": {
+        "definition": "Given a point $\\mathbf{x} \\in \\mathbb{R}^d$ and a set of centroids $\\mathcal{C} = \\{\\boldsymbol{\\mu}_1, \\boldsymbol{\\mu}_2, \\ldots, \\boldsymbol{\\mu}_k\\}$, the nearest centroid assignment is: $$j^* = \\arg\\min_{j \\in \\{1, \\ldots, k\\}} d(\\mathbf{x}, \\boldsymbol{\\mu}_j)$$ where $d(\\cdot, \\cdot)$ is the Euclidean distance function.",
+        "notation": "$\\arg\\min_j f(j)$ = the value of $j$ that minimizes $f(j)$ (returns the index, not the minimum value itself); $j^*$ = the optimal cluster assignment for point $\\mathbf{x}$",
+        "theorem": "**Uniqueness of Nearest Neighbor**: If all pairwise distances between centroids are distinct, i.e., $d(\\boldsymbol{\\mu}_i, \\boldsymbol{\\mu}_j) \\neq d(\\boldsymbol{\\mu}_i, \\boldsymbol{\\mu}_\\ell)$ for $j \\neq \\ell$, and point $\\mathbf{x}$ is not equidistant to any two centroids, then the nearest centroid is unique.",
+        "proof_sketch": "Suppose there exist two distinct nearest centroids $\\boldsymbol{\\mu}_i$ and $\\boldsymbol{\\mu}_j$ with $i \\neq j$. Then $d(\\mathbf{x}, \\boldsymbol{\\mu}_i) = d(\\mathbf{x}, \\boldsymbol{\\mu}_j) = \\min_\\ell d(\\mathbf{x}, \\boldsymbol{\\mu}_\\ell)$. This contradicts the assumption that $\\mathbf{x}$ is not equidistant to multiple centroids. In practice, ties are broken arbitrarily (e.g., choosing the smallest index).",
+        "examples": [
+          "Point $(2, 3)$ with centroids $[(0, 0), (5, 5), (1, 2)]$. Distances: $[\\sqrt{13} \\approx 3.606, \\sqrt{13} \\approx 3.606, \\sqrt{2} \\approx 1.414]$. Nearest: index 2 with distance $\\sqrt{2}$",
+          "Point $(10, 10)$ with centroids $[(0, 0), (15, 15), (10, 15)]$. Distances: $[\\sqrt{200} \\approx 14.14, \\sqrt{50} \\approx 7.07, 5]$. Nearest: index 2 with distance 5"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cluster Assignment Rule",
+          "latex": "$C_j = \\{\\mathbf{x}_i : j = \\arg\\min_{j'} d(\\mathbf{x}_i, \\boldsymbol{\\mu}_{j'})\\}$",
+          "description": "Cluster $C_j$ contains all points for which centroid $j$ is the nearest"
+        },
+        {
+          "name": "Minimum Distance",
+          "latex": "$d_{\\text{min}} = \\min_{j=1}^k d(\\mathbf{x}, \\boldsymbol{\\mu}_j)$",
+          "description": "The actual minimum distance value (not the index)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that finds the index of the nearest centroid to a given point. This directly implements the assignment step logic for a single point in K-Means. Return the index (0-based) of the nearest centroid.",
+        "function_signature": "def find_nearest_centroid(point: tuple[float, float], centroids: list[tuple[float, float]]) -> int:",
+        "starter_code": "def find_nearest_centroid(point: tuple[float, float], centroids: list[tuple[float, float]]) -> int:\n    # Your code here\n    # Find the index of the centroid that is closest to the given point\n    # Use the euclidean_distance function from the previous exercise\n    pass",
+        "test_cases": [
+          {
+            "input": "find_nearest_centroid((2, 3), [(0, 0), (10, 10), (2, 2)])",
+            "expected": "2",
+            "explanation": "Distances: [sqrt(13)≈3.606, sqrt(98)≈9.899, 1.0]. Centroid at index 2 is nearest with distance 1.0"
+          },
+          {
+            "input": "find_nearest_centroid((5, 5), [(0, 0), (10, 10)])",
+            "expected": "0",
+            "explanation": "Point (5,5) is equidistant from both centroids (distance sqrt(50)≈7.07 each), so we return the first index (tie-breaking)"
+          },
+          {
+            "input": "find_nearest_centroid((1, 1), [(1, 1), (100, 100)])",
+            "expected": "0",
+            "explanation": "Distance to first centroid is 0 (same point), which is always the minimum possible distance"
+          },
+          {
+            "input": "find_nearest_centroid((8, 2), [(10, 2), (10, 4), (10, 0)])",
+            "expected": "0",
+            "explanation": "Distances: [2.0, sqrt(20)≈4.472, sqrt(8)≈2.828]. Index 0 is nearest"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Returning the minimum distance instead of the index of the nearest centroid",
+        "Not handling the case where centroids list might be empty (though K-Means assumes k≥1)",
+        "Using incorrect initial values for tracking minimum (e.g., starting with 0 instead of infinity)",
+        "Not breaking ties consistently (best practice: return smallest index when distances are equal)"
+      ],
+      "hint": "Iterate through all centroids, compute the distance to each, and keep track of both the minimum distance seen so far and the index where it occurred.",
+      "references": [
+        "Argmin and argmax operations",
+        "Nearest neighbor algorithms",
+        "Voronoi diagrams"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Centroid Computation via Arithmetic Mean",
+      "relation_to_problem": "After assigning points to clusters, K-Means updates each centroid to be the arithmetic mean (center of mass) of all points in its cluster. This minimizes the within-cluster sum of squared distances.",
+      "prerequisites": [
+        "Basic statistics",
+        "Understanding of averages",
+        "List operations in Python"
+      ],
+      "learning_objectives": [
+        "Understand why the mean minimizes sum of squared distances",
+        "Compute the centroid of a point cluster in $\\mathbb{R}^d$",
+        "Handle edge cases like empty clusters",
+        "Apply coordinate-wise averaging for multi-dimensional points"
+      ],
+      "math_content": {
+        "definition": "Given a cluster $C_j = \\{\\mathbf{x}_1, \\mathbf{x}_2, \\ldots, \\mathbf{x}_{n_j}\\}$ of points in $\\mathbb{R}^d$, the centroid (arithmetic mean) is: $$\\boldsymbol{\\mu}_j = \\frac{1}{n_j} \\sum_{i=1}^{n_j} \\mathbf{x}_i = \\left(\\frac{1}{n_j}\\sum_{i=1}^{n_j} x_{i1}, \\frac{1}{n_j}\\sum_{i=1}^{n_j} x_{i2}, \\ldots, \\frac{1}{n_j}\\sum_{i=1}^{n_j} x_{id}\\right)$$ where $n_j = |C_j|$ is the number of points in cluster $j$.",
+        "notation": "$\\boldsymbol{\\mu}_j \\in \\mathbb{R}^d$ = centroid of cluster $j$; $n_j = |C_j|$ = cardinality (size) of cluster $j$; $x_{ik}$ = $k$-th coordinate of point $\\mathbf{x}_i$",
+        "theorem": "**Optimality of the Mean**: The arithmetic mean $\\boldsymbol{\\mu}$ minimizes the sum of squared Euclidean distances to all points in the cluster: $$\\boldsymbol{\\mu}^* = \\arg\\min_{\\boldsymbol{\\mu} \\in \\mathbb{R}^d} \\sum_{\\mathbf{x}_i \\in C_j} \\|\\mathbf{x}_i - \\boldsymbol{\\mu}\\|^2 = \\frac{1}{n_j}\\sum_{\\mathbf{x}_i \\in C_j} \\mathbf{x}_i$$",
+        "proof_sketch": "Let $f(\\boldsymbol{\\mu}) = \\sum_{i=1}^{n_j} \\|\\mathbf{x}_i - \\boldsymbol{\\mu}\\|^2$. Taking the gradient: $\\nabla_{\\boldsymbol{\\mu}} f = \\nabla_{\\boldsymbol{\\mu}} \\sum_i (\\mathbf{x}_i - \\boldsymbol{\\mu})^T(\\mathbf{x}_i - \\boldsymbol{\\mu}) = -2\\sum_i (\\mathbf{x}_i - \\boldsymbol{\\mu})$. Setting equal to zero: $\\sum_i \\mathbf{x}_i = n_j \\boldsymbol{\\mu}$, thus $\\boldsymbol{\\mu} = \\frac{1}{n_j}\\sum_i \\mathbf{x}_i$. The Hessian is $2n_j I$ (positive definite), confirming this is a minimum.",
+        "examples": [
+          "Cluster $\\{(1,2), (3,4), (5,6)\\}$: $\\boldsymbol{\\mu} = \\left(\\frac{1+3+5}{3}, \\frac{2+4+6}{3}\\right) = (3, 4)$",
+          "Cluster $\\{(0,0), (2,0), (1,2)\\}$: $\\boldsymbol{\\mu} = \\left(\\frac{0+2+1}{3}, \\frac{0+0+2}{3}\\right) = (1, 0.667)$",
+          "Single point cluster $\\{(7,3)\\}$: $\\boldsymbol{\\mu} = (7, 3)$ (the point itself)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Centroid Update Formula (2D)",
+          "latex": "$\\boldsymbol{\\mu}_j = \\left(\\frac{\\sum_{i} x_i}{n_j}, \\frac{\\sum_{i} y_i}{n_j}\\right)$",
+          "description": "Compute mean of x-coordinates and y-coordinates separately for 2D points"
+        },
+        {
+          "name": "Within-Cluster Sum of Squares",
+          "latex": "$\\text{WCSS}_j = \\sum_{\\mathbf{x}_i \\in C_j} \\|\\mathbf{x}_i - \\boldsymbol{\\mu}_j\\|^2$",
+          "description": "Measures compactness of cluster $j$; minimized when $\\boldsymbol{\\mu}_j$ is the mean"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the centroid (mean) of a list of 2D points. Each coordinate should be averaged independently. Round each coordinate to 4 decimal places. This implements the update step for a single cluster in K-Means.",
+        "function_signature": "def compute_centroid(points: list[tuple[float, float]]) -> tuple[float, float]:",
+        "starter_code": "def compute_centroid(points: list[tuple[float, float]]) -> tuple[float, float]:\n    # Your code here\n    # Compute the mean of all points (average x-coordinate and average y-coordinate)\n    # Return the centroid rounded to 4 decimal places\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_centroid([(1, 2), (3, 4), (5, 6)])",
+            "expected": "(3.0, 4.0)",
+            "explanation": "Mean x: (1+3+5)/3 = 3.0, Mean y: (2+4+6)/3 = 4.0"
+          },
+          {
+            "input": "compute_centroid([(0, 0), (2, 0), (1, 2)])",
+            "expected": "(1.0, 0.6667)",
+            "explanation": "Mean x: (0+2+1)/3 = 1.0, Mean y: (0+0+2)/3 = 0.6667 (rounded to 4 decimals)"
+          },
+          {
+            "input": "compute_centroid([(10, 2), (10, 4), (10, 0)])",
+            "expected": "(10.0, 2.0)",
+            "explanation": "All points have x=10, so mean x=10. Mean y: (2+4+0)/3 = 2.0"
+          },
+          {
+            "input": "compute_centroid([(7.5, 3.2)])",
+            "expected": "(7.5, 3.2)",
+            "explanation": "Single point cluster: centroid is the point itself"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle empty clusters (should not occur in valid K-Means, but good to check)",
+        "Not rounding to exactly 4 decimal places as required",
+        "Dividing by the wrong count (e.g., dividing by k instead of the actual number of points in the cluster)",
+        "Attempting to average tuples directly instead of averaging each coordinate separately",
+        "Integer division issues (use float division to maintain precision)"
+      ],
+      "hint": "Sum all x-coordinates and divide by the number of points, then do the same for y-coordinates. Use Python's round() function to round to 4 decimal places.",
+      "references": [
+        "Arithmetic mean",
+        "Center of mass",
+        "Expectation in statistics",
+        "Least squares optimization"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Batch Point Assignment to Clusters",
+      "relation_to_problem": "In each K-Means iteration, all data points must be assigned to their nearest centroids simultaneously. This creates the cluster partitions used in the update step.",
+      "prerequisites": [
+        "Nearest neighbor search",
+        "List comprehensions",
+        "Dictionary or list-based grouping"
+      ],
+      "learning_objectives": [
+        "Assign multiple points to clusters based on nearest centroid",
+        "Organize points into cluster groups (data structures)",
+        "Understand the complete assignment step of K-Means",
+        "Handle the partition of a dataset into k disjoint subsets"
+      ],
+      "math_content": {
+        "definition": "Given a dataset $X = \\{\\mathbf{x}_1, \\mathbf{x}_2, \\ldots, \\mathbf{x}_n\\}$ and centroids $\\mathcal{C} = \\{\\boldsymbol{\\mu}_1, \\ldots, \\boldsymbol{\\mu}_k\\}$, the cluster assignment function $\\gamma: X \\to \\{1, \\ldots, k\\}$ maps each point to its nearest centroid: $$\\gamma(\\mathbf{x}_i) = \\arg\\min_{j \\in \\{1,\\ldots,k\\}} d(\\mathbf{x}_i, \\boldsymbol{\\mu}_j)$$ This induces a partition $\\mathcal{P} = \\{C_1, C_2, \\ldots, C_k\\}$ where $C_j = \\{\\mathbf{x}_i : \\gamma(\\mathbf{x}_i) = j\\}$.",
+        "notation": "$\\gamma(\\mathbf{x})$ = cluster assignment function; $\\mathcal{P} = \\{C_1, \\ldots, C_k\\}$ = partition of $X$ into $k$ clusters; $C_j$ = set of all points assigned to centroid $j$",
+        "theorem": "**Partition Properties**: The cluster assignment creates a partition of $X$ satisfying: (1) $C_i \\cap C_j = \\emptyset$ for $i \\neq j$ (disjoint), (2) $\\bigcup_{j=1}^k C_j = X$ (exhaustive), (3) Each $C_j$ may be empty if no points are nearest to $\\boldsymbol{\\mu}_j$.",
+        "proof_sketch": "Each point is assigned to exactly one cluster (the one with nearest centroid), ensuring disjointness. Since every point must be assigned somewhere, the union equals $X$. Empty clusters occur when a centroid has no points closer to it than to other centroids.",
+        "examples": [
+          "Points $[(1,1), (2,1), (10,10)]$ with centroids $[(0,0), (11,11)]$. Assignments: $\\gamma(1,1)=0$, $\\gamma(2,1)=0$, $\\gamma(10,10)=1$. Partition: $C_0 = \\{(1,1), (2,1)\\}$, $C_1 = \\{(10,10)\\}$",
+          "Points $[(5,5)]$ with centroids $[(0,0), (10,10), (5,0)]$. Assignment: $\\gamma(5,5)=2$ (nearest to $(5,0)$ with distance 5). Partition: $C_0=\\emptyset$, $C_1=\\emptyset$, $C_2=\\{(5,5)\\}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Assignment Step Complexity",
+          "latex": "$O(nkd)$",
+          "description": "For $n$ points, $k$ centroids, and $d$ dimensions: compute $nk$ distances, each taking $O(d)$ time"
+        },
+        {
+          "name": "Voronoi Cell",
+          "latex": "$V_j = \\{\\mathbf{x} \\in \\mathbb{R}^d : d(\\mathbf{x}, \\boldsymbol{\\mu}_j) \\leq d(\\mathbf{x}, \\boldsymbol{\\mu}_i) \\; \\forall i\\}$",
+          "description": "The region of space closer to centroid $j$ than any other; clusters are discrete samples from Voronoi cells"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that assigns each point in a dataset to its nearest centroid, returning a list of cluster assignments (indices). The output should be a list where the i-th element is the cluster index (0-based) to which the i-th point belongs.",
+        "function_signature": "def assign_clusters(points: list[tuple[float, float]], centroids: list[tuple[float, float]]) -> list[int]:",
+        "starter_code": "def assign_clusters(points: list[tuple[float, float]], centroids: list[tuple[float, float]]) -> list[int]:\n    # Your code here\n    # For each point, find which centroid is nearest\n    # Return a list of cluster indices (one per point)\n    pass",
+        "test_cases": [
+          {
+            "input": "assign_clusters([(1, 1), (2, 1), (10, 10)], [(0, 0), (11, 11)])",
+            "expected": "[0, 0, 1]",
+            "explanation": "First two points are closer to (0,0), third point is closer to (11,11)"
+          },
+          {
+            "input": "assign_clusters([(1, 2), (1, 4), (1, 0), (10, 2), (10, 4), (10, 0)], [(1, 1), (10, 1)])",
+            "expected": "[0, 0, 0, 1, 1, 1]",
+            "explanation": "Points near x=1 assigned to first centroid, points near x=10 assigned to second centroid"
+          },
+          {
+            "input": "assign_clusters([(5, 5)], [(0, 0), (10, 10), (5, 0)])",
+            "expected": "[2]",
+            "explanation": "Single point (5,5) is closest to centroid (5,0) with distance 5"
+          },
+          {
+            "input": "assign_clusters([(2, 2), (3, 3), (8, 8), (9, 9)], [(2, 2), (9, 9)])",
+            "expected": "[0, 0, 1, 1]",
+            "explanation": "Points cluster around the two centroids which happen to coincide with data points"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not maintaining the correct order of assignments (must match order of input points)",
+        "Returning clusters as groups of points instead of assignment indices",
+        "Inefficient nested loops without considering vectorization possibilities",
+        "Not handling the case where multiple centroids are equidistant (should return smallest index)"
+      ],
+      "hint": "Use a list comprehension to iterate through all points, and for each point, use the find_nearest_centroid function from the previous exercise.",
+      "references": [
+        "Voronoi diagrams",
+        "Nearest neighbor partitioning",
+        "Cluster analysis"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Iterative Optimization and Convergence",
+      "relation_to_problem": "K-Means alternates between assignment and update steps until convergence or max iterations. Understanding the iterative optimization process is essential for implementing the complete algorithm.",
+      "prerequisites": [
+        "Assignment step",
+        "Centroid computation",
+        "Loop constructs",
+        "Convergence criteria"
+      ],
+      "learning_objectives": [
+        "Understand Lloyd's algorithm as alternating minimization",
+        "Implement the complete iteration loop with termination conditions",
+        "Track centroid changes across iterations",
+        "Recognize when the algorithm has converged"
+      ],
+      "math_content": {
+        "definition": "Lloyd's algorithm for K-Means performs alternating minimization of the objective function: $$J(C, \\boldsymbol{\\mu}) = \\sum_{j=1}^{k} \\sum_{\\mathbf{x}_i \\in C_j} \\|\\mathbf{x}_i - \\boldsymbol{\\mu}_j\\|^2$$ At iteration $t$: (1) **Assignment**: Fix $\\boldsymbol{\\mu}^{(t-1)}$, find optimal $C^{(t)} = \\arg\\min_C J(C, \\boldsymbol{\\mu}^{(t-1)})$. (2) **Update**: Fix $C^{(t)}$, find optimal $\\boldsymbol{\\mu}^{(t)} = \\arg\\min_{\\boldsymbol{\\mu}} J(C^{(t)}, \\boldsymbol{\\mu})$.",
+        "notation": "$t$ = iteration number; $C^{(t)}$ = cluster assignments at iteration $t$; $\\boldsymbol{\\mu}^{(t)}$ = centroids at iteration $t$; $J^{(t)} = J(C^{(t)}, \\boldsymbol{\\mu}^{(t)})$ = objective value",
+        "theorem": "**Monotonic Convergence**: Lloyd's algorithm satisfies $J^{(t+1)} \\leq J^{(t)}$ for all $t$. Since $J$ is bounded below by 0 and decreases monotonically, the algorithm converges to a local minimum in finite iterations (for finite datasets).",
+        "proof_sketch": "In the assignment step, we choose the partition that minimizes $J$ for fixed centroids, so $J(C^{(t)}, \\boldsymbol{\\mu}^{(t-1)}) \\leq J(C^{(t-1)}, \\boldsymbol{\\mu}^{(t-1)})$. In the update step, we choose centroids that minimize $J$ for fixed partition, so $J(C^{(t)}, \\boldsymbol{\\mu}^{(t)}) \\leq J(C^{(t)}, \\boldsymbol{\\mu}^{(t-1)})$. Combining these: $J^{(t)} \\leq J^{(t-1)}$. Since there are finitely many partitions of finite data, convergence occurs when no further improvement is possible.",
+        "examples": [
+          "Iteration 0: Initial centroids $[(1,1), (10,1)]$, $J^{(0)} = 50$. Iteration 1: After assignment and update, centroids become $[(1,2), (10,2)]$, $J^{(1)} = 20$. Iteration 2: Centroids stabilize at $[(1,2), (10,2)]$, $J^{(2)} = 20$. Algorithm converged.",
+          "Maximum iterations reached: Even if not fully converged, stop after max_iterations to ensure termination"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Convergence Criterion (Centroid Stability)",
+          "latex": "$\\max_j \\|\\boldsymbol{\\mu}_j^{(t)} - \\boldsymbol{\\mu}_j^{(t-1)}\\| < \\epsilon$",
+          "description": "Stop when centroids change by less than threshold $\\epsilon$ (often not required in implementations)"
+        },
+        {
+          "name": "Objective Function Decrease",
+          "latex": "$\\Delta J^{(t)} = J^{(t-1)} - J^{(t)} \\geq 0$",
+          "description": "Change in objective function; always non-negative due to monotonic convergence"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified K-Means iteration function that performs a single iteration of assignment and update. Given points, centroids, and a helper function to group points by cluster, return the updated centroids after one iteration. Each centroid coordinate should be rounded to 4 decimal places.",
+        "function_signature": "def kmeans_iteration(points: list[tuple[float, float]], centroids: list[tuple[float, float]]) -> list[tuple[float, float]]:",
+        "starter_code": "def kmeans_iteration(points: list[tuple[float, float]], centroids: list[tuple[float, float]]) -> list[tuple[float, float]]:\n    # Your code here\n    # Step 1: Assign each point to nearest centroid (use assign_clusters)\n    # Step 2: Group points by their cluster assignments\n    # Step 3: Compute new centroid for each cluster (use compute_centroid)\n    # Step 4: Handle empty clusters (keep old centroid if cluster is empty)\n    # Return the updated centroids, rounded to 4 decimal places\n    pass",
+        "test_cases": [
+          {
+            "input": "kmeans_iteration([(1, 2), (1, 4), (1, 0), (10, 2), (10, 4), (10, 0)], [(1, 1), (10, 1)])",
+            "expected": "[(1.0, 2.0), (10.0, 2.0)]",
+            "explanation": "First cluster gets points near x=1, mean is (1,2). Second cluster gets points near x=10, mean is (10,2)"
+          },
+          {
+            "input": "kmeans_iteration([(0, 0), (1, 1), (10, 10), (11, 11)], [(0.5, 0.5), (10.5, 10.5)])",
+            "expected": "[(0.5, 0.5), (10.5, 10.5)]",
+            "explanation": "Centroids are already at the mean of their respective clusters, so they don't change"
+          },
+          {
+            "input": "kmeans_iteration([(2, 2), (3, 3), (8, 8)], [(0, 0), (10, 10), (5, 5)])",
+            "expected": "[(2.5, 2.5), (8.0, 8.0), (5.0, 5.0)]",
+            "explanation": "Point (2,2) and (3,3) nearest to (0,0), (8,8) nearest to (10,10), middle centroid gets no points so keep (5,5)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling empty clusters correctly (should keep previous centroid, not crash)",
+        "Forgetting to round centroid coordinates to 4 decimal places",
+        "Not maintaining the order of centroids (cluster j's centroid should remain at index j)",
+        "Inefficiently recomputing distances multiple times instead of reusing assignments",
+        "Not understanding that one iteration includes both assignment AND update steps"
+      ],
+      "hint": "First assign all points to clusters, then group them by cluster index (you can use a dictionary or list of lists), then compute the new centroid for each cluster. For empty clusters, use the previous centroid position.",
+      "references": [
+        "Lloyd's algorithm",
+        "Expectation-Maximization",
+        "Alternating minimization",
+        "Coordinate descent"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete K-Means Algorithm with Termination",
+      "relation_to_problem": "This integrates all previous concepts into the complete K-Means clustering algorithm, including initialization, iteration loop, and termination based on maximum iterations.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Loop control structures",
+        "Algorithm design patterns"
+      ],
+      "learning_objectives": [
+        "Synthesize all K-Means components into a complete algorithm",
+        "Implement the main iteration loop with proper termination",
+        "Understand the full K-Means pipeline from initialization to convergence",
+        "Apply proper output formatting (rounding to 4 decimals)"
+      ],
+      "math_content": {
+        "definition": "The complete K-Means algorithm is defined by the following procedure: **Input**: Dataset $X = \\{\\mathbf{x}_1, \\ldots, \\mathbf{x}_n\\} \\subset \\mathbb{R}^d$, number of clusters $k$, initial centroids $\\boldsymbol{\\mu}^{(0)} = \\{\\boldsymbol{\\mu}_1^{(0)}, \\ldots, \\boldsymbol{\\mu}_k^{(0)}\\}$, max iterations $T$. **Output**: Final centroids $\\boldsymbol{\\mu}^{(T')}$ where $T' \\leq T$. **Algorithm**: For $t = 1$ to $T$: (1) Assign: $C_j^{(t)} = \\{\\mathbf{x}_i : j = \\arg\\min_{j'} d(\\mathbf{x}_i, \\boldsymbol{\\mu}_{j'}^{(t-1)})\\}$. (2) Update: $\\boldsymbol{\\mu}_j^{(t)} = \\frac{1}{|C_j^{(t)}|} \\sum_{\\mathbf{x}_i \\in C_j^{(t)}} \\mathbf{x}_i$ for non-empty $C_j^{(t)}$. (3) If converged (optional), return $\\boldsymbol{\\mu}^{(t)}$ and terminate. Return $\\boldsymbol{\\mu}^{(T)}$.",
+        "notation": "$T$ = maximum iterations; $T'$ = actual iterations until convergence; $\\boldsymbol{\\mu}^{(0)}$ = initial centroids; $C^{(t)}$ = partition at iteration $t$",
+        "theorem": "**Finite Termination**: For finite datasets, K-Means terminates in at most $T$ iterations (when max_iterations is enforced) or when centroids stabilize. The number of distinct partitions is finite (at most $k^n$ for $n$ points and $k$ clusters), guaranteeing eventual convergence to a stable partition.",
+        "proof_sketch": "Each iteration either strictly decreases $J$ or leaves it unchanged. Since there are finitely many possible partitions and $J$ is bounded below by 0, the algorithm must eventually reach a partition where no reassignment decreases $J$. At this point, centroids stabilize and the algorithm has converged. Enforcing max_iterations ensures termination even if convergence is slow.",
+        "examples": [
+          "Example from problem: points = [(1,2), (1,4), (1,0), (10,2), (10,4), (10,0)], k=2, initial_centroids = [(1,1), (10,1)], max_iterations=10. After iteration 1, centroids update to [(1,2), (10,2)]. These are already optimal, so further iterations don't change them. Final result: [(1.0, 2.0), (10.0, 2.0)]"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Total K-Means Objective",
+          "latex": "$J_{\\text{total}} = \\sum_{j=1}^{k} \\sum_{\\mathbf{x}_i \\in C_j} \\|\\mathbf{x}_i - \\boldsymbol{\\mu}_j\\|^2$",
+          "description": "The within-cluster sum of squares that K-Means minimizes; smaller values indicate tighter clusters"
+        },
+        {
+          "name": "Final Output Rounding",
+          "latex": "$\\boldsymbol{\\mu}_j = (\\text{round}(\\mu_{j,x}, 4), \\text{round}(\\mu_{j,y}, 4))$",
+          "description": "Each coordinate of final centroids must be rounded to 4 decimal places as specified"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs multiple K-Means iterations until max_iterations is reached. Start with initial_centroids and iteratively update them. Return the final centroids with each coordinate rounded to 4 decimal places. This combines all previous sub-quest skills into the complete K-Means algorithm structure.",
+        "function_signature": "def kmeans_multiple_iterations(points: list[tuple[float, float]], k: int, initial_centroids: list[tuple[float, float]], max_iterations: int) -> list[tuple[float, float]]:",
+        "starter_code": "def kmeans_multiple_iterations(points: list[tuple[float, float]], k: int, initial_centroids: list[tuple[float, float]], max_iterations: int) -> list[tuple[float, float]]:\n    # Your code here\n    # Initialize centroids with initial_centroids\n    # For max_iterations times:\n    #   - Perform assignment step (assign points to nearest centroids)\n    #   - Perform update step (recompute centroids as means of assigned points)\n    # Return final centroids with each coordinate rounded to 4 decimal places\n    pass",
+        "test_cases": [
+          {
+            "input": "kmeans_multiple_iterations([(1, 2), (1, 4), (1, 0), (10, 2), (10, 4), (10, 0)], 2, [(1, 1), (10, 1)], 10)",
+            "expected": "[(1.0, 2.0), (10.0, 2.0)]",
+            "explanation": "This is the exact example from the problem. After first iteration, centroids move to optimal positions and remain stable"
+          },
+          {
+            "input": "kmeans_multiple_iterations([(0, 0), (1, 1), (9, 9), (10, 10)], 2, [(0, 0), (10, 10)], 5)",
+            "expected": "[(0.5, 0.5), (9.5, 9.5)]",
+            "explanation": "Two clear clusters: {(0,0), (1,1)} with mean (0.5, 0.5) and {(9,9), (10,10)} with mean (9.5, 9.5)"
+          },
+          {
+            "input": "kmeans_multiple_iterations([(2, 2), (2, 3), (2, 4)], 1, [(0, 0)], 3)",
+            "expected": "[(2.0, 3.0)]",
+            "explanation": "Single cluster: all points assigned to one centroid, mean is (2, 3)"
+          },
+          {
+            "input": "kmeans_multiple_iterations([(1, 1), (5, 5), (9, 9)], 3, [(1, 1), (5, 5), (9, 9)], 1)",
+            "expected": "[(1.0, 1.0), (5.0, 5.0), (9.0, 9.0)]",
+            "explanation": "Initial centroids exactly match data points, and each point is its own cluster. No change needed"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not using initial_centroids correctly (should be the starting point, not recalculated)",
+        "Off-by-one errors in iteration count (should perform exactly max_iterations iterations)",
+        "Forgetting to round the final centroids to 4 decimal places",
+        "Not preserving centroid order throughout iterations",
+        "Modifying the points list or initial_centroids (should not mutate inputs)",
+        "Not handling all k centroids even if some clusters become empty during iteration"
+      ],
+      "hint": "Use a loop that runs max_iterations times. In each iteration, perform the full assignment and update steps using functions from previous exercises. Keep the centroids list updated after each iteration.",
+      "references": [
+        "K-Means clustering",
+        "Lloyd's algorithm",
+        "Unsupervised learning",
+        "Cluster analysis",
+        "Vector quantization"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,377 @@
+{
+  "problem_id": 67,
+  "title": "Implement Compressed Column Sparse Matrix Format (CSC)",
+  "category": "Linear Algebra",
+  "difficulty": "easy",
+  "description": "## Task: Create a Compressed Column Sparse Matrix Representation\n\nYour task is to implement a function that converts a dense matrix into its Compressed Column Sparse (CSC) representation. The CSC format stores only non-zero elements of the matrix and is efficient for matrices with a high number of zero elements.\n\nWrite a function `compressed_col_sparse_matrix(dense_matrix)` that takes in a two-dimensional list `dense_matrix` and returns a tuple of three lists:\n\n- `values`: List of non-zero elements, stored in column-major order.\n- `row indices`: List of row indices corresponding to each value in the values array.\n- `column pointer`: List that indicates the starting index of each column in the values array.\n\n    ",
+  "example": {
+    "input": "dense_matrix = [\n    [0, 0, 3, 0],\n    [1, 0, 0, 4],\n    [0, 2, 0, 0]\n]\n\nvals, row_idx, col_ptr = compressed_col_sparse_matrix(dense_matrix)",
+    "output": "[1, 2, 3, 4] [1, 2, 0, 1] [0, 1, 2, 3, 4]",
+    "reasoning": "The dense matrix is converted to CSC format with the values array containing non-zero elements, row indices array storing the corresponding row index, and column pointer array indicating the start of each column in the values array."
+  },
+  "starter_code": "def compressed_col_sparse_matrix(dense_matrix):\n\t\"\"\"\n\tConvert a dense matrix into its Compressed Column Sparse (CSC) representation.\n\n\t:param dense_matrix: List of lists representing the dense matrix\n\t:return: Tuple of (values, row indices, column pointer)\n\t\"\"\"\n\tpass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Matrix Representation and Column-Major Traversal",
+      "relation_to_problem": "Understanding how to traverse matrices in column-major order is essential for CSC format, which stores non-zero elements column by column, rather than row by row.",
+      "prerequisites": [
+        "2D arrays/lists",
+        "Basic matrix notation",
+        "Nested loops"
+      ],
+      "learning_objectives": [
+        "Understand the difference between row-major and column-major matrix traversal",
+        "Master accessing matrix elements using $(i,j)$ notation where $i$ is the row index and $j$ is the column index",
+        "Implement column-wise iteration over a dense matrix"
+      ],
+      "math_content": {
+        "definition": "A **matrix** $A \\in \\mathbb{R}^{m \\times n}$ is a rectangular array of real numbers with $m$ rows and $n$ columns. Each element is denoted $A_{ij}$ where $i \\in \\{0, 1, \\ldots, m-1\\}$ is the row index and $j \\in \\{0, 1, \\ldots, n-1\\}$ is the column index (using 0-based indexing).",
+        "notation": "$A_{ij}$ = element at row $i$, column $j$; $\\mathbf{a}_j$ = the $j$-th column vector of $A$",
+        "theorem": "**Column-Major Ordering Theorem**: For a matrix $A$ of size $m \\times n$, column-major traversal visits elements in the order $A_{00}, A_{10}, \\ldots, A_{(m-1)0}, A_{01}, A_{11}, \\ldots, A_{(m-1)(n-1)}$. The linear index $k$ for element $A_{ij}$ in column-major order is given by: $$k = i + j \\cdot m$$",
+        "proof_sketch": "In column-major order, we first traverse all $m$ elements of column 0 (contributing indices $0$ to $m-1$), then all $m$ elements of column 1 (contributing indices $m$ to $2m-1$), and so on. For element $A_{ij}$, we have traversed $j$ complete columns (contributing $j \\cdot m$ elements) plus $i$ additional elements in the current column, yielding $k = i + j \\cdot m$.",
+        "examples": [
+          "For matrix $A = \\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{pmatrix}$ with $m=2, n=3$, column-major traversal yields: $(1,0) \\to 1$, $(1,1) \\to 4$, $(2,0) \\to 2$, $(2,1) \\to 5$, $(3,0) \\to 3$, $(3,1) \\to 6$",
+          "For a $3 \\times 3$ identity matrix, column-major order visits: $(0,0) \\to 1$, $(1,0) \\to 0$, $(2,0) \\to 0$, $(0,1) \\to 0$, $(1,1) \\to 1$, $(2,1) \\to 0$, $(0,2) \\to 0$, $(1,2) \\to 0$, $(2,2) \\to 1$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Column-Major Linear Index",
+          "latex": "$k = i + j \\cdot m$",
+          "description": "Converts 2D indices $(i,j)$ to 1D index in column-major order for an $m \\times n$ matrix"
+        },
+        {
+          "name": "Number of Columns",
+          "latex": "$n = \\text{len}(A[0])$",
+          "description": "For a 2D list representation, the number of columns is the length of any row"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that extracts all elements from a matrix in column-major order. This is the foundation for CSC format, which processes matrices column by column. Your function should return a list of tuples where each tuple contains $(\\text{row_index}, \\text{col_index}, \\text{value})$.",
+        "function_signature": "def extract_column_major(matrix: list[list[float]]) -> list[tuple[int, int, float]]:",
+        "starter_code": "def extract_column_major(matrix):\n    \"\"\"\n    Extract all elements from matrix in column-major order.\n    \n    :param matrix: 2D list representing the matrix\n    :return: List of tuples (row_idx, col_idx, value) in column-major order\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "extract_column_major([[1, 2], [3, 4]])",
+            "expected": "[(0, 0, 1), (1, 0, 3), (0, 1, 2), (1, 1, 4)]",
+            "explanation": "For a $2 \\times 2$ matrix, we first process column 0 (elements at rows 0 and 1), then column 1"
+          },
+          {
+            "input": "extract_column_major([[5, 0, 0], [0, 8, 0], [0, 0, 3]])",
+            "expected": "[(0, 0, 5), (1, 0, 0), (2, 0, 0), (0, 1, 0), (1, 1, 8), (2, 1, 0), (0, 2, 0), (1, 2, 0), (2, 2, 3)]",
+            "explanation": "Diagonal matrix traversed column-major includes all elements (including zeros) in order"
+          },
+          {
+            "input": "extract_column_major([[1]])",
+            "expected": "[(0, 0, 1)]",
+            "explanation": "A $1 \\times 1$ matrix has only one element"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row-major and column-major order (iterating rows in outer loop instead of columns)",
+        "Off-by-one errors in loop bounds",
+        "Assuming square matrices only (forgetting that $m \\neq n$ in general)"
+      ],
+      "hint": "Use nested loops with the column index in the outer loop and row index in the inner loop.",
+      "references": [
+        "Column-major vs row-major order",
+        "Matrix storage layouts",
+        "NumPy array ordering"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Sparse Matrices and Sparsity Quantification",
+      "relation_to_problem": "CSC format only stores non-zero elements. Understanding sparsity helps determine when CSC is beneficial and provides the theoretical foundation for identifying which elements to store.",
+      "prerequisites": [
+        "Matrix representation",
+        "Set theory basics",
+        "Counting non-zero elements"
+      ],
+      "learning_objectives": [
+        "Define sparse matrices formally using mathematical notation",
+        "Calculate the sparsity ratio and understand its implications for memory efficiency",
+        "Identify and extract non-zero elements from a matrix in column-major order"
+      ],
+      "math_content": {
+        "definition": "A matrix $A \\in \\mathbb{R}^{m \\times n}$ is called **sparse** if the number of non-zero entries is significantly smaller than the total number of entries. Formally, let $\\text{nnz}(A) = |\\{(i,j) : A_{ij} \\neq 0\\}|$ denote the number of non-zero entries. The **sparsity ratio** is defined as: $$\\rho(A) = \\frac{\\text{nnz}(A)}{m \\cdot n}$$ A matrix is considered sparse when $\\rho(A) \\ll 1$ (typically $\\rho(A) < 0.1$).",
+        "notation": "$\\text{nnz}(A)$ = number of non-zero entries; $\\rho(A)$ = sparsity ratio; $\\mathcal{S}(A) = \\{(i,j) : A_{ij} \\neq 0\\}$ = sparsity pattern (set of non-zero positions)",
+        "theorem": "**Memory Efficiency Theorem**: For a dense matrix $A \\in \\mathbb{R}^{m \\times n}$, the memory requirement is $M_{\\text{dense}} = m \\cdot n \\cdot s_f$ bytes where $s_f$ is the size of a floating-point number. For CSC format, the memory is approximately $M_{\\text{CSC}} \\approx \\text{nnz}(A) \\cdot (s_f + s_i) + n \\cdot s_i$ where $s_i$ is the size of an integer. CSC is more efficient when: $$\\text{nnz}(A) < \\frac{m \\cdot n \\cdot s_f}{s_f + s_i}$$",
+        "proof_sketch": "Dense storage allocates space for all $m \\cdot n$ entries. CSC stores only non-zero values (requiring $\\text{nnz}(A)$ floats), their row indices (requiring $\\text{nnz}(A)$ integers), and column pointers (requiring $n+1$ integers). When $\\text{nnz}(A) \\ll m \\cdot n$, the CSC format uses dramatically less memory. With typical sizes $s_f = 8$ bytes and $s_i = 4$ bytes, CSC is beneficial when $\\rho(A) < \\frac{8}{12} \\approx 0.67$.",
+        "examples": [
+          "For the matrix $A = \\begin{pmatrix} 0 & 0 & 3 \\\\ 1 & 0 & 0 \\\\ 0 & 2 & 0 \\end{pmatrix}$, we have $\\text{nnz}(A) = 3$, $m \\cdot n = 9$, so $\\rho(A) = 3/9 = 0.33$ (sparse)",
+          "An identity matrix $I_n$ has $\\text{nnz}(I_n) = n$ and $\\rho(I_n) = n/n^2 = 1/n$, becoming increasingly sparse as $n$ grows"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sparsity Ratio",
+          "latex": "$\\rho(A) = \\frac{\\text{nnz}(A)}{m \\cdot n}$",
+          "description": "Fraction of non-zero elements; use to determine if CSC format is beneficial"
+        },
+        {
+          "name": "CSC Memory Requirement",
+          "latex": "$M_{\\text{CSC}} = \\text{nnz}(A) \\cdot (s_f + s_i) + (n + 1) \\cdot s_i$",
+          "description": "Total bytes needed for CSC representation with float size $s_f$ and int size $s_i$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that extracts only the non-zero elements from a matrix in column-major order. This directly builds toward the CSC 'values' and 'row indices' arrays. Return a list of tuples containing $(\\text{row_index}, \\text{col_index}, \\text{value})$ for non-zero elements only.",
+        "function_signature": "def extract_nonzero_column_major(matrix: list[list[float]]) -> list[tuple[int, int, float]]:",
+        "starter_code": "def extract_nonzero_column_major(matrix):\n    \"\"\"\n    Extract non-zero elements in column-major order.\n    \n    :param matrix: 2D list representing the matrix\n    :return: List of tuples (row_idx, col_idx, value) for non-zero elements in column-major order\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "extract_nonzero_column_major([[0, 0, 3, 0], [1, 0, 0, 4], [0, 2, 0, 0]])",
+            "expected": "[(1, 0, 1), (2, 1, 2), (0, 2, 3), (1, 3, 4)]",
+            "explanation": "Column 0 has element 1 at row 1; column 1 has element 2 at row 2; column 2 has element 3 at row 0; column 3 has element 4 at row 1"
+          },
+          {
+            "input": "extract_nonzero_column_major([[5, 0], [0, 8]])",
+            "expected": "[(0, 0, 5), (1, 1, 8)]",
+            "explanation": "Diagonal matrix has non-zero elements only on the diagonal"
+          },
+          {
+            "input": "extract_nonzero_column_major([[0, 0], [0, 0]])",
+            "expected": "[]",
+            "explanation": "Zero matrix has no non-zero elements"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Treating zero values as non-zero due to floating-point precision issues (use exact comparison with 0 for integer matrices, or threshold for float matrices)",
+        "Processing in row-major instead of column-major order",
+        "Not handling empty matrices or all-zero columns correctly"
+      ],
+      "hint": "Modify your column-major traversal from Step 1 to include a conditional check: only include elements where the value is non-zero.",
+      "references": [
+        "Sparse matrix representations",
+        "Graph adjacency matrices",
+        "Finite element method matrices"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Building the Values and Row Indices Arrays",
+      "relation_to_problem": "The first two components of CSC format are the 'values' array (non-zero elements) and 'row indices' array (row position of each value). This step constructs these arrays from the sparse matrix.",
+      "prerequisites": [
+        "Column-major traversal",
+        "Non-zero element extraction",
+        "List comprehensions or filtering"
+      ],
+      "learning_objectives": [
+        "Construct the values array by storing non-zero elements in column-major order",
+        "Construct the row indices array to maintain positional information",
+        "Understand the correspondence between values and row indices arrays"
+      ],
+      "math_content": {
+        "definition": "For a sparse matrix $A \\in \\mathbb{R}^{m \\times n}$ with sparsity pattern $\\mathcal{S}(A)$, the **values array** is defined as: $$\\text{values} = [A_{ij} : (i,j) \\in \\mathcal{S}(A) \\text{ ordered by column-major}]$$ The **row indices array** is defined as: $$\\text{indices} = [i : (i,j) \\in \\mathcal{S}(A) \\text{ ordered by column-major}]$$ Both arrays have length $\\text{nnz}(A)$ and maintain a one-to-one correspondence.",
+        "notation": "$\\text{values}[k]$ = the $k$-th non-zero value; $\\text{indices}[k]$ = row index of $\\text{values}[k]$; $(i,j) \\mapsto (\\text{values}[k], \\text{indices}[k])$ for the $k$-th non-zero element",
+        "theorem": "**Array Correspondence Theorem**: For any index $k \\in \\{0, 1, \\ldots, \\text{nnz}(A)-1\\}$, there exists a unique $(i,j) \\in \\mathcal{S}(A)$ such that $\\text{values}[k] = A_{ij}$ and $\\text{indices}[k] = i$. Furthermore, if $k_1 < k_2$, then the corresponding column indices satisfy $j_1 \\leq j_2$ (preserving column-major ordering).",
+        "proof_sketch": "The construction iterates through columns in increasing order $j = 0, 1, \\ldots, n-1$. Within each column, rows are processed in order $i = 0, 1, \\ldots, m-1$. When a non-zero element $A_{ij} \\neq 0$ is encountered, it is appended to values and its row index $i$ is appended to indices. This preserves column-major ordering and maintains the invariant that $\\text{values}[k]$ and $\\text{indices}[k]$ always refer to the same matrix position.",
+        "examples": [
+          "For $A = \\begin{pmatrix} 0 & 0 & 3 \\\\ 1 & 0 & 0 \\\\ 0 & 2 & 0 \\end{pmatrix}$: Column 0 contributes $(1,0,1)$, column 1 contributes $(2,1,2)$, column 2 contributes $(0,2,3)$. Thus $\\text{values} = [1, 2, 3]$ and $\\text{indices} = [1, 2, 0]$",
+          "For $A = \\begin{pmatrix} 5 & 0 \\\\ 0 & 8 \\\\ 3 & 0 \\end{pmatrix}$: $\\text{values} = [5, 3, 8]$ and $\\text{indices} = [0, 2, 1]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Values Array Construction",
+          "latex": "$\\text{values} = [A_{ij} : j \\in [0,n), i \\in [0,m), A_{ij} \\neq 0]$",
+          "description": "Collect non-zero values in column-major order"
+        },
+        {
+          "name": "Row Indices Array Construction",
+          "latex": "$\\text{indices} = [i : j \\in [0,n), i \\in [0,m), A_{ij} \\neq 0]$",
+          "description": "Collect corresponding row indices in the same order as values"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that constructs both the values array and row indices array from a dense matrix. These are the first two components of CSC format. The function should return a tuple (values, row_indices) where both lists are ordered by column-major traversal.",
+        "function_signature": "def build_csc_values_and_indices(matrix: list[list[float]]) -> tuple[list[float], list[int]]:",
+        "starter_code": "def build_csc_values_and_indices(matrix):\n    \"\"\"\n    Build the values and row indices arrays for CSC format.\n    \n    :param matrix: 2D list representing the dense matrix\n    :return: Tuple of (values, row_indices)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "build_csc_values_and_indices([[0, 0, 3, 0], [1, 0, 0, 4], [0, 2, 0, 0]])",
+            "expected": "([1, 2, 3, 4], [1, 2, 0, 1])",
+            "explanation": "Non-zero elements in column-major order: column 0 → (1,1), column 1 → (2,2), column 2 → (3,0), column 3 → (4,1)"
+          },
+          {
+            "input": "build_csc_values_and_indices([[1, 0], [0, 0], [2, 3]])",
+            "expected": "([1, 2, 3], [0, 2, 2])",
+            "explanation": "Column 0 has elements at rows 0 and 2; column 1 has element at row 2"
+          },
+          {
+            "input": "build_csc_values_and_indices([[0]])",
+            "expected": "([], [])",
+            "explanation": "Single zero element results in empty arrays"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to maintain synchronized order between values and indices arrays",
+        "Appending to only one array when a non-zero element is found",
+        "Processing rows in outer loop (row-major) instead of columns (column-major)"
+      ],
+      "hint": "Iterate through columns in the outer loop. For each column, iterate through rows. When you find a non-zero element, append it to values and append its row index to indices.",
+      "references": [
+        "CSC format specification",
+        "scipy.sparse.csc_matrix documentation",
+        "Coordinate list (COO) format"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Column Pointer Array and Cumulative Indexing",
+      "relation_to_problem": "The column pointer array is the third and final component of CSC format. It enables efficient column access by storing the starting position of each column's data in the values/indices arrays.",
+      "prerequisites": [
+        "Cumulative sums",
+        "Array indexing",
+        "Values and row indices arrays"
+      ],
+      "learning_objectives": [
+        "Understand the role of the column pointer array in enabling random column access",
+        "Construct the column pointer array using cumulative counting",
+        "Extract a specific column's non-zero elements using the column pointer"
+      ],
+      "math_content": {
+        "definition": "For a matrix $A \\in \\mathbb{R}^{m \\times n}$ in CSC format, the **column pointer array** (indptr) is a length-$(n+1)$ array where: $$\\text{indptr}[j] = \\sum_{k=0}^{j-1} |\\{i : A_{ik} \\neq 0\\}|$$ with $\\text{indptr}[0] = 0$ by convention. Equivalently, $\\text{indptr}[j]$ stores the starting index in the values/indices arrays where column $j$'s data begins, and $\\text{indptr}[n] = \\text{nnz}(A)$.",
+        "notation": "$\\text{indptr}[j]$ = starting position of column $j$ in values/indices arrays; $n_j = \\text{indptr}[j+1] - \\text{indptr}[j]$ = number of non-zero elements in column $j$",
+        "theorem": "**Column Extraction Theorem**: For column $j$ of matrix $A$ in CSC format, all non-zero elements can be extracted as: $$\\{(i, A_{ij}) : i \\in \\text{indices}[\\text{indptr}[j]:\\text{indptr}[j+1]], A_{ij} \\in \\text{values}[\\text{indptr}[j]:\\text{indptr}[j+1]]\\}$$ This operation has time complexity $O(n_j)$ where $n_j$ is the number of non-zero elements in column $j$.",
+        "proof_sketch": "By construction, $\\text{indptr}[j]$ marks the position where column $j$'s data begins. Since columns are processed in order, column $j$'s data occupies positions $[\\text{indptr}[j], \\text{indptr}[j+1))$ in both values and indices arrays. The length of this range is $\\text{indptr}[j+1] - \\text{indptr}[j] = n_j$. To reconstruct column $j$, we create a sparse vector with $\\text{indices}[k]$ giving the row position and $\\text{values}[k]$ giving the value for $k \\in [\\text{indptr}[j], \\text{indptr}[j+1))$.",
+        "examples": [
+          "For $A = \\begin{pmatrix} 0 & 0 & 3 \\\\ 1 & 0 & 0 \\\\ 0 & 2 & 0 \\end{pmatrix}$: Column 0 has 1 non-zero, column 1 has 1 non-zero, column 2 has 1 non-zero. Thus $\\text{indptr} = [0, 1, 2, 3]$. To extract column 1: positions $[1:2)$ in values give $[2]$, positions $[1:2)$ in indices give $[2]$, meaning row 2 has value 2.",
+          "For a matrix with columns having 0, 3, 0, 2 non-zeros respectively: $\\text{indptr} = [0, 0, 3, 3, 5]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Column Pointer Recurrence",
+          "latex": "$\\text{indptr}[j+1] = \\text{indptr}[j] + n_j$",
+          "description": "Each pointer is the previous pointer plus the count of non-zeros in the current column"
+        },
+        {
+          "name": "Total Non-Zero Elements",
+          "latex": "$\\text{nnz}(A) = \\text{indptr}[n]$",
+          "description": "The final entry in the column pointer array equals the total number of non-zeros"
+        },
+        {
+          "name": "Column j Non-Zero Count",
+          "latex": "$n_j = \\text{indptr}[j+1] - \\text{indptr}[j]$",
+          "description": "Compute the number of non-zero elements in column $j$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that constructs the column pointer array for CSC format. Given a matrix, count the non-zero elements in each column and build the cumulative index array. The array should have length $n+1$ where $n$ is the number of columns, starting with 0 and ending with the total number of non-zeros.",
+        "function_signature": "def build_column_pointer(matrix: list[list[float]]) -> list[int]:",
+        "starter_code": "def build_column_pointer(matrix):\n    \"\"\"\n    Build the column pointer array for CSC format.\n    \n    :param matrix: 2D list representing the dense matrix\n    :return: List of column pointers (length = num_columns + 1)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "build_column_pointer([[0, 0, 3, 0], [1, 0, 0, 4], [0, 2, 0, 0]])",
+            "expected": "[0, 1, 2, 3, 4]",
+            "explanation": "Column 0 has 1 non-zero, column 1 has 1, column 2 has 1, column 3 has 1. Cumulative: [0, 0+1, 1+1, 2+1, 3+1] = [0, 1, 2, 3, 4]"
+          },
+          {
+            "input": "build_column_pointer([[1, 0], [2, 0], [3, 4]])",
+            "expected": "[0, 3, 4]",
+            "explanation": "Column 0 has 3 non-zeros (1,2,3), column 1 has 1 non-zero (4). Cumulative: [0, 0+3, 3+1] = [0, 3, 4]"
+          },
+          {
+            "input": "build_column_pointer([[0, 0], [0, 0]])",
+            "expected": "[0, 0, 0]",
+            "explanation": "All columns have 0 non-zeros, so all pointers are 0 except we still need n+1=3 entries"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to include the initial 0 or the final total count (array should have n+1 elements, not n)",
+        "Counting all elements instead of only non-zero elements per column",
+        "Using absolute positions instead of cumulative counts"
+      ],
+      "hint": "First, count the number of non-zero elements in each column. Then, build the pointer array by computing cumulative sums, starting from 0.",
+      "references": [
+        "Cumulative sum algorithm",
+        "Prefix sum arrays",
+        "CSC format internals"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Complete CSC Format Assembly and Verification",
+      "relation_to_problem": "This final step integrates all previous concepts to construct the complete CSC representation. It combines the values, row indices, and column pointer arrays into a unified format and verifies correctness.",
+      "prerequisites": [
+        "Values array construction",
+        "Row indices array construction",
+        "Column pointer array construction"
+      ],
+      "learning_objectives": [
+        "Integrate all three CSC components (values, row indices, column pointer) into a complete representation",
+        "Verify CSC format correctness by reconstructing matrix elements",
+        "Understand the space complexity and access patterns of CSC format"
+      ],
+      "math_content": {
+        "definition": "The **Compressed Sparse Column (CSC) format** represents a matrix $A \\in \\mathbb{R}^{m \\times n}$ as a triple $(\\text{values}, \\text{indices}, \\text{indptr})$ where: (1) $\\text{values} \\in \\mathbb{R}^{\\text{nnz}(A)}$ stores non-zero entries in column-major order, (2) $\\text{indices} \\in \\mathbb{Z}^{\\text{nnz}(A)}$ stores corresponding row indices, and (3) $\\text{indptr} \\in \\mathbb{Z}^{n+1}$ stores column start positions with $\\text{indptr}[0]=0$ and $\\text{indptr}[n]=\\text{nnz}(A)$.",
+        "notation": "$(\\text{values}, \\text{indices}, \\text{indptr})$ = CSC triple; $A_{\\text{CSC}}$ = matrix $A$ in CSC format",
+        "theorem": "**CSC Completeness Theorem**: A matrix $A$ can be uniquely reconstructed from its CSC representation $(\\text{values}, \\text{indices}, \\text{indptr})$ using: $$A_{ij} = \\begin{cases} \\text{values}[k] & \\text{if } \\exists k \\in [\\text{indptr}[j], \\text{indptr}[j+1]) : \\text{indices}[k] = i \\\\ 0 & \\text{otherwise} \\end{cases}$$",
+        "proof_sketch": "For each element $A_{ij}$, we examine column $j$'s data in positions $[\\text{indptr}[j], \\text{indptr}[j+1))$. If there exists an index $k$ in this range where $\\text{indices}[k] = i$, then $A_{ij} = \\text{values}[k]$ by construction. Otherwise, the element was zero and not stored, so $A_{ij} = 0$. This reconstruction is unique because each $(i,j)$ pair maps to at most one position in the values array.",
+        "examples": [
+          "For $A = \\begin{pmatrix} 0 & 0 & 3 & 0 \\\\ 1 & 0 & 0 & 4 \\\\ 0 & 2 & 0 & 0 \\end{pmatrix}$: CSC = $([1,2,3,4], [1,2,0,1], [0,1,2,3,4])$. To find $A_{0,2}$: column 2 data is at positions $[2:3)$, giving values$[2]=3$ at row indices$[2]=0$, confirming $A_{0,2}=3$.",
+          "Identity matrix $I_3$ in CSC: $([1,1,1], [0,1,2], [0,1,2,3])$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "CSC Space Complexity",
+          "latex": "$S(A_{\\text{CSC}}) = 2 \\cdot \\text{nnz}(A) + n + 1$",
+          "description": "Total array slots needed (values + indices + indptr)"
+        },
+        {
+          "name": "Element Access Time",
+          "latex": "$T_{\\text{access}}(i,j) = O(n_j)$",
+          "description": "Time to access element $A_{ij}$ requires searching column $j$ with $n_j$ non-zeros"
+        },
+        {
+          "name": "Column Access Time",
+          "latex": "$T_{\\text{column}}(j) = O(n_j)$",
+          "description": "Time to extract all non-zeros in column $j$ is proportional to the count $n_j$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that combines all components to build a complete CSC representation. The function should return a tuple of three lists: (values, row_indices, column_pointer). This exercise integrates all previous sub-quests and produces the final CSC format, but does NOT reveal the exact solution structure for the main problem.",
+        "function_signature": "def build_csc_components(matrix: list[list[float]]) -> tuple[list[float], list[int], list[int]]:",
+        "starter_code": "def build_csc_components(matrix):\n    \"\"\"\n    Build all three CSC format components.\n    \n    :param matrix: 2D list representing the dense matrix\n    :return: Tuple of (values, row_indices, column_pointer)\n    \"\"\"\n    # Your code here - combine techniques from previous steps\n    # Step 1: Extract non-zero elements in column-major order\n    # Step 2: Build values and row_indices arrays\n    # Step 3: Build column_pointer array\n    pass",
+        "test_cases": [
+          {
+            "input": "build_csc_components([[0, 0, 3, 0], [1, 0, 0, 4], [0, 2, 0, 0]])",
+            "expected": "([1, 2, 3, 4], [1, 2, 0, 1], [0, 1, 2, 3, 4])",
+            "explanation": "Complete CSC format: values in column-major order, row indices aligned with values, column pointers showing cumulative non-zero counts starting from 0"
+          },
+          {
+            "input": "build_csc_components([[5]])",
+            "expected": "([5], [0], [0, 1])",
+            "explanation": "Single element matrix: one value, one row index, two column pointers (start=0, end=1)"
+          },
+          {
+            "input": "build_csc_components([[1, 2], [3, 4]])",
+            "expected": "([1, 3, 2, 4], [0, 1, 0, 1], [0, 2, 4])",
+            "explanation": "Dense $2 \\times 2$ matrix: column 0 has 2 elements, column 1 has 2 elements, pointers at [0, 2, 4]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not maintaining consistency between values and indices array lengths",
+        "Off-by-one errors in column pointer array (must have exactly n+1 elements)",
+        "Processing matrix in row-major instead of column-major order",
+        "Forgetting to handle empty matrices or all-zero columns"
+      ],
+      "hint": "You can reuse functions from previous steps: first build values and row_indices together (Step 3), then build the column_pointer separately (Step 4). Alternatively, do everything in one pass through the matrix.",
+      "references": [
+        "scipy.sparse.csc_matrix",
+        "SuiteSparse library",
+        "MATLAB sparse matrix format",
+        "Matrix Market format"
+      ]
+    }
+  ]
+}

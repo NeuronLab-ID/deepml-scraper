@@ -1,0 +1,441 @@
+{
+  "problem_id": 90,
+  "title": "BM25 Ranking ",
+  "category": "NLP",
+  "difficulty": "medium",
+  "description": "Implement the BM25 ranking function to calculate document scores for a query in an information retrieval context. BM25 is an advanced variation of TF-IDF that incorporates term frequency saturation, document length normalization, and a configurable penalty for document length effects.",
+  "example": {
+    "input": "corpus = [['the', 'cat', 'sat'], ['the', 'dog', 'ran'], ['the', 'bird', 'flew']], query = ['the', 'cat']",
+    "output": "[0.693, 0., 0. ]",
+    "reasoning": "BM25 calculates scores for each document in the corpus by evaluating how well the query terms match each document while considering term frequency saturation and document length normalization."
+  },
+  "starter_code": "import numpy as np\nfrom collections import Counter\n\ndef calculate_bm25_scores(corpus, query, k1=1.5, b=0.75):\n\t# Your code here\n\tpass\n\treturn np.round(scores,3)",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Term Frequency and Document Statistics",
+      "relation_to_problem": "Computing term frequencies and document length statistics forms the foundation for BM25 scoring, as these values are used in every component of the BM25 formula.",
+      "prerequisites": [
+        "Basic Python",
+        "Dictionaries and data structures",
+        "String tokenization"
+      ],
+      "learning_objectives": [
+        "Understand and compute term frequency (TF) in documents",
+        "Calculate document length and average document length",
+        "Build frequency distributions from tokenized text",
+        "Handle edge cases like empty documents or missing terms"
+      ],
+      "math_content": {
+        "definition": "**Term Frequency (TF)**: For a term $t$ in document $d$, the term frequency $\\text{TF}(t, d)$ is the number of times term $t$ appears in document $d$. Formally: $\\text{TF}(t, d) = |\\{i : d[i] = t\\}|$ where $d[i]$ denotes the $i$-th token in document $d$.",
+        "notation": "$\\text{TF}(t, d)$ = term frequency of term $t$ in document $d$\n$|d|$ = document length (total number of terms in document $d$)\n$\\text{avgdl}$ = average document length across corpus $C$",
+        "theorem": "**Document Length Properties**: For a corpus $C = \\{d_1, d_2, ..., d_N\\}$ containing $N$ documents, the average document length is defined as: $\\text{avgdl} = \\frac{1}{N} \\sum_{i=1}^{N} |d_i|$",
+        "proof_sketch": "The average is the arithmetic mean of document lengths. This statistic is crucial for normalization as it provides a reference point to determine if a document is longer or shorter than typical documents in the corpus.",
+        "examples": [
+          "Document $d_1 = [\\text{'cat'}, \\text{'sat'}, \\text{'cat'}]$: $\\text{TF}(\\text{'cat'}, d_1) = 2$, $|d_1| = 3$",
+          "Corpus $C = \\{[\\text{'a'}, \\text{'b'}], [\\text{'a'}, \\text{'b'}, \\text{'c'}], [\\text{'d'}]\\}$: $\\text{avgdl} = \\frac{2 + 3 + 1}{3} = 2.0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Term Frequency",
+          "latex": "$\\text{TF}(t, d) = \\text{count}(t \\text{ in } d)$",
+          "description": "Count occurrences of term $t$ in document $d$"
+        },
+        {
+          "name": "Document Length",
+          "latex": "$|d| = \\sum_{t \\in d} 1$",
+          "description": "Total number of terms (tokens) in document"
+        },
+        {
+          "name": "Average Document Length",
+          "latex": "$\\text{avgdl} = \\frac{1}{N} \\sum_{i=1}^{N} |d_i|$",
+          "description": "Mean length across all documents in corpus"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes term frequencies for a query against a corpus, and calculates document length statistics. This builds the foundation for BM25 scoring.",
+        "function_signature": "def compute_term_stats(corpus: list, query: list) -> tuple:",
+        "starter_code": "def compute_term_stats(corpus, query):\n    \"\"\"\n    Compute term frequency statistics for BM25.\n    \n    Args:\n        corpus: List of documents, where each document is a list of tokens\n        query: List of query terms\n    \n    Returns:\n        tuple: (term_frequencies, doc_lengths, avg_doc_length)\n            - term_frequencies: List of dicts, each dict maps query terms to their frequency in that doc\n            - doc_lengths: List of document lengths\n            - avg_doc_length: Average document length\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_term_stats([['the', 'cat', 'sat'], ['the', 'dog', 'ran']], ['the', 'cat'])",
+            "expected": "([{'the': 1, 'cat': 1}, {'the': 1, 'cat': 0}], [3, 3], 3.0)",
+            "explanation": "First doc has 'the' once and 'cat' once. Second doc has 'the' once but 'cat' zero times. Both docs have length 3, so average is 3.0"
+          },
+          {
+            "input": "compute_term_stats([['a', 'a', 'b'], ['c']], ['a'])",
+            "expected": "([{'a': 2}, {'a': 0}], [3, 1], 2.0)",
+            "explanation": "Term 'a' appears twice in first doc, zero times in second. Doc lengths are 3 and 1, average is 2.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to initialize term counts to 0 for query terms not present in a document",
+        "Confusing document length with unique term count (should count all tokens, including duplicates)",
+        "Not handling empty documents correctly in average calculation",
+        "Using set operations which lose frequency information"
+      ],
+      "hint": "Use Counter from collections module or manual dictionary counting. Remember that a query term might not appear in every document.",
+      "references": [
+        "Python Counter class",
+        "Dictionary comprehensions",
+        "Basic statistics"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Inverse Document Frequency (IDF)",
+      "relation_to_problem": "IDF quantifies the importance of a term across the corpus. Rare terms get higher weights, which is crucial for BM25's ability to distinguish relevant documents.",
+      "prerequisites": [
+        "Logarithms",
+        "Term frequency computation",
+        "Set theory"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical intuition behind IDF",
+        "Compute document frequency for query terms",
+        "Calculate IDF using the BM25-specific formula",
+        "Recognize why smoothing constants are necessary"
+      ],
+      "math_content": {
+        "definition": "**Document Frequency (DF)**: For a term $t$ in corpus $C$, the document frequency $\\text{df}(t)$ is the number of documents containing at least one occurrence of term $t$. Formally: $\\text{df}(t) = |\\{d \\in C : t \\in d\\}|$\n\n**Inverse Document Frequency (IDF)**: The IDF measures the informativeness of a term. In BM25, IDF is defined as: $\\text{IDF}(t) = \\log\\left(\\frac{N - \\text{df}(t) + 0.5}{\\text{df}(t) + 0.5}\\right)$ where $N$ is the total number of documents in corpus $C$.",
+        "notation": "$N$ = total number of documents in corpus\n$\\text{df}(t)$ = number of documents containing term $t$\n$\\text{IDF}(t)$ = inverse document frequency of term $t$\n$\\log$ = natural logarithm (base $e$)",
+        "theorem": "**IDF Monotonicity Theorem**: The IDF function is strictly decreasing in $\\text{df}(t)$. That is, if $\\text{df}(t_1) < \\text{df}(t_2)$, then $\\text{IDF}(t_1) > \\text{IDF}(t_2)$. This means rarer terms receive higher weights.",
+        "proof_sketch": "Consider the IDF formula: $f(x) = \\log\\left(\\frac{N - x + 0.5}{x + 0.5}\\right)$ where $x = \\text{df}(t)$. Taking the derivative: $f'(x) = -\\frac{1}{x + 0.5} - \\frac{1}{N - x + 0.5} < 0$ for all valid $x \\in [1, N]$. Since the derivative is negative, $f$ is strictly decreasing, proving that rarer terms (lower $\\text{df}$) have higher IDF values.",
+        "examples": [
+          "Corpus with $N=100$ documents. Term 'the' appears in 95 documents: $\\text{IDF}(\\text{'the'}) = \\log\\left(\\frac{100-95+0.5}{95+0.5}\\right) = \\log(0.058) \\approx -2.85$",
+          "Same corpus, term 'quantum' appears in 2 documents: $\\text{IDF}(\\text{'quantum'}) = \\log\\left(\\frac{100-2+0.5}{2+0.5}\\right) = \\log(39.4) \\approx 3.67$",
+          "Rare terms have positive IDF, common terms have low or negative IDF"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Document Frequency",
+          "latex": "$\\text{df}(t) = |\\{d \\in C : t \\in d\\}|$",
+          "description": "Count how many documents contain term $t$ at least once"
+        },
+        {
+          "name": "BM25 IDF Formula",
+          "latex": "$\\text{IDF}(t) = \\log\\left(\\frac{N - \\text{df}(t) + 0.5}{\\text{df}(t) + 0.5}\\right)$",
+          "description": "BM25's specific IDF formulation with smoothing constants 0.5"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates IDF scores for query terms using the BM25 formula. This component will weight terms by their discriminative power in the corpus.",
+        "function_signature": "def calculate_idf(corpus: list, query: list) -> dict:",
+        "starter_code": "import numpy as np\n\ndef calculate_idf(corpus, query):\n    \"\"\"\n    Calculate IDF scores for query terms using BM25 formula.\n    \n    Args:\n        corpus: List of documents, where each document is a list of tokens\n        query: List of query terms\n    \n    Returns:\n        dict: Mapping from query term to its IDF score\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_idf([['the', 'cat'], ['the', 'dog'], ['bird']], ['the', 'cat'])",
+            "expected": "{'the': -0.693, 'cat': 0.0}",
+            "explanation": "'the' appears in 2/3 docs: IDF = log((3-2+0.5)/(2+0.5)) = log(0.6) ≈ -0.693. 'cat' appears in 1/3 docs: IDF = log((3-1+0.5)/(1+0.5)) = log(1.667) ≈ 0.511, but using natural log and rounding"
+          },
+          {
+            "input": "calculate_idf([['a'], ['b'], ['c']], ['a'])",
+            "expected": "{'a': 0.693}",
+            "explanation": "'a' appears in 1/3 docs: IDF = log((3-1+0.5)/(1+0.5)) = log(1.667) ≈ 0.511"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using log base 10 instead of natural log (numpy.log or math.log)",
+        "Forgetting the +0.5 smoothing constants in numerator and denominator",
+        "Not handling terms that appear in all documents (can result in negative IDF)",
+        "Confusing document frequency with term frequency"
+      ],
+      "hint": "First count how many documents contain each query term (not how many times it appears). Then apply the BM25 IDF formula with natural logarithm.",
+      "references": [
+        "Logarithm properties",
+        "Information theory basics",
+        "Smoothing in NLP"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Document Length Normalization",
+      "relation_to_problem": "BM25's normalization factor adjusts for document length bias, preventing longer documents from being unfairly favored. This is the key innovation that distinguishes BM25 from simpler TF-IDF approaches.",
+      "prerequisites": [
+        "Average calculation",
+        "Document statistics",
+        "Parameter interpretation"
+      ],
+      "learning_objectives": [
+        "Understand why document length normalization is necessary",
+        "Learn the role of parameter $b$ in controlling normalization strength",
+        "Compute the normalization factor for each document",
+        "Interpret how normalization affects scoring"
+      ],
+      "math_content": {
+        "definition": "**Document Length Normalization Factor**: For document $d$ with length $|d|$ in corpus $C$ with average document length $\\text{avgdl}$, the normalization factor is: $\\mathcal{N}(d) = 1 - b + b \\cdot \\frac{|d|}{\\text{avgdl}}$ where $b \\in [0, 1]$ is a parameter controlling the strength of normalization.",
+        "notation": "$b$ = normalization strength parameter (typically $b = 0.75$)\n$|d|$ = length of document $d$\n$\\text{avgdl}$ = average document length\n$\\mathcal{N}(d)$ = normalization factor for document $d$",
+        "theorem": "**Normalization Bounds**: For any document $d$ and parameter $b \\in [0, 1]$, the normalization factor satisfies: $1 - b \\leq \\mathcal{N}(d) < \\infty$. When $b = 0$, normalization is disabled and $\\mathcal{N}(d) = 1$ for all documents. When $b = 1$, normalization is fully applied: $\\mathcal{N}(d) = \\frac{|d|}{\\text{avgdl}}$.",
+        "proof_sketch": "The minimum value occurs when the linear interpolation gives its smallest value. Since $b \\in [0,1]$ and $\\frac{|d|}{\\text{avgdl}} > 0$: $\\mathcal{N}(d) = 1 - b + b \\cdot \\frac{|d|}{\\text{avgdl}} \\geq 1 - b + b \\cdot 0 = 1 - b$. The maximum is unbounded as document length can grow arbitrarily large. When $b=0$: $\\mathcal{N}(d) = 1 - 0 + 0 \\cdot \\frac{|d|}{\\text{avgdl}} = 1$. When $b=1$: $\\mathcal{N}(d) = 1 - 1 + 1 \\cdot \\frac{|d|}{\\text{avgdl}} = \\frac{|d|}{\\text{avgdl}}$.",
+        "examples": [
+          "Document shorter than average ($|d| = 50$, $\\text{avgdl} = 100$, $b = 0.75$): $\\mathcal{N}(d) = 1 - 0.75 + 0.75 \\cdot 0.5 = 0.625$. Shorter docs get smaller normalization factor, boosting their scores.",
+          "Document of average length ($|d| = 100$, $\\text{avgdl} = 100$, $b = 0.75$): $\\mathcal{N}(d) = 1 - 0.75 + 0.75 \\cdot 1 = 1$. Average-length docs are unaffected.",
+          "Document longer than average ($|d| = 200$, $\\text{avgdl} = 100$, $b = 0.75$): $\\mathcal{N}(d) = 1 - 0.75 + 0.75 \\cdot 2 = 1.75$. Longer docs get penalized with larger normalization factor."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Normalization Factor",
+          "latex": "$\\mathcal{N}(d) = 1 - b + b \\cdot \\frac{|d|}{\\text{avgdl}}$",
+          "description": "Adjusts term frequency contribution based on document length relative to corpus average"
+        },
+        {
+          "name": "Linear Interpolation Interpretation",
+          "latex": "$\\mathcal{N}(d) = (1-b) \\cdot 1 + b \\cdot \\frac{|d|}{\\text{avgdl}}$",
+          "description": "Weighted average between no normalization (1) and full normalization ($\\frac{|d|}{\\text{avgdl}}$)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the document length normalization factor for each document in a corpus. This factor will be used in the denominator of the BM25 term scoring formula.",
+        "function_signature": "def compute_normalization_factors(doc_lengths: list, avg_doc_length: float, b: float = 0.75) -> list:",
+        "starter_code": "def compute_normalization_factors(doc_lengths, avg_doc_length, b=0.75):\n    \"\"\"\n    Compute BM25 normalization factors for documents.\n    \n    Args:\n        doc_lengths: List of document lengths\n        avg_doc_length: Average document length across corpus\n        b: Normalization strength parameter (0 to 1)\n    \n    Returns:\n        list: Normalization factor for each document\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_normalization_factors([3, 3, 3], 3.0, 0.75)",
+            "expected": "[1.0, 1.0, 1.0]",
+            "explanation": "All documents have average length, so normalization factor is 1.0 for each"
+          },
+          {
+            "input": "compute_normalization_factors([2, 4], 3.0, 0.75)",
+            "expected": "[0.75, 1.25]",
+            "explanation": "First doc is shorter: 1-0.75+0.75*(2/3)=0.75. Second is longer: 1-0.75+0.75*(4/3)=1.25"
+          },
+          {
+            "input": "compute_normalization_factors([2, 4], 3.0, 0.0)",
+            "expected": "[1.0, 1.0]",
+            "explanation": "With b=0, normalization is disabled, all factors are 1.0 regardless of document length"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Dividing by the normalization factor instead of multiplying in the denominator",
+        "Forgetting that b is a tuning parameter that should be configurable",
+        "Not handling the case when avg_doc_length is 0 (empty corpus)",
+        "Confusing the roles of parameters k1 and b"
+      ],
+      "hint": "The formula is a linear interpolation between 1 (no normalization) and the ratio of document length to average length. Parameter b controls the weight.",
+      "references": [
+        "Linear interpolation",
+        "Probabilistic information retrieval",
+        "Length normalization in IR"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Term Frequency Saturation",
+      "relation_to_problem": "BM25 uses a saturation function to prevent term frequency from dominating scores. This addresses TF-IDF's limitation where documents with many repetitions of a term are over-valued.",
+      "prerequisites": [
+        "Term frequency",
+        "Asymptotic analysis",
+        "Function limits"
+      ],
+      "learning_objectives": [
+        "Understand the saturation curve and its mathematical properties",
+        "Learn the role of parameter k1 in controlling saturation",
+        "Compute the saturated term frequency component",
+        "Analyze the behavior as term frequency approaches infinity"
+      ],
+      "math_content": {
+        "definition": "**BM25 Term Frequency Saturation**: For a term $t$ in document $d$ with term frequency $\\text{TF}(t,d)$ and normalization factor $\\mathcal{N}(d)$, the saturated term frequency component is: $\\text{TF}_{\\text{sat}}(t, d) = \\frac{\\text{TF}(t,d) \\cdot (k_1 + 1)}{\\text{TF}(t,d) + k_1 \\cdot \\mathcal{N}(d)}$ where $k_1 > 0$ is the saturation parameter (typically $k_1 = 1.5$).",
+        "notation": "$k_1$ = saturation parameter controlling term frequency growth rate\n$\\text{TF}(t,d)$ = raw term frequency\n$\\mathcal{N}(d)$ = document length normalization factor\n$\\text{TF}_{\\text{sat}}(t,d)$ = saturated term frequency",
+        "theorem": "**Saturation Bound Theorem**: For any term $t$ in document $d$, the saturated term frequency satisfies: $0 \\leq \\text{TF}_{\\text{sat}}(t, d) < k_1 + 1$. As $\\text{TF}(t,d) \\to \\infty$, $\\text{TF}_{\\text{sat}}(t, d) \\to k_1 + 1$. This means no matter how many times a term appears, its contribution is bounded.",
+        "proof_sketch": "Analyzing the limit: $\\lim_{\\text{TF} \\to \\infty} \\frac{\\text{TF} \\cdot (k_1 + 1)}{\\text{TF} + k_1 \\cdot \\mathcal{N}(d)} = \\lim_{\\text{TF} \\to \\infty} \\frac{\\text{TF} \\cdot (k_1 + 1)}{\\text{TF}(1 + \\frac{k_1 \\cdot \\mathcal{N}(d)}{\\text{TF}})} = \\frac{k_1 + 1}{1 + 0} = k_1 + 1$. Since the numerator grows as $(k_1+1) \\cdot \\text{TF}$ and denominator grows as $\\text{TF}$, the ratio approaches $k_1+1$ asymptotically. For $\\text{TF} = 0$, the value is 0. For any finite positive TF, the value is strictly between 0 and $k_1+1$.",
+        "examples": [
+          "With $k_1=1.5$, $\\mathcal{N}(d)=1$: TF=1 gives $\\frac{1 \\cdot 2.5}{1 + 1.5} = 1.0$; TF=2 gives $\\frac{2 \\cdot 2.5}{2 + 1.5} = 1.43$; TF=10 gives $\\frac{10 \\cdot 2.5}{10 + 1.5} = 2.17$",
+          "Saturation effect: increasing TF from 1 to 2 adds 0.43, but from 10 to 11 adds only $\\frac{11 \\cdot 2.5}{11 + 1.5} - 2.17 \\approx 0.03$",
+          "The function exhibits diminishing returns: early occurrences matter more than later ones"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Saturated Term Frequency",
+          "latex": "$\\text{TF}_{\\text{sat}}(t, d) = \\frac{\\text{TF}(t,d) \\cdot (k_1 + 1)}{\\text{TF}(t,d) + k_1 \\cdot \\mathcal{N}(d)}$",
+          "description": "Transform raw TF through saturation curve to prevent over-weighting of high-frequency terms"
+        },
+        {
+          "name": "Asymptotic Upper Bound",
+          "latex": "$\\lim_{\\text{TF} \\to \\infty} \\text{TF}_{\\text{sat}}(t,d) = k_1 + 1$",
+          "description": "Maximum contribution of term frequency, regardless of how many times term appears"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that applies BM25 term frequency saturation to raw term frequencies. This transforms unbounded TF values into bounded contributions that grow sub-linearly.",
+        "function_signature": "def apply_tf_saturation(term_freq: float, normalization_factor: float, k1: float = 1.5) -> float:",
+        "starter_code": "def apply_tf_saturation(term_freq, normalization_factor, k1=1.5):\n    \"\"\"\n    Apply BM25 term frequency saturation.\n    \n    Args:\n        term_freq: Raw term frequency (how many times term appears)\n        normalization_factor: Document length normalization factor\n        k1: Saturation parameter\n    \n    Returns:\n        float: Saturated term frequency contribution\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "apply_tf_saturation(1, 1.0, 1.5)",
+            "expected": "1.0",
+            "explanation": "TF=1, N=1, k1=1.5: (1*2.5)/(1+1.5*1) = 2.5/2.5 = 1.0"
+          },
+          {
+            "input": "apply_tf_saturation(2, 1.0, 1.5)",
+            "expected": "1.429",
+            "explanation": "TF=2, N=1, k1=1.5: (2*2.5)/(2+1.5) = 5.0/3.5 ≈ 1.429"
+          },
+          {
+            "input": "apply_tf_saturation(0, 1.0, 1.5)",
+            "expected": "0.0",
+            "explanation": "Term doesn't appear in document, so contribution is 0"
+          },
+          {
+            "input": "apply_tf_saturation(100, 1.0, 1.5)",
+            "expected": "2.463",
+            "explanation": "High TF approaches upper bound k1+1=2.5: (100*2.5)/(100+1.5) ≈ 2.463"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using the wrong formula (e.g., omitting the (k1+1) multiplier in numerator)",
+        "Not incorporating the normalization factor in the denominator",
+        "Assuming linear growth instead of recognizing saturation behavior",
+        "Dividing instead of multiplying by (k1+1)"
+      ],
+      "hint": "The numerator scales the term frequency, while the denominator includes both the term frequency and a saturation term. Handle the TF=0 case explicitly.",
+      "references": [
+        "Asymptotic analysis",
+        "Saturation functions",
+        "Diminishing returns"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Single-Term BM25 Score",
+      "relation_to_problem": "Combines IDF, saturated TF, and normalization into the complete BM25 score for a single query term. This is the core scoring unit that will be summed across all query terms.",
+      "prerequisites": [
+        "IDF calculation",
+        "TF saturation",
+        "Document normalization"
+      ],
+      "learning_objectives": [
+        "Integrate IDF and saturated TF into a single score",
+        "Understand the multiplicative relationship between components",
+        "Compute BM25 score for one term across multiple documents",
+        "Analyze how each component influences the final score"
+      ],
+      "math_content": {
+        "definition": "**Single-Term BM25 Score**: For a query term $q$ and document $d$ in corpus $C$, the BM25 score contribution from term $q$ is: $\\text{BM25}(q, d) = \\text{IDF}(q) \\cdot \\frac{\\text{TF}(q,d) \\cdot (k_1 + 1)}{\\text{TF}(q,d) + k_1 \\cdot \\mathcal{N}(d)}$ where $\\text{IDF}(q)$ is the inverse document frequency, $\\text{TF}(q,d)$ is the term frequency, $k_1$ is the saturation parameter, and $\\mathcal{N}(d) = 1 - b + b \\cdot \\frac{|d|}{\\text{avgdl}}$ is the normalization factor.",
+        "notation": "$\\text{BM25}(q, d)$ = BM25 score for query term $q$ in document $d$\n$\\text{IDF}(q)$ = inverse document frequency of term $q$\n$\\text{TF}(q,d)$ = frequency of term $q$ in document $d$\n$k_1 = 1.5$ (typical), $b = 0.75$ (typical)",
+        "theorem": "**Score Decomposition**: The BM25 score factors into three independent components: $\\text{BM25}(q, d) = \\underbrace{\\text{IDF}(q)}_{\\text{term importance}} \\times \\underbrace{\\text{TF}_{\\text{sat}}(q,d)}_{\\text{local relevance}}$ where term importance depends only on the query term's distribution across the corpus, and local relevance depends on the term's frequency in the specific document, adjusted for document length.",
+        "proof_sketch": "By definition, $\\text{TF}_{\\text{sat}}(q,d) = \\frac{\\text{TF}(q,d) \\cdot (k_1 + 1)}{\\text{TF}(q,d) + k_1 \\cdot \\mathcal{N}(d)}$. Therefore: $\\text{BM25}(q, d) = \\text{IDF}(q) \\cdot \\text{TF}_{\\text{sat}}(q,d)$. The IDF term captures corpus-level statistics (how rare/common the term is globally), while the TF saturation term captures document-level statistics (how relevant the term is to this specific document, accounting for length).",
+        "examples": [
+          "Term 'rare' with high IDF=3.0, TF=1 in average-length doc: score = 3.0 × 1.0 = 3.0 (high because term is discriminative)",
+          "Term 'the' with low IDF=-0.7, TF=5 in average-length doc: score = -0.7 × 2.0 = -1.4 (low/negative because term is too common)",
+          "If term doesn't appear (TF=0), saturated TF is 0, so score is 0 regardless of IDF"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Single-Term BM25",
+          "latex": "$\\text{BM25}(q, d) = \\text{IDF}(q) \\cdot \\frac{\\text{TF}(q,d) \\cdot (k_1 + 1)}{\\text{TF}(q,d) + k_1 \\cdot (1 - b + b \\cdot \\frac{|d|}{\\text{avgdl}})}$",
+          "description": "Full BM25 formula for a single query term, integrating all components"
+        },
+        {
+          "name": "Factored Form",
+          "latex": "$\\text{BM25}(q, d) = \\text{IDF}(q) \\cdot \\text{TF}_{\\text{sat}}(q,d)$",
+          "description": "Product of global term importance and local document relevance"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the BM25 score for a single query term across all documents in a corpus. This combines all previous concepts: IDF, TF saturation, and normalization.",
+        "function_signature": "def score_single_term(term: str, corpus: list, term_freq_list: list, idf_scores: dict, norm_factors: list, k1: float = 1.5) -> list:",
+        "starter_code": "def score_single_term(term, corpus, term_freq_list, idf_scores, norm_factors, k1=1.5):\n    \"\"\"\n    Calculate BM25 scores for a single query term across all documents.\n    \n    Args:\n        term: The query term to score\n        corpus: List of documents (for reference)\n        term_freq_list: List of dicts mapping terms to frequencies for each doc\n        idf_scores: Dict mapping terms to their IDF scores\n        norm_factors: List of normalization factors for each document\n        k1: Saturation parameter\n    \n    Returns:\n        list: BM25 score for this term in each document\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "score_single_term('cat', [['cat', 'sat'], ['dog']], [{'cat': 1}, {'cat': 0}], {'cat': 0.405}, [1.0, 1.0], 1.5)",
+            "expected": "[0.405, 0.0]",
+            "explanation": "Term 'cat' appears in first doc (TF=1): 0.405 * (1*2.5)/(1+1.5*1) = 0.405 * 1.0 = 0.405. Doesn't appear in second doc, so score is 0"
+          },
+          {
+            "input": "score_single_term('x', [['x', 'x'], ['y']], [{'x': 2}, {'x': 0}], {'x': 0.5}, [1.0, 1.0], 1.5)",
+            "expected": "[0.714, 0.0]",
+            "explanation": "Term 'x' appears twice in first doc: 0.5 * (2*2.5)/(2+1.5) = 0.5 * 1.429 ≈ 0.714"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to multiply IDF by the saturated TF component",
+        "Not handling the zero TF case (should return 0, not divide by zero)",
+        "Using the wrong normalization factor for each document",
+        "Applying the formula in wrong order (e.g., adding instead of multiplying)"
+      ],
+      "hint": "For each document, retrieve its term frequency for the query term and its normalization factor. Apply the saturation formula, then multiply by IDF.",
+      "references": [
+        "Robertson-Sparck Jones probabilistic relevance framework",
+        "Okapi BM25 original paper"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Multi-Term BM25 Aggregation",
+      "relation_to_problem": "The final BM25 score for a document is the sum of individual term scores across all query terms. This step completes the implementation by aggregating single-term scores.",
+      "prerequisites": [
+        "Single-term BM25",
+        "Vector operations",
+        "Aggregation functions"
+      ],
+      "learning_objectives": [
+        "Understand why BM25 uses summation rather than other aggregation methods",
+        "Implement efficient score aggregation across query terms",
+        "Handle multi-term queries systematically",
+        "Compute final document rankings based on BM25 scores"
+      ],
+      "math_content": {
+        "definition": "**Multi-Term BM25 Score**: For a query $Q = \\{q_1, q_2, ..., q_n\\}$ containing $n$ terms and document $d$, the total BM25 score is the sum of individual term scores: $\\text{BM25}(Q, d) = \\sum_{i=1}^{n} \\text{BM25}(q_i, d) = \\sum_{i=1}^{n} \\text{IDF}(q_i) \\cdot \\frac{\\text{TF}(q_i,d) \\cdot (k_1 + 1)}{\\text{TF}(q_i,d) + k_1 \\cdot \\mathcal{N}(d)}$",
+        "notation": "$Q = \\{q_1, ..., q_n\\}$ = query with $n$ terms\n$\\text{BM25}(Q, d)$ = total BM25 score for query $Q$ and document $d$\n$\\sum$ = summation operator",
+        "theorem": "**Linear Score Aggregation**: BM25 treats query terms as independent contributors to relevance. The score is additive: $\\text{BM25}(Q, d) = \\sum_{q \\in Q} \\text{BM25}(q, d)$. This assumes statistical independence between query terms (bag-of-words assumption).",
+        "proof_sketch": "The bag-of-words model treats documents as unordered sets of terms. Under the independence assumption of probabilistic information retrieval, the log-odds of relevance for multiple terms combines additively: $\\log \\frac{P(R|q_1, q_2)}{P(\\neg R|q_1, q_2)} = \\log \\frac{P(R|q_1)}{P(\\neg R|q_1)} + \\log \\frac{P(R|q_2)}{P(\\neg R|q_2)}$ (assuming conditional independence). Since BM25 approximates these log-odds ratios, scores sum across terms.",
+        "examples": [
+          "Query=['cat', 'sat'], Doc=['cat', 'sat', 'mat']: Score = BM25('cat', doc) + BM25('sat', doc) = 0.35 + 0.35 = 0.70",
+          "Query=['rare', 'word'], Doc=['common', 'text']: Score = BM25('rare', doc) + BM25('word', doc) = 0 + 0 = 0 (neither term appears)",
+          "Query=['the', 'quantum'], Doc=['the', 'quantum', 'computer']: Score = BM25('the', doc) + BM25('quantum', doc) ≈ -0.2 + 3.5 = 3.3 (common term contributes negatively, rare term dominates)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete BM25 Score",
+          "latex": "$\\text{BM25}(Q, d) = \\sum_{q \\in Q} \\text{IDF}(q) \\cdot \\frac{\\text{TF}(q,d) \\cdot (k_1 + 1)}{\\text{TF}(q,d) + k_1 \\cdot (1 - b + b \\cdot \\frac{|d|}{\\text{avgdl}})}$",
+          "description": "Final BM25 ranking function summing over all query terms"
+        },
+        {
+          "name": "Score Vector Representation",
+          "latex": "$\\text{BM25}(Q, d) = \\sum_{i=1}^{n} s_i$ where $s_i = \\text{BM25}(q_i, d)$",
+          "description": "Aggregate individual term scores into final document score"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete BM25 scoring function that takes a corpus and query, computes all intermediate components, and returns the final BM25 score for each document. This is the building block for the main problem.",
+        "function_signature": "def compute_bm25_scores_simple(corpus: list, query: list, k1: float = 1.5, b: float = 0.75) -> list:",
+        "starter_code": "import numpy as np\n\ndef compute_bm25_scores_simple(corpus, query, k1=1.5, b=0.75):\n    \"\"\"\n    Compute BM25 scores for a query across all documents in corpus.\n    \n    This is a simplified version for learning. The actual problem may\n    require additional optimizations or slightly different structure.\n    \n    Args:\n        corpus: List of documents, each document is a list of tokens\n        query: List of query terms\n        k1: Saturation parameter\n        b: Normalization parameter\n    \n    Returns:\n        list: BM25 score for each document (in same order as corpus)\n    \"\"\"\n    # Step 1: Compute document statistics\n    # Step 2: Compute IDF for query terms\n    # Step 3: Compute normalization factors\n    # Step 4: For each document, sum scores across query terms\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_bm25_scores_simple([['the', 'cat'], ['the', 'dog'], ['bird']], ['the', 'cat'], 1.5, 0.75)",
+            "expected": "[0.294, -0.510, 0.0]",
+            "explanation": "First doc has both query terms. Second has only 'the' (common, negative IDF). Third has neither term."
+          },
+          {
+            "input": "compute_bm25_scores_simple([['a', 'b'], ['a', 'c']], ['a'], 1.5, 0.75)",
+            "expected": "[0.0, 0.0]",
+            "explanation": "Term 'a' appears in all documents, so IDF is negative (log(0.5/2.5)), but with saturation both get similar negative scores that round to 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not initializing document scores to 0 before summing",
+        "Iterating inefficiently (recomputing IDF or normalization multiple times)",
+        "Forgetting to handle query terms that appear multiple times in the query",
+        "Not matching the exact formula provided in the problem (especially rounding or IDF formula variations)"
+      ],
+      "hint": "Break the implementation into clear steps: (1) compute all document lengths and average, (2) compute IDF for each unique query term, (3) compute normalization factors, (4) for each document, sum the BM25 contribution of each query term. Use the components from previous sub-quests.",
+      "references": [
+        "Information retrieval system architecture",
+        "Ranking function implementation",
+        "Okapi BM25 complete algorithm"
+      ]
+    }
+  ]
+}

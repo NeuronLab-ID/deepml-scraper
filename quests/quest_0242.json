@@ -1,0 +1,554 @@
+{
+  "problem_id": 242,
+  "title": "Non-Maximum Suppression for Object Detection",
+  "category": "Computer Vision",
+  "difficulty": "hard",
+  "description": "## Task: Implement Non-Maximum Suppression (NMS)\n\nNon-Maximum Suppression is a critical post-processing technique in object detection pipelines. When object detectors like YOLO, SSD, or Faster R-CNN generate predictions, they often produce multiple overlapping bounding boxes for the same object. NMS filters these redundant detections by keeping only the most confident box and suppressing boxes that significantly overlap with it.\n\n### Input:\n- `boxes`: An array-like of shape (N, 4) containing N bounding boxes in format [x1, y1, x2, y2] where (x1, y1) is the top-left corner and (x2, y2) is the bottom-right corner\n- `scores`: An array-like of shape (N,) containing confidence scores for each box\n- `iou_threshold`: A float between 0 and 1 specifying the Intersection over Union threshold for suppression\n\n### Output:\n- Return a list of indices of the kept boxes, ordered by descending confidence score\n- Return -1 for invalid inputs (mismatched dimensions, invalid shapes, threshold out of range)\n- Return empty list for empty input\n\n### Algorithm Overview:\n1. Select the box with the highest confidence score\n2. Remove all boxes that have high IoU overlap with the selected box\n3. Repeat until no boxes remain\n\n### IoU (Intersection over Union):\nThe IoU between two boxes measures their overlap and is computed as the area of intersection divided by the area of union.",
+  "example": {
+    "input": "boxes = [[0, 0, 10, 10], [1, 1, 11, 11], [20, 20, 30, 30], [21, 21, 31, 31]]\nscores = [0.9, 0.8, 0.95, 0.7]\niou_threshold = 0.5",
+    "output": "[2, 0]",
+    "reasoning": "Box 2 (score 0.95) at [20,20,30,30] is selected first as it has the highest score. Box 3 (score 0.7) overlaps significantly with Box 2 (IoU = 81/119 = 0.68 > 0.5), so it is suppressed. Box 0 (score 0.9) at [0,0,10,10] is selected next. Box 1 (score 0.8) overlaps significantly with Box 0 (IoU = 81/119 = 0.68 > 0.5), so it is suppressed. Final result: indices [2, 0]."
+  },
+  "starter_code": "import numpy as np\n\ndef non_maximum_suppression(boxes, scores, iou_threshold):\n    \"\"\"\n    Apply Non-Maximum Suppression (NMS) to bounding boxes.\n    \n    Args:\n        boxes: Array-like of shape (N, 4) with boxes in format [x1, y1, x2, y2]\n        scores: Array-like of shape (N,) with confidence scores\n        iou_threshold: float, IoU threshold for suppression (0 to 1)\n    \n    Returns:\n        List of indices of kept boxes, ordered by descending score\n        Returns -1 for invalid inputs\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Bounding Box Representation and Area Calculation",
+      "relation_to_problem": "NMS operates on bounding boxes, requiring understanding of box coordinates and area computation, which is fundamental for IoU calculation in the suppression algorithm.",
+      "prerequisites": [
+        "Basic coordinate geometry",
+        "Rectangle area formulas",
+        "Python list/array indexing"
+      ],
+      "learning_objectives": [
+        "Understand bounding box coordinate representation [x1, y1, x2, y2]",
+        "Compute the area of a rectangle from coordinate pairs",
+        "Validate bounding box coordinates for consistency",
+        "Handle edge cases like zero-area boxes"
+      ],
+      "math_content": {
+        "definition": "A bounding box $B$ in 2D Euclidean space $\\mathbb{R}^2$ is defined by two points: the top-left corner $(x_1, y_1)$ and the bottom-right corner $(x_2, y_2)$, where $x_1 < x_2$ and $y_1 < y_2$. Formally, $B = \\{(x, y) \\in \\mathbb{R}^2 : x_1 \\leq x \\leq x_2, y_1 \\leq y \\leq y_2\\}$. The box is represented as a 4-tuple $B = [x_1, y_1, x_2, y_2]$.",
+        "notation": "$B = [x_1, y_1, x_2, y_2]$ where $(x_1, y_1)$ is the top-left corner and $(x_2, y_2)$ is the bottom-right corner",
+        "theorem": "**Area Theorem**: The area $A(B)$ of a bounding box $B = [x_1, y_1, x_2, y_2]$ is given by $A(B) = (x_2 - x_1) \\times (y_2 - y_1)$ where $x_2 > x_1$ and $y_2 > y_1$.",
+        "proof_sketch": "The bounding box forms a rectangle aligned with the coordinate axes. The width $w = x_2 - x_1$ represents the horizontal extent, and the height $h = y_2 - y_1$ represents the vertical extent. By the fundamental formula for rectangle area, $A = w \\times h = (x_2 - x_1) \\times (y_2 - y_1)$. For valid boxes, both dimensions must be positive.",
+        "examples": [
+          "Box $B_1 = [0, 0, 10, 10]$ has area $A(B_1) = (10 - 0) \\times (10 - 0) = 100$ square units",
+          "Box $B_2 = [5, 3, 15, 8]$ has area $A(B_2) = (15 - 5) \\times (8 - 3) = 10 \\times 5 = 50$ square units",
+          "Invalid box $B_3 = [10, 10, 5, 5]$ has $x_2 < x_1$ and $y_2 < y_1$, violating the definition"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Bounding Box Area",
+          "latex": "$A(B) = (x_2 - x_1) \\times (y_2 - y_1)$",
+          "description": "Computes the area of a rectangular bounding box from its corner coordinates"
+        },
+        {
+          "name": "Width and Height",
+          "latex": "$w = x_2 - x_1, \\quad h = y_2 - y_1$",
+          "description": "The dimensions of the bounding box"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the area of a bounding box given its coordinates. This is a fundamental building block for IoU calculation in NMS. Handle edge cases where coordinates are invalid or result in zero area.",
+        "function_signature": "def compute_box_area(box: list) -> float:",
+        "starter_code": "def compute_box_area(box):\n    \"\"\"\n    Compute the area of a bounding box.\n    \n    Args:\n        box: List [x1, y1, x2, y2] representing bounding box coordinates\n    \n    Returns:\n        float: Area of the box, or 0.0 if invalid\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_box_area([0, 0, 10, 10])",
+            "expected": "100.0",
+            "explanation": "A 10x10 square has area 100"
+          },
+          {
+            "input": "compute_box_area([5, 3, 15, 8])",
+            "expected": "50.0",
+            "explanation": "Width = 15-5 = 10, Height = 8-3 = 5, Area = 50"
+          },
+          {
+            "input": "compute_box_area([10, 10, 10, 10])",
+            "expected": "0.0",
+            "explanation": "Zero dimensions result in zero area (degenerate box)"
+          },
+          {
+            "input": "compute_box_area([10, 10, 5, 5])",
+            "expected": "0.0",
+            "explanation": "Invalid box where x2 < x1 and y2 < y1 should return 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using absolute value of (x2 - x1) which masks invalid coordinates",
+        "Not handling the case where x1 == x2 or y1 == y2 (degenerate boxes)",
+        "Assuming boxes are always valid without checking constraints",
+        "Forgetting to convert integer coordinates to floats for precise calculations"
+      ],
+      "hint": "Check if the box coordinates satisfy x2 > x1 and y2 > y1 before computing. Use max(0, ...) to ensure non-negative area.",
+      "references": [
+        "Computational Geometry: axis-aligned rectangles",
+        "Computer Vision coordinate systems",
+        "NumPy array indexing"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Intersection Area of Two Bounding Boxes",
+      "relation_to_problem": "Computing the intersection area is the numerator in the IoU formula, which NMS uses to determine if two boxes overlap significantly enough to suppress one of them.",
+      "prerequisites": [
+        "Bounding box area calculation",
+        "Min/max operations",
+        "Coordinate geometry"
+      ],
+      "learning_objectives": [
+        "Determine if two bounding boxes intersect",
+        "Compute the coordinates of the intersection rectangle",
+        "Calculate the area of intersection between two boxes",
+        "Handle non-overlapping boxes that return zero intersection"
+      ],
+      "math_content": {
+        "definition": "Given two bounding boxes $B_A = [x_1^A, y_1^A, x_2^A, y_2^A]$ and $B_B = [x_1^B, y_1^B, x_2^B, y_2^B]$, their intersection $I = B_A \\cap B_B$ is the set of points contained in both boxes: $I = \\{(x, y) : (x, y) \\in B_A \\text{ and } (x, y) \\in B_B\\}$. If the boxes overlap, the intersection is also an axis-aligned rectangle.",
+        "notation": "$I = B_A \\cap B_B$ denotes the intersection region; $A_{\\cap} = A(B_A \\cap B_B)$ denotes the intersection area",
+        "theorem": "**Intersection Rectangle Theorem**: The intersection of two axis-aligned rectangles $B_A$ and $B_B$ is an axis-aligned rectangle $I = [x_1^I, y_1^I, x_2^I, y_2^I]$ where:\n$$x_1^I = \\max(x_1^A, x_1^B), \\quad y_1^I = \\max(y_1^A, y_1^B)$$\n$$x_2^I = \\min(x_2^A, x_2^B), \\quad y_2^I = \\min(y_2^A, y_2^B)$$\nThe boxes intersect if and only if $x_1^I < x_2^I$ and $y_1^I < y_2^I$.",
+        "proof_sketch": "For a point $(x, y)$ to be in both boxes, it must satisfy $x_1^A \\leq x \\leq x_2^A$ and $x_1^B \\leq x \\leq x_2^B$ simultaneously. This is equivalent to $\\max(x_1^A, x_1^B) \\leq x \\leq \\min(x_2^A, x_2^B)$. For this range to be non-empty, we need $\\max(x_1^A, x_1^B) < \\min(x_2^A, x_2^B)$. The same logic applies to the $y$ coordinates. If these conditions hold, the intersection forms a rectangle; otherwise, the intersection is empty with zero area.",
+        "examples": [
+          "Boxes $B_A = [0, 0, 10, 10]$ and $B_B = [5, 5, 15, 15]$ have intersection $I = [\\max(0,5), \\max(0,5), \\min(10,15), \\min(10,15)] = [5, 5, 10, 10]$ with area $= 5 \\times 5 = 25$",
+          "Boxes $B_A = [0, 0, 5, 5]$ and $B_B = [10, 10, 15, 15]$ have $x_1^I = \\max(0, 10) = 10$, $x_2^I = \\min(5, 15) = 5$. Since $10 \\not< 5$, boxes don't intersect, area = 0",
+          "Boxes $B_A = [0, 0, 10, 10]$ and $B_B = [10, 0, 20, 10]$ touch at edge $x = 10$. Since $\\max(0, 10) = 10 = \\min(10, 20)$, no interior intersection, area = 0"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Intersection Rectangle Coordinates",
+          "latex": "$x_1^I = \\max(x_1^A, x_1^B), \\; y_1^I = \\max(y_1^A, y_1^B)$\n$x_2^I = \\min(x_2^A, x_2^B), \\; y_2^I = \\min(y_2^A, y_2^B)$",
+          "description": "Coordinates of the intersection rectangle"
+        },
+        {
+          "name": "Intersection Width and Height",
+          "latex": "$w_I = \\max(0, x_2^I - x_1^I), \\quad h_I = \\max(0, y_2^I - y_1^I)$",
+          "description": "Dimensions of intersection; max with 0 handles non-overlapping boxes"
+        },
+        {
+          "name": "Intersection Area",
+          "latex": "$A_{\\cap} = w_I \\times h_I = \\max(0, x_2^I - x_1^I) \\times \\max(0, y_2^I - y_1^I)$",
+          "description": "Area of overlap between two boxes, 0 if they don't intersect"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the intersection area between two bounding boxes. This is the critical numerator in the IoU calculation that NMS uses. The function must correctly handle all cases: full overlap, partial overlap, edge touching, and no overlap.",
+        "function_signature": "def compute_intersection_area(box1: list, box2: list) -> float:",
+        "starter_code": "def compute_intersection_area(box1, box2):\n    \"\"\"\n    Compute the intersection area between two bounding boxes.\n    \n    Args:\n        box1: List [x1, y1, x2, y2] for first box\n        box2: List [x1, y1, x2, y2] for second box\n    \n    Returns:\n        float: Area of intersection, 0.0 if boxes don't overlap\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_intersection_area([0, 0, 10, 10], [5, 5, 15, 15])",
+            "expected": "25.0",
+            "explanation": "Intersection rectangle [5, 5, 10, 10] has area 5×5 = 25"
+          },
+          {
+            "input": "compute_intersection_area([0, 0, 10, 10], [0, 0, 10, 10])",
+            "expected": "100.0",
+            "explanation": "Identical boxes have full overlap with area 10×10 = 100"
+          },
+          {
+            "input": "compute_intersection_area([0, 0, 5, 5], [10, 10, 15, 15])",
+            "expected": "0.0",
+            "explanation": "Non-overlapping boxes have zero intersection area"
+          },
+          {
+            "input": "compute_intersection_area([0, 0, 10, 10], [10, 0, 20, 10])",
+            "expected": "0.0",
+            "explanation": "Boxes touching at edge x=10 have no interior intersection"
+          },
+          {
+            "input": "compute_intersection_area([1, 1, 11, 11], [0, 0, 10, 10])",
+            "expected": "81.0",
+            "explanation": "Intersection [1, 1, 10, 10] has area 9×9 = 81"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not using max(0, ...) for width/height, causing negative areas for non-overlapping boxes",
+        "Confusing the order of max/min operations for intersection coordinates",
+        "Treating edge-touching boxes as having non-zero intersection",
+        "Computing intersection dimensions incorrectly: (x2 - x1 + 1) instead of (x2 - x1)"
+      ],
+      "hint": "First compute the coordinates of the potential intersection rectangle using max for top-left and min for bottom-right. Then check if this forms a valid rectangle before computing area.",
+      "references": [
+        "Computational Geometry: rectangle intersection",
+        "Axis-Aligned Bounding Box (AABB) collision detection"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Intersection over Union (IoU) Metric",
+      "relation_to_problem": "IoU is the core metric in NMS that quantifies how much two boxes overlap. NMS suppresses boxes when their IoU with a higher-scoring box exceeds the threshold, making IoU computation essential.",
+      "prerequisites": [
+        "Bounding box area calculation",
+        "Intersection area computation",
+        "Set theory union operation"
+      ],
+      "learning_objectives": [
+        "Understand the IoU metric as a normalized overlap measure",
+        "Compute the union area from individual box areas and intersection",
+        "Calculate IoU values ranging from 0 (no overlap) to 1 (perfect overlap)",
+        "Handle edge cases like zero-area boxes and division by zero"
+      ],
+      "math_content": {
+        "definition": "The Intersection over Union (IoU), also called Jaccard Index, between two bounding boxes $B_A$ and $B_B$ is defined as the ratio of their intersection area to their union area:\n$$\\text{IoU}(B_A, B_B) = \\frac{|B_A \\cap B_B|}{|B_A \\cup B_B|} = \\frac{A(B_A \\cap B_B)}{A(B_A \\cup B_B)}$$\nwhere $|\\cdot|$ denotes the area (measure) of a set.",
+        "notation": "$\\text{IoU}(B_A, B_B) \\in [0, 1]$ where 0 indicates no overlap and 1 indicates perfect overlap; $A_{\\cap}$ = intersection area, $A_{\\cup}$ = union area",
+        "theorem": "**Union Area Theorem**: For two bounding boxes $B_A$ and $B_B$ with areas $A_A$ and $A_B$ respectively, and intersection area $A_{\\cap}$, the union area is:\n$$A_{\\cup} = A(B_A \\cup B_B) = A_A + A_B - A_{\\cap}$$\nThis follows from the inclusion-exclusion principle. Consequently:\n$$\\text{IoU}(B_A, B_B) = \\frac{A_{\\cap}}{A_A + A_B - A_{\\cap}}$$",
+        "proof_sketch": "By the inclusion-exclusion principle from set theory, $|A \\cup B| = |A| + |B| - |A \\cap B|$. The union $B_A \\cup B_B$ contains all points in either box. Points in the intersection $B_A \\cap B_B$ are counted in both $A_A$ and $A_B$, so we subtract $A_{\\cap}$ once to avoid double-counting. For IoU properties: (1) If boxes don't overlap, $A_{\\cap} = 0 \\Rightarrow \\text{IoU} = 0$. (2) If boxes are identical, $A_{\\cap} = A_A = A_B \\Rightarrow A_{\\cup} = A_A + A_A - A_A = A_A \\Rightarrow \\text{IoU} = A_A/A_A = 1$. (3) For partial overlap, $0 < A_{\\cap} < \\min(A_A, A_B) \\Rightarrow 0 < \\text{IoU} < 1$.",
+        "examples": [
+          "Boxes $B_A = [0, 0, 10, 10]$ (area=100) and $B_B = [1, 1, 11, 11]$ (area=100) have $A_{\\cap} = 81$. Then $A_{\\cup} = 100 + 100 - 81 = 119$ and $\\text{IoU} = 81/119 \\approx 0.68$",
+          "Identical boxes: $B_A = B_B = [0, 0, 10, 10]$ gives $A_{\\cap} = 100$, $A_{\\cup} = 100 + 100 - 100 = 100$, $\\text{IoU} = 100/100 = 1.0$",
+          "Non-overlapping boxes: $B_A = [0, 0, 5, 5]$ and $B_B = [10, 10, 15, 15]$ gives $A_{\\cap} = 0$, $A_{\\cup} = 25 + 25 - 0 = 50$, $\\text{IoU} = 0/50 = 0$",
+          "One box inside another: $B_A = [0, 0, 10, 10]$ (area=100), $B_B = [2, 2, 5, 5]$ (area=9) gives $A_{\\cap} = 9$, $A_{\\cup} = 100 + 9 - 9 = 100$, $\\text{IoU} = 9/100 = 0.09$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Intersection over Union",
+          "latex": "$\\text{IoU}(B_A, B_B) = \\frac{A_{\\cap}}{A_{\\cup}} = \\frac{A(B_A \\cap B_B)}{A(B_A) + A(B_B) - A(B_A \\cap B_B)}$",
+          "description": "Primary formula for IoU: intersection area divided by union area"
+        },
+        {
+          "name": "Union Area via Inclusion-Exclusion",
+          "latex": "$A_{\\cup} = A_A + A_B - A_{\\cap}$",
+          "description": "Computes union area without explicitly finding union geometry"
+        },
+        {
+          "name": "IoU Properties",
+          "latex": "$0 \\leq \\text{IoU}(B_A, B_B) \\leq 1$\n$\\text{IoU}(B, B) = 1$ (reflexive)\n$\\text{IoU}(B_A, B_B) = \\text{IoU}(B_B, B_A)$ (symmetric)",
+          "description": "Mathematical properties that IoU satisfies"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the Intersection over Union (IoU) between two bounding boxes. This is the exact metric NMS uses to decide whether to suppress a box. Handle edge cases where boxes don't overlap or have zero area.",
+        "function_signature": "def compute_iou(box1: list, box2: list) -> float:",
+        "starter_code": "def compute_iou(box1, box2):\n    \"\"\"\n    Compute Intersection over Union (IoU) between two bounding boxes.\n    \n    Args:\n        box1: List [x1, y1, x2, y2] for first box\n        box2: List [x1, y1, x2, y2] for second box\n    \n    Returns:\n        float: IoU value in range [0, 1], or 0.0 for invalid inputs\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_iou([0, 0, 10, 10], [1, 1, 11, 11])",
+            "expected": "0.68 (approximately 81/119)",
+            "explanation": "Intersection area = 81, Union area = 100 + 100 - 81 = 119, IoU = 81/119 ≈ 0.6807"
+          },
+          {
+            "input": "compute_iou([0, 0, 10, 10], [0, 0, 10, 10])",
+            "expected": "1.0",
+            "explanation": "Identical boxes have perfect overlap, IoU = 1"
+          },
+          {
+            "input": "compute_iou([0, 0, 5, 5], [10, 10, 15, 15])",
+            "expected": "0.0",
+            "explanation": "Non-overlapping boxes have IoU = 0"
+          },
+          {
+            "input": "compute_iou([0, 0, 10, 10], [5, 5, 15, 15])",
+            "expected": "0.14 (approximately 25/175)",
+            "explanation": "Intersection = 25, Union = 100 + 100 - 25 = 175, IoU = 25/175 ≈ 0.1429"
+          },
+          {
+            "input": "compute_iou([20, 20, 30, 30], [21, 21, 31, 31])",
+            "expected": "0.68 (approximately 81/119)",
+            "explanation": "Same as first test case but translated, IoU is translation-invariant"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to subtract intersection when computing union: using A_A + A_B instead of A_A + A_B - A_intersection",
+        "Not handling division by zero when union area is zero (degenerate boxes)",
+        "Computing union area by trying to find union geometry instead of using inclusion-exclusion",
+        "Returning IoU > 1 due to incorrect union calculation",
+        "Not reusing intersection computation from previous step"
+      ],
+      "hint": "Use your previous functions for intersection area and box area. Remember the inclusion-exclusion principle: union = sum of areas minus intersection. Check for zero union before dividing.",
+      "references": [
+        "Jaccard Index in set theory",
+        "Inclusion-Exclusion Principle",
+        "Object detection evaluation metrics"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Array Sorting by Confidence Scores",
+      "relation_to_problem": "NMS processes boxes in order of decreasing confidence score, always selecting the most confident remaining box. Efficient sorting with index tracking is crucial for the NMS algorithm.",
+      "prerequisites": [
+        "Array/list operations",
+        "Sorting algorithms",
+        "Index manipulation"
+      ],
+      "learning_objectives": [
+        "Sort arrays while maintaining original index information",
+        "Understand argsort operation for indirect sorting",
+        "Implement descending order sorting by scores",
+        "Retrieve sorted indices for later reference"
+      ],
+      "math_content": {
+        "definition": "Given a sequence of confidence scores $S = (s_1, s_2, \\ldots, s_n)$ where $s_i \\in [0, 1]$ represents the confidence of detection $i$, an argsort operation produces a permutation $\\pi : \\{1, \\ldots, n\\} \\to \\{1, \\ldots, n\\}$ such that $s_{\\pi(1)} \\geq s_{\\pi(2)} \\geq \\cdots \\geq s_{\\pi(n)}$ (descending order). The sequence $\\pi$ contains the original indices sorted by their corresponding values.",
+        "notation": "$\\pi = \\text{argsort}_{\\text{desc}}(S)$ returns indices that would sort $S$ in descending order; $s_{\\pi(i)}$ is the $i$-th largest score",
+        "theorem": "**Sorting Permutation Theorem**: For any finite sequence $S = (s_1, \\ldots, s_n)$, there exists a permutation $\\pi$ such that $s_{\\pi(1)} \\geq s_{\\pi(2)} \\geq \\cdots \\geq s_{\\pi(n)}$. This permutation is unique if all elements are distinct. The argsort operation computes this permutation in $O(n \\log n)$ time using comparison-based sorting.",
+        "proof_sketch": "Existence follows from the well-ordering principle: any finite set of real numbers has a maximum element. Repeatedly select the maximum from remaining elements to construct the permutation. For uniqueness, if all $s_i$ are distinct, the total order $<$ on $\\mathbb{R}$ induces a unique permutation. Standard sorting algorithms (quicksort, mergesort, heapsort) achieve $O(n \\log n)$ comparisons, which is optimal for comparison-based sorting by the information-theoretic lower bound.",
+        "examples": [
+          "Scores $S = [0.9, 0.8, 0.95, 0.7]$ have $\\text{argsort}_{\\text{desc}}(S) = [2, 0, 1, 3]$ because $s_2 = 0.95 > s_0 = 0.9 > s_1 = 0.8 > s_3 = 0.7$",
+          "Scores $S = [0.5, 0.9, 0.9, 0.3]$ with ties: possible permutations include $[1, 2, 0, 3]$ or $[2, 1, 0, 3]$ (both valid as $s_1 = s_2$)",
+          "Uniform scores $S = [0.5, 0.5, 0.5]$ yield any permutation like $[0, 1, 2]$ (all elements equal)",
+          "Single element $S = [0.9]$ gives $\\text{argsort}_{\\text{desc}}(S) = [0]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Argsort Definition",
+          "latex": "$\\pi = \\text{argsort}_{\\text{desc}}(S) \\text{ such that } s_{\\pi(i)} \\geq s_{\\pi(i+1)} \\; \\forall i$",
+          "description": "Permutation that sorts scores in descending order"
+        },
+        {
+          "name": "Sorted Sequence Access",
+          "latex": "$S_{\\text{sorted}} = (s_{\\pi(1)}, s_{\\pi(2)}, \\ldots, s_{\\pi(n)})$",
+          "description": "Accessing scores in sorted order using the permutation"
+        },
+        {
+          "name": "Time Complexity",
+          "latex": "$T(n) = O(n \\log n)$",
+          "description": "Optimal time complexity for comparison-based sorting"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that returns the indices of scores sorted in descending order. This is the first step in the NMS algorithm: ordering boxes by confidence so we always process the most confident detection first. Do not use built-in argsort; implement using sorted() with custom key and enumerate().",
+        "function_signature": "def argsort_descending(scores: list) -> list:",
+        "starter_code": "def argsort_descending(scores):\n    \"\"\"\n    Return indices that would sort the scores in descending order.\n    \n    Args:\n        scores: List of confidence scores\n    \n    Returns:\n        List of indices sorted by descending score values\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "argsort_descending([0.9, 0.8, 0.95, 0.7])",
+            "expected": "[2, 0, 1, 3]",
+            "explanation": "Scores in descending order: 0.95 (index 2), 0.9 (index 0), 0.8 (index 1), 0.7 (index 3)"
+          },
+          {
+            "input": "argsort_descending([0.5, 0.9, 0.3, 0.9])",
+            "expected": "[1, 3, 0, 2] or [3, 1, 0, 2]",
+            "explanation": "Indices 1 and 3 both have score 0.9 (highest), then 0 (0.5), then 2 (0.3). Tie-breaking order may vary."
+          },
+          {
+            "input": "argsort_descending([0.1, 0.2, 0.3, 0.4])",
+            "expected": "[3, 2, 1, 0]",
+            "explanation": "Reverse order: largest to smallest"
+          },
+          {
+            "input": "argsort_descending([0.5])",
+            "expected": "[0]",
+            "explanation": "Single element returns index 0"
+          },
+          {
+            "input": "argsort_descending([])",
+            "expected": "[]",
+            "explanation": "Empty input returns empty list"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Sorting in ascending order instead of descending (forgetting reverse=True or using negative values incorrectly)",
+        "Losing original indices by sorting the scores directly without tracking indices",
+        "Using enumerate incorrectly: enumerate(sorted(scores)) instead of sorted(enumerate(scores), ...)",
+        "Not handling empty lists or single-element lists",
+        "Returning sorted scores instead of sorted indices"
+      ],
+      "hint": "Use enumerate(scores) to pair each score with its original index, then sort these pairs by score in descending order. Extract just the indices from the sorted pairs.",
+      "references": [
+        "Sorting algorithms",
+        "NumPy argsort function",
+        "Python sorted() with key parameter"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Greedy Selection with Exclusion Criteria",
+      "relation_to_problem": "NMS uses a greedy algorithm: iteratively select the highest-scoring box, then exclude (suppress) all boxes that overlap too much with it. Understanding greedy selection with dynamic exclusion is the algorithmic core of NMS.",
+      "prerequisites": [
+        "Greedy algorithms",
+        "Set operations",
+        "Boolean masking"
+      ],
+      "learning_objectives": [
+        "Understand greedy selection strategies",
+        "Implement iterative selection with dynamic candidate elimination",
+        "Maintain lists of selected and remaining candidates",
+        "Apply exclusion criteria to filter remaining candidates"
+      ],
+      "math_content": {
+        "definition": "A greedy algorithm makes locally optimal choices at each step with the hope of finding a global optimum. For NMS, the greedy strategy is: **At iteration $k$, select the box $b^*$ with the highest confidence score from remaining candidates $C_k$, add it to the output set $O_k$, then remove from $C_{k+1}$ all boxes that satisfy an overlap criterion with $b^*$**. Formally:\n$$b^* = \\arg\\max_{b \\in C_k} s(b)$$\n$$O_{k+1} = O_k \\cup \\{b^*\\}$$\n$$C_{k+1} = C_k \\setminus (\\{b^*\\} \\cup \\{b \\in C_k : \\text{IoU}(b, b^*) > \\tau\\})$$\nwhere $s(b)$ is the confidence score, $\\tau$ is the IoU threshold, and the algorithm terminates when $C_k = \\emptyset$.",
+        "notation": "$C_k$ = candidate set at iteration $k$; $O_k$ = output set at iteration $k$; $s(b)$ = confidence score of box $b$; $\\tau$ = IoU threshold",
+        "theorem": "**Greedy NMS Termination Theorem**: The greedy NMS algorithm terminates in at most $n$ iterations, where $n = |C_0|$ is the initial number of boxes. At each iteration, at least one box is removed from the candidate set (the selected box $b^*$). Since the candidate set is finite and strictly decreasing in size, the algorithm terminates when $C_k = \\emptyset$.",
+        "proof_sketch": "Initially, $|C_0| = n$. At iteration $k$, we select one box $b^* \\in C_k$ and remove it along with possibly other boxes. Thus $|C_{k+1}| < |C_k|$ (strict decrease). Since $|C_k| \\geq 0$ and decreases by at least 1 each iteration, we have $|C_k| = 0$ for some $k \\leq n$. The algorithm has time complexity $O(n^2)$ because we perform at most $n$ iterations, and each iteration computes IoU with at most $n$ remaining boxes.",
+        "examples": [
+          "Given boxes with scores $[0.9, 0.8, 0.95, 0.7]$ and high overlap between boxes 0 and 1: Iteration 1 selects box 2 (score 0.95), removes box 3 (overlaps). Iteration 2 selects box 0 (score 0.9), removes box 1 (overlaps). Output: [2, 0]",
+          "All boxes non-overlapping (IoU = 0): Select all boxes in descending score order",
+          "All boxes identical (IoU = 1): Select only the highest-scoring box, suppress all others",
+          "Chain of overlaps: Box A overlaps B, B overlaps C, but A doesn't overlap C directly. Select A (highest score), suppress B. C remains in candidates if no other overlaps."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Greedy Selection Criterion",
+          "latex": "$b^* = \\arg\\max_{b \\in C_k} s(b)$",
+          "description": "Select the box with maximum confidence score from remaining candidates"
+        },
+        {
+          "name": "Suppression Criterion",
+          "latex": "$\\text{Suppress}(b, b^*) \\Leftrightarrow \\text{IoU}(b, b^*) > \\tau$",
+          "description": "A box is suppressed if its IoU with the selected box exceeds threshold"
+        },
+        {
+          "name": "Candidate Update Rule",
+          "latex": "$C_{k+1} = \\{b \\in C_k : b \\neq b^* \\land \\text{IoU}(b, b^*) \\leq \\tau\\}$",
+          "description": "Remove selected box and all boxes exceeding IoU threshold"
+        },
+        {
+          "name": "Algorithm Complexity",
+          "latex": "$T(n) = O(n^2), \\quad S(n) = O(n)$",
+          "description": "Quadratic time (compare pairs), linear space (store indices)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified greedy selection algorithm where you iteratively select the highest-scoring item from a list and remove all items whose 'overlap scores' with the selected item exceed a threshold. This mimics NMS logic without full IoU computation. Return indices of selected items in order.",
+        "function_signature": "def greedy_selection_with_suppression(scores: list, overlap_matrix: list, threshold: float) -> list:",
+        "starter_code": "def greedy_selection_with_suppression(scores, overlap_matrix, threshold):\n    \"\"\"\n    Greedy selection algorithm with overlap-based suppression.\n    \n    Args:\n        scores: List of confidence scores\n        overlap_matrix: 2D list where overlap_matrix[i][j] is overlap between items i and j\n        threshold: Overlap threshold for suppression\n    \n    Returns:\n        List of selected indices in order of selection\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "greedy_selection_with_suppression([0.9, 0.8, 0.95], [[1.0, 0.7, 0.1], [0.7, 1.0, 0.2], [0.1, 0.2, 1.0]], 0.5)",
+            "expected": "[2, 0]",
+            "explanation": "Select index 2 (score 0.95), suppress index 1 (overlap 0.2 < 0.5, not suppressed but lower score). Then select index 0 (score 0.9), suppress index 1 (overlap 0.7 > 0.5)."
+          },
+          {
+            "input": "greedy_selection_with_suppression([0.9, 0.8], [[1.0, 0.0], [0.0, 1.0]], 0.5)",
+            "expected": "[0, 1]",
+            "explanation": "No overlap (0.0 < 0.5), select both in descending score order"
+          },
+          {
+            "input": "greedy_selection_with_suppression([0.9, 0.8, 0.7], [[1.0, 0.9, 0.9], [0.9, 1.0, 0.9], [0.9, 0.9, 1.0]], 0.5)",
+            "expected": "[0]",
+            "explanation": "Select index 0 (highest score 0.9), suppress indices 1 and 2 (overlaps 0.9 > 0.5)"
+          },
+          {
+            "input": "greedy_selection_with_suppression([0.5], [[1.0]], 0.5)",
+            "expected": "[0]",
+            "explanation": "Single item always selected"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Modifying the candidate list while iterating over it (use indices or separate tracking)",
+        "Not selecting the highest score among remaining candidates at each iteration",
+        "Forgetting to mark the selected box itself as removed from candidates",
+        "Comparing overlap_matrix[i][selected] instead of overlap_matrix[selected][i] (or assuming symmetry)",
+        "Not maintaining the order of selection in the output"
+      ],
+      "hint": "Maintain a boolean array tracking which items are still candidates. In each iteration: find the max score among remaining candidates, add its index to output, mark it and all overlapping items as non-candidates. Repeat until no candidates remain.",
+      "references": [
+        "Greedy algorithms",
+        "Activity selection problem",
+        "Boolean array masking"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Input Validation and Edge Case Handling",
+      "relation_to_problem": "Production NMS implementations must handle invalid inputs gracefully: mismatched dimensions, invalid coordinates, out-of-range thresholds, empty inputs, and degenerate boxes. Robust error handling prevents runtime failures in detection pipelines.",
+      "prerequisites": [
+        "Exception handling",
+        "Array shape validation",
+        "Defensive programming"
+      ],
+      "learning_objectives": [
+        "Validate input array shapes and dimensions",
+        "Check for consistent lengths between boxes and scores",
+        "Verify threshold values are in valid range [0, 1]",
+        "Handle edge cases: empty inputs, single box, all identical boxes",
+        "Return appropriate error codes or values for invalid inputs"
+      ],
+      "math_content": {
+        "definition": "Input validation ensures that function arguments satisfy preconditions before algorithm execution. For NMS, the preconditions are: (1) $\\text{boxes} \\in \\mathbb{R}^{N \\times 4}$ with $N \\geq 0$; (2) $\\text{scores} \\in \\mathbb{R}^N$ with $\\text{scores}_i \\in [0, 1]$; (3) $\\tau \\in [0, 1]$; (4) For each box $[x_1, y_1, x_2, y_2]$: $x_2 > x_1$ and $y_2 > y_1$. A validation function $V : \\text{Inputs} \\to \\{\\text{valid}, \\text{invalid}\\}$ checks these conditions.",
+        "notation": "$\\text{boxes} \\in \\mathbb{R}^{N \\times 4}$ means boxes is a 2D array with $N$ rows and 4 columns; $\\tau \\in [0, 1]$ means threshold in closed interval $[0, 1]$",
+        "theorem": "**Fail-Fast Validation Theorem**: Validating inputs before processing has computational cost $O(N)$ (linear scan of $N$ boxes) but prevents $O(N^2)$ wasted computation if inputs are invalid. Early validation is asymptotically cheaper than detecting errors during execution.",
+        "proof_sketch": "Validation requires checking: array shapes ($O(1)$), length consistency ($O(1)$), threshold range ($O(1)$), and box validity ($O(N)$ to check $N$ boxes). Total validation cost: $O(N)$. If inputs are invalid, executing the full NMS algorithm costs $O(N^2)$ before potentially failing. Since $O(N) < O(N^2)$ for $N > 1$, fail-fast validation is more efficient. Even for valid inputs, the additional $O(N)$ validation cost is dominated by the $O(N^2)$ algorithm cost.",
+        "examples": [
+          "Valid input: boxes = [[0, 0, 10, 10], [5, 5, 15, 15]], scores = [0.9, 0.8], threshold = 0.5. Shapes match (2×4 and 2), threshold in range, boxes valid.",
+          "Invalid shape: boxes = [[0, 0, 10]], scores = [0.9]. Box has 3 coordinates instead of 4 → invalid",
+          "Length mismatch: boxes = [[0, 0, 10, 10], [5, 5, 15, 15]], scores = [0.9]. 2 boxes but 1 score → invalid",
+          "Invalid threshold: threshold = 1.5. Not in [0, 1] → invalid",
+          "Invalid box: [10, 10, 5, 5]. Has $x_2 < x_1$ and $y_2 < y_1$ → invalid",
+          "Empty input: boxes = [], scores = []. Valid edge case, should return empty list []"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Shape Validation",
+          "latex": "$\\text{boxes.shape} = (N, 4) \\land \\text{scores.shape} = (N,)$",
+          "description": "Boxes must be N×4 matrix, scores must be N-length vector with matching N"
+        },
+        {
+          "name": "Threshold Validation",
+          "latex": "$\\tau \\in [0, 1] \\Leftrightarrow 0 \\leq \\tau \\leq 1$",
+          "description": "IoU threshold must be in closed interval [0, 1]"
+        },
+        {
+          "name": "Box Validity",
+          "latex": "$\\forall i: x_2^{(i)} > x_1^{(i)} \\land y_2^{(i)} > y_1^{(i)}$",
+          "description": "Every box must satisfy coordinate ordering constraints"
+        },
+        {
+          "name": "Validation Cost",
+          "latex": "$T_{\\text{validate}}(N) = O(N)$",
+          "description": "Linear time to validate N boxes"
+        }
+      ],
+      "exercise": {
+        "description": "Implement an input validation function for NMS that checks all preconditions. Return a dictionary with 'valid' (boolean) and 'error_message' (string) keys. This function will be the first step in the complete NMS implementation, catching errors before expensive computation.",
+        "function_signature": "def validate_nms_inputs(boxes, scores, iou_threshold) -> dict:",
+        "starter_code": "def validate_nms_inputs(boxes, scores, iou_threshold):\n    \"\"\"\n    Validate inputs for Non-Maximum Suppression.\n    \n    Args:\n        boxes: Array-like of shape (N, 4) with boxes [x1, y1, x2, y2]\n        scores: Array-like of shape (N,) with confidence scores\n        iou_threshold: float, IoU threshold for suppression\n    \n    Returns:\n        dict: {'valid': bool, 'error_message': str}\n              If valid=True, error_message is empty string\n              If valid=False, error_message describes the error\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "validate_nms_inputs([[0, 0, 10, 10], [5, 5, 15, 15]], [0.9, 0.8], 0.5)",
+            "expected": "{'valid': True, 'error_message': ''}",
+            "explanation": "All inputs are valid"
+          },
+          {
+            "input": "validate_nms_inputs([[0, 0, 10]], [0.9], 0.5)",
+            "expected": "{'valid': False, 'error_message': 'Box must have 4 coordinates'}",
+            "explanation": "Box has wrong number of coordinates"
+          },
+          {
+            "input": "validate_nms_inputs([[0, 0, 10, 10]], [0.9, 0.8], 0.5)",
+            "expected": "{'valid': False, 'error_message': 'Boxes and scores must have same length'}",
+            "explanation": "Length mismatch: 1 box, 2 scores"
+          },
+          {
+            "input": "validate_nms_inputs([[0, 0, 10, 10]], [0.9], 1.5)",
+            "expected": "{'valid': False, 'error_message': 'IoU threshold must be in range [0, 1]'}",
+            "explanation": "Threshold out of range"
+          },
+          {
+            "input": "validate_nms_inputs([[10, 10, 5, 5]], [0.9], 0.5)",
+            "expected": "{'valid': False, 'error_message': 'Invalid box coordinates'}",
+            "explanation": "Box has x2 < x1 and y2 < y1"
+          },
+          {
+            "input": "validate_nms_inputs([], [], 0.5)",
+            "expected": "{'valid': True, 'error_message': ''}",
+            "explanation": "Empty inputs are valid edge case"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking if boxes is a 2D array/list before accessing dimensions",
+        "Accepting threshold values outside [0, 1] (e.g., allowing negative)",
+        "Not validating each individual box's coordinate constraints",
+        "Treating empty input as invalid instead of valid edge case",
+        "Checking only scores length without checking boxes shape is (N, 4)",
+        "Not providing informative error messages for debugging"
+      ],
+      "hint": "Check conditions in order: (1) Check types and convertibility to arrays, (2) Check shapes (boxes is 2D with 4 columns, scores is 1D), (3) Check length match, (4) Check threshold range, (5) Check each box's coordinates. Return early with specific error message if any check fails.",
+      "references": [
+        "Defensive programming",
+        "Precondition checking",
+        "Error handling patterns"
+      ]
+    }
+  ]
+}

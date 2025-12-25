@@ -1,0 +1,534 @@
+{
+  "problem_id": 214,
+  "title": "Chain Rule for Composite Functions",
+  "category": "Calculus",
+  "difficulty": "medium",
+  "description": "Implement a function to compute the derivative of composite functions using the chain rule. Given a list of functions (applied right to left) and a point x, calculate the derivative at that point. Available functions: 'square' (x²), 'sin', 'exp', 'log'. The chain rule states that for h(x) = f(g(x)), the derivative is h'(x) = f'(g(x)) · g'(x).",
+  "example": {
+    "input": "functions=['sin', 'square'], x=1.0",
+    "output": "1.080605",
+    "reasoning": "For h(x) = sin(x²): Inner function g(x) = x², outer f(u) = sin(u). At x=1: g(1)=1, g'(x)=2x so g'(1)=2. f'(u)=cos(u) so f'(1)=cos(1)≈0.540. Chain rule: h'(1) = f'(g(1))·g'(1) = cos(1)·2 ≈ 1.0806."
+  },
+  "starter_code": "import numpy as np\n\ndef compute_chain_rule_gradient(functions: list[str], x: float) -> float:\n\t\"\"\"\n\tCompute derivative of composite functions using chain rule.\n\t\n\tArgs:\n\t\tfunctions: List of function names (applied right to left)\n\t\t          Available: 'square', 'sin', 'exp', 'log'\n\t\tx: Point at which to evaluate derivative\n\t\n\tReturns:\n\t\tDerivative value at x\n\t\n\tExample:\n\t\t['sin', 'square'] represents sin(x²)\n\t\t['exp', 'sin', 'square'] represents exp(sin(x²))\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Function Evaluation and Basic Derivatives",
+      "relation_to_problem": "Understanding how to evaluate elementary functions and their derivatives is the foundation for computing chain rule gradients. The main problem requires evaluating both functions and their derivatives at specific points.",
+      "prerequisites": [
+        "Basic algebra",
+        "Function notation",
+        "Limit definition of derivative"
+      ],
+      "learning_objectives": [
+        "Evaluate elementary functions (square, sin, exp, log) at given points",
+        "Compute derivatives of elementary functions using standard rules",
+        "Implement function evaluation in code using numpy"
+      ],
+      "math_content": {
+        "definition": "A **derivative** of a function $f$ at a point $x$ is defined as:\n$$f'(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}$$\nThis represents the instantaneous rate of change of $f$ at $x$, geometrically interpreted as the slope of the tangent line to the curve $y=f(x)$ at the point $(x, f(x))$.",
+        "notation": "$f'(x)$ or $\\frac{df}{dx}$ = derivative of $f$ with respect to $x$",
+        "theorem": "**Differentiability implies continuity**: If $f$ is differentiable at $x=a$, then $f$ is continuous at $x=a$. However, continuity does not imply differentiability (e.g., $f(x)=|x|$ at $x=0$).",
+        "proof_sketch": "If $f'(a)$ exists, then $\\lim_{h \\to 0}[f(a+h)-f(a)] = \\lim_{h \\to 0}\\frac{f(a+h)-f(a)}{h} \\cdot h = f'(a) \\cdot 0 = 0$, which means $\\lim_{x \\to a}f(x) = f(a)$, establishing continuity.",
+        "examples": [
+          "For $f(x) = x^2$: $f'(x) = 2x$. At $x=3$: $f(3)=9$ and $f'(3)=6$",
+          "For $f(x) = \\sin(x)$: $f'(x) = \\cos(x)$. At $x=\\pi/2$: $f(\\pi/2)=1$ and $f'(\\pi/2)=0$",
+          "For $f(x) = e^x$: $f'(x) = e^x$. At $x=0$: $f(0)=1$ and $f'(0)=1$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Power Rule",
+          "latex": "$\\frac{d}{dx}(x^n) = nx^{n-1}$",
+          "description": "For polynomial terms, multiply by exponent and reduce exponent by 1"
+        },
+        {
+          "name": "Exponential Derivative",
+          "latex": "$\\frac{d}{dx}(e^x) = e^x$",
+          "description": "The exponential function is its own derivative"
+        },
+        {
+          "name": "Logarithm Derivative",
+          "latex": "$\\frac{d}{dx}(\\ln x) = \\frac{1}{x}$",
+          "description": "Natural logarithm derivative, defined for $x > 0$"
+        },
+        {
+          "name": "Sine Derivative",
+          "latex": "$\\frac{d}{dx}(\\sin x) = \\cos x$",
+          "description": "Sine differentiates to cosine"
+        },
+        {
+          "name": "Cosine Derivative",
+          "latex": "$\\frac{d}{dx}(\\cos x) = -\\sin x$",
+          "description": "Cosine differentiates to negative sine"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that evaluates a given elementary function and its derivative at a specific point. This is the building block for the chain rule computation.",
+        "function_signature": "def evaluate_function_and_derivative(func_name: str, x: float) -> tuple[float, float]:",
+        "starter_code": "import numpy as np\n\ndef evaluate_function_and_derivative(func_name: str, x: float) -> tuple[float, float]:\n    \"\"\"\n    Evaluate function and its derivative at point x.\n    \n    Args:\n        func_name: One of 'square', 'sin', 'exp', 'log'\n        x: Point at which to evaluate\n    \n    Returns:\n        Tuple of (function_value, derivative_value)\n    \n    Example:\n        evaluate_function_and_derivative('square', 3.0) -> (9.0, 6.0)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "evaluate_function_and_derivative('square', 2.0)",
+            "expected": "(4.0, 4.0)",
+            "explanation": "x^2 at x=2 gives 4, derivative 2x gives 4"
+          },
+          {
+            "input": "evaluate_function_and_derivative('sin', 0.0)",
+            "expected": "(0.0, 1.0)",
+            "explanation": "sin(0)=0, cos(0)=1"
+          },
+          {
+            "input": "evaluate_function_and_derivative('exp', 1.0)",
+            "expected": "(2.718..., 2.718...)",
+            "explanation": "e^1=e and derivative is also e"
+          },
+          {
+            "input": "evaluate_function_and_derivative('log', np.e)",
+            "expected": "(1.0, 0.3678...)",
+            "explanation": "ln(e)=1, derivative 1/e ≈ 0.3678"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing function evaluation with derivative evaluation - they are different values",
+        "Forgetting that log means natural logarithm (ln), not log base 10",
+        "Not handling domain restrictions (e.g., log requires x > 0)",
+        "Mixing up sin and cos derivatives"
+      ],
+      "hint": "Create a dictionary mapping function names to their implementations and derivative implementations. Use numpy functions like np.sin, np.cos, np.exp, np.log.",
+      "references": [
+        "Calculus textbook chapter on derivatives",
+        "Standard derivative formulas",
+        "Numpy mathematical functions documentation"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Function Composition and Evaluation",
+      "relation_to_problem": "The main problem requires understanding how to compose multiple functions and evaluate them. Before computing derivatives, we must correctly evaluate composite functions by applying functions from right to left.",
+      "prerequisites": [
+        "Function evaluation",
+        "Function notation",
+        "Order of operations"
+      ],
+      "learning_objectives": [
+        "Understand function composition notation f(g(x))",
+        "Evaluate composite functions by applying functions in correct order",
+        "Implement forward pass computation for function compositions"
+      ],
+      "math_content": {
+        "definition": "A **composite function** $h = f \\circ g$ (read 'f composed with g') is defined by:\n$$h(x) = (f \\circ g)(x) = f(g(x))$$\nThe function $g$ is applied first to $x$, then $f$ is applied to the result $g(x)$. The domain of $h$ consists of all $x$ in the domain of $g$ such that $g(x)$ is in the domain of $f$.",
+        "notation": "$f \\circ g$ = composition of $f$ and $g$, $(f \\circ g)(x) = f(g(x))$",
+        "theorem": "**Composition is associative but not commutative**: For functions $f$, $g$, and $h$:\n- Associative: $(f \\circ g) \\circ h = f \\circ (g \\circ h)$\n- Not commutative: Generally $f \\circ g \\neq g \\circ f$",
+        "proof_sketch": "Associativity: $[(f \\circ g) \\circ h](x) = (f \\circ g)(h(x)) = f(g(h(x)))$ and $[f \\circ (g \\circ h)](x) = f[(g \\circ h)(x)] = f(g(h(x)))$. Non-commutativity example: Let $f(x)=x^2$ and $g(x)=\\sin x$. Then $(f \\circ g)(x) = \\sin^2 x$ but $(g \\circ f)(x) = \\sin(x^2)$, which are different functions.",
+        "examples": [
+          "Let $f(x) = \\sin x$ and $g(x) = x^2$. Then $(f \\circ g)(x) = \\sin(x^2)$. At $x=1$: $g(1)=1$, then $f(1)=\\sin(1) \\approx 0.8414$",
+          "Let $f(x) = e^x$, $g(x) = \\sin x$, $h(x) = x^2$. Then $(f \\circ g \\circ h)(x) = e^{\\sin(x^2)}$. At $x=0.5$: $h(0.5)=0.25$, $g(0.25)=\\sin(0.25) \\approx 0.2474$, $f(0.2474)=e^{0.2474} \\approx 1.2807$",
+          "Order matters: $\\sin(x^2)$ at $x=2$ gives $\\sin(4) \\approx -0.7568$, but $[\\sin(x)]^2$ at $x=2$ gives $[\\sin(2)]^2 \\approx 0.8268$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Two-function composition",
+          "latex": "$(f \\circ g)(x) = f(g(x))$",
+          "description": "Apply g first, then f to the result"
+        },
+        {
+          "name": "Three-function composition",
+          "latex": "$(f \\circ g \\circ h)(x) = f(g(h(x)))$",
+          "description": "Apply functions right to left: h, then g, then f"
+        },
+        {
+          "name": "General n-function composition",
+          "latex": "$(f_n \\circ \\cdots \\circ f_1)(x) = f_n(f_{n-1}(\\cdots f_1(x) \\cdots))$",
+          "description": "Apply functions sequentially from rightmost to leftmost"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the forward pass for composite functions. Given a list of function names (applied right to left) and an initial value, compute all intermediate values and return the final result. This forward pass will be essential for the chain rule computation.",
+        "function_signature": "def forward_pass(functions: list[str], x: float) -> list[float]:",
+        "starter_code": "import numpy as np\n\ndef forward_pass(functions: list[str], x: float) -> list[float]:\n    \"\"\"\n    Compute forward pass through composite functions.\n    \n    Args:\n        functions: List of function names applied right to left\n                  Available: 'square', 'sin', 'exp', 'log'\n        x: Initial input value\n    \n    Returns:\n        List of intermediate values [x, f1(x), f2(f1(x)), ...]\n    \n    Example:\n        forward_pass(['sin', 'square'], 1.0) -> [1.0, 1.0, 0.8414...]\n        Explanation: start with 1.0, apply square to get 1.0, apply sin to get sin(1.0)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "forward_pass(['square'], 3.0)",
+            "expected": "[3.0, 9.0]",
+            "explanation": "x=3, then x^2=9"
+          },
+          {
+            "input": "forward_pass(['sin', 'square'], 1.0)",
+            "expected": "[1.0, 1.0, 0.8414...]",
+            "explanation": "x=1, square gives 1, sin(1)≈0.8414"
+          },
+          {
+            "input": "forward_pass(['exp', 'sin', 'square'], 0.5)",
+            "expected": "[0.5, 0.25, 0.2474..., 1.2807...]",
+            "explanation": "0.5 -> 0.25 -> sin(0.25) -> exp(sin(0.25))"
+          },
+          {
+            "input": "forward_pass(['log', 'exp'], 2.0)",
+            "expected": "[2.0, 7.389..., 2.0]",
+            "explanation": "2 -> e^2 -> log(e^2)=2, demonstrating inverse functions"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Applying functions left to right instead of right to left - the list order represents outer to inner",
+        "Not storing intermediate values, which are needed for chain rule computation",
+        "Forgetting to include the initial x value in the output",
+        "Confusing function composition with function addition or multiplication"
+      ],
+      "hint": "Start with the initial value x in a list. Iterate through the functions from right to left (or reverse the list), applying each function to the last computed value and appending to the list.",
+      "references": [
+        "Function composition",
+        "Forward propagation in neural networks",
+        "Evaluation order in nested functions"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "The Chain Rule for Two Functions",
+      "relation_to_problem": "The chain rule is the core mathematical principle needed to solve the main problem. Understanding it for two functions is essential before extending to multiple functions.",
+      "prerequisites": [
+        "Derivatives of elementary functions",
+        "Function composition",
+        "Derivative definition"
+      ],
+      "learning_objectives": [
+        "State and prove the chain rule for two composed functions",
+        "Apply the chain rule to compute derivatives of f(g(x))",
+        "Understand the 'derivative of outer times derivative of inner' principle"
+      ],
+      "math_content": {
+        "definition": "**The Chain Rule**: Let $g$ be differentiable at $x$ and $f$ be differentiable at $g(x)$. Then the composite function $h(x) = f(g(x))$ is differentiable at $x$, and its derivative is:\n$$h'(x) = f'(g(x)) \\cdot g'(x)$$\nIn Leibniz notation, if $y=f(u)$ and $u=g(x)$, then:\n$$\\frac{dy}{dx} = \\frac{dy}{du} \\cdot \\frac{du}{dx}$$",
+        "notation": "$h'(x)$ = derivative of composite function, $f'(g(x))$ = derivative of outer function evaluated at inner function",
+        "theorem": "**Chain Rule (Formal Statement)**: If $g: \\mathbb{R} \\to \\mathbb{R}$ is differentiable at $x_0$ and $f: \\mathbb{R} \\to \\mathbb{R}$ is differentiable at $g(x_0)$, then the composition $f \\circ g$ is differentiable at $x_0$ with:\n$$(f \\circ g)'(x_0) = f'(g(x_0)) \\cdot g'(x_0)$$",
+        "proof_sketch": "Let $h(x) = f(g(x))$. By definition:\n$$h'(x_0) = \\lim_{h \\to 0} \\frac{f(g(x_0+h)) - f(g(x_0))}{h}$$\nLet $u_0 = g(x_0)$ and $\\Delta u = g(x_0+h) - g(x_0)$. Then:\n$$h'(x_0) = \\lim_{h \\to 0} \\frac{f(u_0 + \\Delta u) - f(u_0)}{h} = \\lim_{h \\to 0} \\frac{f(u_0 + \\Delta u) - f(u_0)}{\\Delta u} \\cdot \\frac{\\Delta u}{h}$$\nAs $h \\to 0$, we have $\\Delta u \\to 0$ (by continuity of $g$). Thus:\n$$h'(x_0) = f'(u_0) \\cdot g'(x_0) = f'(g(x_0)) \\cdot g'(x_0)$$",
+        "examples": [
+          "Let $h(x) = \\sin(x^2)$. Here $f(u)=\\sin u$ with $f'(u)=\\cos u$, and $g(x)=x^2$ with $g'(x)=2x$. By chain rule: $h'(x) = \\cos(x^2) \\cdot 2x = 2x\\cos(x^2)$. At $x=1$: $h'(1) = 2(1)\\cos(1) = 2\\cos(1) \\approx 1.0806$",
+          "Let $h(x) = e^{\\sin x}$. Here $f(u)=e^u$ with $f'(u)=e^u$, and $g(x)=\\sin x$ with $g'(x)=\\cos x$. By chain rule: $h'(x) = e^{\\sin x} \\cdot \\cos x$. At $x=0$: $h'(0) = e^0 \\cdot 1 = 1$",
+          "Let $h(x) = \\ln(x^2)$ for $x > 0$. Here $f(u)=\\ln u$ with $f'(u)=1/u$, and $g(x)=x^2$ with $g'(x)=2x$. By chain rule: $h'(x) = \\frac{1}{x^2} \\cdot 2x = \\frac{2}{x}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Chain Rule",
+          "latex": "$\\frac{d}{dx}[f(g(x))] = f'(g(x)) \\cdot g'(x)$",
+          "description": "Derivative of outer function (at inner) times derivative of inner function"
+        },
+        {
+          "name": "Leibniz Chain Rule",
+          "latex": "$\\frac{dy}{dx} = \\frac{dy}{du} \\cdot \\frac{du}{dx}$",
+          "description": "Alternative notation emphasizing 'cancellation' of du"
+        },
+        {
+          "name": "Chain Rule Pattern",
+          "latex": "$[f(g(x))]' = f'(\\text{inside}) \\cdot (\\text{inside})'$",
+          "description": "Mnemonic: derivative of outer times derivative of inside"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the chain rule for exactly two composed functions. Given the names of outer and inner functions and a point x, compute the derivative of their composition at that point using the chain rule formula.",
+        "function_signature": "def chain_rule_two_functions(outer: str, inner: str, x: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef chain_rule_two_functions(outer: str, inner: str, x: float) -> float:\n    \"\"\"\n    Compute derivative of f(g(x)) at point x using chain rule.\n    \n    Args:\n        outer: Name of outer function f ('square', 'sin', 'exp', 'log')\n        inner: Name of inner function g ('square', 'sin', 'exp', 'log')\n        x: Point at which to evaluate derivative\n    \n    Returns:\n        Derivative value h'(x) where h(x) = f(g(x))\n    \n    Example:\n        chain_rule_two_functions('sin', 'square', 1.0) -> 1.0806\n        This computes d/dx[sin(x^2)] at x=1\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "chain_rule_two_functions('sin', 'square', 1.0)",
+            "expected": "1.0806",
+            "explanation": "d/dx[sin(x^2)] = cos(x^2)·2x = cos(1)·2 ≈ 1.0806"
+          },
+          {
+            "input": "chain_rule_two_functions('square', 'sin', 0.0)",
+            "expected": "0.0",
+            "explanation": "d/dx[(sin x)^2] = 2sin(x)·cos(x) = 0 at x=0"
+          },
+          {
+            "input": "chain_rule_two_functions('exp', 'square', 1.0)",
+            "expected": "5.4365",
+            "explanation": "d/dx[e^(x^2)] = e^(x^2)·2x = e·2 ≈ 5.4365 at x=1"
+          },
+          {
+            "input": "chain_rule_two_functions('log', 'exp', 2.0)",
+            "expected": "1.0",
+            "explanation": "d/dx[ln(e^x)] = (1/e^x)·e^x = 1, demonstrating inverse function cancellation"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to multiply by the derivative of the inner function - only computing f'(g(x))",
+        "Evaluating f'(x) instead of f'(g(x)) - the outer derivative must be evaluated at the inner function value",
+        "Applying the product rule instead of the chain rule when seeing two functions",
+        "Computing g'(x) at the wrong point"
+      ],
+      "hint": "First compute g(x) to get the intermediate value. Then compute f'(g(x)) using this intermediate value. Finally compute g'(x) at the original point and multiply the two derivatives together.",
+      "references": [
+        "Chain rule proof",
+        "Composite function differentiation",
+        "Rate of change propagation"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Extended Chain Rule for Multiple Compositions",
+      "relation_to_problem": "The main problem requires computing derivatives of arbitrarily long function compositions. The extended chain rule generalizes the two-function case to n functions.",
+      "prerequisites": [
+        "Chain rule for two functions",
+        "Function composition",
+        "Product notation"
+      ],
+      "learning_objectives": [
+        "Extend the chain rule to n composed functions",
+        "Understand the product structure of multiple derivatives",
+        "Implement the backward pass algorithm for gradient computation"
+      ],
+      "math_content": {
+        "definition": "**Extended Chain Rule**: Let $h(x) = f_n(f_{n-1}(\\cdots f_2(f_1(x)) \\cdots))$ be a composition of $n$ differentiable functions. Then:\n$$h'(x) = f_n'(f_{n-1}(\\cdots f_1(x) \\cdots)) \\cdot f_{n-1}'(f_{n-2}(\\cdots f_1(x) \\cdots)) \\cdots f_2'(f_1(x)) \\cdot f_1'(x)$$\nUsing product notation with intermediate values $u_i = f_i(f_{i-1}(\\cdots f_1(x) \\cdots))$ and $u_0 = x$:\n$$h'(x) = \\prod_{i=1}^{n} f_i'(u_{i-1})$$",
+        "notation": "$\\prod$ = product symbol, $u_i$ = intermediate value after applying $i$ functions, $f_i'(u_{i-1})$ = derivative of $i$-th function evaluated at previous intermediate value",
+        "theorem": "**General Chain Rule Theorem**: If functions $f_1, f_2, \\ldots, f_n$ are differentiable at appropriate points such that the composition $f_n \\circ f_{n-1} \\circ \\cdots \\circ f_1$ is defined, then:\n$$(f_n \\circ \\cdots \\circ f_1)'(x) = \\prod_{i=1}^{n} f_i'((f_{i-1} \\circ \\cdots \\circ f_1)(x))$$\nwhere $(f_0)(x) = x$ by convention.",
+        "proof_sketch": "Prove by induction on $n$. Base case $n=2$ is the standard chain rule. Inductive step: Assume true for $n-1$. Let $g = f_{n-1} \\circ \\cdots \\circ f_1$ and $h = f_n \\circ g$. By the two-function chain rule: $h'(x) = f_n'(g(x)) \\cdot g'(x)$. By inductive hypothesis: $g'(x) = \\prod_{i=1}^{n-1} f_i'(u_{i-1})$. Therefore: $h'(x) = f_n'(u_{n-1}) \\cdot \\prod_{i=1}^{n-1} f_i'(u_{i-1}) = \\prod_{i=1}^{n} f_i'(u_{i-1})$.",
+        "examples": [
+          "For $h(x) = e^{\\sin(x^2)}$: Set $f_1(x)=x^2$, $f_2(x)=\\sin x$, $f_3(x)=e^x$. At $x=0.5$: Forward pass gives $u_0=0.5$, $u_1=0.25$, $u_2=\\sin(0.25) \\approx 0.2474$, $u_3=e^{0.2474} \\approx 1.2807$. Derivatives: $f_1'(0.5)=1.0$, $f_2'(0.25)=\\cos(0.25) \\approx 0.9689$, $f_3'(0.2474)=e^{0.2474} \\approx 1.2807$. Product: $h'(0.5) = 1.0 \\times 0.9689 \\times 1.2807 \\approx 1.2409$",
+          "For $h(x) = \\ln(e^{\\sin(x^2)})$ at $x=1$: This simplifies to $\\sin(x^2)$, so $h'(1)$ should equal $2\\cos(1) \\approx 1.0806$. Verifying with 4 functions: $f_1(x)=x^2$, $f_2(x)=\\sin x$, $f_3(x)=e^x$, $f_4(x)=\\ln x$. Forward: $u_0=1, u_1=1, u_2=\\sin(1), u_3=e^{\\sin(1)}, u_4=\\sin(1)$. Derivatives: $2 \\cdot \\cos(1) \\cdot e^{\\sin(1)} \\cdot (1/e^{\\sin(1)}) = 2\\cos(1)$ ✓",
+          "For identity composition $\\ln(e^x)$: $f_1(x)=e^x$, $f_2(x)=\\ln x$. At any $x$: $u_0=x$, $u_1=e^x$. Derivatives: $f_1'(x)=e^x$, $f_2'(e^x)=1/e^x$. Product: $e^x \\cdot (1/e^x) = 1$, confirming $\\frac{d}{dx}[x] = 1$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Extended Chain Rule",
+          "latex": "$\\frac{d}{dx}[f_n(\\cdots f_1(x) \\cdots)] = \\prod_{i=1}^{n} f_i'(u_{i-1})$",
+          "description": "Product of all derivatives evaluated at intermediate values"
+        },
+        {
+          "name": "Leibniz Multi-Chain",
+          "latex": "$\\frac{dy}{dx} = \\frac{dy}{du_{n-1}} \\cdot \\frac{du_{n-1}}{du_{n-2}} \\cdots \\frac{du_1}{dx}$",
+          "description": "Cascade of rate changes through all intermediate variables"
+        },
+        {
+          "name": "Backward Pass",
+          "latex": "$\\frac{\\partial h}{\\partial x} = \\frac{\\partial h}{\\partial u_n} \\cdot \\frac{\\partial u_n}{\\partial u_{n-1}} \\cdots \\frac{\\partial u_1}{\\partial x}$",
+          "description": "Backpropagation formula computing gradient from output to input"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the backward pass algorithm for computing the derivative of an arbitrary composition of functions. Given intermediate values from a forward pass and the function names, compute the product of all derivatives working backwards from output to input.",
+        "function_signature": "def backward_pass(functions: list[str], intermediate_values: list[float]) -> float:",
+        "starter_code": "import numpy as np\n\ndef backward_pass(functions: list[str], intermediate_values: list[float]) -> float:\n    \"\"\"\n    Compute derivative using backward pass through intermediate values.\n    \n    Args:\n        functions: List of function names applied right to left\n        intermediate_values: Results from forward pass [x, f1(x), f2(f1(x)), ...]\n    \n    Returns:\n        Final derivative value (product of all derivatives)\n    \n    Example:\n        functions = ['sin', 'square']\n        intermediate_values = [1.0, 1.0, 0.8414...]  # from forward pass\n        backward_pass(functions, intermediate_values) -> 1.0806\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "backward_pass(['sin', 'square'], [1.0, 1.0, 0.8414])",
+            "expected": "1.0806",
+            "explanation": "cos(1)·2·1 ≈ 1.0806 for sin(x^2) at x=1"
+          },
+          {
+            "input": "backward_pass(['exp', 'sin', 'square'], [0.5, 0.25, 0.2474, 1.2807])",
+            "expected": "1.2409",
+            "explanation": "Product of three derivatives: e^(sin(0.25))·cos(0.25)·1.0"
+          },
+          {
+            "input": "backward_pass(['square'], [2.0, 4.0])",
+            "expected": "4.0",
+            "explanation": "Single function: 2x at x=2 gives 4"
+          },
+          {
+            "input": "backward_pass(['log', 'exp'], [1.0, 2.7183, 1.0])",
+            "expected": "1.0",
+            "explanation": "Inverse functions: (1/e)·e = 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Iterating through functions in the wrong direction - must go backwards through the composition",
+        "Using wrong intermediate values for derivative evaluation - f_i' must be evaluated at u_{i-1}",
+        "Not initializing the gradient accumulator to 1 before starting the product",
+        "Confusing the forward pass values with the backward pass derivatives"
+      ],
+      "hint": "Start with gradient=1.0. Iterate through the functions and intermediate values in reverse order (or from the last function backwards). For each function, compute its derivative at the appropriate intermediate value and multiply into the gradient accumulator.",
+      "references": [
+        "Backpropagation algorithm",
+        "Automatic differentiation",
+        "Computational graphs",
+        "Gradient accumulation"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Complete Chain Rule Implementation",
+      "relation_to_problem": "This sub-quest combines all previous concepts into a complete solution approach. Students integrate forward pass computation with backward pass gradient calculation to compute derivatives of arbitrary function compositions.",
+      "prerequisites": [
+        "Function evaluation and derivatives",
+        "Function composition",
+        "Two-function chain rule",
+        "Extended chain rule",
+        "Forward and backward passes"
+      ],
+      "learning_objectives": [
+        "Combine forward and backward passes into complete chain rule algorithm",
+        "Handle arbitrary-length function compositions",
+        "Validate results against known derivatives and test cases"
+      ],
+      "math_content": {
+        "definition": "**Chain Rule Algorithm**: Given a composition $h(x) = (f_n \\circ \\cdots \\circ f_1)(x)$ and a point $x_0$, compute $h'(x_0)$ in two phases:\n\n**Phase 1 (Forward Pass)**: Compute all intermediate values\n$$u_0 = x_0, \\quad u_i = f_i(u_{i-1}) \\text{ for } i=1,\\ldots,n$$\n\n**Phase 2 (Backward Pass)**: Compute derivative as product\n$$h'(x_0) = \\prod_{i=1}^{n} f_i'(u_{i-1})$$\n\nThis two-phase structure is fundamental to automatic differentiation and backpropagation in neural networks.",
+        "notation": "$u_i$ = intermediate activation at layer $i$, $\\nabla$ = gradient operator, forward/backward = direction of computation",
+        "theorem": "**Computational Efficiency of Chain Rule**: Computing $h'(x)$ for $h = f_n \\circ \\cdots \\circ f_1$ requires exactly $n$ function evaluations (forward) and $n$ derivative evaluations (backward), giving $O(n)$ time complexity. This is exponentially better than naive finite difference approximations which require $O(n)$ function evaluations per derivative, giving $O(n^2)$ for the full gradient.",
+        "proof_sketch": "Forward pass: Each function $f_i$ is evaluated once at $u_{i-1}$, requiring $n$ evaluations total. Backward pass: Each derivative $f_i'$ is evaluated once at $u_{i-1}$, requiring $n$ evaluations. Total: $2n$ operations. Finite differences: Computing $h'(x) \\approx [h(x+\\epsilon)-h(x)]/\\epsilon$ requires $n$ function evaluations per $h$ evaluation, and approximating partial derivatives requires one $h$ evaluation per input dimension.",
+        "examples": [
+          "**Complete example for $h(x) = \\sin(x^2)$ at $x=1$**:\n\nForward: $u_0=1 \\to u_1=1^2=1 \\to u_2=\\sin(1) \\approx 0.8414$\n\nBackward: $f_2'(u_1) = \\cos(1) \\approx 0.5403$, $f_1'(u_0) = 2(1) = 2$\n\nResult: $h'(1) = 0.5403 \\times 2 = 1.0806$",
+          "**Complete example for $h(x) = e^{\\sin(x^2)}$ at $x=0.5$**:\n\nForward: $u_0=0.5 \\to u_1=0.25 \\to u_2=0.2474 \\to u_3=1.2807$\n\nBackward: $f_3'(u_2)=1.2807$, $f_2'(u_1)=0.9689$, $f_1'(u_0)=1.0$\n\nResult: $h'(0.5) = 1.2807 \\times 0.9689 \\times 1.0 = 1.2409$",
+          "**Verification for $h(x) = (x^2)^2 = x^4$ at $x=2$**:\n\nDirect: $h'(x) = 4x^3$, so $h'(2) = 32$\n\nChain rule: $f_2'(u_1) = 2u_1 = 2(4) = 8$, $f_1'(u_0) = 2u_0 = 4$\n\nResult: $8 \\times 4 = 32$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Two-Phase Algorithm",
+          "latex": "$h'(x) = \\left[\\prod_{i=1}^{n} f_i'(u_{i-1})\\right] \\text{ where } u_i = (f_i \\circ \\cdots \\circ f_1)(x)$",
+          "description": "Forward pass computes u_i, backward pass multiplies derivatives"
+        },
+        {
+          "name": "Gradient Flow",
+          "latex": "$\\frac{\\partial \\mathcal{L}}{\\partial x} = \\frac{\\partial \\mathcal{L}}{\\partial u_n} \\prod_{i=1}^{n} f_i'(u_{i-1})$",
+          "description": "In neural networks, gradient flows backwards from loss through all layers"
+        },
+        {
+          "name": "Numerical Stability",
+          "latex": "$\\log h'(x) = \\sum_{i=1}^{n} \\log|f_i'(u_{i-1})|$",
+          "description": "Computing in log space prevents numerical overflow/underflow in deep compositions"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete chain rule gradient computation by combining forward and backward passes. This is a building block that integrates all previous concepts but is still one step away from the final solution (which needs proper error handling and edge cases).",
+        "function_signature": "def compute_gradient(functions: list[str], x: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_gradient(functions: list[str], x: float) -> float:\n    \"\"\"\n    Compute derivative of composite functions using chain rule.\n    Combines forward pass (compute intermediate values) with \n    backward pass (multiply derivatives).\n    \n    Args:\n        functions: List of function names applied right to left\n        x: Point at which to evaluate derivative\n    \n    Returns:\n        Derivative value at x\n    \n    Example:\n        compute_gradient(['sin', 'square'], 1.0) -> 1.0806\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_gradient(['sin', 'square'], 1.0)",
+            "expected": "1.0806",
+            "explanation": "Standard test case: sin(x^2) derivative at x=1"
+          },
+          {
+            "input": "compute_gradient(['exp', 'sin', 'square'], 0.5)",
+            "expected": "1.2409",
+            "explanation": "Three-function composition as shown in examples"
+          },
+          {
+            "input": "compute_gradient(['square'], 3.0)",
+            "expected": "6.0",
+            "explanation": "Single function: derivative of x^2 at x=3 is 6"
+          },
+          {
+            "input": "compute_gradient(['log', 'exp'], 2.0)",
+            "expected": "1.0",
+            "explanation": "Inverse functions should give derivative 1"
+          },
+          {
+            "input": "compute_gradient(['square', 'square'], 2.0)",
+            "expected": "32.0",
+            "explanation": "Double square: x^4 has derivative 4x^3 = 32 at x=2"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not properly linking forward and backward passes - they must use the same intermediate values",
+        "Applying functions in the wrong order during forward pass (should be right to left from the list)",
+        "Evaluating derivatives at wrong points - must use intermediate values, not original x",
+        "Edge case: forgetting that some functions have domain restrictions (log requires positive input)"
+      ],
+      "hint": "Break into two phases: (1) Forward pass creates a list of intermediate values starting with x; (2) Backward pass iterates through functions in reverse, computing each derivative at the corresponding intermediate value and accumulating the product. Use helper functions from previous exercises.",
+      "references": [
+        "Automatic differentiation",
+        "Computational graph execution",
+        "Backpropagation derivation",
+        "Forward-mode vs reverse-mode differentiation"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Robustness and Edge Cases in Differentiation",
+      "relation_to_problem": "Real-world implementations must handle edge cases, domain restrictions, and numerical stability. This final sub-quest ensures students can create production-ready code that handles all scenarios in the main problem.",
+      "prerequisites": [
+        "Complete chain rule implementation",
+        "Function domains",
+        "Numerical computing",
+        "Error handling"
+      ],
+      "learning_objectives": [
+        "Identify and handle domain restrictions in composed functions",
+        "Manage numerical stability in gradient computations",
+        "Validate implementations against edge cases and special values"
+      ],
+      "math_content": {
+        "definition": "**Domain of Composite Function**: For $h = f \\circ g$, the domain is:\n$$\\text{Dom}(h) = \\{x \\in \\text{Dom}(g) : g(x) \\in \\text{Dom}(f)\\}$$\nCritical domain restrictions for our functions:\n- $\\ln(x)$: requires $x > 0$\n- $x^2$: defined for all real $x$\n- $\\sin(x), \\cos(x), e^x$: defined for all real $x$",
+        "notation": "$\\text{Dom}(f)$ = domain of function $f$, $\\mathbb{R}^+$ = positive real numbers",
+        "theorem": "**Numerical Stability in Products**: When computing products $\\prod_{i=1}^n a_i$ where $a_i$ may be very large or very small, the result can overflow or underflow. Using logarithms prevents this:\n$$\\prod_{i=1}^n a_i = \\exp\\left(\\sum_{i=1}^n \\ln|a_i|\\right)$$\nFor derivatives, since we often compute gradients in log-space in practice, this becomes:\n$$\\ln|h'(x)| = \\sum_{i=1}^n \\ln|f_i'(u_{i-1})|$$",
+        "proof_sketch": "Consider $a_i \\approx 10^{-10}$ for $i=1,\\ldots,100$. Direct product gives $10^{-1000}$, causing underflow in IEEE 754 double precision (minimum $\\approx 10^{-308}$). However, $\\sum_{i=1}^{100} \\ln(10^{-10}) = -1000\\ln(10) \\approx -2302.6$, which is representable. Then $\\exp(-2302.6)$ can be computed or flagged as underflow appropriately.",
+        "examples": [
+          "**Domain issue**: For $h(x) = \\ln(x^2 - 4)$, the domain is $|x| > 2$. At $x=1$, the function is undefined because $x^2-4 = -3 < 0$. The chain rule cannot be applied at points outside the domain.",
+          "**Special values**: For $h(x) = \\sin(x^2)$ at $x=0$: Forward gives $u_0=0, u_1=0, u_2=0$. Backward: $f_2'(0)=\\cos(0)=1$, $f_1'(0)=0$. Result: $h'(0)=1 \\times 0 = 0$, which matches the known result that $h'(x)=2x\\cos(x^2)$ gives $0$ at $x=0$.",
+          "**Numerical stability**: For $h(x) = e^{e^{e^x}}$ at $x=2$: Forward gives $u_0=2, u_1=e^2 \\approx 7.39, u_2=e^{7.39} \\approx 1629, u_3=e^{1629} \\approx 10^{707}$ (overflow!). Computing derivatives directly will overflow. Instead, compute in log-space: $\\ln(h'(2)) = \\ln(e^{1629}) + \\ln(e^{7.39}) + \\ln(e^2) = 1629 + 7.39 + 2 = 1638.39$, giving $h'(2) \\approx 10^{711}$ (still very large but trackable)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Log-space derivative",
+          "latex": "$\\log|h'(x)| = \\sum_{i=1}^{n} \\log|f_i'(u_{i-1})|$",
+          "description": "Prevent overflow/underflow by computing in logarithmic space"
+        },
+        {
+          "name": "Domain constraint propagation",
+          "latex": "$x \\in \\text{Dom}(h) \\Rightarrow f_i(u_{i-1}) \\in \\text{Dom}(f_{i+1})$ for all $i$",
+          "description": "All intermediate values must be in valid domains"
+        },
+        {
+          "name": "Zero derivative handling",
+          "latex": "$\\text{If } f_i'(u_{i-1}) = 0 \\text{ for any } i, \\text{ then } h'(x) = 0$",
+          "description": "Chain breaks at zero derivative - product becomes zero"
+        }
+      ],
+      "exercise": {
+        "description": "Enhance the chain rule implementation with proper error handling, domain validation, and numerical stability considerations. This exercise represents the final refinement before a complete solution to the main problem.",
+        "function_signature": "def robust_chain_rule_gradient(functions: list[str], x: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef robust_chain_rule_gradient(functions: list[str], x: float) -> float:\n    \"\"\"\n    Compute derivative with error handling and numerical stability.\n    \n    Args:\n        functions: List of function names applied right to left\n        x: Point at which to evaluate derivative\n    \n    Returns:\n        Derivative value, or appropriate handling of edge cases\n    \n    Edge cases to handle:\n    - Empty function list (return 1.0 - derivative of identity)\n    - Domain violations (log of negative number)\n    - Numerical overflow/underflow\n    - Zero derivatives in the chain\n    \n    Example:\n        robust_chain_rule_gradient(['sin', 'square'], 1.0) -> 1.0806\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "robust_chain_rule_gradient([], 5.0)",
+            "expected": "1.0",
+            "explanation": "Empty list means identity function, derivative is 1"
+          },
+          {
+            "input": "robust_chain_rule_gradient(['square'], 0.0)",
+            "expected": "0.0",
+            "explanation": "Derivative of x^2 at x=0 is 0"
+          },
+          {
+            "input": "robust_chain_rule_gradient(['sin', 'square'], 1.0)",
+            "expected": "1.0806",
+            "explanation": "Standard case should still work correctly"
+          },
+          {
+            "input": "robust_chain_rule_gradient(['exp', 'log'], 1.0)",
+            "expected": "1.0",
+            "explanation": "Inverse functions: d/dx[e^(ln x)] = 1"
+          },
+          {
+            "input": "robust_chain_rule_gradient(['square', 'sin'], np.pi)",
+            "expected": "0.0",
+            "explanation": "sin(π)=0, so derivative of [sin(π)]^2 is 2·0·cos(π)=0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking if intermediate values fall outside function domains before applying next function",
+        "Ignoring overflow warnings in exponential compositions",
+        "Not handling the edge case of empty function lists",
+        "Forgetting that a zero derivative anywhere in the chain makes the entire derivative zero"
+      ],
+      "hint": "Add validation checks: (1) Handle empty list specially; (2) During forward pass, check domain constraints (e.g., log requires positive); (3) During backward pass, check for zero derivatives early - if any derivative is zero, the final result is zero (short-circuit); (4) Consider tracking if values become extremely large/small.",
+      "references": [
+        "Numerical stability in scientific computing",
+        "Domain and range in calculus",
+        "IEEE 754 floating point",
+        "Defensive programming practices",
+        "Unit testing for edge cases"
+      ]
+    }
+  ]
+}

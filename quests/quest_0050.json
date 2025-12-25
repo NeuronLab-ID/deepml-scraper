@@ -1,0 +1,494 @@
+{
+  "problem_id": 50,
+  "title": "Implement Lasso Regression using Gradient Descent",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "Implement the Lasso Regression algorithm using Gradient Descent. Lasso Regression (Least Absolute Shrinkage and Selection Operator) uses L1 regularization, which adds a penalty equal to the absolute value of the coefficients to the loss function. This encourages sparsity in the model, effectively performing feature selection by shrinking some coefficients to zero.\n\nThe objective function of Lasso Regression is:\n$$\nJ(w, b) = \\frac{1}{2n} \\sum_{i=1}^{n} \\left( y_i - \\left( \\sum_{j=1}^{p} X_{ij} w_j + b \\right) \\right)^2 + \\alpha \\sum_{j=1}^{p} | w_j |\n$$\n\nWhere:\n- $n$ is the number of samples\n- $p$ is the number of features\n- $y_i$ is the actual value for the $i$-th sample\n- $\\hat{y}_i = \\sum_{j=1}^{p} X_{ij} w_j + b$ is the predicted value\n- $w_j$ is the weight for the $j$-th feature\n- $b$ is the bias term (not regularized)\n- $\\alpha$ is the regularization strength\n\nYour task is to implement gradient descent to minimize this objective function, returning the optimized weights and bias.",
+  "example": {
+    "input": "X = np.array([[0, 0], [1, 1], [2, 2]])\ny = np.array([0, 1, 2])\nalpha = 0.1\nweights, bias = l1_regularization_gradient_descent(X, y, alpha=alpha, learning_rate=0.01, max_iter=1000)",
+    "output": "(array([0.42371644, 0.42371644]), 0.15385068459377865)",
+    "reasoning": "The algorithm minimizes the Lasso objective by iteratively updating weights via gradient descent. With identical features (both columns equal), the L1 penalty distributes the weight equally (~0.424 each). The bias (0.154) adjusts the intercept. The regularization prevents overfitting by penalizing large weights."
+  },
+  "starter_code": "import numpy as np\n\ndef l1_regularization_gradient_descent(X: np.ndarray, y: np.ndarray, alpha: float = 0.1, learning_rate: float = 0.01, max_iter: int = 1000, tol: float = 1e-4) -> tuple:\n    \"\"\"\n    Implement Lasso Regression using Gradient Descent.\n    \n    Args:\n        X: Feature matrix of shape (n_samples, n_features)\n        y: Target vector of shape (n_samples,)\n        alpha: L1 regularization strength (higher = more regularization)\n        learning_rate: Step size for gradient descent updates\n        max_iter: Maximum number of iterations\n        tol: Convergence tolerance - stops when L1 norm of weight gradient < tol\n    \n    Returns:\n        tuple: (weights, bias) where:\n            - weights: np.ndarray of shape (n_features,)\n            - bias: float\n    \n    Note:\n        - The bias term is NOT regularized\n        - Use subgradient for L1: sign(0) = 0\n    \"\"\"\n    n_samples, n_features = X.shape\n    weights = np.zeros(n_features)\n    bias = 0.0\n    \n    # Your code here\n    pass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Linear Prediction and Mean Squared Error",
+      "relation_to_problem": "Understanding how to compute predictions and measure error is fundamental to implementing any regression algorithm, including Lasso. The MSE forms the first component of the Lasso objective function.",
+      "prerequisites": [
+        "Basic linear algebra",
+        "Matrix multiplication",
+        "NumPy arrays"
+      ],
+      "learning_objectives": [
+        "Derive the linear prediction formula in matrix form",
+        "Compute Mean Squared Error (MSE) for regression problems",
+        "Understand the geometric interpretation of predictions in feature space",
+        "Implement vectorized prediction and error computation"
+      ],
+      "math_content": {
+        "definition": "A **linear predictor** with weights $\\mathbf{w} \\in \\mathbb{R}^p$ and bias $b \\in \\mathbb{R}$ maps feature vectors $\\mathbf{x}_i \\in \\mathbb{R}^p$ to predictions via $\\hat{y}_i = \\mathbf{w}^T \\mathbf{x}_i + b = \\sum_{j=1}^{p} w_j x_{ij} + b$. The **Mean Squared Error** (MSE) loss function measures prediction quality: $\\text{MSE}(\\mathbf{w}, b) = \\frac{1}{n} \\sum_{i=1}^{n} (y_i - \\hat{y}_i)^2 = \\frac{1}{n} \\|\\mathbf{y} - \\mathbf{\\hat{y}}\\|_2^2$ where $n$ is the number of samples.",
+        "notation": "$\\mathbf{X} \\in \\mathbb{R}^{n \\times p}$ = feature matrix, $\\mathbf{y} \\in \\mathbb{R}^n$ = target vector, $\\mathbf{w} \\in \\mathbb{R}^p$ = weight vector, $b \\in \\mathbb{R}$ = bias/intercept, $\\mathbf{\\hat{y}} \\in \\mathbb{R}^n$ = predictions",
+        "theorem": "**Matrix Form**: For feature matrix $\\mathbf{X} \\in \\mathbb{R}^{n \\times p}$, the vectorized prediction is $\\mathbf{\\hat{y}} = \\mathbf{X}\\mathbf{w} + b\\mathbf{1}_n$ where $\\mathbf{1}_n$ is an $n$-dimensional vector of ones. This allows efficient computation of all predictions simultaneously.",
+        "proof_sketch": "Each prediction $\\hat{y}_i = \\sum_{j=1}^{p} X_{ij} w_j + b$ can be written as the $i$-th element of $\\mathbf{X}\\mathbf{w} + b\\mathbf{1}_n$. Since matrix multiplication distributes over vector addition and scalar-vector multiplication, the result follows from the definition of matrix-vector products.",
+        "examples": [
+          "Example 1: Given $\\mathbf{X} = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix}$, $\\mathbf{w} = \\begin{bmatrix} 0.5 \\\\ 0.3 \\end{bmatrix}$, $b = 0.1$, we compute $\\mathbf{\\hat{y}} = \\begin{bmatrix} 1(0.5) + 2(0.3) \\\\ 3(0.5) + 4(0.3) \\end{bmatrix} + \\begin{bmatrix} 0.1 \\\\ 0.1 \\end{bmatrix} = \\begin{bmatrix} 1.2 \\\\ 2.8 \\end{bmatrix}$",
+          "Example 2: If $\\mathbf{y} = \\begin{bmatrix} 1.0 \\\\ 3.0 \\end{bmatrix}$, then $\\text{MSE} = \\frac{1}{2}[(1.0-1.2)^2 + (3.0-2.8)^2] = \\frac{1}{2}[0.04 + 0.04] = 0.04$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Linear Prediction (Scalar)",
+          "latex": "$\\hat{y}_i = \\sum_{j=1}^{p} w_j x_{ij} + b$",
+          "description": "Compute prediction for single sample $i$"
+        },
+        {
+          "name": "Linear Prediction (Vector)",
+          "latex": "$\\mathbf{\\hat{y}} = \\mathbf{X}\\mathbf{w} + b\\mathbf{1}_n$",
+          "description": "Compute all predictions simultaneously"
+        },
+        {
+          "name": "Mean Squared Error",
+          "latex": "$\\text{MSE} = \\frac{1}{n} \\sum_{i=1}^{n} (y_i - \\hat{y}_i)^2$",
+          "description": "Average squared prediction error"
+        }
+      ],
+      "exercise": {
+        "description": "Implement functions to compute linear predictions and MSE. This is the foundation for evaluating any regression model before adding regularization.",
+        "function_signature": "def compute_mse(X: np.ndarray, y: np.ndarray, weights: np.ndarray, bias: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_predictions(X: np.ndarray, weights: np.ndarray, bias: float) -> np.ndarray:\n    \"\"\"\n    Compute linear predictions for all samples.\n    \n    Args:\n        X: Feature matrix of shape (n_samples, n_features)\n        weights: Weight vector of shape (n_features,)\n        bias: Scalar bias term\n    \n    Returns:\n        predictions: Vector of shape (n_samples,)\n    \"\"\"\n    # Your code here\n    pass\n\ndef compute_mse(X: np.ndarray, y: np.ndarray, weights: np.ndarray, bias: float) -> float:\n    \"\"\"\n    Compute Mean Squared Error.\n    \n    Args:\n        X: Feature matrix of shape (n_samples, n_features)\n        y: Target vector of shape (n_samples,)\n        weights: Weight vector of shape (n_features,)\n        bias: Scalar bias term\n    \n    Returns:\n        mse: Mean squared error (scalar)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_predictions(np.array([[1, 2], [3, 4]]), np.array([0.5, 0.3]), 0.1)",
+            "expected": "np.array([1.2, 2.8])",
+            "explanation": "First prediction: 1*0.5 + 2*0.3 + 0.1 = 1.2; Second: 3*0.5 + 4*0.3 + 0.1 = 2.8"
+          },
+          {
+            "input": "compute_mse(np.array([[1, 2], [3, 4]]), np.array([1.0, 3.0]), np.array([0.5, 0.3]), 0.1)",
+            "expected": "0.04",
+            "explanation": "Predictions are [1.2, 2.8], errors are [0.2, -0.2], squared: [0.04, 0.04], mean: 0.04"
+          },
+          {
+            "input": "compute_predictions(np.array([[0], [1], [2]]), np.array([2.0]), 1.0)",
+            "expected": "np.array([1.0, 3.0, 5.0])",
+            "explanation": "Simple linear function: y = 2x + 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to add the bias term to predictions",
+        "Using np.dot instead of @ for matrix multiplication (both work but @ is clearer)",
+        "Not using vectorized operations, leading to slow loops",
+        "Confusing sum of squared errors with mean squared error (forgetting to divide by n)"
+      ],
+      "hint": "Use matrix multiplication X @ weights for efficient computation. Remember that bias is added to every prediction.",
+      "references": [
+        "Matrix-vector multiplication",
+        "NumPy broadcasting",
+        "Vectorization for performance"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Gradient of Mean Squared Error",
+      "relation_to_problem": "To minimize the Lasso objective using gradient descent, we must compute gradients with respect to weights and bias. The MSE gradient forms the first part of the complete Lasso gradient before adding the L1 regularization term.",
+      "prerequisites": [
+        "Multivariable calculus",
+        "Chain rule",
+        "Matrix calculus",
+        "Linear prediction and MSE"
+      ],
+      "learning_objectives": [
+        "Derive the gradient of MSE with respect to weights and bias using calculus",
+        "Understand the chain rule in the context of composed functions",
+        "Implement vectorized gradient computation",
+        "Verify gradient correctness using numerical approximation"
+      ],
+      "math_content": {
+        "definition": "The **gradient** of a scalar function $f: \\mathbb{R}^p \\rightarrow \\mathbb{R}$ is the vector of partial derivatives $\\nabla f = \\begin{bmatrix} \\frac{\\partial f}{\\partial w_1} & \\cdots & \\frac{\\partial f}{\\partial w_p} \\end{bmatrix}^T$. For the MSE loss $L(\\mathbf{w}, b) = \\frac{1}{n} \\sum_{i=1}^{n} (y_i - \\hat{y}_i)^2$ where $\\hat{y}_i = \\mathbf{w}^T \\mathbf{x}_i + b$, we seek $\\nabla_{\\mathbf{w}} L$ and $\\frac{\\partial L}{\\partial b}$.",
+        "notation": "$\\nabla_{\\mathbf{w}} L$ = gradient with respect to weights, $\\frac{\\partial L}{\\partial b}$ = gradient with respect to bias, $\\mathbf{r} = \\mathbf{\\hat{y}} - \\mathbf{y}$ = residual vector",
+        "theorem": "**MSE Gradient Theorem**: For MSE loss $L(\\mathbf{w}, b) = \\frac{1}{n} \\|\\mathbf{y} - \\mathbf{X}\\mathbf{w} - b\\mathbf{1}_n\\|_2^2$, the gradients are: (1) $\\nabla_{\\mathbf{w}} L = \\frac{1}{n} \\mathbf{X}^T (\\mathbf{\\hat{y}} - \\mathbf{y})$, (2) $\\frac{\\partial L}{\\partial b} = \\frac{1}{n} \\sum_{i=1}^{n} (\\hat{y}_i - y_i) = \\frac{1}{n} \\mathbf{1}_n^T (\\mathbf{\\hat{y}} - \\mathbf{y})$.",
+        "proof_sketch": "Using the chain rule: $\\frac{\\partial L}{\\partial w_j} = \\frac{1}{n} \\sum_{i=1}^{n} 2(\\hat{y}_i - y_i) \\frac{\\partial \\hat{y}_i}{\\partial w_j}$. Since $\\frac{\\partial \\hat{y}_i}{\\partial w_j} = x_{ij}$, we get $\\frac{\\partial L}{\\partial w_j} = \\frac{1}{n} \\sum_{i=1}^{n} 2(\\hat{y}_i - y_i) x_{ij}$. Factoring out the 2 (absorbed into learning rate in practice) and recognizing this as the $j$-th component of $\\mathbf{X}^T(\\mathbf{\\hat{y}} - \\mathbf{y})$ gives the matrix form. For bias: $\\frac{\\partial \\hat{y}_i}{\\partial b} = 1$, yielding $\\frac{\\partial L}{\\partial b} = \\frac{1}{n} \\sum_{i=1}^{n} 2(\\hat{y}_i - y_i)$.",
+        "examples": [
+          "Example: $\\mathbf{X} = \\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}$, $\\mathbf{y} = \\begin{bmatrix} 2 \\\\ 3 \\end{bmatrix}$, $\\mathbf{w} = \\begin{bmatrix} 1 \\\\ 1 \\end{bmatrix}$, $b = 0$. Predictions: $\\mathbf{\\hat{y}} = \\begin{bmatrix} 1 \\\\ 1 \\end{bmatrix}$. Residuals: $\\mathbf{r} = \\begin{bmatrix} -1 \\\\ -2 \\end{bmatrix}$. Gradient: $\\nabla_{\\mathbf{w}} L = \\frac{1}{2} \\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}^T \\begin{bmatrix} -1 \\\\ -2 \\end{bmatrix} = \\begin{bmatrix} -0.5 \\\\ -1.0 \\end{bmatrix}$. Bias gradient: $\\frac{\\partial L}{\\partial b} = \\frac{1}{2}(-1 + -2) = -1.5$",
+          "Interpretation: Negative gradients mean we should increase weights and bias to reduce the loss (predictions are too low)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Weight Gradient",
+          "latex": "$\\nabla_{\\mathbf{w}} L = \\frac{1}{n} \\mathbf{X}^T (\\mathbf{\\hat{y}} - \\mathbf{y})$",
+          "description": "Gradient of MSE with respect to weights"
+        },
+        {
+          "name": "Bias Gradient",
+          "latex": "$\\frac{\\partial L}{\\partial b} = \\frac{1}{n} \\sum_{i=1}^{n} (\\hat{y}_i - y_i)$",
+          "description": "Gradient of MSE with respect to bias"
+        },
+        {
+          "name": "Residual Vector",
+          "latex": "$\\mathbf{r} = \\mathbf{\\hat{y}} - \\mathbf{y}$",
+          "description": "Prediction errors used in gradient computation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement gradient computation for MSE loss. This is the first component of the Lasso gradient (before adding L1 regularization).",
+        "function_signature": "def compute_mse_gradients(X: np.ndarray, y: np.ndarray, weights: np.ndarray, bias: float) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef compute_mse_gradients(X: np.ndarray, y: np.ndarray, weights: np.ndarray, bias: float) -> tuple:\n    \"\"\"\n    Compute gradients of MSE loss with respect to weights and bias.\n    \n    Args:\n        X: Feature matrix of shape (n_samples, n_features)\n        y: Target vector of shape (n_samples,)\n        weights: Weight vector of shape (n_features,)\n        bias: Scalar bias term\n    \n    Returns:\n        tuple: (weight_gradient, bias_gradient) where:\n            - weight_gradient: np.ndarray of shape (n_features,)\n            - bias_gradient: float\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_mse_gradients(np.array([[1, 0], [0, 1]]), np.array([2, 3]), np.array([1, 1]), 0)",
+            "expected": "(np.array([-0.5, -1.0]), -1.5)",
+            "explanation": "Predictions [1, 1], targets [2, 3], residuals [-1, -2]. Weight gradients: X^T @ residuals / n = [-0.5, -1.0]. Bias: mean of residuals = -1.5"
+          },
+          {
+            "input": "compute_mse_gradients(np.array([[1], [2], [3]]), np.array([1, 2, 3]), np.array([1.0]), 0)",
+            "expected": "(np.array([0.0]), 0.0)",
+            "explanation": "Perfect predictions [1, 2, 3] = targets, so all gradients are zero (at minimum)"
+          },
+          {
+            "input": "compute_mse_gradients(np.array([[2, 3], [4, 5]]), np.array([8, 10]), np.array([1, 1]), 1)",
+            "expected": "(np.array([-1.0, -1.5]), -0.5)",
+            "explanation": "Predictions [6, 10], targets [8, 10], residuals [-2, 0]. Weight gradients via chain rule."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to transpose X when computing X^T @ residuals",
+        "Computing (y - y_hat) instead of (y_hat - y) for residuals",
+        "Not dividing by n (number of samples)",
+        "Including the factor of 2 from derivative of squared term (absorbed in learning rate)",
+        "Using loops instead of vectorized operations"
+      ],
+      "hint": "First compute predictions and residuals. Then use matrix multiplication for the weight gradient. The bias gradient is just the mean of residuals.",
+      "references": [
+        "Matrix calculus",
+        "Chain rule for composed functions",
+        "Least squares gradient derivation"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "The Sign Function and L1 Subgradient",
+      "relation_to_problem": "The L1 regularization term in Lasso uses the absolute value function, which is non-differentiable at zero. Understanding the subgradient and sign function is essential for correctly computing the Lasso gradient at all weight values.",
+      "prerequisites": [
+        "Calculus",
+        "Absolute value function",
+        "Piecewise functions"
+      ],
+      "learning_objectives": [
+        "Understand why |w| is non-differentiable at w=0",
+        "Define the subgradient for non-smooth functions",
+        "Implement the sign function with correct handling of zero",
+        "Apply subgradient to optimize non-smooth objectives"
+      ],
+      "math_content": {
+        "definition": "The **absolute value function** $f(w) = |w|$ is defined as $|w| = \\begin{cases} w & \\text{if } w \\geq 0 \\\\ -w & \\text{if } w < 0 \\end{cases}$. It is continuous everywhere but not differentiable at $w = 0$. The **subgradient** $\\partial f(w)$ generalizes the gradient to non-smooth functions. For $f(w) = |w|$: $\\partial f(w) = \\begin{cases} \\{1\\} & \\text{if } w > 0 \\\\ [-1, 1] & \\text{if } w = 0 \\\\ \\{-1\\} & \\text{if } w < 0 \\end{cases}$. In practice, we use $\\text{sign}(0) = 0$ as a valid subgradient choice.",
+        "notation": "$\\text{sign}(w)$ = sign function, $\\partial f(w)$ = subgradient set, $|w|$ = absolute value",
+        "theorem": "**Subgradient Optimality**: A point $w^*$ minimizes a convex function $f$ if and only if $0 \\in \\partial f(w^*)$. For the L1 penalty $g(w) = \\alpha |w|$, the subgradient is $\\partial g(w) = \\alpha \\cdot \\text{sign}(w)$ where $\\text{sign}(w) = \\begin{cases} 1 & w > 0 \\\\ 0 & w = 0 \\\\ -1 & w < 0 \\end{cases}$ (choosing 0 at zero).",
+        "proof_sketch": "The derivative of $|w|$ for $w > 0$ is $\\frac{d|w|}{dw} = \\frac{d(w)}{dw} = 1$. For $w < 0$, $\\frac{d|w|}{dw} = \\frac{d(-w)}{dw} = -1$. At $w = 0$, the left derivative is $-1$ and right derivative is $1$, so no unique derivative exists. The subgradient at zero is any value $g \\in [-1, 1]$ such that $|w'| \\geq |w| + g(w' - w) = g \\cdot w'$ for all $w'$. This inequality holds for any $g \\in [-1, 1]$. Choosing $g = 0$ allows gradient descent to leave $w = 0$ only when the non-regularized gradient is strong enough.",
+        "examples": [
+          "Example 1: $\\text{sign}(3.5) = 1$ (positive weight)",
+          "Example 2: $\\text{sign}(-2.1) = -1$ (negative weight)",
+          "Example 3: $\\text{sign}(0) = 0$ (at zero, using subgradient convention)",
+          "Example 4: For vector $\\mathbf{w} = [2, 0, -1.5]$, $\\text{sign}(\\mathbf{w}) = [1, 0, -1]$ (applied element-wise)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sign Function",
+          "latex": "$\\text{sign}(w) = \\begin{cases} 1 & w > 0 \\\\ 0 & w = 0 \\\\ -1 & w < 0 \\end{cases}$",
+          "description": "Used for L1 regularization gradient"
+        },
+        {
+          "name": "L1 Penalty",
+          "latex": "$R(\\mathbf{w}) = \\alpha \\sum_{j=1}^{p} |w_j|$",
+          "description": "Lasso regularization term"
+        },
+        {
+          "name": "L1 Subgradient",
+          "latex": "$\\frac{\\partial R}{\\partial w_j} = \\alpha \\cdot \\text{sign}(w_j)$",
+          "description": "Gradient of L1 penalty for each weight"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the sign function and compute the L1 penalty gradient. This is the second component needed for the complete Lasso gradient.",
+        "function_signature": "def compute_l1_gradient(weights: np.ndarray, alpha: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef sign(w: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute sign function element-wise.\n    \n    Args:\n        w: Array of any shape\n    \n    Returns:\n        sign_w: Array of same shape with values in {-1, 0, 1}\n    \"\"\"\n    # Your code here\n    pass\n\ndef compute_l1_gradient(weights: np.ndarray, alpha: float) -> np.ndarray:\n    \"\"\"\n    Compute gradient of L1 penalty term.\n    \n    Args:\n        weights: Weight vector of shape (n_features,)\n        alpha: L1 regularization strength\n    \n    Returns:\n        gradient: Vector of shape (n_features,)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "sign(np.array([3.5, -2.1, 0.0, 0, -0.5]))",
+            "expected": "np.array([1, -1, 0, 0, -1])",
+            "explanation": "Sign of each element: positive->1, negative->-1, zero->0"
+          },
+          {
+            "input": "compute_l1_gradient(np.array([2.0, 0.0, -1.5]), 0.1)",
+            "expected": "np.array([0.1, 0.0, -0.1])",
+            "explanation": "Gradient = alpha * sign(weights) = 0.1 * [1, 0, -1] = [0.1, 0.0, -0.1]"
+          },
+          {
+            "input": "compute_l1_gradient(np.array([1.0, 2.0, 3.0]), 0.5)",
+            "expected": "np.array([0.5, 0.5, 0.5])",
+            "explanation": "All weights positive, so gradient is alpha for each: [0.5, 0.5, 0.5]"
+          },
+          {
+            "input": "compute_l1_gradient(np.array([0.0, 0.0]), 1.0)",
+            "expected": "np.array([0.0, 0.0])",
+            "explanation": "Weights at zero use subgradient 0, so gradient is [0, 0]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using np.sign which returns 0.0 for zero (correct) but may have different dtype issues",
+        "Not handling the zero case explicitly, leading to numerical instability",
+        "Forgetting to multiply by alpha (regularization strength)",
+        "Thinking the gradient should be 1/alpha instead of alpha",
+        "Not applying sign element-wise to weight vectors"
+      ],
+      "hint": "NumPy's np.sign function already implements the sign convention correctly. The L1 gradient is simply alpha times the sign of each weight.",
+      "references": [
+        "Subgradient methods",
+        "Non-smooth optimization",
+        "Convex analysis"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Gradient Descent Update Rule",
+      "relation_to_problem": "Gradient descent is the iterative optimization algorithm used to minimize the Lasso objective. Understanding the update rule and learning rate is crucial for implementing the complete Lasso Regression algorithm.",
+      "prerequisites": [
+        "Gradients",
+        "Iterative algorithms",
+        "Convergence criteria"
+      ],
+      "learning_objectives": [
+        "Derive the gradient descent update rule from first principles",
+        "Understand the role of the learning rate in convergence",
+        "Implement parameter updates for weights and bias",
+        "Apply convergence criteria to detect optimization completion"
+      ],
+      "math_content": {
+        "definition": "**Gradient descent** is an iterative optimization algorithm that minimizes a differentiable function $f(\\mathbf{w})$ by repeatedly moving in the direction of steepest descent. Starting from initial parameters $\\mathbf{w}^{(0)}$, the algorithm updates: $\\mathbf{w}^{(t+1)} = \\mathbf{w}^{(t)} - \\eta \\nabla f(\\mathbf{w}^{(t)})$ where $\\eta > 0$ is the **learning rate** (step size) and $\\nabla f$ is the gradient. The algorithm terminates when a convergence criterion is met, typically $\\|\\nabla f(\\mathbf{w}^{(t)})\\| < \\epsilon$ for tolerance $\\epsilon$.",
+        "notation": "$\\mathbf{w}^{(t)}$ = parameters at iteration $t$, $\\eta$ = learning rate, $\\nabla f$ = gradient, $\\epsilon$ = convergence tolerance",
+        "theorem": "**Convergence of Gradient Descent**: For a convex, $L$-smooth function $f$ (i.e., $\\|\\nabla f(\\mathbf{w}) - \\nabla f(\\mathbf{w}')\\| \\leq L \\|\\mathbf{w} - \\mathbf{w}'\\|$) and learning rate $\\eta \\leq \\frac{1}{L}$, gradient descent converges to the global minimum: $f(\\mathbf{w}^{(t)}) - f(\\mathbf{w}^*) \\leq \\frac{\\|\\mathbf{w}^{(0)} - \\mathbf{w}^*\\|^2}{2\\eta t}$ where $\\mathbf{w}^*$ is the minimizer. The convergence rate is $O(1/t)$.",
+        "proof_sketch": "For convex $f$ and $\\eta \\leq 1/L$, we have $f(\\mathbf{w}^{(t+1)}) \\leq f(\\mathbf{w}^{(t)}) - \\frac{\\eta}{2} \\|\\nabla f(\\mathbf{w}^{(t)})\\|^2$. Summing from $t=0$ to $T-1$ and using convexity gives the bound. Intuitively, moving against the gradient reduces the function value at each step, and smoothness prevents overshooting.",
+        "examples": [
+          "Example 1: Minimizing $f(w) = w^2$ with $w^{(0)} = 2$, $\\eta = 0.1$. Iteration 1: $\\nabla f(2) = 4$, so $w^{(1)} = 2 - 0.1(4) = 1.6$. Iteration 2: $\\nabla f(1.6) = 3.2$, so $w^{(2)} = 1.6 - 0.1(3.2) = 1.28$. Converges to $w^* = 0$.",
+          "Example 2: For $f(w_1, w_2) = w_1^2 + w_2^2$ with $\\mathbf{w}^{(0)} = [1, 1]$, $\\eta = 0.1$: $\\nabla f = [2w_1, 2w_2] = [2, 2]$, update: $\\mathbf{w}^{(1)} = [1, 1] - 0.1[2, 2] = [0.8, 0.8]$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gradient Descent Update",
+          "latex": "$\\mathbf{w}^{(t+1)} = \\mathbf{w}^{(t)} - \\eta \\nabla_{\\mathbf{w}} f(\\mathbf{w}^{(t)})$",
+          "description": "Update weights in direction of negative gradient"
+        },
+        {
+          "name": "Bias Update",
+          "latex": "$b^{(t+1)} = b^{(t)} - \\eta \\frac{\\partial f}{\\partial b}(b^{(t)})$",
+          "description": "Update bias using its gradient"
+        },
+        {
+          "name": "L1 Convergence Criterion",
+          "latex": "$\\|\\nabla_{\\mathbf{w}} f(\\mathbf{w}^{(t)})\\|_1 < \\epsilon$",
+          "description": "Stop when L1 norm of weight gradient is small"
+        }
+      ],
+      "exercise": {
+        "description": "Implement gradient descent for a simple quadratic function. This teaches the core update mechanism before combining MSE and L1 gradients in the final Lasso implementation.",
+        "function_signature": "def gradient_descent(initial_weights: np.ndarray, gradient_func: callable, learning_rate: float, max_iter: int, tol: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef gradient_descent(initial_weights: np.ndarray, gradient_func: callable, learning_rate: float = 0.01, max_iter: int = 1000, tol: float = 1e-4) -> np.ndarray:\n    \"\"\"\n    Generic gradient descent optimizer.\n    \n    Args:\n        initial_weights: Starting point of shape (n_features,)\n        gradient_func: Function that computes gradient given weights\n        learning_rate: Step size for updates\n        max_iter: Maximum iterations\n        tol: Convergence tolerance (stop when ||gradient||_1 < tol)\n    \n    Returns:\n        optimized_weights: Final weights of shape (n_features,)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "gradient_descent(np.array([2.0, 2.0]), lambda w: 2*w, learning_rate=0.1, max_iter=100, tol=1e-4)",
+            "expected": "np.array([0.0, 0.0]) (approximately)",
+            "explanation": "Minimizing f(w) = w1^2 + w2^2, gradient is 2*w. Should converge to origin."
+          },
+          {
+            "input": "gradient_descent(np.array([5.0]), lambda w: 2*(w - 3), learning_rate=0.1, max_iter=100, tol=1e-4)",
+            "expected": "np.array([3.0]) (approximately)",
+            "explanation": "Minimizing f(w) = (w-3)^2, gradient is 2*(w-3). Should converge to w=3."
+          },
+          {
+            "input": "gradient_descent(np.array([1.0, -1.0]), lambda w: np.array([4*w[0], 2*w[1]]), learning_rate=0.1, max_iter=50, tol=1e-3)",
+            "expected": "np.array([0.0, 0.0]) (approximately)",
+            "explanation": "Minimizing f(w) = 2*w1^2 + w2^2. Different curvatures, both converge to zero."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using learning rate too large, causing divergence (oscillation)",
+        "Using learning rate too small, requiring excessive iterations",
+        "Not checking convergence, running unnecessary iterations",
+        "Updating parameters in-place incorrectly (use new_w = w - eta * grad, not w -= eta * grad in wrong scope)",
+        "Using L2 norm for convergence instead of L1 norm (problem specifies L1)"
+      ],
+      "hint": "In each iteration: compute gradient, update weights, check if gradient norm is below tolerance. Use np.linalg.norm(gradient, ord=1) for L1 norm.",
+      "references": [
+        "Gradient descent convergence",
+        "Learning rate selection",
+        "Convex optimization"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Combining Gradients: Complete Lasso Objective",
+      "relation_to_problem": "The Lasso objective combines MSE loss with L1 regularization. Understanding how to add these gradients and why the bias is not regularized is essential for correct implementation.",
+      "prerequisites": [
+        "MSE gradient",
+        "L1 subgradient",
+        "Gradient descent",
+        "Regularization theory"
+      ],
+      "learning_objectives": [
+        "Derive the complete Lasso gradient by combining MSE and L1 terms",
+        "Understand why bias should not be regularized",
+        "Compute the full Lasso objective function value",
+        "Implement combined gradient computation for Lasso"
+      ],
+      "math_content": {
+        "definition": "The **Lasso objective function** is $J(\\mathbf{w}, b) = \\underbrace{\\frac{1}{2n} \\sum_{i=1}^{n} (y_i - \\hat{y}_i)^2}_{\\text{MSE Loss}} + \\underbrace{\\alpha \\sum_{j=1}^{p} |w_j|}_{\\text{L1 Penalty}}$ where $\\hat{y}_i = \\sum_{j=1}^{p} X_{ij} w_j + b$. Note: (1) The bias $b$ is NOT included in the L1 penalty, (2) The factor $\\frac{1}{2}$ in MSE is conventional (absorbed in learning rate), (3) $\\alpha \\geq 0$ controls regularization strength.",
+        "notation": "$J(\\mathbf{w}, b)$ = Lasso objective, $\\alpha$ = regularization parameter, $\\mathbf{w}$ = weights (regularized), $b$ = bias (not regularized)",
+        "theorem": "**Lasso Gradient**: The gradients of the Lasso objective are: (1) $\\nabla_{\\mathbf{w}} J = \\frac{1}{n} \\mathbf{X}^T (\\mathbf{\\hat{y}} - \\mathbf{y}) + \\alpha \\cdot \\text{sign}(\\mathbf{w})$, (2) $\\frac{\\partial J}{\\partial b} = \\frac{1}{n} \\sum_{i=1}^{n} (\\hat{y}_i - y_i)$. The weight gradient has two terms: MSE contribution and L1 penalty. The bias gradient has only the MSE term.",
+        "proof_sketch": "By linearity of differentiation: $\\nabla_{\\mathbf{w}} J = \\nabla_{\\mathbf{w}} [\\text{MSE}] + \\nabla_{\\mathbf{w}} [\\text{L1 penalty}]$. From previous sub-quests: $\\nabla_{\\mathbf{w}} [\\text{MSE}] = \\frac{1}{n} \\mathbf{X}^T (\\mathbf{\\hat{y}} - \\mathbf{y})$ and $\\nabla_{\\mathbf{w}} [\\alpha \\sum |w_j|] = \\alpha \\cdot \\text{sign}(\\mathbf{w})$. Adding these gives the weight gradient. The bias gradient remains unchanged since $b$ does not appear in the L1 term: $\\frac{\\partial}{\\partial b} [\\alpha \\sum |w_j|] = 0$.",
+        "examples": [
+          "Example 1: Why not regularize bias? The bias represents the overall level/offset of predictions. Penalizing it would shift predictions toward zero, which is undesirable (targets may not be centered at zero). Only feature weights are regularized to encourage sparsity.",
+          "Example 2: With $\\mathbf{w} = [2, -1]$, $\\alpha = 0.1$, MSE gradient $= [-0.5, 0.3]$: Lasso weight gradient $= [-0.5, 0.3] + 0.1 \\cdot [1, -1] = [-0.4, 0.4]$. The L1 term pushes positive weights down and negative weights up (toward zero).",
+          "Example 3: At $\\mathbf{w} = [0, 0]$, if MSE gradient $= [-0.05, 0.12]$ and $\\alpha = 0.1$: Lasso gradient $= [-0.05, 0.12] + 0.1 \\cdot [0, 0] = [-0.05, 0.12]$. Zero weights stay zero unless MSE gradient exceeds regularization strength."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Lasso Objective",
+          "latex": "$J(\\mathbf{w}, b) = \\frac{1}{2n} \\sum_{i=1}^{n} (y_i - \\hat{y}_i)^2 + \\alpha \\sum_{j=1}^{p} |w_j|$",
+          "description": "Complete Lasso loss function"
+        },
+        {
+          "name": "Lasso Weight Gradient",
+          "latex": "$\\nabla_{\\mathbf{w}} J = \\frac{1}{n} \\mathbf{X}^T (\\mathbf{\\hat{y}} - \\mathbf{y}) + \\alpha \\cdot \\text{sign}(\\mathbf{w})$",
+          "description": "Gradient for weight updates (MSE + L1)"
+        },
+        {
+          "name": "Lasso Bias Gradient",
+          "latex": "$\\frac{\\partial J}{\\partial b} = \\frac{1}{n} \\sum_{i=1}^{n} (\\hat{y}_i - y_i)$",
+          "description": "Gradient for bias updates (MSE only)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement functions to compute the complete Lasso objective value and its gradients. This directly prepares you for the final implementation.",
+        "function_signature": "def compute_lasso_objective(X: np.ndarray, y: np.ndarray, weights: np.ndarray, bias: float, alpha: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_lasso_objective(X: np.ndarray, y: np.ndarray, weights: np.ndarray, bias: float, alpha: float) -> float:\n    \"\"\"\n    Compute the Lasso objective function value.\n    \n    Args:\n        X: Feature matrix of shape (n_samples, n_features)\n        y: Target vector of shape (n_samples,)\n        weights: Weight vector of shape (n_features,)\n        bias: Scalar bias term\n        alpha: L1 regularization strength\n    \n    Returns:\n        objective: Scalar objective value\n    \"\"\"\n    # Your code here\n    pass\n\ndef compute_lasso_gradients(X: np.ndarray, y: np.ndarray, weights: np.ndarray, bias: float, alpha: float) -> tuple:\n    \"\"\"\n    Compute gradients of Lasso objective.\n    \n    Args:\n        X: Feature matrix of shape (n_samples, n_features)\n        y: Target vector of shape (n_samples,)\n        weights: Weight vector of shape (n_features,)\n        bias: Scalar bias term\n        alpha: L1 regularization strength\n    \n    Returns:\n        tuple: (weight_gradient, bias_gradient)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_lasso_objective(np.array([[1, 2], [3, 4]]), np.array([1, 2]), np.array([0.5, 0.5]), 0, 0.1)",
+            "expected": "1.665",
+            "explanation": "Predictions: [1.5, 3.5], MSE: 0.5*((1-1.5)^2 + (2-3.5)^2) = 1.25, L1: 0.1*(0.5+0.5) = 0.1, Total: 1.35"
+          },
+          {
+            "input": "compute_lasso_gradients(np.array([[1, 0], [0, 1]]), np.array([2, 3]), np.array([1, 1]), 0, 0.1)",
+            "expected": "(np.array([-0.4, -0.9]), -1.5)",
+            "explanation": "MSE gradients: [-0.5, -1.0], L1 gradients: [0.1, 0.1], Combined: [-0.4, -0.9]. Bias: -1.5"
+          },
+          {
+            "input": "compute_lasso_gradients(np.array([[1], [2]]), np.array([1, 2]), np.array([0.0]), 0, 0.5)",
+            "expected": "(np.array([0.0]), 0.0)",
+            "explanation": "Perfect predictions, zero weights. MSE gradient = 0, L1 gradient = 0 (sign(0)=0), total = 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Regularizing the bias term (bias should NOT have L1 penalty)",
+        "Forgetting to add the L1 gradient to the MSE gradient for weights",
+        "Using different formulas for MSE (e.g., forgetting 1/2n vs 1/n factors)",
+        "Computing L1 penalty on predictions instead of weights",
+        "Not using the subgradient convention sign(0)=0"
+      ],
+      "hint": "The weight gradient has two parts: MSE gradient + L1 gradient. The bias gradient is just the MSE gradient (no L1). Combine the components you built in previous sub-quests.",
+      "references": [
+        "Lasso regression theory",
+        "L1 vs L2 regularization",
+        "Feature selection via sparsity"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Lasso Regression with Gradient Descent",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts to implement the complete Lasso Regression algorithm. You'll combine MSE and L1 gradients within a gradient descent loop, handling convergence and parameter updates.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Complete understanding of Lasso objective and gradients"
+      ],
+      "learning_objectives": [
+        "Integrate MSE and L1 gradients into a single optimization loop",
+        "Implement proper initialization and convergence checking",
+        "Handle the complete Lasso Regression algorithm from start to finish",
+        "Understand the relationship between alpha, learning rate, and convergence"
+      ],
+      "math_content": {
+        "definition": "**Lasso Regression via Gradient Descent** is an iterative algorithm to minimize $J(\\mathbf{w}, b) = \\frac{1}{2n} \\sum_{i=1}^{n} (y_i - \\mathbf{w}^T\\mathbf{x}_i - b)^2 + \\alpha \\sum_{j=1}^{p} |w_j|$. Algorithm: (1) Initialize $\\mathbf{w}^{(0)} = \\mathbf{0}$, $b^{(0)} = 0$, (2) For $t = 0, 1, 2, \\ldots$ until convergence: compute $\\mathbf{\\hat{y}}^{(t)} = \\mathbf{X}\\mathbf{w}^{(t)} + b^{(t)}$, compute gradients $\\nabla_{\\mathbf{w}} J^{(t)} = \\frac{1}{n}\\mathbf{X}^T(\\mathbf{\\hat{y}}^{(t)} - \\mathbf{y}) + \\alpha \\cdot \\text{sign}(\\mathbf{w}^{(t)})$ and $\\nabla_b J^{(t)} = \\frac{1}{n}\\sum_i(\\hat{y}_i^{(t)} - y_i)$, update $\\mathbf{w}^{(t+1)} = \\mathbf{w}^{(t)} - \\eta \\nabla_{\\mathbf{w}} J^{(t)}$ and $b^{(t+1)} = b^{(t)} - \\eta \\nabla_b J^{(t)}$, (3) Stop if $\\|\\nabla_{\\mathbf{w}} J^{(t)}\\|_1 < \\epsilon$ or $t \\geq t_{\\max}$.",
+        "notation": "$t$ = iteration index, $\\eta$ = learning rate, $\\epsilon$ = tolerance, $t_{\\max}$ = max iterations, $\\mathbf{w}^{(t)}$ = weights at iteration $t$",
+        "theorem": "**Sparsity Property of Lasso**: As $\\alpha$ increases, more weights are driven to exactly zero. For sufficiently large $\\alpha$, all weights become zero: $\\mathbf{w}^* = \\mathbf{0}$. This occurs when $\\alpha > \\frac{1}{n}\\|\\mathbf{X}^T\\mathbf{y}\\|_{\\infty}$ (the maximum absolute correlation). Lasso performs automatic feature selection by setting irrelevant feature weights to zero.",
+        "proof_sketch": "At the optimum, the gradient must satisfy $0 \\in \\partial J(\\mathbf{w}^*, b^*)$. For weight $w_j^*$, this means: if $w_j^* = 0$, then $|\\frac{1}{n}\\sum_i X_{ij}(\\hat{y}_i - y_i)| \\leq \\alpha$ (subgradient condition). If this MSE gradient component has magnitude less than $\\alpha$, the weight remains zero. As $\\alpha$ increases, more weights satisfy this condition and are shrunk to zero, creating sparse solutions.",
+        "examples": [
+          "Example 1: With $\\alpha = 0$ (no regularization), Lasso reduces to ordinary least squares, minimizing only MSE",
+          "Example 2: With very large $\\alpha$, all weights are pushed to zero, giving $\\hat{y} = b$ (constant prediction equal to mean of $y$)",
+          "Example 3: For the example in the problem statement with $X = [[0,0],[1,1],[2,2]]$, $y = [0,1,2]$, $\\alpha=0.1$: The algorithm finds weights that balance fitting the data with keeping weights small, resulting in approximately $w \\approx [0.424, 0.424]$ and $b \\approx 0.154$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Update Rule",
+          "latex": "$\\mathbf{w}^{(t+1)} = \\mathbf{w}^{(t)} - \\eta \\left[\\frac{1}{n}\\mathbf{X}^T(\\mathbf{\\hat{y}}^{(t)} - \\mathbf{y}) + \\alpha \\cdot \\text{sign}(\\mathbf{w}^{(t)})\\right]$",
+          "description": "Single iteration weight update"
+        },
+        {
+          "name": "Bias Update Rule",
+          "latex": "$b^{(t+1)} = b^{(t)} - \\eta \\cdot \\frac{1}{n}\\sum_{i=1}^{n}(\\hat{y}_i^{(t)} - y_i)$",
+          "description": "Single iteration bias update"
+        },
+        {
+          "name": "Convergence Check",
+          "latex": "$\\|\\nabla_{\\mathbf{w}} J^{(t)}\\|_1 = \\sum_{j=1}^{p} |\\nabla_{w_j} J^{(t)}| < \\epsilon$",
+          "description": "Stop when L1 norm of weight gradient is small"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete Lasso Regression algorithm using gradient descent. This synthesizes all previous sub-quests into the final solution.",
+        "function_signature": "def lasso_regression_gd(X: np.ndarray, y: np.ndarray, alpha: float, learning_rate: float, max_iter: int, tol: float) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef lasso_regression_gd(X: np.ndarray, y: np.ndarray, alpha: float = 0.1, learning_rate: float = 0.01, max_iter: int = 1000, tol: float = 1e-4) -> tuple:\n    \"\"\"\n    Implement Lasso Regression using Gradient Descent.\n    \n    Args:\n        X: Feature matrix of shape (n_samples, n_features)\n        y: Target vector of shape (n_samples,)\n        alpha: L1 regularization strength\n        learning_rate: Step size for gradient descent\n        max_iter: Maximum iterations\n        tol: Convergence tolerance (stop when ||weight_gradient||_1 < tol)\n    \n    Returns:\n        tuple: (weights, bias)\n    \n    Algorithm:\n        1. Initialize weights and bias to zero\n        2. For each iteration:\n           a. Compute predictions\n           b. Compute MSE gradients for weights and bias\n           c. Add L1 gradient (alpha * sign(weights)) to weight gradient\n           d. Update weights and bias\n           e. Check convergence\n        3. Return final parameters\n    \"\"\"\n    n_samples, n_features = X.shape\n    weights = np.zeros(n_features)\n    bias = 0.0\n    \n    for iteration in range(max_iter):\n        # Step 1: Compute predictions\n        # Your code here\n        \n        # Step 2: Compute residuals\n        # Your code here\n        \n        # Step 3: Compute MSE gradients\n        # Your code here\n        \n        # Step 4: Add L1 gradient to weight gradient\n        # Your code here\n        \n        # Step 5: Update parameters\n        # Your code here\n        \n        # Step 6: Check convergence\n        # Your code here\n        \n    return weights, bias",
+        "test_cases": [
+          {
+            "input": "lasso_regression_gd(np.array([[0, 0], [1, 1], [2, 2]]), np.array([0, 1, 2]), alpha=0.1, learning_rate=0.01, max_iter=1000, tol=1e-4)",
+            "expected": "(np.array([0.424, 0.424]), 0.154) approximately",
+            "explanation": "The provided example. Identical features mean weights split equally. L1 regularization keeps weights moderate."
+          },
+          {
+            "input": "lasso_regression_gd(np.array([[1], [2], [3]]), np.array([2, 4, 6]), alpha=0.0, learning_rate=0.01, max_iter=1000, tol=1e-4)",
+            "expected": "(np.array([2.0]), 0.0) approximately",
+            "explanation": "Perfect linear relationship y=2x with no regularization should recover exact weights"
+          },
+          {
+            "input": "lasso_regression_gd(np.array([[1, 0], [0, 1], [1, 1]]), np.array([1, 1, 2]), alpha=0.5, learning_rate=0.05, max_iter=2000, tol=1e-4)",
+            "expected": "Weights close to [1, 1] but slightly shrunk",
+            "explanation": "With high regularization, weights are penalized but data still requires both features"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not initializing weights and bias to zero (common practice for regression)",
+        "Forgetting to check convergence, always running max_iter iterations",
+        "Applying L1 gradient to bias (bias is NOT regularized)",
+        "Using L2 norm instead of L1 norm for convergence check",
+        "Not handling the case where weights become exactly zero during optimization",
+        "Choosing learning rate too large (causing divergence) or too small (slow convergence)"
+      ],
+      "hint": "Structure your code with clear steps: (1) predict, (2) compute residuals, (3) compute both gradients, (4) add L1 to weight gradient only, (5) update both parameters, (6) check convergence. Build on functions from previous sub-quests.",
+      "references": [
+        "Lasso Regression",
+        "Coordinate Descent (alternative to gradient descent)",
+        "Proximal Gradient Methods",
+        "Cross-validation for alpha selection"
+      ]
+    }
+  ]
+}

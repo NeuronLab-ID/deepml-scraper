@@ -1,0 +1,35 @@
+{
+  "description": "SW1wbGVtZW50IHBvbGljeSBldmFsdWF0aW9uIGZvciBhIDV4NSBncmlkd29ybGQuIEdpdmVuIGEgcG9saWN5IChtYXBwaW5nIGVhY2ggc3RhdGUgdG8gYWN0aW9uIHByb2JhYmlsaXRpZXMpLCBjb21wdXRlIHRoZSBzdGF0ZS12YWx1ZSBmdW5jdGlvbiAkVihzKSQgZm9yIGVhY2ggY2VsbCB1c2luZyB0aGUgQmVsbG1hbiBleHBlY3RhdGlvbiBlcXVhdGlvbi4gVGhlIGFnZW50IGNhbiBtb3ZlIHVwLCBkb3duLCBsZWZ0LCBvciByaWdodCwgcmVjZWl2aW5nIGEgY29uc3RhbnQgcmV3YXJkIG9mIC0xIGZvciBlYWNoIG1vdmUuIFRlcm1pbmFsIHN0YXRlcyAodGhlIGZvdXIgY29ybmVycykgYXJlIGZpeGVkIGF0IDAuIEl0ZXJhdGUgdW50aWwgdGhlIGxhcmdlc3QgY2hhbmdlIGluICRWJCBpcyBsZXNzIHRoYW4gYSBnaXZlbiB0aHJlc2hvbGQuIE9ubHkgdXNlIFB5dGhvbiBidWlsdC1pbnMgYW5kIG5vIGV4dGVybmFsIFJMIGxpYnJhcmllcy4=",
+  "id": "142",
+  "test_cases": [
+    {
+      "test": "grid_size = 5\ngamma = 0.9\nthreshold = 0.001\npolicy = {(i, j): {'up': 0.25, 'down': 0.25, 'left': 0.25, 'right': 0.25} for i in range(grid_size) for j in range(grid_size)}\nV = gridworld_policy_evaluation(policy, gamma, threshold)\nprint([round(V[2][2], 4), V[0][0], V[0][4], V[4][0], V[4][4]])",
+      "expected_output": "[-7.0902, 0.0, 0.0, 0.0, 0.0]"
+    },
+    {
+      "test": "grid_size = 5\ngamma = 0.9\nthreshold = 0.001\npolicy = {(i, j): {'up': 0.1, 'down': 0.4, 'left': 0.1, 'right': 0.4} for i in range(grid_size) for j in range(grid_size)}\nV = gridworld_policy_evaluation(policy, gamma, threshold)\nprint(round(V[1][3], 4) < 0)",
+      "expected_output": "True"
+    }
+  ],
+  "difficulty": "medium",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "policy = {(i, j): {'up': 0.25, 'down': 0.25, 'left': 0.25, 'right': 0.25} for i in range(5) for j in range(5)}\ngamma = 0.9\nthreshold = 0.001\nV = gridworld_policy_evaluation(policy, gamma, threshold)\nprint(round(V[2][2], 4))",
+    "output": "-7.0902",
+    "reasoning": "The policy is uniform (equal chance of each move). The agent receives -1 per step. After iterative updates, the center state value converges to about -7.09, and corners remain at 0."
+  },
+  "category": "Reinforcement Learning",
+  "starter_code": "def gridworld_policy_evaluation(policy: dict, gamma: float, threshold: float) -> list[list[float]]:\n    \"\"\"\n    Evaluate state-value function for a policy on a 5x5 gridworld.\n    \n    Args:\n        policy: dict mapping (row, col) to action probability dicts\n        gamma: discount factor\n        threshold: convergence threshold\n    Returns:\n        5x5 list of floats\n    \"\"\"\n    # Your code here\n    pass",
+  "title": "Gridworld Policy Evaluation",
+  "learn_section": "IyBHcmlkd29ybGQgUG9saWN5IEV2YWx1YXRpb24KCkluIHJlaW5mb3JjZW1lbnQgbGVhcm5pbmcsICoqcG9saWN5IGV2YWx1YXRpb24qKiBpcyB0aGUgcHJvY2VzcyBvZiBjb21wdXRpbmcgdGhlIHN0YXRlLXZhbHVlIGZ1bmN0aW9uIGZvciBhIGdpdmVuIHBvbGljeS4gRm9yIGEgZ3JpZHdvcmxkIGVudmlyb25tZW50LCB0aGlzIGludm9sdmVzIGl0ZXJhdGl2ZWx5IHVwZGF0aW5nIHRoZSB2YWx1ZSBvZiBlYWNoIHN0YXRlIGJhc2VkIG9uIHRoZSBleHBlY3RlZCByZXR1cm4gZm9sbG93aW5nIHRoZSBwb2xpY3kuCgojIyBLZXkgQ29uY2VwdHMKCi0gKipTdGF0ZS1WYWx1ZSBGdW5jdGlvbiAoVik6KiogIAogIFRoZSBleHBlY3RlZCByZXR1cm4gd2hlbiBzdGFydGluZyBmcm9tIGEgc3RhdGUgYW5kIGZvbGxvd2luZyBhIGdpdmVuIHBvbGljeS4KCi0gKipQb2xpY3k6KiogIAogIEEgbWFwcGluZyBmcm9tIHN0YXRlcyB0byBwcm9iYWJpbGl0aWVzIG9mIHNlbGVjdGluZyBlYWNoIGF2YWlsYWJsZSBhY3Rpb24uCgotICoqQmVsbG1hbiBFeHBlY3RhdGlvbiBFcXVhdGlvbjoqKiAgCiAgRm9yIGVhY2ggc3RhdGUgJHMkOgogICQkCiAgVihzKSA9IFxzdW1fe2F9IFxwaShhfHMpIFxzdW1fe3MnfSBQKHMnfHMsYSkgW1IocyxhLHMnKSArIFxnYW1tYSBWKHMnKV0KICAkJAogIHdoZXJlOgogIC0gJCBccGkoYXxzKSAkIGlzIHRoZSBwcm9iYWJpbGl0eSBvZiB0YWtpbmcgYWN0aW9uICQgYSAkIGluIHN0YXRlICQgcyAkLAogIC0gJCBQKHMnfHMsYSkgJCBpcyB0aGUgcHJvYmFiaWxpdHkgb2YgdHJhbnNpdGlvbmluZyB0byBzdGF0ZSAkIHMnICQsCiAgLSAkIFIocyxhLHMnKSAkIGlzIHRoZSByZXdhcmQgZm9yIHRoYXQgdHJhbnNpdGlvbiwKICAtICQgXGdhbW1hICQgaXMgdGhlIGRpc2NvdW50IGZhY3Rvci4KCiMjIEFsZ29yaXRobSBPdmVydmlldwoKMS4gKipJbml0aWFsaXphdGlvbjoqKiAgCiAgIFN0YXJ0IHdpdGggYW4gaW5pdGlhbCBndWVzcyAoY29tbW9ubHkgemVyb3MpIGZvciB0aGUgc3RhdGUtdmFsdWUgZnVuY3Rpb24gJCBWKHMpICQuCgoyLiAqKkl0ZXJhdGl2ZSBVcGRhdGU6KiogIAogICBGb3IgZWFjaCBub24tdGVybWluYWwgc3RhdGUsIHVwZGF0ZSB0aGUgc3RhdGUgdmFsdWUgdXNpbmcgdGhlIEJlbGxtYW4gZXhwZWN0YXRpb24gZXF1YXRpb24uIENvbnRpbnVlIHVwZGF0aW5nIHVudGlsIHRoZSBtYXhpbXVtIGNoYW5nZSBpbiB2YWx1ZSAoZGVsdGEpIGlzIGxlc3MgdGhhbiBhIGdpdmVuIHRocmVzaG9sZC4KCjMuICoqVGVybWluYWwgU3RhdGVzOioqICAKICAgRm9yIHRoaXMgZXhhbXBsZSwgdGhlIGZvdXIgY29ybmVycyBvZiB0aGUgZ3JpZCBhcmUgY29uc2lkZXJlZCB0ZXJtaW5hbCwgc28gdGhlaXIgdmFsdWVzIHJlbWFpbiB1bmNoYW5nZWQuCgpUaGlzIGV2YWx1YXRpb24gbWV0aG9kIGlzIGVzc2VudGlhbCBmb3IgdW5kZXJzdGFuZGluZyBob3cgImdvb2QiIGVhY2ggc3RhdGUgaXMgdW5kZXIgYSBzcGVjaWZpYyBwb2xpY3ksIGFuZCBpdCBmb3JtcyB0aGUgYmFzaXMgZm9yIG1vcmUgYWR2YW5jZWQgcmVpbmZvcmNlbWVudCBsZWFybmluZyBhbGdvcml0aG1zLg==",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/arpitsinghgautam",
+      "name": "Arpit Singh Gautam"
+    }
+  ],
+  "description_decoded": "Implement policy evaluation for a 5x5 gridworld. Given a policy (mapping each state to action probabilities), compute the state-value function $V(s)$ for each cell using the Bellman expectation equation. The agent can move up, down, left, or right, receiving a constant reward of -1 for each move. Terminal states (the four corners) are fixed at 0. Iterate until the largest change in $V$ is less than a given threshold. Only use Python built-ins and no external RL libraries.",
+  "learn_section_decoded": "# Gridworld Policy Evaluation\n\nIn reinforcement learning, **policy evaluation** is the process of computing the state-value function for a given policy. For a gridworld environment, this involves iteratively updating the value of each state based on the expected return following the policy.\n\n## Key Concepts\n\n- **State-Value Function (V):**  \n  The expected return when starting from a state and following a given policy.\n\n- **Policy:**  \n  A mapping from states to probabilities of selecting each available action.\n\n- **Bellman Expectation Equation:**  \n  For each state $s$:\n  $$\n  V(s) = \\sum_{a} \\pi(a|s) \\sum_{s'} P(s'|s,a) [R(s,a,s') + \\gamma V(s')]\n  $$\n  where:\n  - $ \\pi(a|s) $ is the probability of taking action $ a $ in state $ s $,\n  - $ P(s'|s,a) $ is the probability of transitioning to state $ s' $,\n  - $ R(s,a,s') $ is the reward for that transition,\n  - $ \\gamma $ is the discount factor.\n\n## Algorithm Overview\n\n1. **Initialization:**  \n   Start with an initial guess (commonly zeros) for the state-value function $ V(s) $.\n\n2. **Iterative Update:**  \n   For each non-terminal state, update the state value using the Bellman expectation equation. Continue updating until the maximum change in value (delta) is less than a given threshold.\n\n3. **Terminal States:**  \n   For this example, the four corners of the grid are considered terminal, so their values remain unchanged.\n\nThis evaluation method is essential for understanding how \"good\" each state is under a specific policy, and it forms the basis for more advanced reinforcement learning algorithms."
+}

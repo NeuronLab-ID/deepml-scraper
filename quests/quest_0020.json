@@ -1,0 +1,528 @@
+{
+  "problem_id": 20,
+  "title": "Decision Tree Learning",
+  "category": "Machine Learning",
+  "difficulty": "hard",
+  "description": "Write a Python function that implements the decision tree learning algorithm for classification. The function should use recursive binary splitting based on entropy and information gain to build a decision tree. It should take a list of examples (each example is a dict of attribute-value pairs) and a list of attribute names as input, and return a nested dictionary representing the decision tree.",
+  "example": {
+    "input": "examples = [\n                    {'Outlook': 'Sunny', 'Temperature': 'Hot', 'Humidity': 'High', 'Wind': 'Weak', 'PlayTennis': 'No'},\n                    {'Outlook': 'Sunny', 'Temperature': 'Hot', 'Humidity': 'High', 'Wind': 'Strong', 'PlayTennis': 'No'},\n                    {'Outlook': 'Overcast', 'Temperature': 'Hot', 'Humidity': 'High', 'Wind': 'Weak', 'PlayTennis': 'Yes'},\n                    {'Outlook': 'Rain', 'Temperature': 'Mild', 'Humidity': 'High', 'Wind': 'Weak', 'PlayTennis': 'Yes'}\n                ],\n                attributes = ['Outlook', 'Temperature', 'Humidity', 'Wind']",
+    "output": "{\n            'Outlook': {\n                'Sunny': {'Humidity': {'High': 'No', 'Normal': 'Yes'}},\n                'Overcast': 'Yes',\n                'Rain': {'Wind': {'Weak': 'Yes', 'Strong': 'No'}}\n            }\n        }",
+    "reasoning": "Using the given examples, the decision tree algorithm determines that 'Outlook' is the best attribute to split the data initially. When 'Outlook' is 'Overcast', the outcome is always 'Yes', so it becomes a leaf node. In cases of 'Sunny' and 'Rain', it further splits based on 'Humidity' and 'Wind', respectively. The resulting tree structure is able to classify the training examples with the attributes 'Outlook', 'Temperature', 'Humidity', and 'Wind'."
+  },
+  "starter_code": "def learn_decision_tree(examples: list[dict], attributes: list[str], target_attr: str) -> dict:\n\t# Your code here\n\treturn decision_tree",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Entropy and Information Theory Fundamentals",
+      "relation_to_problem": "Entropy is the core impurity measure used to evaluate how mixed the class labels are at each node. You need to calculate entropy for datasets to determine split quality in the decision tree algorithm.",
+      "prerequisites": [
+        "Basic probability theory",
+        "Logarithms (base 2)",
+        "Python dictionaries and lists"
+      ],
+      "learning_objectives": [
+        "Understand entropy as a measure of disorder in information theory",
+        "Calculate Shannon entropy for discrete probability distributions",
+        "Implement entropy calculation for classification datasets",
+        "Interpret entropy values (0 = pure, high = impure)"
+      ],
+      "math_content": {
+        "definition": "**Shannon Entropy** is a measure of uncertainty or impurity in a random variable. For a discrete random variable $X$ with probability mass function $p(x)$ over possible values $\\{x_1, x_2, \\ldots, x_n\\}$, the entropy $H(X)$ is defined as:\n$$H(X) = -\\sum_{i=1}^{n} p(x_i) \\log_2 p(x_i)$$\nwhere $0 \\log_2 0$ is defined as $0$ by convention (limiting case).\n\nFor classification problems, if $D$ is a dataset with target classes $\\mathcal{C} = \\{c_1, c_2, \\ldots, c_K\\}$, the entropy of $D$ is:\n$$H(D) = -\\sum_{k=1}^{K} p_k \\log_2 p_k$$\nwhere $p_k = \\frac{|\\{x \\in D : class(x) = c_k\\}|}{|D|}$ is the proportion of examples in class $c_k$.",
+        "notation": "$H(X)$ = entropy of random variable $X$ (bits), $p(x_i)$ = probability of outcome $x_i$, $\\log_2$ = logarithm base 2 (measures information in bits), $p_k$ = proportion of class $k$ in dataset",
+        "theorem": "**Entropy Bounds Theorem**: For a random variable with $K$ possible outcomes, $0 \\leq H(X) \\leq \\log_2 K$. The minimum $H(X) = 0$ occurs when one outcome has probability 1 (complete certainty), and the maximum $H(X) = \\log_2 K$ occurs when all outcomes are equally likely (maximum uncertainty).",
+        "proof_sketch": "**Lower bound**: Since $0 \\leq p_i \\leq 1$, we have $\\log_2 p_i \\leq 0$, so $-p_i \\log_2 p_i \\geq 0$. Equality holds when one $p_i = 1$ and others are 0.\n\n**Upper bound**: Using Lagrange multipliers to maximize $H$ subject to $\\sum p_i = 1$ and $p_i \\geq 0$, we find the maximum occurs at $p_i = 1/K$ for all $i$, giving $H = -K \\cdot \\frac{1}{K} \\log_2 \\frac{1}{K} = \\log_2 K$.",
+        "examples": [
+          "**Example 1 (Pure dataset)**: Dataset with 8 examples, all class 'Yes'. $p_{Yes} = 1.0$, $p_{No} = 0.0$. $H = -1.0 \\log_2(1.0) - 0 \\log_2(0) = 0$ bits. Perfect certainty.",
+          "**Example 2 (Balanced dataset)**: Dataset with 5 'Yes' and 5 'No' (10 total). $p_{Yes} = 0.5$, $p_{No} = 0.5$. $H = -0.5 \\log_2(0.5) - 0.5 \\log_2(0.5) = -0.5(-1) - 0.5(-1) = 1.0$ bit. Maximum uncertainty for binary classification.",
+          "**Example 3 (Imbalanced dataset)**: Dataset with 9 'Yes' and 5 'No' (14 total). $p_{Yes} = 9/14 \\approx 0.643$, $p_{No} = 5/14 \\approx 0.357$. $H = -0.643 \\log_2(0.643) - 0.357 \\log_2(0.357) \\approx 0.940$ bits."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Shannon Entropy",
+          "latex": "$H(X) = -\\sum_{i=1}^{n} p(x_i) \\log_2 p(x_i)$",
+          "description": "Primary formula for calculating entropy. Use when you have a probability distribution over discrete outcomes."
+        },
+        {
+          "name": "Binary Entropy Function",
+          "latex": "$H(p) = -p \\log_2 p - (1-p) \\log_2(1-p)$",
+          "description": "Special case for binary classification (two classes). Use when dealing with Yes/No or positive/negative classification."
+        },
+        {
+          "name": "Class Proportion",
+          "latex": "$p_k = \\frac{n_k}{n}$",
+          "description": "Calculate proportion of examples in class $k$ where $n_k$ is count of class $k$ and $n$ is total count."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the Shannon entropy of a dataset given the class labels. The function should handle the edge case where a class has zero examples (by convention, $0 \\log_2 0 = 0$). This is the first building block for the decision tree algorithm, as you'll need to calculate entropy at every node to determine the best splits.",
+        "function_signature": "def calculate_entropy(labels: list[str]) -> float:",
+        "starter_code": "import math\n\ndef calculate_entropy(labels: list[str]) -> float:\n    \"\"\"\n    Calculate Shannon entropy of a list of class labels.\n    \n    Args:\n        labels: List of class labels (strings)\n    \n    Returns:\n        Entropy value in bits (float)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_entropy(['Yes', 'Yes', 'Yes', 'Yes'])",
+            "expected": "0.0",
+            "explanation": "All examples have the same label, so entropy is 0 (perfectly pure, no uncertainty)"
+          },
+          {
+            "input": "calculate_entropy(['Yes', 'No', 'Yes', 'No'])",
+            "expected": "1.0",
+            "explanation": "Equal split between two classes: p_Yes=0.5, p_No=0.5. H = -0.5*log2(0.5) - 0.5*log2(0.5) = 1.0 bit"
+          },
+          {
+            "input": "calculate_entropy(['Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'No', 'No', 'No'])",
+            "expected": "0.954",
+            "explanation": "Imbalanced: p_Yes=5/8=0.625, p_No=3/8=0.375. H = -0.625*log2(0.625) - 0.375*log2(0.375) ≈ 0.954 bits"
+          },
+          {
+            "input": "calculate_entropy(['A', 'B', 'C', 'A'])",
+            "expected": "1.5",
+            "explanation": "Three classes: p_A=0.5, p_B=0.25, p_C=0.25. H = -0.5*log2(0.5) - 0.25*log2(0.25) - 0.25*log2(0.25) = 1.5 bits"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using natural log (ln) instead of log base 2 - entropy should be in bits, not nats",
+        "Not handling the 0*log(0) case - should return 0, not throw an error or return NaN",
+        "Forgetting to negate the sum - entropy formula has a negative sign in front",
+        "Dividing by total count inside the log instead of outside: should be p*log(p), not log(p/n)"
+      ],
+      "hint": "First count the frequency of each unique label using a dictionary or Counter. Then calculate the proportion for each class, and apply the entropy formula. Remember to handle zero probabilities specially.",
+      "references": [
+        "Information Theory and Shannon's Entropy",
+        "Claude Shannon's 'A Mathematical Theory of Communication' (1948)",
+        "Decision Trees in Machine Learning - entropy as impurity measure"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Information Gain and Attribute Selection",
+      "relation_to_problem": "Information gain determines which attribute to select for splitting at each node. The decision tree algorithm must calculate information gain for every candidate attribute and choose the one with the highest gain to create the most informative split.",
+      "prerequisites": [
+        "Shannon entropy calculation",
+        "Conditional probability",
+        "Set partitioning"
+      ],
+      "learning_objectives": [
+        "Understand information gain as the reduction in entropy after a split",
+        "Calculate weighted average entropy for partitioned datasets",
+        "Implement information gain computation for categorical attributes",
+        "Select the best splitting attribute based on maximum information gain"
+      ],
+      "math_content": {
+        "definition": "**Information Gain** measures the expected reduction in entropy (impurity) achieved by partitioning a dataset $D$ according to an attribute $A$. Formally:\n$$IG(D, A) = H(D) - H(D|A)$$\nwhere $H(D)$ is the entropy of the dataset before the split, and $H(D|A)$ is the conditional entropy after splitting on attribute $A$.\n\nThe conditional entropy $H(D|A)$ is the weighted average of entropies of the subsets created by splitting on $A$:\n$$H(D|A) = \\sum_{v \\in Values(A)} \\frac{|D_v|}{|D|} H(D_v)$$\nwhere $Values(A)$ is the set of possible values for attribute $A$, $D_v = \\{x \\in D : x[A] = v\\}$ is the subset of examples with attribute value $v$, and $|D_v|$ is the size of subset $v$.",
+        "notation": "$IG(D, A)$ = information gain from splitting dataset $D$ on attribute $A$, $H(D|A)$ = conditional entropy given attribute $A$, $D_v$ = subset of data where attribute $A$ has value $v$, $\\frac{|D_v|}{|D|}$ = weight/proportion of examples in subset $v$",
+        "theorem": "**Non-negativity of Information Gain**: For any dataset $D$ and attribute $A$, $IG(D, A) \\geq 0$, with equality if and only if attribute $A$ provides no information about the class labels (i.e., the class distribution is identical across all subsets $D_v$).\n\nThis follows from the **Data Processing Inequality** in information theory: splitting cannot increase uncertainty.",
+        "proof_sketch": "By Jensen's inequality for the concave function $-x \\log x$:\n$$H(D|A) = \\sum_v \\frac{|D_v|}{|D|} H(D_v) \\leq H(D)$$\nEquality holds when all $D_v$ have identical class distributions to $D$. Therefore:\n$$IG(D, A) = H(D) - H(D|A) \\geq 0$$",
+        "examples": [
+          "**Example 1**: Dataset $D$ has 9 'Yes' and 5 'No' (14 total). $H(D) \\approx 0.940$ bits.\nAttribute 'Outlook' has values {Sunny, Overcast, Rain}:\n- $D_{Sunny}$: 2 'Yes', 3 'No' (5 total), $H(D_{Sunny}) = 0.971$\n- $D_{Overcast}$: 4 'Yes', 0 'No' (4 total), $H(D_{Overcast}) = 0.0$\n- $D_{Rain}$: 3 'Yes', 2 'No' (5 total), $H(D_{Rain}) = 0.971$\n\n$H(D|Outlook) = \\frac{5}{14}(0.971) + \\frac{4}{14}(0.0) + \\frac{5}{14}(0.971) = 0.693$\n$IG(D, Outlook) = 0.940 - 0.693 = 0.247$ bits",
+          "**Example 2**: Same dataset, attribute 'Wind' with values {Weak, Strong}:\n- $D_{Weak}$: 6 'Yes', 2 'No', $H = 0.811$\n- $D_{Strong}$: 3 'Yes', 3 'No', $H = 1.0$\n\n$H(D|Wind) = \\frac{8}{14}(0.811) + \\frac{6}{14}(1.0) = 0.892$\n$IG(D, Wind) = 0.940 - 0.892 = 0.048$ bits\n\nOutlook has higher information gain, so it's the better split."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Information Gain",
+          "latex": "$IG(D, A) = H(D) - \\sum_{v \\in Values(A)} \\frac{|D_v|}{|D|} H(D_v)$",
+          "description": "Complete formula combining entropy before and after split. Use to evaluate each candidate attribute."
+        },
+        {
+          "name": "Conditional Entropy",
+          "latex": "$H(D|A) = \\sum_{v} w_v \\cdot H(D_v)$ where $w_v = \\frac{|D_v|}{|D|}$",
+          "description": "Weighted average entropy after split. Weights are proportional to subset sizes."
+        },
+        {
+          "name": "Best Attribute Selection",
+          "latex": "$A^* = \\arg\\max_{A \\in Attributes} IG(D, A)$",
+          "description": "Choose the attribute with maximum information gain for splitting."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the information gain for a specific attribute on a dataset. The function takes a list of examples (dictionaries), an attribute name, and the target attribute name. It should partition the dataset by the attribute's values, calculate the weighted conditional entropy, and return the information gain. This is the core mechanism for selecting which attribute to split on in the decision tree.",
+        "function_signature": "def calculate_information_gain(examples: list[dict], attribute: str, target_attr: str) -> float:",
+        "starter_code": "def calculate_information_gain(examples: list[dict], attribute: str, target_attr: str) -> float:\n    \"\"\"\n    Calculate information gain from splitting dataset on given attribute.\n    \n    Args:\n        examples: List of example dictionaries\n        attribute: The attribute to split on\n        target_attr: The target classification attribute\n    \n    Returns:\n        Information gain in bits (float)\n    \"\"\"\n    # Your code here\n    # Hint: You'll need your entropy function from step 1\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_information_gain([{'A': 'x', 'Class': 'Yes'}, {'A': 'x', 'Class': 'Yes'}, {'A': 'y', 'Class': 'No'}, {'A': 'y', 'Class': 'No'}], 'A', 'Class')",
+            "expected": "1.0",
+            "explanation": "Perfect split: attribute 'A' completely separates the classes. Original entropy H=1.0, conditional entropy H(D|A)=0, so IG=1.0"
+          },
+          {
+            "input": "calculate_information_gain([{'Outlook': 'Sunny', 'Play': 'No'}, {'Outlook': 'Sunny', 'Play': 'No'}, {'Outlook': 'Rain', 'Play': 'Yes'}, {'Outlook': 'Rain', 'Play': 'Yes'}], 'Outlook', 'Play')",
+            "expected": "1.0",
+            "explanation": "Outlook perfectly separates: Sunny→No, Rain→Yes. IG = H(D) - 0 = 1.0 bits"
+          },
+          {
+            "input": "calculate_information_gain([{'A': 'x', 'Class': 'Yes'}, {'A': 'x', 'Class': 'No'}, {'A': 'y', 'Class': 'Yes'}, {'A': 'y', 'Class': 'No'}], 'A', 'Class')",
+            "expected": "0.0",
+            "explanation": "No information: both subsets have identical 50/50 class distribution. H(D)=1.0, H(D|A)=1.0, IG=0"
+          },
+          {
+            "input": "calculate_information_gain([{'Wind': 'Weak', 'Play': 'Yes'}, {'Wind': 'Weak', 'Play': 'Yes'}, {'Wind': 'Weak', 'Play': 'No'}, {'Wind': 'Strong', 'Play': 'No'}, {'Wind': 'Strong', 'Play': 'No'}, {'Wind': 'Strong', 'Play': 'No'}], 'Wind', 'Play')",
+            "expected": "0.420",
+            "explanation": "Partial information: H(D)=0.918, H(D|Weak)=0.918 (2 Yes, 1 No), H(D|Strong)=0 (all No). Weighted: IG≈0.420"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to weight the subset entropies by their proportions - must multiply by |D_v|/|D|",
+        "Using the wrong attribute for partitioning vs. calculating entropy (split on 'attribute', calculate entropy on 'target_attr')",
+        "Not handling empty subsets - if an attribute value doesn't appear in data, skip it",
+        "Calculating gain as absolute difference instead of relative reduction in entropy"
+      ],
+      "hint": "First calculate the entropy of the entire dataset using the target attribute. Then partition examples by the splitting attribute's values, calculate entropy for each partition, weight by partition size, sum to get conditional entropy, and subtract from original entropy.",
+      "references": [
+        "ID3 Algorithm and Information Gain",
+        "Mutual Information in Information Theory",
+        "Attribute Selection Measures in Decision Trees"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Dataset Partitioning and Subset Creation",
+      "relation_to_problem": "After selecting the best attribute, you must partition the dataset into subsets based on that attribute's values. Each subset becomes the data for a child node in the tree. This partitioning operation is repeated recursively until stopping criteria are met.",
+      "prerequisites": [
+        "Dictionary operations in Python",
+        "List filtering and comprehension",
+        "Set theory basics"
+      ],
+      "learning_objectives": [
+        "Partition datasets by attribute values efficiently",
+        "Extract unique values from categorical attributes",
+        "Filter examples based on attribute-value conditions",
+        "Structure partitioned data for recursive tree construction"
+      ],
+      "math_content": {
+        "definition": "A **partition** of a set $S$ is a collection of non-empty, pairwise disjoint subsets $\\{S_1, S_2, \\ldots, S_k\\}$ whose union equals $S$:\n$$S = \\bigcup_{i=1}^{k} S_i \\quad \\text{and} \\quad S_i \\cap S_j = \\emptyset \\text{ for } i \\neq j$$\n\nFor decision trees, given dataset $D$ and attribute $A$ with domain $Values(A) = \\{v_1, v_2, \\ldots, v_k\\}$, we create a partition:\n$$\\mathcal{P}_A(D) = \\{D_{v_1}, D_{v_2}, \\ldots, D_{v_k}\\}$$\nwhere each subset is defined by:\n$$D_{v_i} = \\{(x, y) \\in D : x[A] = v_i\\}$$\n\nThis partition satisfies: $D = \\bigcup_{i=1}^{k} D_{v_i}$ and $D_{v_i} \\cap D_{v_j} = \\emptyset$ for $i \\neq j$.",
+        "notation": "$\\mathcal{P}_A(D)$ = partition of dataset $D$ by attribute $A$, $D_v$ = subset where attribute $A$ equals value $v$, $x[A]$ = value of attribute $A$ for example $x$, $Values(A)$ = domain/range of attribute $A$",
+        "theorem": "**Partition Cardinality Theorem**: For a partition $\\mathcal{P}_A(D)$ of dataset $D$ by attribute $A$:\n$$|D| = \\sum_{v \\in Values(A)} |D_v|$$\nThe size of the original dataset equals the sum of sizes of all subsets.\n\nAdditionally, the number of subsets in the partition equals the number of distinct values of attribute $A$ that actually appear in $D$: $|\\mathcal{P}_A(D)| = |\\{x[A] : x \\in D\\}|$",
+        "proof_sketch": "Since the subsets are pairwise disjoint and their union is $D$, each element of $D$ appears in exactly one subset $D_v$. Therefore, counting elements across all subsets gives the total count:\n$$|D| = \\left|\\bigcup_{v} D_v\\right| = \\sum_{v} |D_v|$$\nThis is the fundamental property of partitions.",
+        "examples": [
+          "**Example 1**: Dataset $D$ with 4 examples:\n$D = \\{(Sunny, Hot, No), (Sunny, Cool, No), (Rain, Hot, Yes), (Rain, Cool, Yes)\\}$\n\nPartitioning by 'Outlook' gives:\n$D_{Sunny} = \\{(Sunny, Hot, No), (Sunny, Cool, No)\\}$ (2 examples)\n$D_{Rain} = \\{(Rain, Hot, Yes), (Rain, Cool, Yes)\\}$ (2 examples)\n\nVerify: $|D| = 4 = 2 + 2 = |D_{Sunny}| + |D_{Rain}|$ ✓",
+          "**Example 2**: Same dataset, partition by 'Temperature':\n$D_{Hot} = \\{(Sunny, Hot, No), (Rain, Hot, Yes)\\}$ (2 examples)\n$D_{Cool} = \\{(Sunny, Cool, No), (Rain, Cool, Yes)\\}$ (2 examples)\n\nBoth partitions have 2 subsets, but different contents.",
+          "**Example 3**: If attribute 'Wind' has values {Weak, Strong} but only 'Weak' appears in data:\n$D_{Weak} = D$ (all examples), $D_{Strong} = \\emptyset$\n\nPractically, we only create non-empty subsets, so partition has 1 subset."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Subset Definition",
+          "latex": "$D_v = \\{x \\in D : x[A] = v\\}$",
+          "description": "Filter dataset to examples where attribute A equals specific value v. Use list comprehension or filter in Python."
+        },
+        {
+          "name": "Value Extraction",
+          "latex": "$Values(A) = \\{x[A] : x \\in D\\}$",
+          "description": "Extract set of unique values that attribute A takes in dataset D. Use set comprehension."
+        },
+        {
+          "name": "Partition Size Sum",
+          "latex": "$\\sum_{v \\in Values(A)} |D_v| = |D|$",
+          "description": "Verification: sum of partition sizes must equal original dataset size."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that partitions a dataset into subsets based on the values of a specified attribute. The function should return a dictionary mapping each unique attribute value to the list of examples having that value. Empty subsets (attribute values not present in the data) should not be included. This partitioning function will be called after selecting the best split attribute to divide data for child nodes.",
+        "function_signature": "def partition_dataset(examples: list[dict], attribute: str) -> dict[str, list[dict]]:",
+        "starter_code": "def partition_dataset(examples: list[dict], attribute: str) -> dict[str, list[dict]]:\n    \"\"\"\n    Partition dataset by values of specified attribute.\n    \n    Args:\n        examples: List of example dictionaries\n        attribute: The attribute to partition by\n    \n    Returns:\n        Dictionary mapping attribute values to lists of examples\n        Example: {'Sunny': [{...}, {...}], 'Rain': [{...}]}\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "partition_dataset([{'A': 'x', 'B': '1'}, {'A': 'x', 'B': '2'}, {'A': 'y', 'B': '3'}], 'A')",
+            "expected": "{'x': [{'A': 'x', 'B': '1'}, {'A': 'x', 'B': '2'}], 'y': [{'A': 'y', 'B': '3'}]}",
+            "explanation": "Two partitions: 'x' gets 2 examples, 'y' gets 1 example. Disjoint and complete."
+          },
+          {
+            "input": "partition_dataset([{'Outlook': 'Sunny', 'Play': 'No'}, {'Outlook': 'Rain', 'Play': 'Yes'}, {'Outlook': 'Sunny', 'Play': 'Yes'}], 'Outlook')",
+            "expected": "{'Sunny': [{'Outlook': 'Sunny', 'Play': 'No'}, {'Outlook': 'Sunny', 'Play': 'Yes'}], 'Rain': [{'Outlook': 'Rain', 'Play': 'Yes'}]}",
+            "explanation": "Partition by Outlook: Sunny→2 examples, Rain→1 example"
+          },
+          {
+            "input": "partition_dataset([{'Color': 'Red'}, {'Color': 'Red'}, {'Color': 'Red'}], 'Color')",
+            "expected": "{'Red': [{'Color': 'Red'}, {'Color': 'Red'}, {'Color': 'Red'}]}",
+            "explanation": "All examples have same value, so single partition containing all data"
+          },
+          {
+            "input": "partition_dataset([{'X': '1', 'Y': 'a'}, {'X': '2', 'Y': 'b'}, {'X': '3', 'Y': 'c'}], 'X')",
+            "expected": "{'1': [{'X': '1', 'Y': 'a'}], '2': [{'X': '2', 'Y': 'b'}], '3': [{'X': '3', 'Y': 'c'}]}",
+            "explanation": "Each example has unique value for X, so 3 partitions with 1 example each"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not preserving the full example dictionary in subsets - must include all attributes, not just the splitting attribute",
+        "Creating keys for attribute values that don't appear in the dataset (should only create non-empty subsets)",
+        "Modifying the original examples list - should create new data structures",
+        "Using list instead of dictionary for return type - need mapping from value to subset for efficient lookup"
+      ],
+      "hint": "Iterate through examples once, and for each example, add it to the subset corresponding to its attribute value. Use a dictionary with defaultdict or check if key exists before appending.",
+      "references": [
+        "Set Partitioning in Discrete Mathematics",
+        "Data Grouping and Aggregation",
+        "Equivalence Relations and Partitions"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Stopping Criteria and Base Cases for Recursion",
+      "relation_to_problem": "The recursive tree-building process must terminate when certain conditions are met. Understanding when to stop splitting and create a leaf node is essential to prevent infinite recursion and produce a valid decision tree. Base cases include pure nodes, empty attribute lists, and empty datasets.",
+      "prerequisites": [
+        "Recursion principles",
+        "Boolean logic",
+        "Majority voting"
+      ],
+      "learning_objectives": [
+        "Identify base cases that terminate recursive splitting",
+        "Determine when a node should become a leaf",
+        "Implement majority class selection for leaf nodes",
+        "Handle edge cases in tree construction"
+      ],
+      "math_content": {
+        "definition": "A **leaf node** (terminal node) in a decision tree is a node that makes a classification decision rather than splitting further. A node becomes a leaf when one or more **stopping criteria** are satisfied:\n\n1. **Perfect Classification (Zero Entropy)**: All examples in the node have the same class label.\n   $$\\forall (x, y) \\in D_v : y = c \\text{ for some class } c$$\n   Mathematically: $H(D_v) = 0$\n\n2. **No Remaining Attributes**: The set of available splitting attributes is empty.\n   $$Attributes = \\emptyset$$\n\n3. **Empty Dataset**: The subset at the node is empty (can occur in testing on unseen attribute values).\n   $$D_v = \\emptyset$$\n\n4. **Identical Examples**: All remaining examples have identical attribute values but possibly different class labels (unresolvable by further splitting).\n   $$\\forall x, x' \\in D_v : x[A] = x'[A] \\text{ for all } A \\in Attributes$$",
+        "notation": "$D_v$ = dataset at current node, $c^*$ = majority class, $H(D_v)$ = entropy at node, $Attributes$ = remaining splittable attributes, $\\arg\\max$ = argument that maximizes a function",
+        "theorem": "**Majority Class Theorem**: For a leaf node with dataset $D_v$, the optimal class prediction that minimizes classification error on $D_v$ is the majority class:\n$$c^* = \\arg\\max_{c \\in \\mathcal{C}} |\\{(x, y) \\in D_v : y = c\\}|$$\n\nThe expected error rate at this leaf is:\n$$Error(D_v) = 1 - \\max_{c} p_c = 1 - \\frac{n_{c^*}}{|D_v|}$$\nwhere $n_{c^*}$ is the count of the majority class.",
+        "proof_sketch": "For any class assignment $\\hat{c}$, the error rate is:\n$$E(\\hat{c}) = \\frac{|\\{(x,y) \\in D_v : y \\neq \\hat{c}\\}|}{|D_v|} = 1 - \\frac{n_{\\hat{c}}}{|D_v|}$$\nThis is minimized when $n_{\\hat{c}}$ is maximized, which occurs for the majority class $c^*$.",
+        "examples": [
+          "**Example 1 (Pure node)**: $D_v = \\{(x_1, Yes), (x_2, Yes), (x_3, Yes)\\}$\nAll labels are 'Yes', so $H(D_v) = 0$. Create leaf node returning 'Yes'.",
+          "**Example 2 (No attributes left)**: $D_v = \\{(x_1, Yes), (x_2, Yes), (x_3, No)\\}$, $Attributes = \\emptyset$\nCannot split further. Majority class is 'Yes' (2 vs 1), so create leaf returning 'Yes'.",
+          "**Example 3 (Tie-breaking)**: $D_v = \\{(x_1, Yes), (x_2, No)\\}$, equal split.\nTie between classes. Convention: choose alphabetically first ('No' < 'Yes'), or randomly, or by prior class frequency.",
+          "**Example 4 (Empty node)**: $D_v = \\emptyset$\nRare in training, but can occur. Return parent node's majority class as default."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Majority Class",
+          "latex": "$c^* = \\arg\\max_{c} |\\{y : (x,y) \\in D, y = c\\}|$",
+          "description": "Find the class with highest frequency in dataset. Use Counter or frequency dictionary."
+        },
+        {
+          "name": "Purity Check",
+          "latex": "$Pure(D) \\iff |\\{y : (x,y) \\in D\\}| = 1$",
+          "description": "Node is pure if all examples have identical class labels. Check: set of labels has size 1."
+        },
+        {
+          "name": "Leaf Error Rate",
+          "latex": "$Error = 1 - \\frac{\\max_c n_c}{n}$",
+          "description": "Fraction of examples misclassified by majority vote. Perfect classification gives error = 0."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that determines if a node should be a leaf and, if so, returns the appropriate class label. The function checks stopping criteria: (1) all examples have same class, (2) no attributes remain, (3) dataset is empty. If it's a leaf, return the majority class; otherwise, return None to indicate splitting should continue. You'll also implement a helper to find the majority class with tie-breaking.",
+        "function_signature": "def should_stop_splitting(examples: list[dict], attributes: list[str], target_attr: str, parent_class: str = None) -> str | None:",
+        "starter_code": "from collections import Counter\n\ndef should_stop_splitting(examples: list[dict], attributes: list[str], target_attr: str, parent_class: str = None) -> str | None:\n    \"\"\"\n    Check if recursion should stop and return leaf class if so.\n    \n    Args:\n        examples: Current dataset at node\n        attributes: Remaining splittable attributes\n        target_attr: Target classification attribute\n        parent_class: Majority class of parent (for empty node case)\n    \n    Returns:\n        Class label (str) if should create leaf, None if should continue splitting\n    \"\"\"\n    # Your code here\n    pass\n\ndef get_majority_class(examples: list[dict], target_attr: str) -> str:\n    \"\"\"\n    Return the most common class label.\n    If tie, return first alphabetically.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "should_stop_splitting([{'A': 'x', 'Class': 'Yes'}, {'A': 'y', 'Class': 'Yes'}], ['A'], 'Class')",
+            "expected": "'Yes'",
+            "explanation": "All examples have class 'Yes' (pure node). Should stop and return 'Yes'."
+          },
+          {
+            "input": "should_stop_splitting([{'Class': 'Yes'}, {'Class': 'No'}, {'Class': 'Yes'}], [], 'Class')",
+            "expected": "'Yes'",
+            "explanation": "No attributes left to split on. Majority class is 'Yes' (2 vs 1), so return 'Yes'."
+          },
+          {
+            "input": "should_stop_splitting([], ['A', 'B'], 'Class', 'No')",
+            "expected": "'No'",
+            "explanation": "Empty dataset. Return parent's majority class 'No' as default."
+          },
+          {
+            "input": "should_stop_splitting([{'A': 'x', 'Class': 'Yes'}, {'A': 'y', 'Class': 'No'}], ['A', 'B'], 'Class')",
+            "expected": "None",
+            "explanation": "Mixed classes and attributes available. Should continue splitting, return None."
+          },
+          {
+            "input": "get_majority_class([{'Class': 'B'}, {'Class': 'A'}, {'Class': 'B'}, {'Class': 'A'}, {'Class': 'A'}], 'Class')",
+            "expected": "'A'",
+            "explanation": "Count: A=3, B=2. Majority is 'A'."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking purity first - this is the most common base case and should be checked before others",
+        "Forgetting to handle empty dataset case - should return parent's majority class, not crash",
+        "Not implementing tie-breaking for majority class - need deterministic behavior (e.g., alphabetical)",
+        "Returning a class when splitting should continue - only return a class string for base cases"
+      ],
+      "hint": "Check conditions in order: (1) empty dataset → return parent_class, (2) extract all labels and check if all identical → return that class, (3) no attributes remaining → return majority class. If none of these, return None.",
+      "references": [
+        "Recursion Termination Conditions",
+        "Majority Voting in Classification",
+        "Tie-Breaking Strategies in ML Algorithms"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Recursive Tree Construction Algorithm",
+      "relation_to_problem": "The complete decision tree learning algorithm combines all previous concepts: calculate information gain for each attribute, select the best, partition the data, check stopping criteria, and recursively build subtrees. This step integrates everything into the full ID3/entropy-based tree learning procedure.",
+      "prerequisites": [
+        "Entropy calculation",
+        "Information gain",
+        "Dataset partitioning",
+        "Recursion and base cases"
+      ],
+      "learning_objectives": [
+        "Integrate all previous concepts into complete algorithm",
+        "Implement recursive tree structure as nested dictionaries",
+        "Handle the main recursive case: select attribute, partition, recurse",
+        "Construct tree representation matching the required output format"
+      ],
+      "math_content": {
+        "definition": "The **ID3 (Iterative Dichotomiser 3) Algorithm** is a recursive procedure for constructing decision trees using entropy and information gain. Formally, the algorithm $\\text{BuildTree}(D, A, T)$ takes:\n- $D$: dataset of examples\n- $A$: set of candidate attributes\n- $T$: target attribute name\n\nand returns a tree structure:\n\n$$\n\\text{BuildTree}(D, A, T) = \\begin{cases}\n\\text{Leaf}(c) & \\text{if stopping criterion met} \\\\\n\\text{Node}(a^*, \\{v: \\text{BuildTree}(D_v, A \\setminus \\{a^*\\}, T)\\}) & \\text{otherwise}\n\\end{cases}\n$$\n\nwhere $a^* = \\arg\\max_{a \\in A} IG(D, a)$ is the best splitting attribute, and $D_v = \\{x \\in D : x[a^*] = v\\}$ are the partitioned subsets.",
+        "notation": "$\\text{BuildTree}$ = recursive tree construction function, $D_v$ = subset for value $v$, $A \\setminus \\{a^*\\}$ = remaining attributes after removing $a^*$, $\\text{Leaf}(c)$ = terminal node with class $c$, $\\text{Node}(a, children)$ = internal node splitting on attribute $a$",
+        "theorem": "**ID3 Convergence Theorem**: The ID3 algorithm terminates in finite time. Specifically, for a dataset with $n$ examples and $d$ attributes, the maximum depth of the resulting tree is $d$, and the algorithm makes at most $O(d)$ recursive calls along any path from root to leaf.\n\n**Proof**: Each recursive call removes one attribute from the available set (in the $A \\setminus \\{a^*\\}$ step). Since $|A|$ decreases by 1 with each recursive level, and we have base cases when $A = \\emptyset$, the recursion must terminate within $d$ levels.",
+        "proof_sketch": "**Termination**: Define a potential function $\\Phi = |A|$ (number of remaining attributes). At each recursive step, $\\Phi$ decreases by 1 (we remove the selected attribute). Base cases occur when $\\Phi = 0$ or other conditions. Since $\\Phi \\geq 0$ and decreases, termination is guaranteed.\n\n**Depth bound**: The longest path occurs when we split on a different attribute at each level without hitting purity. This path has length at most $|A| = d$.",
+        "examples": [
+          "**Example 1 - Small tree**: \n$D = \\{(Sunny, No), (Rain, Yes)\\}$, $A = \\{Outlook\\}$\n\nStep 1: Check base cases - not pure, have attributes.\nStep 2: Calculate $IG(D, Outlook)$ - perfect split, gain = 1.0\nStep 3: Select Outlook, partition: $D_{Sunny} = \\{(Sunny, No)\\}$, $D_{Rain} = \\{(Rain, Yes)\\}$\nStep 4: Recurse on subsets:\n- $\\text{BuildTree}(D_{Sunny}, \\emptyset, T)$ → pure, return 'No'\n- $\\text{BuildTree}(D_{Rain}, \\emptyset, T)$ → pure, return 'Yes'\n\nResult: $\\{Outlook: \\{Sunny: 'No', Rain: 'Yes'\\}\\}$",
+          "**Example 2 - Multi-level tree**:\n$D$ = PlayTennis dataset (14 examples), $A = \\{Outlook, Temp, Humidity, Wind\\}$\n\nStep 1: Calculate IG for all attributes:\n- $IG(D, Outlook) = 0.246$\n- $IG(D, Humidity) = 0.151$\n- etc.\n\nStep 2: Select $a^* = Outlook$ (highest gain)\nStep 3: Partition by Outlook → 3 subsets\nStep 4: Recurse on each subset with $A' = \\{Temp, Humidity, Wind\\}$\n- Overcast subset is pure → leaf 'Yes'\n- Sunny/Rain subsets need further splitting on Humidity/Wind\n\nFinal tree has Outlook at root, nested decisions below."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Best Attribute Selection",
+          "latex": "$a^* = \\arg\\max_{a \\in A} IG(D, a)$",
+          "description": "Core decision: choose attribute with maximum information gain for splitting."
+        },
+        {
+          "name": "Recursive Structure",
+          "latex": "$Tree = \\{a^*: \\{v_1: Tree_1, v_2: Tree_2, \\ldots\\}\\}$",
+          "description": "Tree representation as nested dictionaries. Keys are attribute values, values are subtrees."
+        },
+        {
+          "name": "Attribute Removal",
+          "latex": "$A_{\\text{new}} = A \\setminus \\{a^*\\}$",
+          "description": "After splitting on attribute $a^*$, remove it from available attributes for subtrees."
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete decision tree learning algorithm that recursively builds a tree using entropy-based information gain. The function should: (1) check base cases and return leaf if needed, (2) calculate information gain for all remaining attributes, (3) select the best attribute, (4) partition data by that attribute's values, (5) recursively build subtrees for each partition, and (6) return the tree as a nested dictionary. This is the culmination of all previous sub-quests.",
+        "function_signature": "def learn_decision_tree(examples: list[dict], attributes: list[str], target_attr: str, parent_class: str = None) -> dict | str:",
+        "starter_code": "def learn_decision_tree(examples: list[dict], attributes: list[str], target_attr: str, parent_class: str = None) -> dict | str:\n    \"\"\"\n    Build decision tree using ID3 algorithm with entropy and information gain.\n    \n    Args:\n        examples: Training dataset (list of dicts)\n        attributes: List of attribute names available for splitting\n        target_attr: Name of target classification attribute\n        parent_class: Majority class of parent (for empty node default)\n    \n    Returns:\n        Nested dict representing tree: {attribute: {value: subtree, ...}}\n        or string (class label) for leaf nodes\n    \"\"\"\n    # Base cases:\n    # 1. Check if should stop (use functions from previous steps)\n    # 2. If yes, return class label\n    \n    # Recursive case:\n    # 1. Calculate information gain for each attribute\n    # 2. Select best attribute (max IG)\n    # 3. Partition examples by best attribute\n    # 4. For each partition value:\n    #    - Recursively build subtree with remaining attributes\n    # 5. Return dictionary: {best_attr: {value1: subtree1, value2: subtree2, ...}}\n    \n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "learn_decision_tree([{'A': 'x', 'Class': 'Yes'}, {'A': 'x', 'Class': 'Yes'}], ['A'], 'Class')",
+            "expected": "'Yes'",
+            "explanation": "Pure dataset (all 'Yes'), should return leaf 'Yes' immediately"
+          },
+          {
+            "input": "learn_decision_tree([{'A': 'x', 'Class': 'Yes'}, {'A': 'y', 'Class': 'No'}], ['A'], 'Class')",
+            "expected": "{'A': {'x': 'Yes', 'y': 'No'}}",
+            "explanation": "Perfect split on A: x→Yes, y→No. Single-level tree with two leaves"
+          },
+          {
+            "input": "learn_decision_tree([{'A': 'x', 'B': '1', 'C': 'Yes'}, {'A': 'x', 'B': '2', 'C': 'No'}, {'A': 'y', 'B': '1', 'C': 'No'}, {'A': 'y', 'B': '2', 'C': 'Yes'}], ['A', 'B'], 'C')",
+            "expected": "{'A': {'x': {'B': {'1': 'Yes', '2': 'No'}}, 'y': {'B': {'1': 'No', '2': 'Yes'}}}}",
+            "explanation": "Neither A nor B alone separates classes. Tree needs both attributes. A splits first (arbitrary if equal IG), then B in each branch"
+          },
+          {
+            "input": "learn_decision_tree([{'Outlook': 'Sunny', 'Play': 'No'}, {'Outlook': 'Overcast', 'Play': 'Yes'}, {'Outlook': 'Rain', 'Play': 'Yes'}], ['Outlook'], 'Play')",
+            "expected": "{'Outlook': {'Sunny': 'No', 'Overcast': 'Yes', 'Rain': 'Yes'}}",
+            "explanation": "Outlook perfectly splits data into pure subsets. Single-level tree with three leaves"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not removing the selected attribute before recursing - this causes infinite recursion or incorrect trees",
+        "Forgetting to check base cases first - must check before calculating information gain",
+        "Not passing parent_class to recursive calls - needed for empty subset handling",
+        "Incorrect tree structure - should be {attr: {val1: subtree1, val2: subtree2}}, not other formats",
+        "Calculating information gain on target attribute - should only consider splitting attributes, not target",
+        "Not handling all attribute values - must create subtree for each value in partition"
+      ],
+      "hint": "Structure: (1) Base case checks using previous functions, (2) Loop through attributes calculating IG, track maximum, (3) Partition on best attribute, (4) Build dictionary with best attribute as key, (5) For each partition value, recursively call with reduced attribute list, (6) Return nested structure.",
+      "references": [
+        "ID3 Algorithm (Quinlan, 1986)",
+        "C4.5 Decision Tree Algorithm",
+        "CART (Classification and Regression Trees)",
+        "Recursive Algorithms and Tree Data Structures"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Tree Evaluation and Prediction",
+      "relation_to_problem": "After building the decision tree, you need to use it for classification. This involves traversing the tree structure from root to leaf based on an input example's attribute values. Understanding tree traversal validates that your tree construction is correct and completes the decision tree learning system.",
+      "prerequisites": [
+        "Tree data structures",
+        "Dictionary traversal",
+        "Recursive navigation"
+      ],
+      "learning_objectives": [
+        "Navigate nested dictionary tree structure",
+        "Make predictions by following decision paths",
+        "Handle missing attributes in test examples",
+        "Evaluate tree accuracy on test sets"
+      ],
+      "math_content": {
+        "definition": "**Tree Prediction** is the process of classifying a new example $x$ by traversing the decision tree $T$ from root to leaf:\n\n$$\\text{Predict}(T, x) = \\begin{cases}\nT & \\text{if } T \\in \\mathcal{C} \\text{ (leaf)} \\\\\n\\text{Predict}(T[a][x[a]], x) & \\text{if } T = \\{a: \\text{subtrees}\\} \\text{ (internal node)}\n\\end{cases}$$\n\nwhere $a$ is the splitting attribute at the current node, $x[a]$ is the value of that attribute for example $x$, and $T[a][x[a]]$ is the subtree corresponding to that value.\n\n**Classification Function**: The learned decision tree defines a function $f: \\mathcal{X} \\to \\mathcal{C}$ mapping feature space to class labels:\n$$f(x) = \\text{Predict}(T, x)$$",
+        "notation": "$\\text{Predict}(T, x)$ = classification function, $T$ = tree structure, $x$ = input example, $x[a]$ = value of attribute $a$ in example $x$, $T[a][v]$ = subtree for attribute $a$ with value $v$, $\\mathcal{C}$ = set of class labels",
+        "theorem": "**Perfect Classification Theorem**: For a decision tree $T$ trained on dataset $D$, if $T$ is fully grown (no pruning) and all training examples have unique attribute combinations, then:\n$$\\text{Accuracy}_{train}(T, D) = 1.0$$\nThe tree perfectly classifies all training examples.\n\n**Proof**: By construction, the ID3 algorithm continues splitting until each leaf contains examples of only one class (or no attributes remain). For each training example $(x, y) \\in D$, the path from root to leaf determined by $x$'s attributes leads to a leaf with label $y$ (or the majority label if examples with identical attributes exist).",
+        "proof_sketch": "Induction on tree depth:\n- **Base**: Depth 0 (single leaf) - all examples have same class by base case, accuracy = 1.0\n- **Step**: At depth $d$, split creates pure subsets (or can't split further). Each subset recursively builds a tree with accuracy 1.0 on its portion. Union over all branches gives accuracy 1.0 on entire training set.\n\nNote: Test accuracy may be lower due to overfitting.",
+        "examples": [
+          "**Example 1**: Tree $T = \\{Outlook: \\{Sunny: 'No', Rain: 'Yes'\\}\\}$, example $x = \\{Outlook: 'Sunny', Temp: 'Hot'\\}$\n\nPrediction process:\n1. Tree is internal node with attribute 'Outlook'\n2. $x[Outlook] = 'Sunny'$\n3. Follow subtree $T[Outlook][Sunny] = 'No'$\n4. Reach leaf, return 'No'\n\n$\\text{Predict}(T, x) = 'No'$",
+          "**Example 2**: Tree $T = \\{A: \\{x: \\{B: \\{1: 'Yes', 2: 'No'\\}\\}, y: 'No'\\}\\}$, example $x = \\{A: 'x', B: '1'\\}$\n\nPath: Root → A='x' → B='1' → Leaf 'Yes'\n$\\text{Predict}(T, x) = 'Yes'$",
+          "**Example 3 (Accuracy calculation)**: Tree $T$ tested on dataset $D_{test}$ with 10 examples. Predictions vs. true labels:\n- Correct: 8 examples\n- Incorrect: 2 examples\n\n$\\text{Accuracy} = \\frac{8}{10} = 0.8 = 80\\%$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Prediction Function",
+          "latex": "$\\hat{y} = \\text{Predict}(T, x)$",
+          "description": "Classify example $x$ using tree $T$. Traverse from root to leaf following $x$'s attributes."
+        },
+        {
+          "name": "Classification Accuracy",
+          "latex": "$\\text{Acc}(T, D) = \\frac{1}{|D|} \\sum_{(x,y) \\in D} \\mathbb{1}[\\text{Predict}(T, x) = y]$",
+          "description": "Fraction of correctly classified examples. $\\mathbb{1}[\\cdot]$ is indicator function (1 if true, 0 if false)."
+        },
+        {
+          "name": "Error Rate",
+          "latex": "$\\text{Error} = 1 - \\text{Accuracy}$",
+          "description": "Fraction of misclassified examples. Complementary to accuracy."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that uses a trained decision tree to predict the class label for a new example. The function should recursively traverse the tree structure, following branches according to the example's attribute values, until reaching a leaf node. Also implement an accuracy calculation function that evaluates the tree on a test dataset. This demonstrates that your tree learning algorithm produces usable classifiers.",
+        "function_signature": "def predict(tree: dict | str, example: dict) -> str:",
+        "starter_code": "def predict(tree: dict | str, example: dict) -> str:\n    \"\"\"\n    Predict class label for an example using decision tree.\n    \n    Args:\n        tree: Decision tree (nested dict or str for leaf)\n        example: Example to classify (dict of attribute-value pairs)\n    \n    Returns:\n        Predicted class label (str)\n    \"\"\"\n    # Your code here\n    pass\n\ndef calculate_accuracy(tree: dict | str, examples: list[dict], target_attr: str) -> float:\n    \"\"\"\n    Calculate classification accuracy on dataset.\n    \n    Args:\n        tree: Trained decision tree\n        examples: Test dataset\n        target_attr: Name of target attribute\n    \n    Returns:\n        Accuracy as fraction (0.0 to 1.0)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "predict('Yes', {'A': 'x', 'B': 'y'})",
+            "expected": "'Yes'",
+            "explanation": "Tree is just a leaf 'Yes'. Return immediately regardless of example."
+          },
+          {
+            "input": "predict({'Outlook': {'Sunny': 'No', 'Rain': 'Yes'}}, {'Outlook': 'Sunny'})",
+            "expected": "'No'",
+            "explanation": "Tree splits on Outlook. Example has Outlook='Sunny', follow to leaf 'No'"
+          },
+          {
+            "input": "predict({'A': {'x': {'B': {'1': 'Yes', '2': 'No'}}, 'y': 'No'}}, {'A': 'x', 'B': '1'})",
+            "expected": "'Yes'",
+            "explanation": "Multi-level: A='x' leads to subtree, then B='1' leads to 'Yes'"
+          },
+          {
+            "input": "predict({'A': {'x': {'B': {'1': 'Yes', '2': 'No'}}, 'y': 'No'}}, {'A': 'y', 'B': '1'})",
+            "expected": "'No'",
+            "explanation": "A='y' leads directly to leaf 'No'. B value is ignored (not on this path)"
+          },
+          {
+            "input": "calculate_accuracy({'X': {'a': 'P', 'b': 'N'}}, [{'X': 'a', 'C': 'P'}, {'X': 'b', 'C': 'N'}, {'X': 'a', 'C': 'P'}], 'C')",
+            "expected": "1.0",
+            "explanation": "All 3 examples classified correctly: a→P (correct twice), b→N (correct once). Accuracy = 3/3 = 1.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling leaf nodes (strings) separately from internal nodes (dicts) - need type check",
+        "Trying to access attribute that doesn't exist in example - should have been in training data attributes",
+        "Not recursing properly - must recursively call predict on subtree, not just return subtree",
+        "Comparing predicted and true labels with wrong equality - ensure both are strings",
+        "Integer division for accuracy - use float division to get 0.0-1.0 range"
+      ],
+      "hint": "For predict: check if tree is a string (leaf), return it. Otherwise, tree is a dict - get the splitting attribute (key), look up example's value for that attribute, recursively predict on corresponding subtree. For accuracy: predict each example, compare to true label, count matches, divide by total.",
+      "references": [
+        "Tree Traversal Algorithms",
+        "Classification Performance Metrics",
+        "Recursive Data Structure Navigation",
+        "Model Evaluation in Machine Learning"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,457 @@
+{
+  "problem_id": 80,
+  "title": "Normal Distribution PDF Calculator",
+  "category": "Probability",
+  "difficulty": "medium",
+  "description": "Write a Python function to calculate the probability density function (PDF) of the normal distribution for a given value, mean, and standard deviation. The function should use the mathematical formula of the normal distribution to return the PDF value rounded to 5 decimal places.",
+  "example": {
+    "input": "x = 16, mean = 15, std_dev = 2.04",
+    "output": "0.17342",
+    "reasoning": "The function computes the PDF using x = 16, mean = 15, and std_dev = 2.04."
+  },
+  "starter_code": "import math\n\ndef normal_pdf(x, mean, std_dev):\n\t\"\"\"\n\tCalculate the probability density function (PDF) of the normal distribution.\n\t:param x: The value at which the PDF is evaluated.\n\t:param mean: The mean (μ) of the distribution.\n\t:param std_dev: The standard deviation (σ) of the distribution.\n\t\"\"\"\n\t# Your code here\n\tpass\n\treturn round(val,5)",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding the Exponential Function and Euler's Number",
+      "relation_to_problem": "The normal distribution PDF formula contains the exponential term $e^{-\\frac{(x-\\mu)^2}{2\\sigma^2}}$, which is the core computational component that determines the bell-shaped curve.",
+      "prerequisites": [
+        "Basic algebra",
+        "Powers and exponents",
+        "Function evaluation"
+      ],
+      "learning_objectives": [
+        "Understand Euler's number $e$ and its mathematical significance",
+        "Compute exponential expressions with negative exponents",
+        "Evaluate the exponential function for squared differences"
+      ],
+      "math_content": {
+        "definition": "**Euler's number** $e$ is a mathematical constant approximately equal to 2.71828. It is the base of the natural logarithm and is defined as the limit: $e = \\lim_{n \\to \\infty} \\left(1 + \\frac{1}{n}\\right)^n$. The exponential function $f(x) = e^x$ is the unique function that is its own derivative.",
+        "notation": "$e \\approx 2.71828$, $e^x$ = exponential function, $\\exp(x)$ = alternative notation for $e^x$",
+        "theorem": "**Properties of the Exponential Function**: For any real numbers $a$ and $b$: (1) $e^{a+b} = e^a \\cdot e^b$, (2) $e^{-x} = \\frac{1}{e^x}$, (3) $e^0 = 1$, (4) $e^x > 0$ for all $x \\in \\mathbb{R}$",
+        "proof_sketch": "The property $e^{-x} = \\frac{1}{e^x}$ follows from the general exponent rule $a^{-n} = \\frac{1}{a^n}$. This is crucial because the normal distribution uses negative exponents to create the decreasing tail behavior away from the mean.",
+        "examples": [
+          "Example 1: $e^0 = 1$ (any number to the power 0 equals 1)",
+          "Example 2: $e^{-1} = \\frac{1}{e} \\approx 0.36788$",
+          "Example 3: If $(x-\\mu)^2 = 4$, then $e^{-\\frac{4}{2}} = e^{-2} \\approx 0.13534$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Exponential with Negative Squared Difference",
+          "latex": "$e^{-\\frac{(x-\\mu)^2}{2\\sigma^2}}$",
+          "description": "This formula appears in the normal distribution PDF. The squared difference $(x-\\mu)^2$ is always non-negative, making the exponent always negative or zero, ensuring the output is between 0 and 1."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the exponential term of the normal distribution formula. Given a value $x$, mean $\\mu$, and standard deviation $\\sigma$, compute $e^{-\\frac{(x-\\mu)^2}{2\\sigma^2}}$. This is the un-normalized Gaussian kernel.",
+        "function_signature": "def gaussian_kernel(x: float, mean: float, std_dev: float) -> float:",
+        "starter_code": "import math\n\ndef gaussian_kernel(x, mean, std_dev):\n    \"\"\"\n    Calculate the exponential term of the normal distribution.\n    :param x: The value at which to evaluate\n    :param mean: The mean (μ) of the distribution\n    :param std_dev: The standard deviation (σ)\n    :return: The value of e^(-(x-μ)²/(2σ²)) rounded to 5 decimals\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "gaussian_kernel(15, 15, 2.04)",
+            "expected": "1.0",
+            "explanation": "When x equals the mean, the exponent is 0, so e^0 = 1"
+          },
+          {
+            "input": "gaussian_kernel(16, 15, 2.04)",
+            "expected": "0.88250",
+            "explanation": "The squared difference is (16-15)² = 1, giving e^(-1/(2*2.04²)) ≈ 0.88250"
+          },
+          {
+            "input": "gaussian_kernel(17, 15, 2.04)",
+            "expected": "0.61907",
+            "explanation": "The squared difference is (17-15)² = 4, giving e^(-4/(2*2.04²)) ≈ 0.61907"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to square the difference (x-μ) before dividing by 2σ²",
+        "Using σ instead of σ² in the denominator",
+        "Not handling the negative sign in the exponent correctly",
+        "Computing (x-μ²) instead of (x-μ)²"
+      ],
+      "hint": "Remember that math.exp(x) computes e^x in Python. Break down the calculation: first compute the squared difference, then divide by 2σ², negate it, and finally apply the exponential function.",
+      "references": [
+        "Exponential function properties",
+        "Euler's number",
+        "Gaussian functions"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Computing the Square Root and Understanding π",
+      "relation_to_problem": "The normalization constant of the normal distribution PDF is $\\frac{1}{\\sigma\\sqrt{2\\pi}}$. Understanding how to compute square roots and work with π is essential for calculating this coefficient.",
+      "prerequisites": [
+        "Basic arithmetic",
+        "Understanding of irrational numbers",
+        "Powers and roots"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical constant π and its significance",
+        "Compute square roots of products and expressions",
+        "Calculate the normalization constant for probability density functions"
+      ],
+      "math_content": {
+        "definition": "**The constant π (pi)** is the ratio of a circle's circumference to its diameter, approximately 3.14159. In probability theory, $\\sqrt{2\\pi}$ appears in the normalization constant of the normal distribution, ensuring the total area under the curve equals 1. The **square root** of a positive number $a$ is the value $b$ such that $b^2 = a$, denoted $\\sqrt{a}$ or $a^{1/2}$.",
+        "notation": "$\\pi \\approx 3.14159$, $\\sqrt{x}$ = square root of $x$, $\\sqrt{2\\pi} \\approx 2.50663$",
+        "theorem": "**Properties of Square Roots**: For positive real numbers $a$ and $b$: (1) $\\sqrt{ab} = \\sqrt{a} \\cdot \\sqrt{b}$, (2) $\\sqrt{\\frac{a}{b}} = \\frac{\\sqrt{a}}{\\sqrt{b}}$, (3) $(\\sqrt{a})^2 = a$, (4) $\\sqrt{a^2} = |a|$",
+        "proof_sketch": "The normalization constant $\\frac{1}{\\sigma\\sqrt{2\\pi}}$ ensures that $\\int_{-\\infty}^{\\infty} f(x) dx = 1$. This follows from the Gaussian integral: $\\int_{-\\infty}^{\\infty} e^{-\\frac{x^2}{2}} dx = \\sqrt{2\\pi}$. By substituting $u = \\frac{x-\\mu}{\\sigma}$ and applying this result, we derive the normalization factor.",
+        "examples": [
+          "Example 1: $\\sqrt{2\\pi} = \\sqrt{2} \\cdot \\sqrt{\\pi} \\approx 1.41421 \\times 1.77245 \\approx 2.50663$",
+          "Example 2: If $\\sigma = 2.04$, then $\\sigma\\sqrt{2\\pi} = 2.04 \\times 2.50663 \\approx 5.11352$",
+          "Example 3: The reciprocal: $\\frac{1}{5.11352} \\approx 0.19556$ (the normalization constant)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Normalization Constant",
+          "latex": "$\\frac{1}{\\sigma\\sqrt{2\\pi}}$",
+          "description": "This coefficient ensures the PDF integrates to 1 over all real numbers, making it a valid probability density function."
+        },
+        {
+          "name": "Variance Form",
+          "latex": "$\\frac{1}{\\sqrt{2\\pi\\sigma^2}}$",
+          "description": "An equivalent form expressing the normalization in terms of variance $\\sigma^2 = \\text{Var}(X)$."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the normalization constant for the normal distribution. Given a standard deviation $\\sigma$, compute $\\frac{1}{\\sigma\\sqrt{2\\pi}}$. This constant ensures the area under the PDF curve equals 1.",
+        "function_signature": "def normalization_constant(std_dev: float) -> float:",
+        "starter_code": "import math\n\ndef normalization_constant(std_dev):\n    \"\"\"\n    Calculate the normalization constant for normal distribution.\n    :param std_dev: The standard deviation (σ)\n    :return: The value of 1/(σ√(2π)) rounded to 5 decimals\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "normalization_constant(1.0)",
+            "expected": "0.39894",
+            "explanation": "For standard normal (σ=1), the constant is 1/√(2π) ≈ 0.39894"
+          },
+          {
+            "input": "normalization_constant(2.04)",
+            "expected": "0.19556",
+            "explanation": "With σ=2.04, we get 1/(2.04*√(2π)) ≈ 0.19556"
+          },
+          {
+            "input": "normalization_constant(0.5)",
+            "expected": "0.79788",
+            "explanation": "Smaller σ means larger normalization constant: 1/(0.5*√(2π)) ≈ 0.79788"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using π instead of √(2π) in the denominator",
+        "Forgetting to multiply σ by √(2π) before taking the reciprocal",
+        "Computing √(2)*π instead of √(2π)",
+        "Using degrees mode instead of radians (though π is dimensionless)"
+      ],
+      "hint": "In Python, math.pi gives you π and math.sqrt() computes square roots. First calculate 2*math.pi, then take its square root, multiply by std_dev, and finally compute the reciprocal using 1/result.",
+      "references": [
+        "The constant π",
+        "Square root properties",
+        "Normalization in probability theory",
+        "Gaussian integral"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Combining Components: The Squared Difference Formula",
+      "relation_to_problem": "The exponent in the normal distribution PDF is $-\\frac{(x-\\mu)^2}{2\\sigma^2}$. Understanding how squared differences measure distance from the mean is crucial for implementing the distribution.",
+      "prerequisites": [
+        "Algebra",
+        "Squaring operations",
+        "Understanding of mean and deviation"
+      ],
+      "learning_objectives": [
+        "Understand how $(x-\\mu)^2$ measures squared distance from the mean",
+        "Compute the standardized squared distance using $\\sigma^2$",
+        "Recognize the role of this term in creating the bell-shaped curve"
+      ],
+      "math_content": {
+        "definition": "**Squared Difference (Squared Deviation)**: For a value $x$ and mean $\\mu$, the squared difference is $(x-\\mu)^2$. This is always non-negative and measures the squared distance from the mean. **Normalized Squared Distance**: The expression $\\frac{(x-\\mu)^2}{2\\sigma^2}$ divides by twice the variance, creating a standardized measure that determines the exponential decay rate in the PDF.",
+        "notation": "$x$ = observed value, $\\mu$ = mean, $\\sigma^2$ = variance, $(x-\\mu)$ = deviation, $(x-\\mu)^2$ = squared deviation",
+        "theorem": "**Symmetry of Squared Difference**: For any $z \\in \\mathbb{R}$, $(\\mu - z - \\mu)^2 = (\\mu + z - \\mu)^2 = z^2$. This ensures that values equidistant from the mean (e.g., $\\mu-2$ and $\\mu+2$) have the same PDF value, creating the symmetric bell curve.",
+        "proof_sketch": "Consider $x_1 = \\mu - a$ and $x_2 = \\mu + a$ for some $a > 0$. Then $(x_1 - \\mu)^2 = (-a)^2 = a^2$ and $(x_2 - \\mu)^2 = a^2$. Since both squared differences are equal, both points will have identical PDF values when substituted into the formula, demonstrating the distribution's symmetry around $\\mu$.",
+        "examples": [
+          "Example 1: If $\\mu = 15$ and $x = 17$, then $(x-\\mu)^2 = (17-15)^2 = 4$",
+          "Example 2: If $\\mu = 15$ and $x = 13$, then $(x-\\mu)^2 = (13-15)^2 = 4$ (same as above, showing symmetry)",
+          "Example 3: If $\\sigma = 2.04$, then $2\\sigma^2 = 2(2.04)^2 = 2(4.1616) = 8.3232$, so $\\frac{4}{8.3232} \\approx 0.48065$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Exponent Term",
+          "latex": "$-\\frac{(x-\\mu)^2}{2\\sigma^2}$",
+          "description": "The complete exponent used in the normal distribution. The factor of 2 in the denominator comes from the derivation of maximum likelihood estimation and ensures proper mathematical properties."
+        },
+        {
+          "name": "Z-score Squared",
+          "latex": "$z^2 = \\left(\\frac{x-\\mu}{\\sigma}\\right)^2 = \\frac{(x-\\mu)^2}{\\sigma^2}$",
+          "description": "The squared z-score measures how many standard deviations away from the mean a value is, squared. The exponent can be written as $-\\frac{z^2}{2}$."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the exponent value (not the exponential) for the normal distribution formula. Given $x$, $\\mu$, and $\\sigma$, compute $-\\frac{(x-\\mu)^2}{2\\sigma^2}$. This value determines how much the PDF decreases from its maximum at the mean.",
+        "function_signature": "def normal_exponent(x: float, mean: float, std_dev: float) -> float:",
+        "starter_code": "def normal_exponent(x, mean, std_dev):\n    \"\"\"\n    Calculate the exponent in the normal distribution formula.\n    :param x: The value at which to evaluate\n    :param mean: The mean (μ) \n    :param std_dev: The standard deviation (σ)\n    :return: The value of -(x-μ)²/(2σ²) rounded to 5 decimals\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "normal_exponent(15, 15, 2.04)",
+            "expected": "0.0",
+            "explanation": "When x = μ, the difference is 0, so the exponent is 0"
+          },
+          {
+            "input": "normal_exponent(16, 15, 2.04)",
+            "expected": "-0.12016",
+            "explanation": "With (x-μ)² = 1 and 2σ² = 8.3232, we get -1/8.3232 ≈ -0.12016"
+          },
+          {
+            "input": "normal_exponent(13, 15, 2.04)",
+            "expected": "-0.48065",
+            "explanation": "With (x-μ)² = 4, we get -4/8.3232 ≈ -0.48065 (symmetric with x=17)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing (x² - μ²) instead of (x-μ)²; these are NOT equivalent",
+        "Forgetting the negative sign in front of the fraction",
+        "Dividing by σ instead of σ², or by 2σ instead of 2σ²",
+        "Not squaring σ: using 2σ instead of 2σ²"
+      ],
+      "hint": "Break this into steps: (1) compute the difference x-mean, (2) square it, (3) divide by 2*std_dev², (4) negate the result. Be careful with the order of operations!",
+      "references": [
+        "Variance and standard deviation",
+        "Squared deviations",
+        "Standardization in statistics"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "The Complete Normal Distribution PDF Formula",
+      "relation_to_problem": "This sub-quest integrates all previous concepts into the complete formula: $f(x) = \\frac{1}{\\sigma\\sqrt{2\\pi}} e^{-\\frac{(x-\\mu)^2}{2\\sigma^2}}$. This is the exact calculation needed for the main problem.",
+      "prerequisites": [
+        "Exponential functions (Step 1)",
+        "Normalization constants (Step 2)",
+        "Squared differences (Step 3)"
+      ],
+      "learning_objectives": [
+        "Combine the normalization constant with the exponential term",
+        "Understand why the PDF is maximized at the mean",
+        "Implement the complete normal distribution PDF calculation",
+        "Verify results match the expected bell curve behavior"
+      ],
+      "math_content": {
+        "definition": "**Normal Distribution Probability Density Function**: A continuous random variable $X$ follows a normal distribution with mean $\\mu$ and standard deviation $\\sigma > 0$, denoted $X \\sim N(\\mu, \\sigma^2)$, if its probability density function is: $$f(x; \\mu, \\sigma) = \\frac{1}{\\sigma\\sqrt{2\\pi}} \\exp\\left(-\\frac{(x-\\mu)^2}{2\\sigma^2}\\right), \\quad x \\in \\mathbb{R}$$",
+        "notation": "$X \\sim N(\\mu, \\sigma^2)$ means \"$X$ is normally distributed with mean $\\mu$ and variance $\\sigma^2$\", $f(x)$ or $f(x; \\mu, \\sigma)$ denotes the PDF evaluated at $x$",
+        "theorem": "**Maximum of Normal PDF**: The normal distribution PDF achieves its maximum value at $x = \\mu$, where $f(\\mu) = \\frac{1}{\\sigma\\sqrt{2\\pi}}$. For any $x \\neq \\mu$, we have $f(x) < f(\\mu)$. The PDF is strictly decreasing as we move away from $\\mu$ in either direction.",
+        "proof_sketch": "Since $e^x$ is strictly increasing and $(x-\\mu)^2 \\geq 0$ with equality only at $x = \\mu$, the exponent $-\\frac{(x-\\mu)^2}{2\\sigma^2}$ is maximized (equals 0) when $x = \\mu$. Since $e^0 = 1$ and $e^{-a} < 1$ for $a > 0$, we have $\\exp\\left(-\\frac{(x-\\mu)^2}{2\\sigma^2}\\right) \\leq 1$, with equality only at $x = \\mu$. Therefore, $f(x) \\leq \\frac{1}{\\sigma\\sqrt{2\\pi}}$ with equality only at $x = \\mu$.",
+        "examples": [
+          "Example 1: At the mean, $f(15; 15, 2.04) = \\frac{1}{2.04\\sqrt{2\\pi}} \\cdot e^0 = 0.19556 \\times 1 = 0.19556$",
+          "Example 2: One unit away, $f(16; 15, 2.04) = 0.19556 \\times e^{-0.12016} \\approx 0.19556 \\times 0.88694 \\approx 0.17342$",
+          "Example 3: Two units away, $f(17; 15, 2.04) = 0.19556 \\times e^{-0.48065} \\approx 0.19556 \\times 0.61858 \\approx 0.12095$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Normal Distribution PDF (Standard Form)",
+          "latex": "$f(x) = \\frac{1}{\\sigma\\sqrt{2\\pi}} e^{-\\frac{(x-\\mu)^2}{2\\sigma^2}}$",
+          "description": "The complete formula combining normalization and exponential decay. Use this to compute PDF values for any x."
+        },
+        {
+          "name": "Standard Normal PDF",
+          "latex": "$\\phi(z) = \\frac{1}{\\sqrt{2\\pi}} e^{-\\frac{z^2}{2}}$",
+          "description": "Special case when μ=0 and σ=1. Any normal distribution can be standardized using z = (x-μ)/σ."
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete normal distribution PDF function by combining all previous components. This function should integrate the normalization constant (Step 2) with the exponential term (Step 1 and Step 3) to produce the final PDF value. The result should match the expected output from the main problem.",
+        "function_signature": "def normal_pdf(x: float, mean: float, std_dev: float) -> float:",
+        "starter_code": "import math\n\ndef normal_pdf(x, mean, std_dev):\n    \"\"\"\n    Calculate the probability density function (PDF) of the normal distribution.\n    :param x: The value at which the PDF is evaluated\n    :param mean: The mean (μ) of the distribution\n    :param std_dev: The standard deviation (σ) of the distribution\n    :return: The PDF value rounded to 5 decimal places\n    \"\"\"\n    # Your code here\n    # Hint: Combine concepts from previous exercises\n    # 1. Calculate the normalization constant\n    # 2. Calculate the exponent\n    # 3. Calculate the exponential term\n    # 4. Multiply them together\n    pass",
+        "test_cases": [
+          {
+            "input": "normal_pdf(16, 15, 2.04)",
+            "expected": "0.17342",
+            "explanation": "This is the example from the main problem. At x=16 with μ=15, σ=2.04"
+          },
+          {
+            "input": "normal_pdf(15, 15, 2.04)",
+            "expected": "0.19556",
+            "explanation": "At the mean, the PDF reaches its maximum: 1/(σ√(2π)) ≈ 0.19556"
+          },
+          {
+            "input": "normal_pdf(17, 15, 2.04)",
+            "expected": "0.12095",
+            "explanation": "Two units from the mean, the PDF decreases symmetrically"
+          },
+          {
+            "input": "normal_pdf(15, 0, 1)",
+            "expected": "0.0",
+            "explanation": "For standard normal, at x=15 (far from mean), PDF approaches 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Multiplying the components in the wrong order (though order doesn't matter mathematically, logical flow helps debugging)",
+        "Forgetting to round the final result to 5 decimal places",
+        "Computing the exponent and exponential separately but forgetting to multiply by the normalization constant",
+        "Using the wrong formula: swapping σ and σ² in different parts"
+      ],
+      "hint": "You've built all the pieces in previous steps. The PDF is simply the normalization constant times the exponential term. Structure your code clearly: compute each component, then combine them with multiplication.",
+      "references": [
+        "Normal distribution",
+        "Gaussian function",
+        "Probability density functions",
+        "Statistical distributions"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Understanding PDF Values and Their Interpretation",
+      "relation_to_problem": "While the previous step computes the PDF, this step ensures you understand what PDF values mean and their critical distinction from probabilities. This prevents the common mistake of misinterpreting PDF output.",
+      "prerequisites": [
+        "Normal distribution PDF (Step 4)",
+        "Basic probability theory",
+        "Integration concepts"
+      ],
+      "learning_objectives": [
+        "Distinguish between probability density and probability",
+        "Understand why PDF values can exceed 1.0",
+        "Interpret PDF values in the context of the normal distribution",
+        "Verify PDF calculations satisfy expected mathematical properties"
+      ],
+      "math_content": {
+        "definition": "**Probability Density vs. Probability**: For a continuous random variable $X$ with PDF $f(x)$: (1) The PDF value $f(x_0)$ at a point is NOT a probability—it represents the density at that point; (2) The probability that $X$ equals exactly $x_0$ is always zero: $P(X = x_0) = 0$; (3) Probabilities are computed as areas: $P(a \\leq X \\leq b) = \\int_a^b f(x) dx$; (4) PDF values can exceed 1, but must satisfy $\\int_{-\\infty}^{\\infty} f(x) dx = 1$.",
+        "notation": "$f(x)$ = PDF value (density), $P(a \\leq X \\leq b)$ = probability (area under curve), $\\int_a^b f(x)dx$ = definite integral giving area",
+        "theorem": "**Properties of Normal PDF**: For $X \\sim N(\\mu, \\sigma^2)$: (1) $f(x) > 0$ for all $x \\in \\mathbb{R}$ (always positive); (2) $f(\\mu - a) = f(\\mu + a)$ for all $a$ (symmetry); (3) $\\lim_{x \\to \\pm\\infty} f(x) = 0$ (tails approach zero); (4) The inflection points occur at $x = \\mu \\pm \\sigma$; (5) $\\int_{-\\infty}^{\\infty} f(x) dx = 1$ (normalization).",
+        "proof_sketch": "To verify $f(\\mu - a) = f(\\mu + a)$: Note that $(\\mu - a - \\mu)^2 = (-a)^2 = a^2 = (\\mu + a - \\mu)^2$. Since both points have the same squared difference from the mean, they yield identical exponents and thus identical PDF values. This demonstrates the perfect symmetry of the normal distribution around its mean.",
+        "examples": [
+          "Example 1: $f(16; 15, 2.04) = 0.17342$ is a density, not a probability. $P(X = 16) = 0$ exactly.",
+          "Example 2: For $\\sigma = 0.5$ (very concentrated), $f(\\mu) = \\frac{1}{0.5\\sqrt{2\\pi}} \\approx 0.798 < 1$, but for $\\sigma = 0.2$, $f(\\mu) \\approx 1.995 > 1$ (PDF can exceed 1!).",
+          "Example 3: Symmetry check: $f(13; 15, 2.04)$ should equal $f(17; 15, 2.04)$ since both are 2 units from mean."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Maximum PDF Value",
+          "latex": "$f_{\\max} = f(\\mu) = \\frac{1}{\\sigma\\sqrt{2\\pi}}$",
+          "description": "The peak of the bell curve. Smaller σ (narrower distribution) gives larger maximum PDF value."
+        },
+        {
+          "name": "Empirical Rule (68-95-99.7)",
+          "latex": "$P(\\mu - \\sigma \\leq X \\leq \\mu + \\sigma) \\approx 0.68$, $P(\\mu - 2\\sigma \\leq X \\leq \\mu + 2\\sigma) \\approx 0.95$",
+          "description": "Approximately 68% of data falls within 1σ, 95% within 2σ, and 99.7% within 3σ of the mean."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a validation function that checks whether PDF calculations satisfy key mathematical properties. Given a normal_pdf function and parameters (x, mean, std_dev), verify: (1) the PDF value is positive, (2) symmetry holds (PDF at mean-d equals PDF at mean+d), and (3) the maximum occurs at the mean. Return a dictionary with validation results.",
+        "function_signature": "def validate_normal_pdf(pdf_function, mean: float, std_dev: float, test_distance: float) -> dict:",
+        "starter_code": "def validate_normal_pdf(pdf_function, mean, std_dev, test_distance):\n    \"\"\"\n    Validate that a PDF function satisfies normal distribution properties.\n    :param pdf_function: A function that computes normal PDF\n    :param mean: The mean of the distribution\n    :param std_dev: The standard deviation\n    :param test_distance: Distance from mean to test symmetry\n    :return: Dictionary with validation results\n    \"\"\"\n    # Your code here\n    # Check:\n    # 1. PDF at mean is positive\n    # 2. PDF at (mean - test_distance) equals PDF at (mean + test_distance)\n    # 3. PDF at mean >= PDF at (mean + test_distance)\n    pass",
+        "test_cases": [
+          {
+            "input": "validate_normal_pdf(normal_pdf, 15, 2.04, 2.0)",
+            "expected": "{'positive': True, 'symmetric': True, 'max_at_mean': True}",
+            "explanation": "All properties should hold for a correct implementation"
+          },
+          {
+            "input": "validate_normal_pdf(normal_pdf, 0, 1, 1.5)",
+            "expected": "{'positive': True, 'symmetric': True, 'max_at_mean': True}",
+            "explanation": "Should work for standard normal distribution as well"
+          },
+          {
+            "input": "validate_normal_pdf(normal_pdf, 100, 15, 10)",
+            "expected": "{'positive': True, 'symmetric': True, 'max_at_mean': True}",
+            "explanation": "Should work for any valid mean and standard deviation"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Thinking PDF values represent probabilities (they don't—they're densities)",
+        "Being surprised when PDF values exceed 1.0 (this is valid for narrow distributions)",
+        "Confusing the PDF function f(x) with the CDF function F(x) = P(X ≤ x)",
+        "Not understanding that P(X = specific value) = 0 for continuous distributions",
+        "Forgetting that only areas under the PDF curve represent probabilities"
+      ],
+      "hint": "Call pdf_function multiple times with different x values and compare results. For symmetry, check if abs(pdf_left - pdf_right) < 0.00001 (allowing for tiny rounding differences). For the maximum, verify pdf_at_mean >= pdf_away_from_mean.",
+      "references": [
+        "Continuous probability distributions",
+        "Probability density vs probability mass",
+        "CDF vs PDF",
+        "Integration and probability"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Practical Applications and Edge Cases",
+      "relation_to_problem": "This final sub-quest tests your complete understanding by having you handle edge cases and apply the normal PDF to practical scenarios, ensuring robust implementation.",
+      "prerequisites": [
+        "Normal PDF implementation (Step 4)",
+        "PDF interpretation (Step 5)",
+        "Error handling"
+      ],
+      "learning_objectives": [
+        "Handle edge cases (extreme values, very small/large σ)",
+        "Apply normal PDF to multiple data points efficiently",
+        "Understand computational limits and precision issues",
+        "Use the PDF for real-world statistical analysis"
+      ],
+      "math_content": {
+        "definition": "**Edge Cases in Normal Distribution**: (1) **Extreme x-values**: When $|x - \\mu| >> \\sigma$ (e.g., $x > \\mu + 6\\sigma$), the PDF value becomes extremely small ($< 10^{-9}$) and may underflow to 0 in floating-point arithmetic. (2) **Small σ**: When $\\sigma \\to 0$, the distribution becomes a Dirac delta function concentrated at $\\mu$, with $f(\\mu) \\to \\infty$. (3) **Large σ**: When $\\sigma$ is very large, the distribution flattens, with $f(\\mu) \\to 0$.",
+        "notation": "$\\epsilon$ = machine epsilon (smallest representable difference), $\\text{underflow}$ = when a number is too small to represent, $\\text{overflow}$ = when a number is too large to represent",
+        "theorem": "**Tail Probabilities**: For a standard normal distribution $Z \\sim N(0,1)$: $P(|Z| > 3) \\approx 0.0027$, $P(|Z| > 4) \\approx 0.00006$, $P(|Z| > 6) < 10^{-9}$. This means values beyond 6 standard deviations are extraordinarily rare. For numerical stability, PDF values at such extreme points may be computed as effectively zero.",
+        "proof_sketch": "As $|x - \\mu|$ increases, $(x-\\mu)^2$ grows quadratically, making the exponent $-\\frac{(x-\\mu)^2}{2\\sigma^2}$ increasingly negative. Since $e^{-k} \\to 0$ exponentially fast as $k \\to \\infty$, the PDF decays rapidly in the tails. Specifically, $f(\\mu + k\\sigma) = f(\\mu) \\cdot e^{-k^2/2}$, which decreases faster than any polynomial as $k$ increases.",
+        "examples": [
+          "Example 1: For $N(15, 2.04)$, at $x = 30$ (7.4σ away), $f(30) \\approx 1.6 \\times 10^{-12}$ (essentially zero)",
+          "Example 2: For $N(15, 0.1)$ (very small σ), $f(15) = \\frac{1}{0.1\\sqrt{2\\pi}} \\approx 3.989$ (PDF >> 1)",
+          "Example 3: For $N(15, 100)$ (very large σ), $f(15) = \\frac{1}{100\\sqrt{2\\pi}} \\approx 0.00399$ (very flat distribution)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Standardized Distance",
+          "latex": "$|z| = \\left|\\frac{x - \\mu}{\\sigma}\\right|$",
+          "description": "Number of standard deviations from the mean. If |z| > 6, the PDF is negligible."
+        },
+        {
+          "name": "Relative PDF Height",
+          "latex": "$\\frac{f(x)}{f(\\mu)} = e^{-\\frac{(x-\\mu)^2}{2\\sigma^2}}$",
+          "description": "The PDF at any point as a fraction of the maximum. Always between 0 and 1."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a robust function that calculates PDF values for a list of x-values, handling edge cases gracefully. The function should: (1) validate inputs (σ > 0), (2) warn when |x-μ| > 5σ (extreme tails), (3) compute PDF for all x-values, (4) return results with a flag indicating if any values were in extreme tails. This demonstrates production-ready code.",
+        "function_signature": "def normal_pdf_batch(x_values: list, mean: float, std_dev: float) -> dict:",
+        "starter_code": "import math\n\ndef normal_pdf_batch(x_values, mean, std_dev):\n    \"\"\"\n    Calculate PDF for multiple x-values with edge case handling.\n    :param x_values: List of x values to evaluate\n    :param mean: The mean (μ)\n    :param std_dev: The standard deviation (σ)\n    :return: Dictionary with 'pdf_values' (list), 'extreme_tail_warning' (bool)\n    \"\"\"\n    # Your code here\n    # 1. Validate std_dev > 0\n    # 2. Calculate PDF for each x\n    # 3. Check if any |x - mean| > 5 * std_dev\n    # 4. Return results\n    pass",
+        "test_cases": [
+          {
+            "input": "normal_pdf_batch([15, 16, 17], 15, 2.04)",
+            "expected": "{'pdf_values': [0.19556, 0.17342, 0.12095], 'extreme_tail_warning': False}",
+            "explanation": "Normal values near the mean, no extreme tails"
+          },
+          {
+            "input": "normal_pdf_batch([0, 15, 30], 15, 2.04)",
+            "expected": "{'pdf_values': [0.0, 0.19556, 0.0], 'extreme_tail_warning': True}",
+            "explanation": "x=0 and x=30 are >5σ away (extreme tails), PDFs approach 0"
+          },
+          {
+            "input": "normal_pdf_batch([0, 1, 2], 0, 1)",
+            "expected": "{'pdf_values': [0.39894, 0.24197, 0.05399], 'extreme_tail_warning': False}",
+            "explanation": "Standard normal, all values within reasonable range"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not validating that σ > 0 (would cause division by zero or sqrt of negative)",
+        "Not handling floating-point underflow for extreme tail values",
+        "Treating PDF values that underflow to 0 as errors rather than valid extreme cases",
+        "Computing each PDF independently rather than reusing the normalization constant",
+        "Not recognizing when numerical precision limits affect results"
+      ],
+      "hint": "First validate inputs. Then compute the normalization constant once (it's the same for all x-values). Loop through x_values, computing each PDF and checking if abs(x - mean) > 5 * std_dev. Store results and set the warning flag if needed.",
+      "references": [
+        "Numerical stability",
+        "Floating-point arithmetic",
+        "Tail probabilities",
+        "Statistical computing",
+        "Error handling in scientific code"
+      ]
+    }
+  ]
+}

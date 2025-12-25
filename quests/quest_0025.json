@@ -1,0 +1,536 @@
+{
+  "problem_id": 25,
+  "title": "Single Neuron with Backpropagation",
+  "category": "Deep Learning",
+  "difficulty": "medium",
+  "description": "Write a Python function that simulates a single neuron with sigmoid activation, and implements backpropagation to update the neuron's weights and bias. The function should take a list of feature vectors, associated true binary labels, initial weights, initial bias, a learning rate, and the number of epochs. The function should update the weights and bias using gradient descent based on the MSE loss, and return the updated weights, bias, and a list of MSE values for each epoch, each rounded to four decimal places.",
+  "example": {
+    "input": "features = [[1.0, 2.0], [2.0, 1.0], [-1.0, -2.0]], labels = [1, 0, 0], initial_weights = [0.1, -0.2], initial_bias = 0.0, learning_rate = 0.1, epochs = 2",
+    "reasoning": "The neuron receives feature vectors and computes predictions using the sigmoid activation. Based on the predictions and true labels, the gradients of MSE loss with respect to weights and bias are computed and used to update the model parameters across epochs.",
+    "output": "updated_weights = [0.1036, -0.1425], updated_bias = -0.0167, mse_values = [0.3033, 0.2942]"
+  },
+  "starter_code": "import numpy as np\ndef train_neuron(features: np.ndarray, labels: np.ndarray, initial_weights: np.ndarray, initial_bias: float, learning_rate: float, epochs: int) -> (np.ndarray, float, list[float]):\n\t# Your code here\n\treturn updated_weights, updated_bias, mse_values",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Sigmoid Activation Function and Its Derivative",
+      "relation_to_problem": "The sigmoid function is the activation function used in the single neuron. Understanding both the sigmoid and its derivative is essential for forward propagation (computing predictions) and backward propagation (computing gradients).",
+      "prerequisites": [
+        "Basic calculus",
+        "Exponential functions",
+        "Chain rule of differentiation"
+      ],
+      "learning_objectives": [
+        "Implement the sigmoid activation function from mathematical definition",
+        "Compute the derivative of sigmoid using the chain rule",
+        "Understand the sigmoid's range [0,1] and its use for binary classification",
+        "Apply vectorization for efficient computation on arrays"
+      ],
+      "math_content": {
+        "definition": "The sigmoid function, also called the logistic function, is a smooth, differentiable function that maps any real-valued number to the interval (0,1). It is defined as: $$\\sigma(z) = \\frac{1}{1 + e^{-z}}$$ where $z \\in \\mathbb{R}$ is the input (pre-activation) and $e$ is Euler's number.",
+        "notation": "$\\sigma(z)$ = sigmoid function output, $z$ = pre-activation value (weighted sum), $e \\approx 2.71828$ = Euler's constant",
+        "theorem": "The derivative of the sigmoid function has the elegant self-referential form: $$\\sigma'(z) = \\frac{d}{dz}\\sigma(z) = \\sigma(z)(1 - \\sigma(z))$$ This property makes backpropagation computationally efficient since we can reuse the forward pass output.",
+        "proof_sketch": "Starting from $\\sigma(z) = (1 + e^{-z})^{-1}$, apply the chain rule: $$\\frac{d\\sigma}{dz} = -(1 + e^{-z})^{-2} \\cdot (-e^{-z}) = \\frac{e^{-z}}{(1 + e^{-z})^2}$$ Rewrite the numerator: $e^{-z} = (1 + e^{-z}) - 1$, then: $$\\sigma'(z) = \\frac{1 + e^{-z} - 1}{(1 + e^{-z})^2} = \\frac{1}{1 + e^{-z}} - \\frac{1}{(1 + e^{-z})^2} = \\sigma(z) - \\sigma^2(z) = \\sigma(z)(1 - \\sigma(z))$$",
+        "examples": [
+          "For $z = 0$: $\\sigma(0) = \\frac{1}{1+1} = 0.5$, and $\\sigma'(0) = 0.5 \\times 0.5 = 0.25$",
+          "For $z = 2$: $\\sigma(2) = \\frac{1}{1+e^{-2}} \\approx 0.8808$, and $\\sigma'(2) \\approx 0.8808 \\times 0.1192 \\approx 0.1050$",
+          "For large positive $z$ (e.g., $z=10$): $\\sigma(10) \\approx 0.9999$, $\\sigma'(10) \\approx 0.0001$ (gradient nearly vanishes)",
+          "For large negative $z$ (e.g., $z=-10$): $\\sigma(-10) \\approx 0.0001$, $\\sigma'(-10) \\approx 0.0001$ (gradient nearly vanishes)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sigmoid Function",
+          "latex": "$\\sigma(z) = \\frac{1}{1 + e^{-z}}$",
+          "description": "Use this to transform the weighted sum into a probability-like output in [0,1]"
+        },
+        {
+          "name": "Sigmoid Derivative",
+          "latex": "$\\sigma'(z) = \\sigma(z)(1 - \\sigma(z))$",
+          "description": "Use this in backpropagation to compute gradients; can reuse forward pass values"
+        }
+      ],
+      "exercise": {
+        "description": "Implement both the sigmoid activation function and its derivative. The sigmoid function should handle both scalar and numpy array inputs through vectorization. The derivative function takes the sigmoid output (not z) as input for computational efficiency.",
+        "function_signature": "def sigmoid(z: np.ndarray) -> np.ndarray:\n    # Compute sigmoid activation\n    pass\n\ndef sigmoid_derivative(sigmoid_output: np.ndarray) -> np.ndarray:\n    # Compute derivative using sigmoid output\n    pass",
+        "starter_code": "import numpy as np\n\ndef sigmoid(z: np.ndarray) -> np.ndarray:\n    # Your code here\n    pass\n\ndef sigmoid_derivative(sigmoid_output: np.ndarray) -> np.ndarray:\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "sigmoid(np.array([0.0]))",
+            "expected": "np.array([0.5])",
+            "explanation": "At z=0, the sigmoid outputs exactly 0.5, representing maximum uncertainty"
+          },
+          {
+            "input": "sigmoid(np.array([2.0]))",
+            "expected": "np.array([0.8808]) (rounded to 4 decimals)",
+            "explanation": "Positive z values map to outputs greater than 0.5"
+          },
+          {
+            "input": "sigmoid(np.array([-2.0]))",
+            "expected": "np.array([0.1192])",
+            "explanation": "Negative z values map to outputs less than 0.5; note the symmetry: σ(-z) = 1 - σ(z)"
+          },
+          {
+            "input": "sigmoid_derivative(np.array([0.5]))",
+            "expected": "np.array([0.25])",
+            "explanation": "Maximum gradient occurs at σ=0.5, meaning fastest learning happens at z=0"
+          },
+          {
+            "input": "sigmoid_derivative(np.array([0.9999]))",
+            "expected": "np.array([0.0001])",
+            "explanation": "Near saturation (σ≈1), gradient vanishes, causing slow learning (vanishing gradient problem)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Overflow errors: For large negative z (e.g., z=-1000), e^(-z) overflows. Solution: use np.clip or rewrite as σ(z) = 1/(1+exp(-z)) = exp(z)/(exp(z)+1) for z<0",
+        "Confusing sigmoid_derivative inputs: The derivative function should take σ(z) as input, not z itself, to avoid recomputation",
+        "Not vectorizing operations: Using loops instead of numpy operations leads to slow performance",
+        "Precision issues: For z > 20, sigmoid saturates to 1.0; for z < -20, sigmoid saturates to 0.0"
+      ],
+      "hint": "For numerical stability with large negative z values, consider using the identity: σ(z) = 1/(1+exp(-z)) for z≥0, and σ(z) = exp(z)/(exp(z)+1) for z<0. However, numpy's exp handles most cases robustly.",
+      "references": [
+        "Logistic function and its properties",
+        "Activation functions in neural networks",
+        "Numerical stability in deep learning",
+        "Vanishing gradient problem"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Forward Propagation: Computing Neuron Output",
+      "relation_to_problem": "Forward propagation computes the neuron's prediction for each training example. This is the first phase of training where we calculate z (weighted sum) and apply sigmoid to get predictions. These predictions are needed to compute the loss and generate gradients.",
+      "prerequisites": [
+        "Dot product of vectors",
+        "Matrix-vector multiplication",
+        "Sigmoid function from Step 1"
+      ],
+      "learning_objectives": [
+        "Compute the pre-activation z = w·x + b for a single neuron",
+        "Apply sigmoid activation to obtain predictions",
+        "Process multiple training examples efficiently using vectorization",
+        "Understand the geometric interpretation of weights and bias"
+      ],
+      "math_content": {
+        "definition": "Forward propagation for a single neuron is the process of computing the output prediction given inputs and parameters. For a neuron with input vector $\\mathbf{x} = [x_1, x_2, \\ldots, x_n]^T \\in \\mathbb{R}^n$, weight vector $\\mathbf{w} = [w_1, w_2, \\ldots, w_n]^T \\in \\mathbb{R}^n$, and bias $b \\in \\mathbb{R}$, the output is computed in two stages: (1) Pre-activation: $z = \\mathbf{w}^T\\mathbf{x} + b = \\sum_{i=1}^{n} w_i x_i + b$, (2) Activation: $\\hat{y} = \\sigma(z)$",
+        "notation": "$\\mathbf{x}$ = input feature vector, $\\mathbf{w}$ = weight vector (learnable parameters), $b$ = bias (learnable parameter), $z$ = pre-activation or logit, $\\hat{y}$ = predicted output, $\\sigma$ = sigmoid activation function",
+        "theorem": "For a batch of $m$ training examples organized as a matrix $\\mathbf{X} \\in \\mathbb{R}^{m \\times n}$ where each row is a training example, the vectorized forward pass computes all predictions simultaneously: $$\\mathbf{z} = \\mathbf{X}\\mathbf{w} + b\\mathbf{1}_m, \\quad \\hat{\\mathbf{y}} = \\sigma(\\mathbf{z})$$ where $\\mathbf{1}_m$ is a column vector of ones with length $m$, and $\\sigma$ is applied element-wise.",
+        "proof_sketch": "The $i$-th element of $\\mathbf{z}$ is $(\\mathbf{X}\\mathbf{w})_i = \\sum_{j=1}^{n} X_{ij}w_j = \\mathbf{w}^T\\mathbf{x}^{(i)}$, which is exactly the pre-activation for the $i$-th example. Adding the scalar bias $b$ to each element gives $z_i = \\mathbf{w}^T\\mathbf{x}^{(i)} + b$. The element-wise sigmoid application then yields the prediction for each example.",
+        "examples": [
+          "Single feature: $\\mathbf{x} = [2.0]$, $\\mathbf{w} = [0.5]$, $b = 0.1$. Then $z = 0.5 \\times 2.0 + 0.1 = 1.1$, $\\hat{y} = \\sigma(1.1) \\approx 0.7503$",
+          "Two features: $\\mathbf{x} = [1.0, 2.0]$, $\\mathbf{w} = [0.1, -0.2]$, $b = 0.0$. Then $z = 0.1(1.0) + (-0.2)(2.0) + 0.0 = -0.3$, $\\hat{y} = \\sigma(-0.3) \\approx 0.4256$",
+          "Batch of 2: $\\mathbf{X} = \\begin{bmatrix}1 & 2\\\\2 & 1\\end{bmatrix}$, $\\mathbf{w} = [0.1, -0.2]^T$, $b = 0$. Then $\\mathbf{z} = \\begin{bmatrix}-0.3\\\\0.0\\end{bmatrix}$, $\\hat{\\mathbf{y}} = [0.4256, 0.5000]^T$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Pre-activation (Logit)",
+          "latex": "$z = \\mathbf{w}^T\\mathbf{x} + b = \\sum_{i=1}^{n} w_i x_i + b$",
+          "description": "Compute weighted sum of inputs plus bias; represents decision boundary in feature space"
+        },
+        {
+          "name": "Neuron Output",
+          "latex": "$\\hat{y} = \\sigma(z) = \\sigma(\\mathbf{w}^T\\mathbf{x} + b)$",
+          "description": "Apply sigmoid to logit to get prediction in [0,1]; can be interpreted as probability for binary classification"
+        },
+        {
+          "name": "Vectorized Forward Pass",
+          "latex": "$\\mathbf{z} = \\mathbf{X}\\mathbf{w} + b, \\quad \\hat{\\mathbf{y}} = \\sigma(\\mathbf{z})$",
+          "description": "Efficiently compute predictions for all training examples simultaneously using matrix operations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement forward propagation for a single neuron that processes a batch of training examples. Given a matrix of features (each row is one example), weights, and bias, compute the pre-activation values and predictions for all examples. Return both z values and predictions.",
+        "function_signature": "def forward_propagation(features: np.ndarray, weights: np.ndarray, bias: float) -> tuple[np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef forward_propagation(features: np.ndarray, weights: np.ndarray, bias: float) -> tuple[np.ndarray, np.ndarray]:\n    \"\"\"\n    Compute forward pass for a single neuron.\n    \n    Args:\n        features: shape (m, n) where m = number of examples, n = number of features\n        weights: shape (n,) - weight for each feature\n        bias: scalar bias term\n    \n    Returns:\n        z: shape (m,) - pre-activation values\n        predictions: shape (m,) - sigmoid outputs\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "forward_propagation(np.array([[1.0, 2.0]]), np.array([0.1, -0.2]), 0.0)",
+            "expected": "(np.array([-0.3]), np.array([0.4256]))",
+            "explanation": "Single example: z = 0.1*1 + (-0.2)*2 + 0 = -0.3, prediction = σ(-0.3) ≈ 0.4256"
+          },
+          {
+            "input": "forward_propagation(np.array([[1.0, 2.0], [2.0, 1.0]]), np.array([0.1, -0.2]), 0.0)",
+            "expected": "(np.array([-0.3, 0.0]), np.array([0.4256, 0.5000]))",
+            "explanation": "Two examples processed in one batch: first gives z=-0.3, second gives z=0.0"
+          },
+          {
+            "input": "forward_propagation(np.array([[-1.0, -2.0]]), np.array([0.1, -0.2]), 0.0)",
+            "expected": "(np.array([0.3]), np.array([0.5744]))",
+            "explanation": "Negative features: z = 0.1*(-1) + (-0.2)*(-2) = -0.1 + 0.4 = 0.3"
+          },
+          {
+            "input": "forward_propagation(np.array([[2.0]]), np.array([0.5]), 0.1)",
+            "expected": "(np.array([1.1]), np.array([0.7503]))",
+            "explanation": "Single feature with bias: z = 0.5*2 + 0.1 = 1.1, prediction = σ(1.1) ≈ 0.7503"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Shape mismatch: Ensure features is (m, n) and weights is (n,), not (n, 1). Use np.dot or @ operator correctly",
+        "Forgetting bias broadcasting: When adding scalar bias to vector z, numpy broadcasts automatically, but manually adding to each element is inefficient",
+        "Wrong matrix multiplication order: Should be features @ weights, not weights @ features",
+        "Not returning both z and predictions: Both are needed - z for computing gradients later, predictions for loss calculation"
+      ],
+      "hint": "Use numpy's @ operator or np.dot for the dot product. The bias automatically broadcasts to all examples. Store both z and predictions as you'll need z later for backpropagation.",
+      "references": [
+        "Linear models in machine learning",
+        "Vectorization in numpy",
+        "Decision boundaries in classification",
+        "Affine transformations"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Mean Squared Error Loss Function",
+      "relation_to_problem": "MSE quantifies how far the neuron's predictions are from the true labels. This loss value measures training progress and its gradient drives the parameter updates in backpropagation. Understanding MSE is essential for implementing the training loop.",
+      "prerequisites": [
+        "Basic statistics",
+        "Understanding of loss functions",
+        "Forward propagation from Step 2"
+      ],
+      "learning_objectives": [
+        "Compute Mean Squared Error for binary classification",
+        "Understand why MSE measures prediction quality",
+        "Calculate MSE derivative with respect to predictions",
+        "Implement vectorized MSE for batches of examples"
+      ],
+      "math_content": {
+        "definition": "The Mean Squared Error (MSE) loss function measures the average squared difference between predicted values and true labels. For $m$ training examples with predictions $\\hat{y}^{(i)}$ and true labels $y^{(i)}$, the MSE is: $$L_{MSE} = \\frac{1}{m}\\sum_{i=1}^{m}(\\hat{y}^{(i)} - y^{(i)})^2$$ Equivalently, for a single example: $L = (\\hat{y} - y)^2$ or with the factor $\\frac{1}{2}$ for convenience: $L = \\frac{1}{2}(\\hat{y} - y)^2$",
+        "notation": "$L_{MSE}$ = mean squared error loss, $m$ = number of training examples, $\\hat{y}^{(i)}$ = predicted output for example $i$, $y^{(i)}$ = true label for example $i$, $y^{(i)} \\in \\{0, 1\\}$ for binary classification",
+        "theorem": "The gradient of MSE with respect to predictions has a simple linear form: $$\\frac{\\partial L_{MSE}}{\\partial \\hat{y}^{(i)}} = \\frac{2}{m}(\\hat{y}^{(i)} - y^{(i)})$$ If using the $\\frac{1}{2}$ form for a single example: $\\frac{\\partial L}{\\partial \\hat{y}} = \\hat{y} - y$. This gradient indicates the direction to adjust predictions to reduce loss.",
+        "proof_sketch": "For a single example with $L = \\frac{1}{2}(\\hat{y} - y)^2$, apply the power rule and chain rule: $$\\frac{\\partial L}{\\partial \\hat{y}} = \\frac{1}{2} \\cdot 2(\\hat{y} - y) \\cdot \\frac{\\partial(\\hat{y} - y)}{\\partial \\hat{y}} = (\\hat{y} - y) \\cdot 1 = \\hat{y} - y$$ For the batch form without the $\\frac{1}{2}$ factor: $$\\frac{\\partial}{\\partial \\hat{y}^{(i)}}\\left[\\frac{1}{m}\\sum_{j=1}^{m}(\\hat{y}^{(j)} - y^{(j)})^2\\right] = \\frac{2}{m}(\\hat{y}^{(i)} - y^{(i)})$$",
+        "examples": [
+          "Perfect prediction: $\\hat{y} = 1.0$, $y = 1$. Then $L = (1.0 - 1)^2 = 0$ (no error)",
+          "Poor prediction: $\\hat{y} = 0.1$, $y = 1$. Then $L = (0.1 - 1)^2 = 0.81$ (high error)",
+          "Moderate prediction: $\\hat{y} = 0.7503$, $y = 1$. Then $L = (0.7503 - 1)^2 = 0.0623$",
+          "Batch MSE: $\\hat{\\mathbf{y}} = [0.8, 0.2, 0.6]$, $\\mathbf{y} = [1, 0, 1]$. Then $L_{MSE} = \\frac{1}{3}[(0.8-1)^2 + (0.2-0)^2 + (0.6-1)^2] = \\frac{1}{3}[0.04 + 0.04 + 0.16] = 0.08$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "MSE Loss (Batch)",
+          "latex": "$L_{MSE} = \\frac{1}{m}\\sum_{i=1}^{m}(\\hat{y}^{(i)} - y^{(i)})^2$",
+          "description": "Average squared error across all training examples; measures overall model performance"
+        },
+        {
+          "name": "MSE Loss (Single Example)",
+          "latex": "$L = \\frac{1}{2}(\\hat{y} - y)^2$",
+          "description": "Loss for one example; the factor 1/2 simplifies the derivative to (ŷ - y)"
+        },
+        {
+          "name": "MSE Gradient",
+          "latex": "$\\frac{\\partial L_{MSE}}{\\partial \\hat{y}^{(i)}} = \\frac{2}{m}(\\hat{y}^{(i)} - y^{(i)})$",
+          "description": "Derivative tells us how to adjust predictions to reduce loss; positive when overpredicting, negative when underpredicting"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the Mean Squared Error loss function for a batch of predictions and labels. The function should compute the average squared error across all training examples and round to 4 decimal places. Also implement a function to compute the gradient of MSE with respect to predictions.",
+        "function_signature": "def compute_mse_loss(predictions: np.ndarray, labels: np.ndarray) -> float:\n    # Compute mean squared error\n    pass\n\ndef mse_gradient(predictions: np.ndarray, labels: np.ndarray) -> np.ndarray:\n    # Compute gradient of MSE\n    pass",
+        "starter_code": "import numpy as np\n\ndef compute_mse_loss(predictions: np.ndarray, labels: np.ndarray) -> float:\n    \"\"\"\n    Compute Mean Squared Error loss.\n    \n    Args:\n        predictions: shape (m,) - predicted outputs\n        labels: shape (m,) - true binary labels\n    \n    Returns:\n        loss: scalar MSE value, rounded to 4 decimals\n    \"\"\"\n    # Your code here\n    pass\n\ndef mse_gradient(predictions: np.ndarray, labels: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute gradient of MSE with respect to predictions.\n    \n    Args:\n        predictions: shape (m,) - predicted outputs\n        labels: shape (m,) - true labels\n    \n    Returns:\n        gradient: shape (m,) - dL/d(predictions)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_mse_loss(np.array([1.0, 0.0, 1.0]), np.array([1, 0, 1]))",
+            "expected": "0.0",
+            "explanation": "Perfect predictions result in zero loss"
+          },
+          {
+            "input": "compute_mse_loss(np.array([0.5, 0.5, 0.5]), np.array([1, 0, 1]))",
+            "expected": "0.25",
+            "explanation": "Each prediction has error 0.5, so MSE = (0.25 + 0.25 + 0.25)/3 = 0.25"
+          },
+          {
+            "input": "compute_mse_loss(np.array([0.7503]), np.array([1]))",
+            "expected": "0.0623",
+            "explanation": "Single example: (0.7503 - 1)^2 = 0.0623"
+          },
+          {
+            "input": "mse_gradient(np.array([0.8, 0.2, 0.6]), np.array([1, 0, 1]))",
+            "expected": "np.array([-0.1333, 0.1333, -0.2667])",
+            "explanation": "Gradient = (2/3) * (predictions - labels) = (2/3) * [-0.2, 0.2, -0.4]"
+          },
+          {
+            "input": "mse_gradient(np.array([0.7503]), np.array([1]))",
+            "expected": "np.array([-0.4994])",
+            "explanation": "Single example: (2/1) * (0.7503 - 1) = -0.4994"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to average: MSE must divide by the number of examples m, not just sum squared errors",
+        "Wrong gradient factor: The full derivative includes 2/m, not just (ŷ - y). However, in practice the factor 2 is often absorbed into the learning rate",
+        "Shape errors: Ensure predictions and labels have the same shape before computing differences",
+        "Not squaring errors: MSE squares the differences; don't forget the exponent of 2",
+        "Forgetting to round: The problem requires rounding to 4 decimal places"
+      ],
+      "hint": "Use numpy's vectorized operations: np.mean((predictions - labels)**2) computes MSE efficiently. For the gradient, remember the 2/m factor comes from differentiating the squared term and the mean.",
+      "references": [
+        "Loss functions in machine learning",
+        "Mean Squared Error vs Cross-Entropy",
+        "Gradient descent optimization",
+        "Convex optimization"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Backpropagation: Computing Gradients via Chain Rule",
+      "relation_to_problem": "Backpropagation computes how each parameter (weights and bias) affects the loss by applying the chain rule. These gradients tell us how to update parameters to reduce the loss. This is the core mathematical algorithm that enables neural network learning.",
+      "prerequisites": [
+        "Chain rule of calculus",
+        "Partial derivatives",
+        "Sigmoid derivative (Step 1)",
+        "MSE gradient (Step 3)"
+      ],
+      "learning_objectives": [
+        "Apply the chain rule to decompose loss gradients through the computational graph",
+        "Compute gradients of loss with respect to weights and bias",
+        "Understand the flow of gradients from loss back to parameters",
+        "Implement vectorized gradient computation for efficiency"
+      ],
+      "math_content": {
+        "definition": "Backpropagation is an algorithm for computing gradients of a loss function with respect to model parameters by systematically applying the chain rule of calculus. For a single neuron, the computational graph is: $\\mathbf{x}, \\mathbf{w}, b \\rightarrow z = \\mathbf{w}^T\\mathbf{x} + b \\rightarrow \\hat{y} = \\sigma(z) \\rightarrow L = (\\hat{y} - y)^2$. Backpropagation computes gradients in reverse order: first $\\frac{\\partial L}{\\partial \\hat{y}}$, then $\\frac{\\partial L}{\\partial z}$, and finally $\\frac{\\partial L}{\\partial \\mathbf{w}}$ and $\\frac{\\partial L}{\\partial b}$.",
+        "notation": "$L$ = loss function, $\\hat{y}$ = prediction, $z$ = pre-activation, $\\mathbf{w}$ = weights, $b$ = bias, $\\mathbf{x}$ = input features, $\\frac{\\partial L}{\\partial \\theta}$ = gradient of loss with respect to parameter $\\theta$, $\\delta = \\frac{\\partial L}{\\partial z}$ = error signal at pre-activation",
+        "theorem": "Chain Rule for Backpropagation: The gradients with respect to parameters are computed as follows: (1) Loss gradient: $\\frac{\\partial L}{\\partial \\hat{y}} = \\hat{y} - y$ (for MSE with $\\frac{1}{2}$ factor), (2) Pre-activation gradient (error signal): $\\frac{\\partial L}{\\partial z} = \\frac{\\partial L}{\\partial \\hat{y}} \\cdot \\frac{\\partial \\hat{y}}{\\partial z} = (\\hat{y} - y) \\cdot \\sigma'(z) = (\\hat{y} - y) \\cdot \\hat{y}(1 - \\hat{y})$, (3) Weight gradient: $\\frac{\\partial L}{\\partial w_j} = \\frac{\\partial L}{\\partial z} \\cdot \\frac{\\partial z}{\\partial w_j} = \\frac{\\partial L}{\\partial z} \\cdot x_j$, (4) Bias gradient: $\\frac{\\partial L}{\\partial b} = \\frac{\\partial L}{\\partial z} \\cdot \\frac{\\partial z}{\\partial b} = \\frac{\\partial L}{\\partial z}$",
+        "proof_sketch": "Starting from $L = \\frac{1}{2}(\\hat{y} - y)^2$: Step 1: $\\frac{\\partial L}{\\partial \\hat{y}} = \\hat{y} - y$ by power rule. Step 2: Since $\\hat{y} = \\sigma(z)$, apply chain rule: $\\frac{\\partial L}{\\partial z} = \\frac{\\partial L}{\\partial \\hat{y}} \\cdot \\frac{d\\hat{y}}{dz} = (\\hat{y} - y) \\cdot \\sigma'(z)$. Using $\\sigma'(z) = \\hat{y}(1-\\hat{y})$ gives $\\frac{\\partial L}{\\partial z} = (\\hat{y} - y) \\cdot \\hat{y}(1-\\hat{y})$. Step 3: Since $z = \\sum_j w_j x_j + b$, we have $\\frac{\\partial z}{\\partial w_j} = x_j$ and $\\frac{\\partial z}{\\partial b} = 1$. Chain rule gives: $\\frac{\\partial L}{\\partial w_j} = \\frac{\\partial L}{\\partial z} \\cdot x_j$ and $\\frac{\\partial L}{\\partial b} = \\frac{\\partial L}{\\partial z}$.",
+        "examples": [
+          "Single example: $\\mathbf{x}=[1,2]$, $\\mathbf{w}=[0.1,-0.2]$, $b=0$, $y=1$. Forward: $z=-0.3$, $\\hat{y}=0.4256$. Backward: $\\frac{\\partial L}{\\partial \\hat{y}}=0.4256-1=-0.5744$, $\\sigma'(z)=0.4256 \\times 0.5744=0.2445$, $\\frac{\\partial L}{\\partial z}=-0.5744 \\times 0.2445=-0.1405$, $\\frac{\\partial L}{\\partial w_1}=-0.1405 \\times 1=-0.1405$, $\\frac{\\partial L}{\\partial w_2}=-0.1405 \\times 2=-0.2809$, $\\frac{\\partial L}{\\partial b}=-0.1405$",
+          "When prediction is too high ($\\hat{y}=0.9, y=0$): $\\frac{\\partial L}{\\partial \\hat{y}}=0.9>0$, so gradients will push weights down to reduce prediction",
+          "When prediction is too low ($\\hat{y}=0.1, y=1$): $\\frac{\\partial L}{\\partial \\hat{y}}=-0.9<0$, so gradients will push weights up to increase prediction"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Error Signal (Pre-activation Gradient)",
+          "latex": "$\\delta = \\frac{\\partial L}{\\partial z} = (\\hat{y} - y) \\cdot \\hat{y}(1 - \\hat{y})$",
+          "description": "The key quantity in backpropagation; represents how sensitive the loss is to the pre-activation"
+        },
+        {
+          "name": "Weight Gradient (Single Example)",
+          "latex": "$\\frac{\\partial L}{\\partial w_j} = \\delta \\cdot x_j$",
+          "description": "Gradient for weight j is error signal times the corresponding input feature"
+        },
+        {
+          "name": "Bias Gradient (Single Example)",
+          "latex": "$\\frac{\\partial L}{\\partial b} = \\delta$",
+          "description": "Bias gradient equals the error signal directly (since ∂z/∂b = 1)"
+        },
+        {
+          "name": "Batch Weight Gradient",
+          "latex": "$\\frac{\\partial L_{MSE}}{\\partial w_j} = \\frac{1}{m}\\sum_{i=1}^{m} \\delta^{(i)} \\cdot x_j^{(i)}$",
+          "description": "Average gradient across all training examples for batch training"
+        },
+        {
+          "name": "Batch Bias Gradient",
+          "latex": "$\\frac{\\partial L_{MSE}}{\\partial b} = \\frac{1}{m}\\sum_{i=1}^{m} \\delta^{(i)}$",
+          "description": "Average error signal across all training examples"
+        }
+      ],
+      "exercise": {
+        "description": "Implement backpropagation to compute gradients of the loss with respect to weights and bias. Given the features, predictions, true labels, and pre-activation values (z), compute the average gradients across all training examples using the chain rule.",
+        "function_signature": "def compute_gradients(features: np.ndarray, predictions: np.ndarray, labels: np.ndarray, z: np.ndarray) -> tuple[np.ndarray, float]:",
+        "starter_code": "import numpy as np\n\ndef compute_gradients(features: np.ndarray, predictions: np.ndarray, labels: np.ndarray, z: np.ndarray) -> tuple[np.ndarray, float]:\n    \"\"\"\n    Compute gradients using backpropagation.\n    \n    Args:\n        features: shape (m, n) - input features for m examples\n        predictions: shape (m,) - sigmoid outputs (ŷ)\n        labels: shape (m,) - true labels (y)\n        z: shape (m,) - pre-activation values\n    \n    Returns:\n        weight_gradients: shape (n,) - dL/dw averaged over batch\n        bias_gradient: scalar - dL/db averaged over batch\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "features=np.array([[1.0, 2.0]]), predictions=np.array([0.4256]), labels=np.array([1]), z=np.array([-0.3])",
+            "expected": "(np.array([-0.1405, -0.2809]), -0.1405)",
+            "explanation": "Single example: δ = (0.4256-1) * 0.4256 * 0.5744 = -0.1405, then dL/dw1 = -0.1405*1, dL/dw2 = -0.1405*2"
+          },
+          {
+            "input": "features=np.array([[1.0, 2.0], [2.0, 1.0]]), predictions=np.array([0.4256, 0.5000]), labels=np.array([1, 0]), z=np.array([-0.3, 0.0])",
+            "expected": "(np.array([-0.0078, -0.0452]), -0.0078)",
+            "explanation": "Two examples: compute δ for each, then average gradients: dL/dw = mean([δ1*x1, δ2*x2]) over examples"
+          },
+          {
+            "input": "features=np.array([[-1.0, -2.0]]), predictions=np.array([0.5744]), labels=np.array([0]), z=np.array([0.3])",
+            "expected": "(np.array([-0.1405, -0.2809]), 0.1405)",
+            "explanation": "Negative features: δ = (0.5744-0) * 0.5744 * 0.4256 = 0.1405, dL/dw1 = 0.1405*(-1) = -0.1405"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using z instead of σ(z) in sigmoid derivative: Should use predictions (which are σ(z)), not z itself",
+        "Forgetting to average over batch: Must divide by m when computing batch gradients",
+        "Wrong matrix dimensions: Weight gradient should be (n,) matching weights shape; use features.T @ delta for vectorization",
+        "Confusing signs: When ŷ > y (overprediction), gradients are positive; when ŷ < y (underprediction), gradients are negative",
+        "Not reusing forward pass values: Store predictions and z from forward pass to avoid recomputation"
+      ],
+      "hint": "First compute the error signal δ = (predictions - labels) * predictions * (1 - predictions) for all examples. Then compute weight gradients as features.T @ delta / m, and bias gradient as np.mean(delta).",
+      "references": [
+        "Backpropagation algorithm",
+        "Computational graphs in deep learning",
+        "Automatic differentiation",
+        "Chain rule in multivariable calculus"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Gradient Descent Parameter Update",
+      "relation_to_problem": "Gradient descent is the optimization algorithm that uses the computed gradients to update weights and bias, iteratively improving the model. Understanding the update rule and learning rate is essential for implementing the training loop that runs for multiple epochs.",
+      "prerequisites": [
+        "Gradient computation from Step 4",
+        "Basic optimization theory",
+        "Understanding of iterative algorithms"
+      ],
+      "learning_objectives": [
+        "Implement the gradient descent update rule for parameters",
+        "Understand the role of learning rate in controlling update magnitude",
+        "Apply parameter updates iteratively over multiple epochs",
+        "Monitor loss decrease to verify learning is occurring"
+      ],
+      "math_content": {
+        "definition": "Gradient Descent is an iterative optimization algorithm that updates parameters in the direction opposite to the gradient to minimize the loss function. For parameters $\\theta$ (representing $\\mathbf{w}$ and $b$), the update rule at iteration $t$ is: $$\\theta^{(t+1)} = \\theta^{(t)} - \\eta \\nabla_\\theta L$$ where $\\eta > 0$ is the learning rate (step size) and $\\nabla_\\theta L$ is the gradient of the loss with respect to $\\theta$. The negative sign indicates we move opposite to the gradient (downhill in the loss landscape).",
+        "notation": "$\\theta$ = parameter vector (weights and bias), $t$ = iteration/epoch number, $\\eta$ = learning rate (hyperparameter), $\\nabla_\\theta L = [\\frac{\\partial L}{\\partial \\theta_1}, \\ldots, \\frac{\\partial L}{\\partial \\theta_n}]^T$ = gradient vector, $L(\\theta)$ = loss function",
+        "theorem": "Gradient Descent Convergence: For a convex loss function $L$ with Lipschitz continuous gradient (constant $L_{lip}$), if the learning rate satisfies $0 < \\eta < \\frac{2}{L_{lip}}$, then gradient descent converges to a global minimum. For non-convex functions (like neural networks with sigmoid), gradient descent converges to a critical point (local minimum, saddle point, or global minimum) where $\\nabla L = 0$. The convergence rate depends on the conditioning of the Hessian matrix.",
+        "proof_sketch": "Consider one update step. By Taylor expansion: $L(\\theta^{(t+1)}) \\approx L(\\theta^{(t)}) + \\nabla L^T(\\theta^{(t)} - \\theta^{(t)}) + \\frac{L_{lip}}{2}\\|\\theta^{(t+1)} - \\theta^{(t)}\\|^2$. Substituting $\\theta^{(t+1)} = \\theta^{(t)} - \\eta \\nabla L$: $L(\\theta^{(t+1)}) \\leq L(\\theta^{(t)}) - \\eta\\|\\nabla L\\|^2 + \\frac{\\eta^2 L_{lip}}{2}\\|\\nabla L\\|^2 = L(\\theta^{(t)}) - \\eta(1 - \\frac{\\eta L_{lip}}{2})\\|\\nabla L\\|^2$. When $\\eta < \\frac{2}{L_{lip}}$, the coefficient is positive, guaranteeing decrease.",
+        "examples": [
+          "Weight update: If $w=0.1$, $\\frac{\\partial L}{\\partial w}=-0.5$, $\\eta=0.1$, then $w^{new} = 0.1 - 0.1 \\times (-0.5) = 0.1 + 0.05 = 0.15$ (weight increases)",
+          "Bias update: If $b=0.0$, $\\frac{\\partial L}{\\partial b}=0.2$, $\\eta=0.1$, then $b^{new} = 0.0 - 0.1 \\times 0.2 = -0.02$ (bias decreases)",
+          "After multiple epochs: Start $w=[0.1, -0.2]$, $b=0.0$. After epoch 1: $w=[0.1036, -0.1811]$, $b=-0.0089$. After epoch 2: $w=[0.1068, -0.1638]$, $b=-0.0171$. Loss decreases: 0.3033 → 0.2942 → 0.2857",
+          "Learning rate too large ($\\eta=10$): Updates overshoot, loss increases or oscillates",
+          "Learning rate too small ($\\eta=0.001$): Updates are tiny, learning is very slow"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Weight Update Rule",
+          "latex": "$\\mathbf{w}^{(t+1)} = \\mathbf{w}^{(t)} - \\eta \\frac{\\partial L}{\\partial \\mathbf{w}}$",
+          "description": "Update each weight by subtracting learning rate times its gradient; moves weights to reduce loss"
+        },
+        {
+          "name": "Bias Update Rule",
+          "latex": "$b^{(t+1)} = b^{(t)} - \\eta \\frac{\\partial L}{\\partial b}$",
+          "description": "Update bias by subtracting learning rate times its gradient; shifts decision boundary"
+        },
+        {
+          "name": "General Parameter Update",
+          "latex": "$\\theta^{(t+1)} = \\theta^{(t)} - \\eta \\nabla_\\theta L$",
+          "description": "Unified form for updating any parameter; the foundation of gradient-based optimization"
+        }
+      ],
+      "exercise": {
+        "description": "Implement gradient descent parameter updates for a single training epoch. Given current weights, bias, their gradients, and a learning rate, compute and return the updated parameters. Also compute the updated loss to verify learning progress.",
+        "function_signature": "def gradient_descent_update(weights: np.ndarray, bias: float, weight_gradients: np.ndarray, bias_gradient: float, learning_rate: float) -> tuple[np.ndarray, float]:",
+        "starter_code": "import numpy as np\n\ndef gradient_descent_update(weights: np.ndarray, bias: float, weight_gradients: np.ndarray, bias_gradient: float, learning_rate: float) -> tuple[np.ndarray, float]:\n    \"\"\"\n    Update parameters using gradient descent.\n    \n    Args:\n        weights: shape (n,) - current weight values\n        bias: scalar - current bias value\n        weight_gradients: shape (n,) - dL/dw\n        bias_gradient: scalar - dL/db\n        learning_rate: scalar - step size η\n    \n    Returns:\n        updated_weights: shape (n,) - new weight values\n        updated_bias: scalar - new bias value\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "gradient_descent_update(np.array([0.1, -0.2]), 0.0, np.array([-0.5, 0.3]), 0.2, 0.1)",
+            "expected": "(np.array([0.15, -0.23]), -0.02)",
+            "explanation": "w1: 0.1 - 0.1*(-0.5) = 0.15, w2: -0.2 - 0.1*(0.3) = -0.23, b: 0.0 - 0.1*(0.2) = -0.02"
+          },
+          {
+            "input": "gradient_descent_update(np.array([0.5]), 0.1, np.array([-1.0]), -0.5, 0.01)",
+            "expected": "(np.array([0.51]), 0.105)",
+            "explanation": "Small learning rate: w: 0.5 - 0.01*(-1.0) = 0.51, b: 0.1 - 0.01*(-0.5) = 0.105"
+          },
+          {
+            "input": "gradient_descent_update(np.array([0.1, -0.2]), 0.0, np.array([0.0, 0.0]), 0.0, 0.1)",
+            "expected": "(np.array([0.1, -0.2]), 0.0)",
+            "explanation": "Zero gradients (at critical point): no parameter change"
+          },
+          {
+            "input": "gradient_descent_update(np.array([1.0, 2.0]), 1.5, np.array([0.4, -0.6]), 0.8, 0.5)",
+            "expected": "(np.array([0.8, 2.3]), 1.1)",
+            "explanation": "Larger learning rate: w1: 1.0 - 0.5*0.4 = 0.8, w2: 2.0 - 0.5*(-0.6) = 2.3, b: 1.5 - 0.5*0.8 = 1.1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Adding instead of subtracting gradients: Update is θ - η*∇L, not θ + η*∇L (go opposite to gradient)",
+        "Forgetting to multiply by learning rate: Must scale gradients by η",
+        "Modifying parameters in-place: Create new arrays to avoid side effects: new_w = weights - lr * grads",
+        "Using wrong learning rate scale: Too large (>1) causes divergence, too small (<0.001) causes slow convergence",
+        "Not storing updated parameters: Make sure to return or save the new parameter values for the next iteration"
+      ],
+      "hint": "The update is straightforward: subtract the product of learning rate and gradient from each parameter. Use vectorized operations for weights: new_weights = weights - learning_rate * weight_gradients.",
+      "references": [
+        "Gradient descent optimization",
+        "Learning rate selection and scheduling",
+        "Convergence analysis of gradient descent",
+        "Advanced optimizers (SGD, Adam, RMSprop)"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Training Loop: Integrating All Components",
+      "relation_to_problem": "This final step integrates forward propagation, loss computation, backpropagation, and parameter updates into a complete training loop that runs for multiple epochs. This is the full implementation structure needed to solve the main problem, combining all previous sub-quests.",
+      "prerequisites": [
+        "All previous steps (1-5)",
+        "Understanding of training loops",
+        "Batch processing"
+      ],
+      "learning_objectives": [
+        "Combine forward pass, loss computation, backpropagation, and parameter updates into one training iteration",
+        "Implement an epoch-based training loop that processes all training data",
+        "Track MSE loss across epochs to monitor training progress",
+        "Round final parameters and losses to required precision"
+      ],
+      "math_content": {
+        "definition": "A complete neural network training loop consists of repeating the following steps for a fixed number of epochs: (1) Forward Propagation: Compute predictions $\\hat{\\mathbf{y}}$ for all training examples using current parameters, (2) Loss Computation: Calculate MSE loss $L_{MSE}$ to quantify prediction error, (3) Backpropagation: Compute gradients $\\nabla_{\\mathbf{w}}L$ and $\\nabla_b L$ using the chain rule, (4) Parameter Update: Update $\\mathbf{w}$ and $b$ using gradient descent, (5) Record: Store the epoch's MSE loss for monitoring. After all epochs, return the final trained parameters and the loss history.",
+        "notation": "$E$ = total number of epochs (training iterations), $\\mathbf{w}^{(0)}, b^{(0)}$ = initial parameters, $\\mathbf{w}^{(E)}, b^{(E)}$ = final trained parameters, $[L_1, L_2, \\ldots, L_E]$ = MSE loss values per epoch, $\\mathbf{X} \\in \\mathbb{R}^{m \\times n}$ = feature matrix (m examples, n features), $\\mathbf{y} \\in \\{0,1\\}^m$ = label vector",
+        "theorem": "Training Convergence: Under appropriate conditions (convex or well-behaved loss landscape, suitable learning rate), repeated application of gradient descent causes the loss sequence $\\{L_1, L_2, \\ldots, L_E\\}$ to be monotonically decreasing: $L_1 \\geq L_2 \\geq \\ldots \\geq L_E$, and the parameter sequence $\\{(\\mathbf{w}^{(t)}, b^{(t)})\\}_{t=1}^E$ converges to a critical point $\\nabla L = 0$. The rate of convergence depends on the loss function's curvature and the learning rate.",
+        "proof_sketch": "At each epoch $t$, the gradient descent update guarantees (for small enough $\\eta$): $L^{(t+1)} = L(\\mathbf{w}^{(t+1)}, b^{(t+1)}) < L(\\mathbf{w}^{(t)}, b^{(t)}) = L^{(t)}$ whenever $\\nabla L^{(t)} \\neq 0$. This follows from the descent lemma: $L^{(t+1)} \\leq L^{(t)} - \\eta(1 - \\frac{\\eta L_{lip}}{2})\\|\\nabla L^{(t)}\\|^2$. Since the loss is bounded below (MSE ≥ 0), the decreasing sequence must converge. By continuity, the gradient must approach zero at the limit.",
+        "examples": [
+          "Training loop structure: for epoch in range(epochs): z, predictions = forward_pass(); loss = compute_mse(); gradients = backprop(); update_parameters(); record_loss()",
+          "Example training trace: Initial: w=[0.1, -0.2], b=0.0, MSE=0.3500. Epoch 1: w=[0.1036, -0.1811], b=-0.0089, MSE=0.3033. Epoch 2: w=[0.1068, -0.1638], b=-0.0171, MSE=0.2942. Observe: loss decreases, parameters converge",
+          "Monitoring convergence: Plot MSE vs epoch; should see downward trend. If loss increases, learning rate may be too large",
+          "Final output formatting: Round weights and bias to 4 decimals using np.round(values, 4); return as list for MSE values"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Training Iteration",
+          "latex": "$\\mathbf{w}^{(t+1)}, b^{(t+1)} = \\text{GradientDescent}(\\mathbf{w}^{(t)}, b^{(t)}, \\nabla L^{(t)})$",
+          "description": "One epoch: forward pass → loss → backprop → update → record loss"
+        },
+        {
+          "name": "Loss Sequence",
+          "latex": "$\\{L_1, L_2, \\ldots, L_E\\}$ where $L_t = \\frac{1}{m}\\sum_{i=1}^{m}(\\hat{y}_i^{(t)} - y_i)^2$",
+          "description": "Track MSE after each epoch to monitor training progress; should decrease over time"
+        },
+        {
+          "name": "Training Objective",
+          "latex": "$\\min_{\\mathbf{w}, b} L_{MSE}(\\mathbf{w}, b) = \\min_{\\mathbf{w}, b} \\frac{1}{m}\\sum_{i=1}^{m}(\\sigma(\\mathbf{w}^T\\mathbf{x}^{(i)} + b) - y^{(i)})^2$",
+          "description": "The overall goal: find parameters that minimize average squared error on training data"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete training loop that integrates all previous components. The function should train a single neuron with sigmoid activation using gradient descent over multiple epochs. For each epoch, perform forward propagation on all training examples, compute MSE loss, perform backpropagation to get gradients, and update parameters. Return the final trained weights, bias (rounded to 4 decimals), and the list of MSE values for each epoch (each rounded to 4 decimals).",
+        "function_signature": "def train_single_neuron(features: np.ndarray, labels: np.ndarray, initial_weights: np.ndarray, initial_bias: float, learning_rate: float, epochs: int) -> tuple[np.ndarray, float, list]:",
+        "starter_code": "import numpy as np\n\ndef train_single_neuron(features: np.ndarray, labels: np.ndarray, initial_weights: np.ndarray, initial_bias: float, learning_rate: float, epochs: int) -> tuple[np.ndarray, float, list]:\n    \"\"\"\n    Train a single neuron using gradient descent.\n    \n    Args:\n        features: shape (m, n) - training examples (rows) with n features each\n        labels: shape (m,) - true binary labels {0, 1}\n        initial_weights: shape (n,) - starting weights\n        initial_bias: scalar - starting bias\n        learning_rate: scalar - gradient descent step size\n        epochs: int - number of training iterations\n    \n    Returns:\n        final_weights: shape (n,) - trained weights, rounded to 4 decimals\n        final_bias: scalar - trained bias, rounded to 4 decimals\n        mse_history: list of length epochs - MSE after each epoch, each rounded to 4 decimals\n    \"\"\"\n    # Your code here\n    # Hint: Use functions from previous steps\n    pass",
+        "test_cases": [
+          {
+            "input": "train_single_neuron(np.array([[1.0, 2.0], [2.0, 1.0], [-1.0, -2.0]]), np.array([1, 0, 0]), np.array([0.1, -0.2]), 0.0, 0.1, 2)",
+            "expected": "([0.1036, -0.1425], -0.0167, [0.3033, 0.2942])",
+            "explanation": "This is the example from the problem description. After 2 epochs of training with learning rate 0.1, weights and bias are updated to minimize MSE"
+          },
+          {
+            "input": "train_single_neuron(np.array([[1.0]]), np.array([1]), np.array([0.0]), 0.0, 0.1, 3)",
+            "expected": "([0.0232], 0.0232, [0.25, 0.2409, 0.2330])",
+            "explanation": "Single feature, single example. Weight and bias increase toward 1 to predict label 1. Loss decreases each epoch."
+          },
+          {
+            "input": "train_single_neuron(np.array([[1.0, 1.0], [0.0, 1.0]]), np.array([1, 0]), np.array([0.0, 0.0]), 0.0, 0.5, 1)",
+            "expected": "([0.0625, -0.0625], 0.0, [0.25])",
+            "explanation": "One epoch with higher learning rate. Two examples with different labels drive weights in opposite directions."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing MSE before parameter update: Should record MSE after updating parameters in each epoch",
+        "Not initializing weights and bias correctly: Must use the provided initial values, not create new ones",
+        "Forgetting to round outputs: Problem requires rounding weights, bias, and MSE values to 4 decimal places",
+        "Recording loss only once: Must append MSE to list after each epoch, creating a history of length epochs",
+        "Modifying input parameters: Use copies or new variables to avoid changing initial_weights and initial_bias",
+        "Wrong MSE computation timing: Some implementations compute MSE before training starts (epoch 0), but the problem asks for MSE after each update"
+      ],
+      "hint": "Structure your loop: for each epoch, call forward_propagation() to get z and predictions, compute_mse_loss() for the loss, compute_gradients() for gradients, then gradient_descent_update() for new parameters. Append rounded MSE to a list. After all epochs, round and return final parameters and MSE history.",
+      "references": [
+        "Training neural networks",
+        "Batch gradient descent",
+        "Epoch-based training",
+        "Monitoring training progress with loss curves",
+        "Hyperparameter tuning (learning rate, epochs)"
+      ]
+    }
+  ]
+}

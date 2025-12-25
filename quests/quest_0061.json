@@ -1,0 +1,567 @@
+{
+  "problem_id": 61,
+  "title": "Implement F-Score Calculation for Binary Classification",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "## Task: Implement F-Score Calculation for Binary Classification\n\nYour task is to implement a function that calculates the F-Score for a binary classification task. The F-Score combines both Precision and Recall into a single metric, providing a balanced measure of a model's performance.\n\nWrite a function `f_score(y_true, y_pred, beta)` where:\n\n- `y_true`: A numpy array of true labels (binary).\n- `y_pred`: A numpy array of predicted labels (binary).\n- `beta`: A float value that adjusts the importance of Precision and Recall. When `beta=1`, it computes the F1-Score, a balanced measure of both Precision and Recall.\n\nThe function should return the F-Score rounded to three decimal places.\n\n    ",
+  "example": {
+    "input": "y_true = np.array([1, 0, 1, 1, 0, 1])\ny_pred = np.array([1, 0, 1, 0, 0, 1])\nbeta = 1\n\nprint(f_score(y_true, y_pred, beta))",
+    "output": "0.857",
+    "reasoning": "The F-Score for the binary classification task is calculated using the true labels, predicted labels, and beta value."
+  },
+  "starter_code": "import numpy as np\n\ndef f_score(y_true, y_pred, beta):\n\t\"\"\"\n\tCalculate F-Score for a binary classification task.\n\n\t:param y_true: Numpy array of true labels\n\t:param y_pred: Numpy array of predicted labels\n\t:param beta: The weight of precision in the harmonic mean\n\t:return: F-Score rounded to three decimal places\n\t\"\"\"\n\tpass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Confusion Matrix Construction for Binary Classification",
+      "relation_to_problem": "The confusion matrix provides the fundamental counts (TP, FP, FN, TN) that are essential building blocks for calculating precision, recall, and ultimately the F-Score.",
+      "prerequisites": [
+        "Binary classification fundamentals",
+        "Array manipulation in NumPy",
+        "Boolean operations"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of a confusion matrix",
+        "Compute true positives, false positives, true negatives, and false negatives from prediction arrays",
+        "Recognize the relationship between predictions, ground truth, and confusion matrix entries"
+      ],
+      "math_content": {
+        "definition": "A **confusion matrix** (or contingency table) for binary classification is a $2 \\times 2$ matrix $C$ that summarizes the prediction performance of a classifier:\n\n$$C = \\begin{bmatrix} \\text{TN} & \\text{FP} \\\\ \\text{FN} & \\text{TP} \\end{bmatrix}$$\n\nwhere:\n- $\\text{TP}$ (True Positives): Number of samples correctly predicted as positive\n- $\\text{TN}$ (True Negatives): Number of samples correctly predicted as negative  \n- $\\text{FP}$ (False Positives): Number of samples incorrectly predicted as positive (Type I error)\n- $\\text{FN}$ (False Negatives): Number of samples incorrectly predicted as negative (Type II error)",
+        "notation": "$y_i \\in \\{0, 1\\}$ = true label for sample $i$; $\\hat{y}_i \\in \\{0, 1\\}$ = predicted label for sample $i$; $n$ = total number of samples",
+        "theorem": "For a binary classification task with $n$ samples, the sum of all confusion matrix entries equals the total number of samples: $\\text{TP} + \\text{TN} + \\text{FP} + \\text{FN} = n$",
+        "proof_sketch": "Every sample must be classified into exactly one of four categories: correctly positive (TP), correctly negative (TN), incorrectly positive (FP), or incorrectly negative (FN). Since these categories are mutually exclusive and exhaustive, their sum equals the total number of samples.",
+        "examples": [
+          "Example 1: Given $y_{\\text{true}} = [1, 0, 1, 1, 0, 1]$ and $y_{\\text{pred}} = [1, 0, 1, 0, 0, 1]$. Sample-by-sample: (1,1)→TP, (0,0)→TN, (1,1)→TP, (1,0)→FN, (0,0)→TN, (1,1)→TP. Result: TP=3, TN=2, FP=0, FN=1.",
+          "Example 2: For a perfect classifier where $y_{\\text{true}} = y_{\\text{pred}} = [1, 1, 0, 0]$, we have TP=2, TN=2, FP=0, FN=0."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "True Positives",
+          "latex": "$\\text{TP} = \\sum_{i=1}^{n} \\mathbb{1}[y_i = 1 \\land \\hat{y}_i = 1]$",
+          "description": "Count samples where both true and predicted labels are 1"
+        },
+        {
+          "name": "False Positives",
+          "latex": "$\\text{FP} = \\sum_{i=1}^{n} \\mathbb{1}[y_i = 0 \\land \\hat{y}_i = 1]$",
+          "description": "Count samples where true label is 0 but predicted label is 1"
+        },
+        {
+          "name": "False Negatives",
+          "latex": "$\\text{FN} = \\sum_{i=1}^{n} \\mathbb{1}[y_i = 1 \\land \\hat{y}_i = 0]$",
+          "description": "Count samples where true label is 1 but predicted label is 0"
+        },
+        {
+          "name": "True Negatives",
+          "latex": "$\\text{TN} = \\sum_{i=1}^{n} \\mathbb{1}[y_i = 0 \\land \\hat{y}_i = 0]$",
+          "description": "Count samples where both true and predicted labels are 0"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the four components of a confusion matrix (TP, FP, TN, FN) given true labels and predicted labels as NumPy arrays.",
+        "function_signature": "def confusion_matrix_components(y_true: np.ndarray, y_pred: np.ndarray) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef confusion_matrix_components(y_true, y_pred):\n    \"\"\"\n    Calculate TP, FP, TN, FN for binary classification.\n    \n    :param y_true: Numpy array of true binary labels\n    :param y_pred: Numpy array of predicted binary labels\n    :return: Tuple (TP, FP, TN, FN) as integers\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "confusion_matrix_components(np.array([1, 0, 1, 1, 0, 1]), np.array([1, 0, 1, 0, 0, 1]))",
+            "expected": "(3, 0, 2, 1)",
+            "explanation": "3 samples correctly predicted as positive, 0 incorrectly predicted as positive, 2 correctly predicted as negative, 1 incorrectly predicted as negative"
+          },
+          {
+            "input": "confusion_matrix_components(np.array([1, 1, 0, 0]), np.array([1, 1, 0, 0]))",
+            "expected": "(2, 0, 2, 0)",
+            "explanation": "Perfect classification yields no errors (FP=0, FN=0)"
+          },
+          {
+            "input": "confusion_matrix_components(np.array([1, 1, 1, 0, 0, 0]), np.array([0, 0, 0, 1, 1, 1]))",
+            "expected": "(0, 3, 0, 3)",
+            "explanation": "Complete misclassification where all positives predicted as negative and vice versa"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing the positions of FP and FN - remember FP is predicting positive when actually negative",
+        "Using arithmetic operations instead of logical AND operations for counting",
+        "Not handling edge cases where all predictions are the same class",
+        "Forgetting to ensure arrays are the same length before processing"
+      ],
+      "hint": "Use NumPy's boolean indexing and the sum() function. You can combine conditions with the & (and) operator to count specific combinations of true and predicted labels.",
+      "references": [
+        "NumPy boolean indexing",
+        "Confusion matrix interpretation",
+        "Binary classification evaluation metrics"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Precision: Quantifying Positive Prediction Accuracy",
+      "relation_to_problem": "Precision is one of the two fundamental components of the F-Score formula. Understanding how to compute precision correctly, including handling edge cases, is essential for F-Score calculation.",
+      "prerequisites": [
+        "Confusion matrix construction",
+        "Division by zero handling",
+        "Ratio and proportion fundamentals"
+      ],
+      "learning_objectives": [
+        "Derive and understand the formal definition of precision",
+        "Compute precision from confusion matrix components",
+        "Handle the edge case when no positive predictions are made",
+        "Interpret precision in the context of classification performance"
+      ],
+      "math_content": {
+        "definition": "**Precision** (also called Positive Predictive Value or PPV) is the proportion of positive predictions that are actually correct:\n\n$$\\text{Precision} = \\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$$\n\nwhere the denominator represents all samples predicted as positive. Precision answers: \"Of all samples we predicted as positive, how many were truly positive?\"",
+        "notation": "$P = \\text{Precision}$; $\\text{TP}$ = true positives; $\\text{FP}$ = false positives; $P \\in [0, 1]$ where higher values indicate better performance",
+        "theorem": "**Bounds Theorem**: For any binary classifier, $0 \\leq \\text{Precision} \\leq 1$, with $\\text{Precision} = 1$ if and only if $\\text{FP} = 0$ (no false positives), and $\\text{Precision} = 0$ if and only if $\\text{TP} = 0$ (no true positives).",
+        "proof_sketch": "Since TP, FP are non-negative integers, the numerator $\\text{TP} \\geq 0$ and denominator $\\text{TP} + \\text{FP} \\geq \\text{TP}$. Thus $\\frac{\\text{TP}}{\\text{TP} + \\text{FP}} \\leq 1$. The ratio equals 1 when $\\text{FP} = 0$, and equals 0 when $\\text{TP} = 0$ (assuming at least one positive prediction exists).",
+        "examples": [
+          "Example 1: TP=3, FP=0 → Precision = $\\frac{3}{3+0} = 1.0$. Perfect precision: all positive predictions were correct.",
+          "Example 2: TP=80, FP=20 → Precision = $\\frac{80}{80+20} = 0.8$. 80% of positive predictions were correct.",
+          "Example 3 (Edge case): TP=0, FP=0 → Precision = $\\frac{0}{0+0}$ is undefined. Convention: set to 0.0 or handle as missing."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Precision Formula",
+          "latex": "$P = \\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$",
+          "description": "Use when measuring the accuracy of positive predictions"
+        },
+        {
+          "name": "Precision with Zero Denominator",
+          "latex": "$P = \\begin{cases} \\frac{\\text{TP}}{\\text{TP} + \\text{FP}} & \\text{if } \\text{TP} + \\text{FP} > 0 \\\\ 0 & \\text{otherwise} \\end{cases}$",
+          "description": "Handle the edge case when no positive predictions are made"
+        },
+        {
+          "name": "Alternative Formulation",
+          "latex": "$P = \\frac{\\sum_{i=1}^{n} \\mathbb{1}[y_i = 1 \\land \\hat{y}_i = 1]}{\\sum_{i=1}^{n} \\mathbb{1}[\\hat{y}_i = 1]}$",
+          "description": "Direct computation from prediction arrays without explicit confusion matrix"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates precision from true labels and predicted labels. The function must handle the edge case where no positive predictions are made (denominator is zero) by returning 0.0.",
+        "function_signature": "def calculate_precision(y_true: np.ndarray, y_pred: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef calculate_precision(y_true, y_pred):\n    \"\"\"\n    Calculate precision for binary classification.\n    \n    :param y_true: Numpy array of true binary labels\n    :param y_pred: Numpy array of predicted binary labels\n    :return: Precision as a float, 0.0 if no positive predictions\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_precision(np.array([1, 0, 1, 1, 0, 1]), np.array([1, 0, 1, 0, 0, 1]))",
+            "expected": "1.0",
+            "explanation": "TP=3, FP=0, so precision = 3/(3+0) = 1.0. All positive predictions were correct."
+          },
+          {
+            "input": "calculate_precision(np.array([1, 1, 1, 0, 0]), np.array([1, 1, 0, 1, 0]))",
+            "expected": "0.6666666666666666",
+            "explanation": "TP=2, FP=1, so precision = 2/(2+1) ≈ 0.667. Two out of three positive predictions were correct."
+          },
+          {
+            "input": "calculate_precision(np.array([1, 1, 1, 0, 0]), np.array([0, 0, 0, 0, 0]))",
+            "expected": "0.0",
+            "explanation": "No positive predictions made (TP=0, FP=0), so precision is defined as 0.0 by convention."
+          },
+          {
+            "input": "calculate_precision(np.array([0, 0, 0, 0]), np.array([1, 1, 1, 1]))",
+            "expected": "0.0",
+            "explanation": "TP=0, FP=4, so precision = 0/(0+4) = 0.0. All positive predictions were wrong."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the division by zero case when TP + FP = 0",
+        "Confusing precision with accuracy - they measure different aspects of performance",
+        "Using TN or FN in the precision formula (precision only depends on positive predictions)",
+        "Forgetting that precision ignores false negatives entirely",
+        "Not recognizing that high precision alone doesn't guarantee good performance"
+      ],
+      "hint": "First compute TP and FP using boolean indexing. Check if their sum is zero before dividing. NumPy's sum() function can count True values in boolean arrays.",
+      "references": [
+        "Positive Predictive Value",
+        "Classification metrics trade-offs",
+        "Precision-recall curves"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Recall: Quantifying Positive Class Detection Rate",
+      "relation_to_problem": "Recall is the second fundamental component of the F-Score formula. Together with precision, it forms the complete picture needed to compute the F-Score metric.",
+      "prerequisites": [
+        "Confusion matrix construction",
+        "Division by zero handling",
+        "Understanding of Type II error"
+      ],
+      "learning_objectives": [
+        "Derive and understand the formal definition of recall",
+        "Compute recall from confusion matrix components",
+        "Handle the edge case when no actual positive samples exist",
+        "Understand the complementary relationship between precision and recall"
+      ],
+      "math_content": {
+        "definition": "**Recall** (also called Sensitivity, True Positive Rate, or Hit Rate) is the proportion of actual positive samples that are correctly identified:\n\n$$\\text{Recall} = \\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$$\n\nwhere the denominator represents all actual positive samples. Recall answers: \"Of all truly positive samples, how many did we correctly identify?\"",
+        "notation": "$R = \\text{Recall}$; $\\text{TP}$ = true positives; $\\text{FN}$ = false negatives; $R \\in [0, 1]$ where higher values indicate better coverage of positive class",
+        "theorem": "**Bounds Theorem**: For any binary classifier, $0 \\leq \\text{Recall} \\leq 1$, with $\\text{Recall} = 1$ if and only if $\\text{FN} = 0$ (no false negatives), and $\\text{Recall} = 0$ if and only if $\\text{TP} = 0$ (no true positives). Additionally, for a fixed set of actual positives, recall is a strictly decreasing function of false negatives.",
+        "proof_sketch": "The denominator $\\text{TP} + \\text{FN}$ equals the total number of actual positive samples, which is fixed regardless of the classifier. Since $\\text{TP} \\leq \\text{TP} + \\text{FN}$, we have $\\frac{\\text{TP}}{\\text{TP} + \\text{FN}} \\leq 1$. The ratio equals 1 when $\\text{FN} = 0$, meaning all actual positives were found. It equals 0 when $\\text{TP} = 0$, meaning no actual positives were found.",
+        "examples": [
+          "Example 1: TP=3, FN=1 → Recall = $\\frac{3}{3+1} = 0.75$. Found 75% of all actual positive samples.",
+          "Example 2: TP=80, FN=10 → Recall = $\\frac{80}{80+10} \\approx 0.889$. Detected about 89% of actual positives.",
+          "Example 3 (Perfect recall): TP=5, FN=0 → Recall = $\\frac{5}{5+0} = 1.0$. Found all actual positives.",
+          "Example 4 (Edge case): TP=0, FN=0 → Recall = $\\frac{0}{0+0}$ is undefined. This occurs when there are no actual positive samples."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Recall Formula",
+          "latex": "$R = \\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$",
+          "description": "Use when measuring how well the classifier finds positive samples"
+        },
+        {
+          "name": "Recall with Zero Denominator",
+          "latex": "$R = \\begin{cases} \\frac{\\text{TP}}{\\text{TP} + \\text{FN}} & \\text{if } \\text{TP} + \\text{FN} > 0 \\\\ 0 & \\text{otherwise} \\end{cases}$",
+          "description": "Handle the edge case when no actual positive samples exist"
+        },
+        {
+          "name": "Complementary Relationship",
+          "latex": "$\\text{False Negative Rate} = 1 - \\text{Recall} = \\frac{\\text{FN}}{\\text{TP} + \\text{FN}}$",
+          "description": "Recall and false negative rate sum to 1"
+        },
+        {
+          "name": "Alternative Formulation",
+          "latex": "$R = \\frac{\\sum_{i=1}^{n} \\mathbb{1}[y_i = 1 \\land \\hat{y}_i = 1]}{\\sum_{i=1}^{n} \\mathbb{1}[y_i = 1]}$",
+          "description": "Direct computation from arrays: true positives divided by all actual positives"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates recall from true labels and predicted labels. The function must handle the edge case where no actual positive samples exist (denominator is zero) by returning 0.0.",
+        "function_signature": "def calculate_recall(y_true: np.ndarray, y_pred: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef calculate_recall(y_true, y_pred):\n    \"\"\"\n    Calculate recall for binary classification.\n    \n    :param y_true: Numpy array of true binary labels\n    :param y_pred: Numpy array of predicted binary labels\n    :return: Recall as a float, 0.0 if no actual positives exist\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_recall(np.array([1, 0, 1, 1, 0, 1]), np.array([1, 0, 1, 0, 0, 1]))",
+            "expected": "0.75",
+            "explanation": "TP=3, FN=1, so recall = 3/(3+1) = 0.75. Found 3 out of 4 actual positives."
+          },
+          {
+            "input": "calculate_recall(np.array([1, 1, 1, 0, 0]), np.array([1, 1, 1, 0, 0]))",
+            "expected": "1.0",
+            "explanation": "TP=3, FN=0, so recall = 3/(3+0) = 1.0. Perfect recall: found all actual positives."
+          },
+          {
+            "input": "calculate_recall(np.array([1, 1, 1, 1]), np.array([0, 0, 0, 0]))",
+            "expected": "0.0",
+            "explanation": "TP=0, FN=4, so recall = 0/(0+4) = 0.0. Failed to find any actual positives."
+          },
+          {
+            "input": "calculate_recall(np.array([0, 0, 0, 0]), np.array([1, 1, 0, 0]))",
+            "expected": "0.0",
+            "explanation": "No actual positives exist (TP=0, FN=0), so recall is defined as 0.0 by convention."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the division by zero case when TP + FN = 0 (no actual positives)",
+        "Confusing recall with precision - recall focuses on actual positives, precision on predicted positives",
+        "Using FP instead of FN in the denominator",
+        "Thinking that high recall alone indicates good performance (ignoring false positives)",
+        "Not recognizing the precision-recall tradeoff: improving one often degrades the other"
+      ],
+      "hint": "Count the number of actual positive samples (where y_true == 1) and how many of those were correctly predicted. Check if there are any actual positives before dividing.",
+      "references": [
+        "Sensitivity and specificity",
+        "ROC curves",
+        "Precision-recall tradeoff",
+        "Type I and Type II errors"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Harmonic Mean: The Mathematical Foundation of F-Score",
+      "relation_to_problem": "The F-Score is defined as a weighted harmonic mean of precision and recall. Understanding why harmonic mean is used (rather than arithmetic or geometric mean) is crucial for implementing and interpreting the F-Score correctly.",
+      "prerequisites": [
+        "Arithmetic mean",
+        "Geometric mean",
+        "Understanding of average metrics",
+        "Precision and recall computation"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of harmonic mean",
+        "Recognize why harmonic mean is appropriate for rate-like quantities",
+        "Derive the relationship between harmonic mean and F1-Score",
+        "Compare harmonic mean behavior with arithmetic mean for imbalanced values"
+      ],
+      "math_content": {
+        "definition": "The **harmonic mean** $H$ of $n$ positive numbers $x_1, x_2, \\ldots, x_n$ is defined as:\n\n$$H = \\frac{n}{\\sum_{i=1}^{n} \\frac{1}{x_i}} = \\frac{n}{\\frac{1}{x_1} + \\frac{1}{x_2} + \\cdots + \\frac{1}{x_n}}$$\n\nFor two values $a$ and $b$ (such as precision and recall):\n\n$$H(a, b) = \\frac{2}{\\frac{1}{a} + \\frac{1}{b}} = \\frac{2ab}{a + b}$$",
+        "notation": "$H_n$ = harmonic mean of $n$ values; $A_n$ = arithmetic mean; $G_n$ = geometric mean; For positive numbers: $H_n \\leq G_n \\leq A_n$ (AM-GM-HM inequality)",
+        "theorem": "**AM-GM-HM Inequality**: For positive numbers $x_1, \\ldots, x_n$, the harmonic mean $H$, geometric mean $G$, and arithmetic mean $A$ satisfy: $H \\leq G \\leq A$, with equality if and only if all $x_i$ are equal. Furthermore, the harmonic mean is more sensitive to small values: if any $x_i$ is close to zero, $H$ is also close to zero.",
+        "proof_sketch": "For two positive numbers $a, b$: The arithmetic mean is $A = \\frac{a+b}{2}$. The harmonic mean is $H = \\frac{2ab}{a+b}$. We need to show $H \\leq A$:\n\n$$\\frac{2ab}{a+b} \\leq \\frac{a+b}{2}$$\n\n$$4ab \\leq (a+b)^2$$\n\n$$4ab \\leq a^2 + 2ab + b^2$$\n\n$$0 \\leq a^2 - 2ab + b^2 = (a-b)^2$$\n\nwhich is always true. Equality holds when $a = b$.",
+        "examples": [
+          "Example 1 (Balanced): $a = 0.8, b = 0.8$ → Harmonic mean = $\\frac{2 \\times 0.8 \\times 0.8}{0.8 + 0.8} = 0.8$. When values are equal, harmonic and arithmetic means coincide.",
+          "Example 2 (Imbalanced): $a = 0.9, b = 0.1$ → Harmonic mean = $\\frac{2 \\times 0.9 \\times 0.1}{0.9 + 0.1} = \\frac{0.18}{1.0} = 0.18$. Arithmetic mean = $0.5$. The harmonic mean (0.18) is much closer to the smaller value (0.1) than arithmetic mean.",
+          "Example 3 (F1 context): Precision = 0.6, Recall = 0.4 → $F_1 = \\frac{2 \\times 0.6 \\times 0.4}{0.6 + 0.4} = \\frac{0.48}{1.0} = 0.48$. This is less than the arithmetic mean of 0.5."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Harmonic Mean (Two Values)",
+          "latex": "$H(a, b) = \\frac{2ab}{a + b}$",
+          "description": "Used when averaging two rate-like quantities (e.g., precision and recall)"
+        },
+        {
+          "name": "F1-Score as Harmonic Mean",
+          "latex": "$F_1 = 2 \\cdot \\frac{P \\cdot R}{P + R}$",
+          "description": "F1-Score is precisely the harmonic mean of precision $P$ and recall $R$"
+        },
+        {
+          "name": "Reciprocal Form",
+          "latex": "$\\frac{1}{H} = \\frac{1}{2}\\left(\\frac{1}{a} + \\frac{1}{b}\\right)$",
+          "description": "Alternative formulation showing harmonic mean as reciprocal of arithmetic mean of reciprocals"
+        },
+        {
+          "name": "Zero Handling",
+          "latex": "$H(a, b) = \\begin{cases} \\frac{2ab}{a + b} & \\text{if } a + b > 0 \\\\ 0 & \\text{otherwise} \\end{cases}$",
+          "description": "When either value is zero, the harmonic mean is defined as zero"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the harmonic mean of two positive numbers. This will be the foundation for computing F1-Score. Handle the edge case where both numbers are zero by returning 0.0.",
+        "function_signature": "def harmonic_mean(a: float, b: float) -> float:",
+        "starter_code": "def harmonic_mean(a, b):\n    \"\"\"\n    Calculate the harmonic mean of two numbers.\n    \n    :param a: First positive number\n    :param b: Second positive number\n    :return: Harmonic mean, 0.0 if both are zero\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "harmonic_mean(0.8, 0.8)",
+            "expected": "0.8",
+            "explanation": "When both values are equal, harmonic mean equals that value: 2×0.8×0.8/(0.8+0.8) = 0.8"
+          },
+          {
+            "input": "harmonic_mean(0.6, 0.4)",
+            "expected": "0.48",
+            "explanation": "Harmonic mean = 2×0.6×0.4/(0.6+0.4) = 0.48/1.0 = 0.48, which is less than arithmetic mean of 0.5"
+          },
+          {
+            "input": "harmonic_mean(0.9, 0.1)",
+            "expected": "0.18",
+            "explanation": "For imbalanced values, harmonic mean (0.18) is much closer to smaller value (0.1) than larger value (0.9)"
+          },
+          {
+            "input": "harmonic_mean(1.0, 0.75)",
+            "expected": "0.8571428571428571",
+            "explanation": "Harmonic mean = 2×1.0×0.75/(1.0+0.75) = 1.5/1.75 ≈ 0.857"
+          },
+          {
+            "input": "harmonic_mean(0.0, 0.0)",
+            "expected": "0.0",
+            "explanation": "When both values are zero, return 0.0 by convention"
+          },
+          {
+            "input": "harmonic_mean(0.5, 0.0)",
+            "expected": "0.0",
+            "explanation": "When either value is zero, the harmonic mean is zero: 2×0.5×0/(0.5+0) = 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using arithmetic mean instead of harmonic mean for rate-like quantities",
+        "Not handling the case when the denominator (a + b) is zero",
+        "Forgetting that harmonic mean is always ≤ arithmetic mean for non-equal values",
+        "Not recognizing that harmonic mean heavily penalizes small values (one very small value drastically reduces the result)",
+        "Attempting to compute harmonic mean when values can be negative (harmonic mean requires positive values)"
+      ],
+      "hint": "The formula is 2ab/(a+b). Make sure to check if the denominator is zero before dividing. If either input is zero, the numerator will be zero, giving a result of 0.0.",
+      "references": [
+        "Pythagorean means",
+        "AM-GM-HM inequality",
+        "Why harmonic mean for rates",
+        "Mean comparison properties"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "F₁-Score: Balanced Harmonic Mean of Precision and Recall",
+      "relation_to_problem": "The F₁-Score (β=1 case) is the most commonly used F-Score variant. Mastering its computation and interpretation prepares you for the generalized F_β-Score implementation.",
+      "prerequisites": [
+        "Precision calculation",
+        "Recall calculation",
+        "Harmonic mean",
+        "Edge case handling"
+      ],
+      "learning_objectives": [
+        "Derive the F₁-Score formula from precision and recall",
+        "Implement F₁-Score with proper edge case handling",
+        "Understand why F₁ is preferred over accuracy for imbalanced datasets",
+        "Interpret F₁-Score values in classification contexts"
+      ],
+      "math_content": {
+        "definition": "The **F₁-Score** is the harmonic mean of precision $P$ and recall $R$, providing a single metric that balances both:\n\n$$F_1 = 2 \\cdot \\frac{P \\cdot R}{P + R} = \\frac{2 \\cdot \\text{TP}}{2 \\cdot \\text{TP} + \\text{FP} + \\text{FN}}$$\n\nThe F₁-Score ranges from 0 (worst) to 1 (best) and gives equal weight to precision and recall.",
+        "notation": "$F_1 \\in [0, 1]$; $P$ = precision; $R$ = recall; $\\text{TP}$ = true positives; $\\text{FP}$ = false positives; $\\text{FN}$ = false negatives",
+        "theorem": "**Alternative Formulation Theorem**: The F₁-Score can be expressed directly in terms of confusion matrix components:\n\n$$F_1 = \\frac{2 \\cdot \\text{TP}}{2 \\cdot \\text{TP} + \\text{FP} + \\text{FN}}$$\n\nThis formulation is computationally more stable and avoids computing precision and recall separately.",
+        "proof_sketch": "Starting from $F_1 = \\frac{2PR}{P + R}$ where $P = \\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$ and $R = \\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$:\n\n$$F_1 = \\frac{2 \\cdot \\frac{\\text{TP}}{\\text{TP} + \\text{FP}} \\cdot \\frac{\\text{TP}}{\\text{TP} + \\text{FN}}}{\\frac{\\text{TP}}{\\text{TP} + \\text{FP}} + \\frac{\\text{TP}}{\\text{TP} + \\text{FN}}}$$\n\nMultiplying numerator and denominator by $(\\text{TP} + \\text{FP})(\\text{TP} + \\text{FN})$:\n\n$$F_1 = \\frac{2 \\cdot \\text{TP}^2}{\\text{TP}(\\text{TP} + \\text{FN}) + \\text{TP}(\\text{TP} + \\text{FP})} = \\frac{2 \\cdot \\text{TP}^2}{2 \\cdot \\text{TP}^2 + \\text{TP} \\cdot \\text{FN} + \\text{TP} \\cdot \\text{FP}}$$\n\nFactoring out TP from denominator:\n\n$$F_1 = \\frac{2 \\cdot \\text{TP}}{2 \\cdot \\text{TP} + \\text{FN} + \\text{FP}}$$",
+        "examples": [
+          "Example 1: $y_{\\text{true}} = [1, 0, 1, 1, 0, 1], y_{\\text{pred}} = [1, 0, 1, 0, 0, 1]$ → TP=3, FP=0, FN=1. $F_1 = \\frac{2 \\times 3}{2 \\times 3 + 0 + 1} = \\frac{6}{7} \\approx 0.857$",
+          "Example 2 (Perfect): TP=10, FP=0, FN=0 → $F_1 = \\frac{20}{20} = 1.0$. Perfect classification.",
+          "Example 3 (High precision, low recall): TP=1, FP=0, FN=9 → Precision=1.0, Recall=0.1. $F_1 = \\frac{2}{2 + 9} \\approx 0.182$. The low recall heavily penalizes the F₁-Score.",
+          "Example 4 (Balanced errors): TP=50, FP=10, FN=10 → $F_1 = \\frac{100}{100 + 10 + 10} = \\frac{100}{120} \\approx 0.833$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "F₁-Score (Precision-Recall Form)",
+          "latex": "$F_1 = 2 \\cdot \\frac{P \\cdot R}{P + R}$",
+          "description": "Standard formulation as harmonic mean of precision and recall"
+        },
+        {
+          "name": "F₁-Score (Direct Form)",
+          "latex": "$F_1 = \\frac{2 \\cdot \\text{TP}}{2 \\cdot \\text{TP} + \\text{FP} + \\text{FN}}$",
+          "description": "Computationally stable form directly from confusion matrix"
+        },
+        {
+          "name": "F₁-Score with Zero Handling",
+          "latex": "$F_1 = \\begin{cases} \\frac{2PR}{P + R} & \\text{if } P + R > 0 \\\\ 0 & \\text{otherwise} \\end{cases}$",
+          "description": "Handle case when both precision and recall are zero"
+        },
+        {
+          "name": "Relationship to Accuracy",
+          "latex": "$\\text{Accuracy} = \\frac{\\text{TP} + \\text{TN}}{\\text{TP} + \\text{TN} + \\text{FP} + \\text{FN}}$",
+          "description": "F₁ ignores TN, making it suitable for imbalanced datasets where accuracy is misleading"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the F₁-Score from true labels and predicted labels. Use the direct formulation (2×TP / (2×TP + FP + FN)) for numerical stability. Return 0.0 when the denominator is zero.",
+        "function_signature": "def f1_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef f1_score(y_true, y_pred):\n    \"\"\"\n    Calculate F1-Score for binary classification.\n    \n    :param y_true: Numpy array of true binary labels\n    :param y_pred: Numpy array of predicted binary labels\n    :return: F1-Score as a float, 0.0 if denominator is zero\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "f1_score(np.array([1, 0, 1, 1, 0, 1]), np.array([1, 0, 1, 0, 0, 1]))",
+            "expected": "0.8571428571428571",
+            "explanation": "TP=3, FP=0, FN=1. F₁ = 2×3/(2×3+0+1) = 6/7 ≈ 0.857"
+          },
+          {
+            "input": "f1_score(np.array([1, 1, 0, 0]), np.array([1, 1, 0, 0]))",
+            "expected": "1.0",
+            "explanation": "Perfect classification: TP=2, FP=0, FN=0. F₁ = 2×2/(2×2+0+0) = 1.0"
+          },
+          {
+            "input": "f1_score(np.array([1, 1, 1, 0, 0]), np.array([0, 0, 0, 1, 1]))",
+            "expected": "0.0",
+            "explanation": "Complete misclassification: TP=0, FP=2, FN=3. F₁ = 0/(0+2+3) = 0.0"
+          },
+          {
+            "input": "f1_score(np.array([0, 0, 0, 0]), np.array([0, 0, 0, 0]))",
+            "expected": "0.0",
+            "explanation": "No positive predictions or actual positives: TP=0, FP=0, FN=0. F₁ = 0.0 by convention"
+          },
+          {
+            "input": "f1_score(np.array([1, 1, 1, 1, 0]), np.array([1, 0, 0, 0, 0]))",
+            "expected": "0.4",
+            "explanation": "Low recall: TP=1, FP=0, FN=3. F₁ = 2×1/(2×1+0+3) = 2/5 = 0.4"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing precision and recall separately then taking harmonic mean, which can accumulate floating-point errors",
+        "Not handling the edge case when TP=FP=FN=0 (no positives in predictions or ground truth)",
+        "Confusing F₁-Score with accuracy - F₁ ignores true negatives",
+        "Thinking high F₁ on imbalanced data means the model works well on both classes",
+        "Forgetting that F₁ ranges from 0 to 1, not 0 to 100"
+      ],
+      "hint": "Use the direct formula: 2×TP/(2×TP+FP+FN). First compute TP, FP, and FN using boolean indexing, then check if the denominator is non-zero before dividing.",
+      "references": [
+        "F-measure interpretation",
+        "Metrics for imbalanced classification",
+        "Micro vs macro averaging",
+        "F1-Score limitations"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "F_β-Score: Weighted Harmonic Mean with Adjustable Precision-Recall Tradeoff",
+      "relation_to_problem": "The F_β-Score generalizes F₁-Score by introducing a parameter β that controls the relative importance of precision versus recall. This is the final concept needed to solve the main problem.",
+      "prerequisites": [
+        "F₁-Score calculation",
+        "Precision and recall",
+        "Weighted averages",
+        "Parameter interpretation"
+      ],
+      "learning_objectives": [
+        "Derive the F_β-Score formula and understand the role of β",
+        "Implement F_β-Score for arbitrary β values",
+        "Interpret how different β values affect metric behavior",
+        "Synthesize all previous concepts to create a complete F-Score calculator"
+      ],
+      "math_content": {
+        "definition": "The **F_β-Score** is a weighted harmonic mean of precision $P$ and recall $R$, where β controls the relative importance:\n\n$$F_\\beta = (1 + \\beta^2) \\cdot \\frac{P \\cdot R}{(\\beta^2 \\cdot P) + R}$$\n\nwhere $\\beta > 0$ determines the weight:\n- $\\beta = 1$: Equal weight to precision and recall (F₁-Score)\n- $\\beta > 1$: Emphasizes recall over precision\n- $\\beta < 1$: Emphasizes precision over recall",
+        "notation": "$F_\\beta \\in [0, 1]$; $\\beta \\in \\mathbb{R}^+$ is the weighting parameter; Common values: $F_{0.5}, F_1, F_2$; $\\beta^2$ represents the ratio of recall importance to precision importance",
+        "theorem": "**β-Weighting Theorem**: The parameter $\\beta$ in F_β-Score determines recall-to-precision importance ratio. Specifically:\n\n$$\\lim_{\\beta \\to 0} F_\\beta = P \\quad \\text{and} \\quad \\lim_{\\beta \\to \\infty} F_\\beta = R$$\n\n$F_\\beta$ weights recall $\\beta^2$ times as important as precision. For example, $F_2$ considers recall 4 times as important as precision.",
+        "proof_sketch": "As $\\beta \\to 0$:\n$$F_\\beta = (1 + \\beta^2) \\cdot \\frac{PR}{\\beta^2 P + R} \\approx 1 \\cdot \\frac{PR}{R} = P$$\n\nAs $\\beta \\to \\infty$:\n$$F_\\beta = (1 + \\beta^2) \\cdot \\frac{PR}{\\beta^2 P + R} = \\frac{PR}{P + \\frac{R}{\\beta^2}} \\cdot \\frac{1 + \\beta^2}{\\beta^2} \\approx \\frac{PR}{P} = R$$\n\nFor $\\beta = 1$: $F_1 = 2 \\cdot \\frac{PR}{P + R}$ (harmonic mean).",
+        "examples": [
+          "Example 1: P=0.8, R=0.6, β=1 → $F_1 = (1+1) \\cdot \\frac{0.8 \\times 0.6}{1 \\times 0.8 + 0.6} = 2 \\cdot \\frac{0.48}{1.4} \\approx 0.686$",
+          "Example 2: P=0.8, R=0.6, β=2 → $F_2 = (1+4) \\cdot \\frac{0.8 \\times 0.6}{4 \\times 0.8 + 0.6} = 5 \\cdot \\frac{0.48}{3.8} \\approx 0.632$. Lower than F₁ because low recall is penalized more heavily.",
+          "Example 3: P=0.8, R=0.6, β=0.5 → $F_{0.5} = (1+0.25) \\cdot \\frac{0.8 \\times 0.6}{0.25 \\times 0.8 + 0.6} = 1.25 \\cdot \\frac{0.48}{0.8} = 0.75$. Higher than F₁ because high precision is valued more.",
+          "Example 4 (Main problem): y_true=[1,0,1,1,0,1], y_pred=[1,0,1,0,0,1], β=1 → TP=3, FP=0, FN=1. P=1.0, R=0.75. $F_1 = 2 \\cdot \\frac{1.0 \\times 0.75}{1.0 + 0.75} \\approx 0.857$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "F_β-Score (General Form)",
+          "latex": "$F_\\beta = (1 + \\beta^2) \\cdot \\frac{P \\cdot R}{(\\beta^2 \\cdot P) + R}$",
+          "description": "Full generalized F-Score formula for any β > 0"
+        },
+        {
+          "name": "F_β-Score (Direct Form)",
+          "latex": "$F_\\beta = \\frac{(1 + \\beta^2) \\cdot \\text{TP}}{(1 + \\beta^2) \\cdot \\text{TP} + \\beta^2 \\cdot \\text{FN} + \\text{FP}}$",
+          "description": "Computationally stable direct computation from confusion matrix"
+        },
+        {
+          "name": "Special Cases",
+          "latex": "$F_1 = \\frac{2PR}{P+R}, \\quad F_2 = \\frac{5PR}{4P+R}, \\quad F_{0.5} = \\frac{1.25PR}{0.25P+R}$",
+          "description": "Commonly used variants with specific β values"
+        },
+        {
+          "name": "Zero Handling",
+          "latex": "$F_\\beta = \\begin{cases} (1 + \\beta^2) \\cdot \\frac{PR}{\\beta^2 P + R} & \\text{if } \\beta^2 P + R > 0 \\\\ 0 & \\text{otherwise} \\end{cases}$",
+          "description": "Return 0.0 when denominator is zero (both P and R are zero)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete F_β-Score function that takes true labels, predicted labels, and β parameter. This synthesizes all previous sub-quests: compute precision, recall, and apply the weighted harmonic mean formula. Round the result to three decimal places.",
+        "function_signature": "def f_beta_score(y_true: np.ndarray, y_pred: np.ndarray, beta: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef f_beta_score(y_true, y_pred, beta):\n    \"\"\"\n    Calculate F-beta Score for binary classification.\n    \n    :param y_true: Numpy array of true binary labels\n    :param y_pred: Numpy array of predicted binary labels\n    :param beta: Weight of precision vs recall (positive float)\n    :return: F-beta Score rounded to three decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "f_beta_score(np.array([1, 0, 1, 1, 0, 1]), np.array([1, 0, 1, 0, 0, 1]), 1)",
+            "expected": "0.857",
+            "explanation": "TP=3, FP=0, FN=1. P=1.0, R=0.75. F₁ = 2×(1.0×0.75)/(1.0+0.75) = 1.5/1.75 ≈ 0.857 (rounded to 3 decimals)"
+          },
+          {
+            "input": "f_beta_score(np.array([1, 1, 0, 0, 1]), np.array([1, 0, 0, 0, 1]), 2)",
+            "expected": "0.833",
+            "explanation": "TP=2, FP=0, FN=1. P=1.0, R=0.667. F₂ = 5×(1.0×0.667)/(4×1.0+0.667) ≈ 0.833"
+          },
+          {
+            "input": "f_beta_score(np.array([1, 1, 1, 0, 0]), np.array([1, 1, 0, 1, 0]), 0.5)",
+            "expected": "0.714",
+            "explanation": "TP=2, FP=1, FN=1. P=0.667, R=0.667. F₀.₅ = 1.25×(0.667×0.667)/(0.25×0.667+0.667) ≈ 0.714"
+          },
+          {
+            "input": "f_beta_score(np.array([0, 0, 0, 0]), np.array([0, 0, 0, 0]), 1)",
+            "expected": "0.0",
+            "explanation": "No positives: TP=FP=FN=0, so F-Score is 0.0 by convention"
+          },
+          {
+            "input": "f_beta_score(np.array([1, 1, 1, 1]), np.array([1, 1, 1, 1]), 1.5)",
+            "expected": "1.0",
+            "explanation": "Perfect classification: P=1.0, R=1.0, so F_β = 1.0 for any β"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not squaring β in the formula - the weight is β², not β",
+        "Applying rounding at intermediate steps rather than only at the end",
+        "Not handling the edge case when both precision and recall are zero",
+        "Misunderstanding β interpretation: β>1 favors recall, not precision",
+        "Using integer division instead of float division in Python 2 compatibility contexts",
+        "Computing precision and recall separately without checking for zero denominators"
+      ],
+      "hint": "First compute precision and recall separately (handling their edge cases). Then apply the F_β formula: (1+β²)×P×R/(β²×P+R). Check if the denominator is zero before dividing. Finally, round the result to exactly 3 decimal places.",
+      "references": [
+        "F-measure history and criticism",
+        "Choosing appropriate β values",
+        "Cost-sensitive learning",
+        "Evaluation metrics for imbalanced data"
+      ]
+    }
+  ]
+}

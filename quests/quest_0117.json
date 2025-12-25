@@ -1,0 +1,510 @@
+{
+  "problem_id": 117,
+  "title": "Compute Orthonormal Basis for 2D Vectors",
+  "category": "Linear Algebra",
+  "difficulty": "medium",
+  "description": "Implement a function that computes an orthonormal basis for the subspace spanned by a list of 2D vectors using the Gram-Schmidt process. The function should take a list of 2D vectors and a tolerance value (tol) to determine linear independence, returning a list of orthonormal vectors (unit length and orthogonal to each other) that span the same subspace. This is a fundamental concept in linear algebra with applications in machine learning, such as feature orthogonalization.",
+  "example": {
+    "input": "orthonormal_basis([[1, 0], [1, 1]])",
+    "output": "[array([1., 0.]), array([0., 1.])]",
+    "reasoning": "Start with [1, 0], normalize to [1, 0]. For [1, 1], subtract its projection onto [1, 0] (which is [1, 0]), leaving [0, 1]. Check if norm > 1e-10 (it is 1), then normalize to [0, 1]. The result is an orthonormal basis."
+  },
+  "starter_code": "import numpy as np\n\ndef orthonormal_basis(vectors: list[list[float]], tol: float = 1e-10) -> list[np.ndarray]:\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Vector Normalization and Unit Vectors",
+      "relation_to_problem": "Normalization is the final step in Gram-Schmidt: after orthogonalizing vectors, we must normalize them to unit length to create an orthonormal (not just orthogonal) basis.",
+      "prerequisites": [
+        "Basic vector arithmetic",
+        "Square roots",
+        "NumPy arrays"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition of vector norm",
+        "Compute the Euclidean norm (magnitude) of 2D vectors",
+        "Normalize vectors to unit length",
+        "Recognize when a vector has zero norm and handle edge cases"
+      ],
+      "math_content": {
+        "definition": "The **norm** (or **magnitude**) of a vector $v = \\begin{pmatrix} v_1 \\\\ v_2 \\end{pmatrix} \\in \\mathbb{R}^2$ is defined as: $$\\|v\\| = \\sqrt{v_1^2 + v_2^2} = \\sqrt{\\langle v, v \\rangle}$$ where $\\langle v, v \\rangle$ is the inner product of the vector with itself. A vector $u$ is called a **unit vector** if $\\|u\\| = 1$. The process of **normalization** transforms a non-zero vector into a unit vector pointing in the same direction.",
+        "notation": "$\\|v\\|$ = norm (magnitude) of vector $v$; $\\hat{v}$ = normalized version of $v$",
+        "theorem": "**Theorem (Normalization):** For any non-zero vector $v \\in \\mathbb{R}^2$, the normalized vector $$\\hat{v} = \\frac{v}{\\|v\\|} = \\frac{1}{\\|v\\|} \\begin{pmatrix} v_1 \\\\ v_2 \\end{pmatrix}$$ is a unit vector, i.e., $\\|\\hat{v}\\| = 1$.",
+        "proof_sketch": "**Proof:** Let $\\hat{v} = \\frac{v}{\\|v\\|}$. Then: $$\\|\\hat{v}\\| = \\left\\|\\frac{v}{\\|v\\|}\\right\\| = \\frac{\\|v\\|}{\\|v\\|} = 1$$ where we used the property that $\\|cv\\| = |c| \\cdot \\|v\\|$ for scalar $c$ and the fact that $\\|v\\| > 0$ for non-zero vectors. $\\square$",
+        "examples": [
+          "Example 1: Normalize $v = \\begin{pmatrix} 3 \\\\ 4 \\end{pmatrix}$. First, $\\|v\\| = \\sqrt{3^2 + 4^2} = \\sqrt{9 + 16} = 5$. Then $\\hat{v} = \\frac{1}{5}\\begin{pmatrix} 3 \\\\ 4 \\end{pmatrix} = \\begin{pmatrix} 0.6 \\\\ 0.8 \\end{pmatrix}$. Verify: $\\|\\hat{v}\\| = \\sqrt{0.6^2 + 0.8^2} = \\sqrt{0.36 + 0.64} = 1$.",
+          "Example 2: Normalize $v = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$. We have $\\|v\\| = 1$, so $\\hat{v} = v = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$ (already normalized).",
+          "Example 3: For $v = \\begin{pmatrix} -2 \\\\ -2 \\end{pmatrix}$, $\\|v\\| = \\sqrt{4 + 4} = 2\\sqrt{2}$, so $\\hat{v} = \\begin{pmatrix} -\\frac{1}{\\sqrt{2}} \\\\ -\\frac{1}{\\sqrt{2}} \\end{pmatrix} \\approx \\begin{pmatrix} -0.7071 \\\\ -0.7071 \\end{pmatrix}$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Euclidean Norm (2D)",
+          "latex": "$\\|v\\| = \\sqrt{v_1^2 + v_2^2}$",
+          "description": "Compute the magnitude of a 2D vector. This is the distance from the origin to the point $(v_1, v_2)$."
+        },
+        {
+          "name": "Normalization Formula",
+          "latex": "$\\hat{v} = \\frac{v}{\\|v\\|}$",
+          "description": "Scale a vector to unit length. Only applicable when $\\|v\\| \\neq 0$."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that normalizes a 2D vector to unit length. The function should accept a numpy array representing a 2D vector and return the normalized vector. If the input vector has zero norm (within tolerance 1e-10), raise a ValueError with message 'Cannot normalize zero vector'.",
+        "function_signature": "def normalize_vector(v: np.ndarray, tol: float = 1e-10) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef normalize_vector(v: np.ndarray, tol: float = 1e-10) -> np.ndarray:\n    # Compute the norm of v\n    # Check if norm is too small (within tolerance)\n    # Return normalized vector v / norm\n    pass",
+        "test_cases": [
+          {
+            "input": "normalize_vector(np.array([3.0, 4.0]))",
+            "expected": "np.array([0.6, 0.8])",
+            "explanation": "Norm is 5, so divide each component by 5: [3/5, 4/5] = [0.6, 0.8]"
+          },
+          {
+            "input": "normalize_vector(np.array([1.0, 0.0]))",
+            "expected": "np.array([1.0, 0.0])",
+            "explanation": "Already a unit vector, norm is 1"
+          },
+          {
+            "input": "normalize_vector(np.array([-2.0, -2.0]))",
+            "expected": "np.array([-0.70710678, -0.70710678])",
+            "explanation": "Norm is 2√2 ≈ 2.828, divide each by 2.828 to get -1/√2 ≈ -0.7071"
+          },
+          {
+            "input": "normalize_vector(np.array([0.0, 0.0]))",
+            "expected": "ValueError: 'Cannot normalize zero vector'",
+            "explanation": "Zero vector has no direction, normalization is undefined"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check for zero vectors before division (causes division by zero)",
+        "Using integer division instead of float division",
+        "Not using np.linalg.norm() or manually computing with np.sqrt(np.dot(v, v))",
+        "Forgetting that normalized vectors maintain direction but have length 1"
+      ],
+      "hint": "Use numpy's built-in functions like np.linalg.norm() or compute manually using np.sqrt(np.sum(v**2)). Always check if the norm is greater than tolerance before dividing.",
+      "references": [
+        "Vector spaces",
+        "Euclidean geometry",
+        "NumPy linalg module"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Inner Product and Orthogonality",
+      "relation_to_problem": "The dot product is central to Gram-Schmidt: we use it to compute projections and verify orthogonality. Two vectors are orthogonal when their dot product is zero.",
+      "prerequisites": [
+        "Vector arithmetic",
+        "Summation notation",
+        "Basic trigonometry"
+      ],
+      "learning_objectives": [
+        "Compute the inner product (dot product) of 2D vectors",
+        "Understand the geometric interpretation of dot product",
+        "Determine when two vectors are orthogonal",
+        "Apply the Cauchy-Schwarz inequality"
+      ],
+      "math_content": {
+        "definition": "The **inner product** (or **dot product**) of two vectors $u = \\begin{pmatrix} u_1 \\\\ u_2 \\end{pmatrix}$ and $v = \\begin{pmatrix} v_1 \\\\ v_2 \\end{pmatrix}$ in $\\mathbb{R}^2$ is defined as: $$\\langle u, v \\rangle = u \\cdot v = u_1 v_1 + u_2 v_2$$ This operation takes two vectors and produces a scalar. Two vectors $u$ and $v$ are **orthogonal** (denoted $u \\perp v$) if and only if $\\langle u, v \\rangle = 0$.",
+        "notation": "$\\langle u, v \\rangle$ or $u \\cdot v$ = inner product; $u \\perp v$ = $u$ orthogonal to $v$",
+        "theorem": "**Theorem (Geometric Interpretation):** For vectors $u, v \\in \\mathbb{R}^2$, $$\\langle u, v \\rangle = \\|u\\| \\|v\\| \\cos(\\theta)$$ where $\\theta$ is the angle between $u$ and $v$. **Corollary:** $u \\perp v$ if and only if $\\theta = 90°$ (perpendicular vectors).",
+        "proof_sketch": "**Proof of Orthogonality Criterion:** If $\\theta = 90°$, then $\\cos(90°) = 0$, so $\\langle u, v \\rangle = \\|u\\| \\|v\\| \\cdot 0 = 0$. Conversely, if $\\langle u, v \\rangle = 0$ and both vectors are non-zero, then $\\|u\\| \\|v\\| \\cos(\\theta) = 0$ implies $\\cos(\\theta) = 0$, so $\\theta = 90°$. $\\square$",
+        "examples": [
+          "Example 1: $u = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$, $v = \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix}$. Then $\\langle u, v \\rangle = 1 \\cdot 0 + 0 \\cdot 1 = 0$, so $u \\perp v$ (standard basis vectors are orthogonal).",
+          "Example 2: $u = \\begin{pmatrix} 3 \\\\ 4 \\end{pmatrix}$, $v = \\begin{pmatrix} 4 \\\\ -3 \\end{pmatrix}$. Then $\\langle u, v \\rangle = 3 \\cdot 4 + 4 \\cdot (-3) = 12 - 12 = 0$, so these are orthogonal.",
+          "Example 3: $u = \\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}$, $v = \\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}$. Then $\\langle u, v \\rangle = 1 + 1 = 2 \\neq 0$, so not orthogonal (same direction, angle is 0°)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Dot Product (2D)",
+          "latex": "$u \\cdot v = u_1 v_1 + u_2 v_2$",
+          "description": "Multiply corresponding components and sum. Returns a scalar."
+        },
+        {
+          "name": "Orthogonality Test",
+          "latex": "$u \\perp v \\Leftrightarrow u \\cdot v = 0$",
+          "description": "Two vectors are orthogonal if their dot product equals zero (within numerical tolerance)."
+        },
+        {
+          "name": "Cauchy-Schwarz Inequality",
+          "latex": "$|\\langle u, v \\rangle| \\leq \\|u\\| \\|v\\|$",
+          "description": "The absolute value of the dot product is bounded by the product of norms. Equality holds when vectors are parallel."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that checks whether two 2D vectors are orthogonal. The function should accept two numpy arrays and a tolerance value, returning True if the vectors are orthogonal (dot product has absolute value less than tolerance) and False otherwise.",
+        "function_signature": "def are_orthogonal(u: np.ndarray, v: np.ndarray, tol: float = 1e-10) -> bool:",
+        "starter_code": "import numpy as np\n\ndef are_orthogonal(u: np.ndarray, v: np.ndarray, tol: float = 1e-10) -> bool:\n    # Compute dot product of u and v\n    # Check if absolute value is less than tolerance\n    pass",
+        "test_cases": [
+          {
+            "input": "are_orthogonal(np.array([1.0, 0.0]), np.array([0.0, 1.0]))",
+            "expected": "True",
+            "explanation": "Standard basis vectors: dot product is 1*0 + 0*1 = 0, so orthogonal"
+          },
+          {
+            "input": "are_orthogonal(np.array([3.0, 4.0]), np.array([4.0, -3.0]))",
+            "expected": "True",
+            "explanation": "Dot product is 3*4 + 4*(-3) = 12 - 12 = 0, so orthogonal"
+          },
+          {
+            "input": "are_orthogonal(np.array([1.0, 1.0]), np.array([1.0, 1.0]))",
+            "expected": "False",
+            "explanation": "Same vectors: dot product is 1*1 + 1*1 = 2 ≠ 0, not orthogonal"
+          },
+          {
+            "input": "are_orthogonal(np.array([1.0, 0.0]), np.array([1e-11, 1.0]))",
+            "expected": "True",
+            "explanation": "Dot product is 1*1e-11 = 1e-11 < 1e-10 tolerance, considered orthogonal"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not using absolute value when checking if dot product is near zero (negative values exist)",
+        "Confusing orthogonality with being perpendicular in everyday language (they're the same mathematically)",
+        "Forgetting to use tolerance for floating-point comparisons",
+        "Using == 0 instead of checking |dot_product| < tolerance"
+      ],
+      "hint": "Use np.dot(u, v) to compute the dot product, then check if np.abs(dot_product) < tol. Remember that numerical errors can make theoretically zero values very small but non-zero.",
+      "references": [
+        "Inner product spaces",
+        "Orthogonal vectors",
+        "Cauchy-Schwarz inequality"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Vector Projection onto Another Vector",
+      "relation_to_problem": "Projection is the core operation in Gram-Schmidt: to orthogonalize vector v₂ with respect to u₁, we subtract the projection of v₂ onto u₁, removing the parallel component and leaving only the orthogonal part.",
+      "prerequisites": [
+        "Inner product computation",
+        "Vector normalization",
+        "Scalar multiplication of vectors"
+      ],
+      "learning_objectives": [
+        "Understand the geometric meaning of projection",
+        "Compute the scalar projection (component) of one vector onto another",
+        "Compute the vector projection of one vector onto another",
+        "Recognize that projection onto a unit vector simplifies the formula"
+      ],
+      "math_content": {
+        "definition": "The **projection** of vector $v$ onto vector $u$ (where $u \\neq 0$) is the vector $\\text{proj}_u(v)$ that lies along $u$ and best approximates $v$. It is defined as: $$\\text{proj}_u(v) = \\frac{\\langle v, u \\rangle}{\\langle u, u \\rangle} u = \\frac{v \\cdot u}{\\|u\\|^2} u$$ The **scalar projection** (or component) of $v$ onto $u$ is: $$\\text{comp}_u(v) = \\frac{\\langle v, u \\rangle}{\\|u\\|} = \\frac{v \\cdot u}{\\|u\\|}$$ This represents the signed length of the projection.",
+        "notation": "$\\text{proj}_u(v)$ = vector projection of $v$ onto $u$; $\\text{comp}_u(v)$ = scalar projection",
+        "theorem": "**Theorem (Orthogonal Decomposition):** Any vector $v$ can be uniquely decomposed into two components: $$v = \\text{proj}_u(v) + \\text{perp}_u(v)$$ where $\\text{proj}_u(v)$ is parallel to $u$ and $\\text{perp}_u(v) = v - \\text{proj}_u(v)$ is orthogonal to $u$. That is, $\\langle \\text{perp}_u(v), u \\rangle = 0$. **Special Case:** If $u$ is a unit vector ($\\|u\\| = 1$), the formula simplifies to: $$\\text{proj}_u(v) = \\langle v, u \\rangle u$$",
+        "proof_sketch": "**Proof of Orthogonality:** We need to show $\\langle v - \\text{proj}_u(v), u \\rangle = 0$. Let $\\text{proj}_u(v) = \\frac{\\langle v, u \\rangle}{\\langle u, u \\rangle} u$. Then: $$\\langle v - \\text{proj}_u(v), u \\rangle = \\langle v, u \\rangle - \\left\\langle \\frac{\\langle v, u \\rangle}{\\langle u, u \\rangle} u, u \\right\\rangle = \\langle v, u \\rangle - \\frac{\\langle v, u \\rangle}{\\langle u, u \\rangle} \\langle u, u \\rangle = \\langle v, u \\rangle - \\langle v, u \\rangle = 0$$ Thus $v - \\text{proj}_u(v)$ is orthogonal to $u$. $\\square$",
+        "examples": [
+          "Example 1: Project $v = \\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}$ onto $u = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$. We have $\\langle v, u \\rangle = 1$, $\\langle u, u \\rangle = 1$, so $\\text{proj}_u(v) = \\frac{1}{1} \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix} = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$. The perpendicular part is $v - \\text{proj}_u(v) = \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix}$.",
+          "Example 2: Project $v = \\begin{pmatrix} 3 \\\\ 4 \\end{pmatrix}$ onto $u = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$. Then $\\text{proj}_u(v) = \\frac{3}{1} \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix} = \\begin{pmatrix} 3 \\\\ 0 \\end{pmatrix}$.",
+          "Example 3: Project $v = \\begin{pmatrix} 2 \\\\ 3 \\end{pmatrix}$ onto $u = \\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}$. We have $\\langle v, u \\rangle = 5$, $\\langle u, u \\rangle = 2$, so $\\text{proj}_u(v) = \\frac{5}{2} \\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix} = \\begin{pmatrix} 2.5 \\\\ 2.5 \\end{pmatrix}$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Vector Projection (General)",
+          "latex": "$\\text{proj}_u(v) = \\frac{\\langle v, u \\rangle}{\\langle u, u \\rangle} u$",
+          "description": "Project vector v onto vector u. The denominator is the squared norm of u."
+        },
+        {
+          "name": "Vector Projection (Unit Vector)",
+          "latex": "$\\text{proj}_u(v) = \\langle v, u \\rangle u$ when $\\|u\\| = 1$",
+          "description": "Simplified formula when u is a unit vector. Just multiply the dot product by u."
+        },
+        {
+          "name": "Orthogonal Component",
+          "latex": "$\\text{perp}_u(v) = v - \\text{proj}_u(v)$",
+          "description": "The part of v perpendicular to u. This is what remains after subtracting the projection."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the vector projection of v onto u. The function should accept two 2D numpy arrays and return the projection as a numpy array. Handle the edge case where u is the zero vector by raising a ValueError with message 'Cannot project onto zero vector'.",
+        "function_signature": "def project_vector(v: np.ndarray, u: np.ndarray, tol: float = 1e-10) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef project_vector(v: np.ndarray, u: np.ndarray, tol: float = 1e-10) -> np.ndarray:\n    # Check if u is zero vector\n    # Compute dot product v·u\n    # Compute dot product u·u (squared norm)\n    # Return (v·u / u·u) * u\n    pass",
+        "test_cases": [
+          {
+            "input": "project_vector(np.array([1.0, 1.0]), np.array([1.0, 0.0]))",
+            "expected": "np.array([1.0, 0.0])",
+            "explanation": "v·u = 1, u·u = 1, so projection is (1/1)*[1,0] = [1,0]"
+          },
+          {
+            "input": "project_vector(np.array([3.0, 4.0]), np.array([1.0, 0.0]))",
+            "expected": "np.array([3.0, 0.0])",
+            "explanation": "v·u = 3, u·u = 1, so projection is (3/1)*[1,0] = [3,0]"
+          },
+          {
+            "input": "project_vector(np.array([2.0, 3.0]), np.array([1.0, 1.0]))",
+            "expected": "np.array([2.5, 2.5])",
+            "explanation": "v·u = 5, u·u = 2, so projection is (5/2)*[1,1] = [2.5, 2.5]"
+          },
+          {
+            "input": "project_vector(np.array([1.0, 1.0]), np.array([0.0, 0.0]))",
+            "expected": "ValueError: 'Cannot project onto zero vector'",
+            "explanation": "Cannot project onto zero vector (undefined direction)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Dividing by the norm instead of the squared norm (using ||u|| instead of ||u||²)",
+        "Forgetting to multiply the scalar coefficient by the vector u",
+        "Computing projection of u onto v instead of v onto u (order matters!)",
+        "Not handling the zero vector case"
+      ],
+      "hint": "The formula is: projection = (np.dot(v, u) / np.dot(u, u)) * u. First compute the scalar coefficient, then multiply by u. Check if np.dot(u, u) < tol² to detect zero vectors.",
+      "references": [
+        "Vector projections",
+        "Orthogonal decomposition",
+        "Least squares approximation"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Orthogonalizing Two Vectors",
+      "relation_to_problem": "This is the heart of Gram-Schmidt for 2D: given two linearly independent vectors, create two orthogonal vectors that span the same space by keeping the first vector and subtracting its projection from the second.",
+      "prerequisites": [
+        "Vector projection",
+        "Orthogonality testing",
+        "Linear independence"
+      ],
+      "learning_objectives": [
+        "Apply the Gram-Schmidt process to orthogonalize two vectors",
+        "Understand why subtracting projection creates orthogonality",
+        "Verify that orthogonalized vectors span the same subspace",
+        "Detect and handle linearly dependent vectors"
+      ],
+      "math_content": {
+        "definition": "Given two linearly independent vectors $v_1, v_2 \\in \\mathbb{R}^2$, the **Gram-Schmidt orthogonalization process** constructs orthogonal vectors $u_1, u_2$ as follows: $$u_1 = v_1$$ $$u_2 = v_2 - \\text{proj}_{u_1}(v_2) = v_2 - \\frac{\\langle v_2, u_1 \\rangle}{\\langle u_1, u_1 \\rangle} u_1$$ The resulting vectors satisfy $\\langle u_1, u_2 \\rangle = 0$ (orthogonal) and $\\text{span}(u_1, u_2) = \\text{span}(v_1, v_2)$ (same subspace).",
+        "notation": "$\\text{span}(v_1, v_2)$ = all linear combinations $a v_1 + b v_2$; $u_1 \\perp u_2$ means orthogonal",
+        "theorem": "**Theorem (Gram-Schmidt Orthogonalization):** If $v_1, v_2$ are linearly independent, then the vectors $u_1, u_2$ constructed above are orthogonal and span the same subspace. Moreover, $u_2 \\neq 0$ if and only if $v_2 \\notin \\text{span}(v_1)$ (i.e., $v_2$ is not a scalar multiple of $v_1$).",
+        "proof_sketch": "**Proof of Orthogonality:** From step 3, we showed that $v_2 - \\text{proj}_{u_1}(v_2)$ is orthogonal to $u_1$. Thus $\\langle u_2, u_1 \\rangle = 0$. **Proof of Same Span:** Since $u_1 = v_1$, clearly $u_1 \\in \\text{span}(v_1, v_2)$. Also, $u_2 = v_2 - c u_1$ for some scalar $c$, so $u_2 \\in \\text{span}(v_1, v_2)$. Conversely, $v_1 = u_1$ and $v_2 = u_2 + c u_1$, so $v_1, v_2 \\in \\text{span}(u_1, u_2)$. Therefore, the spans are equal. $\\square$",
+        "examples": [
+          "Example 1: Orthogonalize $v_1 = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$ and $v_2 = \\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}$. Set $u_1 = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$. Then $\\text{proj}_{u_1}(v_2) = \\frac{1}{1} \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix} = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$, so $u_2 = \\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix} - \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix} = \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix}$. Verify: $u_1 \\cdot u_2 = 0$.",
+          "Example 2: Orthogonalize $v_1 = \\begin{pmatrix} 3 \\\\ 4 \\end{pmatrix}$ and $v_2 = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$. Set $u_1 = \\begin{pmatrix} 3 \\\\ 4 \\end{pmatrix}$. Then $\\text{proj}_{u_1}(v_2) = \\frac{3}{25} \\begin{pmatrix} 3 \\\\ 4 \\end{pmatrix} = \\begin{pmatrix} 0.36 \\\\ 0.48 \\end{pmatrix}$, so $u_2 = \\begin{pmatrix} 0.64 \\\\ -0.48 \\end{pmatrix}$.",
+          "Example 3 (Dependent): Orthogonalize $v_1 = \\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}$ and $v_2 = \\begin{pmatrix} 2 \\\\ 2 \\end{pmatrix}$. Then $\\text{proj}_{u_1}(v_2) = \\frac{4}{2} \\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix} = \\begin{pmatrix} 2 \\\\ 2 \\end{pmatrix} = v_2$, so $u_2 = \\begin{pmatrix} 0 \\\\ 0 \\end{pmatrix}$ (linearly dependent!)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gram-Schmidt (Step 1)",
+          "latex": "$u_1 = v_1$",
+          "description": "Keep the first vector as-is. It defines the first direction."
+        },
+        {
+          "name": "Gram-Schmidt (Step 2)",
+          "latex": "$u_2 = v_2 - \\frac{\\langle v_2, u_1 \\rangle}{\\langle u_1, u_1 \\rangle} u_1$",
+          "description": "Subtract the component of v₂ parallel to u₁, leaving only the perpendicular part."
+        },
+        {
+          "name": "Linear Independence Test",
+          "latex": "$\\|u_2\\| > \\text{tol}$",
+          "description": "If the orthogonalized vector has non-zero norm, the original vectors were independent."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that orthogonalizes two 2D vectors using Gram-Schmidt. The function should return a list of two orthogonal vectors. If the second vector becomes zero (norm less than tolerance) after orthogonalization, return only the first vector (as a list with one element), indicating linear dependence.",
+        "function_signature": "def orthogonalize_two_vectors(v1: np.ndarray, v2: np.ndarray, tol: float = 1e-10) -> list[np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef orthogonalize_two_vectors(v1: np.ndarray, v2: np.ndarray, tol: float = 1e-10) -> list[np.ndarray]:\n    # Set u1 = v1\n    # Compute projection of v2 onto u1\n    # Compute u2 = v2 - projection\n    # Check if norm of u2 is greater than tolerance\n    # Return [u1] if dependent, [u1, u2] if independent\n    pass",
+        "test_cases": [
+          {
+            "input": "orthogonalize_two_vectors(np.array([1.0, 0.0]), np.array([1.0, 1.0]))",
+            "expected": "[np.array([1.0, 0.0]), np.array([0.0, 1.0])]",
+            "explanation": "Projection of [1,1] onto [1,0] is [1,0], so u₂ = [1,1] - [1,0] = [0,1]. Orthogonal."
+          },
+          {
+            "input": "orthogonalize_two_vectors(np.array([3.0, 4.0]), np.array([1.0, 0.0]))",
+            "expected": "[np.array([3.0, 4.0]), np.array([0.64, -0.48])]",
+            "explanation": "After subtracting projection, u₂ has components perpendicular to u₁."
+          },
+          {
+            "input": "orthogonalize_two_vectors(np.array([1.0, 1.0]), np.array([2.0, 2.0]))",
+            "expected": "[np.array([1.0, 1.0])]",
+            "explanation": "v₂ is scalar multiple of v₁, so u₂ becomes zero vector. Return only [u₁]."
+          },
+          {
+            "input": "orthogonalize_two_vectors(np.array([1.0, 0.0]), np.array([0.0, 1.0]))",
+            "expected": "[np.array([1.0, 0.0]), np.array([0.0, 1.0])]",
+            "explanation": "Already orthogonal, projection is zero, so u₂ = v₂."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check if u₂ has sufficient norm (comparing to tolerance)",
+        "Modifying v₁ instead of keeping it as u₁",
+        "Computing projection of u₁ onto v₂ instead of v₂ onto u₁",
+        "Not handling the case where vectors are linearly dependent"
+      ],
+      "hint": "Use your projection function from step 3. After computing u₂ = v₂ - proj, check if np.linalg.norm(u2) > tol. If not, the vectors are dependent, so return only [u1].",
+      "references": [
+        "Gram-Schmidt process",
+        "Linear independence",
+        "Orthogonal basis"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Linear Independence and Tolerance Handling",
+      "relation_to_problem": "The main problem processes multiple vectors and must detect which are linearly independent. The tolerance parameter determines when a vector is considered 'essentially zero' due to numerical errors.",
+      "prerequisites": [
+        "Vector norms",
+        "Floating-point arithmetic",
+        "Linear algebra fundamentals"
+      ],
+      "learning_objectives": [
+        "Understand linear independence and dependence",
+        "Recognize numerical issues in floating-point computation",
+        "Apply tolerance-based comparisons for numerical stability",
+        "Filter out linearly dependent vectors during Gram-Schmidt"
+      ],
+      "math_content": {
+        "definition": "A set of vectors $\\{v_1, v_2, \\ldots, v_k\\} \\subset \\mathbb{R}^n$ is **linearly independent** if no vector can be expressed as a linear combination of the others. Formally, the only solution to $$c_1 v_1 + c_2 v_2 + \\cdots + c_k v_k = 0$$ is $c_1 = c_2 = \\cdots = c_k = 0$. Otherwise, the set is **linearly dependent**. In the context of Gram-Schmidt, after orthogonalizing $v_k$ against $u_1, \\ldots, u_{k-1}$, if the resulting vector has norm less than a tolerance $\\text{tol}$, then $v_k$ is considered dependent on the previous vectors.",
+        "notation": "$\\text{span}(S)$ = all linear combinations of vectors in set $S$; $\\text{dim}(V)$ = dimension of space $V$",
+        "theorem": "**Theorem (Dimension Constraint):** In $\\mathbb{R}^2$, any set of more than 2 vectors is linearly dependent. A set of 2 vectors is linearly independent if and only if they are not scalar multiples of each other. **Numerical Stability Theorem:** In finite-precision arithmetic, comparing to zero must use a tolerance. A computed value $x$ is considered zero if $|x| < \\text{tol}$, where $\\text{tol}$ accounts for rounding errors (typically $10^{-10}$ to $10^{-15}$).",
+        "proof_sketch": "**Proof of Dimension Constraint:** $\\mathbb{R}^2$ has dimension 2, so any basis has exactly 2 vectors. By the Steinitz exchange lemma, no set of more than 2 vectors can be independent. For 2 vectors $v_1, v_2$, they are dependent if and only if one is a scalar multiple of the other, i.e., $v_2 = c v_1$ for some $c \\in \\mathbb{R}$. This occurs precisely when $v_2$ is parallel to $v_1$, making the orthogonalized $u_2 = 0$. $\\square$",
+        "examples": [
+          "Example 1: $\\{\\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}, \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix}\\}$ is linearly independent (standard basis).",
+          "Example 2: $\\{\\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}, \\begin{pmatrix} 2 \\\\ 2 \\end{pmatrix}\\}$ is linearly dependent since $\\begin{pmatrix} 2 \\\\ 2 \\end{pmatrix} = 2 \\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}$.",
+          "Example 3: After orthogonalizing, if $u_2 = \\begin{pmatrix} 10^{-12} \\\\ 10^{-11} \\end{pmatrix}$, then $\\|u_2\\| \\approx 10^{-11} < 10^{-10} = \\text{tol}$, so we consider it zero (dependent).",
+          "Example 4: $\\{\\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}, \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix}, \\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}\\}$ is dependent (3 vectors in 2D)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Linear Dependence via Zero Vector",
+          "latex": "$\\|u_k\\| \\leq \\text{tol} \\Rightarrow v_k \\in \\text{span}(v_1, \\ldots, v_{k-1})$",
+          "description": "If the orthogonalized vector is essentially zero, the original vector was dependent."
+        },
+        {
+          "name": "Numerical Zero Test",
+          "latex": "$|x| < \\text{tol}$",
+          "description": "Standard way to check if a floating-point value x is numerically zero."
+        },
+        {
+          "name": "Maximum Independent Vectors",
+          "latex": "$\\text{In } \\mathbb{R}^n, \\text{ at most } n \\text{ vectors can be independent}$",
+          "description": "Dimension limits the size of any linearly independent set."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that determines how many vectors in a list are linearly independent using the Gram-Schmidt process. The function should orthogonalize vectors one by one, counting how many result in non-zero vectors (norm > tolerance). Return the count of independent vectors.",
+        "function_signature": "def count_independent_vectors(vectors: list[np.ndarray], tol: float = 1e-10) -> int:",
+        "starter_code": "import numpy as np\n\ndef count_independent_vectors(vectors: list[np.ndarray], tol: float = 1e-10) -> int:\n    # Initialize empty list for orthogonal basis\n    # For each vector:\n    #   Subtract projections onto all current basis vectors\n    #   If resulting vector has norm > tol, add to basis\n    # Return length of basis\n    pass",
+        "test_cases": [
+          {
+            "input": "count_independent_vectors([np.array([1.0, 0.0]), np.array([0.0, 1.0])])",
+            "expected": "2",
+            "explanation": "Both vectors are independent (standard basis)"
+          },
+          {
+            "input": "count_independent_vectors([np.array([1.0, 1.0]), np.array([2.0, 2.0])])",
+            "expected": "1",
+            "explanation": "Second vector is 2× first, so only 1 independent vector"
+          },
+          {
+            "input": "count_independent_vectors([np.array([1.0, 0.0]), np.array([1.0, 1.0]), np.array([0.0, 1.0])])",
+            "expected": "2",
+            "explanation": "In 2D, maximum 2 independent vectors. Third is dependent."
+          },
+          {
+            "input": "count_independent_vectors([np.array([3.0, 4.0]), np.array([4.0, -3.0])])",
+            "expected": "2",
+            "explanation": "Both vectors are independent (orthogonal, different directions)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not accumulating projections from all previous basis vectors",
+        "Using exact equality with zero instead of tolerance comparison",
+        "Forgetting that in 2D, at most 2 vectors can be independent",
+        "Adding a vector to the basis even when its norm is below tolerance"
+      ],
+      "hint": "Iterate through vectors, orthogonalizing each against all vectors already in your basis list. Only add to basis if np.linalg.norm(orthogonalized_vector) > tol.",
+      "references": [
+        "Linear independence",
+        "Numerical linear algebra",
+        "Floating-point arithmetic"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Gram-Schmidt: Orthonormalization",
+      "relation_to_problem": "This combines all previous steps: orthogonalize vectors iteratively (step 4), check for linear independence (step 5), and normalize results (step 1) to produce the final orthonormal basis.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "List/array manipulation",
+        "Algorithm design"
+      ],
+      "learning_objectives": [
+        "Implement the complete Gram-Schmidt process for multiple vectors",
+        "Process vectors iteratively, building the orthonormal basis incrementally",
+        "Combine orthogonalization, independence checking, and normalization",
+        "Handle edge cases: empty input, all dependent vectors, zero vectors"
+      ],
+      "math_content": {
+        "definition": "The **Gram-Schmidt orthonormalization process** transforms a list of vectors $\\{v_1, v_2, \\ldots, v_k\\} \\subset \\mathbb{R}^n$ into an orthonormal set $\\{e_1, e_2, \\ldots, e_m\\}$ where $m \\leq k$ is the number of linearly independent vectors. The algorithm proceeds iteratively: $$\\begin{align*}u_1 &= v_1 \\\\u_i &= v_i - \\sum_{j=1}^{i-1} \\text{proj}_{u_j}(v_i) = v_i - \\sum_{j=1}^{i-1} \\frac{\\langle v_i, u_j \\rangle}{\\langle u_j, u_j \\rangle} u_j\\end{align*}$$ If $\\|u_i\\| > \\text{tol}$, then normalize: $e_i = \\frac{u_i}{\\|u_i\\|}$ and add to the basis. Otherwise, discard $v_i$ as dependent.",
+        "notation": "$\\{e_1, \\ldots, e_m\\}$ = orthonormal basis; $m = \\text{rank}(\\{v_1, \\ldots, v_k\\})$ = number of independent vectors",
+        "theorem": "**Theorem (Gram-Schmidt Correctness):** The Gram-Schmidt process produces an orthonormal basis for $\\text{span}(v_1, \\ldots, v_k)$. Specifically: (1) $\\langle e_i, e_j \\rangle = \\delta_{ij}$ (orthonormal), (2) $\\text{span}(e_1, \\ldots, e_m) = \\text{span}(v_1, \\ldots, v_k)$ (same subspace), (3) $m = \\text{rank}(\\{v_1, \\ldots, v_k\\})$ (count of independent vectors). **Complexity:** For $k$ vectors in $\\mathbb{R}^n$, the algorithm requires $O(k^2 n)$ operations (each of $k$ vectors requires projecting against up to $k-1$ previous vectors, each projection is $O(n)$).",
+        "proof_sketch": "**Proof by Induction:** Base case ($i=1$): $u_1 = v_1$, normalize to $e_1$. Clearly $\\|e_1\\| = 1$. Inductive step: Assume $\\{e_1, \\ldots, e_{i-1}\\}$ is orthonormal. By construction, $u_i = v_i - \\sum_{j=1}^{i-1} \\text{proj}_{u_j}(v_i)$, so $u_i$ is orthogonal to each $u_j$ (and thus each $e_j = u_j / \\|u_j\\|$). If $\\|u_i\\| > \\text{tol}$, then $e_i = u_i / \\|u_i\\|$ is a unit vector orthogonal to all previous $e_j$. Thus $\\{e_1, \\ldots, e_i\\}$ is orthonormal. $\\square$",
+        "examples": [
+          "Example 1: Given $[\\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}, \\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}]$. Step 1: $u_1 = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$, $e_1 = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$. Step 2: $u_2 = \\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix} - 1 \\cdot \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix} = \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix}$, $e_2 = \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix}$. Result: $[\\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}, \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix}]$.",
+          "Example 2: Given $[\\begin{pmatrix} 3 \\\\ 0 \\end{pmatrix}, \\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}]$. Step 1: $u_1 = \\begin{pmatrix} 3 \\\\ 0 \\end{pmatrix}$, $e_1 = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$. Step 2: $u_2 = \\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix} - 1 \\cdot \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix} = \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix}$, $e_2 = \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix}$.",
+          "Example 3 (Dependent): Given $[\\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}, \\begin{pmatrix} 2 \\\\ 2 \\end{pmatrix}, \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix}]$. Step 1: $e_1 = \\frac{1}{\\sqrt{2}}\\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}$. Step 2: $u_2 = 0$ (dependent). Step 3: $u_3 = \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix} - \\frac{1}{2}\\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix} = \\begin{pmatrix} -0.5 \\\\ 0.5 \\end{pmatrix}$, $e_2 = \\frac{1}{\\sqrt{2}}\\begin{pmatrix} -1 \\\\ 1 \\end{pmatrix}$. Result: 2 basis vectors."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Iterative Orthogonalization",
+          "latex": "$u_i = v_i - \\sum_{j=1}^{i-1} \\langle v_i, e_j \\rangle e_j$ (if $e_j$ are orthonormal)",
+          "description": "Subtract projections onto all previous orthonormal basis vectors."
+        },
+        {
+          "name": "Normalization Step",
+          "latex": "$e_i = \\frac{u_i}{\\|u_i\\|}$ if $\\|u_i\\| > \\text{tol}$",
+          "description": "Convert orthogonal vector to unit vector, but only if it's not too small."
+        },
+        {
+          "name": "Orthonormal Basis Properties",
+          "latex": "$\\langle e_i, e_j \\rangle = \\delta_{ij} = \\begin{cases} 1 & i=j \\\\ 0 & i \\neq j \\end{cases}$",
+          "description": "Basis vectors are mutually orthogonal and each has unit length."
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete orthonormal_basis function as specified in the main problem. Process each input vector iteratively: subtract projections onto all current basis vectors (simplified since basis is orthonormal), check if the result has sufficient norm, normalize if so, and add to the basis. Return the list of orthonormal basis vectors. This is the integration of all previous sub-quests.",
+        "function_signature": "def orthonormal_basis(vectors: list[list[float]], tol: float = 1e-10) -> list[np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef orthonormal_basis(vectors: list[list[float]], tol: float = 1e-10) -> list[np.ndarray]:\n    basis = []\n    \n    for v in vectors:\n        # Convert to numpy array\n        v = np.array(v, dtype=float)\n        \n        # Orthogonalize: subtract projections onto all basis vectors\n        # Since basis is orthonormal, projection is simpler: <v, e> * e\n        u = v.copy()\n        for e in basis:\n            # Subtract projection of v onto e\n            pass\n        \n        # Check if resulting vector is non-zero (within tolerance)\n        # If so, normalize and add to basis\n        \n    return basis",
+        "test_cases": [
+          {
+            "input": "orthonormal_basis([[1, 0], [1, 1]])",
+            "expected": "[array([1., 0.]), array([0., 1.])]",
+            "explanation": "Standard Gram-Schmidt example: first vector [1,0] is normalized, second becomes [0,1] after removing projection"
+          },
+          {
+            "input": "orthonormal_basis([[3, 0], [1, 1]])",
+            "expected": "[array([1., 0.]), array([0., 1.])]",
+            "explanation": "First vector [3,0] normalizes to [1,0], second [1,1] becomes [0,1] after removing [1,0] component"
+          },
+          {
+            "input": "orthonormal_basis([[1, 1], [2, 2]])",
+            "expected": "[array([0.70710678, 0.70710678])]",
+            "explanation": "Second vector is dependent (scalar multiple), so only one basis vector: [1,1]/√2"
+          },
+          {
+            "input": "orthonormal_basis([[1, 1], [-1, 1]])",
+            "expected": "[array([0.70710678, 0.70710678]), array([-0.70710678, 0.70710678])]",
+            "explanation": "These are already orthogonal, just need normalization: [1,1]/√2 and [-1,1]/√2"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not using the simplified projection formula when basis vectors are already orthonormal",
+        "Forgetting to convert input lists to numpy arrays",
+        "Not making a copy of the vector before modifying it in the loop",
+        "Adding vectors to basis before normalizing them",
+        "Incorrect order of operations: must orthogonalize first, then check norm, then normalize"
+      ],
+      "hint": "Since basis vectors are already orthonormal, projection of v onto e is simply np.dot(v, e) * e. Iterate through all basis vectors, subtracting this projection each time. After the loop, check if np.linalg.norm(u) > tol, and if so, normalize u and append to basis.",
+      "references": [
+        "Gram-Schmidt algorithm",
+        "QR decomposition",
+        "Orthonormal bases in linear algebra"
+      ]
+    }
+  ]
+}

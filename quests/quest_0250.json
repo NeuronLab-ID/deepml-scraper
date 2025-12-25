@@ -1,0 +1,442 @@
+{
+  "problem_id": 250,
+  "title": "Calculate SLA Compliance Metrics for Model Service",
+  "category": "MLOps",
+  "difficulty": "easy",
+  "description": "In production ML systems, Service Level Agreement (SLA) monitoring is crucial for ensuring your model serving endpoints meet performance guarantees. Given a list of request results from a model serving endpoint, compute key SLA compliance metrics.\n\nEach request result is a dictionary with:\n- 'latency_ms': Response latency in milliseconds (float)\n- 'status': Either 'success', 'error', or 'timeout'\n\nWrite a function `calculate_sla_metrics(requests, latency_sla_ms)` that computes:\n\n1. **Latency SLA Compliance**: Percentage of successful requests that completed within the latency threshold\n2. **Error Rate**: Percentage of all requests that resulted in an error or timeout\n3. **Overall SLA Compliance**: Percentage of all requests that both succeeded AND met the latency threshold\n\nThe function should return a dictionary with these three metrics. If the input list is empty, return an empty dictionary. If there are no successful requests, latency_sla_compliance should be 0.0.\n\nAll returned values should be percentages (0-100) rounded to 2 decimal places.",
+  "example": {
+    "input": "requests = [{'status': 'success', 'latency_ms': 50}, {'status': 'success', 'latency_ms': 80}, {'status': 'success', 'latency_ms': 120}, {'status': 'error', 'latency_ms': 30}, {'status': 'timeout', 'latency_ms': 5000}], latency_sla_ms = 100.0",
+    "output": "{'latency_sla_compliance': 66.67, 'error_rate': 40.0, 'overall_sla_compliance': 40.0}",
+    "reasoning": "Out of 5 total requests, 3 succeeded. Of the 3 successful requests, 2 had latency <= 100ms (50ms and 80ms), giving latency_sla_compliance = 2/3 * 100 = 66.67%. There were 2 failed requests (1 error + 1 timeout), giving error_rate = 2/5 * 100 = 40%. Overall SLA compliance = 2/5 * 100 = 40% (requests that both succeeded AND met the latency threshold)."
+  },
+  "starter_code": "def calculate_sla_metrics(requests: list, latency_sla_ms: float = 100.0) -> dict:\n    \"\"\"\n    Calculate SLA compliance metrics for a model serving endpoint.\n    \n    Args:\n        requests: list of request results, each a dict with 'latency_ms' and 'status'\n        latency_sla_ms: maximum acceptable latency in ms for SLA compliance\n    \n    Returns:\n        dict with keys: 'latency_sla_compliance', 'error_rate', 'overall_sla_compliance'\n        All values as percentages (0-100), rounded to 2 decimal places.\n    \"\"\"\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Set Theory and Cardinality: Counting Elements with Predicates",
+      "relation_to_problem": "Computing SLA metrics requires counting requests that satisfy specific conditions (successful, within latency threshold, failed). Set theory provides the mathematical foundation for formally defining and counting these subsets.",
+      "prerequisites": [
+        "Basic Python",
+        "Understanding of dictionaries and lists"
+      ],
+      "learning_objectives": [
+        "Define sets using predicates and logical conditions",
+        "Calculate cardinality (size) of sets defined by predicates",
+        "Apply logical conjunctions (AND) and disjunctions (OR) to set definitions",
+        "Implement predicate-based filtering in Python"
+      ],
+      "math_content": {
+        "definition": "Let $U$ be a universe of objects. A **predicate** $P$ is a function $P: U \\to \\{true, false\\}$. The **set defined by predicate** $P$ is $S_P = \\{x \\in U : P(x) = true\\}$. The **cardinality** of a finite set $S$, denoted $|S|$, is the number of elements in $S$.",
+        "notation": "$|S|$ = cardinality (count) of set $S$, $\\{x \\in U : P(x)\\}$ = set of all elements in $U$ satisfying predicate $P$, $\\land$ = logical AND, $\\lor$ = logical OR, $\\neg$ = logical NOT",
+        "theorem": "**Theorem (Set Composition)**: For predicates $P$ and $Q$ on universe $U$: (1) $|\\{x : P(x) \\land Q(x)\\}| \\leq \\min(|\\{x : P(x)\\}|, |\\{x : Q(x)\\}|)$, (2) $|\\{x : P(x) \\lor Q(x)\\}| = |\\{x : P(x)\\}| + |\\{x : Q(x)\\}| - |\\{x : P(x) \\land Q(x)\\}|$",
+        "proof_sketch": "Proof of (1): The set $\\{x : P(x) \\land Q(x)\\}$ is a subset of both $\\{x : P(x)\\}$ and $\\{x : Q(x)\\}$, since every element satisfying both predicates must satisfy each individually. Therefore its cardinality cannot exceed either. Proof of (2): This is the inclusion-exclusion principle. When counting elements satisfying $P$ or $Q$, we add both counts but must subtract the intersection to avoid double-counting elements satisfying both conditions.",
+        "examples": [
+          "Let $U = \\{1, 2, 3, 4, 5, 6\\}$. Define $P(x) = (x > 3)$ and $Q(x) = (x$ is even). Then $\\{x : P(x)\\} = \\{4, 5, 6\\}$ with $|\\{x : P(x)\\}| = 3$. Also $\\{x : Q(x)\\} = \\{2, 4, 6\\}$ with cardinality 3. The conjunction gives $\\{x : P(x) \\land Q(x)\\} = \\{4, 6\\}$ with cardinality 2.",
+          "For requests in an ML system, let $U$ be all requests, $P(r) = (r.status = success)$, and $Q(r) = (r.latency\\_ms \\leq 100)$. Then $\\{r : P(r) \\land Q(r)\\}$ represents successful requests meeting the latency SLA, and $|\\{r : P(r) \\land Q(r)\\}|$ counts such requests."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cardinality by Predicate Count",
+          "latex": "$|\\{x \\in U : P(x)\\}| = \\sum_{x \\in U} \\mathbb{1}_{P(x)}$",
+          "description": "Count elements satisfying predicate $P$ by summing indicator function $\\mathbb{1}_{P(x)}$ which equals 1 if $P(x)$ is true, 0 otherwise"
+        },
+        {
+          "name": "Conjunction Cardinality",
+          "latex": "$|\\{x : P(x) \\land Q(x)\\}| = \\sum_{x \\in U} \\mathbb{1}_{P(x)} \\cdot \\mathbb{1}_{Q(x)}$",
+          "description": "Count elements satisfying both predicates by multiplying indicator functions"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that counts elements in a list satisfying a given condition. This builds the foundation for counting successful requests, failed requests, and requests meeting latency thresholds. The function should accept a list of dictionaries and a predicate function, returning the count of elements where the predicate evaluates to True.",
+        "function_signature": "def count_by_predicate(items: list, predicate: callable) -> int:",
+        "starter_code": "def count_by_predicate(items: list, predicate: callable) -> int:\n    \"\"\"\n    Count the number of items in the list that satisfy the predicate.\n    \n    Args:\n        items: list of items to evaluate\n        predicate: function that takes an item and returns True/False\n    \n    Returns:\n        Count of items where predicate(item) is True\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "count_by_predicate([1, 2, 3, 4, 5], lambda x: x > 3)",
+            "expected": "2",
+            "explanation": "Elements 4 and 5 satisfy the predicate x > 3, so the count is 2"
+          },
+          {
+            "input": "count_by_predicate([{'status': 'success'}, {'status': 'error'}, {'status': 'success'}], lambda r: r['status'] == 'success')",
+            "expected": "2",
+            "explanation": "Two dictionaries have status equal to 'success', applying set theory to count elements satisfying the predicate"
+          },
+          {
+            "input": "count_by_predicate([], lambda x: x > 0)",
+            "expected": "0",
+            "explanation": "Empty set has cardinality 0 regardless of predicate"
+          },
+          {
+            "input": "count_by_predicate([{'x': 5, 'y': 10}, {'x': 15, 'y': 8}], lambda d: d['x'] > 10 and d['y'] < 12)",
+            "expected": "1",
+            "explanation": "Only the second element satisfies both conditions (conjunction), demonstrating |{x : P(x) ∧ Q(x)}|"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle empty lists (should return 0, not error)",
+        "Not considering that predicates can be complex boolean expressions",
+        "Confusing predicates with filters (predicate returns bool, filter returns items)",
+        "Attempting to count without iterating through all elements"
+      ],
+      "hint": "Use a loop or list comprehension with a conditional check. The cardinality formula translates directly to summing 1 for each element where the predicate is True.",
+      "references": [
+        "Discrete Mathematics: Sets and Predicates",
+        "Python filter() and lambda functions",
+        "Indicator functions in probability theory"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Ratios and Percentages: Computing Proportions from Counts",
+      "relation_to_problem": "SLA metrics are expressed as percentages (latency compliance, error rate, overall compliance). Understanding ratios and their conversion to percentages with proper rounding is essential for reporting these metrics accurately.",
+      "prerequisites": [
+        "Counting elements with predicates",
+        "Basic arithmetic operations"
+      ],
+      "learning_objectives": [
+        "Define mathematical ratios and their representation",
+        "Convert ratios to percentages using proper scaling",
+        "Apply rounding rules to finite precision (2 decimal places)",
+        "Handle edge cases: division by zero and empty denominators"
+      ],
+      "math_content": {
+        "definition": "Let $A$ and $B$ be finite sets with $|B| > 0$. The **ratio** of $A$ to $B$ is $r = \\frac{|A|}{|B|}$, where $0 \\leq r \\leq \\infty$. If $A \\subseteq B$, then $0 \\leq r \\leq 1$. The **percentage** corresponding to ratio $r$ is $p = r \\times 100\\%$, expressed in the range $[0, 100]$. **Rounding** to $n$ decimal places means finding the value $x'$ such that $x' = \\frac{\\lfloor x \\cdot 10^n + 0.5 \\rfloor}{10^n}$.",
+        "notation": "$\\frac{|A|}{|B|}$ = ratio of cardinalities, $\\%$ = percent (per hundred), $\\lfloor \\cdot \\rfloor$ = floor function (round down), $\\lceil \\cdot \\rceil$ = ceiling function (round up)",
+        "theorem": "**Theorem (Ratio Bounds)**: If $A \\subseteq B$ and $|B| > 0$, then $\\frac{|A|}{|B|} \\in [0, 1]$, and consequently the percentage $p \\in [0, 100]$. **Theorem (Division by Zero)**: The ratio $\\frac{|A|}{|B|}$ is undefined when $|B| = 0$. In practical applications, this case requires special handling (returning 0, null, or raising an error depending on context).",
+        "proof_sketch": "Proof of Ratio Bounds: Since $A \\subseteq B$, every element of $A$ is in $B$, so $|A| \\leq |B|$. Since cardinalities are non-negative, $|A| \\geq 0$. Therefore $0 \\leq |A| \\leq |B|$, which gives $0 \\leq \\frac{|A|}{|B|} \\leq 1$ when $|B| > 0$. Multiplying by 100 preserves the inequality: $0 \\leq \\frac{|A|}{|B|} \\times 100 \\leq 100$.",
+        "examples": [
+          "If 8 out of 10 requests succeed, the success ratio is $r = \\frac{8}{10} = 0.8$, and the success percentage is $p = 0.8 \\times 100\\% = 80\\%$.",
+          "Given $|A| = 2$ and $|B| = 3$, the ratio is $\\frac{2}{3} = 0.\\overline{6}$. Converting to percentage: $0.\\overline{6} \\times 100 = 66.\\overline{6}\\%$. Rounding to 2 decimal places: $66.67\\%$.",
+          "For SLA metrics: if 15 out of 20 successful requests meet the latency threshold, latency compliance = $\\frac{15}{20} \\times 100\\% = 75.00\\%$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Ratio to Percentage Conversion",
+          "latex": "$p = \\frac{|A|}{|B|} \\times 100$",
+          "description": "Convert a ratio to percentage by multiplying by 100. Used for all SLA metric calculations."
+        },
+        {
+          "name": "Rounding to n Decimal Places",
+          "latex": "$\\text{round}_n(x) = \\frac{\\lfloor x \\cdot 10^n + 0.5 \\rfloor}{10^n}$",
+          "description": "Standard rounding formula. For n=2: multiply by 100, add 0.5, floor, divide by 100."
+        },
+        {
+          "name": "Complementary Percentage",
+          "latex": "$p_{\\neg A} = 100\\% - p_A$",
+          "description": "If $p_A$ is the percentage of events with property A, then $p_{\\neg A}$ is the percentage without it (when universe is fixed)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes a percentage from two counts (numerator and denominator) with proper rounding to 2 decimal places. This is the core operation for calculating any SLA metric. Handle the edge case where the denominator is zero by returning 0.0.",
+        "function_signature": "def calculate_percentage(count: int, total: int) -> float:",
+        "starter_code": "def calculate_percentage(count: int, total: int) -> float:\n    \"\"\"\n    Calculate percentage from count and total, rounded to 2 decimal places.\n    \n    Args:\n        count: numerator (number of items matching criterion)\n        total: denominator (total number of items)\n    \n    Returns:\n        Percentage value (0-100) rounded to 2 decimal places.\n        Returns 0.0 if total is 0.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_percentage(8, 10)",
+            "expected": "80.0",
+            "explanation": "8/10 = 0.8, multiply by 100 gives 80.0%"
+          },
+          {
+            "input": "calculate_percentage(2, 3)",
+            "expected": "66.67",
+            "explanation": "2/3 = 0.6666..., multiply by 100 gives 66.6666..., rounding to 2 decimals gives 66.67"
+          },
+          {
+            "input": "calculate_percentage(0, 5)",
+            "expected": "0.0",
+            "explanation": "0/5 = 0, representing 0% compliance or error rate"
+          },
+          {
+            "input": "calculate_percentage(5, 5)",
+            "expected": "100.0",
+            "explanation": "5/5 = 1.0, representing 100% compliance"
+          },
+          {
+            "input": "calculate_percentage(10, 0)",
+            "expected": "0.0",
+            "explanation": "Edge case: division by zero should return 0.0 (no data means no compliance)"
+          },
+          {
+            "input": "calculate_percentage(1, 6)",
+            "expected": "16.67",
+            "explanation": "1/6 = 0.1666..., multiply by 100 gives 16.6666..., rounding up to 16.67"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to multiply by 100 (returning ratio instead of percentage)",
+        "Not handling division by zero (causes runtime error)",
+        "Incorrect rounding (using truncation instead of rounding, or wrong precision)",
+        "Returning integer instead of float (loses decimal precision)",
+        "Rounding before multiplying by 100 instead of after"
+      ],
+      "hint": "Check for zero denominator first. Use Python's round() function with 2 as the second argument after computing the ratio and multiplying by 100.",
+      "references": [
+        "IEEE 754 floating-point arithmetic",
+        "Python round() function documentation",
+        "Statistical reporting standards for percentages"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Conditional Probability and Filtering: Computing Metrics on Subsets",
+      "relation_to_problem": "The latency SLA compliance metric is computed only on successful requests (not all requests). This requires understanding conditional metrics - computing ratios on filtered subsets of data where a condition is met.",
+      "prerequisites": [
+        "Set theory and cardinality",
+        "Computing percentages from counts"
+      ],
+      "learning_objectives": [
+        "Understand conditional metrics computed on filtered subsets",
+        "Distinguish between unconditional and conditional ratios",
+        "Implement multi-stage filtering (filter then count)",
+        "Handle edge cases when filtered subset is empty"
+      ],
+      "math_content": {
+        "definition": "Let $U$ be a universe of events, and $P, Q$ be predicates on $U$. The **conditional ratio** of $Q$ given $P$ is defined as: $$r_{Q|P} = \\frac{|\\{x \\in U : P(x) \\land Q(x)\\}|}{|\\{x \\in U : P(x)\\}|}$$ provided $|\\{x : P(x)\\}| > 0$. The **conditional percentage** is $p_{Q|P} = r_{Q|P} \\times 100\\%$. This measures \"what proportion of elements satisfying $P$ also satisfy $Q$\".",
+        "notation": "$r_{Q|P}$ = ratio of $Q$ given $P$ (read: \"Q given P\"), $|$ = \"given that\" (conditioning), $S|P = \\{x \\in S : P(x)\\}$ = subset of $S$ satisfying $P$",
+        "theorem": "**Theorem (Conditional vs Unconditional Ratios)**: For predicates $P, Q$ on universe $U$: $$r_{Q|P} = \\frac{r_{P \\land Q}}{r_P}$$ where $r_P = \\frac{|\\{x : P(x)\\}|}{|U|}$ and $r_{P \\land Q} = \\frac{|\\{x : P(x) \\land Q(x)\\}|}{|U|}$ are unconditional ratios. This is analogous to the conditional probability formula: $P(Q|P) = \\frac{P(Q \\land P)}{P(P)}$.",
+        "proof_sketch": "Starting with the definition: $$r_{Q|P} = \\frac{|\\{x : P(x) \\land Q(x)\\}|}{|\\{x : P(x)\\}|}$$ Multiply both numerator and denominator by $\\frac{1}{|U|}$: $$r_{Q|P} = \\frac{\\frac{|\\{x : P(x) \\land Q(x)\\}|}{|U|}}{\\frac{|\\{x : P(x)\\}|}{|U|}} = \\frac{r_{P \\land Q}}{r_P}$$ This shows the conditional ratio can be derived from unconditional ratios, though in practice we compute it directly from filtered counts.",
+        "examples": [
+          "In an ML system, let $P(r) = (r.status = success)$ and $Q(r) = (r.latency\\_ms \\leq 100)$. The latency SLA compliance is the conditional ratio $r_{Q|P}$: \"of successful requests, what proportion met the latency threshold?\" If 20 requests succeeded and 15 of those had latency ≤ 100ms, then $r_{Q|P} = \\frac{15}{20} = 0.75 = 75\\%$.",
+          "Compare to unconditional: If there were 30 total requests, 20 succeeded, and 15 met both conditions, then $r_P = \\frac{20}{30} = 0.667$, $r_{P \\land Q} = \\frac{15}{30} = 0.5$, and $r_{Q|P} = \\frac{0.5}{0.667} = 0.75$ (same result).",
+          "Edge case: If no requests succeeded ($|\\{x : P(x)\\}| = 0$), the conditional ratio is undefined. Convention: return 0.0 to indicate \"no data to measure compliance\"."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Conditional Percentage Formula",
+          "latex": "$p_{Q|P} = \\frac{|\\{x : P(x) \\land Q(x)\\}|}{|\\{x : P(x)\\}|} \\times 100\\%$",
+          "description": "Compute percentage of P-satisfying elements that also satisfy Q. Used for latency SLA compliance (Q = meets latency, P = is successful)."
+        },
+        {
+          "name": "Two-Stage Filtering Count",
+          "latex": "$|\\{x : P(x) \\land Q(x)\\}| = \\sum_{x \\in \\{y : P(y)\\}} \\mathbb{1}_{Q(x)}$",
+          "description": "First filter by P, then count elements in filtered set satisfying Q. Equivalent to counting elements satisfying both."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates a conditional percentage: given a list of items, filter by a primary condition, then compute what percentage of the filtered items satisfy a secondary condition. This directly models latency SLA compliance (primary: success, secondary: meets latency). Return 0.0 if the filtered set is empty.",
+        "function_signature": "def conditional_percentage(items: list, primary_condition: callable, secondary_condition: callable) -> float:",
+        "starter_code": "def conditional_percentage(items: list, primary_condition: callable, secondary_condition: callable) -> float:\n    \"\"\"\n    Calculate what percentage of items satisfying primary_condition also satisfy secondary_condition.\n    \n    Args:\n        items: list of items to analyze\n        primary_condition: predicate defining the subset to analyze\n        secondary_condition: predicate to measure within the filtered subset\n    \n    Returns:\n        Percentage (0-100) rounded to 2 decimal places.\n        Returns 0.0 if no items satisfy primary_condition.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "conditional_percentage([{'status': 'success', 'latency': 50}, {'status': 'success', 'latency': 150}, {'status': 'error', 'latency': 30}], lambda r: r['status'] == 'success', lambda r: r['latency'] <= 100)",
+            "expected": "50.0",
+            "explanation": "Of 2 successful requests, 1 has latency ≤ 100ms, giving 1/2 = 50%"
+          },
+          {
+            "input": "conditional_percentage([1, 2, 3, 4, 5, 6], lambda x: x > 2, lambda x: x % 2 == 0)",
+            "expected": "50.0",
+            "explanation": "Of numbers > 2 (which are 3,4,5,6 = 4 items), exactly 2 are even (4,6), giving 2/4 = 50%"
+          },
+          {
+            "input": "conditional_percentage([{'x': 1}, {'x': 2}, {'x': 3}], lambda d: d['x'] > 5, lambda d: d['x'] < 10)",
+            "expected": "0.0",
+            "explanation": "No items satisfy primary condition (x > 5), so return 0.0 by convention"
+          },
+          {
+            "input": "conditional_percentage([{'a': True, 'b': True}, {'a': True, 'b': True}, {'a': True, 'b': False}], lambda d: d['a'], lambda d: d['b'])",
+            "expected": "66.67",
+            "explanation": "All 3 items satisfy primary (a=True), 2 satisfy secondary (b=True), giving 2/3 = 66.67%"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing percentage on all items instead of filtered subset (unconditional instead of conditional)",
+        "Not filtering by primary condition first (counting wrong denominator)",
+        "Checking secondary condition on all items, not just those passing primary",
+        "Not handling empty filtered set (division by zero)",
+        "Confusing filter order (should be: all items → filter by primary → measure secondary on filtered)"
+      ],
+      "hint": "First filter the list by primary_condition to get a subset. Then count how many in that subset satisfy secondary_condition. Use your percentage calculation from step 2.",
+      "references": [
+        "Conditional probability in statistics",
+        "Set theory: relative complements and restrictions",
+        "Python filter() and list comprehensions"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Complement Sets and Error Metrics: Computing Failure Rates",
+      "relation_to_problem": "The error rate metric measures requests that failed (status is 'error' or 'timeout'). This requires understanding complement sets and disjunctions - counting elements that satisfy at least one of multiple failure conditions.",
+      "prerequisites": [
+        "Set theory and predicates",
+        "Computing percentages",
+        "Logical operators (AND, OR, NOT)"
+      ],
+      "learning_objectives": [
+        "Define and compute complement sets (NOT operation)",
+        "Apply disjunction (OR) to combine multiple failure conditions",
+        "Distinguish between success and failure metrics",
+        "Implement union of predicate-defined sets"
+      ],
+      "math_content": {
+        "definition": "Let $U$ be a universe and $P$ a predicate on $U$. The **complement** of set $S_P = \\{x : P(x)\\}$ is $S_P^c = \\{x \\in U : \\neg P(x)\\}$, where $\\neg$ denotes logical negation. For predicates $P_1, P_2, ..., P_n$, the **disjunction** (OR) is: $$\\{x : P_1(x) \\lor P_2(x) \\lor ... \\lor P_n(x)\\} = \\{x : \\exists i, P_i(x)\\}$$ This is the union $S_{P_1} \\cup S_{P_2} \\cup ... \\cup S_{P_n}$.",
+        "notation": "$S^c$ = complement of set $S$, $\\neg P$ = NOT $P$ (negation), $P \\lor Q$ = P OR Q (disjunction), $\\cup$ = set union, $\\exists$ = \"there exists\"",
+        "theorem": "**Theorem (Complement Cardinality)**: For finite universe $U$ and predicate $P$: $$|\\{x : \\neg P(x)\\}| = |U| - |\\{x : P(x)\\}|$$ **Theorem (De Morgan's Laws)**: For predicates $P, Q$: (1) $\\neg(P \\land Q) \\equiv (\\neg P) \\lor (\\neg Q)$, (2) $\\neg(P \\lor Q) \\equiv (\\neg P) \\land (\\neg Q)$. These relate complements of intersections and unions.",
+        "proof_sketch": "Proof of Complement Cardinality: The sets $\\{x : P(x)\\}$ and $\\{x : \\neg P(x)\\}$ partition $U$ (every element is in exactly one). Therefore $|\\{x : P(x)\\}| + |\\{x : \\neg P(x)\\}| = |U|$, giving the result. Proof of De Morgan (1): An element fails to satisfy both $P$ and $Q$ if and only if it fails to satisfy at least one. Formally: $\\neg(P(x) \\land Q(x)) \\equiv (P(x) \\to false) \\lor (Q(x) \\to false) \\equiv \\neg P(x) \\lor \\neg Q(x)$.",
+        "examples": [
+          "In ML systems, if $P(r) = (r.status = success)$, then $\\neg P(r) = (r.status \\neq success)$ captures all failed requests. If 80% succeeded, then 20% failed: $p_{\\neg P} = 100\\% - 80\\% = 20\\%$.",
+          "For error rate with multiple failure types: Let $P_1(r) = (r.status = error)$ and $P_2(r) = (r.status = timeout)$. The set of failed requests is $\\{r : P_1(r) \\lor P_2(r)\\}$. If there are 30 total requests with 3 errors and 2 timeouts, error rate = $\\frac{3+2}{30} \\times 100\\% = 16.67\\%$.",
+          "Application of De Morgan: \"Not (successful AND fast)\" is equivalent to \"(not successful) OR (not fast)\", i.e., requests that either failed or exceeded latency threshold."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complement Percentage",
+          "latex": "$p_{\\neg P} = 100\\% - p_P$",
+          "description": "If $p_P$% of items satisfy predicate P, then $(100-p_P)$% satisfy NOT P. Used to derive error rate from success rate."
+        },
+        {
+          "name": "Disjunction Cardinality (Disjoint Case)",
+          "latex": "$|S_1 \\cup S_2| = |S_1| + |S_2|$ when $S_1 \\cap S_2 = \\emptyset$",
+          "description": "For disjoint sets (status can't be both 'error' and 'timeout'), union size is sum of sizes."
+        },
+        {
+          "name": "Error Rate Formula",
+          "latex": "$\\text{Error Rate} = \\frac{|\\{r : r.status \\in \\{error, timeout\\}\\}|}{|R|} \\times 100\\%$",
+          "description": "Percentage of requests with status 'error' or 'timeout' out of all requests."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the percentage of items where a given field has any value from a set of failure values. This models the error rate calculation where status can be 'error' or 'timeout'. Handle the edge case of empty input by returning 0.0.",
+        "function_signature": "def calculate_failure_rate(items: list, field: str, failure_values: set) -> float:",
+        "starter_code": "def calculate_failure_rate(items: list, field: str, failure_values: set) -> float:\n    \"\"\"\n    Calculate the percentage of items where the specified field has a value in failure_values.\n    \n    Args:\n        items: list of dictionaries to analyze\n        field: the field name to check\n        failure_values: set of values considered failures\n    \n    Returns:\n        Percentage (0-100) of items with field value in failure_values, rounded to 2 decimals.\n        Returns 0.0 if items list is empty.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_failure_rate([{'status': 'success'}, {'status': 'error'}, {'status': 'timeout'}, {'status': 'success'}], 'status', {'error', 'timeout'})",
+            "expected": "50.0",
+            "explanation": "2 out of 4 requests have status in {'error', 'timeout'}, giving 2/4 = 50%"
+          },
+          {
+            "input": "calculate_failure_rate([{'code': 200}, {'code': 404}, {'code': 500}, {'code': 200}], 'code', {404, 500, 503})",
+            "expected": "50.0",
+            "explanation": "2 out of 4 have error codes (404, 500), giving 50% failure rate"
+          },
+          {
+            "input": "calculate_failure_rate([{'status': 'success'}, {'status': 'success'}], 'status', {'error', 'timeout'})",
+            "expected": "0.0",
+            "explanation": "No requests have failure status, so failure rate is 0%"
+          },
+          {
+            "input": "calculate_failure_rate([], 'status', {'error'})",
+            "expected": "0.0",
+            "explanation": "Empty input returns 0.0 by convention"
+          },
+          {
+            "input": "calculate_failure_rate([{'result': 'fail'}, {'result': 'fail'}, {'result': 'fail'}], 'result', {'fail'})",
+            "expected": "100.0",
+            "explanation": "All items have failure value, giving 100% failure rate"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Checking for only one failure value instead of all values in the set",
+        "Using AND logic instead of OR (item must match ANY failure value, not all)",
+        "Not handling case where field doesn't exist in dictionary (should use .get() with default)",
+        "Computing complement instead of direct count (unnecessary extra step)",
+        "Forgetting to convert set membership check to boolean"
+      ],
+      "hint": "Iterate through items and count how many have the field value present in the failure_values set. Use the 'in' operator for set membership. Then convert to percentage.",
+      "references": [
+        "Set theory: complements and unions",
+        "Boolean algebra and De Morgan's laws",
+        "Python set operations and membership testing"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Multi-Metric Aggregation: Computing Comprehensive SLA Reports",
+      "relation_to_problem": "The final solution requires computing three different metrics from the same dataset and returning them in a structured format. This requires coordinating multiple calculations, handling edge cases consistently, and organizing results into a dictionary.",
+      "prerequisites": [
+        "Conditional percentages",
+        "Failure rates",
+        "Set theory",
+        "Percentage calculations"
+      ],
+      "learning_objectives": [
+        "Compute multiple related metrics from a single dataset efficiently",
+        "Understand relationships between different SLA metrics",
+        "Handle edge cases uniformly across multiple calculations",
+        "Return structured data (dictionaries) with multiple computed values"
+      ],
+      "math_content": {
+        "definition": "An **SLA metrics tuple** is a structured collection of performance measures computed from a request dataset $R$. For latency threshold $\\tau$, define: (1) **Latency SLA Compliance**: $L = \\frac{|\\{r \\in R : r.status = success \\land r.latency \\leq \\tau\\}|}{|\\{r \\in R : r.status = success\\}|} \\times 100\\%$ (conditional), (2) **Error Rate**: $E = \\frac{|\\{r \\in R : r.status \\in \\{error, timeout\\}\\}|}{|R|} \\times 100\\%$ (unconditional), (3) **Overall SLA Compliance**: $O = \\frac{|\\{r \\in R : r.status = success \\land r.latency \\leq \\tau\\}|}{|R|} \\times 100\\%$ (unconditional).",
+        "notation": "$L$ = latency compliance, $E$ = error rate, $O$ = overall compliance, $\\tau$ = latency threshold, $R$ = set of all requests",
+        "theorem": "**Theorem (Metric Relationships)**: The three metrics satisfy: $$O = (100\\% - E) \\times \\frac{L}{100\\%} = S \\times \\frac{L}{100\\%}$$ where $S = 100\\% - E$ is the success rate. This shows overall compliance is the product of success rate and latency compliance. **Corollary**: $O \\leq L$ and $O \\leq S$, with equality when $L = 100\\%$ or $S = 100\\%$ respectively.",
+        "proof_sketch": "Let $N = |R|$, $N_s = |\\{r : r.status = success\\}|$, and $N_{sl} = |\\{r : r.status = success \\land r.latency \\leq \\tau\\}|$. Then: $E = \\frac{N - N_s}{N} \\times 100\\%$, so $S = 100\\% - E = \\frac{N_s}{N} \\times 100\\%$. Also $L = \\frac{N_{sl}}{N_s} \\times 100\\%$ and $O = \\frac{N_{sl}}{N} \\times 100\\%$. Therefore: $$O = \\frac{N_{sl}}{N} \\times 100\\% = \\frac{N_s}{N} \\times \\frac{N_{sl}}{N_s} \\times 100\\% = \\frac{S}{100\\%} \\times L = S \\times \\frac{L}{100\\%}$$ The corollary follows since $S, L \\leq 100\\%$.",
+        "examples": [
+          "Given 10 requests: 8 successful (80% success rate, 20% error rate), of which 6 met latency threshold. Then $L = \\frac{6}{8} \\times 100\\% = 75\\%$, $E = \\frac{2}{10} \\times 100\\% = 20\\%$, $O = \\frac{6}{10} \\times 100\\% = 60\\%$. Verify: $80\\% \\times \\frac{75\\%}{100\\%} = 80\\% \\times 0.75 = 60\\%$ ✓",
+          "Edge case: 0 requests. All metrics undefined. Convention: return empty dictionary {}.",
+          "Edge case: 0 successful requests (all failed). $E = 100\\%$, $L = 0.0$ (no data for conditional), $O = 0.0$ (no requests met both conditions)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Overall SLA from Components",
+          "latex": "$O = S \\times \\frac{L}{100}$ where $S = 100 - E$",
+          "description": "Overall compliance equals success rate times latency compliance (both as percentages). Validates consistency across metrics."
+        },
+        {
+          "name": "Shared Numerator Optimization",
+          "latex": "$N_{sl} = |\\{r : r.status = success \\land r.latency \\leq \\tau\\}|$ used in both $L$ and $O$",
+          "description": "Count successful requests meeting latency once, reuse for both metrics. Improves efficiency."
+        },
+        {
+          "name": "Edge Case Handling",
+          "latex": "$f(\\emptyset) = \\{\\}$, $\\frac{n}{0} \\to 0.0$",
+          "description": "Empty input returns empty dict; zero denominators return 0.0 for that metric."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes a simplified two-metric SLA report from a dataset. Given a list of request dictionaries (with 'status' and 'latency_ms' fields), compute: (1) success_rate: percentage of requests with status='success', (2) fast_success_rate: percentage of ALL requests that are both successful AND have latency ≤ threshold. Return a dictionary with these two metrics. If input is empty, return empty dictionary {}. This builds toward the full solution without revealing it completely.",
+        "function_signature": "def compute_simple_sla_report(requests: list, latency_threshold: float) -> dict:",
+        "starter_code": "def compute_simple_sla_report(requests: list, latency_threshold: float) -> dict:\n    \"\"\"\n    Compute simplified SLA metrics from request data.\n    \n    Args:\n        requests: list of dicts with 'status' and 'latency_ms' keys\n        latency_threshold: maximum acceptable latency in milliseconds\n    \n    Returns:\n        Dictionary with 'success_rate' and 'fast_success_rate' as percentages (0-100),\n        rounded to 2 decimal places. Returns {} if requests is empty.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_simple_sla_report([{'status': 'success', 'latency_ms': 50}, {'status': 'success', 'latency_ms': 150}, {'status': 'error', 'latency_ms': 30}], 100.0)",
+            "expected": "{'success_rate': 66.67, 'fast_success_rate': 33.33}",
+            "explanation": "2/3 requests succeeded (66.67%), 1/3 was both successful and fast (33.33%)"
+          },
+          {
+            "input": "compute_simple_sla_report([{'status': 'success', 'latency_ms': 50}], 100.0)",
+            "expected": "{'success_rate': 100.0, 'fast_success_rate': 100.0}",
+            "explanation": "Single successful fast request: both metrics are 100%"
+          },
+          {
+            "input": "compute_simple_sla_report([], 100.0)",
+            "expected": "{}",
+            "explanation": "Empty input returns empty dictionary by convention"
+          },
+          {
+            "input": "compute_simple_sla_report([{'status': 'error', 'latency_ms': 10}, {'status': 'timeout', 'latency_ms': 5000}], 100.0)",
+            "expected": "{'success_rate': 0.0, 'fast_success_rate': 0.0}",
+            "explanation": "No successful requests, so both metrics are 0%"
+          },
+          {
+            "input": "compute_simple_sla_report([{'status': 'success', 'latency_ms': 80}, {'status': 'success', 'latency_ms': 90}, {'status': 'success', 'latency_ms': 120}], 100.0)",
+            "expected": "{'success_rate': 100.0, 'fast_success_rate': 66.67}",
+            "explanation": "All 3 succeeded (100%), but only 2/3 were fast (66.67%)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing metrics in wrong order (compute counts first, then percentages)",
+        "Not reusing intermediate counts (inefficient to scan data multiple times)",
+        "Inconsistent edge case handling (some metrics return 0, others return empty)",
+        "Wrong denominator for fast_success_rate (should be total requests, not successful requests)",
+        "Not checking for empty input before computing metrics",
+        "Returning wrong data structure (tuple instead of dict, wrong key names)"
+      ],
+      "hint": "First handle the empty input case. Then count: (1) total requests, (2) successful requests, (3) requests that are both successful AND meet latency. Compute percentages using these counts with appropriate denominators.",
+      "references": [
+        "MLOps monitoring best practices",
+        "Service Level Objectives (SLO) and Service Level Indicators (SLI)",
+        "Python dictionary comprehensions and structured data"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,461 @@
+{
+  "problem_id": 251,
+  "title": "Analyze Canary Deployment Health for Model Rollout",
+  "category": "MLOps",
+  "difficulty": "medium",
+  "description": "In production ML systems, canary deployments are a critical strategy for safely rolling out new model versions. A small percentage of traffic is routed to the new (canary) model while the majority continues to use the existing (baseline) model. By comparing their performance, you can decide whether to promote the canary to full production or roll back.\n\nGiven prediction results from both canary and baseline models, compute key comparison metrics to determine if the canary deployment is healthy.\n\nEach result in both lists is a dictionary with:\n- 'latency_ms': Response latency in milliseconds (float)\n- 'prediction': The model's predicted value\n- 'ground_truth': The actual correct value\n\nWrite a function `analyze_canary_deployment(canary_results, baseline_results, accuracy_tolerance, latency_tolerance)` that computes:\n\n1. **canary_accuracy**: Fraction of correct predictions for canary model (0-1)\n2. **baseline_accuracy**: Fraction of correct predictions for baseline model (0-1)\n3. **accuracy_change_pct**: Relative change in accuracy as percentage\n4. **canary_avg_latency**: Average latency of canary model (ms)\n5. **baseline_avg_latency**: Average latency of baseline model (ms)\n6. **latency_change_pct**: Relative change in latency as percentage\n7. **promote_recommended**: Boolean - True if canary accuracy did not degrade beyond accuracy_tolerance AND latency did not increase beyond latency_tolerance\n\nIf either input list is empty, return an empty dictionary.\n\nAll numeric values should be rounded to 2 decimal places except accuracy values which should be rounded to 4 decimal places.",
+  "example": {
+    "input": "canary_results = [{'latency_ms': 45, 'prediction': 1, 'ground_truth': 1}, {'latency_ms': 50, 'prediction': 0, 'ground_truth': 0}, {'latency_ms': 48, 'prediction': 1, 'ground_truth': 1}, {'latency_ms': 52, 'prediction': 1, 'ground_truth': 0}, {'latency_ms': 47, 'prediction': 0, 'ground_truth': 0}], baseline_results = [{'latency_ms': 50, 'prediction': 1, 'ground_truth': 1}, {'latency_ms': 55, 'prediction': 0, 'ground_truth': 0}, {'latency_ms': 52, 'prediction': 1, 'ground_truth': 0}, {'latency_ms': 58, 'prediction': 0, 'ground_truth': 0}, {'latency_ms': 53, 'prediction': 1, 'ground_truth': 1}]",
+    "output": "{'canary_accuracy': 0.8, 'baseline_accuracy': 0.8, 'accuracy_change_pct': 0.0, 'canary_avg_latency': 48.4, 'baseline_avg_latency': 53.6, 'latency_change_pct': -9.7, 'promote_recommended': True}",
+    "reasoning": "Canary has 4/5 correct predictions (accuracy 0.8), baseline also has 4/5 (accuracy 0.8), so accuracy change is 0%. Canary average latency is (45+50+48+52+47)/5 = 48.4ms, baseline is (50+55+52+58+53)/5 = 53.6ms. Latency change is (48.4-53.6)/53.6 * 100 = -9.7% (improved). Since accuracy did not degrade and latency improved, promote_recommended is True."
+  },
+  "starter_code": "def analyze_canary_deployment(canary_results: list, baseline_results: list, accuracy_tolerance: float = 0.05, latency_tolerance: float = 0.10) -> dict:\n    \"\"\"\n    Analyze canary deployment health metrics for model rollout decision.\n    \n    Args:\n        canary_results: list of prediction results from canary (new) model\n                       Each dict has 'latency_ms', 'prediction', 'ground_truth'\n        baseline_results: list of prediction results from baseline (existing) model\n                         Each dict has 'latency_ms', 'prediction', 'ground_truth'\n        accuracy_tolerance: max acceptable relative accuracy degradation (0.05 = 5%)\n        latency_tolerance: max acceptable relative latency increase (0.10 = 10%)\n    \n    Returns:\n        dict with canary/baseline metrics and promotion recommendation\n    \"\"\"\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Computing Classification Accuracy from Predictions",
+      "relation_to_problem": "The canary deployment problem requires calculating accuracy for both canary and baseline models by comparing predictions against ground truth values, which is the foundation for determining if the new model performs acceptably.",
+      "prerequisites": [
+        "Basic Python",
+        "List comprehension",
+        "Fractions and percentages"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of classification accuracy",
+        "Compute accuracy from prediction-ground truth pairs",
+        "Handle edge cases with empty datasets"
+      ],
+      "math_content": {
+        "definition": "**Classification Accuracy** is a performance metric that measures the proportion of correct predictions made by a classifier. Formally, let $D = \\{(y_i, \\hat{y}_i)\\}_{i=1}^n$ be a dataset of $n$ samples where $y_i$ is the ground truth label and $\\hat{y}_i$ is the predicted label. The accuracy is defined as: $$A(D) = \\frac{1}{n}\\sum_{i=1}^{n} \\mathbb{1}[y_i = \\hat{y}_i]$$ where $\\mathbb{1}[\\cdot]$ is the indicator function that equals 1 if the condition is true and 0 otherwise.",
+        "notation": "$n$ = total number of predictions; $y_i$ = ground truth for sample $i$; $\\hat{y}_i$ = predicted value for sample $i$; $\\mathbb{1}[\\cdot]$ = indicator function; $A(D) \\in [0, 1]$ = accuracy value",
+        "theorem": "**Theorem (Accuracy Bounds)**: For any classifier and dataset, $0 \\leq A(D) \\leq 1$, where $A(D) = 0$ indicates all predictions are incorrect and $A(D) = 1$ indicates perfect prediction.",
+        "proof_sketch": "Since $\\mathbb{1}[y_i = \\hat{y}_i] \\in \\{0, 1\\}$ for all $i$, we have $0 \\leq \\sum_{i=1}^{n} \\mathbb{1}[y_i = \\hat{y}_i] \\leq n$. Dividing by $n > 0$ preserves the inequality: $0 \\leq \\frac{1}{n}\\sum_{i=1}^{n} \\mathbb{1}[y_i = \\hat{y}_i] \\leq 1$.",
+        "examples": [
+          "Example 1: Given predictions $[1, 0, 1, 1]$ and ground truth $[1, 0, 0, 1]$, we have matches at positions 1, 2, and 4. Thus $A = \\frac{3}{4} = 0.75$ or 75% accuracy.",
+          "Example 2: For binary classification with predictions $[0, 0, 0]$ and ground truth $[1, 1, 1]$, all predictions are wrong, so $A = \\frac{0}{3} = 0.0$ or 0% accuracy."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Classification Accuracy",
+          "latex": "$A = \\frac{\\text{number of correct predictions}}{\\text{total number of predictions}} = \\frac{\\sum_{i=1}^{n} \\mathbb{1}[y_i = \\hat{y}_i]}{n}$",
+          "description": "Use this to evaluate any classifier's correctness rate. Always ensure denominator is non-zero."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates classification accuracy given a list of prediction dictionaries. Each dictionary contains 'prediction' and 'ground_truth' keys. Return accuracy rounded to 4 decimal places. If the input list is empty, return None.",
+        "function_signature": "def calculate_accuracy(results: list) -> float:",
+        "starter_code": "def calculate_accuracy(results: list) -> float:\n    \"\"\"\n    Calculate classification accuracy from prediction results.\n    \n    Args:\n        results: list of dicts with 'prediction' and 'ground_truth' keys\n    \n    Returns:\n        float: accuracy rounded to 4 decimal places, or None if empty\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_accuracy([{'prediction': 1, 'ground_truth': 1}, {'prediction': 0, 'ground_truth': 0}, {'prediction': 1, 'ground_truth': 0}])",
+            "expected": "0.6667",
+            "explanation": "2 out of 3 predictions are correct: (2/3 = 0.6667)"
+          },
+          {
+            "input": "calculate_accuracy([{'prediction': 1, 'ground_truth': 1}, {'prediction': 1, 'ground_truth': 1}])",
+            "expected": "1.0",
+            "explanation": "All predictions match ground truth perfectly"
+          },
+          {
+            "input": "calculate_accuracy([])",
+            "expected": "None",
+            "explanation": "Empty input should return None to avoid division by zero"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle the empty list case (division by zero)",
+        "Not rounding to the correct number of decimal places",
+        "Using floating point comparison for equality when values should be exact",
+        "Confusing accuracy with error rate (accuracy = 1 - error_rate)"
+      ],
+      "hint": "Count how many times prediction equals ground_truth, then divide by the total count. Use Python's sum() with a generator expression for elegance.",
+      "references": [
+        "Binary classification metrics",
+        "Confusion matrix basics",
+        "Statistical estimation theory"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Computing Average Latency and Summary Statistics",
+      "relation_to_problem": "Canary deployment decisions depend not only on accuracy but also on latency performance. We must compute average latency for both models to assess if the canary introduces unacceptable slowdowns.",
+      "prerequisites": [
+        "Arithmetic mean",
+        "List operations",
+        "Floating-point arithmetic"
+      ],
+      "learning_objectives": [
+        "Understand the definition of arithmetic mean for latency measurements",
+        "Extract specific fields from structured data",
+        "Handle precision requirements in performance metrics"
+      ],
+      "math_content": {
+        "definition": "**Arithmetic Mean (Average)** of a set of measurements $X = \\{x_1, x_2, \\ldots, x_n\\}$ is defined as: $$\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n} x_i$$ In the context of latency measurements, each $x_i$ represents the response time in milliseconds for request $i$. The mean provides a central tendency measure for the latency distribution.",
+        "notation": "$x_i$ = latency measurement for request $i$ (in ms); $n$ = total number of measurements; $\\bar{x}$ = sample mean latency; $\\sum$ = summation operator",
+        "theorem": "**Theorem (Mean Value Property)**: If all measurements are non-negative ($x_i \\geq 0$ for all $i$), then $0 \\leq \\bar{x} \\leq \\max_i x_i$. Furthermore, $\\bar{x} = 0$ if and only if all $x_i = 0$.",
+        "proof_sketch": "Since $x_i \\geq 0$ for all $i$, we have $\\sum_{i=1}^{n} x_i \\geq 0$, thus $\\bar{x} \\geq 0$. For the upper bound, $\\sum_{i=1}^{n} x_i \\leq n \\cdot \\max_i x_i$, so dividing by $n$ gives $\\bar{x} \\leq \\max_i x_i$.",
+        "examples": [
+          "Example 1: Latencies $[45, 50, 48, 52, 47]$ ms have mean $\\bar{x} = \\frac{45+50+48+52+47}{5} = \\frac{242}{5} = 48.4$ ms",
+          "Example 2: Uniform latencies $[100, 100, 100]$ ms have mean $\\bar{x} = \\frac{300}{3} = 100$ ms, equal to each individual measurement"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Arithmetic Mean",
+          "latex": "$\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n} x_i = \\frac{x_1 + x_2 + \\cdots + x_n}{n}$",
+          "description": "Use for computing average latency. Critical for comparing performance between model versions."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the average latency from a list of result dictionaries. Each dictionary has a 'latency_ms' key with a float value. Return the average rounded to 2 decimal places. If the input list is empty, return None.",
+        "function_signature": "def calculate_avg_latency(results: list) -> float:",
+        "starter_code": "def calculate_avg_latency(results: list) -> float:\n    \"\"\"\n    Calculate average latency from prediction results.\n    \n    Args:\n        results: list of dicts with 'latency_ms' key\n    \n    Returns:\n        float: average latency rounded to 2 decimal places, or None if empty\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_avg_latency([{'latency_ms': 45.0}, {'latency_ms': 50.0}, {'latency_ms': 48.0}])",
+            "expected": "47.67",
+            "explanation": "Mean of [45, 50, 48] is (45+50+48)/3 = 143/3 = 47.67 ms"
+          },
+          {
+            "input": "calculate_avg_latency([{'latency_ms': 100.5}, {'latency_ms': 99.5}])",
+            "expected": "100.0",
+            "explanation": "Mean of [100.5, 99.5] is 200/2 = 100.0 ms"
+          },
+          {
+            "input": "calculate_avg_latency([])",
+            "expected": "None",
+            "explanation": "Empty input returns None to handle edge case"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not extracting the 'latency_ms' field correctly from dictionaries",
+        "Rounding too early in the calculation (round only the final result)",
+        "Forgetting to handle the empty list case",
+        "Using integer division instead of float division"
+      ],
+      "hint": "Extract all latency values into a list first, then compute the sum and divide by the count. Python's sum() and len() are your friends.",
+      "references": [
+        "Descriptive statistics",
+        "Performance metrics in distributed systems",
+        "Percentile vs mean latency"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Calculating Relative Percentage Change",
+      "relation_to_problem": "The core comparison in canary deployment requires computing relative percentage changes for both accuracy and latency metrics. This tells us whether the canary represents an improvement, degradation, or neutral change compared to the baseline.",
+      "prerequisites": [
+        "Percentages",
+        "Relative change concept",
+        "Signed numbers"
+      ],
+      "learning_objectives": [
+        "Understand relative percentage change vs absolute change",
+        "Compute percentage change with correct sign interpretation",
+        "Apply percentage change to both increasing and decreasing metrics"
+      ],
+      "math_content": {
+        "definition": "**Relative Percentage Change** quantifies the relative difference between a new value and a reference (baseline) value as a percentage. Given a baseline value $V_{base}$ and a new value $V_{new}$, the relative percentage change is: $$\\Delta\\% = \\frac{V_{new} - V_{base}}{V_{base}} \\times 100\\%$$ A positive value indicates increase; negative indicates decrease. The absolute difference $|V_{new} - V_{base}|$ is normalized by the baseline magnitude.",
+        "notation": "$V_{base}$ = baseline (reference) value; $V_{new}$ = new (comparison) value; $\\Delta\\% $ = percentage change; $V_{base} \\neq 0$ (required for definition)",
+        "theorem": "**Theorem (Percentage Change Properties)**: (1) If $V_{new} > V_{base}$, then $\\Delta\\% > 0$ (increase). (2) If $V_{new} < V_{base}$, then $\\Delta\\% < 0$ (decrease). (3) If $V_{new} = V_{base}$, then $\\Delta\\% = 0$ (no change). (4) If $V_{new} = 2V_{base}$, then $\\Delta\\% = 100\\%$ (doubled).",
+        "proof_sketch": "(1) $V_{new} > V_{base} \\Rightarrow V_{new} - V_{base} > 0$. Since $V_{base} > 0$ for positive metrics, dividing preserves sign: $\\frac{V_{new} - V_{base}}{V_{base}} > 0$, thus $\\Delta\\% > 0$. Properties (2)-(4) follow similarly from arithmetic.",
+        "examples": [
+          "Example 1 (Latency decrease): Baseline latency = 53.6 ms, canary latency = 48.4 ms. Change = $\\frac{48.4 - 53.6}{53.6} \\times 100 = \\frac{-5.2}{53.6} \\times 100 = -9.70\\%$. Negative indicates improvement (lower latency).",
+          "Example 2 (Accuracy increase): Baseline accuracy = 0.75, canary accuracy = 0.80. Change = $\\frac{0.80 - 0.75}{0.75} \\times 100 = \\frac{0.05}{0.75} \\times 100 = 6.67\\%$. Positive indicates improvement (higher accuracy).",
+          "Example 3 (No change): Baseline = 100, canary = 100. Change = $\\frac{100 - 100}{100} \\times 100 = 0\\%$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Relative Percentage Change",
+          "latex": "$\\Delta\\% = \\frac{V_{new} - V_{baseline}}{V_{baseline}} \\times 100$",
+          "description": "Use to compare any two metrics (accuracy, latency, etc.). Sign indicates direction of change."
+        },
+        {
+          "name": "Alternative Form",
+          "latex": "$\\Delta\\% = \\left(\\frac{V_{new}}{V_{baseline}} - 1\\right) \\times 100$",
+          "description": "Mathematically equivalent form, sometimes more intuitive: ratio minus 1, scaled to percentage."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the relative percentage change between a new value and a baseline value. Return the result rounded to 2 decimal places. If the baseline is zero, return None (undefined).",
+        "function_signature": "def calculate_percentage_change(new_value: float, baseline_value: float) -> float:",
+        "starter_code": "def calculate_percentage_change(new_value: float, baseline_value: float) -> float:\n    \"\"\"\n    Calculate relative percentage change from baseline to new value.\n    \n    Args:\n        new_value: the new measurement\n        baseline_value: the reference/baseline measurement\n    \n    Returns:\n        float: percentage change rounded to 2 decimal places, or None if baseline is 0\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_percentage_change(48.4, 53.6)",
+            "expected": "-9.7",
+            "explanation": "Change is (48.4-53.6)/53.6*100 = -9.70%, indicating 9.7% decrease"
+          },
+          {
+            "input": "calculate_percentage_change(0.8, 0.8)",
+            "expected": "0.0",
+            "explanation": "No change when new equals baseline: (0.8-0.8)/0.8*100 = 0%"
+          },
+          {
+            "input": "calculate_percentage_change(120, 100)",
+            "expected": "20.0",
+            "explanation": "20% increase: (120-100)/100*100 = 20%"
+          },
+          {
+            "input": "calculate_percentage_change(50, 0)",
+            "expected": "None",
+            "explanation": "Undefined when baseline is zero (division by zero)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using absolute change instead of relative change (forgetting to divide by baseline)",
+        "Dividing by the new value instead of the baseline value",
+        "Forgetting to multiply by 100 to convert to percentage",
+        "Not handling the baseline=0 edge case",
+        "Confusing the sign: negative means decrease for latency (good) but also decrease for accuracy (bad)"
+      ],
+      "hint": "The formula is (new - baseline) / baseline * 100. Remember to check for zero baseline first.",
+      "references": [
+        "Relative vs absolute change",
+        "Growth rate calculations",
+        "Business metrics and KPIs"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Boolean Logic and Threshold-Based Decision Making",
+      "relation_to_problem": "The final promotion decision in canary deployment is a logical conjunction: promote only if BOTH accuracy degradation is within tolerance AND latency increase is within tolerance. This requires understanding boolean operators and threshold comparisons.",
+      "prerequisites": [
+        "Boolean algebra",
+        "Comparison operators",
+        "Logical AND operation"
+      ],
+      "learning_objectives": [
+        "Understand conjunction (AND) in decision logic",
+        "Apply tolerance thresholds to metric changes",
+        "Implement multi-criteria decision rules"
+      ],
+      "math_content": {
+        "definition": "**Logical Conjunction (AND)** is a binary boolean operation that returns true if and only if both operands are true. Formally, for propositions $P$ and $Q$: $$P \\land Q = \\begin{cases} \\text{True} & \\text{if } P = \\text{True and } Q = \\text{True} \\\\ \\text{False} & \\text{otherwise} \\end{cases}$$ In deployment decisions, $P$ might represent \"accuracy is acceptable\" and $Q$ represents \"latency is acceptable\". The system promotes only when $P \\land Q = \\text{True}$.",
+        "notation": "$\\land$ = logical AND operator; $P, Q$ = boolean propositions; $\\text{True}, \\text{False}$ = boolean values; $\\Delta_{acc}$ = accuracy change percentage; $\\tau_{acc}$ = accuracy tolerance threshold",
+        "theorem": "**Theorem (Threshold Acceptance Criteria)**: Let $\\Delta_{acc}$ be the accuracy percentage change and $\\tau_{acc}$ be the tolerance (positive value). Define acceptance predicate: $$A_{acc} = (\\Delta_{acc} \\geq -\\tau_{acc})$$ This is true if accuracy did not degrade more than $\\tau_{acc}$ percent. Similarly for latency: $$A_{lat} = (\\Delta_{lat} \\leq \\tau_{lat})$$ The promotion decision is: $$\\text{Promote} = A_{acc} \\land A_{lat}$$",
+        "proof_sketch": "We want to reject if accuracy degraded too much (dropped below $-\\tau_{acc}$) or latency increased too much (rose above $\\tau_{lat}$). By De Morgan's law, rejecting when $(\\Delta_{acc} < -\\tau_{acc}) \\lor (\\Delta_{lat} > \\tau_{lat})$ is equivalent to accepting when $(\\Delta_{acc} \\geq -\\tau_{acc}) \\land (\\Delta_{lat} \\leq \\tau_{lat})$.",
+        "examples": [
+          "Example 1: Accuracy change = -3%, tolerance = 5%, latency change = -10%, tolerance = 10%. Check: $-3 \\geq -5$ (True) AND $-10 \\leq 10$ (True). Result: Promote = True.",
+          "Example 2: Accuracy change = -8%, tolerance = 5%, latency change = 2%, tolerance = 10%. Check: $-8 \\geq -5$ (False) AND $2 \\leq 10$ (True). Result: Promote = False (accuracy degraded too much).",
+          "Example 3: Accuracy change = 0%, tolerance = 5%, latency change = 15%, tolerance = 10%. Check: $0 \\geq -5$ (True) AND $15 \\leq 10$ (False). Result: Promote = False (latency increased too much)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Accuracy Acceptance",
+          "latex": "$A_{acc} = (\\Delta_{acc} \\geq -\\tau_{acc})$",
+          "description": "Checks if accuracy change is within acceptable degradation. Note: negative tolerance allows for some degradation."
+        },
+        {
+          "name": "Latency Acceptance",
+          "latex": "$A_{lat} = (\\Delta_{lat} \\leq \\tau_{lat})$",
+          "description": "Checks if latency increase is within tolerance. Negative change (improvement) always passes."
+        },
+        {
+          "name": "Promotion Decision",
+          "latex": "$\\text{Promote} = A_{acc} \\land A_{lat} = (\\Delta_{acc} \\geq -\\tau_{acc}) \\land (\\Delta_{lat} \\leq \\tau_{lat})$",
+          "description": "Both conditions must be satisfied for promotion recommendation."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that makes a promotion decision based on metric changes and tolerances. The function takes accuracy change percentage, latency change percentage, accuracy tolerance (default 5.0), and latency tolerance (default 10.0). Return True if the canary should be promoted (accuracy did not degrade beyond tolerance AND latency did not increase beyond tolerance), False otherwise.",
+        "function_signature": "def should_promote(accuracy_change_pct: float, latency_change_pct: float, accuracy_tolerance: float = 5.0, latency_tolerance: float = 10.0) -> bool:",
+        "starter_code": "def should_promote(accuracy_change_pct: float, latency_change_pct: float, accuracy_tolerance: float = 5.0, latency_tolerance: float = 10.0) -> bool:\n    \"\"\"\n    Determine if canary should be promoted based on metric changes and tolerances.\n    \n    Args:\n        accuracy_change_pct: percentage change in accuracy (can be negative)\n        latency_change_pct: percentage change in latency (can be negative)\n        accuracy_tolerance: max acceptable accuracy degradation (positive value, e.g., 5.0 means 5%)\n        latency_tolerance: max acceptable latency increase (positive value, e.g., 10.0 means 10%)\n    \n    Returns:\n        bool: True if should promote, False otherwise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "should_promote(0.0, -9.7, 5.0, 10.0)",
+            "expected": "True",
+            "explanation": "Accuracy unchanged (0 >= -5) and latency improved (-9.7 <= 10): promote"
+          },
+          {
+            "input": "should_promote(-8.0, 5.0, 5.0, 10.0)",
+            "expected": "False",
+            "explanation": "Accuracy degraded too much (-8 < -5): do not promote"
+          },
+          {
+            "input": "should_promote(2.0, 15.0, 5.0, 10.0)",
+            "expected": "False",
+            "explanation": "Latency increased too much (15 > 10): do not promote"
+          },
+          {
+            "input": "should_promote(-4.0, 9.0, 5.0, 10.0)",
+            "expected": "True",
+            "explanation": "Both within tolerances (-4 >= -5 and 9 <= 10): promote"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using OR instead of AND (promoting when either condition is met rather than both)",
+        "Checking accuracy_change >= tolerance instead of >= -tolerance (wrong sign)",
+        "Checking latency_change >= tolerance instead of <= tolerance (wrong direction)",
+        "Confusing tolerance value with threshold (tolerance is a positive bound, threshold would be negative for accuracy)",
+        "Not understanding that negative accuracy change is bad but negative latency change is good"
+      ],
+      "hint": "You need both conditions to be true. For accuracy, allow degradation up to -tolerance. For latency, allow increase up to +tolerance. Use the 'and' operator.",
+      "references": [
+        "Boolean logic in programming",
+        "Multi-criteria decision analysis",
+        "A/B test decision rules"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Data Validation and Edge Case Handling",
+      "relation_to_problem": "Production ML systems must handle edge cases robustly. Empty result sets, missing data, and invalid inputs can crash unprotected code. The canary deployment analyzer must return appropriate values (empty dict) when inputs are invalid, ensuring system reliability.",
+      "prerequisites": [
+        "Defensive programming",
+        "Input validation",
+        "Exception handling"
+      ],
+      "learning_objectives": [
+        "Identify and handle edge cases in data processing",
+        "Implement early-return patterns for invalid inputs",
+        "Distinguish between different types of empty/invalid data"
+      ],
+      "math_content": {
+        "definition": "**Edge Case Handling** in computational systems refers to special conditions that occur at the boundaries of input domains or under exceptional circumstances. For data processing functions with domain $D$, we define the **valid input domain** $D_{valid} \\subseteq D$ where the primary algorithm is defined. The **edge cases** are inputs in $D \\setminus D_{valid}$ that require special handling. For the canary deployment problem: $$D_{valid} = \\{(C, B) : C, B \\text{ are non-empty lists with required keys}\\}$$",
+        "notation": "$D$ = input domain; $D_{valid}$ = valid input subset; $\\emptyset$ = empty set; $|L|$ = cardinality (length) of list $L$; $L = \\emptyset \\Leftrightarrow |L| = 0$",
+        "theorem": "**Theorem (Early Return Principle)**: For a function $f: D \\rightarrow R$ with valid domain $D_{valid} \\subset D$, implementing an early return strategy that checks $x \\in D_{valid}$ before proceeding to main computation reduces complexity and prevents errors. Formally: $$f(x) = \\begin{cases} r_{invalid} & \\text{if } x \\notin D_{valid} \\\\ f_{main}(x) & \\text{if } x \\in D_{valid} \\end{cases}$$ where $r_{invalid}$ is a designated return value for invalid inputs (e.g., None, empty dict, error code).",
+        "proof_sketch": "By checking validity first, we guarantee $f_{main}$ only receives valid inputs, avoiding undefined operations (division by zero, indexing empty lists, etc.). This creates a fail-fast system with predictable behavior.",
+        "examples": [
+          "Example 1 (Empty list): Input $C = [\\,]$, $B = [1,2,3]$. Since $|C| = 0$, we cannot compute mean latency or accuracy. Return empty dict $\\{\\}$ immediately.",
+          "Example 2 (Both empty): Input $C = [\\,]$, $B = [\\,]$. Return empty dict $\\{\\}$ before any computation.",
+          "Example 3 (Valid input): Input $C = [\\{...\\}]$, $B = [\\{...\\}, \\{...\\}]$. Both non-empty, proceed to main computation."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Empty Check Predicate",
+          "latex": "$\\text{IsValid}(C, B) = (|C| > 0) \\land (|B| > 0)$",
+          "description": "Returns true if both input lists are non-empty, enabling safe computation."
+        },
+        {
+          "name": "Safe Division Check",
+          "latex": "$\\text{SafeDivide}(a, b) = \\begin{cases} a/b & \\text{if } b \\neq 0 \\\\ \\text{undefined} & \\text{if } b = 0 \\end{cases}$",
+          "description": "Always check denominator before division to prevent runtime errors."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that validates canary and baseline result lists and returns an appropriate response. If either list is empty, return an empty dictionary. If both lists are valid (non-empty), return a dictionary with a 'status' key set to 'valid' and 'canary_count' and 'baseline_count' keys with the respective list lengths. This simulates the validation step needed before performing metric calculations.",
+        "function_signature": "def validate_deployment_data(canary_results: list, baseline_results: list) -> dict:",
+        "starter_code": "def validate_deployment_data(canary_results: list, baseline_results: list) -> dict:\n    \"\"\"\n    Validate canary and baseline result lists.\n    \n    Args:\n        canary_results: list of canary model results\n        baseline_results: list of baseline model results\n    \n    Returns:\n        dict: empty dict if invalid, or dict with status and counts if valid\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "validate_deployment_data([], [{'latency_ms': 50}])",
+            "expected": "{}",
+            "explanation": "Canary results empty: return empty dict"
+          },
+          {
+            "input": "validate_deployment_data([{'latency_ms': 45}], [])",
+            "expected": "{}",
+            "explanation": "Baseline results empty: return empty dict"
+          },
+          {
+            "input": "validate_deployment_data([], [])",
+            "expected": "{}",
+            "explanation": "Both empty: return empty dict"
+          },
+          {
+            "input": "validate_deployment_data([{'latency_ms': 45}, {'latency_ms': 50}], [{'latency_ms': 55}])",
+            "expected": "{'status': 'valid', 'canary_count': 2, 'baseline_count': 1}",
+            "explanation": "Both non-empty: return status valid with counts"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Checking for None instead of empty list (different conditions)",
+        "Not handling BOTH lists being empty vs just one being empty",
+        "Performing computations before validation, leading to crashes",
+        "Using exceptions for control flow instead of simple conditionals",
+        "Forgetting that empty list is falsy in Python but should be explicitly checked for clarity"
+      ],
+      "hint": "Check if either list is empty at the very start of your function. Use 'if not canary_results or not baseline_results' or check lengths directly.",
+      "references": [
+        "Defensive programming patterns",
+        "Fail-fast principle",
+        "Input validation best practices"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Integrating Multiple Metrics into a Structured Analysis Pipeline",
+      "relation_to_problem": "The complete canary deployment analysis integrates all previous concepts: calculating accuracies and latencies for both models, computing percentage changes, applying decision logic, and handling edge cases. This final sub-quest teaches how to structure a multi-metric analysis pipeline with proper sequencing and data flow.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Dictionary manipulation in Python",
+        "Function composition"
+      ],
+      "learning_objectives": [
+        "Integrate multiple independent computations into a unified analysis",
+        "Structure output as a well-defined dictionary schema",
+        "Apply rounding rules appropriately to different metric types",
+        "Implement the complete decision pipeline from raw data to recommendation"
+      ],
+      "math_content": {
+        "definition": "**Metric Analysis Pipeline** is a composite function that transforms raw observational data into structured decision metrics. Formally, let $\\mathcal{R}_C$ and $\\mathcal{R}_B$ be sets of prediction results for canary and baseline models. Define the pipeline $\\Phi: \\mathcal{R}_C \\times \\mathcal{R}_B \\times \\mathbb{R}^2 \\rightarrow \\mathcal{M}$ where $\\mathcal{M}$ is the metric space containing: $$\\mathcal{M} = \\{A_C, A_B, \\Delta A, \\bar{L}_C, \\bar{L}_B, \\Delta L, D\\}$$ Here $A$ denotes accuracy, $L$ denotes latency, $\\Delta$ denotes percentage change, and $D \\in \\{\\text{True}, \\text{False}\\}$ is the promotion decision.",
+        "notation": "$\\Phi$ = analysis pipeline function; $\\mathcal{R}_C, \\mathcal{R}_B$ = result sets; $A_C, A_B$ = canary and baseline accuracies; $\\bar{L}_C, \\bar{L}_B$ = mean latencies; $\\Delta A, \\Delta L$ = percentage changes; $D$ = decision boolean; $\\tau_A, \\tau_L$ = tolerance parameters",
+        "theorem": "**Theorem (Pipeline Correctness)**: The pipeline $\\Phi$ produces a valid promotion decision if and only if: (1) All intermediate metric computations are mathematically correct, (2) Percentage changes use the baseline as denominator, (3) The decision logic applies the conjunction of tolerance checks. Formally: $$D = \\text{True} \\Leftrightarrow \\left(\\frac{A_C - A_B}{A_B} \\cdot 100 \\geq -\\tau_A\\right) \\land \\left(\\frac{\\bar{L}_C - \\bar{L}_B}{\\bar{L}_B} \\cdot 100 \\leq \\tau_L\\right)$$",
+        "proof_sketch": "Each component of the pipeline must satisfy its individual mathematical definition (accuracy as fraction correct, mean as sum/count, percentage change as relative difference). The final decision combines these via logical conjunction, which is correct by the semantics of AND.",
+        "examples": [
+          "Example 1 (Full pipeline): Given canary results with 4/5 correct (accuracy=0.8) and mean latency 48.4ms, baseline with 4/5 correct (accuracy=0.8) and mean latency 53.6ms, tolerances 5% and 10%. Compute: $\\Delta A = (0.8-0.8)/0.8 \\times 100 = 0\\%$, $\\Delta L = (48.4-53.6)/53.6 \\times 100 = -9.7\\%$. Check: $0 \\geq -5$ ✓ and $-9.7 \\leq 10$ ✓, thus $D = \\text{True}$.",
+          "Example 2 (Rejection case): Canary accuracy=0.7, baseline accuracy=0.8, tolerance=5%. Compute: $\\Delta A = (0.7-0.8)/0.8 \\times 100 = -12.5\\%$. Check: $-12.5 \\geq -5$ ✗, thus $D = \\text{False}$ regardless of latency."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Canary Analysis",
+          "latex": "$\\Phi(\\mathcal{R}_C, \\mathcal{R}_B, \\tau_A, \\tau_L) = (A_C, A_B, \\Delta A, \\bar{L}_C, \\bar{L}_B, \\Delta L, D)$",
+          "description": "The full pipeline mapping raw results and tolerances to all output metrics and decision."
+        },
+        {
+          "name": "Metric Rounding Rules",
+          "latex": "$A \\to \\text{round}(A, 4), \\quad \\bar{L} \\to \\text{round}(\\bar{L}, 2), \\quad \\Delta \\to \\text{round}(\\Delta, 2)$",
+          "description": "Accuracy: 4 decimals; latency and percentages: 2 decimals."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs a simplified canary analysis. Given two lists of results (each with 'prediction', 'ground_truth', and 'latency_ms'), compute: (1) accuracies for both (4 decimals), (2) average latencies for both (2 decimals), (3) accuracy change percentage (2 decimals), (4) latency change percentage (2 decimals). Return a dictionary with keys: 'canary_accuracy', 'baseline_accuracy', 'accuracy_change_pct', 'canary_avg_latency', 'baseline_avg_latency', 'latency_change_pct'. If either input is empty, return empty dict. DO NOT implement the promotion decision yet - that combines all previous exercises.",
+        "function_signature": "def analyze_canary_metrics(canary_results: list, baseline_results: list) -> dict:",
+        "starter_code": "def analyze_canary_metrics(canary_results: list, baseline_results: list) -> dict:\n    \"\"\"\n    Compute canary deployment metrics (without promotion decision).\n    \n    Args:\n        canary_results: list of dicts with 'prediction', 'ground_truth', 'latency_ms'\n        baseline_results: list of dicts with 'prediction', 'ground_truth', 'latency_ms'\n    \n    Returns:\n        dict with computed metrics, or empty dict if either input is empty\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "analyze_canary_metrics([{'latency_ms': 45, 'prediction': 1, 'ground_truth': 1}, {'latency_ms': 50, 'prediction': 0, 'ground_truth': 0}], [{'latency_ms': 55, 'prediction': 1, 'ground_truth': 1}, {'latency_ms': 60, 'prediction': 0, 'ground_truth': 0}])",
+            "expected": "{'canary_accuracy': 1.0, 'baseline_accuracy': 1.0, 'accuracy_change_pct': 0.0, 'canary_avg_latency': 47.5, 'baseline_avg_latency': 57.5, 'latency_change_pct': -17.39}",
+            "explanation": "Both models: 2/2 correct (accuracy=1.0, change=0%). Canary latency=(45+50)/2=47.5, baseline=(55+60)/2=57.5, change=(47.5-57.5)/57.5*100=-17.39%"
+          },
+          {
+            "input": "analyze_canary_metrics([{'latency_ms': 100, 'prediction': 1, 'ground_truth': 0}], [{'latency_ms': 100, 'prediction': 1, 'ground_truth': 1}])",
+            "expected": "{'canary_accuracy': 0.0, 'baseline_accuracy': 1.0, 'accuracy_change_pct': -100.0, 'canary_avg_latency': 100.0, 'baseline_avg_latency': 100.0, 'latency_change_pct': 0.0}",
+            "explanation": "Canary: 0/1 correct (0.0), baseline: 1/1 correct (1.0), accuracy change=-100%. Both latencies=100, change=0%"
+          },
+          {
+            "input": "analyze_canary_metrics([], [{'latency_ms': 50, 'prediction': 1, 'ground_truth': 1}])",
+            "expected": "{}",
+            "explanation": "Canary results empty: return empty dict"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not validating inputs before processing (forgetting empty check)",
+        "Applying wrong rounding precision to different metrics",
+        "Computing percentage change with wrong baseline (using canary instead of baseline)",
+        "Not extracting all required fields from the result dictionaries",
+        "Returning None instead of empty dict for invalid inputs",
+        "Mixing up which value is 'new' and which is 'baseline' in percentage calculations"
+      ],
+      "hint": "Reuse the concepts from previous sub-quests: validate first, compute accuracies separately, compute latencies separately, then compute percentage changes using baseline as denominator. Structure your output dictionary with the exact keys specified.",
+      "references": [
+        "Data pipeline design",
+        "MLOps metric monitoring",
+        "A/B testing frameworks",
+        "Production ML system design"
+      ]
+    }
+  ]
+}

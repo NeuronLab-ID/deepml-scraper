@@ -1,0 +1,390 @@
+{
+  "problem_id": 192,
+  "title": "Implement the Huber Loss Function",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "Implement the Huber Loss function, which combines the best aspects of Mean Squared Error (MSE) and Mean Absolute Error (MAE). The function should compute the Huber Loss given true and predicted values and a delta threshold. It should handle both scalar and list inputs and return the average loss as a float.",
+  "example": {
+    "input": "round(huber_loss([2.0, 3.0, 4.0], [2.5, 2.0, 4.0], delta=1.0), 4)",
+    "output": "0.2083",
+    "reasoning": "Each element's contribution is computed according to the Huber loss formula and averaged, yielding 0.208333..., which rounds to 0.2083."
+  },
+  "starter_code": "def huber_loss(y_true, y_pred, delta=1.0):\n\t\"\"\"\n\tCompute the Huber Loss between true and predicted values.\n\n\tArgs:\n\t\ty_true (float | list[float]): Ground truth values\n\t\ty_pred (float | list[float]): Predicted values\n\t\tdelta (float): Transition threshold between MSE and MAE behavior\n\n\tReturns:\n\t\tfloat: Average Huber loss\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Residuals and Error Computation",
+      "relation_to_problem": "Computing residuals (the difference between true and predicted values) is the foundational operation for the Huber Loss function, as the loss depends entirely on the magnitude of these residuals.",
+      "prerequisites": [
+        "Basic arithmetic operations",
+        "Absolute value function",
+        "Python list operations"
+      ],
+      "learning_objectives": [
+        "Define residuals formally in the context of regression",
+        "Compute residuals for scalar and vector inputs",
+        "Understand why residual magnitude matters in loss functions"
+      ],
+      "math_content": {
+        "definition": "A **residual** (or error) in regression is defined as the difference between the observed value and the predicted value. Formally, for a true value $y \\in \\mathbb{R}$ and predicted value $\\hat{y} \\in \\mathbb{R}$, the residual is: $$r = y - \\hat{y}$$",
+        "notation": "$y$ = true/observed value; $\\hat{y}$ = predicted value; $r$ = residual; $|r|$ = absolute residual (magnitude of error)",
+        "theorem": "For any regression model, the sum of squared residuals forms the basis of MSE, while the sum of absolute residuals forms the basis of MAE. The Huber loss uses both depending on residual magnitude.",
+        "proof_sketch": "Consider a dataset with $n$ samples: $\\{(y_1, \\hat{y}_1), (y_2, \\hat{y}_2), \\ldots, (y_n, \\hat{y}_n)\\}$. The residual vector is $\\mathbf{r} = [y_1 - \\hat{y}_1, y_2 - \\hat{y}_2, \\ldots, y_n - \\hat{y}_n]^T$. Each component $r_i = y_i - \\hat{y}_i$ measures the model's error for sample $i$. The sign of $r_i$ indicates direction (underestimation vs overestimation), while $|r_i|$ indicates magnitude.",
+        "examples": [
+          "Example 1: $y = 5.0$, $\\hat{y} = 3.0$ → $r = 5.0 - 3.0 = 2.0$, $|r| = 2.0$ (underprediction)",
+          "Example 2: $y = 3.0$, $\\hat{y} = 5.0$ → $r = 3.0 - 5.0 = -2.0$, $|r| = 2.0$ (overprediction)",
+          "Example 3: $y = [2.0, 3.0, 4.0]$, $\\hat{y} = [2.5, 2.0, 4.0]$ → $\\mathbf{r} = [-0.5, 1.0, 0.0]$, $|\\mathbf{r}| = [0.5, 1.0, 0.0]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Residual",
+          "latex": "$r = y - \\hat{y}$",
+          "description": "Compute the signed error between true and predicted values"
+        },
+        {
+          "name": "Absolute Residual",
+          "latex": "$|r| = |y - \\hat{y}|$",
+          "description": "Compute the magnitude of error (always non-negative)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes residuals and their absolute values for both scalar and list inputs. This is a critical building block for evaluating how far predictions deviate from true values.",
+        "function_signature": "def compute_residuals(y_true, y_pred) -> tuple[list[float], list[float]]:",
+        "starter_code": "def compute_residuals(y_true, y_pred):\n    \"\"\"\n    Compute residuals and absolute residuals.\n    \n    Args:\n        y_true (float | list[float]): Ground truth values\n        y_pred (float | list[float]): Predicted values\n    \n    Returns:\n        tuple: (residuals, absolute_residuals) as lists\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_residuals(5.0, 3.0)",
+            "expected": "([2.0], [2.0])",
+            "explanation": "Single scalar: residual = 5.0 - 3.0 = 2.0, absolute residual = 2.0"
+          },
+          {
+            "input": "compute_residuals([2.0, 3.0, 4.0], [2.5, 2.0, 4.0])",
+            "expected": "([-0.5, 1.0, 0.0], [0.5, 1.0, 0.0])",
+            "explanation": "Element-wise: [2.0-2.5, 3.0-2.0, 4.0-4.0] = [-0.5, 1.0, 0.0] with absolute values [0.5, 1.0, 0.0]"
+          },
+          {
+            "input": "compute_residuals([10.0, 15.0], [12.0, 13.0])",
+            "expected": "([-2.0, 2.0], [2.0, 2.0])",
+            "explanation": "Mixed signs: negative residual becomes positive when taking absolute value"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle scalar inputs by converting them to lists for uniform processing",
+        "Confusing the order of subtraction (y_true - y_pred vs y_pred - y_true)",
+        "Not recognizing that absolute value removes sign information needed for gradient computation"
+      ],
+      "hint": "Start by normalizing inputs to lists to handle both scalar and vector cases uniformly, then apply element-wise operations.",
+      "references": [
+        "Regression analysis fundamentals",
+        "Error metrics in supervised learning",
+        "Python list comprehensions"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Quadratic Loss for Small Errors (MSE Component)",
+      "relation_to_problem": "The Huber Loss uses quadratic loss (MSE-like behavior) for small errors. Understanding this component is essential for implementing the first case of the piecewise function.",
+      "prerequisites": [
+        "Residual computation",
+        "Exponentiation",
+        "Piecewise functions"
+      ],
+      "learning_objectives": [
+        "Understand why quadratic loss is sensitive to small errors",
+        "Implement the MSE formula for individual samples",
+        "Recognize when to apply quadratic penalty based on threshold comparison"
+      ],
+      "math_content": {
+        "definition": "**Mean Squared Error (MSE)** measures the average squared difference between predictions and true values. For a single sample, the squared error is: $$L_{\\text{MSE}}(y, \\hat{y}) = \\frac{1}{2}(y - \\hat{y})^2 = \\frac{1}{2}r^2$$ The factor $\\frac{1}{2}$ simplifies derivatives during optimization.",
+        "notation": "$L_{\\text{MSE}}$ = squared error loss; $r$ = residual; $r^2$ = squared residual",
+        "theorem": "**Quadratic Growth Property**: Squared error grows quadratically with residual magnitude. If $|r_1| = 2|r_2|$, then $r_1^2 = 4r_2^2$. This makes MSE highly sensitive to large errors (outliers), as a single large error can dominate the total loss.",
+        "proof_sketch": "Consider the derivative: $\\frac{d}{dr}\\left(\\frac{1}{2}r^2\\right) = r$. The gradient is proportional to the residual itself, meaning larger errors receive proportionally larger gradient updates. For Huber loss, we apply this quadratic penalty only when $|r| \\leq \\delta$, limiting its effect to small errors.",
+        "examples": [
+          "Example 1: $y = 3.0$, $\\hat{y} = 2.5$, $r = 0.5$ → $L = \\frac{1}{2}(0.5)^2 = 0.125$",
+          "Example 2: $y = 3.0$, $\\hat{y} = 2.0$, $r = 1.0$ → $L = \\frac{1}{2}(1.0)^2 = 0.5$ (4× the residual but 4× the loss)",
+          "Example 3: $y = 3.0$, $\\hat{y} = 0.0$, $r = 3.0$ → $L = \\frac{1}{2}(3.0)^2 = 4.5$ (6× the residual but 36× the loss of Example 1)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Quadratic Loss (Single Sample)",
+          "latex": "$L_{\\text{quad}}(r) = \\frac{1}{2}r^2$",
+          "description": "Applied when error magnitude is small (within threshold)"
+        },
+        {
+          "name": "Threshold Condition",
+          "latex": "$|r| \\leq \\delta$",
+          "description": "Condition under which quadratic loss is used in Huber function"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes quadratic loss for residuals, but ONLY for those below a threshold delta. This implements the first branch of the Huber Loss piecewise function.",
+        "function_signature": "def conditional_quadratic_loss(residuals: list[float], delta: float) -> list[float]:",
+        "starter_code": "def conditional_quadratic_loss(residuals, delta):\n    \"\"\"\n    Compute quadratic loss for residuals within threshold.\n    \n    Args:\n        residuals (list[float]): Absolute residuals |y - y_pred|\n        delta (float): Threshold parameter\n    \n    Returns:\n        list[float]: Loss values (0.5 * r^2 if |r| <= delta, else None)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "conditional_quadratic_loss([0.5, 1.0, 1.5], delta=1.0)",
+            "expected": "[0.125, 0.5, None]",
+            "explanation": "0.5 and 1.0 are ≤ 1.0, so compute 0.5*0.5^2=0.125 and 0.5*1.0^2=0.5; 1.5 > 1.0 returns None"
+          },
+          {
+            "input": "conditional_quadratic_loss([0.2, 0.3, 0.8], delta=1.0)",
+            "expected": "[0.02, 0.045, 0.32]",
+            "explanation": "All residuals ≤ 1.0: [0.5*0.04, 0.5*0.09, 0.5*0.64] = [0.02, 0.045, 0.32]"
+          },
+          {
+            "input": "conditional_quadratic_loss([2.0, 3.0], delta=1.0)",
+            "expected": "[None, None]",
+            "explanation": "Both residuals > 1.0, so quadratic loss doesn't apply"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting the 1/2 coefficient in the quadratic loss formula",
+        "Using signed residuals instead of absolute values for threshold comparison",
+        "Applying quadratic loss to ALL residuals instead of checking the threshold condition",
+        "Using strict inequality (<) instead of inclusive (≤) for the threshold check"
+      ],
+      "hint": "Check each residual against delta first, then conditionally compute the loss. Remember MSE uses squared errors with a 1/2 coefficient.",
+      "references": [
+        "Mean Squared Error",
+        "Piecewise function implementation",
+        "Conditional logic in loss functions"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Linear Loss for Large Errors (MAE Component)",
+      "relation_to_problem": "The Huber Loss uses linear loss (MAE-like behavior) for large errors beyond the threshold. This component makes the loss function robust to outliers.",
+      "prerequisites": [
+        "Residual computation",
+        "Threshold comparison",
+        "Linear functions"
+      ],
+      "learning_objectives": [
+        "Understand why linear loss is robust to outliers",
+        "Implement the MAE-based formula for large errors",
+        "Derive the specific Huber linear formula from MAE principles"
+      ],
+      "math_content": {
+        "definition": "**Mean Absolute Error (MAE)** measures average absolute differences. For Huber loss, when $|r| > \\delta$, we use a modified linear penalty: $$L_{\\text{linear}}(r, \\delta) = \\delta\\left(|r| - \\frac{\\delta}{2}\\right) = \\delta|r| - \\frac{\\delta^2}{2}$$ This formula ensures continuity with the quadratic branch at $|r| = \\delta$.",
+        "notation": "$\\delta$ = threshold parameter; $|r|$ = absolute residual; $L_{\\text{linear}}$ = linear penalty component",
+        "theorem": "**Continuity at Threshold**: At $|r| = \\delta$, both branches yield the same value: $$\\frac{1}{2}\\delta^2 = \\delta\\left(\\delta - \\frac{\\delta}{2}\\right) = \\delta \\cdot \\frac{\\delta}{2} = \\frac{\\delta^2}{2}$$ This ensures the Huber loss is continuous and differentiable everywhere.",
+        "proof_sketch": "Evaluate both branches at the boundary $|r| = \\delta$:\n\nQuadratic branch: $\\frac{1}{2}\\delta^2$\n\nLinear branch: $\\delta(\\delta - \\frac{\\delta}{2}) = \\delta \\cdot \\frac{\\delta}{2} = \\frac{\\delta^2}{2}$\n\nSince both equal $\\frac{\\delta^2}{2}$, the function is continuous. The derivative from the left is $r|_{r=\\delta} = \\delta$, and from the right is $\\delta \\cdot \\text{sign}(r) = \\delta$, confirming differentiability.",
+        "examples": [
+          "Example 1: $|r| = 2.0$, $\\delta = 1.0$ → $L = 1.0(2.0 - 0.5) = 1.5$",
+          "Example 2: $|r| = 3.0$, $\\delta = 1.0$ → $L = 1.0(3.0 - 0.5) = 2.5$",
+          "Example 3 (boundary): $|r| = 1.0$, $\\delta = 1.0$ → $L = 1.0(1.0 - 0.5) = 0.5$ (matches quadratic: $\\frac{1}{2}(1.0)^2 = 0.5$)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Linear Loss (Large Errors)",
+          "latex": "$L_{\\text{linear}}(r, \\delta) = \\delta\\left(|r| - \\frac{\\delta}{2}\\right)$",
+          "description": "Applied when error magnitude exceeds threshold (|r| > δ)"
+        },
+        {
+          "name": "Expanded Form",
+          "latex": "$L_{\\text{linear}}(r, \\delta) = \\delta|r| - \\frac{\\delta^2}{2}$",
+          "description": "Alternative form showing linear growth in |r| with offset"
+        },
+        {
+          "name": "Threshold Condition",
+          "latex": "$|r| > \\delta$",
+          "description": "Condition under which linear loss is used"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes linear loss for residuals exceeding a threshold. This implements the second branch of the Huber Loss piecewise function for outlier-robust behavior.",
+        "function_signature": "def conditional_linear_loss(residuals: list[float], delta: float) -> list[float]:",
+        "starter_code": "def conditional_linear_loss(residuals, delta):\n    \"\"\"\n    Compute linear loss for residuals beyond threshold.\n    \n    Args:\n        residuals (list[float]): Absolute residuals |y - y_pred|\n        delta (float): Threshold parameter\n    \n    Returns:\n        list[float]: Loss values (delta*(|r| - delta/2) if |r| > delta, else None)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "conditional_linear_loss([0.5, 1.0, 1.5], delta=1.0)",
+            "expected": "[None, None, 1.0]",
+            "explanation": "Only 1.5 > 1.0: loss = 1.0*(1.5 - 0.5) = 1.0; others are ≤ threshold"
+          },
+          {
+            "input": "conditional_linear_loss([2.0, 3.0, 5.0], delta=1.0)",
+            "expected": "[1.5, 2.5, 4.5]",
+            "explanation": "All > 1.0: [1.0*(2.0-0.5), 1.0*(3.0-0.5), 1.0*(5.0-0.5)] = [1.5, 2.5, 4.5]"
+          },
+          {
+            "input": "conditional_linear_loss([0.8, 0.9], delta=1.0)",
+            "expected": "[None, None]",
+            "explanation": "Both residuals ≤ 1.0, so linear loss doesn't apply"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to subtract delta/2, which would break continuity at the threshold",
+        "Using |r| - delta instead of |r| - delta/2 in the formula",
+        "Applying linear loss when |r| = delta (should use ≤ for quadratic, > for linear)",
+        "Not verifying that the linear and quadratic branches match at |r| = delta"
+      ],
+      "hint": "The formula delta*(|r| - delta/2) ensures smooth transition from quadratic to linear. Verify your implementation produces the same value as quadratic loss at the boundary.",
+      "references": [
+        "Mean Absolute Error",
+        "Piecewise continuity",
+        "Robust loss functions"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Piecewise Function Implementation and Conditional Logic",
+      "relation_to_problem": "The Huber Loss is defined as a piecewise function with two branches. Implementing proper conditional logic to select between quadratic and linear components is crucial for correctness.",
+      "prerequisites": [
+        "Quadratic loss computation",
+        "Linear loss computation",
+        "Boolean logic"
+      ],
+      "learning_objectives": [
+        "Implement piecewise functions using conditional statements",
+        "Combine quadratic and linear loss components based on threshold",
+        "Ensure element-wise processing for vector inputs"
+      ],
+      "math_content": {
+        "definition": "A **piecewise function** is defined by different expressions over different intervals of the domain. The Huber Loss is formally defined as: $$L_\\delta(y, \\hat{y}) = \\begin{cases} \\frac{1}{2}(y - \\hat{y})^2 & \\text{if } |y - \\hat{y}| \\leq \\delta \\\\ \\delta\\left(|y - \\hat{y}| - \\frac{\\delta}{2}\\right) & \\text{if } |y - \\hat{y}| > \\delta \\end{cases}$$",
+        "notation": "$L_\\delta$ = Huber loss function parametrized by $\\delta$; The notation $\\begin{cases}\\end{cases}$ denotes piecewise definition",
+        "theorem": "**Piecewise Function Properties**: (1) **Continuity**: $\\lim_{r \\to \\delta^-} L_\\delta(r) = \\lim_{r \\to \\delta^+} L_\\delta(r) = \\frac{\\delta^2}{2}$. (2) **Differentiability**: The derivative exists at $r = \\delta$ with value $\\delta$. (3) **Convexity**: Huber loss is convex everywhere, ensuring unique global minimum.",
+        "proof_sketch": "To prove convexity, show the second derivative is non-negative:\n\nFor $|r| \\leq \\delta$: $\\frac{d^2}{dr^2}\\left(\\frac{1}{2}r^2\\right) = 1 \\geq 0$\n\nFor $|r| > \\delta$: $\\frac{d^2}{dr^2}(\\delta|r| - \\frac{\\delta^2}{2}) = 0 \\geq 0$\n\nBoth branches have non-negative second derivatives, and continuity at the boundary preserves convexity globally.",
+        "examples": [
+          "Example 1: $r = 0.5$, $\\delta = 1.0$ → Since $0.5 \\leq 1.0$, use quadratic: $L = 0.5(0.5)^2 = 0.125$",
+          "Example 2: $r = 1.5$, $\\delta = 1.0$ → Since $1.5 > 1.0$, use linear: $L = 1.0(1.5 - 0.5) = 1.0$",
+          "Example 3 (boundary): $r = 1.0$, $\\delta = 1.0$ → Since $1.0 \\leq 1.0$, use quadratic: $L = 0.5(1.0)^2 = 0.5$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Huber Loss (Single Sample)",
+          "latex": "$L_\\delta(r) = \\begin{cases} \\frac{1}{2}r^2 & |r| \\leq \\delta \\\\ \\delta(|r| - \\frac{\\delta}{2}) & |r| > \\delta \\end{cases}$",
+          "description": "Full piecewise definition for a single residual"
+        },
+        {
+          "name": "Condition Check",
+          "latex": "$\\text{if } |r| \\leq \\delta \\text{ then branch 1, else branch 2}$",
+          "description": "Logical structure for implementing piecewise behavior"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the complete Huber Loss for individual residuals by combining both quadratic and linear branches. This demonstrates proper piecewise function implementation.",
+        "function_signature": "def huber_loss_single(residual: float, delta: float) -> float:",
+        "starter_code": "def huber_loss_single(residual, delta):\n    \"\"\"\n    Compute Huber Loss for a single residual.\n    \n    Args:\n        residual (float): Absolute residual |y - y_pred|\n        delta (float): Threshold parameter\n    \n    Returns:\n        float: Huber loss value\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "huber_loss_single(0.5, delta=1.0)",
+            "expected": "0.125",
+            "explanation": "|r|=0.5 ≤ 1.0, use quadratic: 0.5 * 0.5^2 = 0.125"
+          },
+          {
+            "input": "huber_loss_single(1.0, delta=1.0)",
+            "expected": "0.5",
+            "explanation": "|r|=1.0 ≤ 1.0 (boundary case), use quadratic: 0.5 * 1.0^2 = 0.5"
+          },
+          {
+            "input": "huber_loss_single(2.0, delta=1.0)",
+            "expected": "1.5",
+            "explanation": "|r|=2.0 > 1.0, use linear: 1.0 * (2.0 - 0.5) = 1.5"
+          },
+          {
+            "input": "huber_loss_single(0.0, delta=1.0)",
+            "expected": "0.0",
+            "explanation": "Perfect prediction: |r|=0.0, loss = 0.5 * 0.0^2 = 0.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using wrong inequality direction (< vs ≤) for the threshold check—boundary should use quadratic branch",
+        "Not taking absolute value of residual before threshold comparison",
+        "Implementing if-elif incorrectly so that boundary case falls through",
+        "Returning wrong branch due to inverted conditional logic"
+      ],
+      "hint": "Use a clear if-else structure: check if absolute residual is within threshold for quadratic, otherwise apply linear. Test the boundary case explicitly.",
+      "references": [
+        "Piecewise functions",
+        "Conditional expressions in Python",
+        "Function composition"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Averaging Loss Over Multiple Samples",
+      "relation_to_problem": "The final Huber Loss implementation must compute element-wise losses for all prediction-target pairs and return their average, combining all previous concepts into the complete solution.",
+      "prerequisites": [
+        "Huber loss for single sample",
+        "List processing",
+        "Numerical averaging"
+      ],
+      "learning_objectives": [
+        "Apply Huber loss element-wise to vectors of predictions and targets",
+        "Compute the mean loss across all samples",
+        "Handle both scalar and vector inputs uniformly",
+        "Understand why averaging is essential for batch loss computation"
+      ],
+      "math_content": {
+        "definition": "For a dataset with $n$ samples $\\{(y_1, \\hat{y}_1), (y_2, \\hat{y}_2), \\ldots, (y_n, \\hat{y}_n)\\}$, the **average Huber Loss** is: $$\\mathcal{L}_\\delta = \\frac{1}{n}\\sum_{i=1}^{n} L_\\delta(y_i, \\hat{y}_i)$$ where each $L_\\delta(y_i, \\hat{y}_i)$ is computed according to the piecewise definition.",
+        "notation": "$\\mathcal{L}_\\delta$ = average Huber loss; $n$ = number of samples; $\\sum_{i=1}^{n}$ = summation over all samples",
+        "theorem": "**Convexity Preservation Under Averaging**: If each $L_\\delta(y_i, \\hat{y}_i)$ is convex in $\\hat{y}_i$, then the average $\\mathcal{L}_\\delta$ is also convex. This ensures gradient descent converges to a global minimum when optimizing models using Huber loss.",
+        "proof_sketch": "Convexity is preserved under non-negative linear combinations. Since $\\mathcal{L}_\\delta = \\frac{1}{n}\\sum_{i=1}^{n} L_\\delta(y_i, \\hat{y}_i)$ is a weighted sum with positive weights $\\frac{1}{n}$, and each $L_\\delta$ is convex (proven in Step 4), the average is convex. Formally, for any $\\hat{y}^{(1)}, \\hat{y}^{(2)}$ and $\\lambda \\in [0,1]$: $$\\mathcal{L}_\\delta(\\lambda\\hat{y}^{(1)} + (1-\\lambda)\\hat{y}^{(2)}) \\leq \\lambda\\mathcal{L}_\\delta(\\hat{y}^{(1)}) + (1-\\lambda)\\mathcal{L}_\\delta(\\hat{y}^{(2)})$$",
+        "examples": [
+          "Example 1: $y = [2.0, 3.0]$, $\\hat{y} = [2.5, 2.0]$, $\\delta = 1.0$\n$r_1 = |2.0 - 2.5| = 0.5 \\leq 1.0$ → $L_1 = 0.5(0.5)^2 = 0.125$\n$r_2 = |3.0 - 2.0| = 1.0 \\leq 1.0$ → $L_2 = 0.5(1.0)^2 = 0.5$\nAverage: $\\mathcal{L} = \\frac{0.125 + 0.5}{2} = 0.3125$",
+          "Example 2: $y = [2.0, 3.0, 4.0]$, $\\hat{y} = [2.5, 2.0, 4.0]$, $\\delta = 1.0$\n$L_1 = 0.125$, $L_2 = 0.5$, $L_3 = 0.0$\nAverage: $\\mathcal{L} = \\frac{0.125 + 0.5 + 0.0}{3} = 0.208\\overline{3}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Average Huber Loss",
+          "latex": "$\\mathcal{L}_\\delta = \\frac{1}{n}\\sum_{i=1}^{n} L_\\delta(y_i, \\hat{y}_i)$",
+          "description": "Mean loss across all samples in the dataset"
+        },
+        {
+          "name": "Element-wise Application",
+          "latex": "$L_\\delta(y_i, \\hat{y}_i) = \\begin{cases} \\frac{1}{2}(y_i - \\hat{y}_i)^2 & |y_i - \\hat{y}_i| \\leq \\delta \\\\ \\delta(|y_i - \\hat{y}_i| - \\frac{\\delta}{2}) & |y_i - \\hat{y}_i| > \\delta \\end{cases}$",
+          "description": "Apply piecewise function to each sample independently"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the average Huber Loss over multiple samples. Given vectors of true and predicted values, compute the loss for each pair and return the mean. This integrates all previous sub-quest concepts.",
+        "function_signature": "def average_huber_loss(y_true, y_pred, delta: float) -> float:",
+        "starter_code": "def average_huber_loss(y_true, y_pred, delta):\n    \"\"\"\n    Compute average Huber Loss across all samples.\n    \n    Args:\n        y_true (float | list[float]): Ground truth values\n        y_pred (float | list[float]): Predicted values\n        delta (float): Threshold parameter\n    \n    Returns:\n        float: Average Huber loss\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "round(average_huber_loss([2.0, 3.0, 4.0], [2.5, 2.0, 4.0], delta=1.0), 4)",
+            "expected": "0.2083",
+            "explanation": "Losses: [0.125, 0.5, 0.0], average = 0.625/3 = 0.208333..., rounded to 0.2083"
+          },
+          {
+            "input": "average_huber_loss(5.0, 3.0, delta=1.0)",
+            "expected": "1.5",
+            "explanation": "Single scalar: |5.0-3.0|=2.0 > 1.0, use linear: 1.0*(2.0-0.5) = 1.5"
+          },
+          {
+            "input": "round(average_huber_loss([1.0, 2.0, 3.0], [1.0, 2.0, 3.0], delta=1.0), 4)",
+            "expected": "0.0",
+            "explanation": "Perfect predictions: all residuals = 0.0, average loss = 0.0"
+          },
+          {
+            "input": "round(average_huber_loss([0.0, 5.0], [1.0, 3.0], delta=1.0), 4)",
+            "expected": "1.25",
+            "explanation": "|0-1|=1.0 ≤ 1.0 → 0.5; |5-3|=2.0 > 1.0 → 1.0*(2.0-0.5)=1.5; avg=(0.5+1.5)/2=1.0... wait, let me recalculate: 0.5*1.0^2=0.5, 1.0*(2.0-0.5)=1.5, (0.5+1.5)/2=1.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to average—returning the sum of losses instead of mean",
+        "Not handling scalar inputs by converting to lists first",
+        "Computing residuals incorrectly (wrong order or not taking absolute value)",
+        "Applying threshold check to the average loss instead of individual losses",
+        "Division by zero when input is empty (should validate input length)"
+      ],
+      "hint": "Convert inputs to lists if needed, compute individual losses using the piecewise function, sum them, and divide by the count. Ensure each residual is evaluated independently.",
+      "references": [
+        "Batch loss computation",
+        "NumPy-style vectorization concepts",
+        "Statistical aggregation"
+      ]
+    }
+  ]
+}

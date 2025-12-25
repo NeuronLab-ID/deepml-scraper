@@ -1,0 +1,528 @@
+{
+  "problem_id": 224,
+  "title": "Group Relative Advantage for GRPO",
+  "category": "Reinforcement Learning",
+  "difficulty": "easy",
+  "description": "Implement the Group Relative Advantage calculation used in GRPO (Group Relative Policy Optimization) from the DeepSeek R1 paper. In GRPO, for each prompt, the model generates a group of G outputs. Each output receives a reward, and the advantage for each output is computed by normalizing rewards within the group. This normalization ensures that the policy update is relative to other outputs for the same prompt, which is key to GRPO's effectiveness.",
+  "example": {
+    "input": "rewards = [0.0, 1.0, 0.0, 1.0]",
+    "output": "[-1.0, 1.0, -1.0, 1.0]",
+    "reasoning": "Mean = 0.5, Std = 0.5. Each reward is normalized: (0-0.5)/0.5 = -1.0 for incorrect outputs, (1-0.5)/0.5 = 1.0 for correct outputs. This gives positive advantage to correct responses and negative to incorrect ones."
+  },
+  "starter_code": "import numpy as np\n\ndef compute_group_relative_advantage(rewards: list[float]) -> list[float]:\n\t\"\"\"\n\tCompute the Group Relative Advantage for GRPO.\n\t\n\tFor each reward r_i in a group, compute:\n\tA_i = (r_i - mean(rewards)) / std(rewards)\n\t\n\tIf all rewards are identical (std=0), return zeros.\n\t\n\tArgs:\n\t\trewards: List of rewards for a group of outputs from the same prompt\n\t\t\n\tReturns:\n\t\tList of normalized advantages\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Statistical Measures: Sample Mean and Expected Value",
+      "relation_to_problem": "Computing the group mean reward is the first step in calculating relative advantages, as we subtract the mean from each individual reward to center the distribution",
+      "prerequisites": [
+        "Basic arithmetic",
+        "Summation notation"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of sample mean and its mathematical properties",
+        "Implement efficient mean computation for reward distributions",
+        "Recognize when to use sample mean versus population mean"
+      ],
+      "math_content": {
+        "definition": "The **sample mean** (or arithmetic mean) of a finite set of values $\\{x_1, x_2, \\ldots, x_n\\}$ is defined as: $$\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n} x_i$$ where $n$ is the number of observations in the sample. The mean represents the central tendency or \"center of mass\" of the distribution.",
+        "notation": "$\\bar{x}$ = sample mean; $n$ = sample size; $x_i$ = the $i$-th observation; $\\sum$ = summation operator",
+        "theorem": "**Linearity of Expectation**: For any constants $a$ and $b$, and random variables $X$ and $Y$: $$E[aX + bY] = aE[X] + bE[Y]$$ This holds even when $X$ and $Y$ are dependent. For the sample mean: $$E[\\bar{X}] = \\mu$$ where $\\mu$ is the population mean.",
+        "proof_sketch": "The mean is the first moment of the distribution. For the linearity property: $$E[aX + bY] = \\sum_{x,y} (ax + by)P(X=x, Y=y) = a\\sum_{x,y} xP(X=x, Y=y) + b\\sum_{x,y} yP(X=x, Y=y) = aE[X] + bE[Y]$$ The sample mean is an unbiased estimator of the population mean because $E[\\frac{1}{n}\\sum X_i] = \\frac{1}{n}\\sum E[X_i] = \\frac{1}{n}(n\\mu) = \\mu$.",
+        "examples": [
+          "For rewards $\\{0.0, 1.0, 0.0, 1.0\\}$: $\\bar{r} = \\frac{0.0 + 1.0 + 0.0 + 1.0}{4} = \\frac{2.0}{4} = 0.5$",
+          "For uniform rewards $\\{0.8, 0.8, 0.8\\}$: $\\bar{r} = \\frac{0.8 + 0.8 + 0.8}{3} = 0.8$",
+          "For single value $\\{5.0\\}$: $\\bar{r} = \\frac{5.0}{1} = 5.0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sample Mean",
+          "latex": "$\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n} x_i$",
+          "description": "Use to compute the central tendency of a group of rewards. This serves as the baseline in GRPO."
+        },
+        {
+          "name": "Alternative Computation",
+          "latex": "$\\bar{x} = \\frac{S}{n}$ where $S = \\sum_{i=1}^{n} x_i$",
+          "description": "Computationally efficient form: sum all values first, then divide by count"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to compute the mean of a list of reward values. This is the baseline that will be subtracted from each reward in GRPO's advantage calculation.",
+        "function_signature": "def compute_mean(values: list[float]) -> float:",
+        "starter_code": "def compute_mean(values: list[float]) -> float:\n    \"\"\"\n    Compute the arithmetic mean of a list of values.\n    \n    Args:\n        values: List of numerical values (rewards)\n        \n    Returns:\n        The mean (average) of the values\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_mean([0.0, 1.0, 0.0, 1.0])",
+            "expected": "0.5",
+            "explanation": "Sum is 2.0, count is 4, so mean is 2.0/4 = 0.5"
+          },
+          {
+            "input": "compute_mean([1.0, 1.0, 1.0, 1.0])",
+            "expected": "1.0",
+            "explanation": "All values identical, mean equals that value"
+          },
+          {
+            "input": "compute_mean([0.0])",
+            "expected": "0.0",
+            "explanation": "Single value case: mean is the value itself"
+          },
+          {
+            "input": "compute_mean([0.2, 0.4, 0.6, 0.8])",
+            "expected": "0.5",
+            "explanation": "Sum is 2.0, count is 4, mean is 0.5"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to convert integer division to float division (in languages with integer division)",
+        "Not handling empty lists (though GRPO always has at least one sample)",
+        "Using inefficient algorithms like repeated addition instead of sum()",
+        "Confusing sample mean with population mean notation"
+      ],
+      "hint": "The sum function combined with len function gives you everything you need. Remember: mean = total / count",
+      "references": [
+        "Statistics: sample mean vs population mean",
+        "Unbiased estimators",
+        "Central tendency measures"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Variance and Standard Deviation: Measuring Spread",
+      "relation_to_problem": "The standard deviation normalizes the advantage values, making them scale-invariant. This ensures stable gradient updates across prompts with different reward distributions.",
+      "prerequisites": [
+        "Sample mean calculation",
+        "Squared differences",
+        "Square root operations"
+      ],
+      "learning_objectives": [
+        "Understand variance as the average squared deviation from the mean",
+        "Derive the relationship between variance and standard deviation",
+        "Implement numerically stable variance computation",
+        "Recognize when standard deviation is zero (all rewards identical)"
+      ],
+      "math_content": {
+        "definition": "The **sample variance** measures the spread of data around the mean: $$s^2 = \\frac{1}{n}\\sum_{i=1}^{n}(x_i - \\bar{x})^2$$ The **sample standard deviation** is the square root of variance: $$s = \\sqrt{s^2} = \\sqrt{\\frac{1}{n}\\sum_{i=1}^{n}(x_i - \\bar{x})^2}$$ Note: Some texts use $n-1$ (Bessel's correction) for unbiased variance estimation, but GRPO uses the population formula with $n$ for computational simplicity.",
+        "notation": "$s^2$ = sample variance; $s$ = sample standard deviation; $(x_i - \\bar{x})$ = deviation from mean; $\\bar{x}$ = sample mean",
+        "theorem": "**Variance Decomposition (Computational Formula)**: $$s^2 = \\frac{1}{n}\\sum_{i=1}^{n}x_i^2 - \\bar{x}^2 = E[X^2] - (E[X])^2$$ This form is sometimes computationally more efficient but can suffer from numerical instability when $\\bar{x}^2$ and $\\frac{1}{n}\\sum x_i^2$ are very close.",
+        "proof_sketch": "Expanding the squared term: $$s^2 = \\frac{1}{n}\\sum_{i=1}^{n}(x_i - \\bar{x})^2 = \\frac{1}{n}\\sum_{i=1}^{n}(x_i^2 - 2x_i\\bar{x} + \\bar{x}^2)$$ $$= \\frac{1}{n}\\sum x_i^2 - 2\\bar{x}\\frac{1}{n}\\sum x_i + \\bar{x}^2 = \\frac{1}{n}\\sum x_i^2 - 2\\bar{x}^2 + \\bar{x}^2 = \\frac{1}{n}\\sum x_i^2 - \\bar{x}^2$$",
+        "examples": [
+          "For rewards $\\{0.0, 1.0, 0.0, 1.0\\}$ with mean $0.5$: Squared deviations: $(0-0.5)^2=0.25$, $(1-0.5)^2=0.25$, $(0-0.5)^2=0.25$, $(1-0.5)^2=0.25$. Variance: $\\frac{0.25+0.25+0.25+0.25}{4} = 0.25$. Standard deviation: $\\sqrt{0.25} = 0.5$",
+          "For uniform rewards $\\{1.0, 1.0, 1.0\\}$: All deviations are zero, so variance = 0 and std = 0",
+          "For rewards $\\{0.0, 0.5, 1.0\\}$ with mean $0.5$: Deviations squared: $0.25, 0, 0.25$. Variance: $\\frac{0.5}{3} \\approx 0.167$. Std: $\\sqrt{0.167} \\approx 0.408$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sample Variance (Definition)",
+          "latex": "$s^2 = \\frac{1}{n}\\sum_{i=1}^{n}(x_i - \\bar{x})^2$",
+          "description": "Most numerically stable form: compute mean first, then squared deviations"
+        },
+        {
+          "name": "Sample Standard Deviation",
+          "latex": "$s = \\sqrt{s^2}$",
+          "description": "Square root of variance. Use this to normalize advantages in GRPO"
+        },
+        {
+          "name": "Computational Formula",
+          "latex": "$s^2 = \\frac{1}{n}\\sum_{i=1}^{n}x_i^2 - \\bar{x}^2$",
+          "description": "Alternative form, but can be numerically unstable for large values"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to compute the standard deviation of reward values. This is crucial for normalizing advantages in GRPO. Handle the edge case where all values are identical (std = 0).",
+        "function_signature": "def compute_std(values: list[float]) -> float:",
+        "starter_code": "def compute_std(values: list[float]) -> float:\n    \"\"\"\n    Compute the standard deviation of a list of values.\n    \n    Args:\n        values: List of numerical values (rewards)\n        \n    Returns:\n        The standard deviation of the values\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_std([0.0, 1.0, 0.0, 1.0])",
+            "expected": "0.5",
+            "explanation": "Mean is 0.5. Squared deviations: all 0.25. Variance: 0.25. Std: sqrt(0.25) = 0.5"
+          },
+          {
+            "input": "compute_std([1.0, 1.0, 1.0, 1.0])",
+            "expected": "0.0",
+            "explanation": "All values identical means no spread, so std = 0"
+          },
+          {
+            "input": "compute_std([0.0, 0.5, 1.0])",
+            "expected": "0.408248...",
+            "explanation": "Mean is 0.5. Squared deviations: [0.25, 0, 0.25]. Variance: 0.5/3. Std: sqrt(1/6)"
+          },
+          {
+            "input": "compute_std([5.0])",
+            "expected": "0.0",
+            "explanation": "Single value has no variance, std = 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using n-1 instead of n in the denominator (Bessel's correction not used in GRPO)",
+        "Not taking the square root of variance to get standard deviation",
+        "Numerical instability from using the computational formula with large values",
+        "Not handling the zero standard deviation case (will cause division by zero later)",
+        "Computing mean multiple times instead of reusing it"
+      ],
+      "hint": "First compute the mean, then compute squared deviations from the mean, average them to get variance, and take the square root. Use numpy or implement from scratch.",
+      "references": [
+        "Bessel's correction for unbiased variance",
+        "Numerical stability in variance computation",
+        "Population vs sample variance",
+        "Second moment of a distribution"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Standardization (Z-Score Transformation)",
+      "relation_to_problem": "The group relative advantage is exactly a z-score transformation applied to the reward distribution, converting raw rewards into standardized units that represent relative performance within the group.",
+      "prerequisites": [
+        "Mean computation",
+        "Standard deviation computation",
+        "Linear transformations"
+      ],
+      "learning_objectives": [
+        "Understand z-score as a measure of how many standard deviations a value is from the mean",
+        "Prove that standardization produces a distribution with mean 0 and standard deviation 1",
+        "Implement vectorized standardization for multiple values",
+        "Handle the degenerate case when standard deviation is zero"
+      ],
+      "math_content": {
+        "definition": "The **z-score** (or standard score) of a value $x$ measures its distance from the mean in units of standard deviation: $$z = \\frac{x - \\mu}{\\sigma}$$ For a sample with mean $\\bar{x}$ and standard deviation $s$: $$z_i = \\frac{x_i - \\bar{x}}{s}$$ A positive z-score indicates the value is above the mean; negative indicates below. The magnitude indicates how many standard deviations away.",
+        "notation": "$z$ = z-score (standardized value); $x$ = original value; $\\mu$ or $\\bar{x}$ = mean; $\\sigma$ or $s$ = standard deviation",
+        "theorem": "**Properties of Standardized Variables**: If $Z = \\frac{X - \\mu}{\\sigma}$, then: (1) $E[Z] = 0$ (mean of standardized variable is zero), (2) $\\text{Var}(Z) = 1$ (variance/std of standardized variable is one), (3) Standardization is a **location-scale transformation** that preserves relative distances",
+        "proof_sketch": "For property (1): $$E[Z] = E\\left[\\frac{X - \\mu}{\\sigma}\\right] = \\frac{1}{\\sigma}E[X - \\mu] = \\frac{1}{\\sigma}(E[X] - \\mu) = \\frac{\\mu - \\mu}{\\sigma} = 0$$ For property (2): $$\\text{Var}(Z) = \\text{Var}\\left(\\frac{X - \\mu}{\\sigma}\\right) = \\frac{1}{\\sigma^2}\\text{Var}(X - \\mu) = \\frac{1}{\\sigma^2}\\text{Var}(X) = \\frac{\\sigma^2}{\\sigma^2} = 1$$ Note: $\\text{Var}(X - \\mu) = \\text{Var}(X)$ because subtracting a constant doesn't change variance.",
+        "examples": [
+          "For reward 1.0 with group mean 0.5 and std 0.5: $z = \\frac{1.0 - 0.5}{0.5} = \\frac{0.5}{0.5} = 1.0$ (one std above mean)",
+          "For reward 0.0 with group mean 0.5 and std 0.5: $z = \\frac{0.0 - 0.5}{0.5} = \\frac{-0.5}{0.5} = -1.0$ (one std below mean)",
+          "For rewards $\\{0, 1, 0, 1\\}$: mean=0.5, std=0.5, z-scores = $\\{-1, 1, -1, 1\\}$. Verify: mean of z-scores = 0, std of z-scores = 1"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Z-Score (Single Value)",
+          "latex": "$z = \\frac{x - \\bar{x}}{s}$",
+          "description": "Standardize a single value given the mean and standard deviation of its group"
+        },
+        {
+          "name": "Z-Score (Vectorized)",
+          "latex": "$\\mathbf{z} = \\frac{\\mathbf{x} - \\bar{x}\\mathbf{1}}{s}$ where $\\mathbf{1}$ is a vector of ones",
+          "description": "Standardize all values in a group simultaneously"
+        },
+        {
+          "name": "Inverse Transformation",
+          "latex": "$x = \\mu + z\\sigma$",
+          "description": "Convert z-score back to original scale"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to standardize a list of values by computing their z-scores. This transforms the values to have mean 0 and std 1. Handle the case when all values are identical (return zeros).",
+        "function_signature": "def standardize(values: list[float]) -> list[float]:",
+        "starter_code": "def standardize(values: list[float]) -> list[float]:\n    \"\"\"\n    Standardize a list of values using z-score transformation.\n    \n    Args:\n        values: List of numerical values to standardize\n        \n    Returns:\n        List of z-scores (standardized values)\n        If all values are identical, return list of zeros\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "standardize([0.0, 1.0, 0.0, 1.0])",
+            "expected": "[-1.0, 1.0, -1.0, 1.0]",
+            "explanation": "Mean=0.5, std=0.5. Each value gets (x-0.5)/0.5 transformation"
+          },
+          {
+            "input": "standardize([1.0, 1.0, 1.0])",
+            "expected": "[0.0, 0.0, 0.0]",
+            "explanation": "All identical: std=0, return zeros to avoid division by zero"
+          },
+          {
+            "input": "standardize([0.0, 0.5, 1.0])",
+            "expected": "[-1.224..., 0.0, 1.224...]",
+            "explanation": "Mean=0.5, std≈0.408. Z-scores: (0-0.5)/0.408≈-1.224, (0.5-0.5)/0.408=0, (1-0.5)/0.408≈1.224"
+          },
+          {
+            "input": "standardize([5.0])",
+            "expected": "[0.0]",
+            "explanation": "Single value: std=0, return zero"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking for zero standard deviation before dividing (causes NaN or infinity)",
+        "Returning empty list instead of zeros when std=0",
+        "Computing mean and std multiple times instead of once",
+        "Not applying the transformation element-wise to all values",
+        "Confusing standardization with normalization (min-max scaling)"
+      ],
+      "hint": "Reuse your compute_mean and compute_std functions. Apply the z-score formula to each element. Check if std is zero first and handle that special case.",
+      "references": [
+        "Z-score in statistics",
+        "Standard normal distribution",
+        "Location-scale families",
+        "Feature scaling in machine learning"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Advantage Functions in Reinforcement Learning",
+      "relation_to_problem": "The advantage function measures how much better an action is compared to the average action. GRPO's group relative advantage is a specific implementation that uses group statistics as the baseline.",
+      "prerequisites": [
+        "Policy gradient methods",
+        "Value functions",
+        "Baseline subtraction"
+      ],
+      "learning_objectives": [
+        "Understand the role of advantage in reducing variance of policy gradients",
+        "Compare different baseline strategies: state-value, learned critic, and group mean",
+        "Recognize why GRPO's group-relative approach eliminates the need for a critic network",
+        "Apply the advantage concept to reward normalization"
+      ],
+      "math_content": {
+        "definition": "In reinforcement learning, the **advantage function** measures the relative value of taking action $a$ in state $s$ compared to the average action: $$A^{\\pi}(s, a) = Q^{\\pi}(s, a) - V^{\\pi}(s)$$ where $Q^{\\pi}(s, a)$ is the action-value function (expected return after taking action $a$) and $V^{\\pi}(s)$ is the state-value function (expected return under policy $\\pi$). A positive advantage indicates the action is better than average; negative indicates worse.",
+        "notation": "$A^{\\pi}(s,a)$ = advantage function under policy $\\pi$; $Q^{\\pi}(s,a)$ = action-value (Q-function); $V^{\\pi}(s)$ = state-value function; $s$ = state; $a$ = action",
+        "theorem": "**Advantage as Variance Reduction**: Using advantage instead of raw returns in policy gradients reduces variance without introducing bias: $$\\nabla_{\\theta} J(\\theta) = \\mathbb{E}_{\\pi_{\\theta}}[\\nabla_{\\theta} \\log \\pi_{\\theta}(a|s) A^{\\pi}(s,a)]$$ The baseline $V^{\\pi}(s)$ reduces variance because it subtracts out the average expected return, centering the gradient signal around zero.",
+        "proof_sketch": "The policy gradient theorem states: $$\\nabla J = \\mathbb{E}[\\nabla \\log \\pi(a|s) Q(s,a)]$$ Subtracting any baseline $b(s)$ that doesn't depend on action $a$ doesn't change the expectation: $$\\mathbb{E}[\\nabla \\log \\pi(a|s) b(s)] = \\sum_a \\pi(a|s) \\nabla \\log \\pi(a|s) b(s) = b(s) \\nabla \\sum_a \\pi(a|s) = b(s) \\nabla 1 = 0$$ Therefore: $$\\nabla J = \\mathbb{E}[\\nabla \\log \\pi(a|s)(Q(s,a) - b(s))]$$ Choosing $b(s) = V(s)$ gives the advantage and empirically minimizes variance.",
+        "examples": [
+          "**Standard Actor-Critic**: Learn $V^{\\pi}(s)$ with a neural network, use $A = r + \\gamma V(s') - V(s)$ (TD error)",
+          "**GAE (Generalized Advantage Estimation)**: Weighted average of $n$-step TD errors to balance bias-variance",
+          "**GRPO**: For prompt $q$ with outputs $\\{o_1, \\ldots, o_G\\}$ and rewards $\\{r_1, \\ldots, r_G\\}$: Use group mean as baseline: $A_i = r_i - \\bar{r}$, then standardize: $A_i = \\frac{r_i - \\bar{r}}{s_r}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Advantage Function",
+          "latex": "$A(s,a) = Q(s,a) - V(s)$",
+          "description": "General form: action-value minus state-value"
+        },
+        {
+          "name": "Group Relative Baseline",
+          "latex": "$A_i = r_i - \\frac{1}{G}\\sum_{j=1}^{G} r_j$",
+          "description": "GRPO uses group mean as baseline instead of learned value function"
+        },
+        {
+          "name": "Normalized Advantage",
+          "latex": "$A_i = \\frac{r_i - \\bar{r}}{\\sigma_r}$",
+          "description": "Further normalize by standard deviation for scale invariance"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified advantage calculation where the baseline is the mean of a group of rewards (not yet normalized by std). This is the centering step that reduces variance in policy gradients.",
+        "function_signature": "def compute_centered_advantage(rewards: list[float]) -> list[float]:",
+        "starter_code": "def compute_centered_advantage(rewards: list[float]) -> list[float]:\n    \"\"\"\n    Compute centered advantages by subtracting the mean.\n    \n    For each reward r_i, compute: A_i = r_i - mean(rewards)\n    This is the advantage before normalization.\n    \n    Args:\n        rewards: List of rewards for a group of outputs\n        \n    Returns:\n        List of centered advantages (mean-subtracted rewards)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_centered_advantage([0.0, 1.0, 0.0, 1.0])",
+            "expected": "[-0.5, 0.5, -0.5, 0.5]",
+            "explanation": "Mean is 0.5. Each advantage is reward minus 0.5"
+          },
+          {
+            "input": "compute_centered_advantage([1.0, 1.0, 1.0])",
+            "expected": "[0.0, 0.0, 0.0]",
+            "explanation": "All rewards equal mean, so all advantages are zero"
+          },
+          {
+            "input": "compute_centered_advantage([0.0, 0.5, 1.0])",
+            "expected": "[-0.5, 0.0, 0.5]",
+            "explanation": "Mean is 0.5. Advantages: 0-0.5=-0.5, 0.5-0.5=0, 1-0.5=0.5"
+          },
+          {
+            "input": "compute_centered_advantage([0.2, 0.8])",
+            "expected": "[-0.3, 0.3]",
+            "explanation": "Mean is 0.5. Advantages: 0.2-0.5=-0.3, 0.8-0.5=0.3"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not understanding why we subtract the mean (it centers the distribution for variance reduction)",
+        "Thinking this is the final advantage (still needs normalization by std)",
+        "Computing mean incorrectly or inefficiently",
+        "Confusing advantage with reward or value",
+        "Not recognizing this is equivalent to A = Q - V where V is approximated by group mean"
+      ],
+      "hint": "This is simply mean subtraction. Compute the mean once, then subtract it from each reward. The result will have mean zero.",
+      "references": [
+        "Policy gradient methods",
+        "Variance reduction in REINFORCE",
+        "Actor-critic architectures",
+        "Baseline functions in RL",
+        "DeepSeek-R1 paper Section 3 on GRPO"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Numerical Stability and Edge Case Handling",
+      "relation_to_problem": "Real-world RL systems must handle edge cases like uniform rewards (std=0), floating-point precision issues, and extreme values. GRPO requires robust handling of the zero-variance case.",
+      "prerequisites": [
+        "IEEE 754 floating-point",
+        "Epsilon comparisons",
+        "Defensive programming"
+      ],
+      "learning_objectives": [
+        "Identify numerical issues in variance and division operations",
+        "Implement epsilon-based comparisons for floating-point equality",
+        "Handle the degenerate case of zero standard deviation correctly",
+        "Write defensive code that prevents NaN and infinity propagation"
+      ],
+      "math_content": {
+        "definition": "**Numerical stability** refers to an algorithm's sensitivity to rounding errors and finite precision arithmetic. An algorithm is **numerically stable** if small perturbations in input lead to small perturbations in output. The key issue for standardization is: $$z = \\frac{x - \\bar{x}}{s}$$ When $s \\approx 0$ (all values nearly identical), division produces very large values or infinity. When $s = 0$ exactly, we have division by zero.",
+        "notation": "$\\epsilon$ = machine epsilon or tolerance threshold; $\\text{NaN}$ = Not a Number (undefined result); $\\infty$ = infinity",
+        "theorem": "**Catastrophic Cancellation**: When subtracting two nearly equal floating-point numbers, significant digits are lost. For variance computation using $s^2 = \\frac{1}{n}\\sum x_i^2 - \\bar{x}^2$, if $\\frac{1}{n}\\sum x_i^2 \\approx \\bar{x}^2$, the subtraction loses precision. **Solution**: Use the two-pass algorithm: first compute mean, then compute squared deviations directly.",
+        "proof_sketch": "IEEE 754 represents numbers as $\\pm m \\times 2^e$. When two numbers differ only in low-order bits, subtraction cancels the high-order bits, leaving only the low-order bits which contain rounding error. Example: If $a = 1.234567890$ and $b = 1.234567880$ with 10-digit precision, then $a - b = 0.000000010$ has only 2 significant digits remaining (the rest were canceled). For variance, if all $x_i$ are nearly equal, both $\\sum x_i^2$ and $\\bar{x}^2$ are large and nearly equal, leading to cancellation.",
+        "examples": [
+          "**Zero Variance Case**: rewards = [1.0, 1.0, 1.0] → std = 0 → return [0.0, 0.0, 0.0] (not divide by zero!)",
+          "**Near-Zero Variance**: rewards = [1.0, 1.0000001, 1.0] → std ≈ 4.7e-8 → could use epsilon threshold",
+          "**Large Values**: rewards = [1e10, 1e10+1, 1e10] → direct computation stable if using deviations from mean"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Epsilon Comparison",
+          "latex": "$|x - y| < \\epsilon$",
+          "description": "Test if two floats are \"equal\" within tolerance. Typical $\\epsilon = 10^{-9}$"
+        },
+        {
+          "name": "Safe Division",
+          "latex": "$z = \\begin{cases} \\frac{x}{y} & \\text{if } |y| > \\epsilon \\\\ 0 & \\text{otherwise} \\end{cases}$",
+          "description": "Avoid division by zero by returning a default value"
+        },
+        {
+          "name": "Stable Variance",
+          "latex": "$s^2 = \\frac{1}{n}\\sum_{i=1}^{n}(x_i - \\bar{x})^2$",
+          "description": "Two-pass algorithm: compute mean first, then squared deviations (more stable)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a safe division function that handles the zero denominator case. This is essential for GRPO's advantage calculation when standard deviation is zero.",
+        "function_signature": "def safe_divide(numerator: float, denominator: float, default: float = 0.0) -> float:",
+        "starter_code": "def safe_divide(numerator: float, denominator: float, default: float = 0.0) -> float:\n    \"\"\"\n    Safely divide numerator by denominator, handling zero/near-zero denominator.\n    \n    Args:\n        numerator: The value to be divided\n        denominator: The divisor\n        default: Value to return if denominator is zero or very close to zero\n        \n    Returns:\n        numerator / denominator if safe, otherwise default\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "safe_divide(1.0, 2.0)",
+            "expected": "0.5",
+            "explanation": "Normal division: 1.0 / 2.0 = 0.5"
+          },
+          {
+            "input": "safe_divide(5.0, 0.0)",
+            "expected": "0.0",
+            "explanation": "Denominator is zero, return default value 0.0"
+          },
+          {
+            "input": "safe_divide(5.0, 1e-15)",
+            "expected": "0.0",
+            "explanation": "Denominator very close to zero (below epsilon), return default"
+          },
+          {
+            "input": "safe_divide(3.0, 6.0, default=99.0)",
+            "expected": "0.5",
+            "explanation": "Normal division, default not used"
+          },
+          {
+            "input": "safe_divide(3.0, 0.0, default=99.0)",
+            "expected": "99.0",
+            "explanation": "Zero denominator, return specified default value"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not using an epsilon threshold (checking denominator == 0.0 exactly may miss near-zero values)",
+        "Using too large epsilon (1e-6 might be too large for some applications)",
+        "Not allowing configurable default return value",
+        "Returning NaN or infinity instead of a safe default",
+        "Not handling negative zero (-0.0) correctly"
+      ],
+      "hint": "Check if the absolute value of the denominator is less than a small epsilon (like 1e-10). If so, return the default. Otherwise, perform the division.",
+      "references": [
+        "IEEE 754 floating-point standard",
+        "Catastrophic cancellation",
+        "Kahan summation algorithm",
+        "Numerically stable algorithms",
+        "Machine epsilon"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Integrating Components: Complete Advantage Calculation",
+      "relation_to_problem": "This sub-quest combines all previous concepts (mean, standard deviation, standardization, advantage, and numerical stability) into the complete GRPO advantage calculation pipeline.",
+      "prerequisites": [
+        "Mean computation",
+        "Standard deviation",
+        "Z-score transformation",
+        "Safe division",
+        "Advantage concepts"
+      ],
+      "learning_objectives": [
+        "Combine statistical measures into a complete advantage calculation",
+        "Apply concepts from reinforcement learning theory to practical implementation",
+        "Ensure numerical stability throughout the pipeline",
+        "Validate that output has correct statistical properties (mean≈0, std≈1, or all zeros)"
+      ],
+      "math_content": {
+        "definition": "The **Group Relative Advantage** for GRPO is defined as the standardized deviation from the group mean reward: $$A_i = \\begin{cases} \\frac{r_i - \\bar{r}}{\\sigma_r} & \\text{if } \\sigma_r > 0 \\\\ 0 & \\text{if } \\sigma_r = 0 \\end{cases}$$ where $r_i$ is the reward for the $i$-th output in a group of $G$ outputs from the same prompt, $\\bar{r} = \\frac{1}{G}\\sum_{j=1}^{G} r_j$ is the group mean reward, and $\\sigma_r = \\sqrt{\\frac{1}{G}\\sum_{j=1}^{G}(r_j - \\bar{r})^2}$ is the group standard deviation.",
+        "notation": "$A_i$ = advantage for output $i$; $r_i$ = reward for output $i$; $\\bar{r}$ = group mean reward; $\\sigma_r$ = group standard deviation; $G$ = group size (number of outputs per prompt)",
+        "theorem": "**Properties of Group Relative Advantage**: (1) If $\\sigma_r > 0$, then $\\sum_{i=1}^{G} A_i = 0$ (advantages sum to zero), $\\frac{1}{G}\\sum_{i=1}^{G} A_i^2 = 1$ (variance is one). (2) If $\\sigma_r = 0$, then $A_i = 0$ for all $i$ (no relative difference to learn from). (3) $A_i > 0$ indicates reward above group average; $A_i < 0$ indicates below average. (4) The transformation is **affine invariant**: if all rewards are shifted by constant $c$ or scaled by $s > 0$, advantages remain unchanged.",
+        "proof_sketch": "Property (1): The sum of z-scores is zero: $$\\sum_i A_i = \\sum_i \\frac{r_i - \\bar{r}}{\\sigma_r} = \\frac{1}{\\sigma_r}\\left(\\sum_i r_i - G\\bar{r}\\right) = \\frac{1}{\\sigma_r}(G\\bar{r} - G\\bar{r}) = 0$$ The variance of z-scores is one by the standardization property. Property (4): If $r_i' = sr_i + c$, then $\\bar{r}' = s\\bar{r} + c$ and $\\sigma_{r'} = s\\sigma_r$, so: $$A_i' = \\frac{sr_i + c - (s\\bar{r} + c)}{s\\sigma_r} = \\frac{s(r_i - \\bar{r})}{s\\sigma_r} = \\frac{r_i - \\bar{r}}{\\sigma_r} = A_i$$",
+        "examples": [
+          "**Binary rewards**: $r = [0, 1, 0, 1]$ → $\\bar{r}=0.5$, $\\sigma_r=0.5$ → $A = [-1, 1, -1, 1]$. Correct outputs get +1 advantage, incorrect get -1.",
+          "**Uniform rewards**: $r = [0.8, 0.8, 0.8]$ → $\\bar{r}=0.8$, $\\sigma_r=0$ → $A = [0, 0, 0]$. No learning signal since all outputs equivalent.",
+          "**Mixed rewards**: $r = [0.2, 0.5, 0.8]$ → $\\bar{r}=0.5$, $\\sigma_r \\approx 0.245$ → $A \\approx [-1.22, 0, 1.22]$. Lowest reward gets -1.22, middle gets 0, highest gets +1.22.",
+          "**Scale invariance**: $r = [0, 10, 0, 10]$ → $\\bar{r}=5$, $\\sigma_r=5$ → $A = [-1, 1, -1, 1]$ (same as $[0, 1, 0, 1]$ case)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete GRPO Advantage",
+          "latex": "$A_i = \\frac{r_i - \\bar{r}}{\\sigma_r}$ if $\\sigma_r > 0$, else $A_i = 0$",
+          "description": "The full formula combining mean centering and standardization with safe division"
+        },
+        {
+          "name": "Pipeline Steps",
+          "latex": "$\\bar{r} \\rightarrow \\sigma_r \\rightarrow A_i = (r_i - \\bar{r})/\\sigma_r$",
+          "description": "Computational order: compute mean, then std, then apply transformation"
+        },
+        {
+          "name": "Validation Properties",
+          "latex": "$\\sum_i A_i \\approx 0$ and $\\sqrt{\\frac{1}{G}\\sum_i A_i^2} \\approx 1$ (if $\\sigma_r > 0$)",
+          "description": "Use these to verify correct implementation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that validates whether a list of values has been correctly standardized. Check if the mean is approximately zero and standard deviation is approximately one. This helps verify advantage calculations.",
+        "function_signature": "def is_standardized(values: list[float], epsilon: float = 1e-6) -> bool:",
+        "starter_code": "def is_standardized(values: list[float], epsilon: float = 1e-6) -> bool:\n    \"\"\"\n    Check if a list of values is standardized (mean≈0, std≈1).\n    \n    Args:\n        values: List of values to check\n        epsilon: Tolerance for floating-point comparison\n        \n    Returns:\n        True if mean ≈ 0 and std ≈ 1 (within epsilon), False otherwise\n        Also returns True if all values are zero (degenerate case)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "is_standardized([-1.0, 1.0, -1.0, 1.0])",
+            "expected": "True",
+            "explanation": "Mean is 0, std is 1, so this is standardized"
+          },
+          {
+            "input": "is_standardized([0.0, 0.0, 0.0])",
+            "expected": "True",
+            "explanation": "All zeros is the degenerate standardized case (from uniform inputs)"
+          },
+          {
+            "input": "is_standardized([1.0, 2.0, 3.0])",
+            "expected": "False",
+            "explanation": "Mean is 2.0 (not 0) and std is not 1, not standardized"
+          },
+          {
+            "input": "is_standardized([-1.224744871, 0.0, 1.224744871])",
+            "expected": "True",
+            "explanation": "Mean ≈ 0, std ≈ 1 (within epsilon), this is standardized"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not reusing previous functions (compute_mean, compute_std) - leads to inconsistencies",
+        "Computing statistics multiple times instead of once and reusing",
+        "Not handling the zero standard deviation case before division",
+        "Forgetting to validate output properties during testing",
+        "Not understanding that standardization preserves rank ordering of values",
+        "Confusing standardization with other normalizations (min-max, L2 norm)"
+      ],
+      "hint": "Compute the mean and std of the input values and check if they're close to 0 and 1 respectively. Handle the all-zeros case specially. Use your epsilon parameter for floating-point comparisons.",
+      "references": [
+        "Complete GRPO algorithm in DeepSeek-R1 paper",
+        "PPO (Proximal Policy Optimization) for comparison",
+        "Advantage estimation in policy gradients",
+        "Numerical validation techniques",
+        "Software testing for numerical algorithms"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,437 @@
+{
+  "problem_id": 166,
+  "title": "Evaluate Expected Value in a Markov Decision Process",
+  "category": "Reinforcement Learning",
+  "difficulty": "medium",
+  "description": "Given an MDP (Markov Decision Process) specified by a set of states, actions, transition probabilities, and rewards, write a function to compute the expected value of taking a particular action in a particular state, assuming a discount factor gamma. Use only NumPy.",
+  "example": {
+    "input": "states = [0, 1]\nactions = ['a', 'b']\nP = {0: {'a': {0: 0.5, 1: 0.5}, 'b': {0: 1.0}}, 1: {'a': {1: 1.0}, 'b': {0: 0.7, 1: 0.3}}}\nR = {0: {'a': {0: 5, 1: 10}, 'b': {0: 2}}, 1: {'a': {1: 0}, 'b': {0: -1, 1: 3}}}\ngamma = 0.9\nV = np.array([1.0, 2.0])\nprint(expected_action_value(0, 'a', P, R, V, gamma))",
+    "output": "8.85",
+    "reasoning": "For state 0 and action 'a':\n  - Next state 0: 0.5 * (5 + 0.9*1.0) = 0.5 * 5.9 = 2.95\n  - Next state 1: 0.5 * (10 + 0.9*2.0) = 0.5 * 11.8 = 5.9\n  Total: 2.95 + 5.9 = 8.85"
+  },
+  "starter_code": "import numpy as np\n\ndef expected_action_value(state, action, P, R, V, gamma):\n    \"\"\"\n    Computes the expected value of taking `action` in `state` for the given MDP.\n    Args:\n      state: int or str, the current state\n      action: str, the chosen action\n      P: dict of dicts, P[s][a][s'] = prob of next state s' if a in s\n      R: dict of dicts, R[s][a][s'] = reward for (s, a, s')\n      V: np.ndarray, the value function vector, indexed by state\n      gamma: float, discount factor\n    Returns:\n      float: expected value\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Weighted Summation and Expected Values",
+      "relation_to_problem": "Computing expected action-value requires calculating weighted sums over probability distributions - the foundation of expectation in stochastic processes",
+      "prerequisites": [
+        "Basic probability theory",
+        "Summation notation",
+        "NumPy array operations"
+      ],
+      "learning_objectives": [
+        "Define mathematical expectation formally using probability measures",
+        "Compute weighted sums over discrete distributions",
+        "Implement expectation calculations using NumPy operations"
+      ],
+      "math_content": {
+        "definition": "Let $X$ be a discrete random variable taking values $x_1, x_2, \\ldots, x_n$ with probabilities $p_1, p_2, \\ldots, p_n$ where $\\sum_{i=1}^n p_i = 1$. The **expected value** or **mathematical expectation** of $X$ is defined as: $$\\mathbb{E}[X] = \\sum_{i=1}^n p_i x_i$$ This represents the probability-weighted average of all possible outcomes.",
+        "notation": "$\\mathbb{E}[X]$ = expected value of random variable $X$, $p_i$ = probability of outcome $i$, $x_i$ = value of outcome $i$",
+        "theorem": "**Linearity of Expectation**: For random variables $X$ and $Y$ and constants $a, b \\in \\mathbb{R}$: $$\\mathbb{E}[aX + bY] = a\\mathbb{E}[X] + b\\mathbb{E}[Y]$$ This holds even when $X$ and $Y$ are not independent.",
+        "proof_sketch": "By definition: $\\mathbb{E}[aX + bY] = \\sum_i p_i(ax_i + by_i) = a\\sum_i p_ix_i + b\\sum_i p_iy_i = a\\mathbb{E}[X] + b\\mathbb{E}[Y]$ using distributivity of summation.",
+        "examples": [
+          "Rolling a fair die: $\\mathbb{E}[X] = \\frac{1}{6}(1 + 2 + 3 + 4 + 5 + 6) = 3.5$",
+          "Weighted outcome: probabilities [0.3, 0.5, 0.2] with values [10, 20, 30] gives $\\mathbb{E}[X] = 0.3(10) + 0.5(20) + 0.2(30) = 19$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Discrete Expectation",
+          "latex": "$\\mathbb{E}[X] = \\sum_{i=1}^n p_i x_i$",
+          "description": "Use when computing expected values over discrete probability distributions"
+        },
+        {
+          "name": "Law of Total Expectation",
+          "latex": "$\\mathbb{E}[X] = \\sum_y \\mathbb{E}[X|Y=y]P(Y=y)$",
+          "description": "Decompose expectations by conditioning on another random variable"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the expected value of a discrete random variable given its probability distribution and corresponding values. This is the core operation needed for MDP value calculations.",
+        "function_signature": "def compute_expectation(probabilities: np.ndarray, values: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_expectation(probabilities: np.ndarray, values: np.ndarray) -> float:\n    \"\"\"\n    Computes E[X] = sum(p_i * x_i) for a discrete random variable.\n    \n    Args:\n        probabilities: np.ndarray of shape (n,) with P(X=x_i)\n        values: np.ndarray of shape (n,) with possible values x_i\n    \n    Returns:\n        float: The expected value\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_expectation(np.array([0.5, 0.5]), np.array([10.0, 20.0]))",
+            "expected": "15.0",
+            "explanation": "Equal probabilities: 0.5*10 + 0.5*20 = 15"
+          },
+          {
+            "input": "compute_expectation(np.array([0.2, 0.3, 0.5]), np.array([5.0, 10.0, 15.0]))",
+            "expected": "11.5",
+            "explanation": "Weighted average: 0.2*5 + 0.3*10 + 0.5*15 = 1 + 3 + 7.5 = 11.5"
+          },
+          {
+            "input": "compute_expectation(np.array([1.0]), np.array([42.0]))",
+            "expected": "42.0",
+            "explanation": "Deterministic: probability 1 on single value gives that value"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to verify probabilities sum to 1 (violates probability axioms)",
+        "Using element-wise multiplication but forgetting to sum the results",
+        "Mismatching array dimensions between probabilities and values"
+      ],
+      "hint": "NumPy's dot product or element-wise multiplication followed by sum achieves this efficiently",
+      "references": [
+        "Probability mass functions",
+        "Discrete probability distributions",
+        "NumPy broadcasting and vectorization"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Discount Factors and Temporal Value",
+      "relation_to_problem": "MDPs use discount factors to weight immediate rewards more heavily than future rewards - essential for computing discounted expected returns",
+      "prerequisites": [
+        "Geometric series",
+        "Present value calculation",
+        "Expected value computation"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical role of discount factors in sequential decision processes",
+        "Apply discounting to future rewards in multi-step scenarios",
+        "Compute present value of future state values using gamma"
+      ],
+      "math_content": {
+        "definition": "A **discount factor** $\\gamma \\in [0, 1]$ weights rewards by temporal distance. A reward $r$ received $t$ time steps in the future has present value $\\gamma^t r$. For $\\gamma < 1$, this ensures **temporal decay**: $$\\lim_{t \\to \\infty} \\gamma^t r = 0$$ This models preference for immediate gratification and reduces uncertainty about distant outcomes.",
+        "notation": "$\\gamma$ = discount factor, $r_t$ = reward at time $t$, $G_t = \\sum_{k=0}^{\\infty} \\gamma^k r_{t+k}$ = discounted cumulative return",
+        "theorem": "**Bounded Cumulative Discounted Reward**: If rewards are bounded by $|r_t| \\leq R_{\\max}$ for all $t$, then the infinite-horizon discounted return is bounded: $$|G_t| \\leq \\sum_{k=0}^{\\infty} \\gamma^k R_{\\max} = \\frac{R_{\\max}}{1 - \\gamma}$$ This convergence property ensures well-defined value functions in infinite-horizon MDPs.",
+        "proof_sketch": "The sum $\\sum_{k=0}^{\\infty} \\gamma^k = \\frac{1}{1-\\gamma}$ for $|\\gamma| < 1$ (geometric series). By triangle inequality: $|G_t| \\leq \\sum_{k=0}^{\\infty} \\gamma^k |r_{t+k}| \\leq R_{\\max} \\sum_{k=0}^{\\infty} \\gamma^k = \\frac{R_{\\max}}{1-\\gamma}$",
+        "examples": [
+          "With $\\gamma=0.9$, reward of 10 received 3 steps ahead: present value = $0.9^3 \\times 10 = 7.29$",
+          "With $\\gamma=0.5$, infinite stream of reward 1: total value = $\\frac{1}{1-0.5} = 2$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Discounted Future Value",
+          "latex": "$\\text{PV}(r, t) = \\gamma^t r$",
+          "description": "Present value of reward $r$ received $t$ steps in future"
+        },
+        {
+          "name": "One-Step Discounted Expectation",
+          "latex": "$\\mathbb{E}[r + \\gamma V_{\\text{next}}] = r + \\gamma \\mathbb{E}[V_{\\text{next}}]$",
+          "description": "Immediate reward plus discounted expected future value - the core MDP backup operator"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the discounted expected value when you have an immediate reward plus probabilistic transitions to next states with known values. This mirrors one step of the Bellman equation.",
+        "function_signature": "def discounted_expectation(immediate_reward: float, next_state_probs: np.ndarray, next_state_values: np.ndarray, gamma: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef discounted_expectation(immediate_reward: float, next_state_probs: np.ndarray, next_state_values: np.ndarray, gamma: float) -> float:\n    \"\"\"\n    Computes: reward + gamma * E[V(next_state)]\n    \n    Args:\n        immediate_reward: float, the immediate reward r\n        next_state_probs: np.ndarray, P(s'|s,a) for each next state\n        next_state_values: np.ndarray, V(s') for each next state\n        gamma: float, discount factor in [0,1]\n    \n    Returns:\n        float: immediate reward plus discounted expected future value\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "discounted_expectation(5.0, np.array([0.5, 0.5]), np.array([10.0, 20.0]), 0.9)",
+            "expected": "18.5",
+            "explanation": "5 + 0.9*(0.5*10 + 0.5*20) = 5 + 0.9*15 = 5 + 13.5 = 18.5"
+          },
+          {
+            "input": "discounted_expectation(2.0, np.array([1.0]), np.array([8.0]), 0.8)",
+            "expected": "8.4",
+            "explanation": "2 + 0.8*8 = 2 + 6.4 = 8.4 (deterministic transition)"
+          },
+          {
+            "input": "discounted_expectation(10.0, np.array([0.3, 0.7]), np.array([5.0, 15.0]), 0.5)",
+            "expected": "16.0",
+            "explanation": "10 + 0.5*(0.3*5 + 0.7*15) = 10 + 0.5*12 = 16"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to apply gamma to future values (treating all rewards equally)",
+        "Applying gamma to immediate reward (gamma only discounts future values)",
+        "Computing expectation before multiplying by gamma instead of after"
+      ],
+      "hint": "First compute the expected future value, then discount it with gamma, then add the immediate reward",
+      "references": [
+        "Bellman equation structure",
+        "Present value in economics",
+        "Geometric series convergence"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Transition Dynamics and State-Dependent Rewards",
+      "relation_to_problem": "MDP transitions map (state, action) pairs to distributions over next states with associated rewards - the complete dynamics model",
+      "prerequisites": [
+        "Conditional probability",
+        "Dictionary/hashmap data structures",
+        "Weighted summation"
+      ],
+      "learning_objectives": [
+        "Parse nested dictionary structures representing transition dynamics P[s][a][s']",
+        "Extract state-dependent rewards R[s][a][s'] for specific transitions",
+        "Iterate over next states while maintaining probability and reward alignment"
+      ],
+      "math_content": {
+        "definition": "The **transition function** $P: S \\times A \\times S \\rightarrow [0, 1]$ satisfies: $$P(s'|s, a) = \\Pr(S_{t+1} = s' | S_t = s, A_t = a)$$ with normalization $\\sum_{s' \\in S} P(s'|s,a) = 1$ for all $s, a$. The **reward function** $R: S \\times A \\times S \\rightarrow \\mathbb{R}$ specifies: $$R(s, a, s') = \\text{expected immediate reward when transitioning from } s \\text{ to } s' \\text{ via action } a$$",
+        "notation": "$P(s'|s,a)$ = transition probability, $R(s,a,s')$ = transition reward, $\\mathcal{T}(s,a) = \\{s' : P(s'|s,a) > 0\\}$ = reachable states",
+        "theorem": "**Markov Property**: The transition probability depends only on the current state and action, not on history: $$P(s'|s_t, a_t, s_{t-1}, a_{t-1}, \\ldots, s_0, a_0) = P(s'|s_t, a_t)$$ This memoryless property enables tractable dynamic programming solutions.",
+        "proof_sketch": "The Markov property is an assumption about the state representation. If satisfied, the state contains all information needed to predict future transitions. Formally, if the state space is properly defined to capture all relevant information, conditional independence holds: future states are independent of past given present.",
+        "examples": [
+          "Deterministic: $P(s'=2|s=1, a=\\text{right}) = 1.0$, all other transitions have probability 0",
+          "Stochastic: $P(s'=1|s=0, a=\\text{stay}) = 0.7$, $P(s'=0|s=0, a=\\text{stay}) = 0.3$ (uncertain outcome)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Transition Probability Constraint",
+          "latex": "$\\sum_{s' \\in S} P(s'|s,a) = 1$",
+          "description": "Probabilities over next states must form valid probability distribution"
+        },
+        {
+          "name": "Expected Immediate Reward",
+          "latex": "$r(s,a) = \\sum_{s'} P(s'|s,a) R(s,a,s')$",
+          "description": "Average immediate reward for (state, action) pair across all possible next states"
+        }
+      ],
+      "exercise": {
+        "description": "Given nested dictionaries for P and R, extract all (next_state, probability, reward) tuples for a specific (state, action) pair. This data extraction is necessary before computing expectations in MDPs.",
+        "function_signature": "def extract_transitions(state, action, P, R) -> list:",
+        "starter_code": "def extract_transitions(state, action, P, R) -> list:\n    \"\"\"\n    Extracts transition information for (state, action) pair.\n    \n    Args:\n        state: current state (int or str)\n        action: chosen action (str)\n        P: dict, P[s][a][s'] = transition probability\n        R: dict, R[s][a][s'] = reward for transition\n    \n    Returns:\n        list of tuples: [(next_state, probability, reward), ...]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "extract_transitions(0, 'a', {0: {'a': {0: 0.5, 1: 0.5}}}, {0: {'a': {0: 5, 1: 10}}})",
+            "expected": "[(0, 0.5, 5), (1, 0.5, 10)]",
+            "explanation": "From state 0 with action 'a', two possible transitions with their probabilities and rewards"
+          },
+          {
+            "input": "extract_transitions(1, 'b', {1: {'b': {0: 0.7, 1: 0.3}}}, {1: {'b': {0: -1, 1: 3}}})",
+            "expected": "[(0, 0.7, -1), (1, 0.3, 3)]",
+            "explanation": "Extracting transitions including negative rewards"
+          },
+          {
+            "input": "extract_transitions(0, 'b', {0: {'b': {0: 1.0}}}, {0: {'b': {0: 2}}})",
+            "expected": "[(0, 1.0, 2)]",
+            "explanation": "Deterministic transition (probability 1.0) to single next state"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Assuming transition and reward dictionaries have identical structures (some transitions may have zero reward)",
+        "Not handling missing keys when state-action pairs have no transitions",
+        "Confusing the nesting order: P[state][action][next_state] vs other orderings"
+      ],
+      "hint": "Iterate through the next states in P[state][action].items() to get (next_state, probability) pairs, then lookup corresponding rewards",
+      "references": [
+        "Markov chains",
+        "State transition diagrams",
+        "Python nested dictionary access"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "The Bellman Expectation Operator for Action-Values",
+      "relation_to_problem": "The action-value function Q(s,a) is computed by applying the Bellman expectation operator - combining immediate rewards with discounted future values over all transition outcomes",
+      "prerequisites": [
+        "Expected value computation",
+        "Discount factors",
+        "MDP transition dynamics"
+      ],
+      "learning_objectives": [
+        "State the Bellman expectation equation for action-values formally",
+        "Decompose Q(s,a) into immediate and future components",
+        "Apply the Bellman operator to compute action-values given a value function"
+      ],
+      "math_content": {
+        "definition": "The **action-value function** (Q-function) under policy $\\pi$ is defined as: $$Q^{\\pi}(s,a) = \\mathbb{E}_{\\pi}\\left[\\sum_{t=0}^{\\infty} \\gamma^t R_{t+k} \\mid S_t = s, A_t = a\\right]$$ This represents the expected cumulative discounted reward when starting in state $s$, taking action $a$, then following policy $\\pi$ thereafter.",
+        "notation": "$Q^{\\pi}(s,a)$ = action-value function under policy $\\pi$, $V^{\\pi}(s)$ = state-value function, $\\mathcal{B}^{\\pi}$ = Bellman expectation operator",
+        "theorem": "**Bellman Expectation Equation for Q**: The action-value function satisfies the recursive equation: $$Q^{\\pi}(s,a) = \\sum_{s' \\in S} P(s'|s,a)\\left[R(s,a,s') + \\gamma V^{\\pi}(s')\\right]$$ where $V^{\\pi}(s') = \\sum_{a' \\in A} \\pi(a'|s') Q^{\\pi}(s', a')$. When the value function $V^{\\pi}$ is given, this equation directly computes $Q^{\\pi}(s,a)$ as a weighted sum over next states.",
+        "proof_sketch": "Using the law of total expectation and the Markov property: $$Q^{\\pi}(s,a) = \\mathbb{E}[R_0 + \\gamma R_1 + \\gamma^2 R_2 + \\cdots | s, a]$$ $$= \\mathbb{E}[R_0 | s, a] + \\gamma \\mathbb{E}[R_1 + \\gamma R_2 + \\cdots | s, a]$$ The first term equals $\\sum_{s'} P(s'|s,a) R(s,a,s')$. The second term equals $\\gamma \\sum_{s'} P(s'|s,a) V^{\\pi}(s')$ by the definition of $V^{\\pi}$ and the Markov property.",
+        "examples": [
+          "Simple 2-state MDP: If from $s=0$ with $a=\\text{move}$, you go to $s'=1$ with prob 1.0, reward 5, and $V(1)=10$, with $\\gamma=0.9$: $Q(0,\\text{move}) = 1.0[5 + 0.9 \\times 10] = 14$",
+          "Stochastic case: From $s=0$, action $a$ leads to $s'=0$ (prob 0.4, reward 2) or $s'=1$ (prob 0.6, reward 8). With $V(0)=5$, $V(1)=12$, $\\gamma=0.8$: $Q(0,a) = 0.4[2+0.8 \\times 5] + 0.6[8+0.8 \\times 12] = 0.4 \\times 6 + 0.6 \\times 17.6 = 12.96$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Bellman Expectation for Q",
+          "latex": "$Q^{\\pi}(s,a) = \\sum_{s'} P(s'|s,a)[R(s,a,s') + \\gamma V^{\\pi}(s')]$",
+          "description": "Core formula for computing action-values from state-values - this is the main problem objective"
+        },
+        {
+          "name": "Q-V Relationship",
+          "latex": "$V^{\\pi}(s) = \\sum_a \\pi(a|s) Q^{\\pi}(s,a)$",
+          "description": "State-value is policy-weighted average of action-values"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the Bellman expectation operator for a single (state, action) pair: compute Q(s,a) by summing over all next states the product of transition probability and [reward + gamma * value_of_next_state]. Use only simple state indices (integers).",
+        "function_signature": "def bellman_q_operator(state: int, action: str, transitions: list, values: np.ndarray, gamma: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef bellman_q_operator(state: int, action: str, transitions: list, values: np.ndarray, gamma: float) -> float:\n    \"\"\"\n    Applies Bellman expectation operator for Q(s,a).\n    \n    Args:\n        state: int, current state index\n        action: str, action taken\n        transitions: list of (next_state_idx, prob, reward) tuples\n        values: np.ndarray, V(s') for each state index\n        gamma: float, discount factor\n    \n    Returns:\n        float: Q(state, action) = sum over s' of P(s'|s,a)[R + gamma*V(s')]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "bellman_q_operator(0, 'a', [(0, 0.5, 5), (1, 0.5, 10)], np.array([1.0, 2.0]), 0.9)",
+            "expected": "8.85",
+            "explanation": "0.5*(5 + 0.9*1.0) + 0.5*(10 + 0.9*2.0) = 0.5*5.9 + 0.5*11.8 = 2.95 + 5.9 = 8.85"
+          },
+          {
+            "input": "bellman_q_operator(1, 'b', [(0, 0.7, -1), (1, 0.3, 3)], np.array([1.0, 2.0]), 0.9)",
+            "expected": "1.57",
+            "explanation": "0.7*(-1 + 0.9*1.0) + 0.3*(3 + 0.9*2.0) = 0.7*(-0.1) + 0.3*4.8 = -0.07 + 1.44 = 1.37"
+          },
+          {
+            "input": "bellman_q_operator(0, 'c', [(2, 1.0, 100)], np.array([0, 0, 50.0]), 0.5)",
+            "expected": "125.0",
+            "explanation": "Deterministic: 1.0*(100 + 0.5*50) = 125"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Applying gamma to the immediate reward (only future values are discounted)",
+        "Forgetting to multiply by transition probabilities (missing the expectation)",
+        "Summing rewards and values first, then applying probabilities (incorrect order of operations)"
+      ],
+      "hint": "For each transition tuple (next_state, prob, reward), compute prob * (reward + gamma * values[next_state]), then sum all these terms",
+      "references": [
+        "Bellman equations",
+        "Dynamic programming",
+        "Policy evaluation in MDPs"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "State Indexing and Value Function Representation",
+      "relation_to_problem": "Value functions V are represented as arrays indexed by state - we must correctly map state identifiers to array indices when looking up values",
+      "prerequisites": [
+        "Array indexing",
+        "Hash tables/dictionaries",
+        "MDP state spaces"
+      ],
+      "learning_objectives": [
+        "Understand different state representations (integers, strings, tuples)",
+        "Map arbitrary state identifiers to array indices for value function lookup",
+        "Handle mixed state types in MDP specifications"
+      ],
+      "math_content": {
+        "definition": "A **state space** $S$ can be represented as an ordered collection $S = \\{s_0, s_1, \\ldots, s_{n-1}\\}$ with cardinality $|S| = n$. The **value function** $V: S \\rightarrow \\mathbb{R}$ assigns a real number to each state. In computational implementations, $V$ is represented as a vector $\\mathbf{v} \\in \\mathbb{R}^n$ where: $$V(s_i) = \\mathbf{v}[i]$$ This requires a bijective mapping $\\text{idx}: S \\rightarrow \\{0, 1, \\ldots, n-1\\}$ from states to array indices.",
+        "notation": "$S$ = state space (set), $\\mathbf{v}$ = value vector (array), $\\text{idx}(s)$ = index mapping function, $n = |S|$ = state space cardinality",
+        "theorem": "**Value Function Representation**: For finite state space $S$ with ordering $s_0, s_1, \\ldots, s_{n-1}$, any value function $V: S \\rightarrow \\mathbb{R}$ can be uniquely represented by vector $\\mathbf{v} \\in \\mathbb{R}^n$ where component $i$ stores $V(s_i)$. Conversely, any vector $\\mathbf{v} \\in \\mathbb{R}^n$ defines a value function.",
+        "proof_sketch": "The bijection between states and indices establishes one-to-one correspondence. Given ordering, map $s_i \\mapsto i$ creates injection (distinct states map to distinct indices). Since ordering covers all $n$ states and indices $0, \\ldots, n-1$, the mapping is surjective, hence bijective. This enables invertible translation between functional and array representations.",
+        "examples": [
+          "Integer states: $S = \\{0, 1, 2\\}$ with $V(0)=5.0, V(1)=3.2, V(2)=7.1$ represented as array [5.0, 3.2, 7.1]",
+          "String states: $S = \\{\\text{'A'}, \\text{'B'}\\}$ requires mapping: 'A'→0, 'B'→1, so $V(\\text{'A'})=10$ stored at index 0"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Index-Based Value Lookup",
+          "latex": "$V(s) = \\mathbf{v}[\\text{idx}(s)]$",
+          "description": "Access value function using state-to-index mapping"
+        },
+        {
+          "name": "State Space Cardinality",
+          "latex": "$|S| = \\dim(\\mathbf{v})$",
+          "description": "Number of states equals dimension of value vector"
+        }
+      ],
+      "exercise": {
+        "description": "Given states can be integers or strings, and value array V is indexed by state position in the states list. Implement a function that creates a state-to-index mapping and uses it to safely look up values for any state identifier.",
+        "function_signature": "def lookup_state_value(state, states: list, V: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef lookup_state_value(state, states: list, V: np.ndarray) -> float:\n    \"\"\"\n    Looks up V(state) using state-to-index mapping.\n    \n    Args:\n        state: state identifier (int, str, or other hashable type)\n        states: list of state identifiers in order\n        V: np.ndarray of values where V[i] = value of states[i]\n    \n    Returns:\n        float: V(state)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "lookup_state_value(0, [0, 1, 2], np.array([10.0, 20.0, 30.0]))",
+            "expected": "10.0",
+            "explanation": "State 0 is at index 0, V[0] = 10.0"
+          },
+          {
+            "input": "lookup_state_value('B', ['A', 'B', 'C'], np.array([1.0, 2.0, 3.0]))",
+            "expected": "2.0",
+            "explanation": "State 'B' is at index 1, V[1] = 2.0"
+          },
+          {
+            "input": "lookup_state_value(1, [0, 1], np.array([5.5, 7.3]))",
+            "expected": "7.3",
+            "explanation": "State 1 is at index 1, V[1] = 7.3"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Assuming state identifiers directly correspond to array indices (only works for integer states starting at 0)",
+        "Not creating a mapping first (inefficient repeated list.index() calls)",
+        "Failing to handle non-integer state identifiers"
+      ],
+      "hint": "Create a dictionary mapping each state in states list to its position index, then use this dictionary for O(1) lookups",
+      "references": [
+        "Hash tables",
+        "Array indexing",
+        "State space discretization"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Action-Value Computation in MDPs",
+      "relation_to_problem": "Synthesize all previous concepts to compute Q(s,a) = E[R + gamma*V(s')] by iterating over transition dynamics with proper state indexing",
+      "prerequisites": [
+        "Bellman expectation operator",
+        "Transition dynamics",
+        "State-value lookup",
+        "Expected value computation"
+      ],
+      "learning_objectives": [
+        "Integrate transition parsing, value lookup, and Bellman operator into complete computation",
+        "Handle arbitrary state types in the complete MDP framework",
+        "Implement the full expected action-value calculation with proper error handling"
+      ],
+      "math_content": {
+        "definition": "The **expected action-value computation** problem: Given MDP tuple $(S, A, P, R, \\gamma)$ and state-value function $V: S \\rightarrow \\mathbb{R}$, compute: $$Q(s,a) = \\mathbb{E}_{s' \\sim P(\\cdot|s,a)}[R(s,a,s') + \\gamma V(s')] = \\sum_{s' \\in S} P(s'|s,a)[R(s,a,s') + \\gamma V(s')]$$ This requires: (1) extracting all next states and their probabilities from $P$, (2) looking up rewards $R(s,a,s')$ for each transition, (3) mapping next states to indices for $V$ lookup, (4) computing weighted sum.",
+        "notation": "$Q(s,a)$ = action-value to compute, $\\mathcal{T}(s,a) = \\{s' : P(s'|s,a) > 0\\}$ = reachable next states, $\\mathbf{v}$ = value vector representation",
+        "theorem": "**Bellman Expectation Decomposition**: The action-value decomposes into immediate and future components: $$Q(s,a) = r(s,a) + \\gamma \\sum_{s'} P(s'|s,a) V(s')$$ where $r(s,a) = \\sum_{s'} P(s'|s,a) R(s,a,s')$ is the expected immediate reward. This two-term structure separates present rewards from discounted future value.",
+        "proof_sketch": "Expanding the definition: $$Q(s,a) = \\sum_{s'} P(s'|s,a)[R(s,a,s') + \\gamma V(s')] = \\sum_{s'} P(s'|s,a)R(s,a,s') + \\gamma\\sum_{s'} P(s'|s,a)V(s')$$ by linearity of summation. The first term is $r(s,a)$, the second is $\\gamma$ times expected next-state value.",
+        "examples": [
+          "Complete example from problem: state=0, action='a', transitions to state 0 (prob 0.5, reward 5) and state 1 (prob 0.5, reward 10), with V=[1.0, 2.0] and gamma=0.9: Q(0,'a') = 0.5*(5+0.9*1.0) + 0.5*(10+0.9*2.0) = 8.85",
+          "With three next states: Q(s,a) with transitions [(s1, 0.2, 1), (s2, 0.5, 3), (s3, 0.3, 2)], V=[10,15,20], gamma=0.8: Q = 0.2*(1+0.8*10) + 0.5*(3+0.8*15) + 0.3*(2+0.8*20) = 0.2*9 + 0.5*15 + 0.3*18 = 15.1"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Q-Value Formula",
+          "latex": "$Q(s,a) = \\sum_{s' \\in \\mathcal{T}(s,a)} P(s'|s,a)[R(s,a,s') + \\gamma V(s')]$",
+          "description": "Sum over all reachable next states of probability-weighted immediate-plus-future value"
+        },
+        {
+          "name": "Vectorized Computation",
+          "latex": "$Q(s,a) = \\mathbf{p}^T (\\mathbf{r} + \\gamma \\mathbf{v}_{\\text{next}})$",
+          "description": "Dot product of probability vector with reward-plus-value vector (efficient implementation)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the full expected action-value computation: extract transitions from nested dictionaries P and R, create state-to-index mapping, look up next-state values, and apply the Bellman expectation formula. This is a simplified version of the main problem focusing on the core algorithm.",
+        "function_signature": "def compute_q_value(state, action, P: dict, R: dict, states: list, V: np.ndarray, gamma: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_q_value(state, action, P: dict, R: dict, states: list, V: np.ndarray, gamma: float) -> float:\n    \"\"\"\n    Computes Q(state, action) using Bellman expectation equation.\n    \n    Args:\n        state: current state identifier\n        action: chosen action\n        P: dict, P[s][a][s'] = transition probability\n        R: dict, R[s][a][s'] = immediate reward\n        states: list of all state identifiers\n        V: np.ndarray, state-value function\n        gamma: float, discount factor\n    \n    Returns:\n        float: Q(state, action)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_q_value(0, 'a', {0: {'a': {0: 0.5, 1: 0.5}}}, {0: {'a': {0: 5, 1: 10}}}, [0, 1], np.array([1.0, 2.0]), 0.9)",
+            "expected": "8.85",
+            "explanation": "Matches the main problem example calculation"
+          },
+          {
+            "input": "compute_q_value(1, 'b', {1: {'b': {0: 0.7, 1: 0.3}}}, {1: {'b': {0: -1, 1: 3}}}, [0, 1], np.array([1.0, 2.0]), 0.9)",
+            "expected": "1.37",
+            "explanation": "0.7*(-1+0.9*1.0) + 0.3*(3+0.9*2.0) = 0.7*(-0.1) + 0.3*4.8 = 1.37"
+          },
+          {
+            "input": "compute_q_value(0, 'b', {0: {'b': {0: 1.0}}}, {0: {'b': {0: 2}}}, [0], np.array([1.0]), 0.9)",
+            "expected": "2.9",
+            "explanation": "Deterministic self-loop: 1.0*(2 + 0.9*1.0) = 2.9"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to create state-to-index mapping before looking up values (causes errors with non-integer states)",
+        "Applying gamma to rewards instead of only to future values",
+        "Not iterating over all next states in the transition dictionary",
+        "Confusing P[s][a] (dict of next states) with a single probability value"
+      ],
+      "hint": "Build a state-to-index dict once, then for each next_state in P[state][action], compute prob * (reward + gamma * V[state_index[next_state]]) and accumulate the sum",
+      "references": [
+        "Policy evaluation algorithms",
+        "Bellman backup operator",
+        "Dynamic programming in MDPs"
+      ]
+    }
+  ]
+}

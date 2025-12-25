@@ -1,0 +1,503 @@
+{
+  "problem_id": 79,
+  "title": "Binomial Distribution Probability",
+  "category": "Probability",
+  "difficulty": "medium",
+  "description": "Write a Python function to calculate the probability of achieving exactly k successes in n independent Bernoulli trials, each with probability p of success, using the Binomial distribution formula.",
+  "example": {
+    "input": "n = 6, k = 2, p = 0.5",
+    "output": "0.23438",
+    "reasoning": "We want the probability of getting exactly 2 successes in 6 trials with 50% success rate. The binomial coefficient C(6,2) = 15, and the probability calculation gives 15 × 0.25 × 0.0625 = 0.23438."
+  },
+  "starter_code": "import math\n\ndef binomial_probability(n: int, k: int, p: float) -> float:\n    \"\"\"\n    Calculate the probability of exactly k successes in n Bernoulli trials.\n    \n    Args:\n        n: Total number of trials\n        k: Number of successes\n        p: Probability of success on each trial\n    \n    Returns:\n        Probability of k successes\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Factorial and Combinatorial Foundations",
+      "relation_to_problem": "The binomial coefficient C(n,k) = n!/(k!(n-k)!) is the core counting component of the binomial probability formula, representing the number of ways to choose k successes from n trials.",
+      "prerequisites": [
+        "Basic arithmetic",
+        "Understanding of multiplication",
+        "Exponentiation"
+      ],
+      "learning_objectives": [
+        "Compute factorials efficiently for both small and large values",
+        "Understand the mathematical definition and properties of factorials",
+        "Handle edge cases like 0! = 1",
+        "Recognize the computational challenges of large factorials"
+      ],
+      "math_content": {
+        "definition": "The **factorial** of a non-negative integer $n$, denoted $n!$, is the product of all positive integers less than or equal to $n$. Formally: $$n! = \\begin{cases} 1 & \\text{if } n = 0 \\\\ n \\cdot (n-1)! & \\text{if } n > 0 \\end{cases}$$ This recursive definition can also be expressed explicitly as: $$n! = n \\times (n-1) \\times (n-2) \\times \\cdots \\times 2 \\times 1$$ for $n \\geq 1$.",
+        "notation": "$n! = $ \"n factorial\"; $0! = 1$ by convention (the empty product)",
+        "theorem": "**Theorem (Factorial Recursion)**: For all non-negative integers $n$, we have $n! = n \\cdot (n-1)!$ with base case $0! = 1$. This recursion forms the basis for both iterative and recursive implementations.",
+        "proof_sketch": "The proof proceeds by induction. **Base case**: $0! = 1$ by definition. **Inductive step**: Assume $(n-1)! = (n-1) \\times (n-2) \\times \\cdots \\times 1$. Then $n! = n \\times [(n-1) \\times (n-2) \\times \\cdots \\times 1] = n \\times (n-1)!$, establishing the recursion for all $n \\geq 1$.",
+        "examples": [
+          "$5! = 5 \\times 4 \\times 3 \\times 2 \\times 1 = 120$",
+          "$3! = 3 \\times 2 \\times 1 = 6$",
+          "$0! = 1$ (by definition, represents the single way to arrange zero objects)",
+          "$1! = 1$ (only one way to arrange a single object)",
+          "$10! = 3,628,800$ (grows very rapidly)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Factorial Definition",
+          "latex": "$n! = \\prod_{i=1}^{n} i = n \\times (n-1) \\times \\cdots \\times 2 \\times 1$",
+          "description": "Direct computation of factorial by multiplying all integers from 1 to n"
+        },
+        {
+          "name": "Factorial Recursion",
+          "latex": "$n! = n \\cdot (n-1)!$ with $0! = 1$",
+          "description": "Recursive formulation useful for mathematical proofs and recursive algorithms"
+        },
+        {
+          "name": "Stirling's Approximation",
+          "latex": "$n! \\approx \\sqrt{2\\pi n}\\left(\\frac{n}{e}\\right)^n$",
+          "description": "Asymptotic approximation for large n, useful for understanding growth rate"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to compute the factorial of a non-negative integer n. Your implementation should handle the base case (0! = 1) correctly and work efficiently for values up to n = 20. This function will be a building block for computing binomial coefficients.",
+        "function_signature": "def factorial(n: int) -> int:",
+        "starter_code": "def factorial(n: int) -> int:\n    \"\"\"\n    Calculate the factorial of n.\n    \n    Args:\n        n: A non-negative integer\n    \n    Returns:\n        The factorial of n (n!)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "factorial(0)",
+            "expected": "1",
+            "explanation": "By definition, 0! = 1 (the empty product). This is a critical edge case that must be handled correctly."
+          },
+          {
+            "input": "factorial(1)",
+            "expected": "1",
+            "explanation": "There is exactly one way to arrange one object, so 1! = 1."
+          },
+          {
+            "input": "factorial(5)",
+            "expected": "120",
+            "explanation": "5! = 5 × 4 × 3 × 2 × 1 = 120. This tests the basic computation."
+          },
+          {
+            "input": "factorial(10)",
+            "expected": "3628800",
+            "explanation": "10! = 3,628,800. Tests handling of larger values where the result grows rapidly."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that 0! = 1 (not 0), which is essential for combinatorial formulas",
+        "Using recursion without memoization for repeated calculations, causing exponential time complexity",
+        "Integer overflow for large n in languages with fixed-size integers (Python handles arbitrary precision)",
+        "Returning 0 for invalid inputs instead of raising an error or handling gracefully"
+      ],
+      "hint": "Start with the base case: what should factorial(0) return? Then use a loop to multiply all integers from 1 to n, or implement the recursive definition directly.",
+      "references": [
+        "Factorial function and its properties",
+        "Combinatorics and counting principles",
+        "Recursive vs iterative algorithm design",
+        "Python's math.factorial() function"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Binomial Coefficients and Combinations",
+      "relation_to_problem": "The binomial coefficient C(n,k) computes how many ways we can choose k successes from n trials, which is multiplied by the probability terms to get the final binomial probability.",
+      "prerequisites": [
+        "Factorial computation",
+        "Understanding of combinations vs permutations",
+        "Basic division"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition of binomial coefficients",
+        "Compute C(n,k) using the factorial formula",
+        "Recognize the symmetry property: C(n,k) = C(n,n-k)",
+        "Handle edge cases: C(n,0) = C(n,n) = 1, and invalid cases where k > n",
+        "Appreciate the combinatorial interpretation as 'n choose k'"
+      ],
+      "math_content": {
+        "definition": "The **binomial coefficient** $\\binom{n}{k}$ (read as \"n choose k\") represents the number of ways to choose $k$ objects from a set of $n$ distinct objects, without regard to order. It is defined as: $$\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$$ for $0 \\leq k \\leq n$, and $\\binom{n}{k} = 0$ if $k > n$ or $k < 0$.",
+        "notation": "$\\binom{n}{k} = C(n,k) = {}^nC_k = $ \"n choose k\"; all notations are equivalent",
+        "theorem": "**Theorem (Symmetry Property)**: For all non-negative integers $n$ and $k$ with $0 \\leq k \\leq n$, we have: $$\\binom{n}{k} = \\binom{n}{n-k}$$ This symmetry follows from the algebraic identity: $$\\frac{n!}{k!(n-k)!} = \\frac{n!}{(n-k)!k!}$$ **Theorem (Pascal's Identity)**: For $n \\geq k \\geq 1$: $$\\binom{n}{k} = \\binom{n-1}{k-1} + \\binom{n-1}{k}$$ This identity is the basis for Pascal's triangle.",
+        "proof_sketch": "**Symmetry proof**: Choosing $k$ objects to include is equivalent to choosing $n-k$ objects to exclude. Algebraically, swapping $k$ and $n-k$ in the denominator doesn't change the value. **Pascal's Identity proof**: Consider choosing $k$ items from $n$ items. Either the last item is included (then we choose $k-1$ from the remaining $n-1$), or it's excluded (then we choose $k$ from the remaining $n-1$). These cases are disjoint and exhaustive.",
+        "examples": [
+          "$\\binom{6}{2} = \\frac{6!}{2!4!} = \\frac{720}{2 \\times 24} = \\frac{720}{48} = 15$ (there are 15 ways to choose 2 items from 6)",
+          "$\\binom{5}{0} = \\frac{5!}{0!5!} = \\frac{120}{1 \\times 120} = 1$ (there's exactly one way to choose nothing)",
+          "$\\binom{5}{5} = \\frac{5!}{5!0!} = \\frac{120}{120 \\times 1} = 1$ (there's exactly one way to choose everything)",
+          "$\\binom{4}{2} = \\binom{4}{4-2} = \\binom{4}{2} = 6$ (demonstrating symmetry)",
+          "$\\binom{10}{3} = \\frac{10!}{3!7!} = \\frac{10 \\times 9 \\times 8}{3 \\times 2 \\times 1} = 120$ (can simplify before computing full factorials)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Binomial Coefficient (Factorial Form)",
+          "latex": "$\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$",
+          "description": "Primary definition using factorials; valid for 0 ≤ k ≤ n"
+        },
+        {
+          "name": "Binomial Coefficient (Product Form)",
+          "latex": "$\\binom{n}{k} = \\frac{n \\times (n-1) \\times \\cdots \\times (n-k+1)}{k!}$",
+          "description": "More efficient computational form that avoids computing (n-k)!"
+        },
+        {
+          "name": "Symmetry Property",
+          "latex": "$\\binom{n}{k} = \\binom{n}{n-k}$",
+          "description": "Use this to reduce computation by always choosing the smaller of k or n-k"
+        },
+        {
+          "name": "Boundary Cases",
+          "latex": "$\\binom{n}{0} = \\binom{n}{n} = 1$ and $\\binom{n}{k} = 0$ if $k > n$",
+          "description": "Essential edge cases that must be handled correctly"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to compute the binomial coefficient C(n,k), which represents the number of ways to choose k items from n items. Use the factorial formula: C(n,k) = n! / (k!(n-k)!). Handle edge cases properly: return 1 when k=0 or k=n, and return 0 when k>n. You can use the factorial function from the previous exercise or Python's math.factorial().",
+        "function_signature": "def binomial_coefficient(n: int, k: int) -> int:",
+        "starter_code": "import math\n\ndef binomial_coefficient(n: int, k: int) -> int:\n    \"\"\"\n    Calculate the binomial coefficient C(n, k) = n! / (k!(n-k)!).\n    \n    Args:\n        n: Total number of items\n        k: Number of items to choose\n    \n    Returns:\n        The number of ways to choose k items from n items\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "binomial_coefficient(6, 2)",
+            "expected": "15",
+            "explanation": "C(6,2) = 6!/(2!4!) = 720/(2×24) = 15. There are 15 ways to choose 2 items from 6 items."
+          },
+          {
+            "input": "binomial_coefficient(5, 0)",
+            "expected": "1",
+            "explanation": "C(5,0) = 5!/(0!5!) = 1. There is exactly one way to choose nothing (the empty set)."
+          },
+          {
+            "input": "binomial_coefficient(5, 5)",
+            "expected": "1",
+            "explanation": "C(5,5) = 5!/(5!0!) = 1. There is exactly one way to choose all 5 items."
+          },
+          {
+            "input": "binomial_coefficient(10, 3)",
+            "expected": "120",
+            "explanation": "C(10,3) = 10!/(3!7!) = 120. This tests a larger calculation."
+          },
+          {
+            "input": "binomial_coefficient(4, 2)",
+            "expected": "6",
+            "explanation": "C(4,2) = 4!/(2!2!) = 24/(2×2) = 6. Classic example: choosing 2 from 4."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing n!, k!, and (n-k)! separately for large n, causing unnecessary computation and potential overflow",
+        "Not handling the edge case where k > n (should return 0, not a negative or error)",
+        "Forgetting that C(n,0) = 1, not 0 (there is one way to choose nothing: the empty set)",
+        "Computing the full factorials when cancellation would simplify: C(100,2) = 100×99/2 is much easier than computing 100!/2!98!",
+        "Not validating that k is non-negative before computation"
+      ],
+      "hint": "Use the factorial formula directly: compute three factorials and divide accordingly. Remember to handle special cases first: if k > n, return 0; if k == 0 or k == n, return 1. Python's math.factorial() is available for use.",
+      "references": [
+        "Combinatorics: combinations vs permutations",
+        "Pascal's triangle and its properties",
+        "Python's math.comb() function (available in Python 3.8+)",
+        "Efficient algorithms for computing binomial coefficients"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Probability of Independent Events and Power Laws",
+      "relation_to_problem": "The binomial formula requires computing p^k (probability of k successes) and (1-p)^(n-k) (probability of n-k failures), representing the probability of a specific sequence of successes and failures.",
+      "prerequisites": [
+        "Basic probability concepts",
+        "Understanding of independent events",
+        "Exponentiation"
+      ],
+      "learning_objectives": [
+        "Understand the multiplication rule for independent events",
+        "Compute probabilities of sequences of independent trials",
+        "Apply the formula P(A and B) = P(A) × P(B) for independent events",
+        "Recognize that (1-p) represents the probability of failure when p is the probability of success",
+        "Calculate compound probabilities using exponentiation"
+      ],
+      "math_content": {
+        "definition": "Two events $A$ and $B$ are **independent** if the occurrence of one does not affect the probability of the other. Formally, events $A$ and $B$ are independent if and only if: $$P(A \\cap B) = P(A) \\cdot P(B)$$ For a sequence of $n$ independent events $A_1, A_2, \\ldots, A_n$, the probability that all occur is: $$P(A_1 \\cap A_2 \\cap \\cdots \\cap A_n) = P(A_1) \\cdot P(A_2) \\cdots P(A_n) = \\prod_{i=1}^{n} P(A_i)$$",
+        "notation": "$P(A \\cap B) = $ probability that both A and B occur; $P(A^c) = 1 - P(A) = $ probability that A does not occur (complement)",
+        "theorem": "**Theorem (Bernoulli Trial Sequence)**: Consider $n$ independent Bernoulli trials, where each trial has probability $p$ of success and probability $q = 1-p$ of failure. The probability of observing a specific sequence with exactly $k$ successes and $n-k$ failures (in a particular order) is: $$P(\\text{specific sequence}) = p^k \\cdot (1-p)^{n-k} = p^k \\cdot q^{n-k}$$ This probability is the same for all sequences with exactly $k$ successes, regardless of their order.",
+        "proof_sketch": "Since the trials are independent, we apply the multiplication rule. If we have $k$ successes, each contributing probability $p$, we multiply $p$ by itself $k$ times: $p^k$. Similarly, we have $n-k$ failures, each contributing probability $(1-p)$, giving $(1-p)^{n-k}$. The total probability is the product: $p^k \\cdot (1-p)^{n-k}$. The independence assumption is crucial—without it, we cannot multiply the individual probabilities.",
+        "examples": [
+          "**Example 1**: Flip a fair coin 3 times. Probability of getting exactly the sequence HHT is: $P(\\text{HHT}) = 0.5 \\times 0.5 \\times 0.5 = 0.5^3 = 0.125$",
+          "**Example 2**: For $p = 0.6$, $n = 5$, $k = 3$: A specific sequence with 3 successes has probability $0.6^3 \\times 0.4^2 = 0.216 \\times 0.16 = 0.03456$",
+          "**Example 3**: Probability of SSSFF (success, success, success, failure, failure) with $p = 0.7$ is: $0.7^3 \\times 0.3^2 = 0.343 \\times 0.09 = 0.03087$",
+          "**Example 4**: For $p = 0.5$, any specific sequence of $n$ outcomes has probability $0.5^n$ regardless of the number of successes (due to symmetry)",
+          "**Example 5**: With $p = 1$ (certain success), $p^k \\times (1-p)^{n-k} = 1^k \\times 0^{n-k}$, which equals 1 only if $k = n$ (all successes)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Multiplication Rule for Independent Events",
+          "latex": "$P(A_1 \\cap A_2 \\cap \\cdots \\cap A_n) = \\prod_{i=1}^{n} P(A_i)$",
+          "description": "For independent events, multiply individual probabilities to get the joint probability"
+        },
+        {
+          "name": "Complement Rule",
+          "latex": "$P(A^c) = 1 - P(A)$",
+          "description": "Probability of failure is one minus probability of success"
+        },
+        {
+          "name": "Sequence Probability in Bernoulli Trials",
+          "latex": "$P(\\text{k successes in specific order}) = p^k(1-p)^{n-k}$",
+          "description": "Probability of any specific sequence with k successes and n-k failures"
+        },
+        {
+          "name": "Power Law for Repeated Independent Events",
+          "latex": "$P(\\text{all n trials succeed}) = p^n$",
+          "description": "When all trials must succeed with individual probability p"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the probability of observing a specific sequence of exactly k successes and (n-k) failures in n independent Bernoulli trials, where each trial has success probability p. This represents the probability of ANY particular ordered sequence with k successes, such as SSFSS or SSSFF (where S=success, F=failure). Use the formula: probability = p^k × (1-p)^(n-k).",
+        "function_signature": "def sequence_probability(n: int, k: int, p: float) -> float:",
+        "starter_code": "def sequence_probability(n: int, k: int, p: float) -> float:\n    \"\"\"\n    Calculate the probability of a specific sequence with k successes in n trials.\n    \n    Args:\n        n: Total number of trials\n        k: Number of successes in the sequence\n        p: Probability of success on each trial\n    \n    Returns:\n        Probability of observing this specific sequence\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "sequence_probability(3, 2, 0.5)",
+            "expected": "0.125",
+            "explanation": "With p=0.5, a sequence with 2 successes and 1 failure has probability 0.5^2 × 0.5^1 = 0.25 × 0.5 = 0.125. Example: HHT or HTH or THH all have this probability."
+          },
+          {
+            "input": "sequence_probability(5, 3, 0.6)",
+            "expected": "0.03456",
+            "explanation": "Probability of a specific sequence with 3 successes: 0.6^3 × 0.4^2 = 0.216 × 0.16 = 0.03456. Example: SSSFF has this probability."
+          },
+          {
+            "input": "sequence_probability(4, 0, 0.3)",
+            "expected": "0.2401",
+            "explanation": "All failures: 0.3^0 × 0.7^4 = 1 × 0.2401 = 0.2401. The probability of FFFF."
+          },
+          {
+            "input": "sequence_probability(6, 6, 0.5)",
+            "expected": "0.015625",
+            "explanation": "All successes: 0.5^6 × 0.5^0 = 0.015625 × 1 = 0.015625. The probability of SSSSSS."
+          },
+          {
+            "input": "sequence_probability(10, 5, 0.5)",
+            "expected": "0.0009765625",
+            "explanation": "With p=0.5, any specific sequence of 10 outcomes has probability 0.5^10 ≈ 0.000977, regardless of k due to symmetry."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing the probability of a specific sequence with the probability of getting k successes in any order (the latter requires multiplying by the binomial coefficient)",
+        "Forgetting to compute (1-p) as the failure probability; using p for both successes and failures",
+        "Not recognizing that p^k × (1-p)^(n-k) is the same for ALL sequences with exactly k successes, regardless of their order",
+        "Computational errors with exponentiation, especially for large n (use ** operator in Python, not ^)",
+        "Assuming events are independent when they're not (e.g., sampling without replacement)"
+      ],
+      "hint": "Use Python's exponentiation operator ** to compute p raised to the power k, and (1-p) raised to the power (n-k). Multiply these two terms together. Remember that any number raised to the power 0 equals 1.",
+      "references": [
+        "Independent events in probability theory",
+        "Bernoulli trials and Bernoulli distribution",
+        "Multiplication rule for probabilities",
+        "Laws of exponents and power calculations"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Binomial Distribution: Combining Counting and Probability",
+      "relation_to_problem": "This sub-quest synthesizes the previous concepts to understand why the binomial probability formula is P(X=k) = C(n,k) × p^k × (1-p)^(n-k), explaining the structure of the formula before implementing it.",
+      "prerequisites": [
+        "Binomial coefficients",
+        "Independent event probabilities",
+        "Understanding of discrete probability distributions"
+      ],
+      "learning_objectives": [
+        "Understand the conceptual derivation of the binomial probability formula",
+        "Recognize why we multiply the binomial coefficient by the sequence probability",
+        "Identify the four required conditions for applying the binomial distribution",
+        "Interpret the binomial PMF in real-world contexts",
+        "Understand the relationship between counting and probability in the formula"
+      ],
+      "math_content": {
+        "definition": "A random variable $X$ follows a **Binomial distribution** with parameters $n$ and $p$, denoted $X \\sim \\text{Binomial}(n, p)$ or $X \\sim B(n, p)$, if $X$ represents the number of successes in $n$ independent Bernoulli trials, each with probability $p$ of success. The **probability mass function (PMF)** is: $$P(X = k) = \\binom{n}{k} p^k (1-p)^{n-k}, \\quad k = 0, 1, 2, \\ldots, n$$ where $\\binom{n}{k}$ counts the number of ways to achieve $k$ successes, and $p^k(1-p)^{n-k}$ is the probability of any specific sequence with $k$ successes.",
+        "notation": "$X \\sim B(n, p)$ means $X$ is binomially distributed; $P(X = k)$ is the probability that $X$ equals $k$; $q = 1-p$ is often used for the failure probability",
+        "theorem": "**Theorem (Binomial PMF Derivation)**: Let $X$ be the number of successes in $n$ independent Bernoulli trials with success probability $p$. Then: $$P(X = k) = \\binom{n}{k} p^k (1-p)^{n-k}$$ **Proof idea**: There are $\\binom{n}{k}$ distinct sequences containing exactly $k$ successes and $n-k$ failures. Each such sequence has probability $p^k(1-p)^{n-k}$ by independence. Since these sequences are mutually exclusive, we sum their probabilities. By the multiplication principle: $$P(X = k) = (\\text{number of sequences with k successes}) \\times (\\text{probability per sequence}) = \\binom{n}{k} \\times p^k(1-p)^{n-k}$$",
+        "proof_sketch": "**Step 1**: Fix a specific sequence with $k$ successes (e.g., $S\\ldots S F\\ldots F$ with $k$ S's and $n-k$ F's). By independence, its probability is $\\prod_{i=1}^{k} p \\times \\prod_{j=1}^{n-k}(1-p) = p^k(1-p)^{n-k}$. **Step 2**: Count how many such sequences exist. This is $\\binom{n}{k}$ because we choose which $k$ positions (out of $n$) contain successes. **Step 3**: All sequences with $k$ successes are mutually exclusive (cannot occur simultaneously). Apply the addition rule: sum over all $\\binom{n}{k}$ sequences, each with probability $p^k(1-p)^{n-k}$, giving $\\binom{n}{k} \\times p^k(1-p)^{n-k}$.",
+        "examples": [
+          "**Example 1**: Fair coin flipped 4 times. Find $P(X = 2)$ where $X$ = number of heads. Here $n=4$, $k=2$, $p=0.5$: $$P(X=2) = \\binom{4}{2}(0.5)^2(0.5)^2 = 6 \\times 0.25 \\times 0.25 = 6 \\times 0.0625 = 0.375$$ The 6 sequences are: HHTT, HTHT, HTTH, THHT, THTH, TTHH.",
+          "**Example 2**: Quality control: items are defective with $p = 0.1$. In 10 items, find $P(X = 2)$: $$P(X=2) = \\binom{10}{2}(0.1)^2(0.9)^8 = 45 \\times 0.01 \\times 0.43046721 \\approx 0.1937$$",
+          "**Example 3**: Medical test with 70% success rate, 5 patients. $P(X = 5)$ (all succeed): $$P(X=5) = \\binom{5}{5}(0.7)^5(0.3)^0 = 1 \\times 0.16807 \\times 1 = 0.16807$$",
+          "**Example 4**: Verify that probabilities sum to 1 for $n=2$, $p=0.5$: $$\\sum_{k=0}^{2} \\binom{2}{k}(0.5)^k(0.5)^{2-k} = 0.25 + 0.5 + 0.25 = 1.0$$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Binomial Probability Mass Function",
+          "latex": "$P(X = k) = \\binom{n}{k} p^k (1-p)^{n-k}$",
+          "description": "Complete formula for binomial probability; central formula of this problem"
+        },
+        {
+          "name": "Four Conditions for Binomial Distribution",
+          "latex": "1. Fixed $n$ trials\\n2. Two outcomes per trial\\n3. Independent trials\\n4. Constant $p$",
+          "description": "All four conditions must hold for binomial distribution to apply"
+        },
+        {
+          "name": "Expected Value",
+          "latex": "$E[X] = \\mu = np$",
+          "description": "Mean number of successes in n trials"
+        },
+        {
+          "name": "Variance",
+          "latex": "$\\text{Var}(X) = \\sigma^2 = np(1-p)$",
+          "description": "Spread of the distribution around the mean"
+        },
+        {
+          "name": "Standard Deviation",
+          "latex": "$\\sigma = \\sqrt{np(1-p)}$",
+          "description": "Square root of variance, in same units as X"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that analyzes whether the binomial distribution is applicable to a given scenario, and if so, computes the expected value (mean) and variance. Given parameters n (number of trials) and p (success probability), return a dictionary containing: (1) is_valid: whether the parameters are valid (n must be positive integer, 0 ≤ p ≤ 1), (2) mean: the expected value np, and (3) variance: np(1-p). This helps validate inputs before computing binomial probabilities.",
+        "function_signature": "def binomial_statistics(n: int, p: float) -> dict:",
+        "starter_code": "def binomial_statistics(n: int, p: float) -> dict:\n    \"\"\"\n    Compute basic statistics for a binomial distribution.\n    \n    Args:\n        n: Number of trials\n        p: Probability of success\n    \n    Returns:\n        Dictionary with keys 'is_valid', 'mean', 'variance'\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "binomial_statistics(10, 0.5)",
+            "expected": "{'is_valid': True, 'mean': 5.0, 'variance': 2.5}",
+            "explanation": "Valid parameters. Mean = 10 × 0.5 = 5.0. Variance = 10 × 0.5 × 0.5 = 2.5. Expect 5 successes on average with spread of 2.5."
+          },
+          {
+            "input": "binomial_statistics(6, 0.3)",
+            "expected": "{'is_valid': True, 'mean': 1.8, 'variance': 1.26}",
+            "explanation": "Valid parameters. Mean = 6 × 0.3 = 1.8. Variance = 6 × 0.3 × 0.7 = 1.26."
+          },
+          {
+            "input": "binomial_statistics(20, 0.0)",
+            "expected": "{'is_valid': True, 'mean': 0.0, 'variance': 0.0}",
+            "explanation": "Edge case: p=0 means no successes possible. Mean and variance both 0. Still valid binomial distribution."
+          },
+          {
+            "input": "binomial_statistics(5, 1.0)",
+            "expected": "{'is_valid': True, 'mean': 5.0, 'variance': 0.0}",
+            "explanation": "Edge case: p=1 means all trials succeed. Mean = 5, but variance = 5 × 1 × 0 = 0 (no variability)."
+          },
+          {
+            "input": "binomial_statistics(10, 1.5)",
+            "expected": "{'is_valid': False, 'mean': None, 'variance': None}",
+            "explanation": "Invalid: p must be between 0 and 1. Return is_valid=False with None for statistics."
+          },
+          {
+            "input": "binomial_statistics(0, 0.5)",
+            "expected": "{'is_valid': False, 'mean': None, 'variance': None}",
+            "explanation": "Invalid: n must be positive. Cannot have zero trials."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Applying binomial distribution when trials are NOT independent (e.g., sampling without replacement from small population—use hypergeometric instead)",
+        "Using binomial distribution when success probability p changes between trials (use other models)",
+        "Confusing P(X = k) with P(X ≤ k) or P(X ≥ k); the binomial PMF gives exact probability, not cumulative",
+        "Forgetting to check that k ≤ n (cannot have more successes than trials)",
+        "Not recognizing when real-world scenarios violate the four conditions (fixed n, two outcomes, independence, constant p)"
+      ],
+      "hint": "First validate the parameters: n should be a positive integer, and p should be between 0 and 1 (inclusive). If valid, compute mean as n × p and variance as n × p × (1-p). Return a dictionary with three keys.",
+      "references": [
+        "Binomial distribution conditions and applications",
+        "Expected value and variance of discrete distributions",
+        "When to use binomial vs other distributions (hypergeometric, Poisson, negative binomial)",
+        "Real-world applications: quality control, medical trials, A/B testing"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Implementing the Complete Binomial Probability Calculator",
+      "relation_to_problem": "This final sub-quest integrates all previous components—factorial, binomial coefficient, probability powers—into the complete binomial probability formula P(X=k) = C(n,k) × p^k × (1-p)^(n-k).",
+      "prerequisites": [
+        "Factorial computation",
+        "Binomial coefficients",
+        "Independent probability calculations",
+        "Understanding of binomial distribution formula"
+      ],
+      "learning_objectives": [
+        "Synthesize all previous components into the complete binomial probability function",
+        "Validate inputs to ensure the binomial distribution is applicable",
+        "Handle edge cases: k=0, k=n, p=0, p=1",
+        "Ensure numerical precision for probability calculations",
+        "Format output appropriately for probability values"
+      ],
+      "math_content": {
+        "definition": "The **binomial probability function** computes the probability of observing exactly $k$ successes in $n$ independent Bernoulli trials, each with success probability $p$. The complete computational formula is: $$P(X = k) = \\frac{n!}{k!(n-k)!} \\times p^k \\times (1-p)^{n-k}$$ This combines three components: (1) **Counting**: $\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$ ways to arrange $k$ successes among $n$ trials, (2) **Success probability**: $p^k$ for $k$ successes occurring, (3) **Failure probability**: $(1-p)^{n-k}$ for $n-k$ failures occurring.",
+        "notation": "$P(X = k)$ = probability mass at $k$; $n$ = number of trials; $k$ = number of successes; $p$ = success probability; $q = 1-p$ = failure probability",
+        "theorem": "**Theorem (Probability Axioms Satisfied)**: The binomial PMF satisfies the axioms of probability: (1) **Non-negativity**: $P(X = k) \\geq 0$ for all $k$, since $\\binom{n}{k} \\geq 0$, $p^k \\geq 0$, and $(1-p)^{n-k} \\geq 0$. (2) **Normalization**: $\\sum_{k=0}^{n} P(X = k) = 1$ by the binomial theorem: $$\\sum_{k=0}^{n} \\binom{n}{k} p^k (1-p)^{n-k} = [p + (1-p)]^n = 1^n = 1$$",
+        "proof_sketch": "**Non-negativity**: Each component is non-negative: binomial coefficients are counts (≥0), probabilities are in [0,1], and powers of non-negative numbers are non-negative. Thus their product is non-negative. **Normalization**: The sum $\\sum_{k=0}^{n} \\binom{n}{k} p^k (1-p)^{n-k}$ is the binomial expansion of $[p + (1-p)]^n$. Since $p + (1-p) = 1$, this equals $1^n = 1$. This proves that the binomial PMF is a valid probability distribution.",
+        "examples": [
+          "**Complete Example**: Calculate $P(X = 2)$ for $n=6$, $k=2$, $p=0.5$: Step 1: $\\binom{6}{2} = \\frac{6!}{2!4!} = \\frac{720}{2 \\times 24} = 15$. Step 2: $p^k = 0.5^2 = 0.25$. Step 3: $(1-p)^{n-k} = 0.5^4 = 0.0625$. Step 4: $P(X=2) = 15 \\times 0.25 \\times 0.0625 = 0.234375$.",
+          "**Edge Case 1**: $n=5$, $k=0$, $p=0.4$: $P(X=0) = \\binom{5}{0}(0.4)^0(0.6)^5 = 1 \\times 1 \\times 0.07776 = 0.07776$ (all failures).",
+          "**Edge Case 2**: $n=3$, $k=3$, $p=0.7$: $P(X=3) = \\binom{3}{3}(0.7)^3(0.3)^0 = 1 \\times 0.343 \\times 1 = 0.343$ (all successes).",
+          "**Verification**: For $n=2$, $p=0.6$, check that probabilities sum to 1: $P(X=0) = 0.16$, $P(X=1) = 0.48$, $P(X=2) = 0.36$. Sum: $0.16 + 0.48 + 0.36 = 1.0$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Binomial Probability Formula",
+          "latex": "$P(X = k) = \\binom{n}{k} p^k (1-p)^{n-k} = \\frac{n!}{k!(n-k)!} p^k (1-p)^{n-k}$",
+          "description": "The complete formula synthesizing all components. This is the target implementation."
+        },
+        {
+          "name": "Computational Form with Simplification",
+          "latex": "$P(X = k) = \\frac{n(n-1)\\cdots(n-k+1)}{k!} p^k (1-p)^{n-k}$",
+          "description": "Alternative form that avoids computing full factorials, more efficient for large n"
+        },
+        {
+          "name": "Log-Space Computation (for numerical stability)",
+          "latex": "$\\log P(X = k) = \\log\\binom{n}{k} + k\\log p + (n-k)\\log(1-p)$",
+          "description": "Use when dealing with very small probabilities to avoid underflow"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete binomial probability function that calculates P(X = k) for a binomial random variable X ~ Binomial(n, p). Your function should: (1) Validate inputs (n > 0, 0 ≤ k ≤ n, 0 ≤ p ≤ 1), (2) Handle edge cases (k > n returns 0), (3) Compute the binomial coefficient using factorials or math.comb(), (4) Calculate p^k and (1-p)^(n-k), (5) Return the product rounded to 5 decimal places. This is a simplified version of the main problem to ensure understanding before tackling the full implementation.",
+        "function_signature": "def compute_binomial_probability(n: int, k: int, p: float) -> float:",
+        "starter_code": "import math\n\ndef compute_binomial_probability(n: int, k: int, p: float) -> float:\n    \"\"\"\n    Calculate P(X = k) for X ~ Binomial(n, p).\n    \n    Args:\n        n: Number of trials\n        k: Number of successes\n        p: Probability of success per trial\n    \n    Returns:\n        Probability of exactly k successes (rounded to 5 decimals)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_binomial_probability(6, 2, 0.5)",
+            "expected": "0.23438",
+            "explanation": "C(6,2)×0.5²×0.5⁴ = 15×0.25×0.0625 = 0.234375 ≈ 0.23438. This is the example from the main problem."
+          },
+          {
+            "input": "compute_binomial_probability(5, 2, 0.4)",
+            "expected": "0.3456",
+            "explanation": "C(5,2)×0.4²×0.6³ = 10×0.16×0.216 = 0.3456. Standard binomial calculation."
+          },
+          {
+            "input": "compute_binomial_probability(10, 0, 0.3)",
+            "expected": "0.02825",
+            "explanation": "C(10,0)×0.3⁰×0.7¹⁰ = 1×1×0.0282475 ≈ 0.02825. All failures case."
+          },
+          {
+            "input": "compute_binomial_probability(4, 4, 0.6)",
+            "expected": "0.1296",
+            "explanation": "C(4,4)×0.6⁴×0.4⁰ = 1×0.1296×1 = 0.1296. All successes case."
+          },
+          {
+            "input": "compute_binomial_probability(3, 1, 0.5)",
+            "expected": "0.375",
+            "explanation": "C(3,1)×0.5¹×0.5² = 3×0.5×0.25 = 0.375. Coin flip example."
+          },
+          {
+            "input": "compute_binomial_probability(5, 6, 0.5)",
+            "expected": "0.0",
+            "explanation": "Invalid case: k > n. Cannot have more successes than trials. Return 0."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to multiply all three components together (binomial coefficient, success power, failure power)",
+        "Using incorrect formula like C(n,k) × p^n instead of C(n,k) × p^k × (1-p)^(n-k)",
+        "Not handling k > n case (should return 0, not error)",
+        "Numerical precision issues with very small probabilities (consider using log-space for production code)",
+        "Rounding too early in intermediate calculations instead of at the end",
+        "Not validating that p is in [0,1] range before computation"
+      ],
+      "hint": "Break the problem into three parts: (1) compute the binomial coefficient using math.comb(n, k) or the factorial formula, (2) compute p**k for the success probability, (3) compute (1-p)**(n-k) for the failure probability. Multiply all three values together. Handle the edge case where k > n by returning 0.",
+      "references": [
+        "Python's math.comb() function for binomial coefficients",
+        "Numerical stability in probability computations",
+        "SciPy's scipy.stats.binom.pmf() for comparison",
+        "Applications: hypothesis testing, confidence intervals, quality control"
+      ]
+    }
+  ]
+}

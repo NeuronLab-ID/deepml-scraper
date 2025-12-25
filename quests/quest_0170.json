@@ -1,0 +1,512 @@
+{
+  "problem_id": 170,
+  "title": "Muon Optimizer Step with Matrix Preconditioning",
+  "category": "Optimization",
+  "difficulty": "medium",
+  "description": "The Muon optimizer is an algorithm that combines momentum with a matrix preconditioning step based on the Newton-Schulz iteration. In this task, you will implement a single Muon optimizer update for a 2D NumPy array of parameters. Your implementation should:\n- Update the momentum using the current gradient and previous momentum.\n- Apply the Newton-Schulz matrix iteration (order 5) to precondition the update direction. This involves normalizing the update, possibly transposing for wide matrices, and running a fixed matrix iteration for a number of steps.\n- Use a scale factor based on the RMS operator norm for stability.\n- Update the parameters using the preconditioned direction, learning rate, and scale.\n\nReturn both the updated parameter matrix and momentum.",
+  "example": {
+    "input": "theta = np.eye(2)\nB = np.zeros((2,2))\ngrad = np.ones((2,2))\neta = 0.1\nmu = 0.9\ntheta_new, B_new = muon_step(theta, B, grad, eta, mu, ns_steps=2)\nprint(np.round(theta_new, 3))",
+    "output": "[[ 0.944 -0.056] [-0.056 0.944]]",
+    "reasoning": "After the momentum and Newton-Schulz preconditioning, the parameters are updated in the direction of the scaled matrix."
+  },
+  "starter_code": "import numpy as np\n\ndef newton_schulz5(G, steps=5, eps=1e-7):\n    # Implement the Newton-Schulz iteration for matrix orthogonalization/preconditioning\n    pass\n\ndef muon_step(theta, B, grad, eta, mu, ns_steps=5, eps=1e-7):\n    \"\"\"\n    theta: np.ndarray, shape (M, N)\n    B: np.ndarray, shape (M, N)\n    grad: np.ndarray, shape (M, N)\n    eta: float (learning rate)\n    mu: float (momentum coefficient)\n    ns_steps: int (Newton-Schulz steps)\n    eps: float (numerical stability)\n    Returns: updated theta, updated B\n    \"\"\"\n    # Implement the Muon optimizer update step\n    pass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Momentum-Based Gradient Updates",
+      "relation_to_problem": "Understanding momentum is essential for the Muon optimizer as it forms the first stage of the update rule, combining past gradients to smooth stochastic optimization and create the base direction before preconditioning.",
+      "prerequisites": [
+        "Basic linear algebra",
+        "Gradient descent",
+        "Vector operations"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical formulation of momentum in optimization",
+        "Implement exponentially weighted moving averages for gradients",
+        "Apply momentum updates to parameter matrices",
+        "Recognize the role of momentum coefficient in optimization dynamics"
+      ],
+      "math_content": {
+        "definition": "**Momentum** is an optimization technique that accumulates an exponentially decaying moving average of past gradients to accelerate convergence. Formally, given a parameter vector $\\theta \\in \\mathbb{R}^d$ and gradient $g_t \\in \\mathbb{R}^d$ at iteration $t$, the momentum vector $M_t \\in \\mathbb{R}^d$ is defined recursively as: $$M_t = \\beta M_{t-1} + (1-\\beta) g_t$$ where $\\beta \\in [0,1)$ is the momentum decay coefficient (typically $\\beta \\in [0.9, 0.99]$), and $M_0 = 0$.",
+        "notation": "$M_t$ = momentum at step $t$, $g_t$ = gradient at step $t$, $\\beta$ = momentum coefficient, $\\theta_t$ = parameters at step $t$",
+        "theorem": "**Momentum Convergence**: For convex quadratic objectives with condition number $\\kappa$, momentum with optimal $\\beta = \\frac{\\sqrt{\\kappa}-1}{\\sqrt{\\kappa}+1}$ achieves convergence rate $O((1-\\frac{1}{\\sqrt{\\kappa}})^t)$, compared to $O((1-\\frac{1}{\\kappa})^t)$ for gradient descent.",
+        "proof_sketch": "Consider the quadratic $f(\\theta) = \\frac{1}{2}\\theta^T A \\theta$ with eigenvalues $\\lambda_{\\min}, \\lambda_{\\max}$. The momentum update can be written as a second-order recurrence relation. Analyzing the characteristic polynomial shows that momentum effectively increases the smallest eigenvalue of the system, improving the condition number from $\\kappa = \\frac{\\lambda_{\\max}}{\\lambda_{\\min}}$ to $\\sqrt{\\kappa}$, yielding the improved rate.",
+        "examples": [
+          "**Example 1**: Given $M_0 = 0$, $g_1 = [1, 2]^T$, $\\beta = 0.9$: $M_1 = 0.9 \\cdot [0,0]^T + 0.1 \\cdot [1,2]^T = [0.1, 0.2]^T$",
+          "**Example 2**: Continuing from Example 1 with $g_2 = [2, 1]^T$: $M_2 = 0.9 \\cdot [0.1, 0.2]^T + 0.1 \\cdot [2, 1]^T = [0.29, 0.28]^T$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Standard Momentum Update",
+          "latex": "$M_t = \\beta M_{t-1} + (1-\\beta) g_t$",
+          "description": "Use this to accumulate gradient information across iterations; the momentum becomes the update direction"
+        },
+        {
+          "name": "Nesterov Momentum Update Direction",
+          "latex": "$U_t = (1-\\beta) g_t + \\beta M_t$",
+          "description": "Alternative formulation that looks ahead; used in Muon to compute the direction before preconditioning"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that updates momentum given the previous momentum, current gradient, and momentum coefficient. This simulates the first stage of the Muon optimizer where gradient information is accumulated.",
+        "function_signature": "def update_momentum(prev_momentum: np.ndarray, gradient: np.ndarray, beta: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef update_momentum(prev_momentum: np.ndarray, gradient: np.ndarray, beta: float) -> np.ndarray:\n    \"\"\"\n    Update momentum using exponentially weighted moving average.\n    \n    Args:\n        prev_momentum: Previous momentum array, shape (M, N)\n        gradient: Current gradient array, shape (M, N)\n        beta: Momentum coefficient in [0, 1)\n    \n    Returns:\n        Updated momentum array, shape (M, N)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "update_momentum(np.zeros((2,2)), np.ones((2,2)), 0.9)",
+            "expected": "[[0.1, 0.1], [0.1, 0.1]]",
+            "explanation": "With zero initial momentum and beta=0.9, the momentum is (1-0.9)*gradient = 0.1*ones"
+          },
+          {
+            "input": "update_momentum(np.array([[0.1, 0.2], [0.3, 0.4]]), np.array([[1.0, 2.0], [3.0, 4.0]]), 0.9)",
+            "expected": "[[0.19, 0.38], [0.57, 0.76]]",
+            "explanation": "Momentum = 0.9*[0.1,0.2,0.3,0.4] + 0.1*[1,2,3,4] = [0.09+0.1, 0.18+0.2, 0.27+0.3, 0.36+0.4]"
+          },
+          {
+            "input": "update_momentum(np.array([[1.0]]), np.array([[0.0]]), 0.5)",
+            "expected": "[[0.5]]",
+            "explanation": "With beta=0.5 and zero gradient, momentum decays by half: 0.5*1.0 + 0.5*0.0 = 0.5"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that beta is applied to the old momentum, not the gradient",
+        "Using beta > 1 or beta < 0, which leads to divergence or incorrect behavior",
+        "Not handling the initial condition M_0 = 0 properly",
+        "Confusing standard momentum with Nesterov momentum formulations"
+      ],
+      "hint": "The momentum at time t is a weighted combination of two terms: the previous momentum scaled by beta, and the current gradient scaled by (1-beta). Think of it as exponential smoothing.",
+      "references": [
+        "Polyak's Heavy Ball Method",
+        "Nesterov Accelerated Gradient",
+        "Exponentially Weighted Moving Averages"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Matrix Norms and Normalization",
+      "relation_to_problem": "The Muon optimizer requires normalizing matrices by their Frobenius norm before applying Newton-Schulz iteration, ensuring numerical stability and proper scaling of the preconditioning step.",
+      "prerequisites": [
+        "Linear algebra",
+        "Vector spaces",
+        "Inner products",
+        "Momentum updates"
+      ],
+      "learning_objectives": [
+        "Understand different matrix norms, particularly the Frobenius norm",
+        "Compute the Frobenius norm efficiently using NumPy operations",
+        "Normalize matrices to unit Frobenius norm",
+        "Recognize the importance of numerical stability through epsilon regularization"
+      ],
+      "math_content": {
+        "definition": "A **matrix norm** is a function $\\|\\cdot\\|: \\mathbb{R}^{m \\times n} \\to \\mathbb{R}_{\\geq 0}$ satisfying: (1) $\\|A\\| = 0 \\iff A = 0$, (2) $\\|\\alpha A\\| = |\\alpha|\\|A\\|$ for scalar $\\alpha$, (3) $\\|A + B\\| \\leq \\|A\\| + \\|B\\|$. The **Frobenius norm** is defined as: $$\\|A\\|_F = \\sqrt{\\sum_{i=1}^{m}\\sum_{j=1}^{n} |a_{ij}|^2} = \\sqrt{\\text{tr}(A^T A)} = \\sqrt{\\sum_{i=1}^{\\min(m,n)} \\sigma_i^2}$$ where $\\sigma_i$ are the singular values of $A$. It is the matrix analogue of the Euclidean norm for vectors.",
+        "notation": "$\\|A\\|_F$ = Frobenius norm of matrix $A$, $a_{ij}$ = entry at row $i$, column $j$, $\\sigma_i$ = $i$-th singular value, $\\text{tr}(\\cdot)$ = matrix trace",
+        "theorem": "**Frobenius Norm Properties**: For matrices $A, B \\in \\mathbb{R}^{m \\times n}$ and orthogonal matrices $Q \\in \\mathbb{R}^{m \\times m}$, $P \\in \\mathbb{R}^{n \\times n}$: (1) $\\|A\\|_F^2 = \\text{tr}(A^T A) = \\text{tr}(A A^T)$, (2) $\\|QAP\\|_F = \\|A\\|_F$ (orthogonal invariance), (3) $\\|A + B\\|_F \\leq \\|A\\|_F + \\|B\\|_F$ (triangle inequality), (4) $|\\langle A, B \\rangle_F| \\leq \\|A\\|_F \\|B\\|_F$ where $\\langle A, B \\rangle_F = \\text{tr}(A^T B)$ (Cauchy-Schwarz).",
+        "proof_sketch": "Property (1) follows directly from the definition: $\\|A\\|_F^2 = \\sum_{i,j} a_{ij}^2 = \\sum_i (A^T A)_{ii} = \\text{tr}(A^T A)$. Property (2) uses the cyclic property of trace and the fact that $Q^TQ = I$: $\\|QAP\\|_F^2 = \\text{tr}(P^T A^T Q^T Q A P) = \\text{tr}(P^T A^T A P) = \\text{tr}(A^T A P P^T) = \\text{tr}(A^T A) = \\|A\\|_F^2$. The triangle inequality follows from viewing the Frobenius norm as the Euclidean norm on the vectorized matrix.",
+        "examples": [
+          "**Example 1**: For $A = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix}$: $\\|A\\|_F = \\sqrt{1^2 + 2^2 + 3^2 + 4^2} = \\sqrt{30} \\approx 5.477$",
+          "**Example 2**: For identity matrix $I_n$: $\\|I_n\\|_F = \\sqrt{n}$ since $\\text{tr}(I_n^T I_n) = \\text{tr}(I_n) = n$",
+          "**Example 3**: Normalized matrix: $\\hat{A} = \\frac{A}{\\|A\\|_F + \\varepsilon}$ where $\\varepsilon = 10^{-7}$ ensures $\\|\\hat{A}\\|_F \\approx 1$ while avoiding division by zero"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Frobenius Norm Computation",
+          "latex": "$\\|A\\|_F = \\sqrt{\\sum_{i,j} a_{ij}^2}$",
+          "description": "Compute this by summing squares of all matrix entries and taking the square root"
+        },
+        {
+          "name": "Matrix Normalization with Stability",
+          "latex": "$\\hat{A} = \\frac{A}{\\|A\\|_F + \\varepsilon}$",
+          "description": "Normalize matrix to unit norm; epsilon prevents division by zero for zero matrices"
+        },
+        {
+          "name": "Trace Formulation",
+          "latex": "$\\|A\\|_F = \\sqrt{\\text{tr}(A^T A)}$",
+          "description": "Alternative computation using matrix trace; useful for theoretical analysis"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the Frobenius norm of a matrix and normalizes it to unit norm with epsilon regularization. This prepares matrices for the Newton-Schulz iteration in the Muon optimizer.",
+        "function_signature": "def normalize_frobenius(matrix: np.ndarray, eps: float = 1e-7) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef normalize_frobenius(matrix: np.ndarray, eps: float = 1e-7) -> np.ndarray:\n    \"\"\"\n    Normalize a matrix by its Frobenius norm with epsilon for stability.\n    \n    Args:\n        matrix: Input matrix, shape (M, N)\n        eps: Small constant for numerical stability\n    \n    Returns:\n        Normalized matrix with Frobenius norm approximately 1\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "normalize_frobenius(np.array([[3.0, 4.0]]))",
+            "expected": "[[0.6, 0.8]]",
+            "explanation": "Frobenius norm is sqrt(9+16)=5, so normalized matrix is [3/5, 4/5] = [0.6, 0.8]"
+          },
+          {
+            "input": "normalize_frobenius(np.eye(2))",
+            "expected": "[[0.7071, 0.0], [0.0, 0.7071]]",
+            "explanation": "Identity matrix has Frobenius norm sqrt(2), so each diagonal element becomes 1/sqrt(2) ≈ 0.7071"
+          },
+          {
+            "input": "normalize_frobenius(np.zeros((2,2)), eps=1e-7)",
+            "expected": "[[0.0, 0.0], [0.0, 0.0]]",
+            "explanation": "Zero matrix stays zero; epsilon prevents division by zero: 0/(0+1e-7) ≈ 0"
+          },
+          {
+            "input": "normalize_frobenius(np.array([[1.0, 1.0], [1.0, 1.0]]))",
+            "expected": "[[0.5, 0.5], [0.5, 0.5]]",
+            "explanation": "Frobenius norm is sqrt(4)=2, so each element becomes 1/2 = 0.5"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using other norms (spectral norm, entry-wise max) instead of Frobenius norm",
+        "Forgetting the square root in the Frobenius norm computation",
+        "Not adding epsilon to the denominator, causing division by zero",
+        "Computing norm incorrectly for multi-dimensional arrays (not flattening properly)",
+        "Adding epsilon to the numerator instead of the denominator"
+      ],
+      "hint": "The Frobenius norm can be computed efficiently using np.linalg.norm with the appropriate parameter, or by using np.sqrt(np.sum(matrix**2)). Add epsilon to the denominator before division.",
+      "references": [
+        "Matrix Norms",
+        "Frobenius Inner Product",
+        "Numerical Stability in Matrix Computations"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Matrix Multiplication and Gram Matrices",
+      "relation_to_problem": "The Newton-Schulz iteration requires computing products like $X X^T$ (Gram matrices), which are fundamental matrix operations needed to iteratively refine the preconditioner in the Muon optimizer.",
+      "prerequisites": [
+        "Matrix operations",
+        "Linear transformations",
+        "Matrix norms",
+        "Momentum updates"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical properties of Gram matrices",
+        "Compute matrix products and transposes efficiently",
+        "Recognize when to use $X X^T$ versus $X^T X$ based on matrix dimensions",
+        "Apply matrix multiplication in iterative algorithms"
+      ],
+      "math_content": {
+        "definition": "For a matrix $X \\in \\mathbb{R}^{m \\times n}$, the **Gram matrix** is defined as $G = X^T X \\in \\mathbb{R}^{n \\times n}$ or $G = X X^T \\in \\mathbb{R}^{m \\times m}$. The Gram matrix captures inner products between columns (for $X^T X$) or rows (for $X X^T$): $(X^T X)_{ij} = \\langle x_i, x_j \\rangle$ where $x_i$ is the $i$-th column of $X$. The Gram matrix is always **symmetric positive semi-definite**: $G^T = G$ and $v^T G v \\geq 0$ for all $v$.",
+        "notation": "$X \\in \\mathbb{R}^{m \\times n}$ = input matrix, $X^T$ = transpose, $G = XX^T$ = Gram matrix, $\\langle \\cdot, \\cdot \\rangle$ = inner product",
+        "theorem": "**Gram Matrix Properties**: For $X \\in \\mathbb{R}^{m \\times n}$ with rank $r$: (1) $G = XX^T$ is symmetric: $G^T = (XX^T)^T = XX^T = G$, (2) $G$ is positive semi-definite: for any $v \\in \\mathbb{R}^m$, $v^T G v = v^T X X^T v = \\|X^T v\\|^2 \\geq 0$, (3) $\\text{rank}(G) = r = \\min(m,n, \\text{rank}(X))$, (4) Eigenvalues of $XX^T$ and $X^TX$ are identical (except for zeros), related to squared singular values: $\\lambda_i(XX^T) = \\sigma_i^2(X)$ for $i \\leq r$.",
+        "proof_sketch": "Symmetry (1) follows from $(AB)^T = B^T A^T$. For positive semi-definiteness (2), let $w = X^T v$; then $v^T XX^T v = w^T w = \\sum_i w_i^2 \\geq 0$. For rank (3), note that $\\text{rank}(XX^T) = \\text{rank}(X)$ since $\\ker(X) = \\ker(XX^T)$. Property (4) follows from SVD: if $X = U\\Sigma V^T$, then $XX^T = U\\Sigma^2 U^T$ and $X^TX = V\\Sigma^2 V^T$, showing both have eigenvalues $\\sigma_i^2$.",
+        "examples": [
+          "**Example 1**: For $X = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix}$, $G = XX^T = \\begin{bmatrix} 5 & 11 \\\\ 11 & 25 \\end{bmatrix}$. Note $G^T = G$ and eigenvalues are $\\approx 29.87, 0.13 > 0$.",
+          "**Example 2**: For orthonormal columns, $X^TX = I$. If $X \\in \\mathbb{R}^{3\\times 2}$ has orthonormal columns, then $X^TX = I_2$ but $XX^T \\neq I_3$.",
+          "**Example 3**: For tall matrices ($m > n$), use $X^TX \\in \\mathbb{R}^{n\\times n}$ (smaller). For wide matrices ($m < n$), use $XX^T \\in \\mathbb{R}^{m \\times m}$ (smaller)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gram Matrix (Row Space)",
+          "latex": "$G = XX^T \\in \\mathbb{R}^{m \\times m}$",
+          "description": "Use for wide matrices (m < n) to reduce computation; captures row inner products"
+        },
+        {
+          "name": "Gram Matrix (Column Space)",
+          "latex": "$G = X^TX \\in \\mathbb{R}^{n \\times n}$",
+          "description": "Use for tall matrices (m > n) to reduce computation; captures column inner products"
+        },
+        {
+          "name": "Quadratic Form",
+          "latex": "$v^T (XX^T) v = \\|X^T v\\|^2$",
+          "description": "Shows positive semi-definiteness; useful for understanding energy in optimization"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the appropriate Gram matrix for a given matrix, choosing $XX^T$ or $X^TX$ based on dimensions to minimize computation. This is a key operation in the Newton-Schulz iteration.",
+        "function_signature": "def compute_gram_matrix(X: np.ndarray, use_left: bool = True) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_gram_matrix(X: np.ndarray, use_left: bool = True) -> np.ndarray:\n    \"\"\"\n    Compute Gram matrix, choosing XX^T or X^TX based on flag.\n    \n    Args:\n        X: Input matrix, shape (M, N)\n        use_left: If True, compute XX^T; if False, compute X^TX\n    \n    Returns:\n        Gram matrix, shape (M, M) if use_left=True, else (N, N)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_gram_matrix(np.array([[1, 2], [3, 4]]), use_left=True)",
+            "expected": "[[5, 11], [11, 25]]",
+            "explanation": "XX^T = [[1,2],[3,4]] @ [[1,3],[2,4]] = [[1+4, 3+8],[3+8, 9+16]] = [[5,11],[11,25]]"
+          },
+          {
+            "input": "compute_gram_matrix(np.array([[1, 2], [3, 4]]), use_left=False)",
+            "expected": "[[10, 14], [14, 20]]",
+            "explanation": "X^TX = [[1,3],[2,4]] @ [[1,2],[3,4]] = [[1+9, 2+12],[3+12, 4+16]] = [[10,14],[14,20]]"
+          },
+          {
+            "input": "compute_gram_matrix(np.array([[1, 0], [0, 1]]), use_left=True)",
+            "expected": "[[1, 0], [0, 1]]",
+            "explanation": "For identity matrix, XX^T = X^TX = I"
+          },
+          {
+            "input": "compute_gram_matrix(np.array([[2.0]]), use_left=True)",
+            "expected": "[[4.0]]",
+            "explanation": "For single element, XX^T = 2*2 = 4"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Multiplying in wrong order (X^T X vs X X^T) based on the problem requirement",
+        "Not considering computational efficiency (always computing the larger matrix)",
+        "Forgetting that Gram matrices are always square and symmetric",
+        "Assuming XX^T equals X^TX (only true for square orthogonal matrices)",
+        "Not checking matrix dimensions before multiplication"
+      ],
+      "hint": "Use np.dot() or @ operator for matrix multiplication. Remember that for X with shape (m,n), XX^T has shape (m,m) and X^TX has shape (n,n). The transpose is X.T in NumPy.",
+      "references": [
+        "Gram-Schmidt Process",
+        "Positive Definite Matrices",
+        "Matrix Factorizations",
+        "Computational Complexity of Matrix Operations"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Polynomial Matrix Iterations and Newton-Schulz Order 5",
+      "relation_to_problem": "The core of Muon's preconditioning uses a quintic (order 5) Newton-Schulz iteration with specific polynomial coefficients to rapidly approximate an orthogonalization-like transformation of the update direction.",
+      "prerequisites": [
+        "Matrix multiplication",
+        "Gram matrices",
+        "Matrix polynomials",
+        "Iterative algorithms"
+      ],
+      "learning_objectives": [
+        "Understand the Newton-Schulz iteration as a matrix polynomial recursion",
+        "Implement the quintic (order 5) Newton-Schulz formula with fixed coefficients",
+        "Apply iterative refinement to matrices for preconditioning",
+        "Recognize convergence properties and the role of polynomial coefficients"
+      ],
+      "math_content": {
+        "definition": "The **Newton-Schulz iteration** is a matrix iteration scheme for computing matrix functions, particularly for approximating the matrix sign function or polar decomposition. For a matrix $X_0$ with $\\|X_0\\|_2 < 1$, the **quintic (order 5) Newton-Schulz iteration** is defined recursively as: $$A_k = X_k X_k^T$$ $$B_k = b \\cdot A_k + c \\cdot (A_k A_k)$$ $$X_{k+1} = a \\cdot X_k + B_k X_k$$ with coefficients $a = 3.4445$, $b = -4.7750$, $c = 2.0315$. This iteration refines $X_k$ to approximate an orthogonal-like matrix that serves as a preconditioner.",
+        "notation": "$X_k$ = matrix iterate at step $k$, $A_k = X_k X_k^T$ = Gram matrix, $a, b, c$ = polynomial coefficients, $X_0$ = normalized input matrix",
+        "theorem": "**Newton-Schulz Convergence**: For the quintic Newton-Schulz iteration with properly chosen coefficients, if $X_0$ satisfies $\\|I - X_0 X_0^T\\| < 1$, then the sequence $\\{X_k\\}$ converges quintically (order 5) to a matrix $X_\\infty$ such that $X_\\infty X_\\infty^T = I$ (orthogonality condition). The convergence rate satisfies $\\|I - X_{k+1}X_{k+1}^T\\| \\leq C \\|I - X_k X_k^T\\|^5$ for some constant $C$, meaning the error decreases by the 5th power at each iteration.",
+        "proof_sketch": "The Newton-Schulz iteration is derived from Newton's method applied to the matrix equation $f(X) = X^{-1} - X^T = 0$ (for orthogonality $XX^T = I$). Standard Newton's method gives $X_{k+1} = X_k - f'(X_k)^{-1}f(X_k)$. By expanding and simplifying using matrix calculus, and applying polynomial approximations to accelerate convergence, we obtain the quintic formula. The specific coefficients $a, b, c$ are chosen to minimize the error term in the Taylor expansion of $\\|I - X_{k+1}X_{k+1}^T\\|$, yielding 5th-order convergence. The proof requires analyzing the polynomial $p(\\lambda) = a + (b + c\\lambda)\\lambda$ and ensuring it approximates $1/\\sqrt{\\lambda}$ near $\\lambda = 1$.",
+        "examples": [
+          "**Example 1**: Start with $X_0 = \\begin{bmatrix} 0.8 & 0.2 \\\\ 0.2 & 0.8 \\end{bmatrix}$ (already somewhat orthogonal). After one iteration with quintic formula, $X_1$ will be closer to an orthogonal matrix.",
+          "**Example 2**: For a normalized random matrix, typically 3-5 iterations are sufficient to achieve $\\|I - X_k X_k^T\\| < 10^{-6}$.",
+          "**Example 3**: The polynomial structure $X_{k+1} = (a + b\\lambda_k + c\\lambda_k^2) X_k$ where $\\lambda_k$ represents $X_k X_k^T$ shows how the iteration refines based on how far $X_k$ is from orthogonality."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gram Matrix Computation",
+          "latex": "$A = XX^T$",
+          "description": "First compute the Gram matrix to assess current orthogonality"
+        },
+        {
+          "name": "Polynomial Combination",
+          "latex": "$B = b \\cdot A + c \\cdot (AA)$",
+          "description": "Combine linear and quadratic terms of Gram matrix with specific coefficients"
+        },
+        {
+          "name": "Quintic Update",
+          "latex": "$X_{\\text{new}} = a \\cdot X + BX$",
+          "description": "Update matrix using polynomial weighting: a=3.4445, b=-4.7750, c=2.0315"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the quintic Newton-Schulz iteration that applies the fixed polynomial formula for a specified number of steps. This function will become the core preconditioning operation in the Muon optimizer.",
+        "function_signature": "def newton_schulz_iteration(X: np.ndarray, steps: int = 5) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef newton_schulz_iteration(X: np.ndarray, steps: int = 5) -> np.ndarray:\n    \"\"\"\n    Apply quintic Newton-Schulz iteration for matrix preconditioning.\n    \n    Args:\n        X: Normalized input matrix, shape (M, N)\n        steps: Number of iteration steps (typically 5)\n    \n    Returns:\n        Preconditioned matrix after iterations, shape (M, N)\n    \"\"\"\n    # Coefficients for quintic Newton-Schulz\n    a = 3.4445\n    b = -4.7750\n    c = 2.0315\n    \n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "newton_schulz_iteration(np.eye(2) / np.sqrt(2), steps=1)",
+            "expected": "[[0.7071, 0.0], [0.0, 0.7071]] (approximately)",
+            "explanation": "Normalized identity is already orthogonal, so iteration should preserve it approximately"
+          },
+          {
+            "input": "newton_schulz_iteration(np.array([[0.9, 0.1], [0.1, 0.9]]), steps=2)",
+            "expected": "Matrix closer to orthogonal form after 2 iterations",
+            "explanation": "Input is near-orthogonal; iterations refine toward true orthogonality"
+          },
+          {
+            "input": "newton_schulz_iteration(np.array([[1.0, 0.0]]), steps=3)",
+            "expected": "[[1.0, 0.0]] (approximately)",
+            "explanation": "Single-row matrix with unit norm remains stable under iteration"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using wrong coefficient values (e.g., confusing a, b, c or using default values like 1.0)",
+        "Computing A = X^T X instead of A = X X^T for the Gram matrix",
+        "Forgetting to multiply B by X in the final step: should be BX not B",
+        "Not iterating the specified number of steps (must loop 'steps' times)",
+        "Computing AA (matrix square) incorrectly or inefficiently",
+        "Applying the update formula in wrong order (e.g., computing B after using X)"
+      ],
+      "hint": "For each iteration: (1) compute A = X @ X.T, (2) compute AA = A @ A, (3) compute B = b*A + c*AA, (4) update X = a*X + B @ X. Repeat this process 'steps' times, updating X each iteration.",
+      "references": [
+        "Newton-Schulz Iteration",
+        "Matrix Sign Function",
+        "Polar Decomposition",
+        "High-Order Matrix Iterations"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Scale Factors and RMS Operator Norms",
+      "relation_to_problem": "The Muon optimizer uses an RMS-based scale factor to ensure the preconditioned update has appropriate magnitude, preventing instability from the Newton-Schulz transformation distorting the step size.",
+      "prerequisites": [
+        "Matrix norms",
+        "Frobenius norm",
+        "Newton-Schulz iteration",
+        "Numerical stability"
+      ],
+      "learning_objectives": [
+        "Understand the relationship between Frobenius norm and operator norms",
+        "Compute RMS (root mean square) operator norm approximations",
+        "Apply scaling factors to maintain update magnitude",
+        "Recognize the role of scale factors in optimizer stability"
+      ],
+      "math_content": {
+        "definition": "The **operator norm** (or spectral norm) of a matrix $A \\in \\mathbb{R}^{m \\times n}$ is defined as: $$\\|A\\|_2 = \\max_{\\|x\\|_2=1} \\|Ax\\|_2 = \\sigma_{\\max}(A)$$ where $\\sigma_{\\max}(A)$ is the largest singular value of $A$. The **RMS operator norm** is an approximation: $$\\|A\\|_{\\text{RMS}} = \\frac{\\|A\\|_F}{\\sqrt{\\min(m,n)}}$$ This provides a computationally cheap approximation to the operator norm, useful for scaling in optimization. For preconditioning, we compute a **scale factor** $s = \\|A\\|_{\\text{RMS}}$ before Newton-Schulz, then rescale the output by $s$ to preserve update magnitude.",
+        "notation": "$\\|A\\|_2$ = operator/spectral norm, $\\sigma_{\\max}$ = largest singular value, $\\|A\\|_F$ = Frobenius norm, $\\|A\\|_{\\text{RMS}}$ = RMS operator norm, $s$ = scale factor",
+        "theorem": "**Norm Relationships**: For $A \\in \\mathbb{R}^{m \\times n}$ with $r = \\min(m,n)$: (1) $\\|A\\|_2 \\leq \\|A\\|_F \\leq \\sqrt{r} \\cdot \\|A\\|_2$, (2) If all singular values are equal (uniform spectrum), then $\\|A\\|_F = \\sqrt{r} \\cdot \\|A\\|_2$, making $\\|A\\|_{\\text{RMS}} = \\|A\\|_2$ exactly, (3) For general matrices, $\\|A\\|_{\\text{RMS}}$ provides a scale factor that is order-of-magnitude correct for the typical operator norm.",
+        "proof_sketch": "For (1): The Frobenius norm satisfies $\\|A\\|_F^2 = \\sum_{i=1}^r \\sigma_i^2$. Since $\\sigma_{\\max} = \\max_i \\sigma_i$, we have $\\sigma_{\\max}^2 \\leq \\sum_i \\sigma_i^2 \\leq r \\cdot \\sigma_{\\max}^2$, giving $\\sigma_{\\max} \\leq \\|A\\|_F \\leq \\sqrt{r} \\cdot \\sigma_{\\max}$. Dividing by $\\sqrt{r}$ yields $\\frac{\\sigma_{\\max}}{\\sqrt{r}} \\leq \\|A\\|_{\\text{RMS}} \\leq \\sigma_{\\max}$. For (2): if all $\\sigma_i = \\sigma$, then $\\|A\\|_F = \\sqrt{r\\sigma^2} = \\sqrt{r}\\sigma$ and $\\|A\\|_2 = \\sigma$, so $\\|A\\|_{\\text{RMS}} = \\sigma$.",
+        "examples": [
+          "**Example 1**: For $A = \\begin{bmatrix} 3 & 0 \\\\ 0 & 4 \\end{bmatrix}$, $\\|A\\|_F = 5$, $r = 2$, so $\\|A\\|_{\\text{RMS}} = 5/\\sqrt{2} \\approx 3.536$. The true operator norm is $\\|A\\|_2 = 4$.",
+          "**Example 2**: For identity $I_n$, $\\|I_n\\|_F = \\sqrt{n}$, so $\\|I_n\\|_{\\text{RMS}} = \\sqrt{n}/\\sqrt{n} = 1 = \\|I_n\\|_2$ (exact).",
+          "**Example 3**: In Muon, if update matrix $U$ has $\\|U\\|_{\\text{RMS}} = 0.5$, we scale by this factor: after Newton-Schulz gives $X$ with $\\|X\\|_2 \\approx 1$, we compute $0.5 \\cdot X$ to maintain the original magnitude."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "RMS Operator Norm",
+          "latex": "$\\|A\\|_{\\text{RMS}} = \\frac{\\|A\\|_F}{\\sqrt{\\min(m,n)}}$",
+          "description": "Compute this as a fast approximation to the spectral norm for scaling"
+        },
+        {
+          "name": "Scale Factor Computation",
+          "latex": "$s = \\|U\\|_{\\text{RMS}}$ before normalization",
+          "description": "Store this scale before normalizing; multiply result by s after Newton-Schulz"
+        },
+        {
+          "name": "Scaled Update",
+          "latex": "$U_{\\text{final}} = s \\cdot X_{\\text{NS}}$",
+          "description": "After Newton-Schulz produces X_NS, rescale by original magnitude s"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the RMS operator norm of a matrix, which serves as the scale factor in Muon before applying Newton-Schulz normalization and after to restore magnitude.",
+        "function_signature": "def compute_rms_norm(matrix: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_rms_norm(matrix: np.ndarray) -> float:\n    \"\"\"\n    Compute the RMS operator norm approximation.\n    \n    Args:\n        matrix: Input matrix, shape (M, N)\n    \n    Returns:\n        RMS operator norm (scalar)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_rms_norm(np.array([[3.0, 4.0]]))",
+            "expected": "5.0",
+            "explanation": "Frobenius norm is 5, min dimension is 1, so RMS = 5/sqrt(1) = 5"
+          },
+          {
+            "input": "compute_rms_norm(np.eye(3))",
+            "expected": "1.0",
+            "explanation": "Identity has Frobenius norm sqrt(3), min dimension 3, so RMS = sqrt(3)/sqrt(3) = 1"
+          },
+          {
+            "input": "compute_rms_norm(np.array([[1.0, 0.0], [0.0, 2.0]]))",
+            "expected": "1.5811",
+            "explanation": "Frobenius norm = sqrt(5) ≈ 2.236, min dimension = 2, RMS = 2.236/sqrt(2) ≈ 1.581"
+          },
+          {
+            "input": "compute_rms_norm(np.zeros((2, 3)))",
+            "expected": "0.0",
+            "explanation": "Zero matrix has Frobenius norm 0, so RMS = 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using max(m,n) instead of min(m,n) in the denominator",
+        "Forgetting to take the square root of min(m,n)",
+        "Computing operator norm via SVD instead of using the RMS approximation",
+        "Not storing the scale factor before normalization in the full algorithm",
+        "Applying scale factor before Newton-Schulz instead of after"
+      ],
+      "hint": "First compute the Frobenius norm, then divide by the square root of the minimum dimension. Use matrix.shape to get dimensions m and n.",
+      "references": [
+        "Matrix Norms",
+        "Singular Value Decomposition",
+        "Spectral Norm",
+        "Numerical Scaling in Optimization"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Muon Optimizer Update Integration",
+      "relation_to_problem": "This final sub-quest integrates all previous components—momentum, normalization, Newton-Schulz iteration, and scaling—into the complete Muon optimizer step that updates parameters with matrix preconditioning.",
+      "prerequisites": [
+        "Momentum updates",
+        "Matrix normalization",
+        "Newton-Schulz iteration",
+        "RMS scaling",
+        "All previous sub-quests"
+      ],
+      "learning_objectives": [
+        "Integrate momentum computation with matrix preconditioning",
+        "Apply the complete Muon algorithm pipeline in correct order",
+        "Handle numerical stability through epsilon regularization",
+        "Update both parameters and momentum state consistently",
+        "Understand the complete optimization step for matrix-valued parameters"
+      ],
+      "math_content": {
+        "definition": "The **Muon optimizer update** for a parameter matrix $\\theta_t \\in \\mathbb{R}^{m \\times n}$ combines momentum-based gradient accumulation with Newton-Schulz matrix preconditioning. Given gradient $g_t$, momentum $M_{t-1}$, learning rate $\\eta$, and momentum coefficient $\\beta$, the update proceeds as: (1) **Momentum Update**: $M_t = \\beta M_{t-1} + (1-\\beta) g_t$, (2) **Scale Extraction**: $s = \\frac{\\|M_t\\|_F}{\\sqrt{\\min(m,n)}}$, (3) **Normalization**: $X_0 = \\frac{M_t}{\\|M_t\\|_F + \\varepsilon}$, (4) **Preconditioning**: $X_k = \\text{NewtonSchulz}(X_0, k_{\\text{steps}})$ via quintic iteration, (5) **Rescaling**: $U = s \\cdot X_k$, (6) **Parameter Update**: $\\theta_{t+1} = \\theta_t - \\eta \\cdot U$. This produces updated parameters $\\theta_{t+1}$ and momentum state $M_t$.",
+        "notation": "$\\theta_t$ = parameters at step $t$, $M_t$ = momentum, $g_t$ = gradient, $\\eta$ = learning rate, $\\beta$ = momentum coefficient, $s$ = scale factor, $X_k$ = preconditioned direction, $U$ = final update direction, $\\varepsilon$ = stability constant",
+        "theorem": "**Muon Convergence Properties**: Under standard convexity assumptions and appropriate learning rate schedule, the Muon optimizer achieves convergence rates comparable to second-order methods while maintaining computational efficiency closer to first-order methods. Specifically: (1) The Newton-Schulz preconditioning approximates the effect of multiplying by $\\sqrt{H^{-1}}$ where $H$ is a layer-wise approximation of the Hessian, (2) The momentum provides variance reduction similar to Adam, (3) The combination yields faster convergence on ill-conditioned problems compared to SGD or Adam, (4) The quintic convergence of Newton-Schulz means 5 steps typically suffice for good preconditioning quality.",
+        "proof_sketch": "The Muon update can be viewed as an approximation to natural gradient descent with a specific metric. The Newton-Schulz iteration computes a matrix $X$ such that $XX^T \\approx I$, effectively decorrelating the gradient components. This is equivalent to whitening the update direction. In the limit of perfect Newton-Schulz convergence, the update becomes $\\theta_{t+1} = \\theta_t - \\eta \\|M_t\\|_{\\text{RMS}} \\cdot Q$ where $Q$ is orthogonal, meaning all directions are treated equally (affine invariance). Combined with momentum's exponential averaging, this provides both variance reduction and adaptive per-layer preconditioning, yielding the stated convergence properties.",
+        "examples": [
+          "**Example 1**: Given $\\theta = I_2$, $M = 0$, $g = \\mathbf{1}$ (all ones), $\\eta = 0.1$, $\\beta = 0.9$: (1) $M_1 = 0.1 \\cdot \\mathbf{1}$, (2) $s = \\frac{0.2}{\\sqrt{2}} \\approx 0.1414$, (3) $X_0 = \\frac{\\mathbf{1}}{2}$, (4) Apply 5 Newton-Schulz steps to get $X_5$, (5) $U = 0.1414 \\cdot X_5$, (6) $\\theta_1 = I_2 - 0.1 \\cdot U$.",
+          "**Example 2**: For gradient $g = \\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}$ and high momentum $\\beta=0.99$, momentum dominates: after many steps, $M_t \\approx \\frac{1-\\beta}{1-\\beta}g = g$ in expectation, and the preconditioning refines the direction.",
+          "**Example 3**: With zero gradient ($g=0$), momentum decays: $M_t = \\beta^t M_0$, and no parameter update occurs if $M_t \\to 0$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Muon Update Pipeline",
+          "latex": "$\\theta_{t+1} = \\theta_t - \\eta \\cdot s \\cdot \\text{NS}\\left(\\frac{M_t}{\\|M_t\\|_F + \\varepsilon}\\right)$",
+          "description": "Full update combining all components: momentum M_t, normalization, Newton-Schulz (NS), scale s, learning rate η"
+        },
+        {
+          "name": "Momentum State Update",
+          "latex": "$M_t = \\beta M_{t-1} + (1-\\beta) g_t$",
+          "description": "Update momentum state to return alongside updated parameters"
+        },
+        {
+          "name": "Scale-Normalize-Precondition Pattern",
+          "latex": "$s = \\|M\\|_{\\text{RMS}}, \\quad X = \\text{NS}(M/\\|M\\|_F), \\quad U = s \\cdot X$",
+          "description": "Key pattern: extract scale, normalize, apply NS iteration, restore scale"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete Muon optimizer step that takes current parameters, momentum state, and gradient, and returns updated parameters and momentum. This integrates all previous sub-quests into a working optimizer update.",
+        "function_signature": "def muon_optimizer_step(theta: np.ndarray, momentum: np.ndarray, gradient: np.ndarray, learning_rate: float, beta: float, ns_steps: int = 5, eps: float = 1e-7) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef muon_optimizer_step(theta: np.ndarray, momentum: np.ndarray, gradient: np.ndarray, \n                        learning_rate: float, beta: float, ns_steps: int = 5, \n                        eps: float = 1e-7) -> tuple:\n    \"\"\"\n    Perform a complete Muon optimizer step.\n    \n    Args:\n        theta: Current parameters, shape (M, N)\n        momentum: Previous momentum, shape (M, N)\n        gradient: Current gradient, shape (M, N)\n        learning_rate: Learning rate (eta)\n        beta: Momentum coefficient (mu)\n        ns_steps: Number of Newton-Schulz iterations\n        eps: Numerical stability constant\n    \n    Returns:\n        (updated_theta, updated_momentum): Both with shape (M, N)\n    \"\"\"\n    # Step 1: Update momentum\n    # Your code here\n    \n    # Step 2: Compute RMS scale factor\n    # Your code here\n    \n    # Step 3: Normalize momentum by Frobenius norm\n    # Your code here\n    \n    # Step 4: Apply Newton-Schulz iteration (quintic, order 5)\n    # Your code here\n    \n    # Step 5: Rescale by original RMS scale\n    # Your code here\n    \n    # Step 6: Update parameters\n    # Your code here\n    \n    pass",
+        "test_cases": [
+          {
+            "input": "muon_optimizer_step(np.eye(2), np.zeros((2,2)), np.ones((2,2)), 0.1, 0.9, ns_steps=2, eps=1e-7)",
+            "expected": "(array with values near [[0.944, -0.056], [-0.056, 0.944]]), array([[0.1, 0.1], [0.1, 0.1]])",
+            "explanation": "Starting from identity with zero momentum and ones gradient at lr=0.1, beta=0.9, after momentum update and 2 NS steps, parameters move toward preconditioned direction"
+          },
+          {
+            "input": "muon_optimizer_step(np.zeros((2,2)), np.zeros((2,2)), np.zeros((2,2)), 0.1, 0.9)",
+            "expected": "(np.zeros((2,2)), np.zeros((2,2)))",
+            "explanation": "Zero gradient and momentum produce no update; parameters and momentum remain zero"
+          },
+          {
+            "input": "muon_optimizer_step(np.array([[1.0, 2.0]]), np.array([[0.05, 0.1]]), np.array([[1.0, 1.0]]), 0.01, 0.5, ns_steps=3)",
+            "expected": "(updated parameters reflecting small step, momentum around [[0.525, 0.55]])",
+            "explanation": "With beta=0.5, momentum is 0.5*old + 0.5*gradient; small learning rate produces small update"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Applying Newton-Schulz before normalizing (must normalize first)",
+        "Forgetting to multiply by scale factor after Newton-Schulz",
+        "Not returning the updated momentum state (need to return both theta and momentum)",
+        "Using gradient directly instead of momentum for the update direction",
+        "Applying learning rate before preconditioning instead of after",
+        "Not handling the case where momentum norm is zero (division by zero without eps)",
+        "Computing RMS norm after normalization instead of before"
+      ],
+      "hint": "Follow the pipeline exactly: (1) update momentum, (2) save RMS scale of momentum, (3) normalize momentum by Frobenius norm with eps, (4) apply Newton-Schulz, (5) multiply result by saved scale, (6) update theta by subtracting learning_rate * scaled_result. Return both new theta and new momentum.",
+      "references": [
+        "Muon Optimizer Paper",
+        "Matrix Preconditioning in Deep Learning",
+        "Second-Order Optimization Methods",
+        "Newton-Schulz Applications",
+        "Momentum and Adaptive Learning Rates"
+      ]
+    }
+  ]
+}

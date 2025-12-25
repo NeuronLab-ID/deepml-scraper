@@ -1,0 +1,461 @@
+{
+  "problem_id": 12,
+  "title": "Singular Value Decomposition (SVD) of 2x2 Matrix",
+  "category": "Linear Algebra",
+  "difficulty": "hard",
+  "description": "Write a Python function that computes an approximate Singular Value Decomposition (SVD) of a real 2×2 matrix using one Jacobi rotation.\n\n**Input:**\n- `A`: a NumPy array of shape (2, 2)\n\n**Rules:**\n- You may use basic NumPy operations (matrix multiplication, transpose, element-wise math, etc.)\n- Do NOT call `numpy.linalg.svd` or any other high-level SVD routine\n- Use a single Jacobi rotation step (no iterative refinements)\n\n**Return:**\nA tuple `(U, S, Vt)` where:\n- `U` is a 2×2 orthogonal matrix (left singular vectors)\n- `S` is a length-2 NumPy array containing the singular values\n- `Vt` is the transpose of the right singular vector matrix V\n\nThe decomposition should satisfy: A ≈ U @ diag(S) @ Vt",
+  "example": {
+    "input": "A = np.array([[2, 1], [1, 2]])",
+    "output": "U ≈ [[0.707, -0.707], [0.707, 0.707]]\nS = [3.0, 1.0]\nVt ≈ [[0.707, 0.707], [-0.707, 0.707]]",
+    "reasoning": "The symmetric matrix [[2,1],[1,2]] has eigenvalues 3 and 1. Since it's symmetric, the SVD simplifies: the singular values equal the absolute eigenvalues, and U, V are related to the eigenvectors. The decomposition satisfies A = U @ diag(S) @ Vt."
+  },
+  "starter_code": "import numpy as np\n\ndef svd_2x2_singular_values(A: np.ndarray) -> tuple:\n    \"\"\"\n    Compute SVD of a 2x2 matrix using one Jacobi rotation.\n    \n    Args:\n        A: A 2x2 numpy array\n    \n    Returns:\n        Tuple (U, S, Vt) where A ≈ U @ diag(S) @ Vt\n        - U: 2x2 orthogonal matrix\n        - S: length-2 array of singular values\n        - Vt: 2x2 orthogonal matrix (transpose of V)\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Computing and Understanding Matrix Transpose Products",
+      "relation_to_problem": "The first step of SVD computation requires forming A^T A, which is fundamental because its eigenvalues yield the squared singular values and its eigenvectors become the right singular vectors V.",
+      "prerequisites": [
+        "Matrix multiplication",
+        "Matrix transpose",
+        "Basic NumPy operations"
+      ],
+      "learning_objectives": [
+        "Compute A^T A for a 2x2 matrix both symbolically and numerically",
+        "Understand why A^T A is always symmetric and positive semi-definite",
+        "Recognize the relationship between A^T A and the SVD"
+      ],
+      "math_content": {
+        "definition": "For any real matrix $A \\in \\mathbb{R}^{m \\times n}$, the Gram matrix is defined as $G = A^T A \\in \\mathbb{R}^{n \\times n}$. This matrix is symmetric ($G = G^T$) and positive semi-definite (all eigenvalues $\\lambda_i \\geq 0$).",
+        "notation": "$A = \\begin{bmatrix} a_{11} & a_{12} \\\\ a_{21} & a_{22} \\end{bmatrix}$, $A^T = \\begin{bmatrix} a_{11} & a_{21} \\\\ a_{12} & a_{22} \\end{bmatrix}$",
+        "theorem": "For a 2x2 matrix $A$, the Gram matrix is: $$A^T A = \\begin{bmatrix} a_{11}^2 + a_{21}^2 & a_{11}a_{12} + a_{21}a_{22} \\\\ a_{11}a_{12} + a_{21}a_{22} & a_{12}^2 + a_{22}^2 \\end{bmatrix}$$",
+        "proof_sketch": "The $(i,j)$ entry of $A^T A$ is the dot product of the $i$-th column of $A^T$ with the $j$-th column of $A$. For $(1,1)$: column 1 of $A$ is $[a_{11}, a_{21}]^T$, so $(A^T A)_{11} = a_{11}^2 + a_{21}^2$. The off-diagonal $(1,2) = (2,1)$ entry is $a_{11}a_{12} + a_{21}a_{22}$, confirming symmetry.",
+        "examples": [
+          "For $A = \\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}$, $A^T A = \\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}$",
+          "For $A = \\begin{bmatrix} 2 & 1 \\\\ 1 & 2 \\end{bmatrix}$, $A^T A = \\begin{bmatrix} 5 & 4 \\\\ 4 & 5 \\end{bmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gram Matrix Diagonal Elements",
+          "latex": "$(A^T A)_{ii} = \\sum_{k=1}^{m} a_{ki}^2$",
+          "description": "Diagonal entries are the squared norms of the columns of A"
+        },
+        {
+          "name": "Gram Matrix Off-Diagonal Elements",
+          "latex": "$(A^T A)_{ij} = \\sum_{k=1}^{m} a_{ki}a_{kj}$",
+          "description": "Off-diagonal entries are dot products between different columns of A"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes the Gram matrix A^T A for any 2x2 matrix A. This is the first step toward SVD computation.",
+        "function_signature": "def compute_gram_matrix(A: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_gram_matrix(A: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute A^T A for a 2x2 matrix.\n    \n    Args:\n        A: 2x2 numpy array\n    \n    Returns:\n        2x2 numpy array representing A^T A\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_gram_matrix(np.array([[1, 0], [0, 1]]))",
+            "expected": "np.array([[1, 0], [0, 1]])",
+            "explanation": "Identity matrix multiplied by its transpose is itself"
+          },
+          {
+            "input": "compute_gram_matrix(np.array([[2, 1], [1, 2]]))",
+            "expected": "np.array([[5, 4], [4, 5]])",
+            "explanation": "For symmetric matrices, A^T A differs from A unless A is orthogonal"
+          },
+          {
+            "input": "compute_gram_matrix(np.array([[3, 0], [4, 0]]))",
+            "expected": "np.array([[25, 0], [0, 0]])",
+            "explanation": "When a column is zero, the corresponding diagonal entry in A^T A is zero"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing A A^T instead of A^T A (wrong order for SVD)",
+        "Forgetting that A^T A is always symmetric for real matrices",
+        "Not recognizing that diagonal entries represent squared column norms"
+      ],
+      "hint": "Use NumPy's @ operator or np.dot for matrix multiplication. Verify your result is symmetric by checking if result equals result.T",
+      "references": [
+        "Gram matrices",
+        "Positive semi-definite matrices",
+        "Matrix norms"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Eigenvalues of 2x2 Symmetric Matrices via Characteristic Polynomial",
+      "relation_to_problem": "The eigenvalues of A^T A are the squared singular values (σ_i^2). Computing them analytically is essential for the exact SVD of a 2x2 matrix.",
+      "prerequisites": [
+        "Determinants",
+        "Trace of a matrix",
+        "Quadratic formula",
+        "Understanding of A^T A from previous sub-quest"
+      ],
+      "learning_objectives": [
+        "Derive and apply the characteristic polynomial for 2x2 matrices",
+        "Compute eigenvalues using trace and determinant",
+        "Understand the relationship between eigenvalues and singular values"
+      ],
+      "math_content": {
+        "definition": "An eigenvalue $\\lambda$ of a matrix $B$ satisfies $\\det(B - \\lambda I) = 0$. For a 2x2 matrix $B = \\begin{bmatrix} b_{11} & b_{12} \\\\ b_{21} & b_{22} \\end{bmatrix}$, the characteristic polynomial is: $$p(\\lambda) = \\lambda^2 - \\text{tr}(B)\\lambda + \\det(B)$$",
+        "notation": "$\\text{tr}(B) = b_{11} + b_{22}$ (trace), $\\det(B) = b_{11}b_{22} - b_{12}b_{21}$ (determinant)",
+        "theorem": "For a 2x2 matrix $B$, the eigenvalues are: $$\\lambda = \\frac{\\text{tr}(B) \\pm \\sqrt{\\text{tr}(B)^2 - 4\\det(B)}}{2}$$",
+        "proof_sketch": "The characteristic equation $\\det(B - \\lambda I) = 0$ expands to $(b_{11} - \\lambda)(b_{22} - \\lambda) - b_{12}b_{21} = 0$, which simplifies to $\\lambda^2 - (b_{11} + b_{22})\\lambda + (b_{11}b_{22} - b_{12}b_{21}) = 0$. Applying the quadratic formula yields the result.",
+        "examples": [
+          "For $B = \\begin{bmatrix} 5 & 4 \\\\ 4 & 5 \\end{bmatrix}$: $\\text{tr}(B) = 10$, $\\det(B) = 9$, so $\\lambda = \\frac{10 \\pm \\sqrt{100-36}}{2} = \\frac{10 \\pm 8}{2} = 9, 1$",
+          "For $B = \\begin{bmatrix} 3 & 0 \\\\ 0 & 3 \\end{bmatrix}$: $\\text{tr}(B) = 6$, $\\det(B) = 9$, discriminant is 0, so $\\lambda = 3$ (repeated)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Characteristic Polynomial for 2x2 Matrix",
+          "latex": "$p(\\lambda) = \\lambda^2 - \\text{tr}(B)\\lambda + \\det(B) = 0$",
+          "description": "Standard form for finding eigenvalues"
+        },
+        {
+          "name": "Eigenvalues via Trace and Determinant",
+          "latex": "$\\lambda_{1,2} = \\frac{\\text{tr}(B) \\pm \\sqrt{\\text{tr}(B)^2 - 4\\det(B)}}{2}$",
+          "description": "Closed-form solution for 2x2 eigenvalues"
+        },
+        {
+          "name": "Singular Values from Eigenvalues",
+          "latex": "$\\sigma_i = \\sqrt{\\lambda_i}$ where $\\lambda_i$ are eigenvalues of $A^T A$",
+          "description": "Connection between eigenvalues of A^T A and singular values of A"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes the eigenvalues of a 2x2 symmetric matrix using the trace and determinant. Return them in descending order.",
+        "function_signature": "def eigenvalues_2x2_symmetric(B: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef eigenvalues_2x2_symmetric(B: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute eigenvalues of a 2x2 symmetric matrix.\n    \n    Args:\n        B: 2x2 symmetric numpy array\n    \n    Returns:\n        Length-2 array of eigenvalues in descending order\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "eigenvalues_2x2_symmetric(np.array([[5, 4], [4, 5]]))",
+            "expected": "np.array([9.0, 1.0])",
+            "explanation": "Trace = 10, Det = 9, discriminant = 64, eigenvalues are (10±8)/2 = 9, 1"
+          },
+          {
+            "input": "eigenvalues_2x2_symmetric(np.array([[1, 0], [0, 1]]))",
+            "expected": "np.array([1.0, 1.0])",
+            "explanation": "Identity matrix has all eigenvalues equal to 1"
+          },
+          {
+            "input": "eigenvalues_2x2_symmetric(np.array([[4, 3], [3, 4]]))",
+            "expected": "np.array([7.0, 1.0])",
+            "explanation": "Trace = 8, Det = 7, discriminant = 36, eigenvalues are (8±6)/2 = 7, 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to sort eigenvalues in descending order (required for singular values)",
+        "Not handling the case when discriminant is negative (shouldn't happen for symmetric matrices)",
+        "Returning squared values instead of the actual eigenvalues",
+        "Computing determinant incorrectly (forgetting the minus sign in ad - bc)"
+      ],
+      "hint": "Use np.trace() and np.linalg.det(), or compute manually. Remember: for symmetric matrices, eigenvalues are always real.",
+      "references": [
+        "Characteristic polynomial",
+        "Eigenvalues and eigenvectors",
+        "Spectral theorem for symmetric matrices"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Jacobi Rotation Angle for Symmetric Matrix Diagonalization",
+      "relation_to_problem": "The Jacobi method provides the rotation angle θ that diagonalizes A^T A in one step (for 2x2), which directly gives us the matrix V in the SVD.",
+      "prerequisites": [
+        "Eigenvalues of symmetric matrices",
+        "Rotation matrices",
+        "Trigonometry",
+        "Understanding of orthogonal transformations"
+      ],
+      "learning_objectives": [
+        "Derive the Jacobi rotation angle formula for 2x2 symmetric matrices",
+        "Understand how rotation matrices diagonalize symmetric matrices",
+        "Construct the rotation matrix R(θ) that becomes V in SVD"
+      ],
+      "math_content": {
+        "definition": "A Jacobi rotation is an orthogonal transformation $R(\\theta) = \\begin{bmatrix} \\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta \\end{bmatrix}$ chosen to zero out off-diagonal elements of a symmetric matrix. For a symmetric $B = \\begin{bmatrix} b_{11} & b_{12} \\\\ b_{12} & b_{22} \\end{bmatrix}$, the rotation angle is: $$\\theta = \\begin{cases} \\frac{\\pi}{4} & \\text{if } b_{11} = b_{22} \\\\ \\frac{1}{2} \\arctan\\left(\\frac{2b_{12}}{b_{11} - b_{22}}\\right) & \\text{otherwise} \\end{cases}$$",
+        "notation": "$R(\\theta)$ = rotation matrix by angle $\\theta$, $R^T R = I$ (orthogonality)",
+        "theorem": "For a 2x2 symmetric matrix $B$, the transformation $D = R^T B R$ yields a diagonal matrix where the off-diagonal elements are zero: $(D)_{12} = (D)_{21} = 0$.",
+        "proof_sketch": "After transformation, the off-diagonal element becomes: $(R^T B R)_{12} = \\frac{1}{2}(b_{22} - b_{11})\\sin(2\\theta) + b_{12}\\cos(2\\theta)$. Setting this to zero gives: $\\tan(2\\theta) = \\frac{2b_{12}}{b_{11} - b_{22}}$, hence $\\theta = \\frac{1}{2}\\arctan\\left(\\frac{2b_{12}}{b_{11} - b_{22}}\\right)$.",
+        "examples": [
+          "For $B = \\begin{bmatrix} 1 & 1 \\\\ 1 & 1 \\end{bmatrix}$: $b_{11} = b_{22}$, so $\\theta = \\pi/4$ (45 degrees)",
+          "For $B = \\begin{bmatrix} 5 & 4 \\\\ 4 & 5 \\end{bmatrix}$: $\\theta = \\frac{1}{2}\\arctan\\left(\\frac{8}{0}\\right) = \\pi/4$",
+          "For $B = \\begin{bmatrix} 4 & 1 \\\\ 1 & 2 \\end{bmatrix}$: $\\theta = \\frac{1}{2}\\arctan\\left(\\frac{2}{2}\\right) = \\frac{1}{2}\\arctan(1) = \\pi/8$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Jacobi Rotation Angle",
+          "latex": "$\\theta = \\frac{1}{2} \\arctan\\left(\\frac{2b_{12}}{b_{11} - b_{22}}\\right)$",
+          "description": "Angle that zeros off-diagonal elements in one rotation for 2x2"
+        },
+        {
+          "name": "Rotation Matrix",
+          "latex": "$R(\\theta) = \\begin{bmatrix} \\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta \\end{bmatrix}$",
+          "description": "Standard 2D rotation matrix (orthogonal)"
+        },
+        {
+          "name": "Special Case",
+          "latex": "$\\theta = \\frac{\\pi}{4}$ when $b_{11} = b_{22}$",
+          "description": "45-degree rotation when diagonal elements are equal"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes the Jacobi rotation angle for a 2x2 symmetric matrix and returns the corresponding rotation matrix R(θ).",
+        "function_signature": "def jacobi_rotation_matrix(B: np.ndarray) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef jacobi_rotation_matrix(B: np.ndarray) -> tuple:\n    \"\"\"\n    Compute Jacobi rotation angle and matrix for a 2x2 symmetric matrix.\n    \n    Args:\n        B: 2x2 symmetric numpy array\n    \n    Returns:\n        Tuple (theta, R) where:\n        - theta: rotation angle in radians\n        - R: 2x2 rotation matrix\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "jacobi_rotation_matrix(np.array([[1, 1], [1, 1]]))",
+            "expected": "(np.pi/4, np.array([[0.707, -0.707], [0.707, 0.707]]))",
+            "explanation": "When b_11 = b_22, rotation angle is π/4 (45 degrees)"
+          },
+          {
+            "input": "jacobi_rotation_matrix(np.array([[5, 4], [4, 5]]))",
+            "expected": "(np.pi/4, np.array([[0.707, -0.707], [0.707, 0.707]]))",
+            "explanation": "Symmetric with equal diagonals requires 45-degree rotation"
+          },
+          {
+            "input": "jacobi_rotation_matrix(np.array([[1, 0], [0, 2]]))",
+            "expected": "(0.0, np.array([[1, 0], [0, 1]]))",
+            "explanation": "Already diagonal (b_12 = 0), so no rotation needed (θ = 0)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the special case when b_11 = b_22 (division by zero)",
+        "Forgetting that arctan gives θ/2, not θ directly",
+        "Using degrees instead of radians for numpy trigonometric functions",
+        "Not checking if the matrix is already diagonal (b_12 ≈ 0)"
+      ],
+      "hint": "Use np.arctan() for the angle calculation. Handle the special case when the denominator is zero or very close to zero. Use np.cos() and np.sin() for the rotation matrix.",
+      "references": [
+        "Jacobi eigenvalue algorithm",
+        "Givens rotations",
+        "Orthogonal diagonalization"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Computing Eigenvectors from Eigenvalues for Symmetric Matrices",
+      "relation_to_problem": "After finding eigenvalues of A^T A, we need the corresponding normalized eigenvectors which form the columns of V. While Jacobi rotation provides them implicitly, understanding the algebraic method is crucial.",
+      "prerequisites": [
+        "Solving linear systems",
+        "Null space computation",
+        "Vector normalization",
+        "Eigenvalues from previous sub-quest"
+      ],
+      "learning_objectives": [
+        "Solve (B - λI)v = 0 to find eigenvectors for 2x2 matrices",
+        "Normalize eigenvectors to unit length",
+        "Verify orthogonality of eigenvectors for symmetric matrices"
+      ],
+      "math_content": {
+        "definition": "An eigenvector $\\mathbf{v}$ corresponding to eigenvalue $\\lambda$ satisfies $(B - \\lambda I)\\mathbf{v} = \\mathbf{0}$. For a 2x2 matrix, this gives a system: $$\\begin{bmatrix} b_{11} - \\lambda & b_{12} \\\\ b_{21} & b_{22} - \\lambda \\end{bmatrix} \\begin{bmatrix} v_1 \\\\ v_2 \\end{bmatrix} = \\begin{bmatrix} 0 \\\\ 0 \\end{bmatrix}$$",
+        "notation": "$\\|\\mathbf{v}\\| = \\sqrt{v_1^2 + v_2^2}$ (Euclidean norm), $\\hat{\\mathbf{v}} = \\mathbf{v}/\\|\\mathbf{v}\\|$ (unit vector)",
+        "theorem": "For a symmetric matrix $B$, eigenvectors corresponding to distinct eigenvalues are orthogonal. For a 2x2 symmetric matrix with eigenvalues $\\lambda_1 \\neq \\lambda_2$, if $\\mathbf{v}_1$ and $\\mathbf{v}_2$ are corresponding eigenvectors, then $\\mathbf{v}_1 \\cdot \\mathbf{v}_2 = 0$.",
+        "proof_sketch": "From $(B - \\lambda I)\\mathbf{v} = \\mathbf{0}$, the rows are proportional, so we can use the first row: $(b_{11} - \\lambda)v_1 + b_{12}v_2 = 0$. If $b_{12} \\neq 0$, set $v_2 = 1$ and solve: $v_1 = -b_{12}/(b_{11} - \\lambda)$. If $b_{12} = 0$, the matrix is diagonal and eigenvectors are $[1,0]^T$ and $[0,1]^T$.",
+        "examples": [
+          "For $B = \\begin{bmatrix} 5 & 4 \\\\ 4 & 5 \\end{bmatrix}$ with $\\lambda = 9$: $(5-9)v_1 + 4v_2 = 0 \\Rightarrow -4v_1 + 4v_2 = 0 \\Rightarrow v_1 = v_2$. Choosing $\\mathbf{v} = [1, 1]^T$, normalized: $[1/\\sqrt{2}, 1/\\sqrt{2}]^T$",
+          "For $\\lambda = 1$: $(5-1)v_1 + 4v_2 = 0 \\Rightarrow 4v_1 + 4v_2 = 0 \\Rightarrow v_1 = -v_2$. Choosing $\\mathbf{v} = [1, -1]^T$, normalized: $[1/\\sqrt{2}, -1/\\sqrt{2}]^T$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Eigenvector Equation",
+          "latex": "$(B - \\lambda I)\\mathbf{v} = \\mathbf{0}$",
+          "description": "Defines eigenvectors as null space vectors"
+        },
+        {
+          "name": "2x2 Eigenvector Component Relation",
+          "latex": "$v_1 = -\\frac{b_{12}}{b_{11} - \\lambda}$ when $v_2 = 1$",
+          "description": "Explicit formula for eigenvector components (when b_12 ≠ 0)"
+        },
+        {
+          "name": "Normalization",
+          "latex": "$\\hat{\\mathbf{v}} = \\frac{\\mathbf{v}}{\\sqrt{v_1^2 + v_2^2}}$",
+          "description": "Converts eigenvector to unit length"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes normalized eigenvectors for a 2x2 symmetric matrix given its two eigenvalues. Return them as columns of a matrix.",
+        "function_signature": "def eigenvectors_2x2_symmetric(B: np.ndarray, eigenvalues: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef eigenvectors_2x2_symmetric(B: np.ndarray, eigenvalues: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute normalized eigenvectors for a 2x2 symmetric matrix.\n    \n    Args:\n        B: 2x2 symmetric numpy array\n        eigenvalues: Length-2 array of eigenvalues [λ1, λ2]\n    \n    Returns:\n        2x2 matrix where columns are normalized eigenvectors\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "eigenvectors_2x2_symmetric(np.array([[5, 4], [4, 5]]), np.array([9, 1]))",
+            "expected": "np.array([[0.707, 0.707], [0.707, -0.707]])",
+            "explanation": "For λ=9: v=[1,1], normalized to [0.707,0.707]. For λ=1: v=[1,-1], normalized to [0.707,-0.707]"
+          },
+          {
+            "input": "eigenvectors_2x2_symmetric(np.array([[3, 0], [0, 1]]), np.array([3, 1]))",
+            "expected": "np.array([[1, 0], [0, 1]])",
+            "explanation": "Diagonal matrix has standard basis vectors as eigenvectors"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not normalizing eigenvectors to unit length",
+        "Not handling the diagonal matrix case (when b_12 = 0)",
+        "Choosing wrong convention for eigenvector signs (multiple valid choices exist)",
+        "Not verifying orthogonality for symmetric matrices with distinct eigenvalues"
+      ],
+      "hint": "For each eigenvalue, solve (B - λI)v = 0. Use the first row to find the relationship between v1 and v2. Then normalize using np.linalg.norm().",
+      "references": [
+        "Null space",
+        "Spectral theorem",
+        "Orthonormal basis"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Computing Left Singular Vectors from Right Singular Vectors",
+      "relation_to_problem": "After finding V and Σ from A^T A, we must compute U using the relationship U = AVΣ^(-1). This completes the SVD decomposition.",
+      "prerequisites": [
+        "Understanding of SVD relationship A = UΣV^T",
+        "Matrix multiplication",
+        "Handling singular values",
+        "Previous sub-quests on eigenvalues/eigenvectors"
+      ],
+      "learning_objectives": [
+        "Derive the relationship U = AVΣ^(-1) from A = UΣV^T",
+        "Handle near-zero singular values to avoid numerical instability",
+        "Verify orthonormality of computed left singular vectors"
+      ],
+      "math_content": {
+        "definition": "The left singular vectors are the columns of the orthogonal matrix $U$ in the SVD $A = U\\Sigma V^T$. For a 2x2 matrix, $U$ is a 2x2 orthogonal matrix satisfying $U^T U = I$. The columns $\\mathbf{u}_i$ are computed as: $$\\mathbf{u}_i = \\frac{1}{\\sigma_i} A \\mathbf{v}_i$$ where $\\sigma_i > 0$ are singular values and $\\mathbf{v}_i$ are right singular vectors.",
+        "notation": "$\\Sigma = \\text{diag}(\\sigma_1, \\sigma_2)$, $\\Sigma^{-1} = \\text{diag}(1/\\sigma_1, 1/\\sigma_2)$ for $\\sigma_i > 0$",
+        "theorem": "Given $A = U\\Sigma V^T$ where $V$ is orthogonal and $\\Sigma$ is diagonal with positive entries, we can solve for $U$: multiply both sides by $V\\Sigma^{-1}$ on the right to get $U = AV\\Sigma^{-1}$.",
+        "proof_sketch": "Starting from $A = U\\Sigma V^T$, multiply both sides on the right by $V$: $AV = U\\Sigma V^T V = U\\Sigma$ (since $V^T V = I$). Then multiply by $\\Sigma^{-1}$: $AV\\Sigma^{-1} = U\\Sigma\\Sigma^{-1} = U$. For the $i$-th column: $A\\mathbf{v}_i = \\sigma_i \\mathbf{u}_i$, so $\\mathbf{u}_i = \\frac{1}{\\sigma_i} A\\mathbf{v}_i$.",
+        "examples": [
+          "For $A = \\begin{bmatrix} 2 & 1 \\\\ 1 & 2 \\end{bmatrix}$, $\\mathbf{v}_1 = [1/\\sqrt{2}, 1/\\sqrt{2}]^T$, $\\sigma_1 = 3$: $\\mathbf{u}_1 = \\frac{1}{3}\\begin{bmatrix} 2 & 1 \\\\ 1 & 2 \\end{bmatrix}\\begin{bmatrix} 1/\\sqrt{2} \\\\ 1/\\sqrt{2} \\end{bmatrix} = \\frac{1}{3\\sqrt{2}}\\begin{bmatrix} 3 \\\\ 3 \\end{bmatrix} = [1/\\sqrt{2}, 1/\\sqrt{2}]^T$",
+          "When $\\sigma_i \\approx 0$, the formula breaks down; handle by orthogonalizing previous vectors or using a pseudo-inverse threshold"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Left Singular Vector Formula",
+          "latex": "$\\mathbf{u}_i = \\frac{1}{\\sigma_i} A \\mathbf{v}_i$ for $\\sigma_i > 0$",
+          "description": "Computes each column of U from corresponding V column and singular value"
+        },
+        {
+          "name": "Matrix Form",
+          "latex": "$U = A V \\Sigma^{-1}$",
+          "description": "Computes all left singular vectors at once"
+        },
+        {
+          "name": "Orthonormality Check",
+          "latex": "$U^T U = I$ (equivalently, $\\mathbf{u}_i \\cdot \\mathbf{u}_j = \\delta_{ij}$)",
+          "description": "Verification that U is orthogonal"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes the left singular vectors U given matrix A, right singular vectors V, and singular values. Handle the case of near-zero singular values.",
+        "function_signature": "def compute_left_singular_vectors(A: np.ndarray, V: np.ndarray, singular_values: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_left_singular_vectors(A: np.ndarray, V: np.ndarray, singular_values: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute left singular vectors U from A, V, and singular values.\n    \n    Args:\n        A: 2x2 numpy array (original matrix)\n        V: 2x2 numpy array (right singular vectors as columns)\n        singular_values: Length-2 array of singular values [σ1, σ2]\n    \n    Returns:\n        2x2 numpy array U (left singular vectors as columns)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_left_singular_vectors(np.array([[2, 1], [1, 2]]), np.array([[0.707, 0.707], [0.707, -0.707]]), np.array([3.0, 1.0]))",
+            "expected": "np.array([[0.707, 0.707], [0.707, -0.707]])",
+            "explanation": "For symmetric matrix, U = V when properly ordered"
+          },
+          {
+            "input": "compute_left_singular_vectors(np.array([[3, 0], [4, 0]]), np.array([[1, 0], [0, 1]]), np.array([5.0, 0.0]))",
+            "expected": "np.array([[0.6, 0.8], [0.8, -0.6]])",
+            "explanation": "When σ2 = 0, second column of U must be orthogonal to first"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Dividing by zero when a singular value is exactly zero",
+        "Not handling near-zero singular values with a tolerance threshold",
+        "Forgetting to verify that U^T U = I after computation",
+        "Using V instead of V columns individually in the computation"
+      ],
+      "hint": "For each column of V, multiply by A then divide by the corresponding singular value. Use a small threshold (e.g., 1e-10) to detect near-zero singular values.",
+      "references": [
+        "SVD computation",
+        "Numerical stability",
+        "Gram-Schmidt orthogonalization"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Assembling the Complete SVD Decomposition",
+      "relation_to_problem": "This final sub-quest combines all previous concepts to construct the full SVD: computing A^T A, finding eigenvalues/eigenvectors, extracting singular values, computing U, and verifying the decomposition.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Understanding of matrix reconstruction",
+        "Numerical verification techniques"
+      ],
+      "learning_objectives": [
+        "Integrate all SVD computation steps into a cohesive algorithm",
+        "Properly order singular values and corresponding vectors",
+        "Verify that A ≈ U @ diag(S) @ V^T within numerical tolerance"
+      ],
+      "math_content": {
+        "definition": "The complete Singular Value Decomposition algorithm for a 2x2 matrix $A$ produces three matrices $(U, \\Sigma, V^T)$ such that $A = U\\Sigma V^T$, where: (1) $U \\in \\mathbb{R}^{2 \\times 2}$ is orthogonal, (2) $\\Sigma = \\text{diag}(\\sigma_1, \\sigma_2)$ with $\\sigma_1 \\geq \\sigma_2 \\geq 0$, (3) $V \\in \\mathbb{R}^{2 \\times 2}$ is orthogonal.",
+        "notation": "$\\text{diag}(\\sigma_1, \\sigma_2)$ creates a diagonal matrix, $V^T$ is the transpose of $V$",
+        "theorem": "Every real 2x2 matrix has an SVD. The singular values are unique (up to ordering), but the singular vectors may not be unique if singular values are repeated or zero.",
+        "proof_sketch": "The algorithm proceeds: (1) Compute $B = A^T A$. (2) Find eigenvalues $\\lambda_1, \\lambda_2$ of $B$ and sort in descending order. (3) Set $\\sigma_i = \\sqrt{\\lambda_i}$. (4) Find normalized eigenvectors of $B$ to form columns of $V$. (5) Compute $\\mathbf{u}_i = \\frac{1}{\\sigma_i}A\\mathbf{v}_i$ for $\\sigma_i > 0$ to form columns of $U$. (6) Return $(U, [\\sigma_1, \\sigma_2], V^T)$.",
+        "examples": [
+          "Complete example for $A = \\begin{bmatrix} 2 & 1 \\\\ 1 & 2 \\end{bmatrix}$: $A^T A = \\begin{bmatrix} 5 & 4 \\\\ 4 & 5 \\end{bmatrix}$, eigenvalues $[9, 1]$, $\\sigma = [3, 1]$, $V = U = \\begin{bmatrix} 0.707 & 0.707 \\\\ 0.707 & -0.707 \\end{bmatrix}$. Verification: $U\\Sigma V^T = A$.",
+          "For $A = \\begin{bmatrix} 3 & 0 \\\\ 4 & 0 \\end{bmatrix}$: singular values $[5, 0]$, $V = I$, $U = \\begin{bmatrix} 0.6 & 0.8 \\\\ 0.8 & -0.6 \\end{bmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "SVD Algorithm Pipeline",
+          "latex": "$A^T A \\xrightarrow{\\text{eigen}} (\\lambda_i, \\mathbf{v}_i) \\xrightarrow{\\sqrt{\\cdot}} \\sigma_i \\xrightarrow{A\\mathbf{v}_i/\\sigma_i} \\mathbf{u}_i$",
+          "description": "Step-by-step data flow for SVD computation"
+        },
+        {
+          "name": "Reconstruction Formula",
+          "latex": "$A = U \\Sigma V^T = \\sum_{i=1}^{2} \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^T$",
+          "description": "Two equivalent forms: matrix product and outer product sum"
+        },
+        {
+          "name": "Verification Criterion",
+          "latex": "$\\|A - U\\Sigma V^T\\|_F < \\epsilon$ where $\\epsilon$ is tolerance",
+          "description": "Frobenius norm measures reconstruction accuracy"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes the complete SVD of a 2x2 matrix by integrating all previous concepts. Return (U, S, Vt) where S is a 1D array of singular values and Vt is V transpose.",
+        "function_signature": "def svd_2x2_complete(A: np.ndarray) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef svd_2x2_complete(A: np.ndarray) -> tuple:\n    \"\"\"\n    Compute SVD of a 2x2 matrix using analytical methods.\n    \n    Args:\n        A: 2x2 numpy array\n    \n    Returns:\n        Tuple (U, S, Vt) where:\n        - U: 2x2 orthogonal matrix (left singular vectors)\n        - S: length-2 array of singular values in descending order\n        - Vt: 2x2 orthogonal matrix (V transpose)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "svd_2x2_complete(np.array([[2, 1], [1, 2]]))",
+            "expected": "(U ≈ [[0.707, 0.707], [0.707, -0.707]], S = [3.0, 1.0], Vt ≈ [[0.707, 0.707], [0.707, -0.707]])",
+            "explanation": "Symmetric matrix: U = V, singular values are [3, 1]"
+          },
+          {
+            "input": "svd_2x2_complete(np.array([[1, 0], [0, 1]]))",
+            "expected": "(U = I, S = [1.0, 1.0], Vt = I)",
+            "explanation": "Identity matrix has SVD equal to itself"
+          },
+          {
+            "input": "svd_2x2_complete(np.array([[3, 0], [4, 0]]))",
+            "expected": "(U ≈ [[0.6, 0.8], [0.8, -0.6]], S = [5.0, 0.0], Vt ≈ [[1, 0], [0, 1]])",
+            "explanation": "Rank-1 matrix has one zero singular value"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not ensuring singular values are in descending order along with their corresponding vectors",
+        "Forgetting to return Vt (V transpose) instead of V",
+        "Not handling edge cases like zero matrices or rank-deficient matrices",
+        "Failing to verify orthonormality of U and V",
+        "Not matching the sign conventions between U and V columns"
+      ],
+      "hint": "Combine all previous functions: compute A^T A → eigenvalues → singular values → eigenvectors for V → compute U = AVΣ^(-1). Ensure proper ordering and verify with np.allclose(A, U @ np.diag(S) @ Vt).",
+      "references": [
+        "Complete SVD algorithm",
+        "Numerical linear algebra",
+        "Matrix decompositions"
+      ]
+    }
+  ]
+}

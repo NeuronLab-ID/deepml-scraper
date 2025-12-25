@@ -1,0 +1,405 @@
+{
+  "problem_id": 162,
+  "title": "Upper Confidence Bound (UCB) Action Selection",
+  "category": "Reinforcement Learning",
+  "difficulty": "easy",
+  "description": "Implement the Upper Confidence Bound (UCB) action selection strategy for the multi-armed bandit problem. Write a function that, given the current number of times each action has been selected, the average rewards for each action, and the current timestep t, returns the action to select according to the UCB1 formula. Use only NumPy.",
+  "example": {
+    "input": "import numpy as np\ncounts = np.array([1, 1, 1, 1])\nvalues = np.array([1.0, 2.0, 1.5, 0.5])\nt = 4\nc = 2.0\nprint(ucb_action(counts, values, t, c))",
+    "output": "1",
+    "reasoning": "At t=4, each action has been tried once, but action 1 has the highest average reward (2.0) and the same confidence bound as the others, so it is chosen."
+  },
+  "starter_code": "import numpy as np\n\ndef ucb_action(counts, values, t, c):\n    \"\"\"\n    Choose an action using the UCB1 formula.\n    Args:\n      counts (np.ndarray): Number of times each action has been chosen\n      values (np.ndarray): Average reward of each action\n      t (int): Current timestep (starts from 1)\n      c (float): Exploration coefficient\n    Returns:\n      int: Index of action to select\n    \"\"\"\n    # TODO: Implement the UCB action selection\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Computing Sample Mean Rewards",
+      "relation_to_problem": "The exploitation term Q(a) in UCB is the sample mean reward, which represents our current best estimate of each action's value. This forms the foundation of the UCB formula's first component.",
+      "prerequisites": [
+        "Basic statistics",
+        "NumPy array operations",
+        "Understanding of expected value"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition of sample mean as an estimator",
+        "Implement efficient computation of means using NumPy",
+        "Recognize how sample means track action values in reinforcement learning"
+      ],
+      "math_content": {
+        "definition": "The **sample mean** (or empirical mean) of a sequence of observations is an unbiased estimator of the true expected value. For an action $a$ that has been selected $n$ times with observed rewards $r_1, r_2, \\ldots, r_n$, the sample mean is:\n\n$$\\bar{X}_a = \\frac{1}{n}\\sum_{i=1}^{n} r_i$$\n\nIn the context of multi-armed bandits, this serves as our estimate $Q(a)$ of the true action value $q^*(a) = \\mathbb{E}[R_t | A_t = a]$.",
+        "notation": "$\\bar{X}_a$ = sample mean for action $a$\n$n$ = number of samples (visit count)\n$r_i$ = reward observed on the $i$-th selection\n$Q(a)$ = estimated action value\n$q^*(a)$ = true expected reward for action $a$",
+        "theorem": "**Law of Large Numbers**: As $n \\to \\infty$, the sample mean converges to the true expected value:\n$$\\lim_{n \\to \\infty} \\bar{X}_a = q^*(a) \\quad \\text{(with probability 1)}$$\n\nThis guarantees that with sufficient samples, our estimates become arbitrarily accurate.",
+        "proof_sketch": "By the Strong Law of Large Numbers, for i.i.d. random variables with finite expectation $\\mu$:\n1. Each reward $r_i \\sim P(R|A=a)$ is independent with $\\mathbb{E}[r_i] = q^*(a)$\n2. The sample mean $\\bar{X}_n = \\frac{1}{n}\\sum_{i=1}^n r_i$ is itself a random variable\n3. By SLLN, $P(\\lim_{n\\to\\infty} \\bar{X}_n = q^*(a)) = 1$\n4. This convergence ensures that exploitation based on $\\bar{X}_a$ eventually selects the optimal action",
+        "examples": [
+          "**Example 1**: Action 0 selected 3 times with rewards [0.5, 0.8, 0.6]. Sample mean = (0.5 + 0.8 + 0.6)/3 = 0.633",
+          "**Example 2**: Action 1 selected 5 times with rewards [1.0, 0.9, 1.1, 0.8, 1.0]. Sample mean = (1.0 + 0.9 + 1.1 + 0.8 + 1.0)/5 = 0.96",
+          "**Example 3**: If values array is [0.5, 0.8, 0.3], action 1 has the highest sample mean and would be preferred by pure exploitation"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sample Mean Formula",
+          "latex": "$\\bar{X}_a = \\frac{1}{n}\\sum_{i=1}^{n} r_i$",
+          "description": "Computes the average reward for action $a$ over $n$ observations"
+        },
+        {
+          "name": "Unbiased Estimator Property",
+          "latex": "$\\mathbb{E}[\\bar{X}_a] = q^*(a)$",
+          "description": "The expected value of the sample mean equals the true mean, making it unbiased"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that identifies the action with the highest sample mean reward. This represents pure greedy exploitation without exploration. Given an array of average rewards for each action, return the index of the action with the maximum value. If multiple actions tie, return the smallest index.",
+        "function_signature": "def greedy_action(values: np.ndarray) -> int:",
+        "starter_code": "import numpy as np\n\ndef greedy_action(values):\n    \"\"\"\n    Select the action with highest average reward (pure exploitation).\n    Args:\n      values (np.ndarray): Average reward for each action\n    Returns:\n      int: Index of action with highest value\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "greedy_action(np.array([0.5, 0.8, 0.3]))",
+            "expected": "1",
+            "explanation": "Action 1 has the highest average reward (0.8), so pure exploitation chooses it"
+          },
+          {
+            "input": "greedy_action(np.array([1.0, 1.0, 0.5]))",
+            "expected": "0",
+            "explanation": "Actions 0 and 1 tie at 1.0; return the smallest index (0)"
+          },
+          {
+            "input": "greedy_action(np.array([0.2, 0.4, 0.9, 0.1]))",
+            "expected": "2",
+            "explanation": "Action 2 has the maximum value (0.9)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using np.max() instead of np.argmax() - max returns the value, not the index",
+        "Not handling ties correctly - should return the smallest index when multiple actions have the same maximum value",
+        "Forgetting that pure exploitation can get stuck on suboptimal actions if initial estimates are misleading"
+      ],
+      "hint": "Use NumPy's argmax function, which automatically returns the smallest index in case of ties",
+      "references": [
+        "Sutton & Barto Chapter 2: Multi-armed Bandits",
+        "Law of Large Numbers",
+        "Unbiased estimators in statistics"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Understanding the Natural Logarithm in Exploration",
+      "relation_to_problem": "The exploration bonus in UCB uses ln(t) in the numerator to control the growth rate of exploration over time. Understanding logarithmic growth is essential for grasping why UCB achieves logarithmic regret bounds.",
+      "prerequisites": [
+        "Calculus basics",
+        "Properties of logarithms",
+        "Growth rate analysis"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical properties of the natural logarithm",
+        "Recognize why ln(t) provides slow, steady growth suitable for exploration schedules",
+        "Compute logarithmic values efficiently using NumPy"
+      ],
+      "math_content": {
+        "definition": "The **natural logarithm** $\\ln(x)$ is the inverse of the exponential function. It is defined for $x > 0$ as:\n\n$$\\ln(x) = \\int_1^x \\frac{1}{t} dt$$\n\nEquivalently, $\\ln(x) = y$ if and only if $e^y = x$, where $e \\approx 2.71828$ is Euler's constant.\n\nIn UCB, we use $\\ln(t)$ where $t$ is the current timestep, providing a growth function that increases but at a **decreasing rate**.",
+        "notation": "$\\ln(x)$ = natural logarithm of $x$\n$e$ = Euler's constant (base of natural logarithm)\n$t$ = current timestep or total number of actions taken\n$\\log(x)$ = can refer to logarithm in any base (context-dependent)",
+        "theorem": "**Key Properties of Natural Logarithm**:\n1. $\\ln(1) = 0$\n2. $\\ln(e) = 1$\n3. $\\ln(xy) = \\ln(x) + \\ln(y)$ (product rule)\n4. $\\ln(x^a) = a\\ln(x)$ (power rule)\n5. $\\frac{d}{dx}\\ln(x) = \\frac{1}{x}$ (derivative)\n6. For large $x$: $\\ln(x) \\ll x$ (logarithmic growth is much slower than linear)\n\n**Growth Rate**: As $t \\to \\infty$, $\\ln(t) \\to \\infty$ but $\\lim_{t \\to \\infty} \\frac{\\ln(t)}{t} = 0$. This means exploration decreases relative to exploitation as timesteps increase.",
+        "proof_sketch": "To show $\\lim_{t \\to \\infty} \\frac{\\ln(t)}{t} = 0$:\n1. Apply L'Hôpital's rule: $\\lim_{t \\to \\infty} \\frac{\\ln(t)}{t} = \\lim_{t \\to \\infty} \\frac{1/t}{1} = \\lim_{t \\to \\infty} \\frac{1}{t} = 0$\n2. This confirms that $\\ln(t)$ grows sublinearly, ensuring exploration bonus shrinks relative to timestep\n3. In UCB context: $\\sqrt{\\frac{\\ln(t)}{n_i}}$ decreases as both $t$ and $n_i$ increase, naturally balancing exploration and exploitation",
+        "examples": [
+          "**Example 1**: $\\ln(1) = 0$, $\\ln(2) \\approx 0.693$, $\\ln(10) \\approx 2.303$, $\\ln(100) \\approx 4.605$. Notice doubling from 10 to 100 only adds ~2.3 to the logarithm.",
+          "**Example 2**: At t=4, $\\ln(4) \\approx 1.386$. At t=100, $\\ln(100) \\approx 4.605$. Despite 25× increase in timesteps, logarithm only increased ~3.3×.",
+          "**Example 3**: For UCB with t=1000, $\\ln(1000) \\approx 6.908$. The exploration term grows slowly, allowing exploitation to dominate as confidence increases."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Natural Logarithm Definition",
+          "latex": "$\\ln(x) = y \\iff e^y = x$",
+          "description": "Defines logarithm as the inverse of exponential function"
+        },
+        {
+          "name": "Logarithmic Growth Rate",
+          "latex": "$\\lim_{t \\to \\infty} \\frac{\\ln(t)}{t} = 0$",
+          "description": "Shows logarithm grows slower than any linear function, crucial for UCB's exploration schedule"
+        },
+        {
+          "name": "UCB Exploration Term",
+          "latex": "$c\\sqrt{\\frac{\\ln(t)}{n}}$",
+          "description": "Uses ln(t) to ensure exploration bonus grows slowly, achieving logarithmic regret"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the exploration coefficient for UCB given the total timestep and the number of times an action has been selected. The function should return sqrt(ln(t) / n) where t is the current timestep and n is the visit count. Handle the edge case where n=0 by returning infinity (indicating the action should be explored).",
+        "function_signature": "def exploration_coefficient(t: int, n: int) -> float:",
+        "starter_code": "import numpy as np\n\ndef exploration_coefficient(t, n):\n    \"\"\"\n    Compute the exploration coefficient for UCB formula.\n    Args:\n      t (int): Current timestep (total actions taken)\n      n (int): Number of times this action has been selected\n    Returns:\n      float: sqrt(ln(t) / n), or inf if n=0\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "exploration_coefficient(4, 1)",
+            "expected": "1.177",
+            "explanation": "sqrt(ln(4)/1) = sqrt(1.386/1) ≈ 1.177. High exploration bonus since action tried only once"
+          },
+          {
+            "input": "exploration_coefficient(4, 4)",
+            "expected": "0.588",
+            "explanation": "sqrt(ln(4)/4) = sqrt(1.386/4) ≈ 0.588. Lower bonus since action tried as often as timestep allows"
+          },
+          {
+            "input": "exploration_coefficient(100, 10)",
+            "expected": "0.681",
+            "explanation": "sqrt(ln(100)/10) = sqrt(4.605/10) ≈ 0.681. Moderate exploration for moderately visited action"
+          },
+          {
+            "input": "exploration_coefficient(10, 0)",
+            "expected": "inf",
+            "explanation": "When n=0, action has never been tried, so exploration bonus is infinite (must explore it)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using log10 or log2 instead of natural log (ln) - UCB theory specifically requires natural logarithm",
+        "Not handling n=0 case - division by zero must return infinity to force exploration of unvisited actions",
+        "Forgetting the square root - the UCB formula uses sqrt(ln(t)/n), not just ln(t)/n",
+        "Using t=0 which makes ln(0) undefined - timesteps should start from 1"
+      ],
+      "hint": "Use np.log() for natural logarithm and np.sqrt() for square root. Check if n==0 before dividing, returning np.inf in that case",
+      "references": [
+        "Calculus of logarithmic functions",
+        "Hoeffding's inequality (motivates the ln(t) term)",
+        "Regret bounds in multi-armed bandits"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Visit Count Tracking and Confidence Intervals",
+      "relation_to_problem": "The denominator N(a) in UCB's exploration term represents how many times we've tried each action. Actions with fewer visits have wider confidence intervals, encouraging exploration. This is the foundation of UCB's uncertainty-based exploration.",
+      "prerequisites": [
+        "Counting and tracking state",
+        "Understanding of confidence intervals",
+        "Inverse relationship concepts"
+      ],
+      "learning_objectives": [
+        "Understand how visit counts inversely affect uncertainty in estimates",
+        "Recognize the statistical principle that more samples reduce confidence interval width",
+        "Implement efficient visit count-based computations using NumPy"
+      ],
+      "math_content": {
+        "definition": "A **confidence interval** provides a range of plausible values for a parameter based on observed data. For the mean reward of action $a$, a confidence interval with confidence level $1-\\alpha$ is:\n\n$$CI = \\bar{X}_a \\pm z_{\\alpha/2} \\cdot \\frac{\\sigma}{\\sqrt{n}}$$\n\nwhere $\\sigma$ is the standard deviation and $n$ is the sample size.\n\nThe **width** of the confidence interval is proportional to $\\frac{1}{\\sqrt{n}}$, meaning:\n- More observations (larger $n$) → narrower interval → more certainty\n- Fewer observations (smaller $n$) → wider interval → more uncertainty\n\nUCB exploits this by using $\\sqrt{\\frac{\\ln(t)}{n}}$ as an **upper confidence bound** on the action value.",
+        "notation": "$n$ or $N(a)$ = number of times action $a$ has been selected (visit count)\n$\\bar{X}_a$ = sample mean reward for action $a$\n$\\sigma$ = standard deviation of rewards\n$z_{\\alpha/2}$ = critical value from standard normal distribution\n$CI$ = confidence interval",
+        "theorem": "**Central Limit Theorem and Confidence Bounds**:\nFor sufficiently large $n$, the sample mean $\\bar{X}_a$ is approximately normally distributed:\n$$\\bar{X}_a \\sim \\mathcal{N}\\left(q^*(a), \\frac{\\sigma^2}{n}\\right)$$\n\nThe standard error decreases as $\\frac{1}{\\sqrt{n}}$, which is why confidence intervals narrow with more samples.\n\n**Hoeffding's Inequality** (used in UCB theory):\nFor bounded rewards in $[0,1]$, with probability at least $1-\\delta$:\n$$\\left|\\bar{X}_a - q^*(a)\\right| \\leq \\sqrt{\\frac{\\ln(1/\\delta)}{2n}}$$\n\nThis motivates UCB's $\\sqrt{\\frac{\\ln(t)}{n}}$ term, where $\\ln(t)$ relates to the confidence level across all $t$ timesteps.",
+        "proof_sketch": "Why does $1/\\sqrt{n}$ appear in confidence intervals?\n1. Variance of sample mean: $\\text{Var}(\\bar{X}_a) = \\text{Var}\\left(\\frac{1}{n}\\sum_{i=1}^n r_i\\right) = \\frac{1}{n^2}\\sum_{i=1}^n \\text{Var}(r_i) = \\frac{\\sigma^2}{n}$\n2. Standard error: $SE = \\sqrt{\\text{Var}(\\bar{X}_a)} = \\frac{\\sigma}{\\sqrt{n}}$\n3. Confidence interval: $\\bar{X}_a \\pm z \\cdot SE = \\bar{X}_a \\pm \\frac{z\\sigma}{\\sqrt{n}}$\n4. UCB uses optimistic estimate (upper bound): $\\bar{X}_a + c\\sqrt{\\frac{\\ln(t)}{n}}$",
+        "examples": [
+          "**Example 1**: Action 0 tried 1 time: uncertainty term = $\\sqrt{\\ln(4)/1} \\approx 1.177$. Action 1 tried 4 times: uncertainty term = $\\sqrt{\\ln(4)/4} \\approx 0.588$. Action 0 gets 2× larger exploration bonus.",
+          "**Example 2**: At t=100, action with n=1 visit: $\\sqrt{\\ln(100)/1} \\approx 2.146$. Action with n=50 visits: $\\sqrt{\\ln(100)/50} \\approx 0.304$. The less-visited action gets 7× larger bonus.",
+          "**Example 3**: If all actions have been tried equally (counts = [5,5,5,5]), they all have the same uncertainty, so UCB reduces to greedy selection based on values."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Standard Error",
+          "latex": "$SE = \\frac{\\sigma}{\\sqrt{n}}$",
+          "description": "Measures uncertainty in sample mean; decreases with more samples"
+        },
+        {
+          "name": "Confidence Interval Width",
+          "latex": "$w = 2z \\cdot \\frac{\\sigma}{\\sqrt{n}}$",
+          "description": "Width of confidence interval is proportional to $1/\\sqrt{n}$"
+        },
+        {
+          "name": "UCB Uncertainty Term",
+          "latex": "$c\\sqrt{\\frac{\\ln(t)}{N(a)}}$",
+          "description": "Exploration bonus inversely proportional to square root of visit count"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes an array of exploration bonuses for all actions given their visit counts and the current timestep. For each action i, compute c * sqrt(ln(t) / counts[i]). If an action has never been tried (count=0), assign it a very large bonus (1e10) to ensure it gets explored. Use a default exploration coefficient c=2.0.",
+        "function_signature": "def compute_exploration_bonuses(counts: np.ndarray, t: int, c: float = 2.0) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_exploration_bonuses(counts, t, c=2.0):\n    \"\"\"\n    Compute exploration bonuses for all actions.\n    Args:\n      counts (np.ndarray): Visit count for each action\n      t (int): Current timestep\n      c (float): Exploration coefficient\n    Returns:\n      np.ndarray: Exploration bonus for each action\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_exploration_bonuses(np.array([1, 1, 1, 1]), 4, c=2.0)",
+            "expected": "[2.354, 2.354, 2.354, 2.354]",
+            "explanation": "All actions tried once at t=4: each gets bonus 2.0 * sqrt(ln(4)/1) ≈ 2.354"
+          },
+          {
+            "input": "compute_exploration_bonuses(np.array([5, 1, 2]), 10, c=1.0)",
+            "expected": "[0.682, 1.523, 1.077]",
+            "explanation": "Action 1 (visited once) gets largest bonus, action 0 (visited 5 times) gets smallest"
+          },
+          {
+            "input": "compute_exploration_bonuses(np.array([0, 3, 2]), 8, c=1.5)",
+            "expected": "[1e10, 1.471, 1.800]",
+            "explanation": "Action 0 never tried (count=0), so it gets maximum bonus to force exploration"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling zero counts - must assign very large bonus (or infinity) to unvisited actions",
+        "Applying the formula element-wise incorrectly - use NumPy vectorized operations for efficiency",
+        "Forgetting the exploration coefficient c - it scales the entire bonus term",
+        "Using wrong logarithm base - must use natural log (np.log)"
+      ],
+      "hint": "Create a bonuses array initialized with large values, then use np.where or boolean indexing to compute sqrt(ln(t)/counts) only where counts > 0",
+      "references": [
+        "Confidence intervals in statistics",
+        "Hoeffding's inequality",
+        "Central Limit Theorem"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Combining Exploitation and Exploration Terms",
+      "relation_to_problem": "UCB combines the sample mean (exploitation) with the uncertainty-based bonus (exploration) to compute an optimistic value for each action. The action with the highest combined value balances current knowledge with potential for learning.",
+      "prerequisites": [
+        "Understanding of Q(a) and confidence bounds",
+        "Element-wise array operations",
+        "Argmax operations"
+      ],
+      "learning_objectives": [
+        "Understand how UCB balances exploitation (Q(a)) and exploration (uncertainty bonus)",
+        "Implement the complete UCB formula as a sum of two terms",
+        "Recognize how to select actions by maximizing UCB scores"
+      ],
+      "math_content": {
+        "definition": "The **Upper Confidence Bound (UCB1)** formula computes an optimistic estimate of each action's value by combining the empirical mean with an exploration bonus:\n\n$$UCB(a) = Q(a) + c\\sqrt{\\frac{\\ln(t)}{N(a)}}$$\n\nwhere:\n- $Q(a) = \\bar{X}_a$ is the **exploitation term** (average observed reward)\n- $c\\sqrt{\\frac{\\ln(t)}{N(a)}}$ is the **exploration term** (uncertainty bonus)\n- $c > 0$ is a tunable parameter controlling exploration intensity\n\nThe algorithm selects:\n$$a^* = \\arg\\max_{a} UCB(a)$$\n\nThis implements the **optimism in the face of uncertainty** principle: act as if each action will yield its most optimistic plausible value.",
+        "notation": "$UCB(a)$ = upper confidence bound score for action $a$\n$Q(a)$ = estimated mean reward (exploitation term)\n$c$ = exploration coefficient\n$t$ = current timestep\n$N(a)$ = visit count for action $a$\n$a^*$ = selected action",
+        "theorem": "**Optimism Principle and Regret Bounds**:\nUCB achieves logarithmic regret:\n$$R(T) = O\\left(\\sum_{a: \\Delta_a > 0} \\frac{\\ln(T)}{\\Delta_a}\\right)$$\n\nwhere $\\Delta_a = q^*(a^*) - q^*(a)$ is the gap between optimal action and action $a$, and $T$ is the time horizon.\n\n**Key Insight**: By always choosing the action with the highest optimistic estimate:\n1. If an action is underexplored (high uncertainty), the exploration term is large → UCB is high → action gets selected → uncertainty reduces\n2. If an action is truly good (high Q(a)), it will be selected frequently\n3. If an action is bad, after a few trials Q(a) + bonus will fall below other actions\n\nThis guarantees all actions are eventually explored enough to distinguish their true values.",
+        "proof_sketch": "Why does UCB balance exploration and exploitation?\n1. **Initially**: All actions have high uncertainty → large exploration bonuses → all actions tried\n2. **For good actions**: $Q(a)$ increases with trials, and even as uncertainty shrinks, $Q(a) + \\text{bonus}$ remains high\n3. **For bad actions**: $Q(a)$ is low, and after sufficient trials, uncertainty shrinks so $Q(a) + \\text{bonus}$ falls below good actions\n4. **Convergence**: Eventually the optimal action is identified and selected most frequently, with only logarithmic regret from early exploration\n\nMathematically, the $\\sqrt{\\frac{\\ln(t)}{N(a)}}$ term ensures:\n- Exploration decreases at rate $O(1/\\sqrt{N(a)})$\n- But never completely stops (as long as $t$ grows)\n- Provides enough exploration to ensure sublinear regret",
+        "examples": [
+          "**Example 1**: t=4, counts=[1,1,1,1], values=[0.5, 0.8, 0.3, 0.6], c=2.0. All actions have same bonus ≈2.354. UCB scores: [2.854, 3.154, 2.654, 2.954]. Select action 1 (highest UCB).",
+          "**Example 2**: t=10, counts=[5,2,1,2], values=[0.9, 0.7, 0.5, 0.8], c=1.5. Action 2 has large bonus due to single visit, but if 0.5 + bonus < 0.9 + smaller_bonus, action 0 is still chosen.",
+          "**Example 3**: As t→∞, exploration bonuses shrink. UCB converges to pure exploitation (selecting argmax of Q values), but only after sufficient exploration guarantees correct identification of the best action."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "UCB1 Formula",
+          "latex": "$UCB(a) = Q(a) + c\\sqrt{\\frac{\\ln(t)}{N(a)}}$",
+          "description": "Complete UCB score combining exploitation and exploration"
+        },
+        {
+          "name": "Action Selection",
+          "latex": "$a^* = \\arg\\max_{a} UCB(a)$",
+          "description": "Choose the action with the highest UCB score"
+        },
+        {
+          "name": "Regret Bound",
+          "latex": "$R(T) = O\\left(\\sum_{a: \\Delta_a > 0} \\frac{\\ln(T)}{\\Delta_a}\\right)$",
+          "description": "UCB achieves logarithmic regret, near-optimal in multi-armed bandits"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes UCB scores for all actions given their visit counts, average rewards, current timestep, and exploration coefficient. The function should return an array where each element is values[i] + c * sqrt(ln(t) / counts[i]). For actions never tried (count=0), return a very large score (1e10) to ensure they are explored first.",
+        "function_signature": "def compute_ucb_scores(counts: np.ndarray, values: np.ndarray, t: int, c: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_ucb_scores(counts, values, t, c):\n    \"\"\"\n    Compute UCB scores for all actions.\n    Args:\n      counts (np.ndarray): Visit count for each action\n      values (np.ndarray): Average reward for each action\n      t (int): Current timestep\n      c (float): Exploration coefficient\n    Returns:\n      np.ndarray: UCB score for each action\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_ucb_scores(np.array([1, 1, 1, 1]), np.array([1.0, 2.0, 1.5, 0.5]), 4, 2.0)",
+            "expected": "[3.354, 4.354, 3.854, 2.854]",
+            "explanation": "All have same exploration bonus ≈2.354. Action 1 has highest value (2.0) so highest UCB (2.0 + 2.354 = 4.354)"
+          },
+          {
+            "input": "compute_ucb_scores(np.array([5, 2, 1]), np.array([0.9, 0.7, 0.4]), 10, 1.5)",
+            "expected": "[1.923, 2.314, 3.685]",
+            "explanation": "Action 2 has low value but highest exploration bonus due to single visit, giving it highest UCB"
+          },
+          {
+            "input": "compute_ucb_scores(np.array([0, 3, 2]), np.array([0.0, 0.8, 0.6]), 8, 1.0)",
+            "expected": "[1e10, 1.671, 1.677]",
+            "explanation": "Action 0 never tried gets maximum score to force initial exploration"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling zero counts before computing sqrt(ln(t)/counts) - causes division by zero",
+        "Computing exploration term but forgetting to add it to values array",
+        "Using wrong array dimensions - counts and values must have same shape",
+        "Not vectorizing the computation - use NumPy operations on entire arrays, not loops"
+      ],
+      "hint": "Start by computing the exploration bonuses (from previous sub-quest), then add them element-wise to the values array. Handle count=0 cases by initializing with large values or using np.where",
+      "references": [
+        "Sutton & Barto: Multi-armed Bandits",
+        "Auer et al. (2002): UCB1 algorithm",
+        "Optimism in the face of uncertainty principle"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Complete UCB Action Selection Implementation",
+      "relation_to_problem": "This sub-quest integrates all previous concepts into the complete UCB action selection algorithm. We compute UCB scores for all actions and select the one with the highest score, implementing the full UCB1 strategy.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "NumPy argmax operation",
+        "Understanding of complete UCB algorithm flow"
+      ],
+      "learning_objectives": [
+        "Integrate exploitation and exploration into a single decision-making function",
+        "Implement robust action selection handling edge cases",
+        "Understand the complete UCB1 algorithm workflow"
+      ],
+      "math_content": {
+        "definition": "The **UCB Action Selection Algorithm** proceeds as follows:\n\n**Input**: \n- $N(a)$ = visit count array for all actions\n- $Q(a)$ = value estimate array for all actions\n- $t$ = current timestep\n- $c$ = exploration coefficient\n\n**Algorithm**:\n1. For each action $a$:\n   - If $N(a) = 0$: Set $UCB(a) = \\infty$ (must explore)\n   - Otherwise: Compute $UCB(a) = Q(a) + c\\sqrt{\\frac{\\ln(t)}{N(a)}}$\n2. Select action: $a^* = \\arg\\max_{a} UCB(a)$\n3. Return $a^*$\n\nThis implements a **deterministic** policy that balances exploration and exploitation optimally in expectation.",
+        "notation": "$a^*$ = selected action\n$UCB(a)$ = upper confidence bound for action $a$\n$\\arg\\max$ = argument that maximizes (returns the index, not the value)\n$\\infty$ = infinity (used for unvisited actions)",
+        "theorem": "**UCB1 Convergence and Regret**:\n\nWith probability 1, UCB1 will:\n1. Try every action infinitely often as $t \\to \\infty$\n2. The proportion of times the optimal action is selected converges to 1\n3. The cumulative regret grows as $O(\\ln T)$, which is optimal\n\n**Formal Statement**: For a $K$-armed bandit with action gaps $\\Delta_a = q^*(a^*) - q^*(a)$, UCB1 achieves expected regret:\n$$\\mathbb{E}[R(T)] \\leq \\sum_{a: \\Delta_a > 0} \\left(\\frac{8\\ln(T)}{\\Delta_a} + \\left(1 + \\frac{\\pi^2}{3}\\right)\\Delta_a\\right)$$\n\nThe $\\ln(T)$ term dominates, confirming logarithmic regret.\n\n**Comparison to other strategies**:\n- Random: $O(T)$ regret (linear)\n- $\\epsilon$-greedy: $O(T)$ regret (linear)\n- UCB1: $O(\\ln T)$ regret (logarithmic) ✓ optimal",
+        "proof_sketch": "Why does UCB1 achieve optimal regret?\n1. **Exploration guarantee**: The $\\sqrt{\\frac{\\ln(t)}{N(a)}}$ term ensures that if an action is neglected, its UCB score grows until it's selected\n2. **Exploitation guarantee**: As $N(a)$ increases, the confidence interval shrinks, so bad actions eventually have low UCB scores\n3. **Optimal balance**: The $\\ln(t)$ scaling is tight - it's the minimum needed to ensure all actions are explored enough to identify the optimum\n4. **Regret decomposition**: Total regret = (times suboptimal action chosen) × (gap in value). UCB ensures suboptimal actions are chosen $O(\\ln T / \\Delta_a)$ times\n5. **Hoeffding bound**: The confidence intervals hold with high probability, preventing premature convergence to suboptimal actions",
+        "examples": [
+          "**Example 1 (from problem)**: counts=[1,1,1,1], values=[1.0,2.0,1.5,0.5], t=4, c=2.0. UCB scores ≈ [3.35, 4.35, 3.85, 2.85]. argmax gives action 1.",
+          "**Example 2**: counts=[10,5,1,8], values=[0.85,0.80,0.50,0.75], t=24, c=1.0. Action 2 has high bonus but low value. After computing UCB, action 0 likely has highest score due to high value + moderate bonus.",
+          "**Example 3**: counts=[0,5,10,8], values=[0,0.9,0.95,0.88], t=23, c=1.5. Action 0 has count=0 so UCB=infinity, must be selected first (initial exploration phase)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete UCB Action Selection",
+          "latex": "$a^* = \\arg\\max_{a} \\left[Q(a) + c\\sqrt{\\frac{\\ln(t)}{N(a)}}\\right]$",
+          "description": "Select action with highest UCB score"
+        },
+        {
+          "name": "Unvisited Action Rule",
+          "latex": "$\\text{If } N(a) = 0 \\text{ then } UCB(a) = \\infty$",
+          "description": "Force exploration of actions never tried"
+        },
+        {
+          "name": "Expected Regret Bound",
+          "latex": "$\\mathbb{E}[R(T)] = O\\left(\\sum_{a: \\Delta_a > 0} \\frac{\\ln(T)}{\\Delta_a}\\right)$",
+          "description": "UCB1's theoretical performance guarantee"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete UCB action selection function. Given arrays of visit counts and average values, the current timestep, and exploration coefficient, compute UCB scores for all actions and return the index of the action with the highest score. This combines all previous sub-quests: compute exploration bonuses, add them to values, and select the argmax. Ensure actions with count=0 are handled properly by giving them maximum priority.",
+        "function_signature": "def ucb_action_selection(counts: np.ndarray, values: np.ndarray, t: int, c: float) -> int:",
+        "starter_code": "import numpy as np\n\ndef ucb_action_selection(counts, values, t, c):\n    \"\"\"\n    Select an action using the UCB1 algorithm.\n    Args:\n      counts (np.ndarray): Visit count for each action\n      values (np.ndarray): Average reward for each action\n      t (int): Current timestep\n      c (float): Exploration coefficient\n    Returns:\n      int: Index of selected action\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "ucb_action_selection(np.array([1, 1, 1, 1]), np.array([1.0, 2.0, 1.5, 0.5]), 4, 2.0)",
+            "expected": "1",
+            "explanation": "This is the exact example from the problem. Action 1 has highest value and same exploration bonus as others, so UCB score is highest."
+          },
+          {
+            "input": "ucb_action_selection(np.array([5, 2, 10]), np.array([0.8, 0.7, 0.9]), 17, 1.5)",
+            "expected": "2",
+            "explanation": "Action 2 has highest value (0.9) and despite lower exploration bonus due to high visit count, likely has highest UCB"
+          },
+          {
+            "input": "ucb_action_selection(np.array([0, 4, 3]), np.array([0.0, 0.8, 0.7]), 7, 1.0)",
+            "expected": "0",
+            "explanation": "Action 0 has never been tried (count=0), so it must be explored first regardless of its value"
+          },
+          {
+            "input": "ucb_action_selection(np.array([10, 10, 10]), np.array([0.5, 0.9, 0.6]), 30, 2.0)",
+            "expected": "1",
+            "explanation": "All actions tried equally (same exploration bonus), so pure exploitation chooses highest value action (1)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using np.max instead of np.argmax - must return the index, not the value",
+        "Not handling ties in argmax - NumPy's argmax automatically returns first occurrence, which is correct",
+        "Computing UCB scores inefficiently with loops instead of vectorized NumPy operations",
+        "Forgetting to handle count=0 before division - must check and assign large value or infinity",
+        "Using wrong timestep value - t should represent total actions taken so far, starting from 1"
+      ],
+      "hint": "Compute UCB scores using the function from sub-quest 4, then use np.argmax to find the index of the highest score. This is a two-line solution if you reuse previous work properly.",
+      "references": [
+        "Auer, Cesa-Bianchi, Fischer (2002): 'Finite-time Analysis of the Multiarmed Bandit Problem'",
+        "Sutton & Barto: Reinforcement Learning Chapter 2",
+        "UCB1 algorithm pseudocode"
+      ]
+    }
+  ]
+}

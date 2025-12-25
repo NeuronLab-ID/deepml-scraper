@@ -1,0 +1,60 @@
+{
+  "description": "V3JpdGUgYSBQeXRob24gZnVuY3Rpb24gdGhhdCBjb21wdXRlcyB0aGUgSmFjb2JpYW4gbWF0cml4IG9mIHRoZSBzb2Z0bWF4IGZ1bmN0aW9uLiBUaGUgc29mdG1heCBmdW5jdGlvbiBtYXBzIGEgdmVjdG9yIG9mIHJlYWwgbnVtYmVycyB0byBhIHByb2JhYmlsaXR5IGRpc3RyaWJ1dGlvbiwgYW5kIGl0cyBkZXJpdmF0aXZlIGlzIGVzc2VudGlhbCBmb3IgYmFja3Byb3BhZ2F0aW9uIGluIG5ldXJhbCBuZXR3b3JrcyB3aXRoIGNsYXNzaWZpY2F0aW9uIG91dHB1dHMuIEdpdmVuIGFuIGlucHV0IHZlY3RvciB4LCByZXR1cm4gdGhlIEphY29iaWFuIG1hdHJpeCBKIHdoZXJlIEpbaV1bal0gPSBkKHNvZnRtYXhfaSkvZCh4X2opLg==",
+  "id": "219",
+  "test_cases": [
+    {
+      "test": "result = softmax_derivative([1.0, 2.0, 3.0])\nprint([[round(v, 4) for v in row] for row in result])",
+      "expected_output": "[[0.0819, -0.022, -0.0599], [-0.022, 0.1848, -0.1628], [-0.0599, -0.1628, 0.2227]]"
+    },
+    {
+      "test": "result = softmax_derivative([1.0, 1.0, 1.0])\nprint([[round(v, 4) for v in row] for row in result])",
+      "expected_output": "[[0.2222, -0.1111, -0.1111], [-0.1111, 0.2222, -0.1111], [-0.1111, -0.1111, 0.2222]]"
+    }
+  ],
+  "difficulty": "medium",
+  "pytorch_difficulty": "medium",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "x = [1.0, 2.0, 3.0]",
+    "output": "[[0.0819, -0.022, -0.0599], [-0.022, 0.1848, -0.1628], [-0.0599, -0.1628, 0.2227]]",
+    "reasoning": "First compute softmax: s = [0.09, 0.2447, 0.6652]. Then for diagonal elements: J[i][i] = s[i] * (1 - s[i]). For off-diagonal: J[i][j] = -s[i] * s[j]. For example, J[0][0] = 0.09 * (1 - 0.09) = 0.0819 and J[0][1] = -0.09 * 0.2447 = -0.022."
+  },
+  "category": "Calculus",
+  "pytorch_starter_code": "aW1wb3J0IHRvcmNoCgpkZWYgc29mdG1heF9kZXJpdmF0aXZlKHg6IHRvcmNoLlRlbnNvcikgLT4gdG9yY2guVGVuc29yOgogICAgIiIiCiAgICBDb21wdXRlIHRoZSBKYWNvYmlhbiBtYXRyaXggb2YgdGhlIHNvZnRtYXggZnVuY3Rpb24gdXNpbmcgUHlUb3JjaC4KICAgIAogICAgQXJnczoKICAgICAgICB4OiBJbnB1dCB0ZW5zb3IKICAgICAgICAKICAgIFJldHVybnM6CiAgICAgICAgSmFjb2JpYW4gbWF0cml4IEogd2hlcmUgSltpXVtqXSA9IGQoc29mdG1heF9pKS9kKHhfaikKICAgICIiIgogICAgIyBZb3VyIGNvZGUgaGVyZSAtIHlvdSBjYW4gdXNlIHRvcmNoLmF1dG9ncmFkLmZ1bmN0aW9uYWwuamFjb2JpYW4KICAgICMgb3IgY29tcHV0ZSBpdCBkaXJlY3RseSBmcm9tIHNvZnRtYXggb3V0cHV0CiAgICBwYXNz",
+  "title": "Derivative of Softmax",
+  "createdAt": "December 5, 2025 at 3:20:29 PM UTC-0500",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/Open-Deep-ML",
+      "name": "Deep-ML"
+    }
+  ],
+  "pytorch_test_cases": [
+    {
+      "test": "import torch\nresult = softmax_derivative(torch.tensor([1.0, 2.0, 3.0]))\nprint([[round(v, 4) for v in row.tolist()] for row in result])",
+      "expected_output": "[[0.0819, -0.022, -0.0599], [-0.022, 0.1848, -0.1628], [-0.0599, -0.1628, 0.2227]]"
+    },
+    {
+      "test": "import torch\nresult = softmax_derivative(torch.tensor([1.0, 1.0, 1.0]))\nprint([[round(v, 4) for v in row.tolist()] for row in result])",
+      "expected_output": "[[0.2222, -0.1111, -0.1111], [-0.1111, 0.2222, -0.1111], [-0.1111, -0.1111, 0.2222]]"
+    },
+    {
+      "test": "import torch\nresult = softmax_derivative(torch.tensor([0.0, 1.0]))\nprint([[round(v, 4) for v in row.tolist()] for row in result])",
+      "expected_output": "[[0.1966, -0.1966], [-0.1966, 0.1966]]"
+    },
+    {
+      "test": "import torch\nresult = softmax_derivative(torch.tensor([2.0, 1.0]))\nprint([[round(v, 4) for v in row.tolist()] for row in result])",
+      "expected_output": "[[0.1966, -0.1966], [-0.1966, 0.1966]]"
+    },
+    {
+      "test": "import torch\nresult = softmax_derivative(torch.tensor([1.0, 2.0, 3.0, 4.0]))\nprint([[round(v, 4) for v in row.tolist()] for row in result])",
+      "expected_output": "[[0.031, -0.0028, -0.0076, -0.0206], [-0.0028, 0.0796, -0.0206, -0.0561], [-0.0076, -0.0206, 0.1808, -0.1525], [-0.0206, -0.0561, -0.1525, 0.2293]]"
+    }
+  ],
+  "learn_section": "IyMgRGVyaXZhdGl2ZSBvZiB0aGUgU29mdG1heCBGdW5jdGlvbgoKIyMjIFRoZSBTb2Z0bWF4IEZ1bmN0aW9uCgpUaGUgc29mdG1heCBmdW5jdGlvbiBjb252ZXJ0cyBhIHZlY3RvciBvZiByZWFsIG51bWJlcnMgaW50byBhIHByb2JhYmlsaXR5IGRpc3RyaWJ1dGlvbjoKCiQkXHRleHR7c29mdG1heH0oeF9pKSA9IFxmcmFje2Vee3hfaX19e1xzdW1fe2s9MX1ee259IGVee3hfa319ID0gc19pJCQKCiMjIyBXaHkgV2UgTmVlZCBJdHMgRGVyaXZhdGl2ZQoKSW4gbmV1cmFsIG5ldHdvcmtzLCBzb2Z0bWF4IGlzIHR5cGljYWxseSB0aGUgZmluYWwgbGF5ZXIgZm9yIGNsYXNzaWZpY2F0aW9uIHRhc2tzLiBEdXJpbmcgYmFja3Byb3BhZ2F0aW9uLCB3ZSBuZWVkIHRvIGNvbXB1dGUgaG93IHRoZSBsb3NzIGNoYW5nZXMgd2l0aCByZXNwZWN0IHRvIHRoZSBpbnB1dHMgdG8gdGhlIHNvZnRtYXggbGF5ZXIuIFRoaXMgcmVxdWlyZXMgdGhlIEphY29iaWFuIG1hdHJpeCBvZiBzb2Z0bWF4LgoKIyMjIERlcml2aW5nIHRoZSBKYWNvYmlhbgoKVGhlIEphY29iaWFuIG1hdHJpeCAkSiQgaGFzIGVsZW1lbnRzICRKX3tpan0gPSBcZnJhY3tccGFydGlhbCBzX2l9e1xwYXJ0aWFsIHhfan0kLgoKKipDYXNlIDE6IFdoZW4gaSA9IGogKGRpYWdvbmFsIGVsZW1lbnRzKSoqCgpVc2luZyB0aGUgcXVvdGllbnQgcnVsZToKJCRcZnJhY3tccGFydGlhbCBzX2l9e1xwYXJ0aWFsIHhfaX0gPSBcZnJhY3tlXnt4X2l9IFxjZG90IFxzdW1fayBlXnt4X2t9IC0gZV57eF9pfSBcY2RvdCBlXnt4X2l9fXsoXHN1bV9rIGVee3hfa30pXjJ9JCQKCiQkPSBcZnJhY3tlXnt4X2l9fXtcc3VtX2sgZV57eF9rfX0gLSBcZnJhY3tlXnt4X2l9fXtcc3VtX2sgZV57eF9rfX0gXGNkb3QgXGZyYWN7ZV57eF9pfX17XHN1bV9rIGVee3hfa319JCQKCiQkPSBzX2kgLSBzX2leMiA9IHNfaSgxIC0gc19pKSQkCgoqKkNhc2UgMjogV2hlbiBpICE9IGogKG9mZi1kaWFnb25hbCBlbGVtZW50cykqKgoKJCRcZnJhY3tccGFydGlhbCBzX2l9e1xwYXJ0aWFsIHhfan0gPSBcZnJhY3swIC0gZV57eF9pfSBcY2RvdCBlXnt4X2p9fXsoXHN1bV9rIGVee3hfa30pXjJ9ID0gLXNfaSBcY2RvdCBzX2okJAoKIyMjIENvbXBhY3QgRm9ybXVsYQoKQ29tYmluaW5nIGJvdGggY2FzZXMgdXNpbmcgdGhlIEtyb25lY2tlciBkZWx0YSAkXGRlbHRhX3tpan0kOgoKJCRKX3tpan0gPSBcZnJhY3tccGFydGlhbCBzX2l9e1xwYXJ0aWFsIHhfan0gPSBzX2koXGRlbHRhX3tpan0gLSBzX2opJCQKCk9yIGluIG1hdHJpeCBmb3JtOgokJEogPSBcdGV4dHtkaWFnfShzKSAtIHMgXGNkb3Qgc15UJCQKCiMjIyBFeGFtcGxlCgpGb3IgJHggPSBbMSwgMl0kOgotICRzID0gWzAuMjY4OSwgMC43MzExXSQKCkphY29iaWFuOgokJEogPSBcYmVnaW57cG1hdHJpeH0gc18xKDEtc18xKSAmIC1zXzEgc18yIFxcIC1zXzIgc18xICYgc18yKDEtc18yKSBcZW5ke3BtYXRyaXh9ID0gXGJlZ2lue3BtYXRyaXh9IDAuMTk2NiAmIC0wLjE5NjYgXFwgLTAuMTk2NiAmIDAuMTk2NiBcZW5ke3BtYXRyaXh9JCQKCiMjIyBLZXkgUHJvcGVydGllcwoKMS4gKipTeW1tZXRyeSoqOiBUaGUgSmFjb2JpYW4gaXMgc3ltbWV0cmljICgkSl97aWp9ID0gSl97aml9JCkKCjIuICoqUm93L0NvbHVtbiBTdW1zKio6IEVhY2ggcm93IChhbmQgY29sdW1uKSBzdW1zIHRvIHplcm8uIFRoaXMgbWFrZXMgc2Vuc2UgYmVjYXVzZSBzb2Z0bWF4IG91dHB1dHMgc3VtIHRvIDEsIHNvIGluY3JlYXNpbmcgb25lIG91dHB1dCBtdXN0IGRlY3JlYXNlIG90aGVycy4KCjMuICoqRGlhZ29uYWwgRG9taW5hbmNlKio6IERpYWdvbmFsIGVsZW1lbnRzIGFyZSBhbHdheXMgcG9zaXRpdmUsIG9mZi1kaWFnb25hbCBhcmUgYWx3YXlzIG5lZ2F0aXZlLgoKNC4gKipDb25uZWN0aW9uIHRvIFNpZ21vaWQqKjogRm9yIG49MiwgdGhlIHNvZnRtYXggSmFjb2JpYW4gZGlhZ29uYWwgZXF1YWxzIHRoZSBzaWdtb2lkIGRlcml2YXRpdmU6ICRzX2koMS1zX2kpJAoKIyMjIEluIFByYWN0aWNlOiBDcm9zcy1FbnRyb3B5IFNpbXBsaWZpY2F0aW9uCgpXaGVuIHNvZnRtYXggaXMgY29tYmluZWQgd2l0aCBjcm9zcy1lbnRyb3B5IGxvc3MgKGFzIGlzIGNvbW1vbiksIHRoZSBncmFkaWVudCBzaW1wbGlmaWVzIGVsZWdhbnRseSB0bzoKJCRcZnJhY3tccGFydGlhbCBMfXtccGFydGlhbCB4X2l9ID0gc19pIC0geV9pJCQKCndoZXJlICR5JCBpcyB0aGUgb25lLWhvdCBlbmNvZGVkIHRydWUgbGFiZWwuIFRoaXMgaXMgd2h5IHNvZnRtYXggKyBjcm9zcy1lbnRyb3B5IGlzIHNvIHBvcHVsYXIgLSB0aGUgZ3JhZGllbnQgaXMgc2ltcGx5IHRoZSBwcmVkaWN0ZWQgcHJvYmFiaWxpdHkgbWludXMgdGhlIHRhcmdldCE=",
+  "starter_code": "def softmax_derivative(x: list[float]) -> list[list[float]]:\n\t\"\"\"\n\tCompute the Jacobian matrix of the softmax function.\n\t\n\tArgs:\n\t\tx: Input vector of real numbers\n\t\t\n\tReturns:\n\t\tJacobian matrix J where J[i][j] = d(softmax_i)/d(x_j)\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "description_decoded": "Write a Python function that computes the Jacobian matrix of the softmax function. The softmax function maps a vector of real numbers to a probability distribution, and its derivative is essential for backpropagation in neural networks with classification outputs. Given an input vector x, return the Jacobian matrix J where J[i][j] = d(softmax_i)/d(x_j).",
+  "learn_section_decoded": "## Derivative of the Softmax Function\n\n### The Softmax Function\n\nThe softmax function converts a vector of real numbers into a probability distribution:\n\n$$\\text{softmax}(x_i) = \\frac{e^{x_i}}{\\sum_{k=1}^{n} e^{x_k}} = s_i$$\n\n### Why We Need Its Derivative\n\nIn neural networks, softmax is typically the final layer for classification tasks. During backpropagation, we need to compute how the loss changes with respect to the inputs to the softmax layer. This requires the Jacobian matrix of softmax.\n\n### Deriving the Jacobian\n\nThe Jacobian matrix $J$ has elements $J_{ij} = \\frac{\\partial s_i}{\\partial x_j}$.\n\n**Case 1: When i = j (diagonal elements)**\n\nUsing the quotient rule:\n$$\\frac{\\partial s_i}{\\partial x_i} = \\frac{e^{x_i} \\cdot \\sum_k e^{x_k} - e^{x_i} \\cdot e^{x_i}}{(\\sum_k e^{x_k})^2}$$\n\n$$= \\frac{e^{x_i}}{\\sum_k e^{x_k}} - \\frac{e^{x_i}}{\\sum_k e^{x_k}} \\cdot \\frac{e^{x_i}}{\\sum_k e^{x_k}}$$\n\n$$= s_i - s_i^2 = s_i(1 - s_i)$$\n\n**Case 2: When i != j (off-diagonal elements)**\n\n$$\\frac{\\partial s_i}{\\partial x_j} = \\frac{0 - e^{x_i} \\cdot e^{x_j}}{(\\sum_k e^{x_k})^2} = -s_i \\cdot s_j$$\n\n### Compact Formula\n\nCombining both cases using the Kronecker delta $\\delta_{ij}$:\n\n$$J_{ij} = \\frac{\\partial s_i}{\\partial x_j} = s_i(\\delta_{ij} - s_j)$$\n\nOr in matrix form:\n$$J = \\text{diag}(s) - s \\cdot s^T$$\n\n### Example\n\nFor $x = [1, 2]$:\n- $s = [0.2689, 0.7311]$\n\nJacobian:\n$$J = \\begin{pmatrix} s_1(1-s_1) & -s_1 s_2 \\\\ -s_2 s_1 & s_2(1-s_2) \\end{pmatrix} = \\begin{pmatrix} 0.1966 & -0.1966 \\\\ -0.1966 & 0.1966 \\end{pmatrix}$$\n\n### Key Properties\n\n1. **Symmetry**: The Jacobian is symmetric ($J_{ij} = J_{ji}$)\n\n2. **Row/Column Sums**: Each row (and column) sums to zero. This makes sense because softmax outputs sum to 1, so increasing one output must decrease others.\n\n3. **Diagonal Dominance**: Diagonal elements are always positive, off-diagonal are always negative.\n\n4. **Connection to Sigmoid**: For n=2, the softmax Jacobian diagonal equals the sigmoid derivative: $s_i(1-s_i)$\n\n### In Practice: Cross-Entropy Simplification\n\nWhen softmax is combined with cross-entropy loss (as is common), the gradient simplifies elegantly to:\n$$\\frac{\\partial L}{\\partial x_i} = s_i - y_i$$\n\nwhere $y$ is the one-hot encoded true label. This is why softmax + cross-entropy is so popular - the gradient is simply the predicted probability minus the target!"
+}

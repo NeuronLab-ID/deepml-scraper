@@ -1,0 +1,572 @@
+{
+  "problem_id": 81,
+  "title": "Poisson Distribution Probability Calculator",
+  "category": "Probability",
+  "difficulty": "easy",
+  "description": "Write a Python function to calculate the probability of observing exactly k events in a fixed interval using the Poisson distribution formula. The function should take k (number of events) and lam (mean rate of occurrences) as inputs and return the probability rounded to 5 decimal places.",
+  "example": {
+    "input": "k = 3, lam = 5",
+    "output": "0.14037",
+    "reasoning": "The function calculates the probability for a given number of events occurring in a fixed interval, based on the mean rate of occurrences."
+  },
+  "starter_code": "import math\n\ndef poisson_probability(k, lam):\n\t\"\"\"\n\tCalculate the probability of observing exactly k events in a fixed interval,\n\tgiven the mean rate of events lam, using the Poisson distribution formula.\n\t:param k: Number of events (non-negative integer)\n\t:param lam: The average rate (mean) of occurrences in a fixed interval\n\t\"\"\"\n\t# Your code here\n\tpass\n\treturn round(val,5)",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Factorials and Their Computation",
+      "relation_to_problem": "The Poisson PMF formula requires computing k! in the denominator. Efficient factorial computation is essential for calculating probabilities, especially for larger values of k.",
+      "prerequisites": [
+        "Basic arithmetic operations",
+        "Understanding of mathematical notation",
+        "Iterative algorithms"
+      ],
+      "learning_objectives": [
+        "Define factorial mathematically and understand its properties",
+        "Implement an efficient factorial function",
+        "Recognize edge cases (0! = 1) and computational limits",
+        "Understand why factorial grows rapidly and its implications"
+      ],
+      "math_content": {
+        "definition": "The factorial of a non-negative integer $n$, denoted $n!$, is the product of all positive integers less than or equal to $n$. Formally: $$n! = \\begin{cases} 1 & \\text{if } n = 0 \\\\ n \\cdot (n-1)! & \\text{if } n > 0 \\end{cases}$$ Equivalently, $n! = n \\times (n-1) \\times (n-2) \\times \\cdots \\times 2 \\times 1$",
+        "notation": "$n!$ reads as 'n factorial', where $n \\in \\mathbb{Z}_{\\geq 0}$ (non-negative integers)",
+        "theorem": "**Base Case Property:** By convention and mathematical necessity, $0! = 1$. This ensures consistency in combinatorial formulas and the empty product definition.",
+        "proof_sketch": "The empty product (product of no numbers) equals the multiplicative identity 1. This convention makes formulas like $\\binom{n}{0} = \\frac{n!}{0! \\cdot n!} = 1$ work correctly.",
+        "examples": [
+          "$3! = 3 \\times 2 \\times 1 = 6$",
+          "$5! = 5 \\times 4 \\times 3 \\times 2 \\times 1 = 120$",
+          "$0! = 1$ (by definition)",
+          "$1! = 1$",
+          "$10! = 3,628,800$ (grows very rapidly)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Recursive Definition",
+          "latex": "$n! = n \\cdot (n-1)!$",
+          "description": "Used for recursive implementation; requires base case $0! = 1$"
+        },
+        {
+          "name": "Iterative Definition",
+          "latex": "$n! = \\prod_{i=1}^{n} i$",
+          "description": "Product notation for iterative computation from 1 to n"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the factorial of a non-negative integer. This is a fundamental building block for the Poisson probability formula. Handle the special case where n=0 returns 1.",
+        "function_signature": "def factorial(n: int) -> int:",
+        "starter_code": "def factorial(n: int) -> int:\n    \"\"\"\n    Calculate the factorial of a non-negative integer n.\n    :param n: Non-negative integer\n    :return: n! (n factorial)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "factorial(0)",
+            "expected": "1",
+            "explanation": "By definition, 0! = 1 (empty product)"
+          },
+          {
+            "input": "factorial(1)",
+            "expected": "1",
+            "explanation": "1! = 1"
+          },
+          {
+            "input": "factorial(3)",
+            "expected": "6",
+            "explanation": "3! = 3 × 2 × 1 = 6"
+          },
+          {
+            "input": "factorial(5)",
+            "expected": "120",
+            "explanation": "5! = 5 × 4 × 3 × 2 × 1 = 120"
+          },
+          {
+            "input": "factorial(10)",
+            "expected": "3628800",
+            "explanation": "10! = 3,628,800 (demonstrates rapid growth)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that 0! = 1, not 0",
+        "Using recursion without considering stack overflow for large n",
+        "Not handling negative inputs (factorials undefined for negative integers)",
+        "Integer overflow for large factorials (n > 20 exceeds standard int range)"
+      ],
+      "hint": "Use a simple loop that multiplies numbers from 1 to n. Don't forget the special case for n=0.",
+      "references": [
+        "Factorial function properties",
+        "Combinatorics and counting principles",
+        "Gamma function (generalization of factorial to real numbers)"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Exponential Function and Euler's Number",
+      "relation_to_problem": "The Poisson PMF contains $e^{-\\lambda}$ where $e \\approx 2.71828$ is Euler's number. Understanding exponential functions and computing $e^x$ accurately is crucial for calculating Poisson probabilities.",
+      "prerequisites": [
+        "Basic algebra",
+        "Understanding of powers and exponents",
+        "Knowledge of mathematical constants"
+      ],
+      "learning_objectives": [
+        "Understand Euler's number e and its mathematical significance",
+        "Compute exponential values using Python's math library",
+        "Recognize properties of the exponential function: e^(a+b) = e^a × e^b",
+        "Apply exponential function to negative exponents (e^(-x))"
+      ],
+      "math_content": {
+        "definition": "**Euler's number** $e$ is a mathematical constant approximately equal to 2.71828. It is the base of the natural logarithm and is defined as the limit: $$e = \\lim_{n \\to \\infty} \\left(1 + \\frac{1}{n}\\right)^n$$ The **exponential function** $e^x$ (or $\\exp(x)$) is defined for all real $x$ and has the property that its derivative equals itself: $\\frac{d}{dx}e^x = e^x$.",
+        "notation": "$e^x = \\exp(x)$ where $x \\in \\mathbb{R}$. For the Poisson distribution, we use $e^{-\\lambda}$ where $\\lambda > 0$",
+        "theorem": "**Exponential Properties:** For any real numbers $a, b$: (1) $e^{a+b} = e^a \\cdot e^b$, (2) $e^{-a} = \\frac{1}{e^a}$, (3) $e^0 = 1$, (4) $(e^a)^b = e^{ab}$",
+        "proof_sketch": "These properties follow from the definition of exponents and the laws of exponents. Property (1) follows from $\\exp(a+b) = \\sum_{n=0}^{\\infty} \\frac{(a+b)^n}{n!}$ and binomial expansion. Property (2) is immediate from $e^a \\cdot e^{-a} = e^{a-a} = e^0 = 1$.",
+        "examples": [
+          "$e^0 = 1$",
+          "$e^1 = e \\approx 2.71828$",
+          "$e^2 \\approx 7.38906$",
+          "$e^{-1} = \\frac{1}{e} \\approx 0.36788$",
+          "$e^{-5} \\approx 0.00674$ (used in Poisson calculation with $\\lambda = 5$)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Exponential Function",
+          "latex": "$e^x = \\exp(x)$",
+          "description": "Base-e exponential; in Python use math.exp(x)"
+        },
+        {
+          "name": "Negative Exponential",
+          "latex": "$e^{-\\lambda} = \\frac{1}{e^{\\lambda}}$",
+          "description": "Form used in Poisson distribution; represents decay factor"
+        },
+        {
+          "name": "Series Expansion",
+          "latex": "$e^x = \\sum_{n=0}^{\\infty} \\frac{x^n}{n!} = 1 + x + \\frac{x^2}{2!} + \\frac{x^3}{3!} + \\cdots$",
+          "description": "Taylor series representation (for theoretical understanding)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes e raised to the power of a given number x. Use Python's math module to access both Euler's number and the exponential function. This will be essential for computing the e^(-lambda) term in the Poisson formula.",
+        "function_signature": "def compute_exponential(x: float) -> float:",
+        "starter_code": "import math\n\ndef compute_exponential(x: float) -> float:\n    \"\"\"\n    Calculate e^x where e is Euler's number.\n    :param x: The exponent (can be positive or negative)\n    :return: e^x rounded to 5 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_exponential(0)",
+            "expected": "1.0",
+            "explanation": "e^0 = 1 by definition of exponents"
+          },
+          {
+            "input": "compute_exponential(1)",
+            "expected": "2.71828",
+            "explanation": "e^1 = e ≈ 2.71828"
+          },
+          {
+            "input": "compute_exponential(-1)",
+            "expected": "0.36788",
+            "explanation": "e^(-1) = 1/e ≈ 0.36788"
+          },
+          {
+            "input": "compute_exponential(-5)",
+            "expected": "0.00674",
+            "explanation": "e^(-5) ≈ 0.00674, needed for Poisson with λ=5"
+          },
+          {
+            "input": "compute_exponential(2.5)",
+            "expected": "12.18249",
+            "explanation": "Demonstrates handling of non-integer exponents"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing e^x with x^e (exponentiation order matters)",
+        "Attempting to implement exponential from scratch instead of using math.exp()",
+        "Not recognizing that e^(-x) is always positive (never zero or negative)",
+        "Forgetting to import the math module before using math.exp()"
+      ],
+      "hint": "Python's math module provides both math.e (Euler's number) and math.exp(x) function. Use math.exp() for accurate computation.",
+      "references": [
+        "Euler's number and natural logarithm",
+        "Exponential growth and decay",
+        "Taylor series expansion of e^x"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Power Function and Exponentiation with Real Numbers",
+      "relation_to_problem": "The Poisson formula requires computing λ^k where λ can be any positive real number and k is a non-negative integer. Understanding exponentiation is essential for the numerator of the Poisson PMF.",
+      "prerequisites": [
+        "Basic arithmetic",
+        "Understanding of exponents",
+        "Integer and float data types"
+      ],
+      "learning_objectives": [
+        "Understand mathematical definition of exponentiation a^b",
+        "Compute powers efficiently for integer and real bases",
+        "Recognize special cases: a^0 = 1, a^1 = a",
+        "Handle edge cases where base or exponent is zero"
+      ],
+      "math_content": {
+        "definition": "**Exponentiation** is a mathematical operation written as $a^b$ where $a$ is the **base** and $b$ is the **exponent** (or power). For positive real $a$ and non-negative integer $b$: $$a^b = \\underbrace{a \\times a \\times \\cdots \\times a}_{b \\text{ times}}$$ More generally, $a^b = e^{b \\ln(a)}$ for $a > 0$ and any real $b$.",
+        "notation": "$a^b$ or $\\text{pow}(a, b)$ represents '$a$ raised to the power of $b$'. In Poisson context: $\\lambda^k$ where $\\lambda \\in \\mathbb{R}^+$ and $k \\in \\mathbb{Z}_{\\geq 0}$",
+        "theorem": "**Exponent Laws:** For $a, b > 0$ and exponents $m, n \\in \\mathbb{R}$: (1) $a^m \\cdot a^n = a^{m+n}$, (2) $\\frac{a^m}{a^n} = a^{m-n}$, (3) $(a^m)^n = a^{mn}$, (4) $a^0 = 1$ (for $a \\neq 0$), (5) $a^{-n} = \\frac{1}{a^n}$",
+        "proof_sketch": "Properties (1)-(3) follow from repeated multiplication. Property (4) is defined to maintain consistency with the exponent laws: $a^n = a^{n-0} = \\frac{a^n}{a^0}$, thus $a^0 = 1$. Property (5) follows from $a^n \\cdot a^{-n} = a^{n-n} = a^0 = 1$.",
+        "examples": [
+          "$5^0 = 1$ (any non-zero number to power 0 is 1)",
+          "$5^1 = 5$",
+          "$5^2 = 25$",
+          "$5^3 = 125$ (as needed for Poisson example with $\\lambda=5, k=3$)",
+          "$2.5^4 = 39.0625$ (real base with integer exponent)",
+          "$0^k = 0$ for all $k > 0$ (edge case: lambda cannot be 0 in Poisson)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Integer Exponentiation",
+          "latex": "$a^n = a \\times a \\times \\cdots \\times a$ ($n$ times)",
+          "description": "For non-negative integer exponents"
+        },
+        {
+          "name": "General Exponentiation",
+          "latex": "$a^b = e^{b \\ln(a)}$",
+          "description": "Definition for real exponents using natural logarithm"
+        },
+        {
+          "name": "Poisson Numerator Term",
+          "latex": "$\\lambda^k$",
+          "description": "Rate parameter raised to the k-th power in Poisson PMF"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that raises a base (lambda parameter) to an integer power k. This computes the λ^k term in the numerator of the Poisson formula. Handle the edge case where k=0 (should return 1).",
+        "function_signature": "def power(base: float, exponent: int) -> float:",
+        "starter_code": "def power(base: float, exponent: int) -> float:\n    \"\"\"\n    Calculate base^exponent where exponent is a non-negative integer.\n    :param base: The base (lambda in Poisson context, must be positive)\n    :param exponent: The exponent (k in Poisson context, non-negative integer)\n    :return: base^exponent\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "power(5, 0)",
+            "expected": "1",
+            "explanation": "Any non-zero number to the power 0 equals 1"
+          },
+          {
+            "input": "power(5, 1)",
+            "expected": "5",
+            "explanation": "Any number to the power 1 equals itself"
+          },
+          {
+            "input": "power(5, 3)",
+            "expected": "125",
+            "explanation": "5^3 = 5 × 5 × 5 = 125, needed for Poisson example"
+          },
+          {
+            "input": "power(2.5, 2)",
+            "expected": "6.25",
+            "explanation": "Demonstrates real base: 2.5^2 = 6.25"
+          },
+          {
+            "input": "power(1.5, 4)",
+            "expected": "5.0625",
+            "explanation": "1.5^4 = 5.0625"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the special case base^0 = 1",
+        "Using repeated multiplication for non-integer exponents (inefficient/incorrect)",
+        "Confusing exponentiation order: a^b ≠ b^a in general",
+        "Not considering floating-point precision for large exponents"
+      ],
+      "hint": "Python's built-in ** operator or pow() function handles exponentiation efficiently. Remember that any number to the power 0 is 1.",
+      "references": [
+        "Laws of exponents",
+        "Exponential notation in mathematics",
+        "Efficient exponentiation algorithms (for advanced study)"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Composing Mathematical Operations: Building Complex Expressions",
+      "relation_to_problem": "The Poisson PMF formula combines multiple operations: λ^k (power), e^(-λ) (exponential), and k! (factorial) in a single expression. Learning to correctly order and compose these operations is critical for implementing the formula.",
+      "prerequisites": [
+        "Factorial computation",
+        "Exponential function",
+        "Exponentiation",
+        "Order of operations (PEMDAS)"
+      ],
+      "learning_objectives": [
+        "Understand order of operations in complex mathematical expressions",
+        "Combine multiple mathematical functions into a single computation",
+        "Recognize the structure of the Poisson PMF: numerator (λ^k × e^(-λ)) divided by denominator (k!)",
+        "Handle numerical precision when combining operations"
+      ],
+      "math_content": {
+        "definition": "A **composite mathematical expression** combines multiple operations according to precedence rules. The **order of operations** (PEMDAS/BODMAS) dictates: Parentheses/Brackets, Exponents/Orders, Multiplication and Division (left-to-right), Addition and Subtraction (left-to-right). For the Poisson formula: $$P(k; \\lambda) = \\frac{\\lambda^k e^{-\\lambda}}{k!}$$ This requires: (1) computing the exponent $\\lambda^k$, (2) computing the exponential $e^{-\\lambda}$, (3) computing the factorial $k!$, (4) multiplying the numerator terms, (5) dividing by the denominator.",
+        "notation": "The fraction bar in $\\frac{\\text{numerator}}{\\text{denominator}}$ indicates division. The numerator $\\lambda^k e^{-\\lambda}$ means $\\lambda^k \\times e^{-\\lambda}$ (multiplication is implicit when terms are adjacent)",
+        "theorem": "**Expression Evaluation Order:** In the expression $\\frac{ab}{c}$ where $a$, $b$, $c$ are functions, evaluate: (1) All function values independently, (2) Multiply numerator components, (3) Divide by denominator. For numerical stability, order may matter when values have vastly different magnitudes.",
+        "proof_sketch": "By the associative property of multiplication and the definition of division: $\\frac{ab}{c} = (a \\times b) \\times c^{-1} = a \\times (b \\times c^{-1})$. However, in floating-point arithmetic, the order can affect precision due to rounding errors. Computing $(\\lambda^k / k!) \\times e^{-\\lambda}$ may be more stable than $(\\lambda^k \\times e^{-\\lambda}) / k!$ when $k!$ is very large.",
+        "examples": [
+          "For $k=3, \\lambda=5$: numerator $= 5^3 \\times e^{-5} = 125 \\times 0.00674 = 0.8422$, denominator $= 3! = 6$, result $= 0.8422 / 6 = 0.1404$",
+          "For $k=0, \\lambda=2$: numerator $= 2^0 \\times e^{-2} = 1 \\times 0.1353 = 0.1353$, denominator $= 0! = 1$, result $= 0.1353$",
+          "Breaking down: $\\frac{\\lambda^k e^{-\\lambda}}{k!} = \\frac{\\lambda^k}{k!} \\times e^{-\\lambda}$ (alternative computation order)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Poisson PMF Structure",
+          "latex": "$P(k; \\lambda) = \\frac{\\lambda^k e^{-\\lambda}}{k!}$",
+          "description": "Complete formula showing all three components combined"
+        },
+        {
+          "name": "Numerator Computation",
+          "latex": "$\\text{numerator} = \\lambda^k \\times e^{-\\lambda}$",
+          "description": "Product of power term and exponential term"
+        },
+        {
+          "name": "Alternative Factorization",
+          "latex": "$P(k; \\lambda) = \\left(\\frac{\\lambda^k}{k!}\\right) \\times e^{-\\lambda}$",
+          "description": "Grouping for numerical stability in some cases"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes a simplified version of the Poisson formula structure by combining three component functions. Given lambda and k, compute (lambda^k × e^(-lambda)) / k!. This exercise brings together all previous concepts without revealing the final solution structure.",
+        "function_signature": "def compute_poisson_components(lam: float, k: int) -> float:",
+        "starter_code": "import math\n\ndef compute_poisson_components(lam: float, k: int) -> float:\n    \"\"\"\n    Compute the combined expression: (lam^k × e^(-lam)) / k!\n    This demonstrates composing multiple mathematical operations.\n    :param lam: Lambda parameter (positive real number)\n    :param k: Event count (non-negative integer)\n    :return: Result of the expression, rounded to 5 decimal places\n    \"\"\"\n    # Your code here\n    # Hint: Break this into steps:\n    # 1. Compute lambda^k\n    # 2. Compute e^(-lambda)\n    # 3. Compute k!\n    # 4. Combine: (step1 × step2) / step3\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_poisson_components(5, 3)",
+            "expected": "0.14037",
+            "explanation": "(5^3 × e^(-5)) / 3! = (125 × 0.00674) / 6 ≈ 0.14037"
+          },
+          {
+            "input": "compute_poisson_components(2, 0)",
+            "expected": "0.13534",
+            "explanation": "(2^0 × e^(-2)) / 0! = (1 × 0.13534) / 1 = 0.13534"
+          },
+          {
+            "input": "compute_poisson_components(1, 1)",
+            "expected": "0.36788",
+            "explanation": "(1^1 × e^(-1)) / 1! = (1 × 0.36788) / 1 = 0.36788"
+          },
+          {
+            "input": "compute_poisson_components(3, 5)",
+            "expected": "0.10082",
+            "explanation": "(3^5 × e^(-3)) / 5! = (243 × 0.04979) / 120 ≈ 0.10082"
+          },
+          {
+            "input": "compute_poisson_components(4.5, 2)",
+            "expected": "0.22380",
+            "explanation": "Demonstrates non-integer lambda: (4.5^2 × e^(-4.5)) / 2!"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Incorrect order of operations: computing (lambda^k / k!) first when e^(-lambda) is very small can lose precision",
+        "Forgetting parentheses: lambda^k × e^(-lambda) / k! might be parsed as lambda^k × (e^(-lambda) / k!) by mistake",
+        "Computing factorial last when k is large (causes overflow before division)",
+        "Not handling edge cases: k=0 requires both 0^0=1 convention and 0!=1"
+      ],
+      "hint": "Break the computation into clear steps: calculate each of the three components (power, exponential, factorial) separately, then combine them. Make sure to handle the k=0 case correctly.",
+      "references": [
+        "Order of operations in algebra",
+        "Numerical stability in scientific computing",
+        "Floating-point arithmetic precision"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Probability Mass Function: Definition and Properties",
+      "relation_to_problem": "Understanding what a Probability Mass Function (PMF) is and its requirements ensures our implementation correctly represents a valid probability distribution. The Poisson PMF has specific mathematical properties that must be satisfied.",
+      "prerequisites": [
+        "Basic probability theory",
+        "Discrete random variables",
+        "Summation notation"
+      ],
+      "learning_objectives": [
+        "Define Probability Mass Function for discrete distributions",
+        "Understand the axioms of probability that PMFs must satisfy",
+        "Verify that computed probabilities are in the valid range [0, 1]",
+        "Recognize the Poisson PMF as a special case of discrete probability distributions"
+      ],
+      "math_content": {
+        "definition": "A **Probability Mass Function (PMF)** for a discrete random variable $X$ is a function $P: \\mathbb{Z}_{\\geq 0} \\to [0,1]$ that assigns probabilities to each possible value. Formally, $P(X = k)$ represents the probability that random variable $X$ takes the value $k$. For the **Poisson distribution** with parameter $\\lambda > 0$: $$P(X = k; \\lambda) = \\frac{\\lambda^k e^{-\\lambda}}{k!}, \\quad k = 0, 1, 2, \\ldots$$ where $\\lambda$ is the **rate parameter** representing the expected number of events in the interval.",
+        "notation": "$P(X = k)$ or $P(k)$ denotes the probability of exactly $k$ occurrences. The parameter $\\lambda$ (lambda) is the mean and variance of the distribution. $X \\sim \\text{Poisson}(\\lambda)$ means '$X$ follows a Poisson distribution with parameter $\\lambda$'",
+        "theorem": "**Axioms of Probability for PMFs:** A function $P$ is a valid PMF if and only if: (1) $0 \\leq P(X = k) \\leq 1$ for all $k$ (non-negativity and boundedness), (2) $\\sum_{k=0}^{\\infty} P(X = k) = 1$ (probabilities sum to 1). For Poisson: $\\sum_{k=0}^{\\infty} \\frac{\\lambda^k e^{-\\lambda}}{k!} = e^{-\\lambda} \\sum_{k=0}^{\\infty} \\frac{\\lambda^k}{k!} = e^{-\\lambda} \\cdot e^{\\lambda} = 1$ ✓",
+        "proof_sketch": "The Poisson PMF satisfies axiom (1) since all terms are positive: $\\lambda^k > 0$, $e^{-\\lambda} > 0$, $k! > 0$, and the formula structure ensures values ≤ 1. For axiom (2), we use the Taylor series expansion $e^{\\lambda} = \\sum_{k=0}^{\\infty} \\frac{\\lambda^k}{k!}$, so factoring out $e^{-\\lambda}$ from the sum gives $e^{-\\lambda} \\cdot e^{\\lambda} = 1$.",
+        "examples": [
+          "For $\\lambda = 1$: $P(0) = e^{-1}/0! \\approx 0.368$, $P(1) = e^{-1}/1! \\approx 0.368$, $P(2) = e^{-1}/2! \\approx 0.184$",
+          "Properties: Mean $E[X] = \\lambda = 1$, Variance $\\text{Var}(X) = \\lambda = 1$",
+          "As $k$ increases beyond $\\lambda$, probabilities decrease exponentially",
+          "The mode (most likely value) is $\\lfloor \\lambda \\rfloor$ for non-integer $\\lambda$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Poisson PMF",
+          "latex": "$P(X = k; \\lambda) = \\frac{\\lambda^k e^{-\\lambda}}{k!}$",
+          "description": "Complete probability mass function for Poisson distribution"
+        },
+        {
+          "name": "Mean and Variance",
+          "latex": "$E[X] = \\text{Var}(X) = \\lambda$",
+          "description": "Unique property: mean equals variance in Poisson distribution"
+        },
+        {
+          "name": "Normalization Condition",
+          "latex": "$\\sum_{k=0}^{\\infty} P(X = k) = 1$",
+          "description": "Sum of all probabilities equals 1 (completeness axiom)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that validates whether a given probability value is valid (between 0 and 1 inclusive). Also compute probabilities for several values of k with a fixed lambda and verify they sum to approximately 1 (within tolerance). This reinforces understanding of PMF properties.",
+        "function_signature": "def validate_probability(p: float) -> bool:",
+        "starter_code": "def validate_probability(p: float) -> bool:\n    \"\"\"\n    Check if a value is a valid probability (in range [0, 1]).\n    :param p: Probability value to validate\n    :return: True if p is in [0, 1], False otherwise\n    \"\"\"\n    # Your code here\n    pass\n\ndef compute_pmf_sum(lam: float, max_k: int) -> float:\n    \"\"\"\n    Compute the sum of Poisson PMF values from k=0 to max_k.\n    This demonstrates that probabilities sum toward 1.\n    :param lam: Lambda parameter\n    :param max_k: Maximum k value to sum\n    :return: Sum of P(X=k) for k=0 to max_k, rounded to 5 decimals\n    \"\"\"\n    # Your code here\n    # Use the formula from previous exercise\n    pass",
+        "test_cases": [
+          {
+            "input": "validate_probability(0.5)",
+            "expected": "True",
+            "explanation": "0.5 is a valid probability"
+          },
+          {
+            "input": "validate_probability(0.0)",
+            "expected": "True",
+            "explanation": "0 is valid (impossible event)"
+          },
+          {
+            "input": "validate_probability(1.0)",
+            "expected": "True",
+            "explanation": "1 is valid (certain event)"
+          },
+          {
+            "input": "validate_probability(1.5)",
+            "expected": "False",
+            "explanation": "1.5 exceeds maximum probability of 1"
+          },
+          {
+            "input": "validate_probability(-0.1)",
+            "expected": "False",
+            "explanation": "Negative probabilities are invalid"
+          },
+          {
+            "input": "compute_pmf_sum(1, 10)",
+            "expected": "0.99995",
+            "explanation": "Sum of first 11 terms (k=0 to 10) for λ=1 approaches 1"
+          },
+          {
+            "input": "compute_pmf_sum(5, 15)",
+            "expected": "0.99994",
+            "explanation": "Sum of first 16 terms for λ=5 nearly equals 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Thinking probability can exceed 1 (must be in [0,1])",
+        "Not recognizing that very small probabilities (e.g., 1e-10) are valid",
+        "Assuming finite sum equals exactly 1 (it approaches 1 as max_k → ∞)",
+        "Confusing probability density (PDF for continuous) with probability mass (PMF for discrete)"
+      ],
+      "hint": "For validation, check if 0 ≤ p ≤ 1. For the sum, use a loop to compute each P(k) from k=0 to max_k and accumulate the sum.",
+      "references": [
+        "Axioms of probability theory",
+        "Discrete probability distributions",
+        "Taylor series of exponential function",
+        "Properties of the Poisson distribution"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Parameter Validation and Complete Implementation",
+      "relation_to_problem": "The Poisson probability calculator must handle edge cases and validate inputs before computation. Understanding domain restrictions (λ > 0, k ≥ 0) and proper rounding ensures a robust, production-ready implementation.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Input validation concepts",
+        "Rounding and precision"
+      ],
+      "learning_objectives": [
+        "Validate input parameters according to mathematical constraints",
+        "Understand domain and range of the Poisson PMF",
+        "Implement proper rounding for probability outputs",
+        "Handle edge cases: k=0, very large k, very small/large lambda",
+        "Combine all components into a complete, validated implementation"
+      ],
+      "math_content": {
+        "definition": "**Parameter Constraints for Poisson Distribution:** The Poisson PMF is defined for: (1) **Rate parameter** $\\lambda \\in \\mathbb{R}^+$ (strictly positive real numbers: $\\lambda > 0$), (2) **Event count** $k \\in \\mathbb{Z}_{\\geq 0}$ (non-negative integers: $k = 0, 1, 2, \\ldots$). Violations of these constraints make the PMF mathematically undefined or meaningless. **Rounding:** For numerical stability and reporting, probabilities are typically rounded to a fixed number of decimal places (e.g., 5 decimals: 0.12345).",
+        "notation": "$\\lambda > 0$ indicates lambda must be strictly positive. $k \\in \\{0, 1, 2, \\ldots\\}$ indicates k is a non-negative integer. The notation $\\text{round}(x, n)$ means rounding $x$ to $n$ decimal places",
+        "theorem": "**Edge Case Behaviors:** (1) As $k \\to \\infty$ with fixed $\\lambda$: $P(X = k) \\to 0$ (probability of very large event counts approaches zero), (2) For $k = 0$: $P(X = 0; \\lambda) = e^{-\\lambda}$ (probability of no events occurring), (3) As $\\lambda \\to 0^+$: distribution concentrates at $k=0$, (4) As $\\lambda \\to \\infty$: distribution approximates normal $\\mathcal{N}(\\lambda, \\lambda)$",
+        "proof_sketch": "Edge case (1): The ratio test shows $\\frac{P(k+1)}{P(k)} = \\frac{\\lambda}{k+1} \\to 0$ as $k \\to \\infty$, so probabilities decrease faster than geometrically. Edge case (2): Direct substitution: $P(0) = \\frac{\\lambda^0 e^{-\\lambda}}{0!} = \\frac{1 \\cdot e^{-\\lambda}}{1} = e^{-\\lambda}$. Edge case (3): As $\\lambda \\to 0$, $e^{-\\lambda} \\to 1$ and $\\lambda^k \\to 0$ for $k > 0$.",
+        "examples": [
+          "Invalid inputs: $\\lambda = 0$ (undefined), $\\lambda = -2$ (meaningless), $k = -1$ (impossible), $k = 3.5$ (must be integer)",
+          "Valid edge case: $k=0, \\lambda=5$ gives $P(0; 5) = e^{-5} \\approx 0.00674$",
+          "Large $k$: $P(20; 5) \\approx 1.888 \\times 10^{-6}$ (extremely rare)",
+          "Rounding: 0.140374 rounded to 5 decimals is 0.14037"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Zero Events Probability",
+          "latex": "$P(X = 0; \\lambda) = e^{-\\lambda}$",
+          "description": "Simplified formula when k=0 (no factorial needed)"
+        },
+        {
+          "name": "Parameter Constraints",
+          "latex": "$\\lambda > 0, \\quad k \\in \\mathbb{Z}_{\\geq 0}$",
+          "description": "Domain restrictions that must be validated"
+        },
+        {
+          "name": "Rounding Function",
+          "latex": "$\\text{round}(P, 5)$",
+          "description": "Round probability to 5 decimal places for output"
+        }
+      ],
+      "exercise": {
+        "description": "Building on all previous concepts, implement input validation that checks: (1) lambda is a positive number, (2) k is a non-negative integer. Then integrate this validation with the probability computation. This is the final step before assembling the complete solution.",
+        "function_signature": "def validate_poisson_inputs(lam: float, k: int) -> bool:",
+        "starter_code": "def validate_poisson_inputs(lam: float, k: int) -> bool:\n    \"\"\"\n    Validate inputs for Poisson probability calculation.\n    :param lam: Lambda parameter (must be positive)\n    :param k: Event count (must be non-negative integer)\n    :return: True if inputs are valid, False otherwise\n    \"\"\"\n    # Your code here\n    pass\n\ndef safe_poisson_probability(k: int, lam: float) -> float:\n    \"\"\"\n    Safely compute Poisson probability with input validation.\n    Returns -1 if inputs are invalid.\n    :param k: Number of events\n    :param lam: Rate parameter\n    :return: Probability rounded to 5 decimals, or -1 if invalid inputs\n    \"\"\"\n    # Your code here\n    # 1. Validate inputs first\n    # 2. If valid, compute probability using previous concepts\n    # 3. Round result to 5 decimal places\n    # 4. Return result\n    pass",
+        "test_cases": [
+          {
+            "input": "validate_poisson_inputs(5, 3)",
+            "expected": "True",
+            "explanation": "Both parameters are valid: λ=5 > 0, k=3 ≥ 0"
+          },
+          {
+            "input": "validate_poisson_inputs(0, 3)",
+            "expected": "False",
+            "explanation": "Lambda must be positive, 0 is invalid"
+          },
+          {
+            "input": "validate_poisson_inputs(-1, 3)",
+            "expected": "False",
+            "explanation": "Lambda cannot be negative"
+          },
+          {
+            "input": "validate_poisson_inputs(5, -1)",
+            "expected": "False",
+            "explanation": "k cannot be negative"
+          },
+          {
+            "input": "safe_poisson_probability(3, 5)",
+            "expected": "0.14037",
+            "explanation": "Valid computation: P(3; 5) = 0.14037"
+          },
+          {
+            "input": "safe_poisson_probability(0, 2)",
+            "expected": "0.13534",
+            "explanation": "Edge case k=0: P(0; 2) = e^(-2) ≈ 0.13534"
+          },
+          {
+            "input": "safe_poisson_probability(-1, 5)",
+            "expected": "-1",
+            "explanation": "Invalid input returns -1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not validating inputs before computation (can cause runtime errors)",
+        "Allowing lambda=0 (causes division by zero or undefined behavior)",
+        "Accepting non-integer values for k (Poisson is discrete only)",
+        "Rounding too early in the computation (loses precision)",
+        "Not handling the special case k=0 correctly (0! = 1, 0^0 = 1 by convention)"
+      ],
+      "hint": "For validation, check type and sign constraints. For safe computation, validate first, then combine all previous components (power, exponential, factorial) with proper rounding at the end.",
+      "references": [
+        "Input validation best practices",
+        "Floating-point rounding modes",
+        "Defensive programming techniques",
+        "Domain and range in mathematics"
+      ]
+    }
+  ]
+}

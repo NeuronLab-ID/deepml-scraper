@@ -1,0 +1,60 @@
+{
+  "description": "SW1wbGVtZW50IHRoZSBmb3J3YXJkIHBhc3Mgb2YgTG9SQSAoTG93LVJhbmsgQWRhcHRhdGlvbiksIGEgcGFyYW1ldGVyLWVmZmljaWVudCBmaW5lLXR1bmluZyB0ZWNobmlxdWUgZm9yIGxhcmdlIGxhbmd1YWdlIG1vZGVscy4gSW4gTG9SQSwgaW5zdGVhZCBvZiB1cGRhdGluZyBhbGwgd2VpZ2h0cyBkdXJpbmcgZmluZS10dW5pbmcsIHdlIGZyZWV6ZSB0aGUgcHJldHJhaW5lZCB3ZWlnaHRzIFcgYW5kIGxlYXJuIHR3byBzbWFsbCBsb3ctcmFuayBtYXRyaWNlcyBBIGFuZCBCIHRoYXQgcmVwcmVzZW50IHRoZSB3ZWlnaHQgdXBkYXRlLiBHaXZlbiBhbiBpbnB1dCB4LCBmcm96ZW4gd2VpZ2h0cyBXLCBhbmQgTG9SQSBtYXRyaWNlcyBBIGFuZCBCIHdpdGggYSBzY2FsaW5nIGZhY3RvciBhbHBoYSwgY29tcHV0ZSB0aGUgb3V0cHV0IG9mIHRoZSBMb1JBIGxheWVyLg==",
+  "id": "222",
+  "test_cases": [
+    {
+      "test": "x = [[1.0, 2.0, 3.0]]\nW = [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]\nB = [[0.1], [0.2], [0.3]]\nA = [[1.0, 2.0]]\nresult = lora_forward(x, W, A, B, alpha=1.0)\nprint([[round(v, 4) for v in row] for row in result])",
+      "expected_output": "[[5.4, 7.8]]"
+    },
+    {
+      "test": "x = [[1.0, 0.0], [0.0, 1.0]]\nW = [[2.0, 1.0], [1.0, 2.0]]\nB = [[1.0], [1.0]]\nA = [[1.0, 1.0]]\nresult = lora_forward(x, W, A, B, alpha=1.0)\nprint([[round(v, 4) for v in row] for row in result])",
+      "expected_output": "[[3.0, 2.0], [2.0, 3.0]]"
+    }
+  ],
+  "difficulty": "medium",
+  "pytorch_difficulty": "medium",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "x = [[1.0, 2.0]], W = [[1.0, 0.0], [0.0, 1.0]], B = [[1.0], [1.0]], A = [[0.5, 0.5]], alpha = 2.0",
+    "output": "[[2.0, 3.0]]",
+    "reasoning": "The output combines the frozen pretrained path (x @ W) with the low-rank adaptation path (x @ B @ A), scaled by alpha/rank. The rank r is determined by the dimensions of A and B."
+  },
+  "category": "Deep Learning",
+  "pytorch_starter_code": "aW1wb3J0IHRvcmNoCgpkZWYgbG9yYV9mb3J3YXJkKAogICAgeDogdG9yY2guVGVuc29yLAogICAgVzogdG9yY2guVGVuc29yLAogICAgQTogdG9yY2guVGVuc29yLAogICAgQjogdG9yY2guVGVuc29yLAogICAgYWxwaGE6IGZsb2F0ID0gMS4wCikgLT4gdG9yY2guVGVuc29yOgogICAgIiIiCiAgICBDb21wdXRlIHRoZSBMb1JBIGZvcndhcmQgcGFzcyB1c2luZyBQeVRvcmNoLgogICAgCiAgICBBcmdzOgogICAgICAgIHg6IElucHV0IHRlbnNvciAoYmF0Y2hfc2l6ZSB4IGluX2ZlYXR1cmVzKQogICAgICAgIFc6IEZyb3plbiBwcmV0cmFpbmVkIHdlaWdodHMgKGluX2ZlYXR1cmVzIHggb3V0X2ZlYXR1cmVzKQogICAgICAgIEE6IExvUkEgbWF0cml4IEEgKHJhbmsgeCBvdXRfZmVhdHVyZXMpCiAgICAgICAgQjogTG9SQSBtYXRyaXggQiAoaW5fZmVhdHVyZXMgeCByYW5rKQogICAgICAgIGFscGhhOiBMb1JBIHNjYWxpbmcgZmFjdG9yCiAgICAgICAgCiAgICBSZXR1cm5zOgogICAgICAgIE91dHB1dCB0ZW5zb3IgKGJhdGNoX3NpemUgeCBvdXRfZmVhdHVyZXMpCiAgICAiIiIKICAgICMgWW91ciBjb2RlIGhlcmUKICAgIHBhc3M=",
+  "title": "LoRA: Low-Rank Adaptation Forward Pass",
+  "learn_section": "IyMgTG9SQTogTG93LVJhbmsgQWRhcHRhdGlvbiBvZiBMYXJnZSBMYW5ndWFnZSBNb2RlbHMKCiMjIyBUaGUgUHJvYmxlbQoKRmluZS10dW5pbmcgbGFyZ2UgbGFuZ3VhZ2UgbW9kZWxzIChMTE1zKSBsaWtlIEdQVC0zICgxNzVCIHBhcmFtZXRlcnMpIGlzIGV4dHJlbWVseSBleHBlbnNpdmU6Ci0gU3RvcmluZyBhIGZ1bGwgY29weSBvZiBmaW5lLXR1bmVkIHdlaWdodHMgZm9yIGVhY2ggdGFzawotIEdQVSBtZW1vcnkgcmVxdWlyZWQgZm9yIG9wdGltaXplciBzdGF0ZXMgZHVyaW5nIHRyYWluaW5nCi0gUmlzayBvZiBjYXRhc3Ryb3BoaWMgZm9yZ2V0dGluZwoKIyMjIFRoZSBMb1JBIFNvbHV0aW9uCgpMb1JBIChMb3ctUmFuayBBZGFwdGF0aW9uKSBmcmVlemVzIHRoZSBwcmV0cmFpbmVkIG1vZGVsIHdlaWdodHMgYW5kIGluamVjdHMgdHJhaW5hYmxlIGxvdy1yYW5rIGRlY29tcG9zaXRpb24gbWF0cmljZXMgaW50byBlYWNoIGxheWVyLgoKKipLZXkgSW5zaWdodCoqOiBUaGUgd2VpZ2h0IHVwZGF0ZXMgZHVyaW5nIGZpbmUtdHVuaW5nIGhhdmUgYSBsb3cgImludHJpbnNpYyByYW5rIiAtIHRoZXkgY2FuIGJlIHdlbGwtYXBwcm94aW1hdGVkIGJ5IGxvdy1yYW5rIG1hdHJpY2VzLgoKIyMjIE1hdGhlbWF0aWNhbCBGb3JtdWxhdGlvbgoKRm9yIGEgcHJldHJhaW5lZCB3ZWlnaHQgbWF0cml4ICRXXzAgXGluIFxtYXRoYmJ7Un1ee2QgXHRpbWVzIGt9JCwgTG9SQSByZXByZXNlbnRzIHRoZSB1cGRhdGUgYXM6CgokJFcgPSBXXzAgKyBcRGVsdGEgVyA9IFdfMCArIEJBJCQKCndoZXJlOgotICRCIFxpbiBcbWF0aGJie1J9XntkIFx0aW1lcyByfSQKLSAkQSBcaW4gXG1hdGhiYntSfV57ciBcdGltZXMga30kICAKLSAkciBcbGwgXG1pbihkLCBrKSQgaXMgdGhlIHJhbmsKCioqRm9yd2FyZCBQYXNzOioqCiQkaCA9IHhXXzAgKyBcZnJhY3tcYWxwaGF9e3J9IFxjZG90IHhCQSQkCgp3aGVyZSAkXGFscGhhJCBpcyBhIHNjYWxpbmcgaHlwZXJwYXJhbWV0ZXIuCgojIyMgUGFyYW1ldGVyIEVmZmljaWVuY3kKCnwgU2V0dGluZyB8IFBhcmFtZXRlcnMgfAp8LS0tLS0tLS0tfC0tLS0tLS0tLS0tLXwKfCBGdWxsIGZpbmUtdHVuaW5nIHwgJGQgXHRpbWVzIGskIHwKfCBMb1JBIHwgJHIgXHRpbWVzIChkICsgaykkIHwKCkZvciAkZCA9IGsgPSA3NjgkIGFuZCAkciA9IDgkOgotIEZ1bGw6ICQ3NjggXHRpbWVzIDc2OCA9IDU4OSw4MjQkCi0gTG9SQTogJDggXHRpbWVzICg3NjggKyA3NjgpID0gMTIsMjg4JAotICoqUmVkdWN0aW9uOiA5Ny45JSoqCgojIyMgSW5pdGlhbGl6YXRpb24KCi0gKipNYXRyaXggQSoqOiBJbml0aWFsaXplZCB3aXRoIHJhbmRvbSBHYXVzc2lhbiB2YWx1ZXMKLSAqKk1hdHJpeCBCKio6IEluaXRpYWxpemVkIHRvIHplcm9zCgpUaGlzIGVuc3VyZXMgJFxEZWx0YSBXID0gQkEgPSAwJCBhdCB0aGUgc3RhcnQsIHNvIHRyYWluaW5nIGJlZ2lucyBmcm9tIHRoZSBwcmV0cmFpbmVkIG1vZGVsLgoKIyMjIFdoZXJlIHRvIEFwcGx5IExvUkEKClR5cGljYWxseSBhcHBsaWVkIHRvIGF0dGVudGlvbiB3ZWlnaHQgbWF0cmljZXM6Ci0gUXVlcnkgcHJvamVjdGlvbiAoJFdfcSQpCi0gS2V5IHByb2plY3Rpb24gKCRXX2skKSAKLSBWYWx1ZSBwcm9qZWN0aW9uICgkV192JCkKLSBPdXRwdXQgcHJvamVjdGlvbiAoJFdfbyQpCgojIyMgQWR2YW50YWdlcwoKMS4gKipNZW1vcnkgRWZmaWNpZW50Kio6IE9ubHkgc3RvcmUvdHJhaW4gbG93LXJhbmsgbWF0cmljZXMKMi4gKipObyBJbmZlcmVuY2UgTGF0ZW5jeSoqOiBDYW4gbWVyZ2UgJFdfMCArIEJBJCBhZnRlciB0cmFpbmluZwozLiAqKlRhc2sgU3dpdGNoaW5nKio6IFN3YXAgTG9SQSB3ZWlnaHRzIHdpdGhvdXQgcmVsb2FkaW5nIGJhc2UgbW9kZWwKNC4gKipSZWR1Y2VkIENhdGFzdHJvcGhpYyBGb3JnZXR0aW5nKio6IEJhc2Ugd2VpZ2h0cyBmcm96ZW4KCiMjIyBNZXJnaW5nIGZvciBJbmZlcmVuY2UKCkFmdGVyIHRyYWluaW5nLCBMb1JBIHdlaWdodHMgY2FuIGJlIG1lcmdlZCBpbnRvIGEgc2luZ2xlIG1hdHJpeCB3aXRoICoqemVybyBhZGRpdGlvbmFsIGluZmVyZW5jZSBjb3N0KiouCgojIyMgQ2hvb3NpbmcgUmFuawoKQ29tbW9uIHZhbHVlczogJHIgXGluIFx7NCwgOCwgMTYsIDMyLCA2NFx9JAoKLSBMb3dlciByYW5rID0gZmV3ZXIgcGFyYW1ldGVycywgbW9yZSBjb21wcmVzc2lvbgotIEhpZ2hlciByYW5rID0gbW9yZSBleHByZXNzaXZlLCBjbG9zZXIgdG8gZnVsbCBmaW5lLXR1bmluZwotIEVtcGlyaWNhbGx5LCBldmVuICRyPTgkIG9mdGVuIG1hdGNoZXMgZnVsbCBmaW5lLXR1bmluZyBwZXJmb3JtYW5jZQoKIyMjIEV4dGVuc2lvbnMKCi0gKipRTG9SQSoqOiBDb21iaW5lcyBMb1JBIHdpdGggNC1iaXQgcXVhbnRpemF0aW9uCi0gKipEb1JBKio6IERlY29tcG9zZXMgd2VpZ2h0cyBpbnRvIG1hZ25pdHVkZSBhbmQgZGlyZWN0aW9uCi0gKipMb1JBKyoqOiBEaWZmZXJlbnQgbGVhcm5pbmcgcmF0ZXMgZm9yIEEgYW5kIEIgbWF0cmljZXM=",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/Open-Deep-ML",
+      "name": "Deep-ML"
+    }
+  ],
+  "pytorch_test_cases": [
+    {
+      "test": "import torch\nx = torch.tensor([[1.0, 2.0, 3.0]])\nW = torch.tensor([[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]])\nB = torch.tensor([[0.1], [0.2], [0.3]])\nA = torch.tensor([[1.0, 2.0]])\nresult = lora_forward(x, W, A, B, alpha=1.0)\nprint([[round(v, 4) for v in row.tolist()] for row in result])",
+      "expected_output": "[[5.4, 7.8]]"
+    },
+    {
+      "test": "import torch\nx = torch.tensor([[1.0, 0.0], [0.0, 1.0]])\nW = torch.tensor([[2.0, 1.0], [1.0, 2.0]])\nB = torch.tensor([[1.0], [1.0]])\nA = torch.tensor([[1.0, 1.0]])\nresult = lora_forward(x, W, A, B, alpha=1.0)\nprint([[round(v, 4) for v in row.tolist()] for row in result])",
+      "expected_output": "[[3.0, 2.0], [2.0, 3.0]]"
+    },
+    {
+      "test": "import torch\nx = torch.tensor([[1.0, 1.0]])\nW = torch.tensor([[1.0], [1.0]])\nB = torch.tensor([[0.5], [0.5]])\nA = torch.tensor([[2.0]])\nresult = lora_forward(x, W, A, B, alpha=2.0)\nprint([[round(v, 4) for v in row.tolist()] for row in result])",
+      "expected_output": "[[6.0]]"
+    },
+    {
+      "test": "import torch\nx = torch.tensor([[1.0, 2.0]])\nW = torch.tensor([[1.0, 0.0], [0.0, 1.0]])\nB = torch.tensor([[1.0, 0.0], [0.0, 1.0]])\nA = torch.tensor([[0.5, 0.0], [0.0, 0.5]])\nresult = lora_forward(x, W, A, B, alpha=2.0)\nprint([[round(v, 4) for v in row.tolist()] for row in result])",
+      "expected_output": "[[1.5, 3.0]]"
+    },
+    {
+      "test": "import torch\nx = torch.tensor([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])\nW = torch.tensor([[1.0, 1.0], [1.0, 1.0], [1.0, 1.0]])\nB = torch.tensor([[1.0], [2.0], [3.0]])\nA = torch.tensor([[0.1, 0.2]])\nresult = lora_forward(x, W, A, B, alpha=1.0)\nprint([[round(v, 4) for v in row.tolist()] for row in result])",
+      "expected_output": "[[1.1, 1.2], [1.2, 1.4], [1.3, 1.6]]"
+    }
+  ],
+  "createdAt": "December 6, 2025 at 10:52:59 PM UTC-0500",
+  "starter_code": "import numpy as np\n\ndef lora_forward(\n\tx: list[list[float]],\n\tW: list[list[float]],\n\tA: list[list[float]],\n\tB: list[list[float]],\n\talpha: float = 1.0\n) -> list[list[float]]:\n\t\"\"\"\n\tCompute the LoRA forward pass.\n\t\n\tArgs:\n\t\tx: Input matrix (batch_size x in_features)\n\t\tW: Frozen pretrained weights (in_features x out_features)\n\t\tA: LoRA matrix A (rank x out_features)\n\t\tB: LoRA matrix B (in_features x rank)\n\t\talpha: LoRA scaling factor\n\t\t\n\tReturns:\n\t\tOutput matrix (batch_size x out_features)\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "description_decoded": "Implement the forward pass of LoRA (Low-Rank Adaptation), a parameter-efficient fine-tuning technique for large language models. In LoRA, instead of updating all weights during fine-tuning, we freeze the pretrained weights W and learn two small low-rank matrices A and B that represent the weight update. Given an input x, frozen weights W, and LoRA matrices A and B with a scaling factor alpha, compute the output of the LoRA layer.",
+  "learn_section_decoded": "## LoRA: Low-Rank Adaptation of Large Language Models\n\n### The Problem\n\nFine-tuning large language models (LLMs) like GPT-3 (175B parameters) is extremely expensive:\n- Storing a full copy of fine-tuned weights for each task\n- GPU memory required for optimizer states during training\n- Risk of catastrophic forgetting\n\n### The LoRA Solution\n\nLoRA (Low-Rank Adaptation) freezes the pretrained model weights and injects trainable low-rank decomposition matrices into each layer.\n\n**Key Insight**: The weight updates during fine-tuning have a low \"intrinsic rank\" - they can be well-approximated by low-rank matrices.\n\n### Mathematical Formulation\n\nFor a pretrained weight matrix $W_0 \\in \\mathbb{R}^{d \\times k}$, LoRA represents the update as:\n\n$$W = W_0 + \\Delta W = W_0 + BA$$\n\nwhere:\n- $B \\in \\mathbb{R}^{d \\times r}$\n- $A \\in \\mathbb{R}^{r \\times k}$  \n- $r \\ll \\min(d, k)$ is the rank\n\n**Forward Pass:**\n$$h = xW_0 + \\frac{\\alpha}{r} \\cdot xBA$$\n\nwhere $\\alpha$ is a scaling hyperparameter.\n\n### Parameter Efficiency\n\n| Setting | Parameters |\n|---------|------------|\n| Full fine-tuning | $d \\times k$ |\n| LoRA | $r \\times (d + k)$ |\n\nFor $d = k = 768$ and $r = 8$:\n- Full: $768 \\times 768 = 589,824$\n- LoRA: $8 \\times (768 + 768) = 12,288$\n- **Reduction: 97.9%**\n\n### Initialization\n\n- **Matrix A**: Initialized with random Gaussian values\n- **Matrix B**: Initialized to zeros\n\nThis ensures $\\Delta W = BA = 0$ at the start, so training begins from the pretrained model.\n\n### Where to Apply LoRA\n\nTypically applied to attention weight matrices:\n- Query projection ($W_q$)\n- Key projection ($W_k$) \n- Value projection ($W_v$)\n- Output projection ($W_o$)\n\n### Advantages\n\n1. **Memory Efficient**: Only store/train low-rank matrices\n2. **No Inference Latency**: Can merge $W_0 + BA$ after training\n3. **Task Switching**: Swap LoRA weights without reloading base model\n4. **Reduced Catastrophic Forgetting**: Base weights frozen\n\n### Merging for Inference\n\nAfter training, LoRA weights can be merged into a single matrix with **zero additional inference cost**.\n\n### Choosing Rank\n\nCommon values: $r \\in \\{4, 8, 16, 32, 64\\}$\n\n- Lower rank = fewer parameters, more compression\n- Higher rank = more expressive, closer to full fine-tuning\n- Empirically, even $r=8$ often matches full fine-tuning performance\n\n### Extensions\n\n- **QLoRA**: Combines LoRA with 4-bit quantization\n- **DoRA**: Decomposes weights into magnitude and direction\n- **LoRA+**: Different learning rates for A and B matrices"
+}

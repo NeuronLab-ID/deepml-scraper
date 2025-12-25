@@ -1,0 +1,473 @@
+{
+  "problem_id": 68,
+  "title": "Find the Image of a Matrix Using Row Echelon Form",
+  "category": "Linear Algebra",
+  "difficulty": "medium",
+  "description": "\n## Task: Compute the Column Space of a Matrix\n\nIn this task, you are required to implement a function `matrix_image(A)` that calculates the column space of a given matrix `A`. The column space, also known as the image or span, consists of all linear combinations of the columns of `A`. To find this, you'll use concepts from linear algebra, focusing on identifying independent columns that span the matrix's image.\n**Your task:** Implement the function `matrix_image(A)` to return the basis vectors that span the column space of `A`. These vectors should be extracted from the original matrix and correspond to the independent columns.\n\n",
+  "example": {
+    "input": "matrix = np.array([\n    [1, 2, 3],\n    [4, 5, 6],\n    [7, 8, 9]\n])\nprint(matrix_image(matrix))",
+    "output": "# [[1, 2],\n#  [4, 5],\n#  [7, 8]]",
+    "reasoning": "The column space of the matrix is spanned by the independent columns [1, 2], [4, 5], and [7, 8]. These columns form the basis vectors that represent the image of the matrix."
+  },
+  "starter_code": "\nimport numpy as np\n\ndef matrix_image(A):\n\t# Write your code here\n\tpass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Elementary Row Operations and Matrix Equivalence",
+      "relation_to_problem": "Elementary row operations are the fundamental transformations used to convert a matrix to row echelon form, which is essential for identifying pivot columns that form the basis of the image.",
+      "prerequisites": [
+        "Matrix notation",
+        "Basic linear systems",
+        "Vector representation"
+      ],
+      "learning_objectives": [
+        "Master the three types of elementary row operations",
+        "Understand how row operations preserve linear dependencies",
+        "Implement row operations programmatically with numerical stability"
+      ],
+      "math_content": {
+        "definition": "An **elementary row operation** on a matrix is one of three types of transformations:\n\n1. **Row Swapping**: Interchange rows $i$ and $j$, denoted $R_i \\leftrightarrow R_j$\n2. **Row Scaling**: Multiply row $i$ by nonzero scalar $c$, denoted $cR_i \\to R_i$\n3. **Row Addition**: Add $c$ times row $j$ to row $i$, denoted $R_i + cR_j \\to R_i$\n\nTwo matrices $A$ and $B$ are **row equivalent** if $B$ can be obtained from $A$ by a finite sequence of elementary row operations.",
+        "notation": "$A \\sim B$ denotes row equivalence between matrices $A$ and $B$\n\n$R_i$ denotes the $i$-th row of a matrix\n\n$E$ denotes an elementary matrix (represents a single row operation)",
+        "theorem": "**Theorem (Row Operation Preservation)**: Elementary row operations preserve the solution set of a linear system $A\\vec{x} = \\vec{b}$. More specifically, if $B$ is obtained from $A$ through elementary row operations, then the columns of $A$ satisfy the same linear dependence relations as the corresponding columns of $B$.",
+        "proof_sketch": "Each elementary row operation can be represented as left-multiplication by an invertible elementary matrix $E$, so $B = EA$. Since multiplication by an invertible matrix is a bijection, the null space (kernel) is preserved: $\\text{Ker}(A) = \\text{Ker}(EA)$. This preservation of null space implies preservation of column dependencies.",
+        "examples": [
+          "Example 1: Given $A = \\begin{bmatrix} 2 & 4 \\\\ 1 & 3 \\end{bmatrix}$, perform $R_1 - 2R_2 \\to R_1$ to get $\\begin{bmatrix} 0 & -2 \\\\ 1 & 3 \\end{bmatrix}$",
+          "Example 2: For $A = \\begin{bmatrix} 0 & 1 \\\\ 3 & 2 \\end{bmatrix}$, swap rows: $R_1 \\leftrightarrow R_2$ yields $\\begin{bmatrix} 3 & 2 \\\\ 0 & 1 \\end{bmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Row Addition Operation",
+          "latex": "$R_i + cR_j \\to R_i$ where $c \\in \\mathbb{R}, c \\neq 0$",
+          "description": "Most commonly used operation to create zeros below pivot positions during Gaussian elimination"
+        },
+        {
+          "name": "Elementary Matrix Representation",
+          "latex": "$B = E_k E_{k-1} \\cdots E_2 E_1 A$",
+          "description": "Any sequence of row operations can be represented as multiplication by elementary matrices"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs a single elementary row operation on a matrix. The function should handle row swapping, row scaling, and row addition. This is a fundamental building block for implementing Gaussian elimination.",
+        "function_signature": "def elementary_row_operation(A: np.ndarray, operation: str, row1: int, row2: int = None, scalar: float = 1.0) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef elementary_row_operation(A: np.ndarray, operation: str, row1: int, row2: int = None, scalar: float = 1.0) -> np.ndarray:\n    \"\"\"\n    Perform an elementary row operation on matrix A.\n    \n    Parameters:\n    - A: input matrix (will be copied, not modified in place)\n    - operation: 'swap', 'scale', or 'add'\n    - row1: first row index (0-indexed)\n    - row2: second row index for swap/add operations\n    - scalar: scaling factor for scale/add operations\n    \n    Returns:\n    - Modified matrix after the operation\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "elementary_row_operation(np.array([[1, 2], [3, 4]], dtype=float), 'swap', 0, 1)",
+            "expected": "np.array([[3, 4], [1, 2]])",
+            "explanation": "Swapping rows 0 and 1 interchanges their positions"
+          },
+          {
+            "input": "elementary_row_operation(np.array([[2, 4], [1, 3]], dtype=float), 'scale', 0, scalar=0.5)",
+            "expected": "np.array([[1, 2], [1, 3]])",
+            "explanation": "Scaling row 0 by 0.5 multiplies all entries by 0.5"
+          },
+          {
+            "input": "elementary_row_operation(np.array([[1, 2], [3, 4]], dtype=float), 'add', 1, 0, -3)",
+            "expected": "np.array([[1, 2], [0, -2]])",
+            "explanation": "Adding -3 times row 0 to row 1 creates a zero in position (1,0)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Modifying the original matrix instead of creating a copy",
+        "Forgetting to handle floating-point precision issues",
+        "Incorrect indexing (mixing 0-based and 1-based indexing)",
+        "Not validating that scalar is nonzero for scaling operations"
+      ],
+      "hint": "Use np.copy() to avoid modifying the input matrix. For the 'add' operation, remember the formula: new_row1 = row1 + scalar * row2",
+      "references": [
+        "Gaussian Elimination algorithm",
+        "Elementary matrices in linear algebra",
+        "Numerical stability in matrix computations"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Row Echelon Form and Pivot Positions",
+      "relation_to_problem": "Converting a matrix to row echelon form reveals the pivot positions, which directly indicate which columns of the original matrix form a basis for its image.",
+      "prerequisites": [
+        "Elementary row operations",
+        "Matrix rank concept",
+        "Leading entries in rows"
+      ],
+      "learning_objectives": [
+        "Recognize when a matrix is in row echelon form",
+        "Implement Gaussian elimination to achieve row echelon form",
+        "Identify pivot positions in a row echelon matrix",
+        "Handle numerical tolerances for zero detection"
+      ],
+      "math_content": {
+        "definition": "A matrix $A$ is in **row echelon form (REF)** if it satisfies:\n\n1. All zero rows are at the bottom of the matrix\n2. The first nonzero entry of each row (called a **pivot** or **leading entry**) is strictly to the right of the pivot in the row above it\n3. All entries below a pivot are zero\n\nA **pivot position** is the location $(i, j)$ of a pivot in the matrix. A **pivot column** is a column containing a pivot position.",
+        "notation": "$\\text{REF}(A)$ denotes a row echelon form of matrix $A$\n\n$p_{ij}$ denotes the pivot at row $i$, column $j$\n\n$\\text{rank}(A) = $ number of pivot positions in $\\text{REF}(A)$",
+        "theorem": "**Theorem (Uniqueness of Pivot Positions)**: Although a matrix can have multiple row echelon forms, the positions of the pivots are unique. That is, all row echelon forms of a matrix $A$ have pivots in the same column indices.\n\n**Theorem (Rank via REF)**: The rank of a matrix equals the number of nonzero rows in any row echelon form of the matrix.",
+        "proof_sketch": "Pivot positions correspond to linearly independent columns. Since row operations preserve linear independence relationships among columns, the set of independent columns (and thus pivot positions) remains invariant across different row echelon forms.",
+        "examples": [
+          "Example 1 (REF): $\\begin{bmatrix} 1 & 2 & 3 \\\\ 0 & 4 & 5 \\\\ 0 & 0 & 6 \\end{bmatrix}$ has pivots at positions $(0,0), (1,1), (2,2)$",
+          "Example 2 (REF): $\\begin{bmatrix} 2 & 1 & 3 & 4 \\\\ 0 & 0 & 5 & 6 \\\\ 0 & 0 & 0 & 0 \\end{bmatrix}$ has pivots at $(0,0), (1,2)$; rank is 2",
+          "Example 3 (Not REF): $\\begin{bmatrix} 1 & 2 \\\\ 0 & 0 \\\\ 0 & 3 \\end{bmatrix}$ violates condition 1 (zero row not at bottom)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Forward Elimination Step",
+          "latex": "$R_i - \\frac{a_{ij}}{a_{kj}} R_k \\to R_i$ for $i > k$",
+          "description": "Eliminates entry $a_{ij}$ below pivot $a_{kj}$ by subtracting appropriate multiple of row $k$ from row $i$"
+        },
+        {
+          "name": "Zero Tolerance Check",
+          "latex": "$|a_{ij}| < \\epsilon \\implies a_{ij} = 0$",
+          "description": "In floating-point arithmetic, treat values below threshold $\\epsilon$ (e.g., $10^{-10}$) as zero"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that converts a matrix to row echelon form using forward elimination (Gaussian elimination). Return both the row echelon form matrix and a list of pivot column indices. This directly builds toward identifying which columns span the image.",
+        "function_signature": "def row_echelon_form(A: np.ndarray, tolerance: float = 1e-10) -> tuple[np.ndarray, list[int]]:",
+        "starter_code": "import numpy as np\n\ndef row_echelon_form(A: np.ndarray, tolerance: float = 1e-10) -> tuple[np.ndarray, list[int]]:\n    \"\"\"\n    Convert matrix A to row echelon form and identify pivot columns.\n    \n    Parameters:\n    - A: input matrix (m x n)\n    - tolerance: threshold for treating values as zero\n    \n    Returns:\n    - ref_matrix: the matrix in row echelon form\n    - pivot_columns: list of column indices where pivots occur\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "row_echelon_form(np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=float))",
+            "expected": "(REF matrix with 2 pivots, [0, 1])",
+            "explanation": "This matrix has rank 2, with pivots in columns 0 and 1; third column is dependent"
+          },
+          {
+            "input": "row_echelon_form(np.array([[2, 4], [1, 2]], dtype=float))",
+            "expected": "(REF matrix with 1 pivot, [0])",
+            "explanation": "Second column is twice the first, so only one pivot exists"
+          },
+          {
+            "input": "row_echelon_form(np.array([[1, 0, 2], [0, 1, 3], [0, 0, 0]], dtype=float))",
+            "expected": "(same matrix, [0, 1])",
+            "explanation": "Already in REF with pivots at columns 0 and 1"
+          },
+          {
+            "input": "row_echelon_form(np.array([[0, 1], [1, 0]], dtype=float))",
+            "expected": "(REF after row swap, [0, 1])",
+            "explanation": "Requires row swap to get pivot in column 0, then both columns are pivots"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the case when the current pivot position is zero (need to swap with a row below)",
+        "Forgetting to use tolerance for zero comparisons in floating-point arithmetic",
+        "Dividing by a value that is numerically zero",
+        "Not tracking which columns actually contain pivots vs just nonzero entries",
+        "Modifying rows that have already been processed"
+      ],
+      "hint": "Iterate through columns left to right. For each column, find the first nonzero entry at or below the current row (this becomes your pivot). Swap rows if needed, then eliminate all entries below the pivot.",
+      "references": [
+        "Gaussian elimination algorithm",
+        "Partial pivoting for numerical stability",
+        "Forward elimination process",
+        "Matrix rank computation"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Linear Independence and Column Dependencies",
+      "relation_to_problem": "Understanding linear independence is crucial because the image is spanned by linearly independent columns (pivot columns). Non-pivot columns are linear combinations of pivot columns and don't contribute new dimensions to the image.",
+      "prerequisites": [
+        "Vector spaces",
+        "Linear combinations",
+        "Span of vectors"
+      ],
+      "learning_objectives": [
+        "Define linear independence formally using vector equations",
+        "Determine if a set of vectors is linearly independent",
+        "Express dependent vectors as combinations of independent ones",
+        "Understand the relationship between pivot columns and linear independence"
+      ],
+      "math_content": {
+        "definition": "A set of vectors $\\{\\vec{v}_1, \\vec{v}_2, \\ldots, \\vec{v}_k\\}$ in $\\mathbb{R}^n$ is **linearly independent** if the only solution to the equation:\n\n$$c_1\\vec{v}_1 + c_2\\vec{v}_2 + \\cdots + c_k\\vec{v}_k = \\vec{0}$$\n\nis the trivial solution $c_1 = c_2 = \\cdots = c_k = 0$.\n\nIf there exists a nontrivial solution (at least one $c_i \\neq 0$), the vectors are **linearly dependent**.\n\nFor a matrix $A = [\\vec{a}_1 \\mid \\vec{a}_2 \\mid \\cdots \\mid \\vec{a}_n]$, the columns are linearly independent if and only if $A\\vec{x} = \\vec{0}$ has only the trivial solution.",
+        "notation": "$\\text{span}\\{\\vec{v}_1, \\ldots, \\vec{v}_k\\} = \\{c_1\\vec{v}_1 + \\cdots + c_k\\vec{v}_k : c_i \\in \\mathbb{R}\\}$\n\n$\\text{Ker}(A) = \\{\\vec{x} : A\\vec{x} = \\vec{0}\\}$ is the kernel (null space) of $A$\n\n$\\dim(\\text{span}\\{\\vec{v}_1, \\ldots, \\vec{v}_k\\})$ = number of linearly independent vectors",
+        "theorem": "**Theorem (Pivot Columns are Independent)**: The columns of a matrix $A$ corresponding to pivot positions in $\\text{REF}(A)$ are linearly independent in the original matrix $A$.\n\n**Theorem (Non-pivot Column Representation)**: Each non-pivot column of $A$ can be written as a unique linear combination of the pivot columns that precede it.\n\n**Theorem (Dimension of Image)**: For an $m \\times n$ matrix $A$, $\\dim(\\text{Im}(A)) = \\text{rank}(A) = $ number of pivot columns.",
+        "proof_sketch": "If pivot columns were dependent, row reduction would create a row of zeros in a pivot position, contradicting the definition of pivot. For non-pivot columns, the REF reveals the exact coefficients needed to express them as combinations of pivot columns (these coefficients appear in the REF matrix).",
+        "examples": [
+          "Example 1: Vectors $\\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix}, \\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix}$ are independent because $c_1\\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix} + c_2\\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix} = \\begin{bmatrix} 0 \\\\ 0 \\end{bmatrix}$ only when $c_1 = c_2 = 0$",
+          "Example 2: Vectors $\\begin{bmatrix} 1 \\\\ 2 \\end{bmatrix}, \\begin{bmatrix} 2 \\\\ 4 \\end{bmatrix}$ are dependent because $2\\begin{bmatrix} 1 \\\\ 2 \\end{bmatrix} - 1\\begin{bmatrix} 2 \\\\ 4 \\end{bmatrix} = \\begin{bmatrix} 0 \\\\ 0 \\end{bmatrix}$",
+          "Example 3: For matrix $A = \\begin{bmatrix} 1 & 2 & 3 \\\\ 0 & 1 & 2 \\\\ 0 & 0 & 0 \\end{bmatrix}$ in REF, pivots at columns 0, 1 indicate these columns are independent; column 2 satisfies $\\vec{a}_2 = 3\\vec{a}_0 + 2\\vec{a}_1$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Linear Independence Test",
+          "latex": "$A\\vec{x} = \\vec{0}$ has only $\\vec{x} = \\vec{0} \\iff \\text{columns of } A \\text{ are independent}$",
+          "description": "Columns are independent if and only if the homogeneous system has only the trivial solution"
+        },
+        {
+          "name": "Dependence Relation from REF",
+          "latex": "$\\vec{a}_j = \\sum_{i \\in \\text{pivots}, i < j} r_{ij} \\vec{a}_i$ for non-pivot column $j$",
+          "description": "Non-pivot columns are combinations of preceding pivot columns; coefficients $r_{ij}$ come from the REF matrix"
+        }
+      ],
+      "exercise": {
+        "description": "Given a matrix and its row echelon form with identified pivot columns, implement a function that checks if a specific column is linearly independent of the pivot columns. This helps understand which columns contribute to the image.",
+        "function_signature": "def is_column_independent(A: np.ndarray, pivot_cols: list[int], test_col: int, tolerance: float = 1e-10) -> bool:",
+        "starter_code": "import numpy as np\n\ndef is_column_independent(A: np.ndarray, pivot_cols: list[int], test_col: int, tolerance: float = 1e-10) -> bool:\n    \"\"\"\n    Check if column test_col is linearly independent of the pivot columns.\n    \n    Parameters:\n    - A: input matrix\n    - pivot_cols: list of indices of pivot columns\n    - test_col: column index to test\n    - tolerance: threshold for zero comparisons\n    \n    Returns:\n    - True if test_col is independent of pivot columns, False otherwise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "is_column_independent(np.array([[1, 2, 3], [0, 1, 2], [0, 0, 0]], dtype=float), [0, 1], 2)",
+            "expected": "False",
+            "explanation": "Column 2 is [3, 2, 0] = 3*[1, 0, 0] + 2*[2, 1, 0], so it's dependent on pivot columns 0 and 1"
+          },
+          {
+            "input": "is_column_independent(np.array([[1, 0], [0, 1]], dtype=float), [0], 1)",
+            "expected": "True",
+            "explanation": "Column 1 is [0, 1], which cannot be expressed as a scalar multiple of column 0 [1, 0]"
+          },
+          {
+            "input": "is_column_independent(np.array([[2, 4], [1, 2]], dtype=float), [0], 1)",
+            "expected": "False",
+            "explanation": "Column 1 is [4, 2] = 2*[2, 1], so it depends on column 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing linear independence with orthogonality (independent vectors need not be perpendicular)",
+        "Checking only pairs of vectors when multiple vectors may be involved in a dependence relation",
+        "Not accounting for numerical precision when solving for coefficients",
+        "Testing columns in the REF matrix instead of the original matrix"
+      ],
+      "hint": "To check if test_col is independent of pivot_cols, try to solve for coefficients that express the test column as a combination of pivot columns. If such coefficients exist (within tolerance), the column is dependent.",
+      "references": [
+        "Basis and dimension in vector spaces",
+        "Fundamental theorem of linear algebra",
+        "Kernel and image relationship"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Column Space and Image of a Linear Transformation",
+      "relation_to_problem": "The column space (image) is the fundamental object we're computing. Understanding its definition, properties, and relationship to matrix transformations is essential before extracting basis vectors.",
+      "prerequisites": [
+        "Linear transformations",
+        "Vector subspaces",
+        "Span and basis"
+      ],
+      "learning_objectives": [
+        "Define the column space (image) of a matrix rigorously",
+        "Understand the image as the range of a linear transformation",
+        "Relate rank to the dimension of the column space",
+        "Compute the span of a given set of vectors"
+      ],
+      "math_content": {
+        "definition": "Let $A$ be an $m \\times n$ matrix with columns $\\vec{a}_1, \\vec{a}_2, \\ldots, \\vec{a}_n \\in \\mathbb{R}^m$. The **column space** (or **image**) of $A$, denoted $\\text{Col}(A)$ or $\\text{Im}(A)$, is:\n\n$$\\text{Im}(A) = \\{A\\vec{x} : \\vec{x} \\in \\mathbb{R}^n\\} = \\text{span}\\{\\vec{a}_1, \\vec{a}_2, \\ldots, \\vec{a}_n\\}$$\n\nEquivalently, $\\text{Im}(A)$ consists of all linear combinations of the columns of $A$:\n\n$$\\text{Im}(A) = \\left\\{c_1\\vec{a}_1 + c_2\\vec{a}_2 + \\cdots + c_n\\vec{a}_n : c_i \\in \\mathbb{R}\\right\\}$$\n\nThe column space is a subspace of $\\mathbb{R}^m$.",
+        "notation": "$\\text{Im}(A) = \\text{Col}(A) = \\text{Range}(A)$ all denote the image\n\n$\\dim(\\text{Im}(A)) = \\text{rank}(A)$\n\n$A: \\mathbb{R}^n \\to \\mathbb{R}^m$ represents matrix $A$ as a linear transformation",
+        "theorem": "**Theorem (Image is a Subspace)**: For any matrix $A$, $\\text{Im}(A)$ is a subspace of $\\mathbb{R}^m$.\n\n**Theorem (Basis for Image)**: A basis for $\\text{Im}(A)$ consists of the pivot columns of $A$. The dimension equals the number of pivot columns (the rank).\n\n**Theorem (Rank-Nullity)**: For an $m \\times n$ matrix $A$:\n$$\\text{rank}(A) + \\text{nullity}(A) = n$$\nwhere $\\text{nullity}(A) = \\dim(\\text{Ker}(A))$.",
+        "proof_sketch": "To prove $\\text{Im}(A)$ is a subspace: (1) $\\vec{0} \\in \\text{Im}(A)$ since $A\\vec{0} = \\vec{0}$; (2) if $\\vec{u}, \\vec{v} \\in \\text{Im}(A)$, then $\\vec{u} + \\vec{v} = A\\vec{x}_1 + A\\vec{x}_2 = A(\\vec{x}_1 + \\vec{x}_2) \\in \\text{Im}(A)$; (3) if $\\vec{u} \\in \\text{Im}(A)$ and $c \\in \\mathbb{R}$, then $c\\vec{u} = cA\\vec{x} = A(c\\vec{x}) \\in \\text{Im}(A)$. Since all linear combinations of columns are achievable via matrix-vector multiplication, the span equals the image.",
+        "examples": [
+          "Example 1: For $A = \\begin{bmatrix} 1 & 2 \\\\ 3 & 6 \\end{bmatrix}$, $\\text{Im}(A) = \\text{span}\\left\\{\\begin{bmatrix} 1 \\\\ 3 \\end{bmatrix}\\right\\}$ since column 2 is dependent",
+          "Example 2: For identity matrix $I_n$, $\\text{Im}(I_n) = \\mathbb{R}^n$ (full column space)",
+          "Example 3: For $A = \\begin{bmatrix} 1 & 0 & 1 \\\\ 0 & 1 & 1 \\\\ 0 & 0 & 0 \\end{bmatrix}$, $\\text{Im}(A) = \\text{span}\\left\\{\\begin{bmatrix} 1 \\\\ 0 \\\\ 0 \\end{bmatrix}, \\begin{bmatrix} 0 \\\\ 1 \\\\ 0 \\end{bmatrix}\\right\\}$ (the $xy$-plane in $\\mathbb{R}^3$)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Image Definition",
+          "latex": "$\\text{Im}(A) = \\{\\vec{y} \\in \\mathbb{R}^m : \\vec{y} = A\\vec{x} \\text{ for some } \\vec{x} \\in \\mathbb{R}^n\\}$",
+          "description": "The image consists of all possible outputs of the linear transformation represented by $A$"
+        },
+        {
+          "name": "Dimension Formula",
+          "latex": "$\\dim(\\text{Im}(A)) = \\text{rank}(A) = \\#\\{\\text{pivot columns}\\}$",
+          "description": "The dimension of the image equals the number of linearly independent columns"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the span of a set of vectors by finding a basis for the span (removing redundant vectors). This is a key operation for understanding how to represent the column space efficiently.",
+        "function_signature": "def find_basis_for_span(vectors: list[np.ndarray], tolerance: float = 1e-10) -> list[np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef find_basis_for_span(vectors: list[np.ndarray], tolerance: float = 1e-10) -> list[np.ndarray]:\n    \"\"\"\n    Find a basis for the span of the given vectors.\n    \n    Parameters:\n    - vectors: list of column vectors (each is a numpy array)\n    - tolerance: threshold for zero detection\n    \n    Returns:\n    - basis: list of linearly independent vectors that span the same space\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "find_basis_for_span([np.array([1, 0, 0]), np.array([0, 1, 0]), np.array([1, 1, 0])])",
+            "expected": "[array([1, 0, 0]), array([0, 1, 0])]",
+            "explanation": "Third vector [1,1,0] = [1,0,0] + [0,1,0], so it's redundant; first two form a basis"
+          },
+          {
+            "input": "find_basis_for_span([np.array([2, 4]), np.array([1, 2])])",
+            "expected": "[array([2, 4])] or [array([1, 2])]",
+            "explanation": "Both vectors are parallel, so only one is needed for the basis"
+          },
+          {
+            "input": "find_basis_for_span([np.array([1, 0, 0]), np.array([0, 1, 0]), np.array([0, 0, 1])])",
+            "expected": "[array([1, 0, 0]), array([0, 1, 0]), array([0, 0, 1])]",
+            "explanation": "All three vectors are independent, forming a basis for R³"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing the column space with the row space (they are generally different subspaces)",
+        "Thinking all columns contribute to the basis (only independent columns do)",
+        "Not recognizing that the dimension of the image can be less than both m and n",
+        "Computing span using REF columns instead of original matrix columns"
+      ],
+      "hint": "Form a matrix with the vectors as columns, then use row reduction to identify pivot columns. The original vectors at pivot positions form the basis.",
+      "references": [
+        "Fundamental subspaces of a matrix",
+        "Dimension theorem for vector spaces",
+        "Four fundamental subspaces (image, kernel, row space, left null space)"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Extracting Pivot Columns from the Original Matrix",
+      "relation_to_problem": "This is the critical final step: using pivot positions identified in REF to extract the correct basis vectors from the original matrix. This distinction is essential because row operations change column values.",
+      "prerequisites": [
+        "Row echelon form",
+        "Pivot identification",
+        "Column space concept"
+      ],
+      "learning_objectives": [
+        "Understand why pivot columns must come from the original matrix, not REF",
+        "Implement the extraction of specific columns by index",
+        "Combine REF analysis with original matrix to find the image basis",
+        "Validate that extracted columns are truly linearly independent"
+      ],
+      "math_content": {
+        "definition": "Given a matrix $A$ and its row echelon form $R = \\text{REF}(A)$, the **pivot column indices** are the column positions $j_1, j_2, \\ldots, j_r$ where pivots occur in $R$. The **basis for the image** of $A$ is:\n\n$$\\mathcal{B} = \\{\\vec{a}_{j_1}, \\vec{a}_{j_2}, \\ldots, \\vec{a}_{j_r}\\}$$\n\nwhere $\\vec{a}_{j_i}$ denotes the $j_i$-th column of the **original matrix** $A$, not the REF matrix $R$.",
+        "notation": "$A[:,j]$ denotes the $j$-th column of matrix $A$\n\n$\\mathcal{B}(\\text{Im}(A))$ denotes a basis for the image of $A$\n\n$[\\vec{v}_1 \\mid \\vec{v}_2 \\mid \\cdots \\mid \\vec{v}_k]$ denotes matrix with columns $\\vec{v}_i$",
+        "theorem": "**Theorem (Critical Distinction)**: Although row reduction preserves the pattern of linear dependencies among columns, it changes the actual column vectors. Therefore:\n- The **pivot positions** are identified from $\\text{REF}(A)$\n- The **basis vectors** are extracted from the original matrix $A$\n\n**Theorem (Correctness of Extraction)**: The columns of $A$ at pivot positions in $\\text{REF}(A)$ form a basis for $\\text{Im}(A)$.",
+        "proof_sketch": "Row operations preserve which columns are independent but not their values. If columns $j_1, \\ldots, j_r$ are pivot columns in $R$, they are independent in $R$. Since row operations preserve independence relations, the corresponding columns in $A$ are also independent. Since rank is preserved, these $r$ independent columns from $A$ (where $r = \\text{rank}(A)$) must span $\\text{Im}(A)$, forming a basis.",
+        "examples": [
+          "Example 1: For $A = \\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\\\ 7 & 8 & 9 \\end{bmatrix}$, $\\text{REF}(A) = \\begin{bmatrix} 1 & 2 & 3 \\\\ 0 & -3 & -6 \\\\ 0 & 0 & 0 \\end{bmatrix}$ has pivots at columns 0, 1. Extract $\\vec{a}_0 = \\begin{bmatrix} 1 \\\\ 4 \\\\ 7 \\end{bmatrix}$, $\\vec{a}_1 = \\begin{bmatrix} 2 \\\\ 5 \\\\ 8 \\end{bmatrix}$ from $A$",
+          "Example 2: For $A = \\begin{bmatrix} 0 & 1 \\\\ 0 & 2 \\end{bmatrix}$, REF shows pivot only in column 1. Extract $\\vec{a}_1 = \\begin{bmatrix} 1 \\\\ 2 \\end{bmatrix}$ from original $A$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Basis Extraction Formula",
+          "latex": "$\\mathcal{B}(\\text{Im}(A)) = \\{A[:,j] : j \\in \\text{pivot\\_indices}(\\text{REF}(A))\\}$",
+          "description": "Extract columns from original matrix A at positions where REF has pivots"
+        },
+        {
+          "name": "Matrix Reconstruction",
+          "latex": "$A = [\\vec{a}_{j_1} \\mid \\vec{a}_{j_2} \\mid \\cdots \\mid \\vec{a}_{j_r}] \\cdot C$",
+          "description": "Any matrix can be written as its pivot columns times a coefficient matrix C"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a matrix, finds its REF and pivot positions, then extracts and returns the pivot columns from the original matrix. This is the penultimate step before solving the main problem.",
+        "function_signature": "def extract_pivot_columns(A: np.ndarray, tolerance: float = 1e-10) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef extract_pivot_columns(A: np.ndarray, tolerance: float = 1e-10) -> np.ndarray:\n    \"\"\"\n    Extract pivot columns from the original matrix A.\n    \n    Parameters:\n    - A: input matrix (m x n)\n    - tolerance: threshold for zero detection in REF computation\n    \n    Returns:\n    - pivot_matrix: matrix formed by pivot columns of A (m x r where r is rank)\n    \"\"\"\n    # Your code here\n    # Hint: You'll need to:\n    # 1. Compute REF of A\n    # 2. Identify pivot column indices\n    # 3. Extract those columns from original A\n    # 4. Return as a new matrix\n    pass",
+        "test_cases": [
+          {
+            "input": "extract_pivot_columns(np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=float))",
+            "expected": "np.array([[1, 2], [4, 5], [7, 8]])",
+            "explanation": "Columns 0 and 1 are pivot columns; column 2 is dependent, so extract first two columns from original matrix"
+          },
+          {
+            "input": "extract_pivot_columns(np.array([[2, 4], [1, 2]], dtype=float))",
+            "expected": "np.array([[2], [1]])",
+            "explanation": "Only column 0 is a pivot column; column 1 is twice column 0"
+          },
+          {
+            "input": "extract_pivot_columns(np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]], dtype=float))",
+            "expected": "np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])",
+            "explanation": "Identity matrix: all columns are pivot columns"
+          },
+          {
+            "input": "extract_pivot_columns(np.array([[1, 2], [2, 4], [3, 6]], dtype=float))",
+            "expected": "np.array([[1], [2], [3]])",
+            "explanation": "3x2 matrix with rank 1; only first column is independent"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Returning columns from the REF matrix instead of the original matrix (THE most common error)",
+        "Confusing column indices with row indices when extracting",
+        "Not preserving the order of pivot columns",
+        "Extracting entire rows instead of columns",
+        "Forgetting to handle edge cases (zero matrix, full rank matrix)"
+      ],
+      "hint": "After computing REF and getting pivot indices like [0, 2, 4], use numpy slicing A[:, pivot_indices] to extract those columns from the original matrix A.",
+      "references": [
+        "Column extraction in NumPy",
+        "Matrix slicing and indexing",
+        "Relationship between REF and original matrix"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Image Computation Algorithm",
+      "relation_to_problem": "This synthesizes all previous concepts into the complete algorithm for computing the matrix image, combining row reduction, pivot identification, and column extraction into a robust solution.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Algorithm composition",
+        "Edge case handling"
+      ],
+      "learning_objectives": [
+        "Integrate all components into a complete solution",
+        "Handle edge cases (zero matrix, full rank, single column)",
+        "Implement the full matrix_image function with proper validation",
+        "Verify correctness through testing on diverse inputs"
+      ],
+      "math_content": {
+        "definition": "The **complete algorithm** for finding $\\text{Im}(A)$ consists of:\n\n**Algorithm: Compute-Image**($A$, $\\epsilon$)  \n**Input:** $m \\times n$ matrix $A$, tolerance $\\epsilon > 0$  \n**Output:** Basis matrix $B$ for $\\text{Im}(A)$\n\n1. $R, P \\leftarrow \\text{RowEchelonForm}(A, \\epsilon)$ // Compute REF and pivot indices\n2. **if** $P = \\emptyset$ **then** return empty matrix // Zero matrix case\n3. $B \\leftarrow A[:, P]$ // Extract pivot columns from original matrix\n4. **return** $B$\n\nThe output $B$ is an $m \\times r$ matrix where $r = |P| = \\text{rank}(A)$, and the columns of $B$ form a basis for $\\text{Im}(A)$.",
+        "notation": "$\\text{RowEchelonForm}(A, \\epsilon) \\to (R, P)$ returns REF matrix $R$ and pivot indices $P$\n\n$A[:, P]$ denotes column extraction using index list $P$\n\n$\\mathcal{O}(mn^2)$ is the time complexity for $m \\times n$ matrix",
+        "theorem": "**Theorem (Algorithm Correctness)**: The algorithm Compute-Image returns a basis for $\\text{Im}(A)$.\n\n**Theorem (Complexity)**: The algorithm runs in $\\mathcal{O}(\\min(m,n) \\cdot mn)$ time, dominated by the row reduction step.\n\n**Theorem (Numerical Stability)**: With proper tolerance $\\epsilon$ and partial pivoting, the algorithm is numerically stable for well-conditioned matrices.",
+        "proof_sketch": "Correctness follows from: (1) REF correctly identifies pivot positions via Gaussian elimination; (2) pivot positions correspond to independent columns by the rank-nullity theorem; (3) these independent columns span the image since their number equals the rank. Time complexity: Gaussian elimination performs $O(mn)$ operations for each of $O(\\min(m,n))$ pivot steps.",
+        "examples": [
+          "Example (Complete trace): For $A = \\begin{bmatrix} 1 & 3 & 5 \\\\ 2 & 6 & 11 \\\\ -1 & -3 & -4 \\end{bmatrix}$:\n- Step 1: Compute $\\text{REF}(A) = \\begin{bmatrix} 1 & 3 & 5 \\\\ 0 & 0 & 1 \\\\ 0 & 0 & 0 \\end{bmatrix}$, pivots at $P = [0, 2]$\n- Step 2: $P \\neq \\emptyset$, continue\n- Step 3: Extract $B = A[:, [0,2]] = \\begin{bmatrix} 1 & 5 \\\\ 2 & 11 \\\\ -1 & -4 \\end{bmatrix}$\n- Output: $\\text{Im}(A) = \\text{span}\\{\\begin{bmatrix} 1 \\\\ 2 \\\\ -1 \\end{bmatrix}, \\begin{bmatrix} 5 \\\\ 11 \\\\ -4 \\end{bmatrix}\\}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Algorithm",
+          "latex": "$\\text{Im}(A) = \\text{span}\\{A[:,j] : j \\in \\text{pivots}(\\text{REF}(A))\\}$",
+          "description": "The image is the span of original matrix columns at REF pivot positions"
+        },
+        {
+          "name": "Verification Check",
+          "latex": "$\\text{rank}(B) = \\text{rank}(A)$ where $B$ is the output basis matrix",
+          "description": "The extracted basis should have the same rank as the original matrix"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete matrix_image function that returns the basis vectors forming the column space. This integrates all concepts from previous sub-quests. Test thoroughly with edge cases.",
+        "function_signature": "def matrix_image(A: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef matrix_image(A: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute the image (column space) of matrix A.\n    \n    Parameters:\n    - A: input matrix (m x n)\n    \n    Returns:\n    - basis_matrix: matrix whose columns form a basis for Im(A)\n                    Shape is (m x r) where r is the rank of A\n    \n    Note: Return columns from the ORIGINAL matrix A, not from REF.\n    \"\"\"\n    # Your code here\n    # You need to implement or use:\n    # 1. Row echelon form computation\n    # 2. Pivot column identification\n    # 3. Column extraction from original matrix\n    pass",
+        "test_cases": [
+          {
+            "input": "matrix_image(np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=float))",
+            "expected": "np.array([[1, 2], [4, 5], [7, 8]])",
+            "explanation": "Standard 3x3 rank-2 matrix; first two columns span the image"
+          },
+          {
+            "input": "matrix_image(np.array([[0, 0], [0, 0]], dtype=float))",
+            "expected": "np.array([], dtype=float).reshape(2, 0)",
+            "explanation": "Zero matrix has empty image (rank 0)"
+          },
+          {
+            "input": "matrix_image(np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]], dtype=float))",
+            "expected": "np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])",
+            "explanation": "Identity matrix: all columns are independent, full rank"
+          },
+          {
+            "input": "matrix_image(np.array([[1, 2], [2, 4], [3, 6]], dtype=float))",
+            "expected": "np.array([[1], [2], [3]])",
+            "explanation": "Rank 1: second column is twice the first"
+          },
+          {
+            "input": "matrix_image(np.array([[2, 4, 6], [1, 2, 3]], dtype=float))",
+            "expected": "np.array([[2], [1]])",
+            "explanation": "All columns are scalar multiples; rank 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Returning the REF matrix instead of extracted columns from original matrix",
+        "Not handling the zero matrix case (should return empty array with correct shape)",
+        "Returning pivot column indices instead of the actual column vectors",
+        "Not ensuring output has correct shape (m x r) for m x n input of rank r",
+        "Using incorrect tolerance leading to misidentification of pivots"
+      ],
+      "hint": "Combine your row_echelon_form and extract_pivot_columns implementations. Make sure to extract from the original matrix A using the pivot indices from REF(A).",
+      "references": [
+        "Complete Gaussian elimination algorithm",
+        "Computational linear algebra best practices",
+        "Testing strategies for numerical algorithms",
+        "Matrix rank and dimension theory"
+      ]
+    }
+  ]
+}

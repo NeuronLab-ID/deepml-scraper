@@ -1,0 +1,64 @@
+{
+  "description": "V3JpdGUgYSBQeXRob24gZnVuY3Rpb24gdGhhdCBjb21wdXRlcyB0aGUgZGVyaXZhdGl2ZSAoZ3JhZGllbnQpIG9mIHRoZSBjcm9zcy1lbnRyb3B5IGxvc3Mgd2l0aCByZXNwZWN0IHRvIHRoZSBpbnB1dCBsb2dpdHMuIEdpdmVuIGEgdmVjdG9yIG9mIGxvZ2l0cyAocmF3IG1vZGVsIG91dHB1dHMgYmVmb3JlIHNvZnRtYXgpIGFuZCBhIHRhcmdldCBjbGFzcyBpbmRleCwgcmV0dXJuIHRoZSBncmFkaWVudCB2ZWN0b3IuIFRoaXMgZ3JhZGllbnQgaXMgZnVuZGFtZW50YWwgZm9yIHRyYWluaW5nIG5ldXJhbCBuZXR3b3JrIGNsYXNzaWZpZXJzIGFuZCBoYXMgYW4gZWxlZ2FudCBjbG9zZWQtZm9ybSBzb2x1dGlvbi4=",
+  "id": "220",
+  "test_cases": [
+    {
+      "test": "result = cross_entropy_derivative([1.0, 2.0, 3.0], 0)\nprint([round(g, 4) for g in result])",
+      "expected_output": "[-0.91, 0.2447, 0.6652]"
+    },
+    {
+      "test": "result = cross_entropy_derivative([1.0, 2.0, 3.0], 2)\nprint([round(g, 4) for g in result])",
+      "expected_output": "[0.09, 0.2447, -0.3348]"
+    }
+  ],
+  "difficulty": "medium",
+  "pytorch_difficulty": "easy",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "logits = [1.0, 2.0, 3.0], target = 0",
+    "output": "[-0.91, 0.2447, 0.6652]",
+    "reasoning": "First compute softmax: p = [0.09, 0.2447, 0.6652]. The one-hot target vector is y = [1, 0, 0]. The gradient is simply p - y = [0.09 - 1, 0.2447 - 0, 0.6652 - 0] = [-0.91, 0.2447, 0.6652]. The negative gradient for class 0 indicates we should increase that logit to reduce loss."
+  },
+  "category": "Calculus",
+  "pytorch_starter_code": "aW1wb3J0IHRvcmNoCmltcG9ydCB0b3JjaC5ubi5mdW5jdGlvbmFsIGFzIEYKCmRlZiBjcm9zc19lbnRyb3B5X2Rlcml2YXRpdmUobG9naXRzOiB0b3JjaC5UZW5zb3IsIHRhcmdldDogaW50KSAtPiB0b3JjaC5UZW5zb3I6CiAgICAiIiIKICAgIENvbXB1dGUgdGhlIGRlcml2YXRpdmUgb2YgY3Jvc3MtZW50cm9weSBsb3NzIHdpdGggcmVzcGVjdCB0byBsb2dpdHMuCiAgICAKICAgIEFyZ3M6CiAgICAgICAgbG9naXRzOiBSYXcgbW9kZWwgb3V0cHV0cyB0ZW5zb3IKICAgICAgICB0YXJnZXQ6IEluZGV4IG9mIHRoZSB0cnVlIGNsYXNzCiAgICAgICAgCiAgICBSZXR1cm5zOgogICAgICAgIEdyYWRpZW50IHRlbnNvcgogICAgIiIiCiAgICAjIFlvdXIgY29kZSBoZXJlIC0gY2FuIHVzZSBhdXRvZ3JhZCBvciB0aGUgYW5hbHl0aWNhbCBmb3JtdWxhCiAgICBwYXNz",
+  "title": "Derivative of Cross-Entropy Loss w.r.t. Logits",
+  "createdAt": "December 5, 2025 at 3:31:30 PM UTC-0500",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/Open-Deep-ML",
+      "name": "Deep-ML"
+    }
+  ],
+  "pytorch_test_cases": [
+    {
+      "test": "import torch\nimport torch.nn.functional as F\nresult = cross_entropy_derivative(torch.tensor([1.0, 2.0, 3.0]), 0)\nprint([round(g, 4) for g in result.tolist()])",
+      "expected_output": "[-0.91, 0.2447, 0.6652]"
+    },
+    {
+      "test": "import torch\nimport torch.nn.functional as F\nresult = cross_entropy_derivative(torch.tensor([1.0, 2.0, 3.0]), 2)\nprint([round(g, 4) for g in result.tolist()])",
+      "expected_output": "[0.09, 0.2447, -0.3348]"
+    },
+    {
+      "test": "import torch\nimport torch.nn.functional as F\nresult = cross_entropy_derivative(torch.tensor([0.0, 1.0]), 0)\nprint([round(g, 4) for g in result.tolist()])",
+      "expected_output": "[-0.7311, 0.7311]"
+    },
+    {
+      "test": "import torch\nimport torch.nn.functional as F\nresult = cross_entropy_derivative(torch.tensor([2.0, 1.0]), 1)\nprint([round(g, 4) for g in result.tolist()])",
+      "expected_output": "[0.7311, -0.7311]"
+    },
+    {
+      "test": "import torch\nimport torch.nn.functional as F\nresult = cross_entropy_derivative(torch.tensor([1.0, 2.0, 3.0, 4.0]), 1)\nprint([round(g, 4) for g in result.tolist()])",
+      "expected_output": "[0.0321, -0.9129, 0.2369, 0.6439]"
+    },
+    {
+      "test": "import torch\nimport torch.nn.functional as F\nresult = cross_entropy_derivative(torch.tensor([0.0, 0.0, 0.0]), 1)\nprint([round(g, 4) for g in result.tolist()])",
+      "expected_output": "[0.3333, -0.6667, 0.3333]"
+    }
+  ],
+  "learn_section": "IyMgRGVyaXZhdGl2ZSBvZiBDcm9zcy1FbnRyb3B5IExvc3Mgd2l0aCBSZXNwZWN0IHRvIExvZ2l0cwoKIyMjIFNldHVwCgpJbiBjbGFzc2lmaWNhdGlvbiBuZXVyYWwgbmV0d29ya3MsIHRoZSBmaW5hbCBsYXllciB0eXBpY2FsbHkgcHJvZHVjZXM6CjEuICoqTG9naXRzKiogJHokOiByYXcgdW5ub3JtYWxpemVkIHNjb3JlcwoyLiAqKlNvZnRtYXgqKjogY29udmVydHMgbG9naXRzIHRvIHByb2JhYmlsaXRpZXMgJHBfaSA9IFxmcmFje2Vee3pfaX19e1xzdW1faiBlXnt6X2p9fSQKMy4gKipDcm9zcy1FbnRyb3B5IExvc3MqKjogbWVhc3VyZXMgcHJlZGljdGlvbiBlcnJvciAkTCA9IC1cc3VtX2kgeV9pIFxsb2cocF9pKSQKCndoZXJlICR5JCBpcyB0aGUgb25lLWhvdCBlbmNvZGVkIHRydWUgbGFiZWwuCgojIyMgVGhlIEVsZWdhbnQgUmVzdWx0CgpXaGVuIHdlIGNvbWJpbmUgc29mdG1heCB3aXRoIGNyb3NzLWVudHJvcHkgbG9zcywgdGhlIGdyYWRpZW50IHdpdGggcmVzcGVjdCB0byBsb2dpdHMgc2ltcGxpZmllcyBiZWF1dGlmdWxseToKCiQkXGZyYWN7XHBhcnRpYWwgTH17XHBhcnRpYWwgel9pfSA9IHBfaSAtIHlfaSQkCgpPciBpbiB2ZWN0b3IgZm9ybToKJCRcbmFibGFfeiBMID0gXHRleHR7c29mdG1heH0oeikgLSB5JCQKClRoaXMgaXMgc2ltcGx5IHRoZSAqKnByZWRpY3RlZCBwcm9iYWJpbGl0eSBtaW51cyB0aGUgdGFyZ2V0KiohCgojIyMgRGVyaXZhdGlvbgoKTGV0J3MgZGVyaXZlIHRoaXMgc3RlcCBieSBzdGVwLgoKKipDcm9zcy1FbnRyb3B5IExvc3M6KioKJCRMID0gLVxzdW1fayB5X2sgXGxvZyhwX2spJCQKClNpbmNlICR5JCBpcyBvbmUtaG90IHdpdGggJHlfYyA9IDEkIGZvciB0cnVlIGNsYXNzICRjJDoKJCRMID0gLVxsb2cocF9jKSQkCgoqKlVzaW5nIENoYWluIFJ1bGU6KioKJCRcZnJhY3tccGFydGlhbCBMfXtccGFydGlhbCB6X2l9ID0gXHN1bV9rIFxmcmFje1xwYXJ0aWFsIEx9e1xwYXJ0aWFsIHBfa30gXGNkb3QgXGZyYWN7XHBhcnRpYWwgcF9rfXtccGFydGlhbCB6X2l9JCQKCioqR3JhZGllbnQgb2YgTG9zcyB3LnIudC4gU29mdG1heCBPdXRwdXQ6KioKJCRcZnJhY3tccGFydGlhbCBMfXtccGFydGlhbCBwX2t9ID0gLVxmcmFje3lfa317cF9rfSQkCgoqKlNvZnRtYXggSmFjb2JpYW4gKGZyb20gcHJldmlvdXMgcHJvYmxlbSk6KioKJCRcZnJhY3tccGFydGlhbCBwX2t9e1xwYXJ0aWFsIHpfaX0gPSBwX2soXGRlbHRhX3traX0gLSBwX2kpJCQKCioqQ29tYmluaW5nOioqCiQkXGZyYWN7XHBhcnRpYWwgTH17XHBhcnRpYWwgel9pfSA9IFxzdW1fayBcbGVmdCgtXGZyYWN7eV9rfXtwX2t9XHJpZ2h0KSBcY2RvdCBwX2soXGRlbHRhX3traX0gLSBwX2kpJCQKCiQkPSAtXHN1bV9rIHlfayhcZGVsdGFfe2tpfSAtIHBfaSkkJAoKJCQ9IC15X2kgKyBwX2kgXHN1bV9rIHlfayQkCgpTaW5jZSAkXHN1bV9rIHlfayA9IDEkIChvbmUtaG90IHZlY3Rvcik6CiQkPSAteV9pICsgcF9pID0gcF9pIC0geV9pJCQKCiMjIyBXaHkgVGhpcyBNYXR0ZXJzCgoxLiAqKkNvbXB1dGF0aW9uYWwgRWZmaWNpZW5jeSoqOiBObyBuZWVkIHRvIGNvbXB1dGUgdGhlIGZ1bGwgSmFjb2JpYW4gbWF0cml4IC0ganVzdCBzdWJ0cmFjdCEKCjIuICoqTnVtZXJpY2FsIFN0YWJpbGl0eSoqOiBEaXJlY3QgZm9ybXVsYSBhdm9pZHMgcG90ZW50aWFsIGlzc3VlcyBmcm9tIG11bHRpcGx5aW5nIHNtYWxsL2xhcmdlIG51bWJlcnMuCgozLiAqKkludHVpdGl2ZSBJbnRlcnByZXRhdGlvbioqOgogICAtIEZvciB0aGUgdHJ1ZSBjbGFzczogZ3JhZGllbnQgPSAkcF97dHJ1ZX0gLSAxJCAoYWx3YXlzIG5lZ2F0aXZlLCBwdXNoZXMgbG9naXQgdXApCiAgIC0gRm9yIHdyb25nIGNsYXNzZXM6IGdyYWRpZW50ID0gJHBfe3dyb25nfSAtIDAkIChhbHdheXMgcG9zaXRpdmUsIHB1c2hlcyBsb2dpdCBkb3duKQogICAtIFdlbGwtY2FsaWJyYXRlZCBwcmVkaWN0aW9uICgkcF97dHJ1ZX0gXGFwcHJveCAxJCk6IGdyYWRpZW50ICRcYXBwcm94IDAkCgo0LiAqKkdyYWRpZW50IE1hZ25pdHVkZSoqOiBUaGUgZ3JhZGllbnQgaXMgbGFyZ2VzdCB3aGVuIHRoZSBtb2RlbCBpcyBtb3N0IHdyb25nLgoKIyMjIEtleSBQcm9wZXJ0aWVzCgoxLiAqKlN1bSB0byBaZXJvKio6ICRcc3VtX2kgKHBfaSAtIHlfaSkgPSAxIC0gMSA9IDAkCgoyLiAqKkJvdW5kZWQqKjogRWFjaCBjb21wb25lbnQgaXMgaW4gJFstMSwgMV0kCgozLiAqKlNwYXJzZSBUYXJnZXQqKjogT25seSBvbmUgY29tcG9uZW50IG9mICR5JCBpcyBub24temVybwoKIyMjIENvbm5lY3Rpb24gdG8gQmluYXJ5IENyb3NzLUVudHJvcHkKCkZvciBiaW5hcnkgY2xhc3NpZmljYXRpb24gd2l0aCBzaWdtb2lkOgokJFxmcmFje1xwYXJ0aWFsIEx9e1xwYXJ0aWFsIHp9ID0gXHNpZ21hKHopIC0geSQkCgpTYW1lIGVsZWdhbnQgZm9ybSEgVGhpcyBpcyB3aHkgc2lnbW9pZCArIGJpbmFyeSBjcm9zcy1lbnRyb3B5IGlzIHRoZSBuYXR1cmFsIGNob2ljZSBmb3IgYmluYXJ5IGNsYXNzaWZpY2F0aW9uLg==",
+  "starter_code": "def cross_entropy_derivative(logits: list[float], target: int) -> list[float]:\n\t\"\"\"\n\tCompute the derivative of cross-entropy loss with respect to logits.\n\t\n\tArgs:\n\t\tlogits: Raw model outputs (before softmax)\n\t\ttarget: Index of the true class (0-indexed)\n\t\t\n\tReturns:\n\t\tGradient vector where gradient[i] = dL/d(logits[i])\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "description_decoded": "Write a Python function that computes the derivative (gradient) of the cross-entropy loss with respect to the input logits. Given a vector of logits (raw model outputs before softmax) and a target class index, return the gradient vector. This gradient is fundamental for training neural network classifiers and has an elegant closed-form solution.",
+  "learn_section_decoded": "## Derivative of Cross-Entropy Loss with Respect to Logits\n\n### Setup\n\nIn classification neural networks, the final layer typically produces:\n1. **Logits** $z$: raw unnormalized scores\n2. **Softmax**: converts logits to probabilities $p_i = \\frac{e^{z_i}}{\\sum_j e^{z_j}}$\n3. **Cross-Entropy Loss**: measures prediction error $L = -\\sum_i y_i \\log(p_i)$\n\nwhere $y$ is the one-hot encoded true label.\n\n### The Elegant Result\n\nWhen we combine softmax with cross-entropy loss, the gradient with respect to logits simplifies beautifully:\n\n$$\\frac{\\partial L}{\\partial z_i} = p_i - y_i$$\n\nOr in vector form:\n$$\\nabla_z L = \\text{softmax}(z) - y$$\n\nThis is simply the **predicted probability minus the target**!\n\n### Derivation\n\nLet's derive this step by step.\n\n**Cross-Entropy Loss:**\n$$L = -\\sum_k y_k \\log(p_k)$$\n\nSince $y$ is one-hot with $y_c = 1$ for true class $c$:\n$$L = -\\log(p_c)$$\n\n**Using Chain Rule:**\n$$\\frac{\\partial L}{\\partial z_i} = \\sum_k \\frac{\\partial L}{\\partial p_k} \\cdot \\frac{\\partial p_k}{\\partial z_i}$$\n\n**Gradient of Loss w.r.t. Softmax Output:**\n$$\\frac{\\partial L}{\\partial p_k} = -\\frac{y_k}{p_k}$$\n\n**Softmax Jacobian (from previous problem):**\n$$\\frac{\\partial p_k}{\\partial z_i} = p_k(\\delta_{ki} - p_i)$$\n\n**Combining:**\n$$\\frac{\\partial L}{\\partial z_i} = \\sum_k \\left(-\\frac{y_k}{p_k}\\right) \\cdot p_k(\\delta_{ki} - p_i)$$\n\n$$= -\\sum_k y_k(\\delta_{ki} - p_i)$$\n\n$$= -y_i + p_i \\sum_k y_k$$\n\nSince $\\sum_k y_k = 1$ (one-hot vector):\n$$= -y_i + p_i = p_i - y_i$$\n\n### Why This Matters\n\n1. **Computational Efficiency**: No need to compute the full Jacobian matrix - just subtract!\n\n2. **Numerical Stability**: Direct formula avoids potential issues from multiplying small/large numbers.\n\n3. **Intuitive Interpretation**:\n   - For the true class: gradient = $p_{true} - 1$ (always negative, pushes logit up)\n   - For wrong classes: gradient = $p_{wrong} - 0$ (always positive, pushes logit down)\n   - Well-calibrated prediction ($p_{true} \\approx 1$): gradient $\\approx 0$\n\n4. **Gradient Magnitude**: The gradient is largest when the model is most wrong.\n\n### Key Properties\n\n1. **Sum to Zero**: $\\sum_i (p_i - y_i) = 1 - 1 = 0$\n\n2. **Bounded**: Each component is in $[-1, 1]$\n\n3. **Sparse Target**: Only one component of $y$ is non-zero\n\n### Connection to Binary Cross-Entropy\n\nFor binary classification with sigmoid:\n$$\\frac{\\partial L}{\\partial z} = \\sigma(z) - y$$\n\nSame elegant form! This is why sigmoid + binary cross-entropy is the natural choice for binary classification."
+}

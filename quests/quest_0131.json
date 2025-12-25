@@ -1,0 +1,492 @@
+{
+  "problem_id": 131,
+  "title": "Implement Efficient Sparse Window Attention",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "Create a function named sparse_window_attention that computes sparse attention over long sequences by sliding a fixed-radius window across the sequence.\n\n• The parameter window_size represents the radius w of the window.\n- For a token at index i, attend only to tokens whose indices are within max(0, i - w) through min(seq_len - 1, i + w), inclusive.\n- Tokens near the beginning or end of the sequence simply have smaller windows; no padding is added.\n\n• Inputs\n- Q, K, V: NumPy arrays with shapes (seq_len, d_k) for Q and K, and (seq_len, d_v) for V.\n- window_size: integer window radius.\n- scale_factor (optional): value used to scale dot-product scores; if None, default to sqrt(d_k).\n\n• Output\n- A NumPy array of shape (seq_len, d_v) containing the attention results.",
+  "example": {
+    "input": "import numpy as np\nQ = np.array([[1.0], [1.0], [1.0]])\nK = np.array([[1.0], [1.0], [1.0]])\nV = np.array([[1.0], [2.0], [3.0]])\nprint(sparse_window_attention(Q, K, V, 1))",
+    "output": "[[1.5] [2. ] [2.5]]",
+    "reasoning": "The sparse_window_attention function processes each query in the input Q by computing attention scores only with keys in K within a window of size 1 (i.e., the current position and one adjacent position on each side), then applies softmax to these scores to derive weights for the corresponding values in V. For the given input arrays, this results in the output where the first element is the weighted average of V[0] and V[1] (yielding 1.5), the second is the average of all elements in V (yielding 2.0), and the third is the average of V[1] and V[2] (yielding 2.5)."
+  },
+  "starter_code": "import numpy as np\ndef sparse_window_attention(Q, K, V, window_size, scale_factor=None):\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Dot Product and Similarity Measures in Vector Spaces",
+      "relation_to_problem": "The dot product Q·K^T is the foundation for computing attention scores between query and key vectors, measuring their alignment and similarity.",
+      "prerequisites": [
+        "Basic linear algebra",
+        "Vector operations",
+        "Matrix multiplication"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of dot product and its geometric interpretation",
+        "Compute dot products between vectors efficiently",
+        "Recognize how dot products measure vector similarity",
+        "Apply dot products to compare multiple vectors using matrix operations"
+      ],
+      "math_content": {
+        "definition": "The **dot product** (or scalar product) of two vectors $\\mathbf{u}, \\mathbf{v} \\in \\mathbb{R}^n$ is defined as: $$\\mathbf{u} \\cdot \\mathbf{v} = \\sum_{i=1}^{n} u_i v_i = u_1v_1 + u_2v_2 + \\cdots + u_nv_n$$ where $u_i$ and $v_i$ are the $i$-th components of vectors $\\mathbf{u}$ and $\\mathbf{v}$ respectively.",
+        "notation": "$\\mathbf{u} \\cdot \\mathbf{v}$ = dot product; $\\|\\mathbf{u}\\|$ = Euclidean norm = $\\sqrt{\\sum_{i=1}^{n} u_i^2}$; $\\theta$ = angle between vectors",
+        "theorem": "**Cauchy-Schwarz Inequality**: For any vectors $\\mathbf{u}, \\mathbf{v} \\in \\mathbb{R}^n$, $$|\\mathbf{u} \\cdot \\mathbf{v}| \\leq \\|\\mathbf{u}\\| \\|\\mathbf{v}\\|$$ with equality if and only if the vectors are linearly dependent. **Geometric Interpretation**: The dot product can be expressed as $$\\mathbf{u} \\cdot \\mathbf{v} = \\|\\mathbf{u}\\| \\|\\mathbf{v}\\| \\cos(\\theta)$$ where $\\theta$ is the angle between the vectors.",
+        "proof_sketch": "For the geometric interpretation: Consider the projection of $\\mathbf{v}$ onto $\\mathbf{u}$. The length of this projection is $\\|\\mathbf{v}\\|\\cos(\\theta)$. Multiplying by $\\|\\mathbf{u}\\|$ gives the dot product. For normalized vectors (unit length), the dot product directly equals $\\cos(\\theta)$, ranging from -1 (opposite) to +1 (parallel).",
+        "examples": [
+          "Example 1: Let $\\mathbf{u} = [1, 2, 3]$ and $\\mathbf{v} = [4, 5, 6]$. Then $\\mathbf{u} \\cdot \\mathbf{v} = 1(4) + 2(5) + 3(6) = 4 + 10 + 18 = 32$.",
+          "Example 2: For matrix-vector multiplication, if $Q = [1, 2]$ and $K = \\begin{bmatrix} 3 \\\\ 4 \\end{bmatrix}$, then $QK = [1, 2] \\begin{bmatrix} 3 \\\\ 4 \\end{bmatrix} = 1(3) + 2(4) = 11$.",
+          "Example 3: Computing attention scores between one query and multiple keys: $Q = [1, 0]$ (shape 1×2), $K = \\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\\\ 1 & 1 \\end{bmatrix}$ (shape 3×2). Then $QK^T = [1, 0] \\begin{bmatrix} 1 & 0 & 1 \\\\ 0 & 1 & 1 \\end{bmatrix} = [1, 0, 1]$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Dot Product Definition",
+          "latex": "$\\mathbf{u} \\cdot \\mathbf{v} = \\sum_{i=1}^{n} u_i v_i$",
+          "description": "Use to compute similarity between two vectors of the same dimension"
+        },
+        {
+          "name": "Matrix-Vector Dot Products",
+          "latex": "$QK^T \\in \\mathbb{R}^{m \\times n}$ where $Q \\in \\mathbb{R}^{m \\times d}$ and $K \\in \\mathbb{R}^{n \\times d}$",
+          "description": "Computes all pairwise dot products between rows of Q and rows of K efficiently"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes pairwise dot products between a single query vector and multiple key vectors. This simulates computing attention scores for one position against multiple other positions.",
+        "function_signature": "def compute_similarity_scores(query: np.ndarray, keys: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_similarity_scores(query: np.ndarray, keys: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute dot product between a query vector and each key vector.\n    \n    Args:\n        query: shape (d_k,) - single query vector\n        keys: shape (n, d_k) - n key vectors of dimension d_k\n    \n    Returns:\n        scores: shape (n,) - dot product of query with each key\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_similarity_scores(np.array([1.0, 0.0]), np.array([[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]))",
+            "expected": "[1.0, 0.0, 1.0]",
+            "explanation": "Query [1,0] is parallel to first key (score=1), orthogonal to second key (score=0), and partially aligned with third key (score=1)"
+          },
+          {
+            "input": "compute_similarity_scores(np.array([2.0, 3.0]), np.array([[1.0, 0.0], [0.0, 1.0]]))",
+            "expected": "[2.0, 3.0]",
+            "explanation": "Dot products: 2(1)+3(0)=2 and 2(0)+3(1)=3"
+          },
+          {
+            "input": "compute_similarity_scores(np.array([1.0]), np.array([[2.0], [3.0], [4.0]]))",
+            "expected": "[2.0, 3.0, 4.0]",
+            "explanation": "One-dimensional case: 1×2=2, 1×3=3, 1×4=4"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing dot product with element-wise multiplication (Hadamard product)",
+        "Not ensuring vectors have matching dimensions before computing dot product",
+        "Using nested loops instead of vectorized operations (np.dot or @)",
+        "Forgetting that dot product is commutative: u·v = v·u"
+      ],
+      "hint": "Use NumPy's matrix multiplication operator (@) or np.dot() to compute all dot products at once rather than looping.",
+      "references": [
+        "Linear Algebra: Vector spaces and inner products",
+        "NumPy broadcasting and vectorization",
+        "Geometric interpretation of dot product"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Scaled Dot-Product and Numerical Stability",
+      "relation_to_problem": "Attention mechanisms scale dot products by 1/√d_k to prevent numerical instability when applying softmax, ensuring gradients don't vanish during training.",
+      "prerequisites": [
+        "Dot product computation",
+        "Square root operations",
+        "Basic probability theory"
+      ],
+      "learning_objectives": [
+        "Understand why scaling is necessary in attention mechanisms",
+        "Compute the scaling factor from key dimension",
+        "Apply scaling to prevent softmax saturation",
+        "Recognize the relationship between dot product magnitude and dimensionality"
+      ],
+      "math_content": {
+        "definition": "The **scaled dot-product** between query $\\mathbf{q} \\in \\mathbb{R}^{d_k}$ and key $\\mathbf{k} \\in \\mathbb{R}^{d_k}$ is defined as: $$\\text{score}(\\mathbf{q}, \\mathbf{k}) = \\frac{\\mathbf{q} \\cdot \\mathbf{k}}{\\sqrt{d_k}}$$ where $d_k$ is the dimensionality of the key (and query) vectors. The scaling factor $\\sqrt{d_k}$ normalizes the variance of the dot product.",
+        "notation": "$d_k$ = dimension of key/query vectors; $\\text{score}(\\mathbf{q}, \\mathbf{k})$ = scaled similarity score; $\\sigma^2$ = variance",
+        "theorem": "**Variance Scaling Property**: If $\\mathbf{q}$ and $\\mathbf{k}$ are random vectors with independent components drawn from distributions with mean 0 and variance 1, then: $$\\mathbb{E}[\\mathbf{q} \\cdot \\mathbf{k}] = 0 \\quad \\text{and} \\quad \\text{Var}(\\mathbf{q} \\cdot \\mathbf{k}) = d_k$$ Dividing by $\\sqrt{d_k}$ yields: $$\\text{Var}\\left(\\frac{\\mathbf{q} \\cdot \\mathbf{k}}{\\sqrt{d_k}}\\right) = 1$$ This keeps the variance constant regardless of dimension, preventing extreme values.",
+        "proof_sketch": "Consider $\\mathbf{q} \\cdot \\mathbf{k} = \\sum_{i=1}^{d_k} q_i k_i$. Since components are independent with mean 0 and variance 1: $\\mathbb{E}[q_i k_i] = \\mathbb{E}[q_i]\\mathbb{E}[k_i] = 0$. For variance: $\\text{Var}(\\sum q_i k_i) = \\sum \\text{Var}(q_i k_i) = \\sum \\mathbb{E}[q_i^2]\\mathbb{E}[k_i^2] = d_k$. Dividing by $\\sqrt{d_k}$ scales variance to 1. Without scaling, high-dimensional dot products would have large magnitudes, pushing softmax into saturation regions where gradients vanish.",
+        "examples": [
+          "Example 1: For $d_k = 4$, scale factor is $\\sqrt{4} = 2$. If unscaled dot product is 8, scaled score is $8/2 = 4$.",
+          "Example 2: Query $\\mathbf{q} = [1, 2, 3]$ and key $\\mathbf{k} = [4, 5, 6]$ with $d_k = 3$. Unscaled: $1(4) + 2(5) + 3(6) = 32$. Scaled: $32/\\sqrt{3} \\approx 18.48$.",
+          "Example 3: Without scaling in high dimensions (e.g., $d_k = 512$), dot products could reach values like ±100, causing softmax to output nearly 0 or 1, losing gradient information."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Scaled Dot-Product Score",
+          "latex": "$\\text{score} = \\frac{\\mathbf{q} \\cdot \\mathbf{k}}{\\sqrt{d_k}}$",
+          "description": "Apply after computing dot product to normalize variance"
+        },
+        {
+          "name": "Scaling Factor",
+          "latex": "$\\alpha = \\frac{1}{\\sqrt{d_k}}$",
+          "description": "Compute once and multiply all scores by this constant"
+        },
+        {
+          "name": "Matrix Form",
+          "latex": "$S = \\frac{QK^T}{\\sqrt{d_k}}$ where $S \\in \\mathbb{R}^{n \\times n}$",
+          "description": "Efficient computation for all pairwise scaled scores"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes scaled dot-product scores between a query vector and multiple key vectors. The function should accept an optional scale_factor parameter that defaults to 1/√d_k.",
+        "function_signature": "def scaled_dot_product_scores(query: np.ndarray, keys: np.ndarray, scale_factor: float = None) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef scaled_dot_product_scores(query: np.ndarray, keys: np.ndarray, scale_factor: float = None) -> np.ndarray:\n    \"\"\"\n    Compute scaled dot-product scores between query and keys.\n    \n    Args:\n        query: shape (d_k,) - single query vector\n        keys: shape (n, d_k) - n key vectors\n        scale_factor: optional scaling factor; if None, use 1/sqrt(d_k)\n    \n    Returns:\n        scores: shape (n,) - scaled dot products\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "scaled_dot_product_scores(np.array([1.0, 0.0]), np.array([[2.0, 0.0], [0.0, 2.0]]))",
+            "expected": "[1.414..., 0.0]",
+            "explanation": "d_k=2, so scale=1/√2≈0.707. Scores: (1×2+0×0)/√2=2/√2≈1.414 and (1×0+0×2)/√2=0"
+          },
+          {
+            "input": "scaled_dot_product_scores(np.array([2.0, 2.0, 2.0]), np.array([[1.0, 1.0, 1.0], [0.0, 0.0, 0.0]]), scale_factor=0.5)",
+            "expected": "[3.0, 0.0]",
+            "explanation": "Custom scale_factor=0.5. Scores: (2+2+2)×0.5=3 and 0×0.5=0"
+          },
+          {
+            "input": "scaled_dot_product_scores(np.array([1.0]), np.array([[4.0], [8.0]]))",
+            "expected": "[4.0, 8.0]",
+            "explanation": "d_k=1, so scale=1/√1=1 (no change). Scores remain 4 and 8"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to apply scaling (causing numerical instability in practice)",
+        "Computing sqrt(d_k) for each query instead of once at initialization",
+        "Using the wrong dimension (e.g., sequence length instead of key dimension)",
+        "Applying scaling before dot product instead of after (mathematically equivalent but conceptually different)"
+      ],
+      "hint": "Extract the dimension d_k from the shape of the query vector, then compute the scaling factor before applying it to the dot products.",
+      "references": [
+        "Vaswani et al. 'Attention Is All You Need' (2017) - original Transformer paper",
+        "Numerical stability in neural networks",
+        "Variance and standard deviation in statistics"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Softmax Function and Probability Distributions",
+      "relation_to_problem": "Softmax converts raw attention scores into normalized probability weights that sum to 1, determining how much each value contributes to the output.",
+      "prerequisites": [
+        "Exponential function",
+        "Probability theory basics",
+        "Summation notation"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of softmax and its properties",
+        "Compute softmax over a vector of scores",
+        "Recognize softmax as a differentiable approximation to argmax",
+        "Apply numerical stability techniques (subtracting maximum)"
+      ],
+      "math_content": {
+        "definition": "The **softmax function** $\\sigma: \\mathbb{R}^n \\to (0,1)^n$ maps a vector of real-valued scores to a probability distribution: $$\\sigma(\\mathbf{z})_i = \\frac{e^{z_i}}{\\sum_{j=1}^{n} e^{z_j}}$$ for $i = 1, 2, \\ldots, n$, where $\\mathbf{z} = [z_1, z_2, \\ldots, z_n]$ is the input vector. The output satisfies $\\sigma(\\mathbf{z})_i \\in (0, 1)$ and $\\sum_{i=1}^{n} \\sigma(\\mathbf{z})_i = 1$.",
+        "notation": "$\\sigma(\\mathbf{z})$ = softmax output; $e$ = Euler's number ≈ 2.718; $z_i$ = i-th score; $\\sum$ = summation over all elements",
+        "theorem": "**Properties of Softmax**: (1) **Translation Invariance**: $\\sigma(\\mathbf{z} + c) = \\sigma(\\mathbf{z})$ for any constant $c \\in \\mathbb{R}$. This allows numerically stable computation by subtracting the maximum: $\\sigma(\\mathbf{z}) = \\sigma(\\mathbf{z} - \\max(\\mathbf{z}))$. (2) **Monotonicity**: If $z_i > z_j$, then $\\sigma(\\mathbf{z})_i > \\sigma(\\mathbf{z})_j$ (preserves ordering). (3) **Temperature Scaling**: $\\sigma(\\mathbf{z}/T)$ with temperature $T > 0$ controls sharpness; $T \\to 0$ approaches argmax (one-hot), $T \\to \\infty$ approaches uniform distribution.",
+        "proof_sketch": "For translation invariance: $$\\frac{e^{z_i + c}}{\\sum_j e^{z_j + c}} = \\frac{e^{z_i}e^c}{e^c\\sum_j e^{z_j}} = \\frac{e^{z_i}}{\\sum_j e^{z_j}}$$ The $e^c$ factors cancel. For numerical stability, choose $c = -\\max(\\mathbf{z})$ so the largest exponent is 0, preventing overflow. For example, $e^{100}$ would overflow, but $e^{100-100} = e^0 = 1$ is safe.",
+        "examples": [
+          "Example 1: $\\mathbf{z} = [1, 2, 3]$. Compute: $e^1 \\approx 2.718$, $e^2 \\approx 7.389$, $e^3 \\approx 20.086$. Sum: $30.193$. Softmax: $[2.718/30.193, 7.389/30.193, 20.086/30.193] \\approx [0.090, 0.245, 0.665]$.",
+          "Example 2: $\\mathbf{z} = [0, 0, 0]$ (equal scores). $e^0 = 1$ for all. Softmax: $[1/3, 1/3, 1/3]$ (uniform distribution).",
+          "Example 3: Numerical stability: $\\mathbf{z} = [1000, 1001, 1002]$. Subtract max (1002): $\\mathbf{z'} = [-2, -1, 0]$. Now $e^{-2} \\approx 0.135$, $e^{-1} \\approx 0.368$, $e^0 = 1$. Sum: $1.503$. Softmax: $[0.090, 0.245, 0.665]$ (same as Example 1 after scaling)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Softmax Definition",
+          "latex": "$\\sigma(\\mathbf{z})_i = \\frac{e^{z_i}}{\\sum_{j=1}^{n} e^{z_j}}$",
+          "description": "Converts scores to probabilities; use for attention weights"
+        },
+        {
+          "name": "Numerically Stable Softmax",
+          "latex": "$\\sigma(\\mathbf{z})_i = \\frac{e^{z_i - \\max(\\mathbf{z})}}{\\sum_{j=1}^{n} e^{z_j - \\max(\\mathbf{z})}}$",
+          "description": "Subtract maximum to prevent overflow/underflow in exponentials"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a numerically stable softmax function that converts a vector of scores into normalized probability weights. Include the max-subtraction trick to handle large values safely.",
+        "function_signature": "def softmax(scores: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef softmax(scores: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute softmax of a 1D array of scores with numerical stability.\n    \n    Args:\n        scores: shape (n,) - raw attention scores\n    \n    Returns:\n        weights: shape (n,) - probability distribution summing to 1\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "softmax(np.array([1.0, 2.0, 3.0]))",
+            "expected": "[0.09003057, 0.24472847, 0.66524096]",
+            "explanation": "Exponentials: e^1≈2.718, e^2≈7.389, e^3≈20.086; sum≈30.193; normalized probabilities"
+          },
+          {
+            "input": "softmax(np.array([0.0, 0.0, 0.0]))",
+            "expected": "[0.33333333, 0.33333333, 0.33333333]",
+            "explanation": "Equal scores produce uniform distribution (each 1/3)"
+          },
+          {
+            "input": "softmax(np.array([1000.0, 1001.0]))",
+            "expected": "[0.26894142, 0.73105858]",
+            "explanation": "Large values handled safely: after subtracting max, becomes e^(-1)/(e^(-1)+e^0)"
+          },
+          {
+            "input": "softmax(np.array([10.0]))",
+            "expected": "[1.0]",
+            "explanation": "Single element always gets probability 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not subtracting the maximum, causing overflow with large scores (e.g., e^1000)",
+        "Forgetting to normalize by the sum of exponentials",
+        "Applying exponential before subtracting max (loses numerical stability)",
+        "Not handling edge cases like single-element arrays or all-equal scores"
+      ],
+      "hint": "Use np.exp() after subtracting np.max(scores), then divide by the sum. This prevents numerical overflow while preserving mathematical correctness.",
+      "references": [
+        "Numerical computing and floating-point arithmetic",
+        "Cross-entropy loss and classification",
+        "Temperature scaling in neural networks"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Weighted Sum and Linear Combinations",
+      "relation_to_problem": "After computing attention weights via softmax, we use them to form a weighted sum of value vectors, producing the final attention output for each position.",
+      "prerequisites": [
+        "Matrix multiplication",
+        "Linear combinations",
+        "Softmax function"
+      ],
+      "learning_objectives": [
+        "Understand weighted sums as linear combinations with coefficients",
+        "Compute weighted averages using probability weights",
+        "Apply attention weights to value vectors",
+        "Recognize the geometric meaning of convex combinations"
+      ],
+      "math_content": {
+        "definition": "A **weighted sum** (or linear combination) of vectors $\\mathbf{v}_1, \\mathbf{v}_2, \\ldots, \\mathbf{v}_n \\in \\mathbb{R}^d$ with weights $w_1, w_2, \\ldots, w_n \\in \\mathbb{R}$ is: $$\\mathbf{y} = \\sum_{i=1}^{n} w_i \\mathbf{v}_i = w_1\\mathbf{v}_1 + w_2\\mathbf{v}_2 + \\cdots + w_n\\mathbf{v}_n$$ When weights satisfy $w_i \\geq 0$ and $\\sum_{i=1}^{n} w_i = 1$ (as with softmax outputs), this is a **convex combination**, representing a point in the convex hull of the vectors.",
+        "notation": "$\\mathbf{y}$ = output vector; $w_i$ = weight for i-th vector; $\\mathbf{v}_i$ = i-th value vector; $\\sum$ = summation; $d$ = dimension",
+        "theorem": "**Properties of Weighted Sums**: (1) **Linearity**: $\\sum w_i (a\\mathbf{v}_i + b\\mathbf{u}_i) = a\\sum w_i\\mathbf{v}_i + b\\sum w_i\\mathbf{u}_i$. (2) **Convex Hull Property**: If $w_i \\geq 0$ and $\\sum w_i = 1$, then $\\mathbf{y}$ lies in the convex hull of $\\{\\mathbf{v}_i\\}$. Geometrically, $\\mathbf{y}$ is a weighted average position. (3) **Matrix Form**: For weight vector $\\mathbf{w} = [w_1, \\ldots, w_n]$ and value matrix $V = [\\mathbf{v}_1^T; \\ldots; \\mathbf{v}_n^T] \\in \\mathbb{R}^{n \\times d}$, the weighted sum is $\\mathbf{y} = \\mathbf{w}^T V = V^T\\mathbf{w}$ (depending on convention).",
+        "proof_sketch": "For matrix form: Writing $V$ with rows $\\mathbf{v}_i^T$, the product $\\mathbf{w}^T V$ computes $(w_1, \\ldots, w_n) \\begin{pmatrix} \\mathbf{v}_1^T \\\\ \\vdots \\\\ \\mathbf{v}_n^T \\end{pmatrix} = w_1\\mathbf{v}_1^T + \\cdots + w_n\\mathbf{v}_n^T$, which transposes to $\\sum w_i \\mathbf{v}_i$. For the convex hull: Since $w_i \\geq 0$ and sum to 1, $\\mathbf{y}$ is a weighted average, lying within the region bounded by the extreme points $\\{\\mathbf{v}_i\\}$. For example, with two vectors and $w_1 = 0.3, w_2 = 0.7$, the result is 70% of the way from $\\mathbf{v}_1$ to $\\mathbf{v}_2$.",
+        "examples": [
+          "Example 1: Values $\\mathbf{v}_1 = [1, 0]$, $\\mathbf{v}_2 = [0, 1]$, weights $w_1 = 0.6, w_2 = 0.4$. Output: $0.6[1,0] + 0.4[0,1] = [0.6, 0.4]$.",
+          "Example 2: Three values $[1, 0, 0]$, $[0, 1, 0]$, $[0, 0, 1]$ with equal weights $1/3$ each. Output: $[1/3, 1/3, 1/3]$ (centroid).",
+          "Example 3: Matrix form with $\\mathbf{w} = [0.5, 0.5]$ and $V = \\begin{pmatrix} 2 & 4 \\\\ 6 & 8 \\end{pmatrix}$. Compute $\\mathbf{w}^T V = [0.5, 0.5] \\begin{pmatrix} 2 & 4 \\\\ 6 & 8 \\end{pmatrix} = [0.5(2)+0.5(6), 0.5(4)+0.5(8)] = [4, 6]$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Weighted Sum (Vector Form)",
+          "latex": "$\\mathbf{y} = \\sum_{i=1}^{n} w_i \\mathbf{v}_i$",
+          "description": "Combine vectors using scalar weights; attention output for one position"
+        },
+        {
+          "name": "Weighted Sum (Matrix Form)",
+          "latex": "$\\mathbf{y} = \\mathbf{w}^T V$ where $\\mathbf{w} \\in \\mathbb{R}^n$, $V \\in \\mathbb{R}^{n \\times d}$",
+          "description": "Efficient computation using matrix-vector multiplication"
+        },
+        {
+          "name": "Attention Output",
+          "latex": "$\\text{output} = \\sum_{j=1}^{n} \\alpha_j \\mathbf{v}_j$ where $\\alpha = \\text{softmax}(\\text{scores})$",
+          "description": "Apply softmax weights to value vectors"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes a weighted sum of value vectors given probability weights (e.g., from softmax). This is the final step in producing an attention output.",
+        "function_signature": "def weighted_sum(weights: np.ndarray, values: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef weighted_sum(weights: np.ndarray, values: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute weighted sum of value vectors.\n    \n    Args:\n        weights: shape (n,) - attention weights (should sum to ~1)\n        values: shape (n, d_v) - value vectors\n    \n    Returns:\n        output: shape (d_v,) - weighted combination of values\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "weighted_sum(np.array([0.5, 0.5]), np.array([[1.0, 0.0], [0.0, 1.0]]))",
+            "expected": "[0.5, 0.5]",
+            "explanation": "Equal weights (0.5 each) produce average of [1,0] and [0,1]"
+          },
+          {
+            "input": "weighted_sum(np.array([1.0, 0.0, 0.0]), np.array([[2.0, 4.0], [6.0, 8.0], [10.0, 12.0]]))",
+            "expected": "[2.0, 4.0]",
+            "explanation": "Weight 1 on first vector, 0 on others, returns first vector unchanged"
+          },
+          {
+            "input": "weighted_sum(np.array([0.2, 0.3, 0.5]), np.array([[10.0], [20.0], [30.0]]))",
+            "expected": "[23.0]",
+            "explanation": "0.2(10) + 0.3(20) + 0.5(30) = 2 + 6 + 15 = 23"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing dimensions: weights should be 1D with length n, values should be n×d",
+        "Not using vectorized operations (looping instead of matrix multiplication)",
+        "Forgetting to handle edge cases where weights might not sum exactly to 1 (due to floating-point precision)",
+        "Using element-wise multiplication instead of proper weighted sum"
+      ],
+      "hint": "Use np.dot() or the @ operator to compute weights @ values, which performs the weighted sum efficiently across all dimensions.",
+      "references": [
+        "Linear algebra: linear combinations and spans",
+        "Convex geometry and convex hulls",
+        "NumPy documentation for dot products and matrix multiplication"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Window-Based Indexing and Boundary Handling",
+      "relation_to_problem": "Sparse window attention restricts computation to a local neighborhood around each position, requiring careful index calculation to handle sequence boundaries correctly.",
+      "prerequisites": [
+        "Array indexing",
+        "Max/min functions",
+        "Range operations"
+      ],
+      "learning_objectives": [
+        "Compute valid window boundaries given a position and window size",
+        "Handle edge cases at sequence start and end without padding",
+        "Extract sub-arrays using computed indices",
+        "Understand asymmetric windows for boundary positions"
+      ],
+      "math_content": {
+        "definition": "For a sequence of length $n$ and a position $i \\in \\{0, 1, \\ldots, n-1\\}$ (zero-indexed), a **window of radius $w$** around position $i$ includes all positions $j$ such that: $$\\max(0, i - w) \\leq j \\leq \\min(n-1, i + w)$$ The window size (number of elements) is: $$|W_i| = \\min(n-1, i+w) - \\max(0, i-w) + 1$$ Note that $|W_i|$ can be less than $2w+1$ for positions near boundaries.",
+        "notation": "$n$ = sequence length; $i$ = current position; $w$ = window radius; $W_i$ = set of indices in window around $i$; $|W_i|$ = window size",
+        "theorem": "**Window Size Properties**: (1) **Interior positions** (where $i \\geq w$ and $i \\leq n-1-w$): $|W_i| = 2w+1$ (full window). (2) **Left boundary** (where $i < w$): $|W_i| = i + w + 1 \\leq 2w+1$. (3) **Right boundary** (where $i > n-1-w$): $|W_i| = n - i + w \\leq 2w+1$. (4) **Corner case**: For $w \\geq n-1$, all positions have full sequence as window ($|W_i| = n$).",
+        "proof_sketch": "For interior: $\\max(0, i-w) = i-w$ and $\\min(n-1, i+w) = i+w$, so range is $(i+w) - (i-w) + 1 = 2w+1$. For left boundary with $i < w$: $\\max(0, i-w) = 0$, giving range $(i+w) - 0 + 1 = i+w+1$. As $i$ increases from 0 to $w-1$, window grows from $w+1$ to $2w$. Similarly for right boundary. Example: sequence length 5, $w=1$. Position 0: window $[0,1]$ (size 2). Position 2: window $[1,2,3]$ (size 3). Position 4: window $[3,4]$ (size 2).",
+        "examples": [
+          "Example 1: $n=10$, $w=2$, $i=5$ (interior). Window: $\\max(0,3)=3$ to $\\min(9,7)=7$, indices $[3,4,5,6,7]$, size 5.",
+          "Example 2: $n=10$, $w=2$, $i=1$ (near left). Window: $\\max(0,-1)=0$ to $\\min(9,3)=3$, indices $[0,1,2,3]$, size 4.",
+          "Example 3: $n=10$, $w=2$, $i=9$ (right boundary). Window: $\\max(0,7)=7$ to $\\min(9,11)=9$, indices $[7,8,9]$, size 3.",
+          "Example 4: $n=3$, $w=1$, $i=0$. Window: $[0,1]$. $i=1$: window $[0,1,2]$ (full). $i=2$: window $[1,2]$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Window Start Index",
+          "latex": "$\\text{start}_i = \\max(0, i - w)$",
+          "description": "Leftmost position in window (clipped to sequence start)"
+        },
+        {
+          "name": "Window End Index",
+          "latex": "$\\text{end}_i = \\min(n-1, i + w)$",
+          "description": "Rightmost position in window (clipped to sequence end)"
+        },
+        {
+          "name": "Window Range",
+          "latex": "$W_i = [\\text{start}_i, \\text{end}_i]$ (inclusive interval)",
+          "description": "Extract keys/values using these bounds: K[start:end+1]"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the window boundaries (start and end indices) for a given position in a sequence. This determines which elements to include when computing attention.",
+        "function_signature": "def compute_window_bounds(position: int, seq_len: int, window_size: int) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef compute_window_bounds(position: int, seq_len: int, window_size: int) -> tuple:\n    \"\"\"\n    Compute the start and end indices for a window around a position.\n    \n    Args:\n        position: current position index (0 to seq_len-1)\n        seq_len: total sequence length\n        window_size: window radius w\n    \n    Returns:\n        (start, end): tuple of integers where start <= position <= end\n                      Both indices are inclusive and within [0, seq_len-1]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_window_bounds(5, 10, 2)",
+            "expected": "(3, 7)",
+            "explanation": "Interior position: max(0,5-2)=3, min(9,5+2)=7, window [3,4,5,6,7]"
+          },
+          {
+            "input": "compute_window_bounds(0, 10, 2)",
+            "expected": "(0, 2)",
+            "explanation": "Left boundary: max(0,0-2)=0, min(9,0+2)=2, window [0,1,2]"
+          },
+          {
+            "input": "compute_window_bounds(9, 10, 2)",
+            "expected": "(7, 9)",
+            "explanation": "Right boundary: max(0,9-2)=7, min(9,9+2)=9, window [7,8,9]"
+          },
+          {
+            "input": "compute_window_bounds(1, 3, 1)",
+            "expected": "(0, 2)",
+            "explanation": "Small sequence: max(0,1-1)=0, min(2,1+1)=2, entire sequence [0,1,2]"
+          },
+          {
+            "input": "compute_window_bounds(2, 5, 0)",
+            "expected": "(2, 2)",
+            "explanation": "Zero radius: only position itself, window [2]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using 1-based indexing instead of 0-based (Python convention)",
+        "Forgetting to add 1 when slicing (Python's end index is exclusive: arr[start:end+1])",
+        "Not handling the case where window_size is 0 (should return single position)",
+        "Computing window size instead of boundaries (different outputs)",
+        "Using incorrect boundary conditions (< vs <=)"
+      ],
+      "hint": "Use max() and min() functions to clip the computed indices to valid range [0, seq_len-1]. Remember that position ± window_size might go out of bounds.",
+      "references": [
+        "Array slicing and indexing in NumPy",
+        "Edge case handling in algorithms",
+        "Sliding window algorithms"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Integrating Components: Attention Over Windows",
+      "relation_to_problem": "This final step combines all previous concepts—computing scaled scores within windows, applying softmax, and producing weighted outputs—to implement full sparse window attention.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Iteration over sequences",
+        "Combining matrix operations"
+      ],
+      "learning_objectives": [
+        "Integrate windowing, scoring, softmax, and weighted sum for each position",
+        "Process entire sequences efficiently position by position",
+        "Handle variable window sizes across the sequence",
+        "Understand the complete sparse attention computation pipeline"
+      ],
+      "math_content": {
+        "definition": "**Sparse window attention** for a sequence of length $n$ computes, for each position $i$, an output vector by: (1) Defining window $W_i = [\\max(0, i-w), \\min(n-1, i+w)]$. (2) Computing scaled scores: $$s_{ij} = \\frac{\\mathbf{q}_i \\cdot \\mathbf{k}_j}{\\sqrt{d_k}} \\quad \\text{for } j \\in W_i$$ (3) Normalizing with softmax: $$\\alpha_{ij} = \\frac{e^{s_{ij}}}{\\sum_{j' \\in W_i} e^{s_{ij'}}}$$ (4) Computing output: $$\\mathbf{o}_i = \\sum_{j \\in W_i} \\alpha_{ij} \\mathbf{v}_j$$ The complete output is $O = [\\mathbf{o}_0, \\mathbf{o}_1, \\ldots, \\mathbf{o}_{n-1}]^T \\in \\mathbb{R}^{n \\times d_v}$.",
+        "notation": "$\\mathbf{q}_i$ = query at position $i$; $\\mathbf{k}_j, \\mathbf{v}_j$ = key, value at position $j$; $W_i$ = window for position $i$; $\\alpha_{ij}$ = attention weight; $\\mathbf{o}_i$ = output at position $i$",
+        "theorem": "**Computational Complexity**: Full attention has complexity $O(n^2 d)$ for computing all pairwise scores. Sparse window attention with radius $w$ reduces this to $O(nwd)$ since each position only attends to at most $2w+1$ neighbors. For $w \\ll n$, this is effectively $O(nd)$ (linear in sequence length). **Memory**: Full attention stores $n \\times n$ score matrix. Sparse attention only needs $O(w)$ scores per position, total $O(nw)$ if materialized (or $O(w)$ if computed on-the-fly).",
+        "proof_sketch": "Complexity analysis: For each of $n$ positions, compute scores with $O(w)$ keys (each score is $O(d)$ dot product), apply softmax over $O(w)$ values ($O(w)$ time), and compute weighted sum of $O(w)$ values ($O(wd)$ time). Total: $n \\cdot O(wd) = O(nwd)$. Compared to full attention's $n \\cdot O(nd) = O(n^2d)$, we save a factor of $n/w$. Example: for $n=1000$, $w=10$, sparse is 100× faster than full attention (ignoring constants).",
+        "examples": [
+          "Example 1: Sequence $n=3$, $w=1$, $d_k=d_v=1$. $Q=K=V=[1,1,1]^T$. Position 0: window $[0,1]$, scores $[1/1, 1/1]=[1,1]$ (scaled by $\\sqrt{1}=1$), softmax $[0.5,0.5]$, output $0.5(1)+0.5(1)=1$. Position 1: window $[0,1,2]$, scores $[1,1,1]$, softmax $[1/3,1/3,1/3]$, output $(1+1+1)/3=1$. Position 2: window $[1,2]$, output $1$. Result: $O=[1,1,1]^T$.",
+          "Example 2: $Q=K=[1,1,1]^T$, $V=[1,2,3]^T$, $w=1$, $d_k=1$. Position 0: attend to $V[0,1]$, equal weights $[0.5,0.5]$, output $(1+2)/2=1.5$. Position 1: attend to $V[0,1,2]$, weights $[1/3,1/3,1/3]$, output $(1+2+3)/3=2$. Position 2: attend to $V[1,2]$, output $(2+3)/2=2.5$. Result matches problem example.",
+          "Example 3: Efficiency comparison. $n=1000$, $w=50$: full attention computes 1M scores, sparse computes ~100k (100× fewer)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Sparse Attention",
+          "latex": "$\\mathbf{o}_i = \\sum_{j \\in W_i} \\text{softmax}\\left(\\frac{\\mathbf{q}_i \\cdot \\mathbf{k}_j}{\\sqrt{d_k}}\\right) \\mathbf{v}_j$",
+          "description": "Full computation for position i: window → scores → softmax → weighted sum"
+        },
+        {
+          "name": "Complexity",
+          "latex": "$\\text{Time} = O(nwd), \\quad \\text{Space} = O(nw)$ for $w \\ll n$",
+          "description": "Linear in sequence length, constant window provides efficiency"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes sparse window attention for one query position. Given a single query, extract the relevant keys/values from the window, compute scaled scores, apply softmax, and return the weighted output. This is the core building block for the full solution.",
+        "function_signature": "def single_position_attention(query: np.ndarray, keys: np.ndarray, values: np.ndarray, position: int, window_size: int, scale_factor: float = None) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef single_position_attention(query: np.ndarray, keys: np.ndarray, values: np.ndarray, position: int, window_size: int, scale_factor: float = None) -> np.ndarray:\n    \"\"\"\n    Compute sparse window attention output for a single query position.\n    \n    Args:\n        query: shape (d_k,) - query vector for the current position\n        keys: shape (seq_len, d_k) - all key vectors\n        values: shape (seq_len, d_v) - all value vectors\n        position: current position index in sequence\n        window_size: window radius w\n        scale_factor: optional; if None, use 1/sqrt(d_k)\n    \n    Returns:\n        output: shape (d_v,) - attention output for this position\n    \"\"\"\n    # Your code here\n    # Hint: Use functions from previous sub-quests\n    # 1. Compute window bounds\n    # 2. Extract keys/values in window\n    # 3. Compute scaled scores\n    # 4. Apply softmax\n    # 5. Compute weighted sum\n    pass",
+        "test_cases": [
+          {
+            "input": "single_position_attention(np.array([1.0]), np.array([[1.0], [1.0], [1.0]]), np.array([[1.0], [2.0], [3.0]]), position=1, window_size=1)",
+            "expected": "[2.0]",
+            "explanation": "Position 1, window [0,1,2], equal scores → equal weights [1/3,1/3,1/3] → (1+2+3)/3=2"
+          },
+          {
+            "input": "single_position_attention(np.array([1.0]), np.array([[1.0], [1.0], [1.0]]), np.array([[1.0], [2.0], [3.0]]), position=0, window_size=1)",
+            "expected": "[1.5]",
+            "explanation": "Position 0, window [0,1], equal weights [0.5,0.5] → (1+2)/2=1.5"
+          },
+          {
+            "input": "single_position_attention(np.array([1.0]), np.array([[1.0], [1.0], [1.0]]), np.array([[1.0], [2.0], [3.0]]), position=2, window_size=1)",
+            "expected": "[2.5]",
+            "explanation": "Position 2, window [1,2], equal weights [0.5,0.5] → (2+3)/2=2.5"
+          },
+          {
+            "input": "single_position_attention(np.array([2.0, 0.0]), np.array([[2.0, 0.0], [0.0, 1.0]]), np.array([[10.0], [20.0]]), position=0, window_size=1)",
+            "expected": "[~12.0]",
+            "explanation": "Query [2,0] more aligned with key [2,0] than [0,1], so weight favors first value"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not extracting the window slice before computing scores (computing scores with full sequence)",
+        "Forgetting to handle the scale_factor (defaulting to None but not computing 1/sqrt(d_k))",
+        "Off-by-one errors in window indexing (remember Python slicing is exclusive on right)",
+        "Not combining all steps in correct order: bounds → slice → score → softmax → sum",
+        "Hardcoding window size instead of computing dynamically based on boundaries"
+      ],
+      "hint": "Reuse functions from previous sub-quests: compute_window_bounds() for indices, scaled_dot_product_scores() for scoring, softmax() for weights, weighted_sum() for output. Chain them together systematically.",
+      "references": [
+        "Attention mechanisms in Transformers",
+        "Sparse attention patterns (Longformer, BigBird)",
+        "Efficient sequence modeling",
+        "Computational complexity of attention variants"
+      ]
+    }
+  ]
+}

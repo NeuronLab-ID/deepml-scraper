@@ -1,0 +1,476 @@
+{
+  "problem_id": 31,
+  "title": "Divide Dataset Based on Feature Threshold",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "Write a Python function to divide a dataset based on whether the value of a specified feature is greater than or equal to a given threshold. The function should return two subsets of the dataset: one with samples that meet the condition and another with samples that do not.",
+  "example": {
+    "input": "X = np.array([[1, 2], \n                  [3, 4], \n                  [5, 6], \n                  [7, 8], \n                  [9, 10]])\n    feature_i = 0\n    threshold = 5",
+    "output": "[array([[ 5,  6],\n                    [ 7,  8],\n                    [ 9, 10]]), \n             array([[1, 2],\n                    [3, 4]])]",
+    "reasoning": "The dataset X is divided based on whether the value in the 0th feature (first column) is greater than or equal to 5. Samples with the first column value >= 5 are in the first subset, and the rest are in the second subset."
+  },
+  "starter_code": "import numpy as np\n\ndef divide_on_feature(X, feature_i, threshold):\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Boolean Indexing and Array Masking in NumPy",
+      "relation_to_problem": "This concept is fundamental to filtering dataset rows based on feature threshold conditions. The main problem requires creating boolean masks to partition samples, which is achieved through boolean indexing.",
+      "prerequisites": [
+        "NumPy arrays",
+        "Basic array indexing",
+        "Comparison operators"
+      ],
+      "learning_objectives": [
+        "Understand boolean mask creation from comparison operations on arrays",
+        "Apply boolean masks to filter array rows",
+        "Implement logical negation for complementary partitions"
+      ],
+      "math_content": {
+        "definition": "Let $\\mathbf{X} \\in \\mathbb{R}^{n \\times d}$ be a data matrix with $n$ samples and $d$ features. A **boolean mask** is a vector $\\mathbf{m} \\in \\{\\text{True}, \\text{False}\\}^n$ where each element $m_i$ indicates whether sample $i$ satisfies a predicate $P$. Formally: $\\mathbf{m} = [P(\\mathbf{x}_1), P(\\mathbf{x}_2), \\ldots, P(\\mathbf{x}_n)]^T$ where $\\mathbf{x}_i$ is the $i$-th row of $\\mathbf{X}$.",
+        "notation": "$\\mathbf{X}[\\mathbf{m}]$ = subset of rows where mask is True; $\\neg\\mathbf{m}$ = logical negation of mask; $\\mathbf{X}[:, j]$ = $j$-th feature column",
+        "theorem": "**Partition Theorem**: Given a boolean mask $\\mathbf{m}$ derived from any predicate, the operations $\\mathbf{X}[\\mathbf{m}]$ and $\\mathbf{X}[\\neg\\mathbf{m}]$ partition $\\mathbf{X}$ such that: (1) Every row appears in exactly one partition, (2) Concatenating both partitions (in order) reconstructs a permutation of $\\mathbf{X}$.",
+        "proof_sketch": "For each index $i \\in \\{1, \\ldots, n\\}$, either $m_i = \\text{True}$ or $m_i = \\text{False}$ (law of excluded middle). If $m_i = \\text{True}$, then $\\mathbf{x}_i \\in \\mathbf{X}[\\mathbf{m}]$ and $\\mathbf{x}_i \\notin \\mathbf{X}[\\neg\\mathbf{m}]$. Conversely, if $m_i = \\text{False}$, then $\\mathbf{x}_i \\notin \\mathbf{X}[\\mathbf{m}]$ and $\\mathbf{x}_i \\in \\mathbf{X}[\\neg\\mathbf{m}]$. Therefore, the sets are disjoint and exhaustive.",
+        "examples": [
+          "Given $\\mathbf{X} = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\\\ 5 & 6 \\end{bmatrix}$ and predicate $P(\\mathbf{x}_i): x_{i,1} > 2$ (first column > 2), the mask is $\\mathbf{m} = [\\text{False}, \\text{True}, \\text{True}]^T$. Then $\\mathbf{X}[\\mathbf{m}] = \\begin{bmatrix} 3 & 4 \\\\ 5 & 6 \\end{bmatrix}$ and $\\mathbf{X}[\\neg\\mathbf{m}] = \\begin{bmatrix} 1 & 2 \\end{bmatrix}$.",
+          "For column extraction: $\\mathbf{X}[:, 0] = [1, 3, 5]^T$ yields a 1D array containing all values from the first feature."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Boolean Mask Generation",
+          "latex": "$\\mathbf{m} = (\\mathbf{X}[:, j] \\geq \\tau)$",
+          "description": "Creates mask where True indicates feature $j$ value meets threshold $\\tau$"
+        },
+        {
+          "name": "Mask Negation",
+          "latex": "$\\neg\\mathbf{m} = \\sim\\mathbf{m}$",
+          "description": "Inverts boolean values to obtain complementary partition"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes a 2D NumPy array and a threshold value, and returns only the rows where the FIRST column value is strictly greater than the threshold.",
+        "function_signature": "def filter_by_first_column(X: np.ndarray, threshold: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef filter_by_first_column(X, threshold):\n    # Your code here\n    # Step 1: Create a boolean mask for X[:, 0] > threshold\n    # Step 2: Apply the mask to filter rows\n    pass",
+        "test_cases": [
+          {
+            "input": "filter_by_first_column(np.array([[1, 2], [3, 4], [5, 6]]), 2)",
+            "expected": "array([[3, 4], [5, 6]])",
+            "explanation": "Rows with first column > 2 are [3,4] and [5,6]"
+          },
+          {
+            "input": "filter_by_first_column(np.array([[10], [5], [15]]), 7)",
+            "expected": "array([[10], [15]])",
+            "explanation": "Only rows with values > 7 are kept"
+          },
+          {
+            "input": "filter_by_first_column(np.array([[1, 2, 3], [4, 5, 6]]), 5)",
+            "expected": "array([], shape=(0, 3))",
+            "explanation": "No rows satisfy condition, returns empty array with preserved column structure"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that X[:, j] extracts a 1D array, not a column vector - this affects dimensions in subsequent operations",
+        "Using X[X[:, 0] > threshold] directly on multi-column arrays - while correct, understanding the mask creation is pedagogically important",
+        "Not handling empty results properly - when no rows satisfy the condition, ensure output shape is (0, d) not just (0,)"
+      ],
+      "hint": "NumPy comparison operators (>, <, >=, <=) broadcast element-wise and return boolean arrays of the same shape. Use this boolean array directly as an index.",
+      "references": [
+        "NumPy boolean indexing documentation",
+        "Array broadcasting rules",
+        "Fancy indexing vs boolean indexing"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Set Partitioning and Disjoint Subsets",
+      "relation_to_problem": "The main problem requires partitioning a dataset into two disjoint subsets based on a threshold condition. Understanding formal set partition theory ensures correct implementation where each sample belongs to exactly one subset.",
+      "prerequisites": [
+        "Set theory basics",
+        "Boolean logic",
+        "Predicate functions"
+      ],
+      "learning_objectives": [
+        "Define formal mathematical properties of set partitions",
+        "Verify partition completeness (union equals original set)",
+        "Verify partition disjointness (intersection is empty)",
+        "Implement complementary partitions using boolean negation"
+      ],
+      "math_content": {
+        "definition": "A **partition** of a set $S$ is a collection of non-empty, disjoint subsets $\\{S_1, S_2, \\ldots, S_k\\}$ such that: (1) $S_i \\cap S_j = \\emptyset$ for all $i \\neq j$ (disjoint property), and (2) $\\bigcup_{i=1}^{k} S_i = S$ (exhaustive property). For binary threshold-based partitioning with predicate $P: S \\to \\{\\text{True}, \\text{False}\\}$, we have $k=2$ with $S_1 = \\{x \\in S : P(x)\\}$ and $S_2 = \\{x \\in S : \\neg P(x)\\}$.",
+        "notation": "$S_1 \\cup S_2$ = union; $S_1 \\cap S_2$ = intersection; $\\emptyset$ = empty set; $|S|$ = cardinality of set $S$",
+        "theorem": "**Binary Partition Cardinality Theorem**: For any binary partition $\\{S_1, S_2\\}$ of set $S$, it holds that $|S_1| + |S_2| = |S|$ and $S_1 \\cap S_2 = \\emptyset$.",
+        "proof_sketch": "Since every element $x \\in S$ satisfies either $P(x) = \\text{True}$ or $P(x) = \\text{False}$ (not both, by law of excluded middle), each element belongs to exactly one subset. Counting elements: $|S_1|$ counts elements where $P$ is true, $|S_2|$ counts where $P$ is false. Since these are mutually exclusive and exhaustive conditions, $|S_1| + |S_2|$ equals the total count $|S|$. Disjointness follows from mutual exclusivity.",
+        "examples": [
+          "Dataset $D = \\{(2, A), (5, B), (7, C), (3, D)\\}$ with predicate $P(x, y): x \\geq 5$. Then $D_1 = \\{(5, B), (7, C)\\}$ and $D_2 = \\{(2, A), (3, D)\\}$. Verify: $|D_1| + |D_2| = 2 + 2 = 4 = |D|$ and $D_1 \\cap D_2 = \\emptyset$.",
+          "For threshold partitioning of feature values: Given feature vector $\\mathbf{f} = [1, 4, 7, 2, 9]$ and threshold $\\tau = 5$, partition into $F_{\\geq 5} = \\{7, 9\\}$ and $F_{< 5} = \\{1, 4, 2\\}$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Partition Completeness",
+          "latex": "$S_1 \\cup S_2 = S$",
+          "description": "Every element of original set appears in exactly one partition"
+        },
+        {
+          "name": "Partition Disjointness",
+          "latex": "$S_1 \\cap S_2 = \\emptyset$",
+          "description": "No element appears in both partitions simultaneously"
+        },
+        {
+          "name": "Cardinality Conservation",
+          "latex": "$|S_1| + |S_2| = |S|$",
+          "description": "Sum of partition sizes equals original set size"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes a 1D NumPy array and a threshold, returns TWO arrays: one with values >= threshold and one with values < threshold. The function should verify the partition property by checking that the sum of lengths equals the original length.",
+        "function_signature": "def partition_array(arr: np.ndarray, threshold: float) -> tuple[np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef partition_array(arr, threshold):\n    # Your code here\n    # Step 1: Create boolean mask for arr >= threshold\n    # Step 2: Extract elements satisfying condition\n    # Step 3: Extract elements NOT satisfying condition (use negation)\n    # Step 4: Return tuple (subset_ge, subset_lt)\n    pass",
+        "test_cases": [
+          {
+            "input": "partition_array(np.array([1, 5, 3, 8, 2]), 4)",
+            "expected": "(array([5, 8]), array([1, 3, 2]))",
+            "explanation": "Values >= 4 are [5, 8], values < 4 are [1, 3, 2]. Sum of lengths: 2 + 3 = 5 ✓"
+          },
+          {
+            "input": "partition_array(np.array([10, 20, 30]), 15)",
+            "expected": "(array([20, 30]), array([10]))",
+            "explanation": "Partition at threshold 15 produces two non-empty subsets"
+          },
+          {
+            "input": "partition_array(np.array([5, 5, 5]), 5)",
+            "expected": "(array([5, 5, 5]), array([]))",
+            "explanation": "All values equal threshold, so all go to >= partition, other is empty"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using > instead of >= for the first partition - the problem explicitly requires >= for threshold comparison",
+        "Not using logical negation (~) for the complementary mask - manually creating arr < threshold works but is less elegant and error-prone",
+        "Forgetting to handle edge cases where one partition is empty - both empty and full partitions are mathematically valid",
+        "Assuming sorted output - partitions preserve original relative ordering, not sorted by value"
+      ],
+      "hint": "The complement of (X >= threshold) is (X < threshold). In NumPy, use the ~ operator to negate a boolean mask rather than creating a separate comparison.",
+      "references": [
+        "Set theory partition axioms",
+        "Boolean algebra complement properties",
+        "NumPy logical operations"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Feature-Based Indexing in Multi-Dimensional Arrays",
+      "relation_to_problem": "The main problem requires selecting a specific feature (column) from a dataset to apply threshold comparison. Understanding feature indexing is essential for generalizing partition logic to arbitrary feature dimensions.",
+      "prerequisites": [
+        "NumPy 2D arrays",
+        "Row vs column indexing",
+        "Array slicing notation"
+      ],
+      "learning_objectives": [
+        "Extract individual feature columns from 2D arrays using column indexing",
+        "Understand the difference between X[:, j] and X[i, :] for feature vs sample access",
+        "Apply threshold predicates to specific feature dimensions",
+        "Maintain data structure integrity when extracting features"
+      ],
+      "math_content": {
+        "definition": "Let $\\mathbf{X} \\in \\mathbb{R}^{n \\times d}$ be a data matrix where rows represent samples and columns represent features. The $j$-th **feature vector** is defined as: $\\mathbf{x}^{(j)} = [x_{1,j}, x_{2,j}, \\ldots, x_{n,j}]^T \\in \\mathbb{R}^n$ where $x_{i,j}$ denotes the value of feature $j$ for sample $i$. In NumPy notation: $\\mathbf{x}^{(j)} = \\mathbf{X}[:, j]$.",
+        "notation": "$\\mathbf{X} \\in \\mathbb{R}^{n \\times d}$ = data matrix with $n$ samples, $d$ features; $\\mathbf{x}_i \\in \\mathbb{R}^d$ = $i$-th sample (row); $\\mathbf{x}^{(j)} \\in \\mathbb{R}^n$ = $j$-th feature (column); $x_{i,j}$ = scalar value at row $i$, column $j$",
+        "theorem": "**Feature Indexing Dimension Theorem**: For matrix $\\mathbf{X} \\in \\mathbb{R}^{n \\times d}$, extracting the $j$-th feature via $\\mathbf{X}[:, j]$ produces a 1D array of shape $(n,)$, while extracting the $i$-th sample via $\\mathbf{X}[i, :]$ produces a 1D array of shape $(d,)$. The transpose relationship does NOT hold in NumPy: both are 1D arrays, not column/row vectors.",
+        "proof_sketch": "NumPy represents vectors as 1D arrays without inherent row/column orientation. When slicing $\\mathbf{X}[:, j]$, the ':' notation selects all rows, and $j$ selects column $j$, yielding $n$ values in 1D array. Similarly, $\\mathbf{X}[i, :]$ selects row $i$ and all columns, yielding $d$ values in 1D array. The shapes $(n,)$ and $(d,)$ are distinct 1D structures, not $(n, 1)$ or $(1, d)$ 2D structures.",
+        "examples": [
+          "Given $\\mathbf{X} = \\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\\\ 7 & 8 & 9 \\end{bmatrix}$, the feature $\\mathbf{x}^{(1)} = \\mathbf{X}[:, 1] = [2, 5, 8]$ (middle column, 0-indexed). Shape is $(3,)$. The sample $\\mathbf{x}_0 = \\mathbf{X}[0, :] = [1, 2, 3]$ (first row). Shape is $(3,)$.",
+          "For threshold comparison on feature 0: $\\mathbf{X}[:, 0] \\geq 5$ produces boolean mask $[\\text{False}, \\text{False}, \\text{True}]$ since values are $[1, 4, 7]$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Feature Extraction",
+          "latex": "$\\mathbf{x}^{(j)} = \\mathbf{X}[:, j]$",
+          "description": "Extracts all values for feature $j$ across all samples"
+        },
+        {
+          "name": "Feature-Based Mask",
+          "latex": "$\\mathbf{m}_j(\\tau) = (\\mathbf{X}[:, j] \\geq \\tau)$",
+          "description": "Boolean mask based on threshold $\\tau$ applied to feature $j$"
+        },
+        {
+          "name": "Conditional Row Selection",
+          "latex": "$\\mathbf{X}[\\mathbf{m}_j(\\tau)]$",
+          "description": "Returns subset of rows where feature $j$ satisfies threshold condition"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes a 2D array, a feature index, and a threshold, and returns the subset of rows where the specified feature column has values >= threshold. This generalizes the previous exercise to arbitrary feature columns.",
+        "function_signature": "def filter_by_feature(X: np.ndarray, feature_index: int, threshold: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef filter_by_feature(X, feature_index, threshold):\n    # Your code here\n    # Step 1: Extract the feature column using X[:, feature_index]\n    # Step 2: Create boolean mask for feature >= threshold\n    # Step 3: Apply mask to X to get filtered rows\n    pass",
+        "test_cases": [
+          {
+            "input": "filter_by_feature(np.array([[1, 2], [3, 4], [5, 6]]), 1, 3)",
+            "expected": "array([[3, 4], [5, 6]])",
+            "explanation": "Feature 1 (second column) values are [2, 4, 6]. Values >= 3 are at rows 1 and 2"
+          },
+          {
+            "input": "filter_by_feature(np.array([[10, 20, 30], [40, 50, 60]]), 2, 35)",
+            "expected": "array([[40, 50, 60]])",
+            "explanation": "Feature 2 (third column) values are [30, 60]. Only 60 >= 35"
+          },
+          {
+            "input": "filter_by_feature(np.array([[5], [10], [15]]), 0, 20)",
+            "expected": "array([], shape=(0, 1))",
+            "explanation": "No values in feature 0 are >= 20, returns empty array with correct column count"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row and column indexing - X[feature_index] selects a row, not a column. Must use X[:, feature_index]",
+        "Attempting to use X[feature_index, :] which also selects a row - the first index always refers to rows",
+        "Not validating feature_index bounds - accessing X[:, j] where j >= d raises IndexError",
+        "Forgetting that feature_index is 0-based - 'first feature' corresponds to index 0, not 1"
+      ],
+      "hint": "In NumPy's 2D indexing X[row_selector, col_selector], the colon ':' means 'all'. So X[:, j] means 'all rows, column j'.",
+      "references": [
+        "NumPy indexing and slicing",
+        "Row-major vs column-major storage",
+        "Feature engineering terminology"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Ordered Pair Return and Multiple Array Output",
+      "relation_to_problem": "The main problem requires returning two arrays in a specific order: samples meeting the threshold condition first, then samples not meeting it. Understanding ordered tuple return semantics is crucial for correct API design.",
+      "prerequisites": [
+        "Python tuples",
+        "Function return values",
+        "Unpacking semantics"
+      ],
+      "learning_objectives": [
+        "Return multiple arrays from a function as an ordered tuple",
+        "Understand immutability and ordering guarantees of tuple structures",
+        "Document return value semantics clearly",
+        "Handle unpacking of multi-array returns"
+      ],
+      "math_content": {
+        "definition": "An **ordered pair** (or $n$-tuple for $n$ elements) is a mathematical structure $(a_1, a_2, \\ldots, a_n)$ where the order of elements matters. Two tuples $(a_1, a_2)$ and $(b_1, b_2)$ are equal if and only if $a_1 = b_1$ and $a_2 = b_2$. In Python, tuples are immutable sequences that preserve insertion order. For binary partition output, we return $(S_1, S_2)$ where $S_1$ is the subset satisfying the condition and $S_2$ is the complementary subset.",
+        "notation": "$(a, b)$ = ordered pair; $(a, b) \\neq (b, a)$ unless $a = b$; $\\pi_1((a, b)) = a$ = first projection; $\\pi_2((a, b)) = b$ = second projection",
+        "theorem": "**Tuple Ordering Axiom**: For any tuple $(a, b)$ in a function's return value, the caller receives the elements in the exact order specified. If $f(x) = (g(x), h(x))$, then unpacking via `result1, result2 = f(x)` guarantees `result1 = g(x)` and `result2 = h(x)`.",
+        "proof_sketch": "Python's tuple unpacking is deterministic and position-based. The assignment `a, b = (x, y)` binds `a` to the first element `x` and `b` to the second element `y` by index position. This mapping is bijective and order-preserving by language specification.",
+        "examples": [
+          "Function returning partition: `def split(x): return (x[x >= 0], x[x < 0])`. Calling with `x = [1, -2, 3]` returns `([1, 3], [-2])`. Unpacking: `pos, neg = split(x)` assigns `pos = [1, 3]` and `neg = [-2]`.",
+          "Order matters: `(array([1, 2]), array([3, 4]))` is different from `(array([3, 4]), array([1, 2]))` even though both contain the same arrays."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Binary Tuple Return",
+          "latex": "$f(\\mathbf{X}, j, \\tau) = (\\mathbf{X}[\\mathbf{m}_j], \\mathbf{X}[\\neg\\mathbf{m}_j])$",
+          "description": "Returns partition as ordered pair: (satisfying, not satisfying)"
+        },
+        {
+          "name": "Projection Functions",
+          "latex": "$\\pi_1(f(\\mathbf{X}, j, \\tau)) = \\mathbf{X}[\\mathbf{m}_j]$",
+          "description": "First element of return tuple is the True partition"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes a 2D array, a feature index, and a threshold, and returns TWO arrays as a tuple: first array contains rows where feature >= threshold, second contains rows where feature < threshold. This combines feature indexing with ordered pair return.",
+        "function_signature": "def partition_by_feature(X: np.ndarray, feature_index: int, threshold: float) -> tuple[np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef partition_by_feature(X, feature_index, threshold):\n    # Your code here\n    # Step 1: Extract feature column\n    # Step 2: Create boolean mask for >= condition\n    # Step 3: Get rows satisfying condition\n    # Step 4: Get rows NOT satisfying condition (use mask negation)\n    # Step 5: Return as tuple (satisfying, not_satisfying)\n    pass",
+        "test_cases": [
+          {
+            "input": "partition_by_feature(np.array([[1, 2], [3, 4], [5, 6]]), 0, 3)",
+            "expected": "(array([[3, 4], [5, 6]]), array([[1, 2]]))",
+            "explanation": "Feature 0 values [1, 3, 5]. Values >= 3 are rows [3,4] and [5,6]. Values < 3 is row [1,2]"
+          },
+          {
+            "input": "partition_by_feature(np.array([[10, 20], [30, 40]]), 1, 25)",
+            "expected": "(array([[30, 40]]), array([[10, 20]]))",
+            "explanation": "Feature 1 values [20, 40]. Only 40 >= 25. Return order: (satisfied, not_satisfied)"
+          },
+          {
+            "input": "partition_by_feature(np.array([[5, 5], [5, 5]]), 0, 5)",
+            "expected": "(array([[5, 5], [5, 5]]), array([], shape=(0, 2)))",
+            "explanation": "All values equal threshold, all go to first partition, second is empty"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Returning arrays in wrong order - the problem specification requires (>= threshold, < threshold), not the reverse",
+        "Returning a list [arr1, arr2] instead of tuple (arr1, arr2) - while functionally similar, tuple is semantically correct for fixed-size returns",
+        "Not handling empty partitions - when one subset is empty, must return empty array with shape (0, d) not None",
+        "Forgetting to return both partitions - some implementations only return the satisfying subset"
+      ],
+      "hint": "Python functions can return multiple values using comma-separated syntax: `return value1, value2` creates a tuple. Use parentheses for clarity: `return (value1, value2)`.",
+      "references": [
+        "Python tuple data structure",
+        "Multiple return values in Python",
+        "Tuple unpacking semantics"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Threshold-Based Binary Split: Decision Tree Foundation",
+      "relation_to_problem": "This sub-quest directly addresses the core operation of the main problem: implementing a binary split based on feature threshold. This is the fundamental operation in decision tree construction and data partitioning algorithms.",
+      "prerequisites": [
+        "Boolean indexing",
+        "Set partitioning",
+        "Feature extraction",
+        "Tuple returns"
+      ],
+      "learning_objectives": [
+        "Implement complete threshold-based binary split function",
+        "Understand connection to decision tree splitting criteria",
+        "Verify partition properties (completeness, disjointness) in implementation",
+        "Handle edge cases: empty partitions, single-element arrays, identical values"
+      ],
+      "math_content": {
+        "definition": "A **threshold-based binary split** on dataset $\\mathbf{X} \\in \\mathbb{R}^{n \\times d}$ with respect to feature $j \\in \\{0, 1, \\ldots, d-1\\}$ and threshold $\\tau \\in \\mathbb{R}$ produces two subsets: $\\mathbf{X}_{\\geq} = \\{\\mathbf{x}_i \\in \\mathbf{X} : x_{i,j} \\geq \\tau\\}$ and $\\mathbf{X}_{<} = \\{\\mathbf{x}_i \\in \\mathbf{X} : x_{i,j} < \\tau\\}$ such that $\\mathbf{X}_{\\geq} \\cup \\mathbf{X}_{<} = \\mathbf{X}$ and $\\mathbf{X}_{\\geq} \\cap \\mathbf{X}_{<} = \\emptyset$.",
+        "notation": "$\\mathbf{X}_{\\geq}$ = satisfying subset; $\\mathbf{X}_{<}$ = non-satisfying subset; $\\text{split}(\\mathbf{X}, j, \\tau) = (\\mathbf{X}_{\\geq}, \\mathbf{X}_{<})$",
+        "theorem": "**Split Invariance Theorem**: For any valid split $\\text{split}(\\mathbf{X}, j, \\tau) = (\\mathbf{X}_{\\geq}, \\mathbf{X}_{<})$, the following properties hold: (1) $|\\mathbf{X}_{\\geq}| + |\\mathbf{X}_{<}| = |\\mathbf{X}|$ (cardinality conservation), (2) $\\mathbf{X}_{\\geq} \\cap \\mathbf{X}_{<} = \\emptyset$ (disjointness), (3) Row order within each subset preserves original relative ordering from $\\mathbf{X}$ (stability).",
+        "proof_sketch": "Properties (1) and (2) follow from the Partition Theorem (Sub-quest 2). For property (3), boolean indexing in NumPy iterates through rows in original order and includes those where mask is True, preserving relative ordering. Since we don't sort or rearrange, stability is guaranteed by implementation.",
+        "examples": [
+          "Example from problem statement: $\\mathbf{X} = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\\\ 5 & 6 \\\\ 7 & 8 \\\\ 9 & 10 \\end{bmatrix}$, feature $j = 0$, threshold $\\tau = 5$. Feature column: $[1, 3, 5, 7, 9]^T$. Mask: $[\\text{False}, \\text{False}, \\text{True}, \\text{True}, \\text{True}]$. Result: $\\mathbf{X}_{\\geq} = \\begin{bmatrix} 5 & 6 \\\\ 7 & 8 \\\\ 9 & 10 \\end{bmatrix}$, $\\mathbf{X}_{<} = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix}$.",
+          "Edge case with all equal: $\\mathbf{X} = \\begin{bmatrix} 5 & 1 \\\\ 5 & 2 \\\\ 5 & 3 \\end{bmatrix}$, $j = 0$, $\\tau = 5$. All feature values equal threshold: $\\mathbf{X}_{\\geq} = \\mathbf{X}$, $\\mathbf{X}_{<} = \\text{empty}(0, 2)$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Split Operation",
+          "latex": "$\\text{split}(\\mathbf{X}, j, \\tau) = (\\mathbf{X}[(\\mathbf{X}[:, j] \\geq \\tau)], \\mathbf{X}[(\\mathbf{X}[:, j] < \\tau)])$",
+          "description": "Full threshold-based binary split returning ordered pair of partitions"
+        },
+        {
+          "name": "Split Cardinality Verification",
+          "latex": "$|\\mathbf{X}_{\\geq}| + |\\mathbf{X}_{<}| = n$",
+          "description": "Verification that partition sizes sum to original dataset size"
+        },
+        {
+          "name": "Information Gain (Context)",
+          "latex": "$IG(\\mathbf{X}, j, \\tau) = H(\\mathbf{X}) - \\frac{|\\mathbf{X}_{\\geq}|}{|\\mathbf{X}|}H(\\mathbf{X}_{\\geq}) - \\frac{|\\mathbf{X}_{<}|}{|\\mathbf{X}|}H(\\mathbf{X}_{<})$",
+          "description": "How decision trees evaluate split quality using entropy (for context only)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete threshold-based split function that divides a dataset based on whether a feature value is >= threshold. This is the exact operation needed for the main problem. The function should return results in the order: (rows with feature >= threshold, rows with feature < threshold).",
+        "function_signature": "def split_dataset(X: np.ndarray, feature_i: int, threshold: float) -> tuple[np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef split_dataset(X, feature_i, threshold):\n    # Your code here\n    # Apply all concepts from previous sub-quests:\n    # 1. Extract feature column\n    # 2. Create boolean mask for >= comparison\n    # 3. Apply mask to get first partition\n    # 4. Apply negated mask to get second partition\n    # 5. Return as ordered tuple\n    pass",
+        "test_cases": [
+          {
+            "input": "split_dataset(np.array([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]]), 0, 5)",
+            "expected": "(array([[5, 6], [7, 8], [9, 10]]), array([[1, 2], [3, 4]]))",
+            "explanation": "Exact example from problem statement. Feature 0 values [1,3,5,7,9]. Values >= 5 are [5,7,9] at rows 2,3,4"
+          },
+          {
+            "input": "split_dataset(np.array([[2, 10], [4, 20], [6, 30]]), 1, 15)",
+            "expected": "(array([[4, 20], [6, 30]]), array([[2, 10]]))",
+            "explanation": "Split on feature 1 (second column) with threshold 15. Values [10,20,30], only 20 and 30 >= 15"
+          },
+          {
+            "input": "split_dataset(np.array([[1, 1], [2, 2]]), 0, 10)",
+            "expected": "(array([], shape=(0, 2)), array([[1, 1], [2, 2]]))",
+            "explanation": "No values >= 10, all go to second partition. First partition is empty but maintains column structure"
+          },
+          {
+            "input": "split_dataset(np.array([[5]]), 0, 5)",
+            "expected": "(array([[5]]), array([], shape=(0, 1)))",
+            "explanation": "Single element equal to threshold goes to >= partition"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using > instead of >= - the problem explicitly requires >= for the first partition",
+        "Returning partitions in wrong order - must return (>= threshold first, < threshold second)",
+        "Creating the second mask with X[:, feature_i] < threshold instead of using ~mask - both work but negation is more efficient",
+        "Not preserving 2D structure for empty results - empty partition should be shape (0, d) not (0,) or None",
+        "Modifying original array X - boolean indexing creates views/copies, original should remain unchanged"
+      ],
+      "hint": "You've learned all the pieces: extract column with X[:, feature_i], create mask with >= threshold, apply mask with X[mask], negate mask with ~mask. Combine these operations and return as a tuple.",
+      "references": [
+        "Decision tree splitting algorithms (CART, ID3, C4.5)",
+        "Scikit-learn DecisionTreeClassifier implementation",
+        "Binary space partitioning"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Validation and Edge Case Analysis for Dataset Partitioning",
+      "relation_to_problem": "Robust implementation requires handling edge cases and validating correctness. This sub-quest ensures your solution works for all inputs: empty datasets, single samples, boundary values, and degenerate cases.",
+      "prerequisites": [
+        "Complete split implementation",
+        "NumPy array properties",
+        "Defensive programming"
+      ],
+      "learning_objectives": [
+        "Identify and handle edge cases in dataset partitioning",
+        "Implement validation checks for partition correctness",
+        "Understand floating-point comparison edge cases",
+        "Write defensive code with proper error handling"
+      ],
+      "math_content": {
+        "definition": "An **edge case** in threshold-based partitioning is an input configuration that produces extreme or degenerate behavior: (1) Empty dataset: $|\\mathbf{X}| = 0$, (2) Single sample: $|\\mathbf{X}| = 1$, (3) Degenerate split: $|\\mathbf{X}_{\\geq}| = 0$ or $|\\mathbf{X}_{<}| = 0$, (4) Uniform feature: $x_{i,j} = c$ for all $i$ (constant feature), (5) Boundary threshold: $\\tau = \\min_i x_{i,j}$ or $\\tau = \\max_i x_{i,j}$.",
+        "notation": "$\\text{shape}(\\mathbf{X}) = (n, d)$; $|\\mathbf{X}| = 0 \\implies \\mathbf{X} = \\text{empty}(0, d)$; $\\varepsilon$ = machine epsilon for floating-point comparison",
+        "theorem": "**Edge Case Preservation Theorem**: For any edge case input, a correct split implementation must satisfy: (1) Return type is always tuple of two arrays, (2) Empty input produces two empty arrays with correct column count, (3) Partition invariants (cardinality, disjointness) hold for all cases, (4) Function never raises exceptions for valid inputs.",
+        "proof_sketch": "For empty input ($n=0$): boolean mask has length 0, both X[mask] and X[~mask] produce empty (0, d) arrays. For single sample ($n=1$): mask is length 1, exactly one partition gets the sample, other is empty. For degenerate splits: if all values fail condition, mask is all False, first partition empty, second has all rows. All cases preserve $(n_1, d)$ and $(n_2, d)$ shapes where $n_1 + n_2 = n$.",
+        "examples": [
+          "Empty input: $\\mathbf{X} = \\text{empty}(0, 3)$, any $j, \\tau$. Result: $(\\text{empty}(0, 3), \\text{empty}(0, 3))$. Cardinality: $0 + 0 = 0$ ✓",
+          "Single sample: $\\mathbf{X} = [[5, 10]]$, $j=0$, $\\tau=5$. Mask: $[\\text{True}]$. Result: $([[5, 10]], \\text{empty}(0, 2))$.",
+          "Uniform feature: $\\mathbf{X} = [[7, 1], [7, 2], [7, 3]]$, $j=0$, $\\tau=7$. All values equal threshold: Result: $(\\mathbf{X}, \\text{empty}(0, 2))$.",
+          "Floating-point boundary: $\\mathbf{X} = [[0.1 + 0.2, 1]]$, $j=0$, $\\tau=0.3$. Due to floating-point precision, $0.1 + 0.2 \\neq 0.3$ in binary representation. Mask uses >=, so result depends on actual binary value."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Empty Partition Shape",
+          "latex": "$\\text{shape}(\\mathbf{X}_{\\emptyset}) = (0, d)$",
+          "description": "Empty partition maintains column dimensionality"
+        },
+        {
+          "name": "Partition Validation",
+          "latex": "$\\text{valid}(\\mathbf{X}_{\\geq}, \\mathbf{X}_{<}) \\iff \\text{shape}(\\mathbf{X}_{\\geq})[1] = \\text{shape}(\\mathbf{X}_{<})[1] = d \\land |\\mathbf{X}_{\\geq}| + |\\mathbf{X}_{<}| = n$",
+          "description": "Both partitions must have same column count and sum to original size"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that performs threshold-based dataset split AND includes validation to verify partition correctness. After splitting, check that: (1) sum of partition sizes equals original size, (2) both partitions have same number of columns as input, (3) no rows are duplicated. Return the partitions along with a boolean indicating validity.",
+        "function_signature": "def split_and_validate(X: np.ndarray, feature_i: int, threshold: float) -> tuple[np.ndarray, np.ndarray, bool]:",
+        "starter_code": "import numpy as np\n\ndef split_and_validate(X, feature_i, threshold):\n    # Your code here\n    # Step 1: Perform standard split\n    # Step 2: Validate cardinality: len(X_ge) + len(X_lt) == len(X)\n    # Step 3: Validate column counts: X_ge.shape[1] == X_lt.shape[1] == X.shape[1]\n    # Step 4: Return (X_ge, X_lt, is_valid)\n    pass",
+        "test_cases": [
+          {
+            "input": "split_and_validate(np.array([[1, 2], [3, 4]]), 0, 2)",
+            "expected": "(array([[3, 4]]), array([[1, 2]]), True)",
+            "explanation": "Standard case: 1 row in first partition, 1 in second, sum = 2 = original. Valid."
+          },
+          {
+            "input": "split_and_validate(np.array([]), 0, 5)",
+            "expected": "(array([], shape=(0,)), array([], shape=(0,)), True)",
+            "explanation": "Empty input: both partitions empty, sum = 0 = original. Valid despite being edge case."
+          },
+          {
+            "input": "split_and_validate(np.array([[5, 5, 5]]), 1, 5)",
+            "expected": "(array([[5, 5, 5]]), array([], shape=(0, 3)), True)",
+            "explanation": "Single sample equal to threshold: goes to >= partition. Column count preserved. Valid."
+          },
+          {
+            "input": "split_and_validate(np.array([[1, 2], [3, 4], [5, 6]]), 0, 10)",
+            "expected": "(array([], shape=(0, 2)), array([[1, 2], [3, 4], [5, 6]]), True)",
+            "explanation": "All values < threshold: first partition empty, second has all rows. Valid degenerate case."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling empty array case - X.shape when X is empty may raise errors without proper checks",
+        "Assuming both partitions are non-empty - many edge cases produce one empty partition",
+        "Using len(X) instead of X.shape[0] - len() works but shape[0] is more explicit for 2D arrays",
+        "Not checking column dimension consistency - especially important when one partition is empty",
+        "Forgetting that empty 2D arrays have shape (0, d) not (0,) - use X.reshape(0, d) if needed"
+      ],
+      "hint": "Add assertions or checks after splitting: assert X_ge.shape[0] + X_lt.shape[0] == X.shape[0] validates cardinality. Test with empty arrays, single samples, and boundary thresholds.",
+      "references": [
+        "Defensive programming practices",
+        "NumPy empty array handling",
+        "Floating-point arithmetic edge cases",
+        "Unit testing edge cases"
+      ]
+    }
+  ]
+}

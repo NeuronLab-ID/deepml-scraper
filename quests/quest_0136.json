@@ -1,0 +1,383 @@
+{
+  "problem_id": 136,
+  "title": "Calculate KL Divergence Between Two Multivariate Gaussian Distributions",
+  "category": "Probability",
+  "difficulty": "medium",
+  "description": "KL divergence measures the dissimilarity between two probability distributions. In this problem, you'll implement a function to compute the KL divergence between two multivariate Gaussian distributions given their means and covariance matrices. Use the provided mathematical formulas and numerical considerations to ensure accuracy.",
+  "example": {
+    "input": "mu_p, Cov_p, mu_q, Cov_q for two random multivariate Gaussians",
+    "output": "A float representing the KL divergence",
+    "reasoning": "The KL divergence is calculated using the formula: 0.5 * (log det term, minus dimension p, Mahalanobis distance between means, and trace term). It measures how dissimilar the second Gaussian is from the first."
+  },
+  "starter_code": "import numpy as np\n\ndef multivariate_kl_divergence(mu_p: np.ndarray, Cov_p: np.ndarray, mu_q: np.ndarray, Cov_q: np.ndarray) -> float:\n    \"\"\"\n    Computes the KL divergence between two multivariate Gaussian distributions.\n    \n    Parameters:\n    mu_p: mean vector of the first distribution\n    Cov_p: covariance matrix of the first distribution\n    mu_q: mean vector of the second distribution\n    Cov_q: covariance matrix of the second distribution\n\n    Returns:\n    KL divergence as a float\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Matrix Determinants and Logarithmic Properties for Covariance Matrices",
+      "relation_to_problem": "The KL divergence formula requires computing log(|Σ_q|/|Σ_p|), which is the log-ratio of determinants. This term measures the volume scaling difference between the two Gaussian distributions.",
+      "prerequisites": [
+        "Linear algebra basics",
+        "Matrix operations",
+        "Natural logarithm properties"
+      ],
+      "learning_objectives": [
+        "Compute determinants of positive definite matrices efficiently",
+        "Apply logarithm properties to ratios of determinants",
+        "Use numerical stability techniques (Cholesky decomposition) for determinant computation",
+        "Understand the geometric interpretation of determinants in covariance matrices"
+      ],
+      "math_content": {
+        "definition": "For a square matrix $A \\in \\mathbb{R}^{n \\times n}$, the **determinant** $|A|$ or $\\det(A)$ is a scalar value that represents the signed volume of the parallelepiped formed by the column vectors of $A$. For a covariance matrix $\\Sigma$ (positive definite), the determinant is always positive and represents the generalized variance of the multivariate distribution.",
+        "notation": "$|\\Sigma|$ = determinant of covariance matrix $\\Sigma$, $\\log(|\\Sigma|)$ = natural logarithm of the determinant (log-determinant)",
+        "theorem": "**Logarithm of Determinant Ratio**: For positive definite matrices $\\Sigma_p$ and $\\Sigma_q$, $\\log\\frac{|\\Sigma_q|}{|\\Sigma_p|} = \\log|\\Sigma_q| - \\log|\\Sigma_p|$. This separation is crucial for numerical stability.",
+        "proof_sketch": "Using logarithm properties: $\\log(a/b) = \\log(a) - \\log(b)$. For Cholesky decomposition $\\Sigma = LL^T$ where $L$ is lower triangular, $\\det(\\Sigma) = \\det(L)\\det(L^T) = (\\det(L))^2 = \\prod_{i=1}^{n} L_{ii}^2$. Therefore, $\\log|\\Sigma| = 2\\sum_{i=1}^{n}\\log(L_{ii})$, which avoids direct determinant computation and overflow.",
+        "examples": [
+          "For $\\Sigma = \\begin{pmatrix} 2 & 0.5 \\\\ 0.5 & 1 \\end{pmatrix}$, $|\\Sigma| = 2(1) - (0.5)(0.5) = 1.75$, so $\\log|\\Sigma| = \\log(1.75) \\approx 0.560$",
+          "Using Cholesky: $L = \\begin{pmatrix} 1.414 & 0 \\\\ 0.354 & 0.935 \\end{pmatrix}$, $\\log|\\Sigma| = 2(\\log(1.414) + \\log(0.935)) \\approx 0.560$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Log-Determinant Ratio",
+          "latex": "$\\log\\frac{|\\Sigma_q|}{|\\Sigma_p|} = \\log|\\Sigma_q| - \\log|\\Sigma_p|$",
+          "description": "Used for the first term in KL divergence formula; subtraction improves numerical stability"
+        },
+        {
+          "name": "Cholesky Log-Determinant",
+          "latex": "$\\log|\\Sigma| = 2\\sum_{i=1}^{n}\\log(L_{ii})$ where $\\Sigma = LL^T$",
+          "description": "Numerically stable method for high-dimensional covariance matrices"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a numerically stable function to compute the log-determinant of a positive definite covariance matrix using Cholesky decomposition. This is a building block for the KL divergence calculation.",
+        "function_signature": "def log_determinant(Sigma: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef log_determinant(Sigma: np.ndarray) -> float:\n    \"\"\"\n    Compute the log-determinant of a positive definite matrix using Cholesky decomposition.\n    \n    Parameters:\n    Sigma: positive definite covariance matrix (n x n)\n    \n    Returns:\n    log|Sigma| as a float\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "log_determinant(np.array([[1.0, 0.0], [0.0, 1.0]]))",
+            "expected": "0.0",
+            "explanation": "Identity matrix has determinant 1, and log(1) = 0"
+          },
+          {
+            "input": "log_determinant(np.array([[2.0, 0.5], [0.5, 1.0]]))",
+            "expected": "0.560",
+            "explanation": "Determinant is 1.75, log(1.75) ≈ 0.560"
+          },
+          {
+            "input": "log_determinant(np.array([[4.0, 0.0], [0.0, 4.0]]))",
+            "expected": "2.773",
+            "explanation": "Diagonal matrix with det=16, log(16) ≈ 2.773"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing det(Σ) directly then taking log—causes overflow for large matrices or underflow for small determinants",
+        "Forgetting that covariance matrices must be positive definite (all eigenvalues > 0)",
+        "Not handling near-singular matrices with regularization (add εI for small ε)",
+        "Using np.linalg.det() for high dimensions—numerically unstable"
+      ],
+      "hint": "Use np.linalg.cholesky() to get the lower triangular matrix L, then extract diagonal elements and sum their logarithms (multiplied by 2).",
+      "references": [
+        "Cholesky decomposition",
+        "Numerical linear algebra",
+        "Positive definite matrices",
+        "Matrix condition numbers"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Trace of Matrix Products and the Trace-Covariance Term",
+      "relation_to_problem": "The KL divergence formula includes $\\text{tr}(\\Sigma_q^{-1}\\Sigma_p)$, which measures how the covariance structure of distribution P differs from Q. This term quantifies the mismatch in variance directions.",
+      "prerequisites": [
+        "Matrix multiplication",
+        "Matrix inversion",
+        "Linear transformations"
+      ],
+      "learning_objectives": [
+        "Compute the trace of a matrix efficiently",
+        "Understand trace properties: tr(AB) = tr(BA) and tr(ABC) = tr(CAB)",
+        "Calculate matrix products involving inverses without explicit inversion",
+        "Interpret the trace term geometrically in terms of covariance alignment"
+      ],
+      "math_content": {
+        "definition": "The **trace** of a square matrix $A \\in \\mathbb{R}^{n \\times n}$ is the sum of its diagonal elements: $\\text{tr}(A) = \\sum_{i=1}^{n} A_{ii}$. For covariance matrices, the trace represents the total variance across all dimensions.",
+        "notation": "$\\text{tr}(\\cdot)$ = trace operator, $\\Sigma^{-1}$ = inverse of covariance matrix (precision matrix)",
+        "theorem": "**Cyclic Property of Trace**: For matrices $A \\in \\mathbb{R}^{m \\times n}$, $B \\in \\mathbb{R}^{n \\times m}$, we have $\\text{tr}(AB) = \\text{tr}(BA)$. More generally, $\\text{tr}(ABC) = \\text{tr}(BCA) = \\text{tr}(CAB)$ when dimensions are compatible. This property is essential for deriving the KL divergence formula.",
+        "proof_sketch": "For $\\text{tr}(AB)$: $(AB)_{ii} = \\sum_j A_{ij}B_{ji}$, so $\\text{tr}(AB) = \\sum_i\\sum_j A_{ij}B_{ji}$. For $\\text{tr}(BA)$: $(BA)_{jj} = \\sum_i B_{ji}A_{ij}$, so $\\text{tr}(BA) = \\sum_j\\sum_i B_{ji}A_{ij}$. Both double sums iterate over the same terms, hence equal.",
+        "examples": [
+          "For $A = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}$, $\\text{tr}(A) = 1 + 4 = 5$",
+          "If $\\Sigma_p = I$ (identity) and $\\Sigma_q = \\begin{pmatrix} 2 & 0 \\\\ 0 & 3 \\end{pmatrix}$, then $\\text{tr}(\\Sigma_q^{-1}\\Sigma_p) = \\text{tr}\\begin{pmatrix} 0.5 & 0 \\\\ 0 & 0.333 \\end{pmatrix} = 0.833$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Trace of Inverse-Covariance Product",
+          "latex": "$\\text{tr}(\\Sigma_q^{-1}\\Sigma_p) = \\sum_{i=1}^{n}\\lambda_i$ where $\\lambda_i$ are eigenvalues of $\\Sigma_q^{-1}\\Sigma_p$",
+          "description": "Measures covariance alignment; equals dimension p when Σ_p = Σ_q"
+        },
+        {
+          "name": "Frobenius Product for Trace",
+          "latex": "$\\text{tr}(A^TB) = \\sum_{i,j} A_{ij}B_{ij} = \\text{vec}(A)^T\\text{vec}(B)$",
+          "description": "Efficient computation via element-wise product sum"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to compute tr(Σ_q^{-1}Σ_p) efficiently by solving the linear system Σ_q X = Σ_p rather than computing the inverse explicitly. This avoids numerical instability.",
+        "function_signature": "def trace_inverse_product(Sigma_p: np.ndarray, Sigma_q: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef trace_inverse_product(Sigma_p: np.ndarray, Sigma_q: np.ndarray) -> float:\n    \"\"\"\n    Compute tr(Sigma_q^{-1} * Sigma_p) without explicit matrix inversion.\n    \n    Parameters:\n    Sigma_p: first covariance matrix (n x n)\n    Sigma_q: second covariance matrix (n x n)\n    \n    Returns:\n    trace value as a float\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "trace_inverse_product(np.eye(3), np.eye(3))",
+            "expected": "3.0",
+            "explanation": "When both matrices are identity, tr(I^{-1}I) = tr(I) = 3"
+          },
+          {
+            "input": "trace_inverse_product(np.array([[1.0, 0.0], [0.0, 1.0]]), np.array([[2.0, 0.0], [0.0, 3.0]]))",
+            "expected": "0.833",
+            "explanation": "tr([[0.5, 0], [0, 0.333]] * I) = 0.5 + 0.333 ≈ 0.833"
+          },
+          {
+            "input": "trace_inverse_product(np.array([[4.0, 1.0], [1.0, 2.0]]), np.array([[2.0, 0.5], [0.5, 1.0]]))",
+            "expected": "3.429",
+            "explanation": "Solve 2X = Σ_p, compute trace of solution"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing Σ_q^{-1} explicitly using np.linalg.inv()—numerically unstable and slow",
+        "Forgetting that tr(Σ_q^{-1}Σ_p) ≠ tr(Σ_pΣ_q^{-1}) in general (though equal for symmetric matrices)",
+        "Not verifying that Σ_q is invertible (check condition number or add regularization)",
+        "Computing full matrix product before taking trace—wastes computation"
+      ],
+      "hint": "Use np.linalg.solve(Sigma_q, Sigma_p) to solve Σ_q X = Σ_p for X, then compute np.trace(X). This is equivalent to tr(Σ_q^{-1}Σ_p) but numerically stable.",
+      "references": [
+        "Trace operator properties",
+        "Linear system solvers",
+        "Numerical stability in matrix computations",
+        "Precision matrices"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Mahalanobis Distance Between Mean Vectors",
+      "relation_to_problem": "The term (μ_p - μ_q)^T Σ_q^{-1} (μ_p - μ_q) in KL divergence is the squared Mahalanobis distance, measuring how far apart the means are relative to the covariance structure of Q.",
+      "prerequisites": [
+        "Vector norms",
+        "Quadratic forms",
+        "Covariance matrix interpretation"
+      ],
+      "learning_objectives": [
+        "Understand the Mahalanobis distance as a generalization of Euclidean distance",
+        "Compute quadratic forms (x - μ)^T Σ^{-1} (x - μ) efficiently",
+        "Interpret the distance in terms of standard deviations",
+        "Apply numerical techniques to avoid explicit matrix inversion"
+      ],
+      "math_content": {
+        "definition": "The **Mahalanobis distance** between a point $x$ and a distribution with mean $\\mu$ and covariance $\\Sigma$ is defined as: $D_M(x, \\mu) = \\sqrt{(x - \\mu)^T \\Sigma^{-1} (x - \\mu)}$. The squared Mahalanobis distance is the quadratic form $(x - \\mu)^T \\Sigma^{-1} (x - \\mu)$, which measures distance in units of standard deviations.",
+        "notation": "$D_M$ = Mahalanobis distance, $\\Sigma^{-1}$ = precision matrix (inverse covariance), $(\\cdot)^T$ = transpose",
+        "theorem": "**Invariance under Linear Transformation**: If $y = Ax + b$, then the Mahalanobis distance is invariant under affine transformations that preserve the covariance structure. For the KL divergence, when $\\Sigma_p = \\Sigma_q$, the mean mismatch term reduces to the squared Euclidean distance scaled by the inverse covariance.",
+        "proof_sketch": "For spherical covariance $\\Sigma = \\sigma^2 I$, we have $\\Sigma^{-1} = \\frac{1}{\\sigma^2}I$, so $(x - \\mu)^T \\Sigma^{-1} (x - \\mu) = \\frac{1}{\\sigma^2}\\|x - \\mu\\|^2$. This is the squared Euclidean distance normalized by variance. For general $\\Sigma$, the eigen-decomposition $\\Sigma = Q\\Lambda Q^T$ whitens the space, transforming the problem to the spherical case.",
+        "examples": [
+          "For $\\mu_p = [0, 0]^T$, $\\mu_q = [1, 0]^T$, $\\Sigma_q = I$: $(\\mu_p - \\mu_q)^T \\Sigma_q^{-1} (\\mu_p - \\mu_q) = [-1, 0] I^{-1} [-1, 0]^T = 1$",
+          "For $\\mu_p = [0, 0]^T$, $\\mu_q = [1, 1]^T$, $\\Sigma_q = \\begin{pmatrix} 2 & 0 \\\\ 0 & 2 \\end{pmatrix}$: Distance is $[-1, -1]\\begin{pmatrix} 0.5 & 0 \\\\ 0 & 0.5 \\end{pmatrix}[-1, -1]^T = 0.5 + 0.5 = 1.0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Squared Mahalanobis Distance",
+          "latex": "$D_M^2(\\mu_p, \\mu_q) = (\\mu_p - \\mu_q)^T \\Sigma_q^{-1} (\\mu_p - \\mu_q)$",
+          "description": "Measures mean separation in standard deviations of Q; appears directly in KL divergence"
+        },
+        {
+          "name": "Computational Form",
+          "latex": "$D_M^2 = \\Delta\\mu^T (\\Sigma_q^{-1} \\Delta\\mu)$ where $\\Delta\\mu = \\mu_p - \\mu_q$",
+          "description": "Solve Σ_q v = Δμ, then compute Δμ^T v for numerical stability"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to compute the squared Mahalanobis distance between two mean vectors given a covariance matrix. Use stable numerical methods (solving linear systems rather than explicit inversion).",
+        "function_signature": "def squared_mahalanobis_distance(mu_p: np.ndarray, mu_q: np.ndarray, Sigma_q: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef squared_mahalanobis_distance(mu_p: np.ndarray, mu_q: np.ndarray, Sigma_q: np.ndarray) -> float:\n    \"\"\"\n    Compute the squared Mahalanobis distance (mu_p - mu_q)^T Sigma_q^{-1} (mu_p - mu_q).\n    \n    Parameters:\n    mu_p: mean vector of first distribution (n,)\n    mu_q: mean vector of second distribution (n,)\n    Sigma_q: covariance matrix of reference distribution (n x n)\n    \n    Returns:\n    squared distance as a float\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "squared_mahalanobis_distance(np.array([0.0, 0.0]), np.array([0.0, 0.0]), np.eye(2))",
+            "expected": "0.0",
+            "explanation": "Distance from a mean to itself is zero"
+          },
+          {
+            "input": "squared_mahalanobis_distance(np.array([1.0, 0.0]), np.array([0.0, 0.0]), np.eye(2))",
+            "expected": "1.0",
+            "explanation": "Euclidean distance squared is 1 when Σ = I"
+          },
+          {
+            "input": "squared_mahalanobis_distance(np.array([1.0, 1.0]), np.array([0.0, 0.0]), np.array([[2.0, 0.0], [0.0, 2.0]]))",
+            "expected": "1.0",
+            "explanation": "With Σ = 2I, the scaled distance is (1² + 1²)/2 = 1.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing Σ_q^{-1} explicitly—use np.linalg.solve(Sigma_q, delta_mu) instead",
+        "Forgetting to transpose vectors correctly: should be (n,) arrays or reshape to (n, 1)",
+        "Not checking that Σ_q is positive definite before inversion",
+        "Computing ||μ_p - μ_q||² directly—this ignores the covariance structure"
+      ],
+      "hint": "Compute delta = mu_p - mu_q, solve Sigma_q @ v = delta for v using np.linalg.solve(), then return np.dot(delta, v).",
+      "references": [
+        "Mahalanobis distance",
+        "Quadratic forms",
+        "Statistical distance measures",
+        "Whitening transformations"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Expectation of Quadratic Forms in Gaussian Random Vectors",
+      "relation_to_problem": "Deriving the KL divergence formula requires computing expectations like E[(x - μ)^T Σ^{-1} (x - μ)] where x ~ N(μ', Σ'). Understanding this expectation yields the dimension term and validates the formula structure.",
+      "prerequisites": [
+        "Probability theory",
+        "Expected value properties",
+        "Multivariate Gaussian distributions",
+        "Covariance matrix definition"
+      ],
+      "learning_objectives": [
+        "Compute expectations of quadratic forms for Gaussian random vectors",
+        "Apply the trace-expectation formula: E[x^T A x] = tr(A Σ) + μ^T A μ",
+        "Understand where the dimension p appears in the KL divergence formula",
+        "Verify special cases: E[(x - μ)^T Σ^{-1} (x - μ)] = p when x ~ N(μ, Σ)"
+      ],
+      "math_content": {
+        "definition": "For a random vector $x \\sim \\mathcal{N}(\\mu, \\Sigma)$ and a symmetric matrix $A$, the **expectation of the quadratic form** is: $\\mathbb{E}[x^T A x] = \\text{tr}(A\\Sigma) + \\mu^T A \\mu$. When centered at the mean: $\\mathbb{E}[(x - \\mu)^T A (x - \\mu)] = \\text{tr}(A\\Sigma)$.",
+        "notation": "$\\mathbb{E}[\\cdot]$ = expectation operator, $x \\sim \\mathcal{N}(\\mu, \\Sigma)$ means $x$ is distributed as multivariate Gaussian with mean $\\mu$ and covariance $\\Sigma$",
+        "theorem": "**Quadratic Form Expectation Theorem**: For $x \\sim \\mathcal{N}(\\mu_1, \\Sigma_1)$ and symmetric matrix $A$, we have: $\\mathbb{E}[(x - \\mu_2)^T A (x - \\mu_2)] = (\\mu_1 - \\mu_2)^T A (\\mu_1 - \\mu_2) + \\text{tr}(A\\Sigma_1)$. This is crucial for the KL divergence derivation.",
+        "proof_sketch": "Expand $(x - \\mu_2) = (x - \\mu_1) + (\\mu_1 - \\mu_2)$. Then $(x - \\mu_2)^T A (x - \\mu_2) = (x - \\mu_1)^T A (x - \\mu_1) + 2(\\mu_1 - \\mu_2)^T A (x - \\mu_1) + (\\mu_1 - \\mu_2)^T A (\\mu_1 - \\mu_2)$. Taking expectation: the cross term vanishes since $\\mathbb{E}[x - \\mu_1] = 0$. The first term becomes $\\mathbb{E}[(x - \\mu_1)^T A (x - \\mu_1)] = \\text{tr}(A\\Sigma_1)$ by cyclic property and the definition of covariance. The last term is constant.",
+        "examples": [
+          "For $x \\sim \\mathcal{N}(0, I_2)$ and $A = I$: $\\mathbb{E}[x^T x] = \\text{tr}(I \\cdot I) + 0^T I \\cdot 0 = 2$",
+          "For $x \\sim \\mathcal{N}(\\mu, \\Sigma)$ and $A = \\Sigma^{-1}$: $\\mathbb{E}[(x - \\mu)^T \\Sigma^{-1} (x - \\mu)] = \\text{tr}(\\Sigma^{-1}\\Sigma) = \\text{tr}(I) = p$, the dimension"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "General Quadratic Form Expectation",
+          "latex": "$\\mathbb{E}[(x - \\mu_2)^T A (x - \\mu_2)] = (\\mu_1 - \\mu_2)^T A (\\mu_1 - \\mu_2) + \\text{tr}(A\\Sigma_1)$ for $x \\sim \\mathcal{N}(\\mu_1, \\Sigma_1)$",
+          "description": "Used to derive the mean and covariance terms in KL divergence"
+        },
+        {
+          "name": "Dimension from Self-Normalization",
+          "latex": "$\\mathbb{E}[(x - \\mu_p)^T \\Sigma_p^{-1} (x - \\mu_p)] = p$ where $x \\sim \\mathcal{N}(\\mu_p, \\Sigma_p)$",
+          "description": "Explains the -p term in KL divergence formula"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to verify the quadratic form expectation formula through Monte Carlo simulation. Given a Gaussian distribution and a matrix A, estimate E[(x - μ₂)^T A (x - μ₂)] and compare with the theoretical formula.",
+        "function_signature": "def expected_quadratic_form(mu1: np.ndarray, Sigma1: np.ndarray, mu2: np.ndarray, A: np.ndarray, n_samples: int = 10000) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef expected_quadratic_form(mu1: np.ndarray, Sigma1: np.ndarray, mu2: np.ndarray, A: np.ndarray, n_samples: int = 10000) -> tuple:\n    \"\"\"\n    Compute E[(x - mu2)^T A (x - mu2)] both theoretically and via Monte Carlo,\n    where x ~ N(mu1, Sigma1).\n    \n    Parameters:\n    mu1: mean of the distribution x is sampled from\n    Sigma1: covariance of the distribution\n    mu2: centering point (can differ from mu1)\n    A: symmetric matrix in the quadratic form\n    n_samples: number of Monte Carlo samples\n    \n    Returns:\n    (theoretical_value, monte_carlo_estimate) as floats\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "expected_quadratic_form(np.zeros(2), np.eye(2), np.zeros(2), np.eye(2))",
+            "expected": "(2.0, ~2.0)",
+            "explanation": "E[x^T x] = tr(I*I) + 0 = 2; MC should be close"
+          },
+          {
+            "input": "expected_quadratic_form(np.array([1.0, 0.0]), np.eye(2), np.zeros(2), np.eye(2))",
+            "expected": "(3.0, ~3.0)",
+            "explanation": "Theoretical: (1² + 0²) + tr(I) = 1 + 2 = 3"
+          },
+          {
+            "input": "expected_quadratic_form(np.zeros(3), 2*np.eye(3), np.zeros(3), 0.5*np.eye(3))",
+            "expected": "(3.0, ~3.0)",
+            "explanation": "tr(0.5I * 2I) = tr(I) = 3"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing which mean (μ₁ or μ₂) appears in which term of the formula",
+        "Forgetting that the trace term uses Σ₁ (covariance of x), not Σ₂",
+        "Not recognizing that E[(x - μ)^T A (x - μ)] = tr(AΣ) when x ~ N(μ, Σ)",
+        "Misapplying the formula when A is not symmetric"
+      ],
+      "hint": "Theoretical value: compute (mu1 - mu2)^T @ A @ (mu1 - mu2) + np.trace(A @ Sigma1). For Monte Carlo: sample x from N(mu1, Sigma1) repeatedly, compute (x - mu2)^T A (x - mu2) for each sample, and average.",
+      "references": [
+        "Gaussian moment properties",
+        "Quadratic forms in statistics",
+        "Trace-expectation formulas",
+        "Monte Carlo methods"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Integrating Components: KL Divergence Formula Assembly and Numerical Stability",
+      "relation_to_problem": "This sub-quest combines all previous concepts to assemble the complete KL divergence formula. You'll integrate log-determinants, trace terms, and Mahalanobis distance while ensuring numerical stability.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Numerical linear algebra",
+        "Error analysis"
+      ],
+      "learning_objectives": [
+        "Combine individual formula components into the complete KL divergence calculation",
+        "Apply numerical stability techniques: Cholesky decomposition, linear system solving",
+        "Validate implementation against known test cases",
+        "Handle edge cases: near-singular matrices, high dimensions, numerical precision",
+        "Understand the geometric interpretation of each term in the formula"
+      ],
+      "math_content": {
+        "definition": "The **KL divergence** between multivariate Gaussians $p(x) \\sim \\mathcal{N}(\\mu_p, \\Sigma_p)$ and $q(x) \\sim \\mathcal{N}(\\mu_q, \\Sigma_q)$ is: $$D_{KL}(p \\parallel q) = \\frac{1}{2}\\left[\\log\\frac{|\\Sigma_q|}{|\\Sigma_p|} - p + (\\mu_p - \\mu_q)^T\\Sigma_q^{-1}(\\mu_p - \\mu_q) + \\text{tr}(\\Sigma_q^{-1}\\Sigma_p)\\right]$$",
+        "notation": "$D_{KL}(p \\parallel q)$ = KL divergence from p to q (asymmetric), $p$ = dimensionality of the vectors",
+        "theorem": "**KL Divergence Decomposition**: The four terms have interpretations: (1) $\\log|\\Sigma_q|/|\\Sigma_p|$ measures volume ratio, (2) $-p$ normalizes the self-information, (3) $(\\mu_p - \\mu_q)^T\\Sigma_q^{-1}(\\mu_p - \\mu_q)$ penalizes mean separation, (4) $\\text{tr}(\\Sigma_q^{-1}\\Sigma_p)$ penalizes covariance mismatch. The divergence is always non-negative, equaling zero iff $p = q$ almost everywhere.",
+        "proof_sketch": "The formula derives from the definition $D_{KL}(p \\parallel q) = \\mathbb{E}_{x\\sim p}[\\log p(x) - \\log q(x)]$. Substituting Gaussian PDFs and expanding: $\\log p(x) = -\\frac{p}{2}\\log(2\\pi) - \\frac{1}{2}\\log|\\Sigma_p| - \\frac{1}{2}(x - \\mu_p)^T\\Sigma_p^{-1}(x - \\mu_p)$, similarly for $q$. Taking expectation over $x \\sim p$ and applying quadratic form expectation formulas from sub-quest 4 yields the result.",
+        "examples": [
+          "When $\\Sigma_p = \\Sigma_q = \\Sigma$ (same covariance): $D_{KL} = \\frac{1}{2}(\\mu_p - \\mu_q)^T\\Sigma^{-1}(\\mu_p - \\mu_q)$, half the squared Mahalanobis distance",
+          "When $\\mu_p = \\mu_q$ (same mean): $D_{KL} = \\frac{1}{2}[\\log|\\Sigma_q|/|\\Sigma_p| - p + \\text{tr}(\\Sigma_q^{-1}\\Sigma_p)]$, measuring only covariance difference"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete KL Divergence Formula",
+          "latex": "$D_{KL}(p \\parallel q) = \\frac{1}{2}\\left[\\log\\frac{|\\Sigma_q|}{|\\Sigma_p|} - p + (\\mu_p - \\mu_q)^T\\Sigma_q^{-1}(\\mu_p - \\mu_q) + \\text{tr}(\\Sigma_q^{-1}\\Sigma_p)\\right]$",
+          "description": "The target formula for the main problem"
+        },
+        {
+          "name": "Numerically Stable Implementation",
+          "latex": "$\\log|\\Sigma| = 2\\sum_i\\log(L_{ii})$, solve $\\Sigma_q v = \\Delta\\mu$, solve $\\Sigma_q X = \\Sigma_p$",
+          "description": "Avoid explicit inverses and determinants"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified version of the KL divergence function that assembles the four components. This exercise combines all building blocks but for 2D Gaussians only to verify understanding before tackling the general case.",
+        "function_signature": "def kl_divergence_2d(mu_p: np.ndarray, Cov_p: np.ndarray, mu_q: np.ndarray, Cov_q: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef kl_divergence_2d(mu_p: np.ndarray, Cov_p: np.ndarray, mu_q: np.ndarray, Cov_q: np.ndarray) -> float:\n    \"\"\"\n    Compute KL divergence between two 2D multivariate Gaussian distributions.\n    Uses numerically stable methods from previous sub-quests.\n    \n    Parameters:\n    mu_p: mean vector of first distribution (2,)\n    Cov_p: covariance matrix of first distribution (2x2)\n    mu_q: mean vector of second distribution (2,)\n    Cov_q: covariance matrix of second distribution (2x2)\n    \n    Returns:\n    KL divergence D_KL(p || q) as a float\n    \"\"\"\n    # Your code here - combine the four terms\n    pass",
+        "test_cases": [
+          {
+            "input": "kl_divergence_2d(np.zeros(2), np.eye(2), np.zeros(2), np.eye(2))",
+            "expected": "0.0",
+            "explanation": "KL divergence between identical distributions is zero"
+          },
+          {
+            "input": "kl_divergence_2d(np.array([1.0, 0.0]), np.eye(2), np.zeros(2), np.eye(2))",
+            "expected": "0.5",
+            "explanation": "Only mean differs: (1/2)*(1² + 0²) = 0.5"
+          },
+          {
+            "input": "kl_divergence_2d(np.zeros(2), 2*np.eye(2), np.zeros(2), np.eye(2))",
+            "expected": "0.614",
+            "explanation": "Only covariance differs: (1/2)[log(1/2²) - 2 + tr(I*2I)] = (1/2)[-1.386 - 2 + 4] ≈ 0.614"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting the factor of 1/2 in front of the entire expression",
+        "Getting the argument order wrong: D_KL(p||q) ≠ D_KL(q||p)",
+        "Not using the dimension p (should be from mu_p.shape[0] or Cov_p.shape[0])",
+        "Mixing up which covariance matrix goes in numerator vs denominator of log ratio",
+        "Computing any explicit matrix inverses—use solving techniques from previous quests"
+      ],
+      "hint": "Use functions from previous sub-quests: (1) Compute log|Σ_q| - log|Σ_p| using Cholesky, (2) Compute tr(Σ_q^{-1}Σ_p) by solving, (3) Compute squared Mahalanobis distance, (4) Subtract dimension p, (5) Multiply sum by 0.5.",
+      "references": [
+        "Information theory",
+        "Statistical distance measures",
+        "Variational inference",
+        "Bayesian model comparison"
+      ]
+    }
+  ]
+}

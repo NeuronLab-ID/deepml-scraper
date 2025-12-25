@@ -1,0 +1,35 @@
+{
+  "description": "SW1wbGVtZW50IHRoZSBBcHJpb3JpIGFsZ29yaXRobSB0byBkaXNjb3ZlciBhbGwgZnJlcXVlbnQgaXRlbXNldHMgaW4gYSBzZXQgb2YgdHJhbnNhY3Rpb25zLCBnaXZlbiBhIG1pbmltdW0gc3VwcG9ydCB0aHJlc2hvbGQuIFlvdXIgZnVuY3Rpb24gc2hvdWxkIHJldHVybiBhbGwgZnJlcXVlbnQgaXRlbXNldHMgKG9mIGFueSBzaXplKSB3aG9zZSBzdXBwb3J0IGlzIGF0IGxlYXN0IHRoZSBnaXZlbiBtaW5pbXVtLiBSZXR1cm4gdGhlIGZyZXF1ZW50IGl0ZW1zZXRzIGFzIGEgZGljdGlvbmFyeSBtYXBwaW5nIGZyb3plbnNldCBvZiBpdGVtcyB0byB0aGVpciBzdXBwb3J0IChmcmFjdGlvbmFsKS4gT25seSB1c2UgYnVpbHQtaW4gUHl0aG9uIGFuZCBzdGFuZGFyZCBsaWJyYXJpZXMgKGNvbGxlY3Rpb25zLCBpdGVydG9vbHMpLg==",
+  "id": "144",
+  "test_cases": [
+    {
+      "test": "transactions = [\n    {'bread', 'milk'},\n    {'bread', 'diaper', 'beer', 'eggs'},\n    {'milk', 'diaper', 'beer', 'cola'},\n    {'bread', 'milk', 'diaper', 'beer'},\n    {'bread', 'milk', 'diaper', 'cola'}\n]\nresult = apriori(transactions, min_support=0.6)\nl=[]\nfor k in sorted(result, key=lambda x: (len(x), sorted(x))):\n    l.append(result[k])\nprint(l)",
+      "expected_output": "0.6 0.8 0.8 0.8 0.6 0.6 0.6 0.6"
+    },
+    {
+      "test": "transactions = [\n    {'a', 'b'}, {'c', 'd'}, {'e', 'f'}, {'g', 'h'}\n]\nresult = apriori(transactions, min_support=0.5)\nprint(result)",
+      "expected_output": "{}"
+    }
+  ],
+  "difficulty": "medium",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "transactions = [\n    {'bread', 'milk'},\n    {'bread', 'diaper', 'beer', 'eggs'},\n    {'milk', 'diaper', 'beer', 'cola'},\n    {'bread', 'milk', 'diaper', 'beer'},\n    {'bread', 'milk', 'diaper', 'cola'}\n]\nresult = apriori(transactions, min_support=0.6)\nfor k in sorted(result, key=lambda x: (len(x), sorted(x))):\n    print(sorted(list(k)), round(result[k], 2))",
+    "output": "['bread'] 0.8\n['diaper'] 0.8\n['milk'] 0.8\n['bread', 'diaper'] 0.6\n['bread', 'milk'] 0.6\n['milk', 'diaper'] 0.6",
+    "reasoning": "Bread, Milk, and Diaper each appear in 4 out of 5 transactions (support=0.8), and the 2-itemsets {'bread','milk'}, {'bread','diaper'}, and {'milk','diaper'} each appear in 3 out of 5 (support=0.6). Only these satisfy the min_support threshold."
+  },
+  "category": "Machine Learning",
+  "starter_code": "import itertools\nfrom collections import defaultdict\n\ndef apriori(transactions, min_support=0.5, max_length=None):\n    \"\"\"\n    Returns: dict mapping frozenset(itemset) -> support (float)\n    \"\"\"\n    # TODO: Implement the Apriori algorithm\n    pass",
+  "title": "Apriori Frequent Itemset Mining",
+  "learn_section": "IyAqKkFwcmlvcmkgQWxnb3JpdGhtIGZvciBGcmVxdWVudCBJdGVtc2V0IE1pbmluZyoqCgpUaGUgQXByaW9yaSBhbGdvcml0aG0gaXMgYSBjbGFzc2ljIGFwcHJvYWNoIHRvIGRpc2NvdmVyaW5nICoqZnJlcXVlbnQgaXRlbXNldHMqKiBmb3IgYXNzb2NpYXRpb24gcnVsZSBtaW5pbmcgaW4gdHJhbnNhY3Rpb25hbCBkYXRhLgoKLS0tCgojIyAqKkhvdyBBcHJpb3JpIFdvcmtzKioKCioqR29hbDoqKgotIEZpbmQgYWxsIGl0ZW1zZXRzIHRoYXQgYXBwZWFyIGluIGF0IGxlYXN0IGEgZ2l2ZW4gZnJhY3Rpb24gKHRoZSAqbWluaW11bSBzdXBwb3J0Kikgb2YgdHJhbnNhY3Rpb25zLgoKKipBbGdvcml0aG0gc3RlcHM6KioKMS4gU3RhcnQgYnkgY291bnRpbmcgc3VwcG9ydCBmb3IgYWxsIHNpbmdsZSBpdGVtcyAoMS1pdGVtc2V0cykuCjIuIFJlbW92ZSBhbnkgdGhhdCBkbyBub3QgbWVldCB0aGUgbWluX3N1cHBvcnQgdGhyZXNob2xkLgozLiBJdGVyYXRpdmVseToKICAgLSBVc2UgZnJlcXVlbnQgay1pdGVtc2V0cyB0byBnZW5lcmF0ZSBjYW5kaWRhdGUgKGsrMSktaXRlbXNldHMuCiAgIC0gQ291bnQgc3VwcG9ydHMgZm9yIHRoZXNlIGNhbmRpZGF0ZXMuCiAgIC0gUmVtb3ZlIHRob3NlIG5vdCBtZWV0aW5nIG1pbl9zdXBwb3J0LgogICAtIFJlcGVhdCB1bnRpbCBubyBuZXcgZnJlcXVlbnQgaXRlbXNldHMgYXJlIGZvdW5kLCBvciB5b3UgcmVhY2ggbWF4X2xlbmd0aCAoaWYgZ2l2ZW4pLgoKKipLZXkgUHJpbmNpcGxlOioqCi0gKipBbnRpLW1vbm90b25pY2l0eToqKiBJZiBhbiBpdGVtc2V0IGlzIGluZnJlcXVlbnQsIGFsbCBzdXBlcnNldHMgYXJlIGFsc28gaW5mcmVxdWVudC4gVGhpcyBhbGxvd3MgQXByaW9yaSB0byBwcnVuZSBjYW5kaWRhdGVzIGVmZmljaWVudGx5LgoKKipFeGFtcGxlOioqCi0gRm9yIHRoZSBkYXRhc2V0OgogIC0gVDE6IHtCcmVhZCwgTWlsa30KICAtIFQyOiB7QnJlYWQsIERpYXBlciwgQmVlcn0KICAtIFQzOiB7TWlsaywgRGlhcGVyLCBCZWVyfQogIC0gVDQ6IHtCcmVhZCwgTWlsaywgRGlhcGVyfQogIC0gVDU6IHtCcmVhZCwgTWlsaywgQ29sYX0KLSBXaXRoIG1pbl9zdXBwb3J0ID0gMC42IChtdXN0IGFwcGVhciBpbiDiiaUzIG9mIDUgdHJhbnNhY3Rpb25zKToKICAtIDEtaXRlbXNldHM6IEJyZWFkICg0LzUpLCBNaWxrICg0LzUpLCBEaWFwZXIgKDMvNSkgYXJlIGZyZXF1ZW50CiAgLSAyLWl0ZW1zZXRzOiB7QnJlYWQsIE1pbGt9ICgzLzUpIGlzIGZyZXF1ZW50CgoqKk5vIGNoYXJ0cyByZXF1aXJlZDogdGhpcyB0YXNrIGlzIGFib3V0IGltcGxlbWVudGF0aW9uIGFuZCBzZXQgbG9naWMuKioKCi0tLQoKKipBcHBsaWNhdGlvbnM6KioKLSBNYXJrZXQgYmFza2V0IGFuYWx5c2lzCi0gRGlzY292ZXJpbmcgYXNzb2NpYXRpb25zIGluIG1lZGljYWwsIHdlYiwgb3IgdHJhbnNhY3Rpb25hbCBkYXRh",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/saitiger",
+      "name": "saitiger"
+    }
+  ],
+  "description_decoded": "Implement the Apriori algorithm to discover all frequent itemsets in a set of transactions, given a minimum support threshold. Your function should return all frequent itemsets (of any size) whose support is at least the given minimum. Return the frequent itemsets as a dictionary mapping frozenset of items to their support (fractional). Only use built-in Python and standard libraries (collections, itertools).",
+  "learn_section_decoded": "# **Apriori Algorithm for Frequent Itemset Mining**\n\nThe Apriori algorithm is a classic approach to discovering **frequent itemsets** for association rule mining in transactional data.\n\n---\n\n## **How Apriori Works**\n\n**Goal:**\n- Find all itemsets that appear in at least a given fraction (the *minimum support*) of transactions.\n\n**Algorithm steps:**\n1. Start by counting support for all single items (1-itemsets).\n2. Remove any that do not meet the min_support threshold.\n3. Iteratively:\n   - Use frequent k-itemsets to generate candidate (k+1)-itemsets.\n   - Count supports for these candidates.\n   - Remove those not meeting min_support.\n   - Repeat until no new frequent itemsets are found, or you reach max_length (if given).\n\n**Key Principle:**\n- **Anti-monotonicity:** If an itemset is infrequent, all supersets are also infrequent. This allows Apriori to prune candidates efficiently.\n\n**Example:**\n- For the dataset:\n  - T1: {Bread, Milk}\n  - T2: {Bread, Diaper, Beer}\n  - T3: {Milk, Diaper, Beer}\n  - T4: {Bread, Milk, Diaper}\n  - T5: {Bread, Milk, Cola}\n- With min_support = 0.6 (must appear in ≥3 of 5 transactions):\n  - 1-itemsets: Bread (4/5), Milk (4/5), Diaper (3/5) are frequent\n  - 2-itemsets: {Bread, Milk} (3/5) is frequent\n\n**No charts required: this task is about implementation and set logic.**\n\n---\n\n**Applications:**\n- Market basket analysis\n- Discovering associations in medical, web, or transactional data"
+}

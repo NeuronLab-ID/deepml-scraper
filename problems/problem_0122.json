@@ -1,0 +1,35 @@
+{
+  "description": "SW1wbGVtZW50IHRoZSBwb2xpY3kgZ3JhZGllbnQgZXN0aW1hdG9yIHVzaW5nIHRoZSBSRUlORk9SQ0UgYWxnb3JpdGhtLiBUaGUgcG9saWN5IGlzIHBhcmFtZXRlcml6ZWQgYnkgYSAyRCBOdW1QeSBhcnJheSBgdGhldGFgIG9mIHNoYXBlIGAobnVtX3N0YXRlcywgbnVtX2FjdGlvbnMpYC4gVGhlIHBvbGljeSBmb3IgZWFjaCBzdGF0ZSBpcyBjb21wdXRlZCB2aWEgc29mdG1heCBvdmVyIGB0aGV0YVtzLCA6XWAuIEdpdmVuIGEgbGlzdCBvZiBlcGlzb2RlcyAoZWFjaCBhIGxpc3Qgb2YgKHN0YXRlLCBhY3Rpb24sIHJld2FyZCkgdHVwbGVzKSwgY29tcHV0ZSB0aGUgYXZlcmFnZSBncmFkaWVudCBvZiB0aGUgbG9nLXBvbGljeSBtdWx0aXBsaWVkIGJ5IHRoZSByZXR1cm4gYXQgZWFjaCB0aW1lIHN0ZXAu",
+  "id": "122",
+  "test_cases": [
+    {
+      "test": "theta = np.zeros((2,2)); episodes = [[(0,1,0), (1,0,1)], [(0,0,0)]]; print(np.round(compute_policy_gradient(theta, episodes), 4))",
+      "expected_output": "[[-0.25  0.25]\n [ 0.25 -0.25]]"
+    },
+    {
+      "test": "theta = np.zeros((2,2)); episodes = [[(0,0,0)], [(0,1,0), (1,1,0)]]; print(np.round(compute_policy_gradient(theta, episodes), 4))",
+      "expected_output": "[[0. 0.]\n [0. 0.]]"
+    }
+  ],
+  "difficulty": "hard",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "theta = np.zeros((2,2)); episodes = [[(0,1,0), (1,0,1)], [(0,0,0)]]",
+    "output": "[[-0.25, 0.25], [0.25, -0.25]]",
+    "reasoning": "Episode 1 contributes a positive gradient from reward 1 at t=1; episode 2 adds zero. Result is averaged across episodes."
+  },
+  "category": "Reinforcement Learning",
+  "starter_code": "import numpy as np\n\ndef compute_policy_gradient(theta: np.ndarray, episodes: list[list[tuple[int, int, float]]]) -> np.ndarray:\n    \"\"\"\n    Estimate the policy gradient using REINFORCE.\n\n    Args:\n        theta: (num_states x num_actions) policy parameters.\n        episodes: List of episodes, where each episode is a list of (state, action, reward).\n\n    Returns:\n        Average policy gradient (same shape as theta).\n    \"\"\"\n    # Your code here\n    pass",
+  "title": "Policy Gradient with REINFORCE",
+  "learn_section": "IyMgUkVJTkZPUkNFIGFuZCBQb2xpY3kgR3JhZGllbnQgRXN0aW1hdGlvbgoKVGhlIFJFSU5GT1JDRSBhbGdvcml0aG0gY29tcHV0ZXMgZ3JhZGllbnRzIG9mIHRoZSBleHBlY3RlZCByZXR1cm4gd2l0aCByZXNwZWN0IHRvIHBvbGljeSBwYXJhbWV0ZXJzIHVzaW5nIE1vbnRlIENhcmxvIHNhbXBsZXMgb2YgZXBpc29kZXMuCgojIyMgU29mdG1heCBQb2xpY3kKR2l2ZW4gJFx0aGV0YSQgd2l0aCBzaGFwZSAobnVtX3N0YXRlcywgbnVtX2FjdGlvbnMpLCB3ZSBkZWZpbmUgdGhlIHByb2JhYmlsaXR5IG9mIGFjdGlvbiAkYSQgaW4gc3RhdGUgJHMkIGFzOgoKJCQKXHBpKGEgXG1pZCBzOyBcdGhldGEpID0gXGZyYWN7XGV4cChcdGhldGFbcywgYV0pfXtcc3VtX3thJ30gXGV4cChcdGhldGFbcywgYSddKX0KJCQKCiMjIyBSRUlORk9SQ0UgR3JhZGllbnQKRm9yIGFuIGVwaXNvZGUgd2l0aCB0cmFuc2l0aW9ucyAkKHNfdCwgYV90LCByX3QpJCBhbmQgcmV0dXJucyAkR190ID0gXHN1bV97az10fV5UIHJfayQ6CgokJApcbmFibGFfXHRoZXRhIEooXHRoZXRhKSBcYXBwcm94IFxzdW1fdCBcbmFibGFfXHRoZXRhIFxsb2cgXHBpKGFfdCBcbWlkIHNfdCkgXGNkb3QgR190CiQkCgojIyMgTG9nLVBvbGljeSBHcmFkaWVudApUbyBjb21wdXRlICRcbmFibGFfXHRoZXRhIFxsb2cgXHBpKGFfdCBcbWlkIHNfdCkkOgoKLSBGb3IgJFx0aGV0YVtzX3QsIGFfdF0kOiAkMSAtIFxwaShhX3QgXG1pZCBzX3QpJAotIEZvciAkXHRoZXRhW3NfdCwgYSddJCwgd2hlcmUgJGEnIFxuZXEgYV90JDogJC1ccGkoYScgXG1pZCBzX3QpJAotIEFsbCBvdGhlciBlbnRyaWVzOiAwCgojIyMgRmluYWwgRXN0aW1hdGUKRm9yIG11bHRpcGxlIGVwaXNvZGVzOgoKJCQKXGhhdHtcbmFibGF9X1x0aGV0YSBKKFx0aGV0YSkgPSBcZnJhY3sxfXtOfSBcc3VtX3tpPTF9Xk4gXHN1bV97dD0wfV57VF9pfSBcbmFibGFfXHRoZXRhIFxsb2cgXHBpKGFfdF5pIFxtaWQgc190XmkpIFxjZG90IEdfdF5pCiQkCgpUaGlzIGFsZ29yaXRobSB3b3JrcyBldmVuIHdpdGhvdXQgdmFsdWUgZnVuY3Rpb24gZXN0aW1hdGlvbiwgbWFraW5nIGl0IGEgZm91bmRhdGlvbmFsIG1ldGhvZCBpbiBwb2xpY3ktYmFzZWQgcmVpbmZvcmNlbWVudCBsZWFybmluZy4K",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/moe18",
+      "name": "Moe Chabot"
+    }
+  ],
+  "description_decoded": "Implement the policy gradient estimator using the REINFORCE algorithm. The policy is parameterized by a 2D NumPy array `theta` of shape `(num_states, num_actions)`. The policy for each state is computed via softmax over `theta[s, :]`. Given a list of episodes (each a list of (state, action, reward) tuples), compute the average gradient of the log-policy multiplied by the return at each time step.",
+  "learn_section_decoded": "## REINFORCE and Policy Gradient Estimation\n\nThe REINFORCE algorithm computes gradients of the expected return with respect to policy parameters using Monte Carlo samples of episodes.\n\n### Softmax Policy\nGiven $\\theta$ with shape (num_states, num_actions), we define the probability of action $a$ in state $s$ as:\n\n$$\n\\pi(a \\mid s; \\theta) = \\frac{\\exp(\\theta[s, a])}{\\sum_{a'} \\exp(\\theta[s, a'])}\n$$\n\n### REINFORCE Gradient\nFor an episode with transitions $(s_t, a_t, r_t)$ and returns $G_t = \\sum_{k=t}^T r_k$:\n\n$$\n\\nabla_\\theta J(\\theta) \\approx \\sum_t \\nabla_\\theta \\log \\pi(a_t \\mid s_t) \\cdot G_t\n$$\n\n### Log-Policy Gradient\nTo compute $\\nabla_\\theta \\log \\pi(a_t \\mid s_t)$:\n\n- For $\\theta[s_t, a_t]$: $1 - \\pi(a_t \\mid s_t)$\n- For $\\theta[s_t, a']$, where $a' \\neq a_t$: $-\\pi(a' \\mid s_t)$\n- All other entries: 0\n\n### Final Estimate\nFor multiple episodes:\n\n$$\n\\hat{\\nabla}_\\theta J(\\theta) = \\frac{1}{N} \\sum_{i=1}^N \\sum_{t=0}^{T_i} \\nabla_\\theta \\log \\pi(a_t^i \\mid s_t^i) \\cdot G_t^i\n$$\n\nThis algorithm works even without value function estimation, making it a foundational method in policy-based reinforcement learning.\n"
+}

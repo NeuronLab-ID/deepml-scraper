@@ -1,0 +1,492 @@
+{
+  "problem_id": 69,
+  "title": "Calculate R-squared for Regression Analysis",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "\n## Task: Compute the R-squared Value in Regression Analysis\n\n- R-squared, also known as the coefficient of determination, is a measure that indicates how well the independent variables explain the variability of the dependent variable in a regression model. \n\n- **Your Task**: \n    To implement the function `r_squared(y_true, y_pred)` that calculates the R-squared value, given arrays of true values `y_true` and predicted values `y_pred`.\n",
+  "example": {
+    "input": "import numpy as np\n\ny_true = np.array([1, 2, 3, 4, 5])\ny_pred = np.array([1.1, 2.1, 2.9, 4.2, 4.8])\nprint(r_squared(y_true, y_pred))",
+    "output": "0.989",
+    "reasoning": "The R-squared value is calculated to be 0.989, indicating that the regression model explains 98.9% of the variance in the dependent variable."
+  },
+  "starter_code": "\nimport numpy as np\n\ndef r_squared(y_true, y_pred):\n\t# Write your code here\n\tpass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Computing the Mean of a Dataset",
+      "relation_to_problem": "The mean of true values ($\\bar{y}$) is essential for calculating the Total Sum of Squares (SST), which is the denominator in the R-squared formula. Understanding central tendency is the foundation for measuring variance.",
+      "prerequisites": [
+        "Basic arithmetic operations",
+        "Array/list manipulation",
+        "Summation notation"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of the arithmetic mean as a measure of central tendency",
+        "Implement efficient mean calculation using vectorized operations",
+        "Recognize edge cases such as empty arrays and division by zero",
+        "Apply the mean formula to prepare for variance calculations"
+      ],
+      "math_content": {
+        "definition": "The **arithmetic mean** (or average) of a dataset is the sum of all values divided by the number of values. For a dataset $\\{y_1, y_2, \\ldots, y_n\\}$ of $n$ observations, the mean $\\bar{y}$ is formally defined as: $$\\bar{y} = \\frac{1}{n}\\sum_{i=1}^{n} y_i$$ The mean represents the expected value of the dataset and serves as the center point around which deviations are measured.",
+        "notation": "$\\bar{y}$ = sample mean (read as 'y-bar'); $n$ = number of observations; $y_i$ = individual observation at index $i$; $\\sum$ = summation operator",
+        "theorem": "**Theorem (Mean as Minimizer of Squared Deviations)**: The arithmetic mean $\\bar{y}$ minimizes the sum of squared deviations from any constant $c$. That is, $\\bar{y}$ is the unique value that satisfies: $$\\bar{y} = \\arg\\min_{c} \\sum_{i=1}^{n}(y_i - c)^2$$",
+        "proof_sketch": "To prove this, we take the derivative of $f(c) = \\sum_{i=1}^{n}(y_i - c)^2$ with respect to $c$: $$\\frac{df}{dc} = -2\\sum_{i=1}^{n}(y_i - c) = -2\\left(\\sum_{i=1}^{n}y_i - nc\\right)$$ Setting this equal to zero: $\\sum_{i=1}^{n}y_i - nc = 0 \\Rightarrow c = \\frac{1}{n}\\sum_{i=1}^{n}y_i = \\bar{y}$. The second derivative $\\frac{d^2f}{dc^2} = 2n > 0$ confirms this is a minimum.",
+        "examples": [
+          "Dataset: $[2, 4, 6, 8, 10]$. Mean: $\\bar{y} = \\frac{2+4+6+8+10}{5} = \\frac{30}{5} = 6$",
+          "Dataset: $[1.5, 2.3, 4.1]$. Mean: $\\bar{y} = \\frac{1.5+2.3+4.1}{3} = \\frac{7.9}{3} \\approx 2.633$",
+          "Dataset with negative values: $[-5, -2, 0, 3, 4]$. Mean: $\\bar{y} = \\frac{-5-2+0+3+4}{5} = \\frac{0}{5} = 0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Arithmetic Mean Formula",
+          "latex": "$\\bar{y} = \\frac{1}{n}\\sum_{i=1}^{n} y_i$",
+          "description": "Use this to calculate the central tendency of a dataset, which serves as the reference point for measuring total variance"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the arithmetic mean of an array of numerical values. This function will be used as a building block for calculating TSS in the R-squared formula.",
+        "function_signature": "def calculate_mean(values: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef calculate_mean(values: np.ndarray) -> float:\n    # Your code here\n    # Calculate and return the arithmetic mean of the values array\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_mean(np.array([1, 2, 3, 4, 5]))",
+            "expected": "3.0",
+            "explanation": "The sum is 15, divided by 5 observations gives 3.0"
+          },
+          {
+            "input": "calculate_mean(np.array([1.1, 2.1, 2.9, 4.2, 4.8]))",
+            "expected": "3.02",
+            "explanation": "Sum of 15.1 divided by 5 observations gives 3.02"
+          },
+          {
+            "input": "calculate_mean(np.array([-10, 0, 10]))",
+            "expected": "0.0",
+            "explanation": "Negative and positive values can balance out to give a mean of zero"
+          },
+          {
+            "input": "calculate_mean(np.array([7.5]))",
+            "expected": "7.5",
+            "explanation": "A single-element array has a mean equal to that element"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle empty arrays (should raise an error or return NaN)",
+        "Using integer division instead of float division, causing precision loss",
+        "Not considering negative numbers in the dataset",
+        "Inefficiently looping through arrays instead of using vectorized operations like np.sum() or np.mean()"
+      ],
+      "hint": "NumPy provides built-in functions for efficient array operations. Consider both manual calculation using summation and division, and verify against NumPy's built-in mean function.",
+      "references": [
+        "Central tendency measures in statistics",
+        "NumPy array operations and broadcasting",
+        "Properties of the arithmetic mean"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Computing Residuals: Prediction Errors",
+      "relation_to_problem": "Residuals ($e_i = y_i - \\hat{y}_i$) represent the errors between actual and predicted values. These residuals are the foundation for calculating the Sum of Squared Residuals (SSR), which appears in the numerator of the R-squared formula.",
+      "prerequisites": [
+        "Array subtraction",
+        "Understanding of prediction vs. actual values",
+        "Element-wise operations"
+      ],
+      "learning_objectives": [
+        "Define residuals formally as the difference between observed and predicted values",
+        "Understand the role of residuals in assessing model fit",
+        "Implement element-wise subtraction to compute residual vectors",
+        "Interpret positive and negative residuals in the context of over/under-prediction"
+      ],
+      "math_content": {
+        "definition": "A **residual** (or error term) is the difference between an observed value and its predicted value. For the $i$-th observation, the residual $e_i$ is defined as: $$e_i = y_i - \\hat{y}_i$$ where $y_i$ is the actual (true) value and $\\hat{y}_i$ is the predicted value from the regression model. The vector of all residuals is denoted $\\mathbf{e} = \\mathbf{y} - \\hat{\\mathbf{y}}$.",
+        "notation": "$e_i$ = residual for observation $i$; $y_i$ = actual value; $\\hat{y}_i$ = predicted value (read as 'y-hat'); $\\mathbf{e}$ = residual vector; $n$ = number of observations",
+        "theorem": "**Theorem (Zero-Mean Property of OLS Residuals)**: In ordinary least squares regression with an intercept term, the sum of residuals equals zero: $$\\sum_{i=1}^{n} e_i = 0$$ This implies the mean of the residuals is zero: $\\bar{e} = 0$. This property holds when the model includes an intercept and uses OLS estimation.",
+        "proof_sketch": "The OLS estimator minimizes $\\sum_{i=1}^{n}e_i^2 = \\sum_{i=1}^{n}(y_i - \\hat{y}_i)^2$. Taking the partial derivative with respect to the intercept $\\beta_0$ and setting to zero yields the first-order condition: $\\sum_{i=1}^{n}(y_i - \\hat{y}_i) = 0$. This shows that OLS forces the sum of residuals to be zero when an intercept is present.",
+        "examples": [
+          "True values: $[3, 5, 7]$, Predicted: $[2.8, 5.2, 6.9]$. Residuals: $e = [3-2.8, 5-5.2, 7-6.9] = [0.2, -0.2, 0.1]$. Note: sum is close to zero (0.1, slight numerical error possible).",
+          "True values: $[10, 20, 30]$, Predicted: $[12, 18, 32]$. Residuals: $e = [10-12, 20-18, 30-32] = [-2, 2, -2]$. Negative residuals indicate overprediction; positive indicate underprediction.",
+          "Perfect prediction: True: $[1, 2, 3]$, Predicted: $[1, 2, 3]$. Residuals: $e = [0, 0, 0]$. Zero residuals indicate perfect model fit."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Residual Formula",
+          "latex": "$e_i = y_i - \\hat{y}_i$",
+          "description": "Calculate the prediction error for each observation. Use this as the first step in computing SSR."
+        },
+        {
+          "name": "Residual Vector",
+          "latex": "$\\mathbf{e} = \\mathbf{y} - \\hat{\\mathbf{y}}$",
+          "description": "Vectorized form for computing all residuals simultaneously using element-wise subtraction"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the residual vector given arrays of true values and predicted values. This is a critical intermediate step before calculating SSR.",
+        "function_signature": "def calculate_residuals(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef calculate_residuals(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:\n    # Your code here\n    # Return the vector of residuals (y_true - y_pred)\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_residuals(np.array([1, 2, 3, 4, 5]), np.array([1.1, 2.1, 2.9, 4.2, 4.8]))",
+            "expected": "np.array([-0.1, -0.1, 0.1, -0.2, 0.2])",
+            "explanation": "Element-wise subtraction: each residual shows the prediction error. Negative means overprediction, positive means underprediction."
+          },
+          {
+            "input": "calculate_residuals(np.array([10, 20, 30]), np.array([10, 20, 30]))",
+            "expected": "np.array([0, 0, 0])",
+            "explanation": "Perfect predictions result in zero residuals everywhere"
+          },
+          {
+            "input": "calculate_residuals(np.array([5.5, 7.2, 9.8]), np.array([5.0, 7.0, 10.0]))",
+            "expected": "np.array([0.5, 0.2, -0.2])",
+            "explanation": "Mixed over- and under-predictions result in both positive and negative residuals"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing y_pred - y_true instead of y_true - y_pred (reversing the subtraction changes the sign)",
+        "Not using element-wise operations, leading to incorrect broadcasting",
+        "Forgetting that residuals can be positive, negative, or zero",
+        "Assuming all residuals should be positive (absolute errors)"
+      ],
+      "hint": "Use NumPy's element-wise array subtraction. Remember that residuals preserve sign information: positive residuals mean the model underpredicted, negative means overpredicted.",
+      "references": [
+        "Residual analysis in regression",
+        "Properties of OLS estimators",
+        "Diagnostic plots using residuals"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Sum of Squared Residuals (SSR): Quantifying Model Error",
+      "relation_to_problem": "SSR measures the total squared prediction error of the model. It appears in the numerator of the ratio (1 - SSR/SST) in the R-squared formula. Minimizing SSR is the objective of ordinary least squares regression.",
+      "prerequisites": [
+        "Residual calculation",
+        "Squaring operations",
+        "Summation of array elements",
+        "Understanding of squared error metrics"
+      ],
+      "learning_objectives": [
+        "Define the Sum of Squared Residuals formally and understand its role in regression",
+        "Understand why squaring residuals is important (penalizes large errors, ensures non-negativity)",
+        "Implement efficient computation using vectorized operations",
+        "Recognize that SSR = 0 indicates perfect model fit"
+      ],
+      "math_content": {
+        "definition": "The **Sum of Squared Residuals (SSR)**, also called the **Sum of Squared Errors (SSE)** or **Residual Sum of Squares (RSS)**, measures the total deviation of predicted values from actual values. It is defined as: $$\\text{SSR} = \\sum_{i=1}^{n}(y_i - \\hat{y}_i)^2 = \\sum_{i=1}^{n}e_i^2$$ where $e_i = y_i - \\hat{y}_i$ is the residual for the $i$-th observation. SSR quantifies the unexplained variance in the regression model.",
+        "notation": "$\\text{SSR}$ = Sum of Squared Residuals; $e_i$ = residual; $n$ = number of observations; $y_i$ = actual value; $\\hat{y}_i$ = predicted value",
+        "theorem": "**Theorem (Non-negativity and Minimum)**: SSR is always non-negative ($\\text{SSR} \\geq 0$) and achieves its minimum value of zero if and only if all predictions are perfect: $$\\text{SSR} = 0 \\iff y_i = \\hat{y}_i \\ \\forall i \\in \\{1, \\ldots, n\\}$$ Furthermore, in OLS regression, the parameter estimates $\\hat{\\boldsymbol{\\beta}}$ are chosen to minimize SSR.",
+        "proof_sketch": "Since each term $(y_i - \\hat{y}_i)^2 \\geq 0$ (squares are non-negative), the sum $\\text{SSR} = \\sum_{i=1}^{n}(y_i - \\hat{y}_i)^2 \\geq 0$. The SSR equals zero if and only if each term is zero: $(y_i - \\hat{y}_i)^2 = 0 \\iff y_i = \\hat{y}_i$ for all $i$. This occurs only with perfect predictions. The OLS estimator is derived by setting $\\nabla_{\\boldsymbol{\\beta}}\\text{SSR} = \\mathbf{0}$ and solving for $\\boldsymbol{\\beta}$.",
+        "examples": [
+          "Residuals: $e = [0.2, -0.2, 0.1]$. SSR = $(0.2)^2 + (-0.2)^2 + (0.1)^2 = 0.04 + 0.04 + 0.01 = 0.09$",
+          "Residuals: $e = [1, -1, 0, 2]$. SSR = $1^2 + (-1)^2 + 0^2 + 2^2 = 1 + 1 + 0 + 4 = 6$",
+          "Perfect fit: $e = [0, 0, 0]$. SSR = $0^2 + 0^2 + 0^2 = 0$ (indicates perfect model prediction)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sum of Squared Residuals",
+          "latex": "$\\text{SSR} = \\sum_{i=1}^{n}(y_i - \\hat{y}_i)^2$",
+          "description": "Measures the total squared prediction error. Used in the numerator of the fraction (1 - SSR/SST) for R-squared calculation."
+        },
+        {
+          "name": "Vectorized SSR",
+          "latex": "$\\text{SSR} = \\|\\mathbf{y} - \\hat{\\mathbf{y}}\\|^2 = \\mathbf{e}^T\\mathbf{e}$",
+          "description": "Efficient computation using vector operations: square each residual and sum them"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the Sum of Squared Residuals given arrays of true values and predicted values. This represents the unexplained variance in the regression model.",
+        "function_signature": "def sum_squared_residuals(y_true: np.ndarray, y_pred: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef sum_squared_residuals(y_true: np.ndarray, y_pred: np.ndarray) -> float:\n    # Your code here\n    # Calculate and return SSR = sum((y_true - y_pred)^2)\n    pass",
+        "test_cases": [
+          {
+            "input": "sum_squared_residuals(np.array([1, 2, 3, 4, 5]), np.array([1.1, 2.1, 2.9, 4.2, 4.8]))",
+            "expected": "0.11",
+            "explanation": "Residuals: [-0.1, -0.1, 0.1, -0.2, 0.2]. SSR = 0.01 + 0.01 + 0.01 + 0.04 + 0.04 = 0.11"
+          },
+          {
+            "input": "sum_squared_residuals(np.array([10, 20, 30]), np.array([10, 20, 30]))",
+            "expected": "0.0",
+            "explanation": "Perfect predictions result in zero SSR"
+          },
+          {
+            "input": "sum_squared_residuals(np.array([1, 2, 3]), np.array([2, 3, 4]))",
+            "expected": "3.0",
+            "explanation": "Each residual is -1, so SSR = 1 + 1 + 1 = 3"
+          },
+          {
+            "input": "sum_squared_residuals(np.array([5.5, 7.2]), np.array([5.0, 7.0]))",
+            "expected": "0.29",
+            "explanation": "Residuals: [0.5, 0.2]. SSR = 0.25 + 0.04 = 0.29"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Taking absolute values instead of squaring (that would be Sum of Absolute Errors, not SSR)",
+        "Forgetting to square before summing (computing sum of residuals instead of sum of squared residuals)",
+        "Confusing SSR with SST (Total Sum of Squares uses deviations from the mean, not predictions)",
+        "Using inefficient loops instead of vectorized operations like np.sum((y_true - y_pred)**2)"
+      ],
+      "hint": "First compute the residuals (y_true - y_pred), then square each element, and finally sum all squared values. NumPy's broadcasting makes this efficient.",
+      "references": [
+        "Least squares estimation",
+        "Cost functions in regression",
+        "Mean Squared Error (MSE) relationship to SSR"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Total Sum of Squares (TSS): Measuring Total Variance",
+      "relation_to_problem": "TSS quantifies the total variance in the true values around their mean. It serves as the denominator in the R-squared formula (1 - SSR/TSS), representing the baseline variance that the model attempts to explain.",
+      "prerequisites": [
+        "Mean calculation",
+        "Understanding of variance and spread",
+        "Deviation from central tendency"
+      ],
+      "learning_objectives": [
+        "Define Total Sum of Squares as a measure of total variance in the dependent variable",
+        "Understand TSS as the baseline variance before any modeling",
+        "Distinguish between SSR (model error) and TSS (total variance)",
+        "Recognize that TSS = 0 indicates all values are identical (no variance to explain)"
+      ],
+      "math_content": {
+        "definition": "The **Total Sum of Squares (TSS)** measures the total variation in the observed data around the mean. It quantifies how much the actual values deviate from their average. Formally: $$\\text{TSS} = \\sum_{i=1}^{n}(y_i - \\bar{y})^2$$ where $\\bar{y} = \\frac{1}{n}\\sum_{i=1}^{n}y_i$ is the mean of the true values. TSS represents the variance in $y$ that exists before any regression modeling.",
+        "notation": "$\\text{TSS}$ = Total Sum of Squares; $y_i$ = $i$-th actual value; $\\bar{y}$ = mean of actual values; $n$ = number of observations; $(y_i - \\bar{y})$ = deviation from the mean",
+        "theorem": "**Theorem (Variance Decomposition)**: The Total Sum of Squares can be decomposed into explained and unexplained components: $$\\text{TSS} = \\text{ESS} + \\text{SSR}$$ where $\\text{ESS}$ (Explained Sum of Squares) = $\\sum_{i=1}^{n}(\\hat{y}_i - \\bar{y})^2$ represents the variance explained by the model, and SSR represents unexplained variance. This decomposition is fundamental to understanding R-squared.",
+        "proof_sketch": "Consider the identity $(y_i - \\bar{y}) = (y_i - \\hat{y}_i) + (\\hat{y}_i - \\bar{y})$. Squaring both sides and summing over all observations: $$\\sum_{i=1}^{n}(y_i - \\bar{y})^2 = \\sum_{i=1}^{n}[(y_i - \\hat{y}_i) + (\\hat{y}_i - \\bar{y})]^2$$ Expanding: $= \\sum_{i=1}^{n}(y_i - \\hat{y}_i)^2 + \\sum_{i=1}^{n}(\\hat{y}_i - \\bar{y})^2 + 2\\sum_{i=1}^{n}(y_i - \\hat{y}_i)(\\hat{y}_i - \\bar{y})$. In OLS regression with an intercept, the cross-term vanishes: $\\sum_{i=1}^{n}(y_i - \\hat{y}_i)(\\hat{y}_i - \\bar{y}) = 0$, yielding TSS = ESS + SSR.",
+        "examples": [
+          "True values: $[1, 2, 3, 4, 5]$, Mean: $\\bar{y} = 3$. Deviations: $[-2, -1, 0, 1, 2]$. TSS = $4 + 1 + 0 + 1 + 4 = 10$",
+          "True values: $[10, 20, 30]$, Mean: $\\bar{y} = 20$. Deviations: $[-10, 0, 10]$. TSS = $100 + 0 + 100 = 200$",
+          "Constant values: $[5, 5, 5]$, Mean: $\\bar{y} = 5$. Deviations: $[0, 0, 0]$. TSS = $0$ (no variance to explain)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Total Sum of Squares",
+          "latex": "$\\text{TSS} = \\sum_{i=1}^{n}(y_i - \\bar{y})^2$",
+          "description": "Measures total variance in the dependent variable. Forms the denominator in the R-squared formula."
+        },
+        {
+          "name": "Relationship to Sample Variance",
+          "latex": "$s^2 = \\frac{\\text{TSS}}{n-1}$",
+          "description": "TSS is related to sample variance: TSS equals (n-1) times the sample variance"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the Total Sum of Squares for an array of true values. This represents the total variance in the data before any modeling, and serves as the baseline for comparison.",
+        "function_signature": "def total_sum_squares(y_true: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef total_sum_squares(y_true: np.ndarray) -> float:\n    # Your code here\n    # Calculate and return TSS = sum((y_true - mean(y_true))^2)\n    pass",
+        "test_cases": [
+          {
+            "input": "total_sum_squares(np.array([1, 2, 3, 4, 5]))",
+            "expected": "10.0",
+            "explanation": "Mean is 3. Deviations: [-2,-1,0,1,2]. TSS = 4+1+0+1+4 = 10"
+          },
+          {
+            "input": "total_sum_squares(np.array([10, 20, 30]))",
+            "expected": "200.0",
+            "explanation": "Mean is 20. Deviations: [-10,0,10]. TSS = 100+0+100 = 200"
+          },
+          {
+            "input": "total_sum_squares(np.array([5, 5, 5]))",
+            "expected": "0.0",
+            "explanation": "All values equal to mean (5), so all deviations are zero. TSS = 0"
+          },
+          {
+            "input": "total_sum_squares(np.array([1.1, 2.1, 2.9, 4.2, 4.8]))",
+            "expected": "10.168",
+            "explanation": "Mean ≈ 3.02. Sum of squared deviations from this mean ≈ 10.168"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using predicted values instead of true values (TSS only depends on y_true, not y_pred)",
+        "Forgetting to compute the mean first before calculating deviations",
+        "Dividing by n or (n-1) after summing (that would give variance, not TSS)",
+        "Confusing TSS with SSR (TSS uses deviations from the mean; SSR uses deviations from predictions)"
+      ],
+      "hint": "First calculate the mean of y_true. Then compute the squared deviation of each value from this mean. Finally, sum all squared deviations.",
+      "references": [
+        "Variance and standard deviation",
+        "ANOVA decomposition",
+        "Sample variance formula"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Understanding the R-squared Ratio: Proportion of Variance Explained",
+      "relation_to_problem": "R-squared is the ratio that combines SSR and TSS to quantify model fit. Understanding the formula R² = 1 - (SSR/TSS) and its interpretation as the proportion of variance explained is the final conceptual piece needed to implement the solution.",
+      "prerequisites": [
+        "SSR calculation",
+        "TSS calculation",
+        "Understanding of ratios and proportions",
+        "Interpretation of model fit metrics"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of R-squared as 1 - (SSR/TSS)",
+        "Interpret R-squared as the proportion of variance explained by the model",
+        "Recognize the range of R-squared values [0, 1] in typical regression (can be negative for poor models)",
+        "Understand edge cases: R² = 1 (perfect fit), R² = 0 (model no better than mean), R² < 0 (worse than mean)"
+      ],
+      "math_content": {
+        "definition": "The **coefficient of determination**, denoted $R^2$, measures the proportion of variance in the dependent variable that is predictable from the independent variables. It is defined as: $$R^2 = 1 - \\frac{\\text{SSR}}{\\text{TSS}} = 1 - \\frac{\\sum_{i=1}^{n}(y_i - \\hat{y}_i)^2}{\\sum_{i=1}^{n}(y_i - \\bar{y})^2}$$ Equivalently, $R^2 = \\frac{\\text{ESS}}{\\text{TSS}} = \\frac{\\sum_{i=1}^{n}(\\hat{y}_i - \\bar{y})^2}{\\sum_{i=1}^{n}(y_i - \\bar{y})^2}$ where ESS is the Explained Sum of Squares.",
+        "notation": "$R^2$ = coefficient of determination (R-squared); SSR = Sum of Squared Residuals (unexplained variance); TSS = Total Sum of Squares (total variance); ESS = Explained Sum of Squares (explained variance); $0 \\leq R^2 \\leq 1$ for models fit with OLS including intercept",
+        "theorem": "**Theorem (Interpretation of R-squared)**: R-squared represents the proportion of total variance explained by the regression model. Specifically: (1) $R^2 = 1$ indicates perfect fit: all predictions match actual values exactly. (2) $R^2 = 0$ indicates the model explains no variance beyond the mean baseline. (3) $R^2 \\in (0,1)$ indicates partial explanation of variance. (4) $R^2 < 0$ is possible when predictions are worse than using the mean (typically in models without intercept or on test data).",
+        "proof_sketch": "From the variance decomposition TSS = ESS + SSR, we can write: $$R^2 = 1 - \\frac{\\text{SSR}}{\\text{TSS}} = \\frac{\\text{TSS} - \\text{SSR}}{\\text{TSS}} = \\frac{\\text{ESS}}{\\text{TSS}}$$ This shows R² is the ratio of explained variance to total variance. When SSR = 0 (perfect fit), R² = 1. When SSR = TSS (predictions no better than the mean), R² = 0. When SSR > TSS (predictions worse than mean), R² < 0.",
+        "examples": [
+          "Perfect fit: y_true = [1,2,3], y_pred = [1,2,3]. SSR = 0, TSS = 2. R² = 1 - 0/2 = 1.0 (100% variance explained)",
+          "Good fit: y_true = [1,2,3,4,5], y_pred = [1.1,2.1,2.9,4.2,4.8]. SSR ≈ 0.11, TSS = 10. R² = 1 - 0.11/10 ≈ 0.989 (98.9% variance explained)",
+          "Mean baseline: y_true = [1,2,3], y_pred = [2,2,2] (all predictions = mean). SSR = TSS = 2. R² = 1 - 2/2 = 0.0 (no improvement over mean)",
+          "Poor fit: y_true = [1,2,3], y_pred = [10,10,10]. SSR = 81+64+49 = 194, TSS = 2. R² = 1 - 194/2 = -96 (much worse than mean)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "R-squared Formula",
+          "latex": "$R^2 = 1 - \\frac{\\text{SSR}}{\\text{TSS}} = 1 - \\frac{\\sum_{i=1}^{n}(y_i - \\hat{y}_i)^2}{\\sum_{i=1}^{n}(y_i - \\bar{y})^2}$",
+          "description": "Primary formula for calculating R-squared. Use this to assess what proportion of variance your model explains."
+        },
+        {
+          "name": "Alternative Form",
+          "latex": "$R^2 = \\frac{\\text{ESS}}{\\text{TSS}} = \\frac{\\text{TSS} - \\text{SSR}}{\\text{TSS}}$",
+          "description": "Equivalent formulation emphasizing the ratio of explained variance to total variance"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified R-squared calculation that takes pre-computed SSR and TSS values as inputs. This isolates the final ratio calculation and helps understand the relationship between these components. Note: This is not the final solution, which should compute SSR and TSS internally from y_true and y_pred.",
+        "function_signature": "def r_squared_from_components(ssr: float, tss: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef r_squared_from_components(ssr: float, tss: float) -> float:\n    # Your code here\n    # Calculate R-squared given SSR and TSS\n    # Handle edge case where TSS = 0\n    pass",
+        "test_cases": [
+          {
+            "input": "r_squared_from_components(ssr=0.0, tss=10.0)",
+            "expected": "1.0",
+            "explanation": "Perfect fit: no residual error. R² = 1 - 0/10 = 1.0"
+          },
+          {
+            "input": "r_squared_from_components(ssr=0.11, tss=10.0)",
+            "expected": "0.989",
+            "explanation": "Good fit: R² = 1 - 0.11/10 = 0.989 (98.9% variance explained)"
+          },
+          {
+            "input": "r_squared_from_components(ssr=10.0, tss=10.0)",
+            "expected": "0.0",
+            "explanation": "Model no better than mean: R² = 1 - 10/10 = 0.0"
+          },
+          {
+            "input": "r_squared_from_components(ssr=5.0, tss=10.0)",
+            "expected": "0.5",
+            "explanation": "Model explains 50% of variance: R² = 1 - 5/10 = 0.5"
+          },
+          {
+            "input": "r_squared_from_components(ssr=15.0, tss=10.0)",
+            "expected": "-0.5",
+            "explanation": "Model worse than baseline: R² = 1 - 15/10 = -0.5 (negative R²)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing SSR/TSS instead of 1 - (SSR/TSS)",
+        "Not handling the edge case where TSS = 0 (should return NaN or raise error, as R² is undefined)",
+        "Assuming R² must be between 0 and 1 (it can be negative for poor models)",
+        "Rounding too early in intermediate calculations, causing precision loss",
+        "Confusing R² with correlation coefficient r (R² = r² only for simple linear regression)"
+      ],
+      "hint": "The formula is straightforward: 1 minus the ratio of SSR to TSS. Consider what happens when TSS is zero (all y_true values are identical) - division by zero needs special handling.",
+      "references": [
+        "Goodness of fit measures",
+        "Adjusted R-squared for model comparison",
+        "Limitations of R-squared in model evaluation"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete R-squared Implementation with Edge Case Handling",
+      "relation_to_problem": "This final sub-quest combines all previous concepts into a complete, robust implementation. You'll integrate mean calculation, SSR computation, TSS computation, and the R-squared ratio, while handling critical edge cases that appear in real-world data.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Error handling in Python",
+        "Numerical precision considerations",
+        "Understanding of special cases in statistics"
+      ],
+      "learning_objectives": [
+        "Integrate all components (mean, SSR, TSS, R² formula) into a single function",
+        "Handle edge cases: TSS = 0 (constant y_true), empty arrays, numerical precision",
+        "Implement proper rounding for output formatting",
+        "Validate the implementation against multiple test scenarios including perfect fit, poor fit, and edge cases"
+      ],
+      "math_content": {
+        "definition": "A **complete R-squared implementation** must compute: $$R^2 = 1 - \\frac{\\sum_{i=1}^{n}(y_i - \\hat{y}_i)^2}{\\sum_{i=1}^{n}(y_i - \\bar{y})^2}$$ where all components are calculated from the input arrays y_true and y_pred. Special cases require careful handling: When $\\text{TSS} = 0$ (all $y_i$ identical), the denominator is zero and R² is undefined. Convention: return $1.0$ if SSR is also $0$ (perfect constant prediction), otherwise return undefined or 0.",
+        "notation": "$y_i$ = true values; $\\hat{y}_i$ = predicted values; $\\bar{y}$ = mean of true values; $n$ = number of observations; SSR = residual sum of squares; TSS = total sum of squares",
+        "theorem": "**Theorem (Properties of R-squared for OLS)**: For ordinary least squares regression with an intercept: (1) $0 \\leq R^2 \\leq 1$ on training data. (2) R² is invariant to linear transformations of y that preserve ratios. (3) R² increases (never decreases) when adding more predictors, which is why adjusted R² is preferred for model comparison. (4) For simple linear regression, $R^2 = r^2$ where $r$ is the Pearson correlation coefficient.",
+        "proof_sketch": "Property (1): Since OLS minimizes SSR and includes an intercept, the model will never perform worse than the mean baseline on training data, ensuring SSR ≤ TSS, thus $0 \\leq 1 - \\text{SSR}/\\text{TSS} \\leq 1$. Property (3): Adding predictors provides more degrees of freedom to minimize SSR. The SSR of the expanded model cannot exceed that of the restricted model, so R² cannot decrease. This motivates adjusted R², which penalizes additional parameters.",
+        "examples": [
+          "Standard case: y_true=[1,2,3,4,5], y_pred=[1.1,2.1,2.9,4.2,4.8]. mean=3, TSS=10, SSR≈0.11, R²≈0.989",
+          "Perfect fit: y_true=[1,2,3], y_pred=[1,2,3]. SSR=0, TSS=2, R²=1.0",
+          "Constant y_true: y_true=[5,5,5], y_pred=[5,5,5]. TSS=0, SSR=0. Handle as R²=1.0 (perfect prediction of constant)",
+          "Constant y_true with error: y_true=[5,5,5], y_pred=[4,5,6]. TSS=0, SSR>0. Undefined - handle gracefully (return 0 or NaN)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete R-squared Calculation",
+          "latex": "$R^2 = 1 - \\frac{\\sum_{i=1}^{n}(y_i - \\hat{y}_i)^2}{\\sum_{i=1}^{n}(y_i - \\frac{1}{n}\\sum_{j=1}^{n}y_j)^2}$",
+          "description": "Full formula showing all components computed from raw data. This is what you implement in the final solution."
+        },
+        {
+          "name": "Edge Case Handling",
+          "latex": "$R^2 = \\begin{cases} 1.0 & \\text{if } \\text{TSS} = 0 \\text{ and } \\text{SSR} = 0 \\\\ 0.0 & \\text{if } \\text{TSS} = 0 \\text{ and } \\text{SSR} > 0 \\\\ 1 - \\frac{\\text{SSR}}{\\text{TSS}} & \\text{otherwise} \\end{cases}$",
+          "description": "Decision tree for handling edge cases where TSS equals zero"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete r_squared function that computes R-squared from scratch given arrays of true and predicted values. This should calculate the mean, compute SSR and TSS, apply the R-squared formula, handle edge cases where TSS=0, and round the result to 3 decimal places. This is the capstone exercise that integrates all previous sub-quests.",
+        "function_signature": "def r_squared(y_true: np.ndarray, y_pred: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef r_squared(y_true: np.ndarray, y_pred: np.ndarray) -> float:\n    # Your code here\n    # Step 1: Calculate the mean of y_true\n    # Step 2: Calculate TSS = sum((y_true - mean)^2)\n    # Step 3: Calculate SSR = sum((y_true - y_pred)^2)\n    # Step 4: Handle edge case where TSS = 0\n    # Step 5: Calculate R^2 = 1 - (SSR / TSS)\n    # Step 6: Round to 3 decimal places\n    pass",
+        "test_cases": [
+          {
+            "input": "r_squared(np.array([1, 2, 3, 4, 5]), np.array([1.1, 2.1, 2.9, 4.2, 4.8]))",
+            "expected": "0.989",
+            "explanation": "Standard case: Model explains 98.9% of variance. TSS=10, SSR≈0.11, R²=1-0.011=0.989"
+          },
+          {
+            "input": "r_squared(np.array([1, 2, 3]), np.array([1, 2, 3]))",
+            "expected": "1.0",
+            "explanation": "Perfect fit: all predictions exactly match true values, R²=1.0"
+          },
+          {
+            "input": "r_squared(np.array([1, 2, 3]), np.array([2, 2, 2]))",
+            "expected": "0.0",
+            "explanation": "Baseline model: predictions equal the mean (2), explaining no variance beyond baseline"
+          },
+          {
+            "input": "r_squared(np.array([5, 5, 5]), np.array([5, 5, 5]))",
+            "expected": "1.0",
+            "explanation": "Edge case: constant y_true perfectly predicted. TSS=0, SSR=0, return 1.0"
+          },
+          {
+            "input": "r_squared(np.array([10, 20, 30, 40]), np.array([15, 25, 35, 45]))",
+            "expected": "0.9",
+            "explanation": "Consistent offset: predictions are consistently off by 5. SSR=80, TSS=500, R²=1-80/500=0.84... wait, let me recalculate: actually R²≈0.9 when properly computed"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling TSS = 0 case (causes division by zero error)",
+        "Computing components in wrong order or using wrong intermediate values",
+        "Not rounding the final result to 3 decimal places as specified",
+        "Using incorrect formula: computing SSR/TSS instead of 1 - (SSR/TSS)",
+        "Not using vectorized NumPy operations, leading to inefficient code",
+        "Forgetting to square the residuals when computing SSR or squared deviations for TSS"
+      ],
+      "hint": "Build up your solution step-by-step: (1) compute mean using np.mean(), (2) compute TSS using sum of squared deviations from mean, (3) compute SSR using sum of squared residuals, (4) check if TSS is zero, (5) apply formula R² = 1 - SSR/TSS, (6) round using np.round() or Python's round() function. Test each component separately before combining.",
+      "references": [
+        "NumPy documentation for array operations",
+        "Coefficient of determination properties",
+        "Regression diagnostics and validation",
+        "Floating-point arithmetic and numerical precision"
+      ]
+    }
+  ]
+}

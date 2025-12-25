@@ -1,0 +1,530 @@
+{
+  "problem_id": 75,
+  "title": "Generate a Confusion Matrix for Binary Classification",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "\n## Task: Generate a Confusion Matrix\n\nYour task is to implement the function `confusion_matrix(data)` that generates a confusion matrix for a binary classification problem. The confusion matrix provides a summary of the prediction results on a classification problem, allowing you to visualize how many data points were correctly or incorrectly labeled.\n\n### Input:\n- A list of lists, where each inner list represents a pair \n- `[y_true, y_pred]` for one observation. `y_true` is the actual label, and `y_pred` is the predicted label.\n\n### Output:\n- A $2 \\times 2$ confusion matrix represented as a list of lists.\n",
+  "example": {
+    "input": "data = [[1, 1], [1, 0], [0, 1], [0, 0], [0, 1]]\nprint(confusion_matrix(data))",
+    "output": "[[1, 1], [2, 1]]",
+    "reasoning": "The confusion matrix shows the counts of true positives, false negatives, false positives, and true negatives."
+  },
+  "starter_code": "\nfrom collections import Counter\n\ndef confusion_matrix(data):\n\t# Implement the function here\n\tpass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Binary Classification Fundamentals: True and Predicted Labels",
+      "relation_to_problem": "Understanding the structure of binary classification data is fundamental to constructing a confusion matrix, which organizes predictions and actual labels into a 2×2 table.",
+      "prerequisites": [
+        "Basic Python lists",
+        "Boolean logic",
+        "Binary number system"
+      ],
+      "learning_objectives": [
+        "Define binary classification formally using set theory notation",
+        "Distinguish between actual labels (ground truth) and predicted labels",
+        "Parse and validate binary classification data structures",
+        "Implement basic label comparison logic"
+      ],
+      "math_content": {
+        "definition": "**Binary Classification:** A classification task where each observation $x_i$ must be assigned to exactly one of two mutually exclusive classes. Formally, given a sample space $\\mathcal{X}$ and a label space $\\mathcal{Y} = \\{0, 1\\}$ (or equivalently $\\{-1, +1\\}$ or $\\{\\text{negative}, \\text{positive}\\}$), a binary classifier is a function $f: \\mathcal{X} \\rightarrow \\mathcal{Y}$. For $n$ observations, we have:\n- True labels: $\\mathbf{y}_{\\text{true}} = (y_1, y_2, \\ldots, y_n)$ where $y_i \\in \\{0, 1\\}$\n- Predicted labels: $\\mathbf{y}_{\\text{pred}} = (\\hat{y}_1, \\hat{y}_2, \\ldots, \\hat{y}_n)$ where $\\hat{y}_i \\in \\{0, 1\\}$\n- Each observation forms a pair: $(y_i, \\hat{y}_i)$ representing (actual, predicted)",
+        "notation": "$y_i$ = actual label for observation $i$; $\\hat{y}_i$ = predicted label for observation $i$; $n$ = total number of observations; $\\mathcal{Y} = \\{0, 1\\}$ = label space",
+        "theorem": "**Label Pairing Theorem:** For any binary classification problem with $n$ observations, there exist exactly $n$ label pairs $(y_i, \\hat{y}_i)$ where $i \\in \\{1, 2, \\ldots, n\\}$. Each pair can be categorized into exactly one of four outcome types based on the Cartesian product $\\mathcal{Y} \\times \\mathcal{Y} = \\{(0,0), (0,1), (1,0), (1,1)\\}$.",
+        "proof_sketch": "Since each $y_i$ and $\\hat{y}_i$ are elements of $\\{0, 1\\}$, their pair $(y_i, \\hat{y}_i)$ must be an element of $\\{0, 1\\} \\times \\{0, 1\\} = \\{(0,0), (0,1), (1,0), (1,1)\\}$. By the definition of Cartesian product, these four pairs are exhaustive and mutually exclusive. Therefore, every observation falls into exactly one category.",
+        "examples": [
+          "**Example 1:** Single observation: $(y_1, \\hat{y}_1) = (1, 1)$ means the actual label was positive (1) and the model correctly predicted positive (1).",
+          "**Example 2:** Dataset $\\{(1, 1), (1, 0), (0, 1), (0, 0)\\}$ contains all four possible outcome types. The pair $(1, 0)$ indicates actual=1, predicted=0.",
+          "**Example 3:** For medical diagnosis where 1=disease, 0=healthy: pair $(0, 1)$ means a healthy patient was incorrectly diagnosed with disease (false alarm)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Label Pair Structure",
+          "latex": "$(y_i, \\hat{y}_i) \\in \\{0, 1\\} \\times \\{0, 1\\}$",
+          "description": "Each observation forms an ordered pair of (actual, predicted) labels"
+        },
+        {
+          "name": "Total Observations",
+          "latex": "$n = |\\{(y_1, \\hat{y}_1), (y_2, \\hat{y}_2), \\ldots, (y_n, \\hat{y}_n)\\}|$",
+          "description": "The cardinality of the set of all label pairs equals the number of observations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that validates and extracts label pairs from binary classification data. The function should parse a list of [actual, predicted] pairs, verify all labels are binary (0 or 1), and return the total count of observations along with separate lists of actual and predicted labels.",
+        "function_signature": "def extract_labels(data: list) -> tuple:",
+        "starter_code": "def extract_labels(data):\n    \"\"\"\n    Extract and validate binary classification labels.\n    \n    Args:\n        data: List of [y_true, y_pred] pairs\n    \n    Returns:\n        tuple: (n, y_true_list, y_pred_list) where n is the count\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "extract_labels([[1, 1], [0, 0], [1, 0]])",
+            "expected": "(3, [1, 0, 1], [1, 0, 0])",
+            "explanation": "Three observations: actual labels are [1,0,1], predicted labels are [1,0,0]"
+          },
+          {
+            "input": "extract_labels([[0, 1]])",
+            "expected": "(1, [0], [1])",
+            "explanation": "Single observation with actual=0, predicted=1"
+          },
+          {
+            "input": "extract_labels([[1, 1], [1, 1], [0, 0]])",
+            "expected": "(3, [1, 1, 0], [1, 1, 0])",
+            "explanation": "Three observations where two positives were correctly predicted and one negative was correctly predicted"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing the order of (actual, predicted) - always remember actual comes first",
+        "Assuming labels can be values other than 0 and 1 without validation",
+        "Not handling empty datasets as an edge case",
+        "Mixing up indexing: data[i][0] is actual, data[i][1] is predicted"
+      ],
+      "hint": "Use list comprehension to extract actual labels from data[i][0] and predicted labels from data[i][1]. Count using len().",
+      "references": [
+        "Binary classification in machine learning",
+        "Cartesian product in discrete mathematics",
+        "Set theory and label spaces"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Classification Outcome Types: The Four Categories",
+      "relation_to_problem": "The confusion matrix cells represent counts of four distinct outcome types (TP, TN, FP, FN). Understanding these categories is essential to correctly populate the matrix.",
+      "prerequisites": [
+        "Binary classification fundamentals",
+        "Boolean logic (AND, equality)",
+        "Conditional statements"
+      ],
+      "learning_objectives": [
+        "Define the four classification outcomes mathematically",
+        "Implement classification logic using boolean conditions",
+        "Distinguish between correct predictions (TP, TN) and errors (FP, FN)",
+        "Categorize individual predictions into outcome types"
+      ],
+      "math_content": {
+        "definition": "**Classification Outcome Types:** For each observation pair $(y_i, \\hat{y}_i)$, we define four mutually exclusive outcome types:\n\n1. **True Positive (TP):** $y_i = 1 \\land \\hat{y}_i = 1$ — correctly predicted positive\n2. **True Negative (TN):** $y_i = 0 \\land \\hat{y}_i = 0$ — correctly predicted negative\n3. **False Positive (FP):** $y_i = 0 \\land \\hat{y}_i = 1$ — incorrectly predicted positive (Type I error)\n4. **False Negative (FN):** $y_i = 1 \\land \\hat{y}_i = 0$ — incorrectly predicted negative (Type II error)\n\nFormally, we define indicator functions: $\\mathbb{1}_{\\text{TP}}(y_i, \\hat{y}_i) = \\begin{cases} 1 & \\text{if } y_i = 1 \\land \\hat{y}_i = 1 \\\\ 0 & \\text{otherwise} \\end{cases}$ and similarly for TN, FP, FN.",
+        "notation": "$\\land$ = logical AND; $\\mathbb{1}_{\\text{condition}}$ = indicator function (returns 1 if condition is true, 0 otherwise); TP, TN, FP, FN = the four outcome categories",
+        "theorem": "**Outcome Partition Theorem:** The four outcome types form a partition of all possible label pairs. That is:\n1. $(\\text{TP} \\cup \\text{TN} \\cup \\text{FP} \\cup \\text{FN}) = \\{(y, \\hat{y}) : y, \\hat{y} \\in \\{0,1\\}\\}$\n2. These sets are pairwise disjoint\n3. For any dataset with $n$ observations: $n = |\\text{TP}| + |\\text{TN}| + |\\text{FP}| + |\\text{FN}|$",
+        "proof_sketch": "The label space has exactly 4 elements: $\\{0,1\\} \\times \\{0,1\\} = \\{(0,0), (0,1), (1,0), (1,1)\\}$. We map: $(1,1) \\mapsto \\text{TP}$, $(0,0) \\mapsto \\text{TN}$, $(0,1) \\mapsto \\text{FP}$, $(1,0) \\mapsto \\text{FN}$. This mapping is bijective (one-to-one and onto), proving the sets are exhaustive and mutually exclusive. Summing the counts of each category must equal the total observations.",
+        "examples": [
+          "**Example 1:** $(1, 1) \\rightarrow \\text{TP}$: Spam email correctly identified as spam",
+          "**Example 2:** $(0, 0) \\rightarrow \\text{TN}$: Non-spam email correctly identified as non-spam",
+          "**Example 3:** $(0, 1) \\rightarrow \\text{FP}$: Non-spam email incorrectly identified as spam (false alarm)",
+          "**Example 4:** $(1, 0) \\rightarrow \\text{FN}$: Spam email incorrectly identified as non-spam (missed detection)",
+          "**Example 5:** Dataset $\\{(1,1), (1,0), (0,1), (0,0), (0,1)\\}$ contains: 1 TP, 1 FN, 2 FP, 1 TN. Total: $1+1+2+1=5$ observations."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "True Positive Condition",
+          "latex": "$\\text{TP}: y_i = 1 \\land \\hat{y}_i = 1$",
+          "description": "Both actual and predicted are positive (1)"
+        },
+        {
+          "name": "True Negative Condition",
+          "latex": "$\\text{TN}: y_i = 0 \\land \\hat{y}_i = 0$",
+          "description": "Both actual and predicted are negative (0)"
+        },
+        {
+          "name": "False Positive Condition",
+          "latex": "$\\text{FP}: y_i = 0 \\land \\hat{y}_i = 1$",
+          "description": "Actual is negative but predicted positive (Type I error)"
+        },
+        {
+          "name": "False Negative Condition",
+          "latex": "$\\text{FN}: y_i = 1 \\land \\hat{y}_i = 0$",
+          "description": "Actual is positive but predicted negative (Type II error)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that categorizes a single prediction pair into one of the four outcome types. Given an [actual, predicted] pair, return a string indicating whether it's 'TP', 'TN', 'FP', or 'FN'. This is a building block for counting outcomes across a dataset.",
+        "function_signature": "def classify_outcome(actual: int, predicted: int) -> str:",
+        "starter_code": "def classify_outcome(actual, predicted):\n    \"\"\"\n    Classify a single prediction into outcome type.\n    \n    Args:\n        actual: True label (0 or 1)\n        predicted: Predicted label (0 or 1)\n    \n    Returns:\n        str: 'TP', 'TN', 'FP', or 'FN'\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "classify_outcome(1, 1)",
+            "expected": "'TP'",
+            "explanation": "Actual=1, Predicted=1: correctly predicted positive class"
+          },
+          {
+            "input": "classify_outcome(0, 0)",
+            "expected": "'TN'",
+            "explanation": "Actual=0, Predicted=0: correctly predicted negative class"
+          },
+          {
+            "input": "classify_outcome(0, 1)",
+            "expected": "'FP'",
+            "explanation": "Actual=0, Predicted=1: false alarm, predicted positive when actually negative"
+          },
+          {
+            "input": "classify_outcome(1, 0)",
+            "expected": "'FN'",
+            "explanation": "Actual=1, Predicted=0: missed detection, predicted negative when actually positive"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing FP and FN: remember 'False Positive' means predicted positive incorrectly",
+        "Not using both conditions: TP requires BOTH actual=1 AND predicted=1",
+        "Reversing the logic: check actual label first, then predicted",
+        "Forgetting that TN is also a 'correct' prediction, not an error"
+      ],
+      "hint": "Use conditional statements (if-elif) to check all four combinations of (actual, predicted) values. Consider using a truth table approach.",
+      "references": [
+        "Type I and Type II errors in hypothesis testing",
+        "Classification errors in statistical decision theory",
+        "Sensitivity and specificity in medical diagnostics"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Counting Outcomes: Aggregating Classification Results",
+      "relation_to_problem": "The confusion matrix entries are counts of each outcome type. This step teaches how to aggregate individual predictions into summary statistics.",
+      "prerequisites": [
+        "Classification outcome types",
+        "Python dictionaries and Counter",
+        "Loop iteration and counting algorithms"
+      ],
+      "learning_objectives": [
+        "Implement counting algorithms for classification outcomes",
+        "Use data structures to aggregate results efficiently",
+        "Compute the four fundamental counts: TP, TN, FP, FN",
+        "Verify the counting invariant: TP + TN + FP + FN = n"
+      ],
+      "math_content": {
+        "definition": "**Outcome Counts:** For a dataset $\\mathcal{D} = \\{(y_1, \\hat{y}_1), \\ldots, (y_n, \\hat{y}_n)\\}$, we define:\n\n$$\\text{TP} = \\sum_{i=1}^{n} \\mathbb{1}(y_i = 1 \\land \\hat{y}_i = 1)$$\n$$\\text{TN} = \\sum_{i=1}^{n} \\mathbb{1}(y_i = 0 \\land \\hat{y}_i = 0)$$\n$$\\text{FP} = \\sum_{i=1}^{n} \\mathbb{1}(y_i = 0 \\land \\hat{y}_i = 1)$$\n$$\\text{FN} = \\sum_{i=1}^{n} \\mathbb{1}(y_i = 1 \\land \\hat{y}_i = 0)$$\n\nwhere $\\mathbb{1}(\\text{condition})$ is the indicator function that equals 1 when the condition is true and 0 otherwise.",
+        "notation": "$\\sum$ = summation operator; $\\mathbb{1}(\\cdot)$ = indicator function; $n$ = total observations; TP, TN, FP, FN = count variables (non-negative integers)",
+        "theorem": "**Count Conservation Theorem:** For any binary classification dataset with $n$ observations, the sum of all outcome counts equals the total number of observations: $$\\text{TP} + \\text{TN} + \\text{FP} + \\text{FN} = n$$ Furthermore, each count is bounded: $0 \\leq \\text{TP}, \\text{TN}, \\text{FP}, \\text{FN} \\leq n$.",
+        "proof_sketch": "Since the four outcome types partition the label space (from Outcome Partition Theorem), every observation $(y_i, \\hat{y}_i)$ contributes exactly 1 to exactly one of the four counts. Therefore, summing across all $n$ observations: $\\sum_{i=1}^{n} [\\mathbb{1}_{\\text{TP}}(i) + \\mathbb{1}_{\\text{TN}}(i) + \\mathbb{1}_{\\text{FP}}(i) + \\mathbb{1}_{\\text{FN}}(i)] = \\sum_{i=1}^{n} 1 = n$. The bounds follow from the fact that each count is a sum of non-negative integers, each $\\leq 1$.",
+        "examples": [
+          "**Example 1:** $\\mathcal{D} = \\{(1,1), (0,0), (1,0)\\}$. Count TP: observation 1 satisfies $y=1, \\hat{y}=1$, so TP=1. Count TN: observation 2 satisfies $y=0, \\hat{y}=0$, so TN=1. Count FN: observation 3 satisfies $y=1, \\hat{y}=0$, so FN=1. Count FP: no observations, so FP=0. Verify: $1+1+0+1=3=n$ ✓",
+          "**Example 2:** $\\mathcal{D} = \\{(1,1), (1,0), (0,1), (0,0), (0,1)\\}$. TP=1 (position 0), FN=1 (position 1), FP=2 (positions 2,4), TN=1 (position 3). Total: $1+1+2+1=5=n$ ✓",
+          "**Example 3:** Perfect classifier on 10 observations: TP=6, TN=4, FP=0, FN=0. This indicates 6 actual positives all correctly predicted, 4 actual negatives all correctly predicted."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "True Positive Count",
+          "latex": "$\\text{TP} = |\\{i : y_i = 1 \\land \\hat{y}_i = 1\\}|$",
+          "description": "Cardinality of the set of correctly predicted positive observations"
+        },
+        {
+          "name": "Count Invariant",
+          "latex": "$\\text{TP} + \\text{TN} + \\text{FP} + \\text{FN} = n$",
+          "description": "The four counts must sum to the total number of observations"
+        },
+        {
+          "name": "Correct Predictions",
+          "latex": "$\\text{Correct} = \\text{TP} + \\text{TN}$",
+          "description": "Total number of correct predictions"
+        },
+        {
+          "name": "Incorrect Predictions",
+          "latex": "$\\text{Errors} = \\text{FP} + \\text{FN}$",
+          "description": "Total number of prediction errors"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that counts all four outcome types for a complete dataset. Given a list of [actual, predicted] pairs, return a dictionary with keys 'TP', 'TN', 'FP', 'FN' mapping to their respective counts. This directly prepares the data needed for confusion matrix construction.",
+        "function_signature": "def count_outcomes(data: list) -> dict:",
+        "starter_code": "def count_outcomes(data):\n    \"\"\"\n    Count all four classification outcomes.\n    \n    Args:\n        data: List of [y_true, y_pred] pairs\n    \n    Returns:\n        dict: {'TP': int, 'TN': int, 'FP': int, 'FN': int}\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "count_outcomes([[1, 1], [0, 0], [1, 0]])",
+            "expected": "{'TP': 1, 'TN': 1, 'FP': 0, 'FN': 1}",
+            "explanation": "One correct positive, one correct negative, one missed positive (FN)"
+          },
+          {
+            "input": "count_outcomes([[1, 1], [1, 0], [0, 1], [0, 0], [0, 1]])",
+            "expected": "{'TP': 1, 'TN': 1, 'FP': 2, 'FN': 1}",
+            "explanation": "1+1+2+1=5 observations total. Two false positives from positions 2 and 4"
+          },
+          {
+            "input": "count_outcomes([[0, 0], [0, 0], [0, 0]])",
+            "expected": "{'TP': 0, 'TN': 3, 'FP': 0, 'FN': 0}",
+            "explanation": "All three observations are true negatives, perfect prediction on negative class"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Initializing counts incorrectly - all should start at 0",
+        "Incrementing the wrong counter based on misunderstanding outcome definitions",
+        "Not validating the count invariant after computation",
+        "Using inefficient nested loops instead of a single pass through the data",
+        "Forgetting to handle empty datasets (should return all zeros)"
+      ],
+      "hint": "Initialize a dictionary with all four keys set to 0. Iterate through data once, checking conditions for each pair and incrementing the appropriate counter.",
+      "references": [
+        "Counting algorithms and complexity",
+        "Python Counter class from collections",
+        "Hash maps for frequency counting"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Confusion Matrix Structure: The 2×2 Layout",
+      "relation_to_problem": "The confusion matrix has a specific 2×2 structure where the four counts must be arranged according to mathematical conventions. Understanding this layout is crucial for correct matrix construction.",
+      "prerequisites": [
+        "Outcome counting",
+        "2D arrays and nested lists in Python",
+        "Matrix indexing conventions"
+      ],
+      "learning_objectives": [
+        "Understand the standard confusion matrix layout and indexing",
+        "Map outcome counts to specific matrix positions",
+        "Distinguish between different confusion matrix conventions",
+        "Construct 2×2 matrices programmatically using nested lists"
+      ],
+      "math_content": {
+        "definition": "**Confusion Matrix Structure:** A confusion matrix $C$ for binary classification is a $2 \\times 2$ matrix where entry $C_{ij}$ represents the count of observations with actual class $i$ and predicted class $j$. The standard form is:\n\n$$C = \\begin{pmatrix} C_{00} & C_{01} \\\\ C_{10} & C_{11} \\end{pmatrix} = \\begin{pmatrix} \\text{TN} & \\text{FP} \\\\ \\text{FN} & \\text{TP} \\end{pmatrix}$$\n\nAlternatively, with rows/columns representing (Actual: Negative, Positive) and (Predicted: Negative, Positive):\n\n| | Pred Neg (0) | Pred Pos (1) |\n|---|---|---|\n| **Act Neg (0)** | TN | FP |\n| **Act Pos (1)** | FN | TP |\n\nNote: Some conventions use $\\begin{pmatrix} \\text{TP} & \\text{FN} \\\\ \\text{FP} & \\text{TN} \\end{pmatrix}$ where rows represent predicted and columns represent actual.",
+        "notation": "$C$ = confusion matrix; $C_{ij}$ = element at row $i$, column $j$ (0-indexed); TN, FP, FN, TP = the four outcome counts positioned in the matrix",
+        "theorem": "**Matrix Trace Theorem:** The trace of the confusion matrix (sum of diagonal elements) equals the total number of correct predictions: $$\\text{tr}(C) = C_{00} + C_{11} = \\text{TN} + \\text{TP} = \\text{Correct Predictions}$$ The sum of off-diagonal elements equals total errors: $$C_{01} + C_{10} = \\text{FP} + \\text{FN} = \\text{Total Errors}$$",
+        "proof_sketch": "The diagonal elements $C_{00}$ and $C_{11}$ correspond to cases where actual class equals predicted class (correct predictions): $C_{00} = \\text{TN}$ (actual=0, pred=0) and $C_{11} = \\text{TP}$ (actual=1, pred=1). Off-diagonal elements represent mismatches: $C_{01} = \\text{FP}$ (actual=0, pred=1) and $C_{10} = \\text{FN}$ (actual=1, pred=0). By the Count Conservation Theorem: $\\text{tr}(C) + (C_{01} + C_{10}) = n$.",
+        "examples": [
+          "**Example 1:** If TP=5, TN=3, FP=2, FN=1, the confusion matrix is $\\begin{pmatrix} 3 & 2 \\\\ 1 & 5 \\end{pmatrix}$. Trace: $3+5=8$ correct predictions out of $8+2+1=11$ total.",
+          "**Example 2:** Perfect classifier with TP=7, TN=3, FP=0, FN=0: $\\begin{pmatrix} 3 & 0 \\\\ 0 & 7 \\end{pmatrix}$. This is a diagonal matrix indicating no errors.",
+          "**Example 3:** For data $\\{(1,1), (1,0), (0,1), (0,0), (0,1)\\}$ with counts TP=1, FN=1, FP=2, TN=1: $C = \\begin{pmatrix} 1 & 2 \\\\ 1 & 1 \\end{pmatrix}$. Diagonal sum: $1+1=2$ correct out of 5.",
+          "**Example 4:** As nested list: [[1, 2], [1, 1]] where C[0][0]=TN=1, C[0][1]=FP=2, C[1][0]=FN=1, C[1][1]=TP=1."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Standard Matrix Form",
+          "latex": "$C = \\begin{pmatrix} \\text{TN} & \\text{FP} \\\\ \\text{FN} & \\text{TP} \\end{pmatrix}$",
+          "description": "Rows: actual class (0,1); Columns: predicted class (0,1)"
+        },
+        {
+          "name": "Alternative Form (Problem Convention)",
+          "latex": "$C = \\begin{pmatrix} \\text{TP} & \\text{FN} \\\\ \\text{FP} & \\text{TN} \\end{pmatrix}$",
+          "description": "This convention places positives first (row/col 0 = positive class)"
+        },
+        {
+          "name": "Matrix Element Formula",
+          "latex": "$C_{ij} = \\sum_{k=1}^{n} \\mathbb{1}(y_k = i \\land \\hat{y}_k = j)$",
+          "description": "Each matrix entry counts observations with actual=i and predicted=j"
+        },
+        {
+          "name": "Accuracy from Matrix",
+          "latex": "$\\text{Accuracy} = \\frac{C_{00} + C_{11}}{\\sum_{i,j} C_{ij}} = \\frac{\\text{tr}(C)}{n}$",
+          "description": "Proportion of correct predictions using matrix trace"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that constructs a 2×2 confusion matrix from a dictionary of outcome counts. Given a dictionary with keys 'TP', 'TN', 'FP', 'FN', return a nested list (list of lists) representing the confusion matrix in the standard format: [[TN, FP], [FN, TP]]. This is the penultimate step before solving the main problem.",
+        "function_signature": "def build_matrix(counts: dict) -> list:",
+        "starter_code": "def build_matrix(counts):\n    \"\"\"\n    Build confusion matrix from outcome counts.\n    \n    Args:\n        counts: Dict with keys 'TP', 'TN', 'FP', 'FN'\n    \n    Returns:\n        list: 2x2 matrix as [[TN, FP], [FN, TP]]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "build_matrix({'TP': 1, 'TN': 1, 'FP': 2, 'FN': 1})",
+            "expected": "[[1, 2], [1, 1]]",
+            "explanation": "Standard form: row 0 = [TN=1, FP=2] (actual negative), row 1 = [FN=1, TP=1] (actual positive)"
+          },
+          {
+            "input": "build_matrix({'TP': 5, 'TN': 3, 'FP': 0, 'FN': 2})",
+            "expected": "[[3, 0], [2, 5]]",
+            "explanation": "Row 0 = [3, 0] for actual negative class, Row 1 = [2, 5] for actual positive class"
+          },
+          {
+            "input": "build_matrix({'TP': 0, 'TN': 0, 'FP': 0, 'FN': 0})",
+            "expected": "[[0, 0], [0, 0]]",
+            "explanation": "Empty dataset case: all counts are zero, resulting in zero matrix"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Mixing up matrix positions: remember [row][column] where row=actual, column=predicted",
+        "Using the wrong convention: check if problem wants [[TN,FP],[FN,TP]] or [[TP,FN],[FP,TN]]",
+        "Creating a flat list instead of nested lists for 2D structure",
+        "Incorrectly accessing dictionary keys (case sensitivity matters)",
+        "Forgetting that Python uses 0-based indexing for matrix positions"
+      ],
+      "hint": "Create a 2×2 nested list structure. First row contains TN and FP, second row contains FN and TP. Use dictionary access: counts['TP'], counts['TN'], etc.",
+      "references": [
+        "Matrix notation and indexing conventions",
+        "2D arrays in Python",
+        "Confusion matrix visualization tools"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "End-to-End Pipeline: From Raw Data to Confusion Matrix",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts into a complete pipeline that transforms raw prediction data into a confusion matrix, solving the main problem.",
+      "prerequisites": [
+        "Label extraction",
+        "Outcome classification",
+        "Outcome counting",
+        "Matrix construction"
+      ],
+      "learning_objectives": [
+        "Integrate multiple processing steps into a coherent pipeline",
+        "Implement the complete confusion matrix generation algorithm",
+        "Handle edge cases and validate outputs",
+        "Understand the computational complexity of the solution"
+      ],
+      "math_content": {
+        "definition": "**Confusion Matrix Function:** The confusion matrix function $\\mathcal{M}: (\\{0,1\\} \\times \\{0,1\\})^n \\rightarrow \\mathbb{Z}^{2 \\times 2}_{\\geq 0}$ maps a dataset of $n$ label pairs to a $2 \\times 2$ matrix of non-negative integers. Formally:\n\n$$\\mathcal{M}(\\mathcal{D}) = \\begin{pmatrix} \\sum_{i=1}^{n} \\mathbb{1}(y_i=0 \\land \\hat{y}_i=0) & \\sum_{i=1}^{n} \\mathbb{1}(y_i=0 \\land \\hat{y}_i=1) \\\\ \\sum_{i=1}^{n} \\mathbb{1}(y_i=1 \\land \\hat{y}_i=0) & \\sum_{i=1}^{n} \\mathbb{1}(y_i=1 \\land \\hat{y}_i=1) \\end{pmatrix}$$\n\nwhere $\\mathcal{D} = \\{(y_1, \\hat{y}_1), \\ldots, (y_n, \\hat{y}_n)\\}$ is the input dataset.",
+        "notation": "$\\mathcal{M}$ = confusion matrix function; $\\mathbb{Z}_{\\geq 0}$ = non-negative integers; $\\mathcal{D}$ = dataset; $n$ = number of observations",
+        "theorem": "**Algorithm Correctness Theorem:** The confusion matrix algorithm that (1) iterates through all observations once, (2) classifies each pair into one of four categories, (3) increments the corresponding counter, and (4) constructs the matrix from counts, produces a valid confusion matrix satisfying: (a) All entries are non-negative integers, (b) Sum of all entries equals $n$, (c) Each entry correctly represents the count of its outcome type. The algorithm has time complexity $O(n)$ and space complexity $O(1)$ (excluding input/output).",
+        "proof_sketch": "**Correctness:** Steps 1-3 implement the summation of indicator functions from the formal definition. By the Outcome Partition Theorem, each observation contributes to exactly one counter. Step 4 maps counts to matrix positions according to the definition. **Complexity:** Single pass through $n$ observations gives $O(n)$ time. Only 4 counter variables needed gives $O(1)$ auxiliary space.",
+        "examples": [
+          "**Example 1 (Full Pipeline):** Input: $\\mathcal{D} = \\{(1,1), (1,0), (0,1), (0,0), (0,1)\\}$\n  Step 1: Extract labels: $\\mathbf{y}_{\\text{true}} = [1,1,0,0,0]$, $\\mathbf{y}_{\\text{pred}} = [1,0,1,0,1]$\n  Step 2: Classify each: TP, FN, FP, TN, FP\n  Step 3: Count: TP=1, FN=1, FP=2, TN=1\n  Step 4: Build: $C = \\begin{pmatrix} 1 & 2 \\\\ 1 & 1 \\end{pmatrix}$\n  Verify: $1+2+1+1=5=n$ ✓",
+          "**Example 2 (Problem Example):** Input: [[1,1], [1,0], [0,1], [0,0], [0,1]]. Following pipeline: Counts are TP=1, FN=1, FP=2, TN=1. Matrix: [[1,2], [1,1]]. Note: Problem shows [[1,1], [2,1]] which uses convention [[TP,FN], [FP,TN]].",
+          "**Example 3 (Edge Case - All Correct):** Input: [[1,1], [1,1], [0,0], [0,0]]. Counts: TP=2, FN=0, FP=0, TN=2. Matrix: $\\begin{pmatrix} 2 & 0 \\\\ 0 & 2 \\end{pmatrix}$ (diagonal matrix, perfect accuracy)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Algorithm",
+          "latex": "$\\mathcal{M}(\\mathcal{D}) = \\begin{pmatrix} |\\{i: y_i=0, \\hat{y}_i=0\\}| & |\\{i: y_i=0, \\hat{y}_i=1\\}| \\\\ |\\{i: y_i=1, \\hat{y}_i=0\\}| & |\\{i: y_i=1, \\hat{y}_i=1\\}| \\end{pmatrix}$",
+          "description": "Cardinality-based definition: count observations matching each condition"
+        },
+        {
+          "name": "Time Complexity",
+          "latex": "$T(n) = O(n)$",
+          "description": "Linear time: single pass through n observations with constant-time operations"
+        },
+        {
+          "name": "Alternative Convention Mapping",
+          "latex": "$C' = \\begin{pmatrix} C_{11} & C_{10} \\\\ C_{01} & C_{00} \\end{pmatrix} = \\begin{pmatrix} \\text{TP} & \\text{FN} \\\\ \\text{FP} & \\text{TN} \\end{pmatrix}$",
+          "description": "Some problems use this convention where positive class comes first"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete function that generates a confusion matrix from raw binary classification data. The function should take a list of [actual, predicted] pairs and return a 2×2 confusion matrix. Pay careful attention to the matrix layout convention used in the problem statement. This exercise synthesizes all previous sub-quests into a complete solution.",
+        "function_signature": "def generate_confusion_matrix(data: list) -> list:",
+        "starter_code": "def generate_confusion_matrix(data):\n    \"\"\"\n    Generate confusion matrix from classification data.\n    \n    Args:\n        data: List of [y_true, y_pred] pairs where labels are 0 or 1\n    \n    Returns:\n        list: 2x2 confusion matrix as nested list\n    \n    The matrix format depends on the problem convention.\n    Standard: [[TN, FP], [FN, TP]]\n    Alternative: [[TP, FN], [FP, TN]]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "generate_confusion_matrix([[1, 1], [1, 0], [0, 1], [0, 0], [0, 1]])",
+            "expected": "[[1, 2], [1, 1]] or [[1, 1], [2, 1]]",
+            "explanation": "TP=1, FN=1, FP=2, TN=1. Standard form: [[1,2],[1,1]]. Alternative form (problem): [[1,1],[2,1]]"
+          },
+          {
+            "input": "generate_confusion_matrix([[1, 1], [0, 0]])",
+            "expected": "[[1, 0], [0, 1]] or [[1, 0], [0, 1]]",
+            "explanation": "Perfect predictions: one positive, one negative. Both conventions give same result here."
+          },
+          {
+            "input": "generate_confusion_matrix([[0, 1], [0, 1], [0, 1]])",
+            "expected": "[[0, 3], [0, 0]] or [[0, 0], [3, 0]]",
+            "explanation": "All false positives: actual=0, predicted=1 for all three observations"
+          },
+          {
+            "input": "generate_confusion_matrix([[1, 0], [1, 0]])",
+            "expected": "[[0, 0], [2, 0]] or [[0, 2], [0, 0]]",
+            "explanation": "All false negatives: actual=1, predicted=0 for both observations"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking which matrix convention the problem uses - always verify with the example",
+        "Inefficient implementation using nested loops instead of single pass",
+        "Not handling empty dataset edge case",
+        "Forgetting to initialize all counters to zero before counting",
+        "Making off-by-one errors in matrix position assignment",
+        "Not validating that the matrix entries sum to n as a sanity check"
+      ],
+      "hint": "Combine techniques from previous exercises: initialize four counters, iterate through data once checking conditions, then arrange counts into the correct 2×2 matrix layout. Compare your output with the problem's example to verify the convention.",
+      "references": [
+        "Algorithm design and analysis",
+        "Classification metrics in scikit-learn",
+        "Confusion matrix visualization with seaborn heatmaps",
+        "Statistical evaluation of binary classifiers"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Deriving Performance Metrics from Confusion Matrices",
+      "relation_to_problem": "After constructing the confusion matrix, understanding how to derive performance metrics (accuracy, precision, recall, F1) provides context for why confusion matrices are fundamental to machine learning evaluation.",
+      "prerequisites": [
+        "Confusion matrix construction",
+        "Basic probability and ratios",
+        "Understanding of fractions and proportions"
+      ],
+      "learning_objectives": [
+        "Derive mathematical formulas for classification metrics from confusion matrix entries",
+        "Understand the relationship between different performance metrics",
+        "Implement metric calculations that handle edge cases (division by zero)",
+        "Interpret metrics in real-world contexts"
+      ],
+      "math_content": {
+        "definition": "**Classification Metrics:** From a confusion matrix $C = \\begin{pmatrix} \\text{TN} & \\text{FP} \\\\ \\text{FN} & \\text{TP} \\end{pmatrix}$, we derive:\n\n1. **Accuracy:** Proportion of correct predictions\n   $$\\text{Accuracy} = \\frac{\\text{TP} + \\text{TN}}{\\text{TP} + \\text{TN} + \\text{FP} + \\text{FN}} = \\frac{\\text{TP} + \\text{TN}}{n}$$\n\n2. **Precision (Positive Predictive Value):** Among predicted positives, proportion that are correct\n   $$\\text{Precision} = \\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$$\n\n3. **Recall (Sensitivity, True Positive Rate):** Among actual positives, proportion detected\n   $$\\text{Recall} = \\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$$\n\n4. **F1 Score:** Harmonic mean of precision and recall\n   $$F_1 = 2 \\cdot \\frac{\\text{Precision} \\cdot \\text{Recall}}{\\text{Precision} + \\text{Recall}} = \\frac{2\\text{TP}}{2\\text{TP} + \\text{FP} + \\text{FN}}$$",
+        "notation": "$n$ = total observations; TP, TN, FP, FN = confusion matrix components; Precision, Recall $\\in [0,1]$ = performance ratios",
+        "theorem": "**Metric Bounds Theorem:** All derived metrics are bounded: $0 \\leq \\text{Accuracy}, \\text{Precision}, \\text{Recall}, F_1 \\leq 1$. Furthermore: (1) Accuracy = 1 iff FP = FN = 0 (perfect classifier), (2) Precision = 1 iff FP = 0 (no false alarms), (3) Recall = 1 iff FN = 0 (no missed detections), (4) $F_1$ = 1 iff both Precision = 1 and Recall = 1.",
+        "proof_sketch": "Each metric is a ratio of non-negative integers where numerator ≤ denominator, ensuring values in [0,1]. Perfect scores occur when error terms vanish. For $F_1$: since it's the harmonic mean of two values in [0,1], it's also in [0,1]. $F_1 = 1$ requires both precision and recall equal 1, which requires FP = FN = 0.",
+        "examples": [
+          "**Example 1:** $C = \\begin{pmatrix} 1 & 2 \\\\ 1 & 1 \\end{pmatrix}$, $n=5$. Accuracy: $(1+1)/5 = 0.4$ (40% correct). Precision: $1/(1+2) = 0.333$ (33% of positive predictions correct). Recall: $1/(1+1) = 0.5$ (50% of actual positives detected). $F_1$: $2(0.333)(0.5)/(0.333+0.5) = 0.4$.",
+          "**Example 2:** Perfect classifier $C = \\begin{pmatrix} 5 & 0 \\\\ 0 & 5 \\end{pmatrix}$. Accuracy: $10/10 = 1.0$. Precision: $5/5 = 1.0$. Recall: $5/5 = 1.0$. $F_1 = 1.0$.",
+          "**Example 3 (Class Imbalance):** $C = \\begin{pmatrix} 90 & 1 \\\\ 5 & 4 \\end{pmatrix}$, $n=100$. Accuracy: $94/100 = 0.94$ (looks good!). But Recall: $4/(4+5) = 0.444$ (missing 56% of positives). This shows accuracy can be misleading with imbalanced classes."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Accuracy",
+          "latex": "$\\text{Accuracy} = \\frac{\\text{TP} + \\text{TN}}{n}$",
+          "description": "Overall correctness rate - can be misleading with class imbalance"
+        },
+        {
+          "name": "Precision",
+          "latex": "$\\text{Precision} = \\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$",
+          "description": "How many predicted positives are actually positive - important when false alarms are costly"
+        },
+        {
+          "name": "Recall",
+          "latex": "$\\text{Recall} = \\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$",
+          "description": "How many actual positives are detected - important when missing positives is costly"
+        },
+        {
+          "name": "F1 Score (alternative form)",
+          "latex": "$F_1 = \\frac{2\\text{TP}}{2\\text{TP} + \\text{FP} + \\text{FN}}$",
+          "description": "Single metric balancing precision and recall - useful for imbalanced datasets"
+        },
+        {
+          "name": "Specificity",
+          "latex": "$\\text{Specificity} = \\frac{\\text{TN}}{\\text{TN} + \\text{FP}}$",
+          "description": "True negative rate - proportion of actual negatives correctly identified"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes all key performance metrics from a confusion matrix. Given a confusion matrix in the standard format [[TN, FP], [FN, TP]], return a dictionary containing accuracy, precision, recall, and F1 score. Handle edge cases where denominators could be zero (return 0.0 for undefined metrics).",
+        "function_signature": "def compute_metrics(confusion_matrix: list) -> dict:",
+        "starter_code": "def compute_metrics(confusion_matrix):\n    \"\"\"\n    Compute classification metrics from confusion matrix.\n    \n    Args:\n        confusion_matrix: 2x2 matrix as [[TN, FP], [FN, TP]]\n    \n    Returns:\n        dict: {\n            'accuracy': float,\n            'precision': float,\n            'recall': float,\n            'f1': float\n        }\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_metrics([[1, 2], [1, 1]])",
+            "expected": "{'accuracy': 0.4, 'precision': 0.333, 'recall': 0.5, 'f1': 0.4}",
+            "explanation": "From earlier example: (1+1)/5=0.4, 1/3≈0.333, 1/2=0.5, F1=0.4"
+          },
+          {
+            "input": "compute_metrics([[5, 0], [0, 5]])",
+            "expected": "{'accuracy': 1.0, 'precision': 1.0, 'recall': 1.0, 'f1': 1.0}",
+            "explanation": "Perfect classifier: all metrics are 1.0"
+          },
+          {
+            "input": "compute_metrics([[10, 0], [5, 0]])",
+            "expected": "{'accuracy': 0.667, 'precision': 0.0, 'recall': 0.0, 'f1': 0.0}",
+            "explanation": "TP=0 makes precision, recall, and F1 all zero. Accuracy is 10/15≈0.667"
+          },
+          {
+            "input": "compute_metrics([[0, 0], [0, 0]])",
+            "expected": "{'accuracy': 0.0, 'precision': 0.0, 'recall': 0.0, 'f1': 0.0}",
+            "explanation": "Empty matrix edge case: all metrics undefined, return 0.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling division by zero when TP+FP=0 or TP+FN=0",
+        "Confusing precision (predicted positive focus) with recall (actual positive focus)",
+        "Using arithmetic mean instead of harmonic mean for F1 score",
+        "Extracting matrix values incorrectly based on wrong indexing",
+        "Not rounding floating point results appropriately for comparison",
+        "Relying solely on accuracy for imbalanced datasets"
+      ],
+      "hint": "Extract TN=matrix[0][0], FP=matrix[0][1], FN=matrix[1][0], TP=matrix[1][1]. Calculate n as sum of all four values. Use conditional checks to avoid division by zero (return 0.0 if denominator is 0).",
+      "references": [
+        "Precision-Recall tradeoff in machine learning",
+        "ROC curves and AUC metrics",
+        "Class imbalance handling techniques",
+        "Matthews correlation coefficient as an alternative metric"
+      ]
+    }
+  ]
+}

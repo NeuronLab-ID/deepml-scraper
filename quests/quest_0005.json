@@ -1,0 +1,504 @@
+{
+  "problem_id": 5,
+  "title": "Scalar Multiplication of a Matrix",
+  "category": "Linear Algebra",
+  "difficulty": "easy",
+  "description": "Write a Python function that multiplies a matrix by a scalar and returns the result.",
+  "example": {
+    "input": "matrix = [[1, 2], [3, 4]], scalar = 2",
+    "output": "[[2, 4], [6, 8]]",
+    "reasoning": "Each element of the matrix is multiplied by the scalar."
+  },
+  "starter_code": "def scalar_multiply(matrix: list[list[int|float]], scalar: int|float) -> list[list[int|float]]:\n\treturn result",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Matrix Structure and Element Access",
+      "relation_to_problem": "Before multiplying each element by a scalar, we must understand how matrices are structured as nested lists and how to access individual elements using indices.",
+      "prerequisites": [
+        "Basic Python lists",
+        "Nested data structures",
+        "Zero-based indexing"
+      ],
+      "learning_objectives": [
+        "Define a matrix formally as a rectangular array of numbers",
+        "Access matrix elements using row and column indices",
+        "Understand the dimensions of a matrix ($m \\times n$)",
+        "Navigate nested list structures in Python"
+      ],
+      "math_content": {
+        "definition": "A **matrix** $A$ of dimension $m \\times n$ (read as \"$m$ by $n$\") is a rectangular array of numbers arranged in $m$ rows and $n$ columns. Each element $a_{ij}$ occupies a unique position determined by its row index $i \\in \\{1, 2, \\ldots, m\\}$ and column index $j \\in \\{1, 2, \\ldots, n\\}$.",
+        "notation": "$A = [a_{ij}]_{m \\times n}$ where $a_{ij}$ denotes the element in the $i$-th row and $j$-th column. In Python, we use zero-based indexing: $a_{ij}$ is accessed as `matrix[i-1][j-1]`.",
+        "theorem": "**Indexing Theorem**: For a matrix $A$ with dimensions $m \\times n$, the valid row indices are $\\{0, 1, \\ldots, m-1\\}$ and valid column indices are $\\{0, 1, \\ldots, n-1\\}$ in zero-based indexing. The total number of elements is $mn$.",
+        "proof_sketch": "Each row contains exactly $n$ elements. With $m$ rows, the total count is $m \\times n$. The zero-based indexing convention maps mathematical index $i$ to programmatic index $i-1$.",
+        "examples": [
+          "Matrix $A = \\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{bmatrix}$ has dimensions $2 \\times 3$. Element $a_{12} = 2$ (row 1, column 2 in 1-based indexing) is accessed as `A[0][1]` in Python.",
+          "For $B = \\begin{bmatrix} 7 & 8 \\\\ 9 & 10 \\\\ 11 & 12 \\end{bmatrix}$, we have $m=3$ rows and $n=2$ columns. Element $b_{32} = 12$ is accessed as `B[2][1]`."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Matrix Dimensions",
+          "latex": "$A \\in \\mathbb{R}^{m \\times n}$",
+          "description": "Notation indicating matrix $A$ has $m$ rows and $n$ columns with real-valued elements"
+        },
+        {
+          "name": "Element Access",
+          "latex": "$a_{ij} = A[i-1][j-1]$",
+          "description": "Converting between mathematical notation (1-indexed) and Python notation (0-indexed)"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that extracts a specific element from a matrix given its row and column indices (using 1-based mathematical indexing). This demonstrates your understanding of matrix structure and index conversion.",
+        "function_signature": "def get_matrix_element(matrix: list[list[int|float]], row: int, col: int) -> int|float:",
+        "starter_code": "def get_matrix_element(matrix: list[list[int|float]], row: int, col: int) -> int|float:\n    # Your code here\n    # Remember: row and col are 1-based (mathematical notation)\n    # Convert to 0-based indexing for Python\n    pass",
+        "test_cases": [
+          {
+            "input": "get_matrix_element([[1, 2, 3], [4, 5, 6]], 1, 2)",
+            "expected": "2",
+            "explanation": "Element at row 1, column 2 (mathematical indexing) is 2. In Python, this is matrix[0][1]."
+          },
+          {
+            "input": "get_matrix_element([[7, 8], [9, 10], [11, 12]], 3, 2)",
+            "expected": "12",
+            "explanation": "Element at row 3, column 2 is 12. In Python, this is matrix[2][1]."
+          },
+          {
+            "input": "get_matrix_element([[5]], 1, 1)",
+            "expected": "5",
+            "explanation": "A 1×1 matrix has only one element at position (1,1)."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that Python uses 0-based indexing while mathematical notation uses 1-based indexing",
+        "Confusing row index with column index (accessing matrix[col][row] instead of matrix[row][col])",
+        "Not validating that indices are within valid bounds before accessing elements",
+        "Treating a matrix as a flat list instead of a nested structure"
+      ],
+      "hint": "To convert from 1-based mathematical indexing to 0-based Python indexing, subtract 1 from both the row and column indices.",
+      "references": [
+        "Matrix notation in linear algebra",
+        "Python nested lists",
+        "Zero-based vs one-based indexing"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Matrix Dimensions and Iteration Patterns",
+      "relation_to_problem": "To multiply every element in a matrix by a scalar, we must iterate through all rows and columns systematically. Understanding matrix dimensions allows us to construct proper iteration bounds.",
+      "prerequisites": [
+        "Matrix structure and indexing",
+        "Nested loops in Python",
+        "Range function"
+      ],
+      "learning_objectives": [
+        "Determine the number of rows and columns in a matrix programmatically",
+        "Construct nested loops to iterate through all matrix elements",
+        "Understand the relationship between outer loop (rows) and inner loop (columns)",
+        "Process every element exactly once in row-major order"
+      ],
+      "math_content": {
+        "definition": "The **dimension** of a matrix $A$, denoted $\\dim(A) = m \\times n$, specifies that $A$ has $m$ rows and $n$ columns. For a non-empty matrix represented as a nested list in Python, $m = \\text{len}(\\text{matrix})$ and $n = \\text{len}(\\text{matrix}[0])$.",
+        "notation": "$m$ = number of rows, $n$ = number of columns. **Row-major order** means we process all elements in row 1, then all elements in row 2, and so on.",
+        "theorem": "**Complete Traversal Theorem**: For a matrix $A \\in \\mathbb{R}^{m \\times n}$, nested loops with $i \\in \\{0, 1, \\ldots, m-1\\}$ (outer) and $j \\in \\{0, 1, \\ldots, n-1\\}$ (inner) will visit each element $a_{ij}$ exactly once.",
+        "proof_sketch": "The outer loop executes $m$ times (once per row). For each outer iteration $i$, the inner loop executes $n$ times (once per column in that row). Total iterations = $m \\times n$, which equals the number of elements. Since each $(i,j)$ pair is unique, every element is visited exactly once.",
+        "examples": [
+          "For $A = \\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{bmatrix}$ with $m=2, n=3$: iteration order is $(0,0) \\to (0,1) \\to (0,2) \\to (1,0) \\to (1,1) \\to (1,2)$, visiting elements 1, 2, 3, 4, 5, 6.",
+          "For $B = \\begin{bmatrix} 7 & 8 \\\\ 9 & 10 \\\\ 11 & 12 \\end{bmatrix}$ with $m=3, n=2$: we iterate through 6 positions total in row-major order."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Number of Rows",
+          "latex": "$m = |\\text{rows}| = \\text{len}(\\text{matrix})$",
+          "description": "The outer dimension of the nested list structure"
+        },
+        {
+          "name": "Number of Columns",
+          "latex": "$n = |\\text{columns}| = \\text{len}(\\text{matrix}[0])$",
+          "description": "The length of any row (assuming rectangular matrix)"
+        },
+        {
+          "name": "Total Elements",
+          "latex": "$|A| = m \\times n$",
+          "description": "Total number of elements in the matrix"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that counts how many times a specific value appears in a matrix. This requires iterating through all elements and checking each one—a fundamental pattern needed for scalar multiplication.",
+        "function_signature": "def count_occurrences(matrix: list[list[int|float]], value: int|float) -> int:",
+        "starter_code": "def count_occurrences(matrix: list[list[int|float]], value: int|float) -> int:\n    # Your code here\n    # Hint: Use nested loops to visit each element\n    # Outer loop: for each row\n    # Inner loop: for each column in that row\n    pass",
+        "test_cases": [
+          {
+            "input": "count_occurrences([[1, 2, 3], [4, 2, 6], [2, 8, 9]], 2)",
+            "expected": "3",
+            "explanation": "The value 2 appears at positions (0,1), (1,1), and (2,0), totaling 3 occurrences."
+          },
+          {
+            "input": "count_occurrences([[5, 5], [5, 5]], 5)",
+            "expected": "4",
+            "explanation": "All four elements equal 5, so the count is 4."
+          },
+          {
+            "input": "count_occurrences([[1, 2], [3, 4]], 7)",
+            "expected": "0",
+            "explanation": "The value 7 does not appear in the matrix, so the count is 0."
+          },
+          {
+            "input": "count_occurrences([[10]], 10)",
+            "expected": "1",
+            "explanation": "A 1×1 matrix with the target value returns count 1."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Only iterating through the first row instead of all rows",
+        "Hard-coding dimensions instead of computing them from the matrix",
+        "Assuming the matrix is square (m = n) when it might be rectangular",
+        "Iterating through indices beyond the actual matrix dimensions",
+        "Using a single loop instead of nested loops for 2D traversal"
+      ],
+      "hint": "Use len(matrix) to get the number of rows and len(matrix[0]) to get the number of columns. Then use two nested for loops with range().",
+      "references": [
+        "Nested loop patterns",
+        "Matrix traversal algorithms",
+        "Row-major vs column-major order"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Formal Definition of Scalar Multiplication",
+      "relation_to_problem": "This is the core mathematical operation we're implementing. Understanding the formal definition ensures we apply the operation correctly to every element.",
+      "prerequisites": [
+        "Matrix structure",
+        "Real number multiplication",
+        "Element-wise operations"
+      ],
+      "learning_objectives": [
+        "Define scalar multiplication formally using mathematical notation",
+        "Understand that scalar multiplication is an element-wise operation",
+        "Recognize scalar multiplication as a linear transformation",
+        "Apply scalar multiplication properties in computations"
+      ],
+      "math_content": {
+        "definition": "Let $A = [a_{ij}]$ be an $m \\times n$ matrix and $k \\in \\mathbb{R}$ be a scalar. The **scalar multiplication** of $A$ by $k$, denoted $kA$, is the $m \\times n$ matrix $B = [b_{ij}]$ where each element is defined by: $$b_{ij} = k \\cdot a_{ij} \\text{ for all } i \\in \\{1, \\ldots, m\\}, j \\in \\{1, \\ldots, n\\}$$",
+        "notation": "$kA = k[a_{ij}] = [ka_{ij}]$. This operation multiplies every single element of $A$ by the scalar $k$.",
+        "theorem": "**Properties of Scalar Multiplication**: For matrices $A, B$ and scalars $k, c \\in \\mathbb{R}$: (1) **Associativity**: $k(cA) = (kc)A$; (2) **Distributivity over matrix addition**: $k(A + B) = kA + kB$; (3) **Distributivity over scalar addition**: $(k + c)A = kA + cA$; (4) **Identity**: $1 \\cdot A = A$; (5) **Zero property**: $0 \\cdot A = O$ where $O$ is the zero matrix.",
+        "proof_sketch": "To prove (1): $(k(cA))_{ij} = k(cA)_{ij} = k(ca_{ij}) = (kc)a_{ij} = ((kc)A)_{ij}$ by associativity of real number multiplication. Similar element-wise proofs establish the other properties.",
+        "examples": [
+          "Let $A = \\begin{bmatrix} 2 & -1 \\\\ 0 & 3 \\end{bmatrix}$ and $k = 4$. Then $4A = \\begin{bmatrix} 4 \\cdot 2 & 4 \\cdot (-1) \\\\ 4 \\cdot 0 & 4 \\cdot 3 \\end{bmatrix} = \\begin{bmatrix} 8 & -4 \\\\ 0 & 12 \\end{bmatrix}$.",
+          "Let $B = \\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{bmatrix}$ and $k = -2$. Then $-2B = \\begin{bmatrix} -2 & -4 & -6 \\\\ -8 & -10 & -12 \\end{bmatrix}$.",
+          "For $k = 0$: $0 \\cdot A = \\begin{bmatrix} 0 & 0 \\\\ 0 & 0 \\end{bmatrix}$ regardless of the values in $A$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Scalar Multiplication Definition",
+          "latex": "$(kA)_{ij} = k \\cdot a_{ij}$",
+          "description": "Each element of the result is the scalar times the corresponding element of the original matrix"
+        },
+        {
+          "name": "Matrix Form",
+          "latex": "$k\\begin{bmatrix} a_{11} & a_{12} \\\\ a_{21} & a_{22} \\end{bmatrix} = \\begin{bmatrix} ka_{11} & ka_{12} \\\\ ka_{21} & ka_{22} \\end{bmatrix}$",
+          "description": "Visual representation showing how scalar multiplication affects a 2×2 matrix"
+        },
+        {
+          "name": "Dimension Preservation",
+          "latex": "If $A \\in \\mathbb{R}^{m \\times n}$, then $kA \\in \\mathbb{R}^{m \\times n}$",
+          "description": "Scalar multiplication preserves the dimensions of the matrix"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that multiplies a single row of a matrix by a scalar. This is a building block for full matrix scalar multiplication—if you can handle one row, you can handle all rows.",
+        "function_signature": "def scalar_multiply_row(row: list[int|float], scalar: int|float) -> list[int|float]:",
+        "starter_code": "def scalar_multiply_row(row: list[int|float], scalar: int|float) -> list[int|float]:\n    # Your code here\n    # Apply the scalar to each element in the row\n    # Return a new list (don't modify the original)\n    pass",
+        "test_cases": [
+          {
+            "input": "scalar_multiply_row([1, 2, 3], 2)",
+            "expected": "[2, 4, 6]",
+            "explanation": "Each element is multiplied by 2: $2 \\cdot [1, 2, 3] = [2 \\cdot 1, 2 \\cdot 2, 2 \\cdot 3] = [2, 4, 6]$."
+          },
+          {
+            "input": "scalar_multiply_row([5, -3, 0, 7], -2)",
+            "expected": "[-10, 6, 0, -14]",
+            "explanation": "Each element is multiplied by -2: $-2 \\cdot 5 = -10$, $-2 \\cdot (-3) = 6$, $-2 \\cdot 0 = 0$, $-2 \\cdot 7 = -14$."
+          },
+          {
+            "input": "scalar_multiply_row([4, 8, 12], 0.5)",
+            "expected": "[2.0, 4.0, 6.0]",
+            "explanation": "Each element is multiplied by 0.5 (or divided by 2): $0.5 \\cdot [4, 8, 12] = [2, 4, 6]$."
+          },
+          {
+            "input": "scalar_multiply_row([10], 3)",
+            "expected": "[30]",
+            "explanation": "A single-element row: $3 \\cdot 10 = 30$."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing scalar multiplication with dot product (which produces a single number, not a vector)",
+        "Trying to multiply the scalar by the row as a whole rather than element-by-element",
+        "Forgetting to handle negative scalars correctly",
+        "Modifying the original row instead of creating a new one",
+        "Not handling floating-point scalars that produce floating-point results"
+      ],
+      "hint": "Think of this as transforming each element independently: result[i] = scalar * row[i]. You can use a list comprehension or a loop.",
+      "references": [
+        "Linear transformations",
+        "Vector spaces",
+        "Scalar field operations"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Building New Matrices with Computed Elements",
+      "relation_to_problem": "After computing each scaled element, we need to construct a new matrix with the same dimensions as the original. This requires creating nested list structures programmatically.",
+      "prerequisites": [
+        "List creation in Python",
+        "Nested list comprehensions",
+        "Matrix dimensions"
+      ],
+      "learning_objectives": [
+        "Create a new matrix with specified dimensions",
+        "Initialize matrix elements with computed values",
+        "Understand the importance of not modifying the input matrix",
+        "Use list comprehensions for efficient matrix construction"
+      ],
+      "math_content": {
+        "definition": "A **matrix constructor** is an operation that creates a new matrix $B \\in \\mathbb{R}^{m \\times n}$ where each element $b_{ij}$ is computed from a function $f(i, j)$. Formally: $$B = [b_{ij}]_{m \\times n} \\text{ where } b_{ij} = f(i, j)$$",
+        "notation": "In Python, we construct matrices as lists of lists: `[[element for j in range(n)] for i in range(m)]` creates an $m \\times n$ matrix.",
+        "theorem": "**Immutability Principle**: When performing matrix operations, creating a new matrix (out-of-place operation) preserves the original data, while modifying the existing matrix (in-place operation) destroys it. For scalar multiplication: $B = kA$ should not alter $A$.",
+        "proof_sketch": "In Python, assignment creates references, not copies. Modifying `result = matrix` then changing `result[i][j]` also changes `matrix[i][j]` because they reference the same object. Creating `result = [[... for j ...] for i ...]` creates a new object in memory.",
+        "examples": [
+          "To create a $2 \\times 3$ zero matrix: $O = \\begin{bmatrix} 0 & 0 & 0 \\\\ 0 & 0 & 0 \\end{bmatrix}$ using `[[0 for j in range(3)] for i in range(2)]`.",
+          "To create an identity matrix: $I_3 = \\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & 1 & 0 \\\\ 0 & 0 & 1 \\end{bmatrix}$ using `[[1 if i==j else 0 for j in range(3)] for i in range(3)]`.",
+          "To double a matrix $A$, create $B$ where $b_{ij} = 2a_{ij}$ without changing $A$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Matrix Construction Pattern",
+          "latex": "$B = [f(i,j)]_{m \\times n}$",
+          "description": "Create matrix $B$ by applying function $f$ to each position $(i,j)$"
+        },
+        {
+          "name": "Nested List Comprehension",
+          "latex": "$\\text{result} = [[\\text{expr}(i,j) \\text{ for } j \\in [0..n)] \\text{ for } i \\in [0..m)]$",
+          "description": "Python pattern for creating an $m \\times n$ matrix with computed elements"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that creates a new matrix with the same dimensions as the input, where each element is the square of the corresponding input element. This demonstrates creating a new matrix with computed values—essential for scalar multiplication.",
+        "function_signature": "def square_matrix_elements(matrix: list[list[int|float]]) -> list[list[int|float]]:",
+        "starter_code": "def square_matrix_elements(matrix: list[list[int|float]]) -> list[list[int|float]]:\n    # Your code here\n    # Create a NEW matrix with same dimensions\n    # Each element in result should be the square of the input element\n    # Do NOT modify the original matrix\n    pass",
+        "test_cases": [
+          {
+            "input": "square_matrix_elements([[1, 2], [3, 4]])",
+            "expected": "[[1, 4], [9, 16]]",
+            "explanation": "Each element is squared: $1^2=1, 2^2=4, 3^2=9, 4^2=16$. Original matrix unchanged."
+          },
+          {
+            "input": "square_matrix_elements([[2, -3, 0], [5, 1, -2]])",
+            "expected": "[[4, 9, 0], [25, 1, 4]]",
+            "explanation": "Squaring: $2^2=4, (-3)^2=9, 0^2=0, 5^2=25, 1^2=1, (-2)^2=4$."
+          },
+          {
+            "input": "square_matrix_elements([[5]])",
+            "expected": "[[25]]",
+            "explanation": "Single element matrix: $5^2 = 25$."
+          },
+          {
+            "input": "square_matrix_elements([[0.5, 2.0], [-1.5, 3.0]])",
+            "expected": "[[0.25, 4.0], [2.25, 9.0]]",
+            "explanation": "Floating-point: $(0.5)^2=0.25, (2.0)^2=4.0, (-1.5)^2=2.25, (3.0)^2=9.0$."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Modifying the original matrix instead of creating a new one",
+        "Using `result = matrix` which creates a reference, not a copy",
+        "Forgetting the outer list comprehension, creating only a single row",
+        "Mixing up the order of loops (columns outer, rows inner) producing transposed results",
+        "Not handling empty matrices or edge cases properly"
+      ],
+      "hint": "Use nested list comprehensions: [[expression_using(matrix[i][j]) for j in range(cols)] for i in range(rows)]. This creates a completely new matrix structure.",
+      "references": [
+        "List comprehensions in Python",
+        "Deep copy vs shallow copy",
+        "Functional programming patterns"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Combining Iteration and Transformation: Element-wise Operations",
+      "relation_to_problem": "Now we combine all previous concepts: iterate through every element of the input matrix, apply a transformation (multiply by scalar), and construct a new result matrix with the same dimensions.",
+      "prerequisites": [
+        "Matrix iteration",
+        "Scalar multiplication definition",
+        "Matrix construction",
+        "Function composition"
+      ],
+      "learning_objectives": [
+        "Apply a transformation to every element of a matrix systematically",
+        "Combine nested iteration with element-wise computation",
+        "Construct a result matrix while preserving input matrix",
+        "Generalize the pattern for any element-wise operation"
+      ],
+      "math_content": {
+        "definition": "An **element-wise operation** on a matrix $A$ is a transformation $T: \\mathbb{R}^{m \\times n} \\to \\mathbb{R}^{m \\times n}$ defined by a function $f: \\mathbb{R} \\to \\mathbb{R}$ such that: $$T(A)_{ij} = f(a_{ij}) \\text{ for all } i,j$$ Scalar multiplication is an element-wise operation where $f(x) = kx$ for fixed scalar $k$.",
+        "notation": "$T(A) = [f(a_{ij})]_{m \\times n}$. Each output element depends only on the corresponding input element, not on any other elements.",
+        "theorem": "**Element-wise Operation Theorem**: For an element-wise operation $T$ defined by $f$, the transformation preserves matrix dimensions and can be computed independently for each element (embarrassingly parallel). The computational complexity is $\\Theta(mn)$ for an $m \\times n$ matrix.",
+        "proof_sketch": "Since each output element $b_{ij} = f(a_{ij})$ depends only on $a_{ij}$ and not on other elements, we must compute $f$ exactly $mn$ times (once per element). Each computation is independent, so they can be performed in any order or simultaneously.",
+        "examples": [
+          "Scalar multiplication with $k=3$ on $A = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix}$: $f(x) = 3x$ gives $\\begin{bmatrix} 3 & 6 \\\\ 9 & 12 \\end{bmatrix}$.",
+          "Negation (special case $k=-1$): $-A = \\begin{bmatrix} -1 & -2 \\\\ -3 & -4 \\end{bmatrix}$ where $f(x) = -x$.",
+          "Adding a constant (not scalar multiplication, but element-wise): $A + 5\\mathbf{1}$ where $\\mathbf{1}$ is all-ones matrix, $f(x) = x + 5$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Element-wise Transformation",
+          "latex": "$B = T(A) \\Leftrightarrow b_{ij} = f(a_{ij}) \\text{ for all } i,j$",
+          "description": "General form of element-wise operations on matrices"
+        },
+        {
+          "name": "Scalar Multiplication as Element-wise Operation",
+          "latex": "$kA = [ka_{ij}]_{m \\times n} = [f(a_{ij})]_{m \\times n} \\text{ where } f(x) = kx$",
+          "description": "Scalar multiplication fits the element-wise pattern with $f(x) = kx$"
+        },
+        {
+          "name": "Computational Complexity",
+          "latex": "$\\text{Time}(T) = \\Theta(mn)$, $\\text{Space}(T) = \\Theta(mn)$",
+          "description": "Both time and space scale linearly with matrix size"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that adds a constant value to every element of a matrix, returning a new matrix. This is another element-wise operation with the same pattern as scalar multiplication, helping you master the technique before the final integration.",
+        "function_signature": "def add_constant_to_matrix(matrix: list[list[int|float]], constant: int|float) -> list[list[int|float]]:",
+        "starter_code": "def add_constant_to_matrix(matrix: list[list[int|float]], constant: int|float) -> list[list[int|float]]:\n    # Your code here\n    # Create a new matrix where each element is matrix[i][j] + constant\n    # Use nested iteration or list comprehensions\n    # Preserve original matrix dimensions\n    pass",
+        "test_cases": [
+          {
+            "input": "add_constant_to_matrix([[1, 2], [3, 4]], 5)",
+            "expected": "[[6, 7], [8, 9]]",
+            "explanation": "Add 5 to each element: $1+5=6, 2+5=7, 3+5=8, 4+5=9$."
+          },
+          {
+            "input": "add_constant_to_matrix([[0, -2, 3], [7, -5, 1]], 10)",
+            "expected": "[[10, 8, 13], [17, 5, 11]]",
+            "explanation": "Add 10 to each: $0+10=10, -2+10=8, 3+10=13, 7+10=17, -5+10=5, 1+10=11$."
+          },
+          {
+            "input": "add_constant_to_matrix([[5, 10], [15, 20]], -5)",
+            "expected": "[[0, 5], [10, 15]]",
+            "explanation": "Add -5 (subtract 5) from each element."
+          },
+          {
+            "input": "add_constant_to_matrix([[2.5, 3.5]], 1.5)",
+            "expected": "[[4.0, 5.0]]",
+            "explanation": "Single row matrix with floating-point: $2.5+1.5=4.0, 3.5+1.5=5.0$."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Adding the constant to only some elements (e.g., first row or column only)",
+        "Confusing element-wise addition with matrix addition (which requires two matrices)",
+        "Forgetting to create a new matrix, modifying the original instead",
+        "Incorrect loop bounds causing missing or extra iterations",
+        "Not handling negative constants correctly"
+      ],
+      "hint": "The pattern is identical to squaring elements, but instead of matrix[i][j]**2, use matrix[i][j] + constant. For scalar multiplication, you'll use matrix[i][j] * scalar.",
+      "references": [
+        "Map function in functional programming",
+        "Element-wise operations in NumPy",
+        "Broadcasting in array operations"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Integration: Implementing Scalar Matrix Multiplication",
+      "relation_to_problem": "This final sub-quest synthesizes all previous concepts to implement complete scalar multiplication: iterate through the matrix, multiply each element by the scalar, and construct the result matrix.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Matrix dimensions",
+        "Scalar multiplication definition",
+        "Element-wise operations"
+      ],
+      "learning_objectives": [
+        "Integrate matrix traversal, scalar multiplication, and matrix construction",
+        "Implement the complete scalar multiplication algorithm",
+        "Handle edge cases (empty matrices, zero scalar, negative scalar)",
+        "Verify correctness using mathematical properties"
+      ],
+      "math_content": {
+        "definition": "The **complete scalar multiplication algorithm** computes $B = kA$ for matrix $A \\in \\mathbb{R}^{m \\times n}$ and scalar $k \\in \\mathbb{R}$. Algorithm: (1) Determine dimensions $m, n$ of $A$; (2) Initialize result matrix $B$ with dimensions $m \\times n$; (3) For each $i \\in \\{0, \\ldots, m-1\\}$ and $j \\in \\{0, \\ldots, n-1\\}$, compute $b_{ij} = k \\cdot a_{ij}$; (4) Return $B$.",
+        "notation": "Algorithm complexity: $\\mathcal{O}(mn)$ time, $\\mathcal{O}(mn)$ space. The operation is optimal since every element must be processed.",
+        "theorem": "**Correctness Theorem**: The algorithm produces $B = kA$ satisfying: (1) $\\dim(B) = \\dim(A)$; (2) $b_{ij} = k \\cdot a_{ij}$ for all valid $i,j$; (3) $A$ remains unchanged; (4) Properties of scalar multiplication hold: $k(cA) = (kc)A$, $k(A+C) = kA + kC$, etc.",
+        "proof_sketch": "By construction, we create $B$ with same dimensions as $A$ (property 1). The explicit assignment $b_{ij} = k \\cdot a_{ij}$ in the loop ensures property 2. Creating a new matrix guarantees property 3. Property 4 follows from properties of real number arithmetic applied element-wise.",
+        "examples": [
+          "Complete example: $A = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix}$, $k=2$. Dimensions: $m=2, n=2$. Compute: $b_{00}=2 \\cdot 1=2$, $b_{01}=2 \\cdot 2=4$, $b_{10}=2 \\cdot 3=6$, $b_{11}=2 \\cdot 4=8$. Result: $\\begin{bmatrix} 2 & 4 \\\\ 6 & 8 \\end{bmatrix}$.",
+          "Edge case: $k=0$ gives zero matrix regardless of $A$: $0 \\cdot A = O$.",
+          "Edge case: $k=-1$ negates all elements: $-1 \\cdot A = -A$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Scalar Multiplication",
+          "latex": "$B = kA \\Leftrightarrow B = [ka_{ij}]_{m \\times n}$",
+          "description": "The result matrix has same dimensions, with each element scaled by $k$"
+        },
+        {
+          "name": "Algorithm Complexity",
+          "latex": "$T(m,n) = \\Theta(mn)$, $S(m,n) = \\Theta(mn)$",
+          "description": "Linear in the number of matrix elements for both time and space"
+        },
+        {
+          "name": "Verification Property",
+          "latex": "$\\|kA\\| = |k| \\cdot \\|A\\|$ (Frobenius norm)",
+          "description": "The magnitude scales proportionally with the scalar"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs scalar multiplication on a matrix, but with a twist: multiply all elements by the scalar EXCEPT the diagonal elements (where row index equals column index), which should remain unchanged. This tests your understanding of conditional element-wise operations.",
+        "function_signature": "def scalar_multiply_off_diagonal(matrix: list[list[int|float]], scalar: int|float) -> list[list[int|float]]:",
+        "starter_code": "def scalar_multiply_off_diagonal(matrix: list[list[int|float]], scalar: int|float) -> list[list[int|float]]:\n    # Your code here\n    # Multiply elements by scalar EXCEPT when i == j (diagonal)\n    # Diagonal elements should be copied unchanged\n    # Return a new matrix\n    pass",
+        "test_cases": [
+          {
+            "input": "scalar_multiply_off_diagonal([[1, 2], [3, 4]], 10)",
+            "expected": "[[1, 20], [30, 4]]",
+            "explanation": "Diagonal elements (1,4) unchanged. Off-diagonal (2,3) multiplied by 10: $2 \\times 10=20$, $3 \\times 10=30$."
+          },
+          {
+            "input": "scalar_multiply_off_diagonal([[5, 0, 0], [0, 5, 0], [0, 0, 5]], 2)",
+            "expected": "[[5, 0, 0], [0, 5, 0], [0, 0, 5]]",
+            "explanation": "Identity-like matrix: diagonal (5,5,5) unchanged, off-diagonal zeros remain zero when multiplied by 2."
+          },
+          {
+            "input": "scalar_multiply_off_diagonal([[1, 2, 3], [4, 5, 6]], 3)",
+            "expected": "[[1, 6, 9], [12, 5, 18]]",
+            "explanation": "Non-square matrix: diagonal is (1,5). Off-diagonal elements multiplied by 3."
+          },
+          {
+            "input": "scalar_multiply_off_diagonal([[7]], -1)",
+            "expected": "[[7]]",
+            "explanation": "1×1 matrix has only one element which is on the diagonal, so it remains unchanged."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check if an element is on the diagonal before applying the scalar",
+        "Only working correctly for square matrices (assuming m = n)",
+        "Applying scalar to diagonal elements when they should be preserved",
+        "Not creating a new matrix, modifying the original instead",
+        "Incorrect boundary conditions in loops"
+      ],
+      "hint": "Use the condition `if i != j` to identify off-diagonal elements. For those, multiply by scalar. For diagonal elements (i == j), copy the original value unchanged. Now you have all the skills for full scalar multiplication!",
+      "references": [
+        "Diagonal matrices",
+        "Conditional transformations",
+        "Matrix decomposition",
+        "Full scalar multiplication implementation"
+      ]
+    }
+  ]
+}

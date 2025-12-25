@@ -1,0 +1,520 @@
+{
+  "problem_id": 249,
+  "title": "Calculate Batch Prediction Health Metrics",
+  "category": "MLOps",
+  "difficulty": "easy",
+  "description": "In production ML systems, monitoring the health of batch prediction jobs is essential for maintaining service reliability. Given a list of prediction results from a batch job, compute key health metrics that are commonly tracked in MLOps dashboards.\n\nEach prediction result is a dictionary with:\n- 'status': Either 'success' or 'error'\n- 'confidence': A float between 0 and 1 (only present when status is 'success')\n\nWrite a function `calculate_batch_health(predictions, confidence_threshold)` that computes:\n\n1. **Success Rate**: Percentage of predictions that completed successfully\n2. **Average Confidence**: Mean confidence score of successful predictions (as a percentage)\n3. **Low Confidence Rate**: Percentage of successful predictions with confidence below the threshold\n\nThe function should return a dictionary with these three metrics. If the input list is empty, return an empty dictionary. If there are no successful predictions, return success_rate as calculated and both confidence metrics as 0.0.\n\nAll returned values should be rounded to 2 decimal places.",
+  "example": {
+    "input": "predictions = [{'status': 'success', 'confidence': 0.9}, {'status': 'success', 'confidence': 0.8}, {'status': 'error'}, {'status': 'success', 'confidence': 0.4}, {'status': 'success', 'confidence': 0.7}], confidence_threshold = 0.5",
+    "output": "{'success_rate': 80.0, 'avg_confidence': 70.0, 'low_confidence_rate': 25.0}",
+    "reasoning": "Out of 5 predictions, 4 succeeded (80% success rate). The successful predictions have confidences [0.9, 0.8, 0.4, 0.7], averaging to 0.7 (70%). Only one prediction (0.4) is below the 0.5 threshold, giving a low confidence rate of 1/4 = 25%."
+  },
+  "starter_code": "def calculate_batch_health(predictions: list, confidence_threshold: float = 0.5) -> dict:\n    \"\"\"\n    Calculate health metrics for a batch prediction job.\n    \n    Args:\n        predictions: list of prediction results, each a dict with 'status' and optionally 'confidence'\n        confidence_threshold: threshold below which a prediction is considered low confidence\n    \n    Returns:\n        dict with keys: 'success_rate', 'avg_confidence', 'low_confidence_rate'\n        All values as percentages (0-100), rounded to 2 decimal places.\n    \"\"\"\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Counting and Classification of Categorical Data",
+      "relation_to_problem": "This concept teaches how to partition and count data by categories (success/error status), which is fundamental for calculating the success rate metric in batch prediction health monitoring.",
+      "prerequisites": [
+        "Basic Python",
+        "Dictionaries",
+        "List comprehension"
+      ],
+      "learning_objectives": [
+        "Understand formal definitions of sets and partitions",
+        "Apply counting principles to categorize data",
+        "Implement efficient algorithms for data classification"
+      ],
+      "math_content": {
+        "definition": "Given a finite set $S$ and a categorical attribute $A: S \\to C$ where $C = \\{c_1, c_2, \\ldots, c_k\\}$ is a set of categories, a **partition** of $S$ by $A$ is a collection of disjoint subsets $\\{S_1, S_2, \\ldots, S_k\\}$ where $S_i = \\{s \\in S : A(s) = c_i\\}$ such that $\\bigcup_{i=1}^{k} S_i = S$ and $S_i \\cap S_j = \\emptyset$ for all $i \\neq j$. The **cardinality** $|S_i|$ represents the count of elements in category $c_i$.",
+        "notation": "$S$ = total dataset, $|S|$ = size of dataset, $S_i$ = subset of category $i$, $|S_i|$ = count in category $i$",
+        "theorem": "**Partition Counting Theorem**: For any partition $\\{S_1, S_2, \\ldots, S_k\\}$ of set $S$, we have $\\sum_{i=1}^{k} |S_i| = |S|$. This follows directly from the definition that partitions are disjoint and exhaustive.",
+        "proof_sketch": "Since the subsets are disjoint ($S_i \\cap S_j = \\emptyset$), no element is counted twice. Since $\\bigcup_{i=1}^{k} S_i = S$, every element of $S$ is counted exactly once. Therefore, the sum of individual counts equals the total count.",
+        "examples": [
+          "Given $S = \\{1, 2, 3, 4, 5\\}$ with $A(x) = \\text{'even' if } x \\bmod 2 = 0 \\text{ else 'odd'}$, we get $S_{\\text{even}} = \\{2, 4\\}$ with $|S_{\\text{even}}| = 2$ and $S_{\\text{odd}} = \\{1, 3, 5\\}$ with $|S_{\\text{odd}}| = 3$. Verification: $2 + 3 = 5 = |S|$.",
+          "For prediction results with status attribute, $S = $ all predictions, $S_{\\text{success}} = \\{p \\in S : p.\\text{status} = \\text{'success'}\\}$, $S_{\\text{error}} = \\{p \\in S : p.\\text{status} = \\text{'error'}\\}$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Category Count",
+          "latex": "$|S_i| = |\\{s \\in S : A(s) = c_i\\}|$",
+          "description": "Count elements belonging to a specific category by filtering the dataset"
+        },
+        {
+          "name": "Partition Completeness",
+          "latex": "$\\sum_{i=1}^{k} |S_i| = |S|$",
+          "description": "Verify that all elements are accounted for in the partition"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that counts the number of items in a list of dictionaries that match a specific status value. This builds the foundation for calculating success rates.",
+        "function_signature": "def count_by_status(items: list, status_value: str) -> int:",
+        "starter_code": "def count_by_status(items: list, status_value: str) -> int:\n    \"\"\"\n    Count the number of items with a given status.\n    \n    Args:\n        items: list of dictionaries, each containing a 'status' key\n        status_value: the status value to count (e.g., 'success' or 'error')\n    \n    Returns:\n        int: count of items with the specified status\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "count_by_status([{'status': 'success'}, {'status': 'error'}, {'status': 'success'}], 'success')",
+            "expected": "2",
+            "explanation": "Two items have status 'success', so the count is 2"
+          },
+          {
+            "input": "count_by_status([{'status': 'error'}, {'status': 'error'}], 'success')",
+            "expected": "0",
+            "explanation": "No items have status 'success', so the count is 0"
+          },
+          {
+            "input": "count_by_status([], 'success')",
+            "expected": "0",
+            "explanation": "Empty list has no items to count"
+          },
+          {
+            "input": "count_by_status([{'status': 'success'}, {'status': 'success'}, {'status': 'success'}], 'error')",
+            "expected": "0",
+            "explanation": "All items are successes, no errors to count"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle empty lists",
+        "Using 'is' instead of '==' for string comparison",
+        "Not checking if 'status' key exists in dictionaries",
+        "Off-by-one errors when manually counting"
+      ],
+      "hint": "Use list comprehension or a filtering function to select items matching the criteria, then compute the length of the result.",
+      "references": [
+        "Set theory partitions",
+        "Python filter() function",
+        "List comprehensions"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Ratio and Percentage Metrics",
+      "relation_to_problem": "Success rate is fundamentally a ratio metric converted to percentage. This sub-quest teaches the mathematical foundations of computing ratios and handling edge cases like division by zero.",
+      "prerequisites": [
+        "Counting categorical data",
+        "Basic arithmetic",
+        "Set theory"
+      ],
+      "learning_objectives": [
+        "Define ratios formally using set cardinality",
+        "Convert ratios to percentages with proper precision",
+        "Handle edge cases in ratio calculations (empty sets, zero denominators)"
+      ],
+      "math_content": {
+        "definition": "Given two sets $A \\subseteq S$ and $S$ where $S$ is the total set, the **ratio** of $A$ to $S$ is defined as $r = \\frac{|A|}{|S|}$ when $|S| > 0$. The ratio is undefined when $|S| = 0$. The **percentage** representation is $p = r \\times 100\\%$. For prediction health metrics, we require $p \\in [0, 100]$ and typically round to $d$ decimal places using the rounding function $\\text{round}(p, d)$.",
+        "notation": "$r$ = ratio (decimal form), $p$ = percentage, $|A|$ = count of subset, $|S|$ = count of total set, $d$ = decimal places for rounding",
+        "theorem": "**Ratio Bounds Theorem**: For any subset $A \\subseteq S$ with $|S| > 0$, the ratio $r = \\frac{|A|}{|S|}$ satisfies $0 \\leq r \\leq 1$. Consequently, the percentage $p = r \\times 100$ satisfies $0 \\leq p \\leq 100$.",
+        "proof_sketch": "By definition of subset, $A \\subseteq S$ implies $|A| \\leq |S|$. Also, cardinality is non-negative: $|A| \\geq 0$. Therefore, $0 \\leq |A| \\leq |S|$. Dividing by $|S| > 0$ preserves inequalities: $0 \\leq \\frac{|A|}{|S|} \\leq 1$. Multiplying by 100 gives $0 \\leq p \\leq 100$.",
+        "examples": [
+          "If $S = \\{1, 2, 3, 4, 5\\}$ and $A = \\{2, 4\\}$, then $r = \\frac{2}{5} = 0.4$ and $p = 40\\%$. Interpretation: 40% of elements in $S$ belong to $A$.",
+          "For batch predictions: if 8 out of 10 predictions succeed, the success rate is $r = \\frac{8}{10} = 0.8$ or $p = 80.0\\%$ (rounded to 1 decimal place).",
+          "Edge case: if all predictions fail, $|A| = 0$, so $r = \\frac{0}{10} = 0.0$ and $p = 0.0\\%$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Ratio Formula",
+          "latex": "$r = \\frac{|A|}{|S|}$ when $|S| > 0$",
+          "description": "Basic ratio of subset to total set; undefined when total is zero"
+        },
+        {
+          "name": "Percentage Conversion",
+          "latex": "$p = r \\times 100$",
+          "description": "Convert decimal ratio to percentage by multiplying by 100"
+        },
+        {
+          "name": "Rounded Percentage",
+          "latex": "$p_d = \\text{round}(r \\times 100, d)$",
+          "description": "Percentage rounded to d decimal places for reporting"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the percentage of successful items from a list of status dictionaries. Return the result rounded to 2 decimal places. This directly builds toward the success_rate metric.",
+        "function_signature": "def calculate_success_percentage(items: list) -> float:",
+        "starter_code": "def calculate_success_percentage(items: list) -> float:\n    \"\"\"\n    Calculate the percentage of items with status 'success'.\n    \n    Args:\n        items: list of dictionaries, each containing a 'status' key\n    \n    Returns:\n        float: percentage of successful items, rounded to 2 decimal places\n               Returns 0.0 if the list is empty\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_success_percentage([{'status': 'success'}, {'status': 'error'}, {'status': 'success'}, {'status': 'success'}])",
+            "expected": "75.0",
+            "explanation": "3 out of 4 items are successful: (3/4) * 100 = 75.0%"
+          },
+          {
+            "input": "calculate_success_percentage([{'status': 'error'}, {'status': 'error'}])",
+            "expected": "0.0",
+            "explanation": "0 out of 2 items are successful: (0/2) * 100 = 0.0%"
+          },
+          {
+            "input": "calculate_success_percentage([])",
+            "expected": "0.0",
+            "explanation": "Empty list should return 0.0 by convention (edge case handling)"
+          },
+          {
+            "input": "calculate_success_percentage([{'status': 'success'}, {'status': 'success'}, {'status': 'success'}])",
+            "expected": "100.0",
+            "explanation": "3 out of 3 items are successful: (3/3) * 100 = 100.0%"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the empty list case (division by zero)",
+        "Forgetting to multiply by 100 for percentage conversion",
+        "Incorrect rounding (using int() instead of round())",
+        "Not specifying the number of decimal places in round()",
+        "Returning None instead of 0.0 for edge cases"
+      ],
+      "hint": "First count the total items and successful items, then handle the edge case where total is zero before computing the ratio.",
+      "references": [
+        "Percentages and proportions",
+        "Python round() function",
+        "Division by zero handling"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Conditional Data Extraction and Filtering",
+      "relation_to_problem": "To compute average confidence and low confidence rate, we must first extract confidence values only from successful predictions. This teaches conditional filtering with multiple criteria.",
+      "prerequisites": [
+        "Dictionary access",
+        "List comprehension",
+        "Conditional statements"
+      ],
+      "learning_objectives": [
+        "Formalize predicate-based filtering in set theory",
+        "Extract values from nested data structures based on conditions",
+        "Handle missing or optional fields in data records"
+      ],
+      "math_content": {
+        "definition": "Given a set $S$ of records and a predicate $P: S \\to \\{\\text{true}, \\text{false}\\}$, the **filtered subset** is $S_P = \\{s \\in S : P(s) = \\text{true}\\}$. For a value extraction function $f: S_P \\to \\mathbb{R}$, the **extracted values** form the multiset $V = \\{f(s) : s \\in S_P\\}$. In our context, $P(s) = (s.\\text{status} = \\text{'success'})$ and $f(s) = s.\\text{confidence}$ where $f$ is only defined for $s \\in S_P$.",
+        "notation": "$S$ = all records, $P$ = predicate function, $S_P$ = filtered subset, $f$ = extraction function, $V$ = extracted values",
+        "theorem": "**Conditional Extraction Theorem**: If $f$ is defined only on $S_P \\subseteq S$, then $|V| = |S_P| \\leq |S|$. The extracted values $V$ form a dataset suitable for aggregate operations (mean, count, etc.) when $|V| > 0$.",
+        "proof_sketch": "Since $f$ maps each element of $S_P$ to exactly one value, we have a bijection between $S_P$ and $V$ in the multiset sense (allowing duplicates). Therefore $|V| = |S_P|$. Since $S_P \\subseteq S$, we have $|S_P| \\leq |S|$ by the subset property.",
+        "examples": [
+          "Given records $S = \\{\\{\\text{status: 'success', confidence: 0.9}\\}, \\{\\text{status: 'error'}\\}, \\{\\text{status: 'success', confidence: 0.7}\\}\\}$, the predicate $P(s) = (s.\\text{status} = \\text{'success'})$ gives $S_P = \\{\\{\\text{status: 'success', confidence: 0.9}\\}, \\{\\text{status: 'success', confidence: 0.7}\\}\\}$ with $|S_P| = 2$. Applying $f(s) = s.\\text{confidence}$ yields $V = [0.9, 0.7]$ with $|V| = 2$.",
+          "For the case where all predictions fail, $S_P = \\emptyset$ and $V = []$ (empty list), making $|V| = 0$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Filtered Subset",
+          "latex": "$S_P = \\{s \\in S : P(s) = \\text{true}\\}$",
+          "description": "Select elements satisfying the predicate condition"
+        },
+        {
+          "name": "Value Extraction",
+          "latex": "$V = [f(s) \\text{ for } s \\in S_P]$",
+          "description": "Extract specific attribute values from filtered elements"
+        },
+        {
+          "name": "Extracted Count",
+          "latex": "$|V| = |S_P|$",
+          "description": "Number of extracted values equals number of filtered elements"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that extracts confidence scores only from predictions with status 'success'. This is essential for computing both average confidence and low confidence rate metrics.",
+        "function_signature": "def extract_success_confidences(predictions: list) -> list:",
+        "starter_code": "def extract_success_confidences(predictions: list) -> list:\n    \"\"\"\n    Extract confidence scores from successful predictions only.\n    \n    Args:\n        predictions: list of dictionaries with 'status' and optionally 'confidence'\n    \n    Returns:\n        list of floats: confidence values from predictions with status 'success'\n                        Empty list if no successful predictions\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "extract_success_confidences([{'status': 'success', 'confidence': 0.9}, {'status': 'error'}, {'status': 'success', 'confidence': 0.7}])",
+            "expected": "[0.9, 0.7]",
+            "explanation": "Only the two successful predictions have confidence values to extract"
+          },
+          {
+            "input": "extract_success_confidences([{'status': 'error'}, {'status': 'error'}])",
+            "expected": "[]",
+            "explanation": "No successful predictions means no confidence values to extract"
+          },
+          {
+            "input": "extract_success_confidences([])",
+            "expected": "[]",
+            "explanation": "Empty input returns empty output"
+          },
+          {
+            "input": "extract_success_confidences([{'status': 'success', 'confidence': 0.5}, {'status': 'success', 'confidence': 1.0}, {'status': 'success', 'confidence': 0.3}])",
+            "expected": "[0.5, 1.0, 0.3]",
+            "explanation": "All three successful predictions contribute their confidence values"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Attempting to access 'confidence' key without checking status first",
+        "Using append() in a loop instead of list comprehension",
+        "Not handling the case where all predictions have status 'error'",
+        "Trying to extract confidence from error predictions (KeyError)",
+        "Modifying the original list instead of creating a new one"
+      ],
+      "hint": "Use list comprehension with a condition to filter by status, then extract the confidence field from each matching record.",
+      "references": [
+        "List comprehensions with conditions",
+        "Dictionary get() method",
+        "Filter and map patterns"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Arithmetic Mean and Sample Statistics",
+      "relation_to_problem": "The average confidence metric requires computing the arithmetic mean of confidence scores. This sub-quest formalizes the mean calculation and its properties.",
+      "prerequisites": [
+        "Conditional data extraction",
+        "Summation",
+        "Division"
+      ],
+      "learning_objectives": [
+        "Define the arithmetic mean formally using summation notation",
+        "Understand properties of the mean (bounds, sensitivity to outliers)",
+        "Implement mean calculation with edge case handling"
+      ],
+      "math_content": {
+        "definition": "Given a non-empty sample $X = \\{x_1, x_2, \\ldots, x_n\\}$ where $n > 0$, the **arithmetic mean** (or sample mean) is defined as $\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n} x_i = \\frac{x_1 + x_2 + \\cdots + x_n}{n}$. The mean is the central tendency measure that minimizes the sum of squared deviations $\\sum_{i=1}^{n}(x_i - \\bar{x})^2$. The mean is undefined for empty samples ($n = 0$).",
+        "notation": "$\\bar{x}$ = sample mean, $x_i$ = individual sample values, $n$ = sample size, $\\sum$ = summation operator",
+        "theorem": "**Mean Bounds Theorem**: If all samples satisfy $a \\leq x_i \\leq b$ for all $i \\in \\{1, \\ldots, n\\}$, then $a \\leq \\bar{x} \\leq b$. Specifically, $\\min(X) \\leq \\bar{x} \\leq \\max(X)$.",
+        "proof_sketch": "Since $x_i \\geq a$ for all $i$, summing gives $\\sum_{i=1}^{n} x_i \\geq na$. Dividing by $n > 0$ yields $\\bar{x} \\geq a$. Similarly, $x_i \\leq b$ implies $\\sum_{i=1}^{n} x_i \\leq nb$, so $\\bar{x} \\leq b$. The mean is therefore bounded by the minimum and maximum values.",
+        "examples": [
+          "For confidence scores $X = [0.9, 0.7, 0.8]$, we have $\\bar{x} = \\frac{0.9 + 0.7 + 0.8}{3} = \\frac{2.4}{3} = 0.8$. As a percentage: $0.8 \\times 100 = 80.0\\%$.",
+          "For $X = [1.0, 1.0, 1.0]$, $\\bar{x} = \\frac{3.0}{3} = 1.0$ (100% confidence on average).",
+          "For a single value $X = [0.5]$, $\\bar{x} = \\frac{0.5}{1} = 0.5$ (the mean equals the single value).",
+          "Verification of bounds: In first example, $\\min(X) = 0.7 \\leq 0.8 \\leq 0.9 = \\max(X)$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Arithmetic Mean",
+          "latex": "$\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n} x_i$",
+          "description": "Sum all values and divide by count; only valid when n > 0"
+        },
+        {
+          "name": "Mean as Percentage",
+          "latex": "$p = \\bar{x} \\times 100$",
+          "description": "Convert mean confidence (in [0,1]) to percentage form"
+        },
+        {
+          "name": "Mean Bounds",
+          "latex": "$\\min(X) \\leq \\bar{x} \\leq \\max(X)$",
+          "description": "The mean always lies between the minimum and maximum values"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the average (mean) confidence as a percentage from a list of confidence values. Return 0.0 if the list is empty. This directly implements the avg_confidence metric component.",
+        "function_signature": "def calculate_average_confidence(confidences: list) -> float:",
+        "starter_code": "def calculate_average_confidence(confidences: list) -> float:\n    \"\"\"\n    Calculate the average confidence as a percentage.\n    \n    Args:\n        confidences: list of confidence values (floats between 0 and 1)\n    \n    Returns:\n        float: average confidence as a percentage (0-100), rounded to 2 decimal places\n               Returns 0.0 if the list is empty\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_average_confidence([0.9, 0.8, 0.7])",
+            "expected": "80.0",
+            "explanation": "Mean of [0.9, 0.8, 0.7] is 2.4/3 = 0.8, which is 80.0%"
+          },
+          {
+            "input": "calculate_average_confidence([1.0, 1.0, 1.0, 1.0])",
+            "expected": "100.0",
+            "explanation": "All confidences are 1.0, so mean is 1.0 = 100.0%"
+          },
+          {
+            "input": "calculate_average_confidence([0.5])",
+            "expected": "50.0",
+            "explanation": "Single value: mean is 0.5 = 50.0%"
+          },
+          {
+            "input": "calculate_average_confidence([])",
+            "expected": "0.0",
+            "explanation": "Empty list returns 0.0 by convention (edge case)"
+          },
+          {
+            "input": "calculate_average_confidence([0.33, 0.34, 0.33])",
+            "expected": "33.33",
+            "explanation": "Mean is 1.0/3 ≈ 0.3333, which is 33.33% when rounded to 2 decimal places"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the empty list case (division by zero)",
+        "Forgetting to convert to percentage (multiply by 100)",
+        "Using integer division instead of float division",
+        "Not rounding to the specified decimal places",
+        "Summing before checking if list is empty",
+        "Calculating median instead of mean"
+      ],
+      "hint": "Use Python's built-in sum() function to add all values, then divide by len(). Check for empty list before dividing.",
+      "references": [
+        "Arithmetic mean definition",
+        "Central tendency measures",
+        "Python sum() and len() functions"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Threshold-Based Classification and Conditional Counting",
+      "relation_to_problem": "The low confidence rate requires counting how many successful predictions fall below a threshold. This teaches binary classification based on numerical thresholds.",
+      "prerequisites": [
+        "Arithmetic mean",
+        "Conditional filtering",
+        "Ratio metrics"
+      ],
+      "learning_objectives": [
+        "Formalize threshold-based classification using indicator functions",
+        "Compute conditional ratios (rate of items meeting multiple criteria)",
+        "Understand the relationship between thresholds and classification rates"
+      ],
+      "math_content": {
+        "definition": "Given a dataset $X = \\{x_1, x_2, \\ldots, x_n\\}$ and a threshold $\\tau \\in \\mathbb{R}$, the **indicator function** for values below threshold is $\\mathbb{1}_{x < \\tau}(x) = \\begin{cases} 1 & \\text{if } x < \\tau \\\\ 0 & \\text{otherwise} \\end{cases}$. The **count below threshold** is $C_{<\\tau} = \\sum_{i=1}^{n} \\mathbb{1}_{x_i < \\tau}(x_i)$. The **rate below threshold** (or threshold violation rate) is $r_{<\\tau} = \\frac{C_{<\\tau}}{n} \\times 100\\%$ when $n > 0$.",
+        "notation": "$\\tau$ = threshold value, $\\mathbb{1}$ = indicator function, $C_{<\\tau}$ = count below threshold, $r_{<\\tau}$ = rate below threshold as percentage",
+        "theorem": "**Threshold Monotonicity Theorem**: For thresholds $\\tau_1 < \\tau_2$, the counts satisfy $C_{<\\tau_1} \\leq C_{<\\tau_2}$, and consequently the rates satisfy $r_{<\\tau_1} \\leq r_{<\\tau_2}$. Intuitively, a higher threshold captures more values below it.",
+        "proof_sketch": "For any $x \\in X$, if $x < \\tau_1$ then $x < \\tau_2$ (since $\\tau_1 < \\tau_2$), so $\\mathbb{1}_{x < \\tau_1}(x) = 1$ implies $\\mathbb{1}_{x < \\tau_2}(x) = 1$. Therefore, every element counted in $C_{<\\tau_1}$ is also counted in $C_{<\\tau_2}$, giving $C_{<\\tau_1} \\leq C_{<\\tau_2}$. Since both rates use the same denominator $n$, the inequality extends to rates.",
+        "examples": [
+          "For $X = [0.9, 0.4, 0.7, 0.3]$ with $\\tau = 0.5$: Elements below threshold are $[0.4, 0.3]$, so $C_{<0.5} = 2$ and $r_{<0.5} = \\frac{2}{4} \\times 100 = 50.0\\%$.",
+          "Same $X$ with $\\tau = 0.6$: Elements below threshold are $[0.4, 0.3]$, so $C_{<0.6} = 2$ and $r_{<0.6} = 50.0\\%$ (same result).",
+          "Same $X$ with $\\tau = 0.8$: Elements below threshold are $[0.4, 0.7, 0.3]$, so $C_{<0.8} = 3$ and $r_{<0.8} = 75.0\\%$ (higher threshold, higher rate).",
+          "For all values above threshold: $X = [0.9, 0.8, 0.7]$ with $\\tau = 0.5$ gives $C_{<0.5} = 0$ and $r_{<0.5} = 0.0\\%$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Indicator Function",
+          "latex": "$\\mathbb{1}_{x < \\tau}(x) = \\begin{cases} 1 & \\text{if } x < \\tau \\\\ 0 & \\text{otherwise} \\end{cases}$",
+          "description": "Binary classification: 1 if below threshold, 0 otherwise"
+        },
+        {
+          "name": "Count Below Threshold",
+          "latex": "$C_{<\\tau} = \\sum_{i=1}^{n} \\mathbb{1}_{x_i < \\tau}(x_i) = |\\{x \\in X : x < \\tau\\}|$",
+          "description": "Count how many values fall below the threshold"
+        },
+        {
+          "name": "Rate Below Threshold",
+          "latex": "$r_{<\\tau} = \\frac{C_{<\\tau}}{n} \\times 100\\%$ when $n > 0$",
+          "description": "Percentage of values below threshold relative to total count"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the percentage of confidence values that fall below a given threshold. This directly implements the low_confidence_rate metric component.",
+        "function_signature": "def calculate_below_threshold_rate(values: list, threshold: float) -> float:",
+        "starter_code": "def calculate_below_threshold_rate(values: list, threshold: float) -> float:\n    \"\"\"\n    Calculate the percentage of values below a threshold.\n    \n    Args:\n        values: list of numerical values\n        threshold: the threshold value to compare against\n    \n    Returns:\n        float: percentage of values below threshold, rounded to 2 decimal places\n               Returns 0.0 if the list is empty\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_below_threshold_rate([0.9, 0.4, 0.7, 0.3], 0.5)",
+            "expected": "50.0",
+            "explanation": "Two values (0.4 and 0.3) out of 4 are below 0.5: (2/4) * 100 = 50.0%"
+          },
+          {
+            "input": "calculate_below_threshold_rate([0.9, 0.8, 0.7], 0.5)",
+            "expected": "0.0",
+            "explanation": "No values are below 0.5: (0/3) * 100 = 0.0%"
+          },
+          {
+            "input": "calculate_below_threshold_rate([0.3, 0.2, 0.1], 0.5)",
+            "expected": "100.0",
+            "explanation": "All three values are below 0.5: (3/3) * 100 = 100.0%"
+          },
+          {
+            "input": "calculate_below_threshold_rate([], 0.5)",
+            "expected": "0.0",
+            "explanation": "Empty list returns 0.0 by convention"
+          },
+          {
+            "input": "calculate_below_threshold_rate([0.5, 0.5, 0.5], 0.5)",
+            "expected": "0.0",
+            "explanation": "Values equal to threshold are NOT below it: (0/3) * 100 = 0.0%"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using <= instead of < for the comparison (values equal to threshold should NOT be counted)",
+        "Not handling empty list case",
+        "Forgetting to convert to percentage (multiply by 100)",
+        "Not rounding to specified decimal places",
+        "Counting values above threshold instead of below",
+        "Confusing threshold parameter order or meaning"
+      ],
+      "hint": "Count how many values satisfy the condition (value < threshold), then compute the ratio as a percentage. Remember that values equal to the threshold are not below it.",
+      "references": [
+        "Indicator functions",
+        "Threshold classification",
+        "Binary classification metrics"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Composite Metrics and Multi-Stage Data Processing",
+      "relation_to_problem": "The batch health calculation combines all previous concepts: partition by status, compute success rate, extract confidences conditionally, compute mean, and compute threshold rate. This teaches pipeline design.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Dictionary construction",
+        "Function composition"
+      ],
+      "learning_objectives": [
+        "Compose multiple statistical operations into a pipeline",
+        "Handle interdependent metric calculations with shared intermediate results",
+        "Design robust systems with comprehensive edge case handling"
+      ],
+      "math_content": {
+        "definition": "A **composite metric system** $M$ consists of multiple metrics $\\{m_1, m_2, \\ldots, m_k\\}$ computed from a shared dataset $S$ through a processing pipeline. Each metric $m_i$ is a function $m_i: S \\to \\mathbb{R}$ that may depend on intermediate computations. The system is **well-defined** if all metrics handle edge cases (empty sets, division by zero) consistently. For batch prediction health, we define: $m_1(S) = $ success rate, $m_2(S) = $ average confidence, $m_3(S, \\tau) = $ low confidence rate with threshold $\\tau$.",
+        "notation": "$S$ = input dataset, $M = \\{m_1, m_2, \\ldots, m_k\\}$ = metric set, $m_i$ = individual metric function, $\\tau$ = threshold parameter",
+        "theorem": "**Pipeline Efficiency Theorem**: When metrics share intermediate computations, computing them in a single pass with shared state is more efficient than independent computation. Specifically, if $k$ metrics each require $O(n)$ time independently, but share $O(n)$ preprocessing, the total complexity is $O(n)$ with sharing versus $O(kn)$ without.",
+        "proof_sketch": "Without sharing: Each metric iterates through the dataset once, giving $k \\times O(n) = O(kn)$. With sharing: One pass extracts all necessary information (e.g., partition by status, extract confidences), then each metric uses $O(1)$ to $O(n)$ operations on preprocessed data. Total: $O(n)$ for preprocessing + $O(n)$ for metric computations = $O(n)$.",
+        "examples": [
+          "For batch health metrics on dataset $S$ of size $n$: Compute success partition $S_{\\text{success}}$ once ($O(n)$), then reuse it for success rate, confidence extraction, and subsequent metrics without re-iterating.",
+          "Pipeline stages: (1) Partition by status → (2) Count for success rate → (3) Extract confidences from successes → (4) Compute mean for avg confidence → (5) Count below threshold for low confidence rate. Each stage uses results from previous stages.",
+          "Edge case handling: If $S = \\emptyset$, return empty result. If $S_{\\text{success}} = \\emptyset$, return success_rate based on counts, but confidence metrics as 0.0 (undefined mean convention)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Success Rate",
+          "latex": "$m_1(S) = \\frac{|S_{\\text{success}}|}{|S|} \\times 100\\%$ when $|S| > 0$",
+          "description": "Percentage of predictions that succeeded"
+        },
+        {
+          "name": "Average Confidence",
+          "latex": "$m_2(S) = \\frac{1}{|S_{\\text{success}}|}\\sum_{s \\in S_{\\text{success}}} s.\\text{confidence} \\times 100\\%$ when $|S_{\\text{success}}| > 0$, else $0$",
+          "description": "Mean confidence of successful predictions as percentage"
+        },
+        {
+          "name": "Low Confidence Rate",
+          "latex": "$m_3(S, \\tau) = \\frac{|\\{s \\in S_{\\text{success}} : s.\\text{confidence} < \\tau\\}|}{|S_{\\text{success}}|} \\times 100\\%$ when $|S_{\\text{success}}| > 0$, else $0$",
+          "description": "Percentage of successful predictions below confidence threshold"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes two related metrics from a list of values: (1) the average value, and (2) the percentage of values below a threshold. This practices computing multiple metrics efficiently from shared data, a simplified version of the full batch health calculation.",
+        "function_signature": "def calculate_value_metrics(values: list, threshold: float) -> dict:",
+        "starter_code": "def calculate_value_metrics(values: list, threshold: float) -> dict:\n    \"\"\"\n    Calculate average and below-threshold rate for a list of values.\n    \n    Args:\n        values: list of numerical values\n        threshold: threshold for classifying low values\n    \n    Returns:\n        dict with keys:\n            - 'average': mean of values as percentage (0-100), rounded to 2 decimal places\n            - 'below_threshold_rate': percentage below threshold, rounded to 2 decimal places\n        Returns empty dict {} if input list is empty\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_value_metrics([0.9, 0.8, 0.4, 0.7], 0.5)",
+            "expected": "{'average': 70.0, 'below_threshold_rate': 25.0}",
+            "explanation": "Mean is 2.8/4 = 0.7 (70.0%), and 1 out of 4 values (0.4) is below 0.5 (25.0%)"
+          },
+          {
+            "input": "calculate_value_metrics([1.0, 0.9, 0.8], 0.5)",
+            "expected": "{'average': 90.0, 'below_threshold_rate': 0.0}",
+            "explanation": "Mean is 2.7/3 = 0.9 (90.0%), and 0 out of 3 values are below 0.5 (0.0%)"
+          },
+          {
+            "input": "calculate_value_metrics([], 0.5)",
+            "expected": "{}",
+            "explanation": "Empty list returns empty dictionary"
+          },
+          {
+            "input": "calculate_value_metrics([0.3, 0.2, 0.1], 0.5)",
+            "expected": "{'average': 20.0, 'below_threshold_rate': 100.0}",
+            "explanation": "Mean is 0.6/3 = 0.2 (20.0%), and all 3 values are below 0.5 (100.0%)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing metrics independently instead of reusing intermediate results",
+        "Inconsistent edge case handling between metrics",
+        "Incorrect dictionary key names (typos break the interface)",
+        "Not returning empty dict for empty input",
+        "Forgetting to round both metrics to 2 decimal places",
+        "Processing the data multiple times instead of once"
+      ],
+      "hint": "First check if the list is empty. If not, compute the average and threshold rate using the techniques from previous sub-quests, then package both results in a dictionary.",
+      "references": [
+        "Function composition",
+        "Pipeline design patterns",
+        "Dictionary creation in Python"
+      ]
+    }
+  ]
+}

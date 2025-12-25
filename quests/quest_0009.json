@@ -1,0 +1,569 @@
+{
+  "problem_id": 9,
+  "title": "Matrix times Matrix ",
+  "category": "Linear Algebra",
+  "difficulty": "medium",
+  "description": "multiply two matrices together (return -1 if shapes of matrix don't align), i.e. $C = A \\cdot B$",
+  "example": {
+    "input": "A = [[1,2],[2,4]], B = [[2,1],[3,4]]",
+    "reasoning": "1\\*2 + 2\\*3 = 8;                   2\\*2 + 3\\*4 = 16;                   1\\*1 + 2\\*4 = 9;                   2\\*1 + 4\\*4 = 18                    Example 2:        input: A = [[1,2],                    [2,4]],                B = [[2,1],                    [3,4],                    [4,5]]        output: -1        reasoning: the length of the rows of A does not equal          the column length of B",
+    "output": "[[ 8,  9],[16, 18]]"
+  },
+  "starter_code": "def matrixmul(a:list[list[int|float]],\n              b:list[list[int|float]])-> list[list[int|float]]:\n\treturn c",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Vector Dot Product and Einstein Summation",
+      "relation_to_problem": "The dot product is the fundamental operation used to compute each element in matrix multiplication. Understanding $c_{ik} = \\sum_{j} a_{ij}b_{jk}$ is essential for implementing matrix multiplication.",
+      "prerequisites": [
+        "Basic arithmetic operations",
+        "Understanding of arrays/lists",
+        "Index notation"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of the dot product between two vectors",
+        "Master index notation and Einstein summation convention",
+        "Implement efficient dot product computation in Python"
+      ],
+      "math_content": {
+        "definition": "Given two vectors $\\mathbf{u}, \\mathbf{v} \\in \\mathbb{R}^n$, the **dot product** (or inner product) is defined as: $$\\mathbf{u} \\cdot \\mathbf{v} = \\sum_{i=1}^{n} u_i v_i = u_1v_1 + u_2v_2 + \\cdots + u_nv_n$$ where $u_i$ and $v_i$ denote the $i$-th components of vectors $\\mathbf{u}$ and $\\mathbf{v}$ respectively.",
+        "notation": "$\\mathbf{u} = (u_1, u_2, \\ldots, u_n)$ represents a vector in $n$-dimensional space; $u_i$ denotes the $i$-th component; $\\sum_{i=1}^{n}$ denotes summation from index $i=1$ to $i=n$",
+        "theorem": "**Theorem (Commutativity of Dot Product)**: For vectors $\\mathbf{u}, \\mathbf{v} \\in \\mathbb{R}^n$, the dot product is commutative: $\\mathbf{u} \\cdot \\mathbf{v} = \\mathbf{v} \\cdot \\mathbf{u}$.",
+        "proof_sketch": "By definition, $\\mathbf{u} \\cdot \\mathbf{v} = \\sum_{i=1}^{n} u_i v_i$. Since scalar multiplication is commutative ($u_i v_i = v_i u_i$) and addition is also commutative, we can rearrange: $\\sum_{i=1}^{n} u_i v_i = \\sum_{i=1}^{n} v_i u_i = \\mathbf{v} \\cdot \\mathbf{u}$.",
+        "examples": [
+          "Example 1: $\\mathbf{u} = (1, 2, 3)$, $\\mathbf{v} = (4, 5, 6)$. Then $\\mathbf{u} \\cdot \\mathbf{v} = 1(4) + 2(5) + 3(6) = 4 + 10 + 18 = 32$",
+          "Example 2: $\\mathbf{u} = (2, -1)$, $\\mathbf{v} = (3, 4)$. Then $\\mathbf{u} \\cdot \\mathbf{v} = 2(3) + (-1)(4) = 6 - 4 = 2$",
+          "Example 3 (Zero vector): $\\mathbf{u} = (1, 2, 3)$, $\\mathbf{0} = (0, 0, 0)$. Then $\\mathbf{u} \\cdot \\mathbf{0} = 1(0) + 2(0) + 3(0) = 0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Dot Product Definition",
+          "latex": "$\\mathbf{u} \\cdot \\mathbf{v} = \\sum_{i=1}^{n} u_i v_i$",
+          "description": "Use this to compute the scalar result from two equal-length vectors"
+        },
+        {
+          "name": "Einstein Summation Convention",
+          "latex": "$u_i v_i \\equiv \\sum_{i} u_i v_i$",
+          "description": "Repeated indices imply summation (used in advanced matrix notation)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the dot product of two vectors (represented as Python lists). The function should return -1 if the vectors have different lengths, otherwise return the dot product as a number.",
+        "function_signature": "def dot_product(u: list[int|float], v: list[int|float]) -> int|float:",
+        "starter_code": "def dot_product(u: list[int|float], v: list[int|float]) -> int|float:\n    # Check if vectors have the same length\n    # If not, return -1\n    # Otherwise, compute sum of u[i] * v[i] for all i\n    pass",
+        "test_cases": [
+          {
+            "input": "dot_product([1, 2, 3], [4, 5, 6])",
+            "expected": "32",
+            "explanation": "1*4 + 2*5 + 3*6 = 4 + 10 + 18 = 32"
+          },
+          {
+            "input": "dot_product([2, -1], [3, 4])",
+            "expected": "2",
+            "explanation": "2*3 + (-1)*4 = 6 - 4 = 2"
+          },
+          {
+            "input": "dot_product([1, 2], [1, 2, 3])",
+            "expected": "-1",
+            "explanation": "Vectors have different lengths (2 vs 3), so operation is undefined"
+          },
+          {
+            "input": "dot_product([1, 0, 0], [0, 1, 0])",
+            "expected": "0",
+            "explanation": "Orthogonal vectors have dot product 0: 1*0 + 0*1 + 0*0 = 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check if vectors have equal length before computing",
+        "Using element-wise multiplication without summing the results",
+        "Confusing dot product (returns scalar) with element-wise product (returns vector)",
+        "Off-by-one errors when iterating through indices"
+      ],
+      "hint": "Use a loop to iterate through both vectors simultaneously, accumulating the product of corresponding elements. Consider using Python's zip() function or range(len(u)).",
+      "references": [
+        "Inner product spaces",
+        "Linear algebra fundamentals",
+        "Vector operations in Euclidean space"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Matrix Representation and Index Notation",
+      "relation_to_problem": "Understanding how to access matrix elements using row and column indices ($a_{ij}$) is fundamental for implementing matrix multiplication algorithms. This enables us to extract rows from matrix A and columns from matrix B.",
+      "prerequisites": [
+        "Two-dimensional arrays/lists",
+        "Nested list indexing",
+        "Vector dot product"
+      ],
+      "learning_objectives": [
+        "Master formal matrix notation and indexing conventions",
+        "Extract specific rows and columns from a matrix",
+        "Understand matrix dimensions and shape compatibility"
+      ],
+      "math_content": {
+        "definition": "A **matrix** is a rectangular array of numbers arranged in rows and columns. An $m \\times n$ matrix $A$ has $m$ rows and $n$ columns: $$A = \\begin{pmatrix} a_{11} & a_{12} & \\cdots & a_{1n} \\\\ a_{21} & a_{22} & \\cdots & a_{2n} \\\\ \\vdots & \\vdots & \\ddots & \\vdots \\\\ a_{m1} & a_{m2} & \\cdots & a_{mn} \\end{pmatrix}$$ where $a_{ij}$ denotes the element in row $i$ and column $j$ (using 1-based indexing in mathematics).",
+        "notation": "$A \\in \\mathbb{R}^{m \\times n}$ means matrix $A$ has $m$ rows and $n$ columns with real-valued entries; $a_{ij}$ or $(A)_{ij}$ denotes the element at row $i$, column $j$; $\\mathbf{a}_i$ denotes the $i$-th row vector; $\\mathbf{a}^{(j)}$ denotes the $j$-th column vector",
+        "theorem": "**Theorem (Row and Column Vectors)**: For a matrix $A \\in \\mathbb{R}^{m \\times n}$, the $i$-th row can be represented as a vector $\\mathbf{a}_i = (a_{i1}, a_{i2}, \\ldots, a_{in}) \\in \\mathbb{R}^n$, and the $j$-th column as $\\mathbf{a}^{(j)} = (a_{1j}, a_{2j}, \\ldots, a_{mj})^T \\in \\mathbb{R}^m$.",
+        "proof_sketch": "By definition, fixing the first index $i$ in $a_{ij}$ while varying $j$ from 1 to $n$ gives all elements in row $i$. Similarly, fixing $j$ and varying $i$ from 1 to $m$ gives all elements in column $j$. These collections satisfy the definition of vectors in the respective dimensional spaces.",
+        "examples": [
+          "Example 1: Matrix $A = \\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{pmatrix}$ is a $2 \\times 3$ matrix. Element $a_{12} = 2$ (row 1, column 2). Row 1: $(1, 2, 3)$. Column 2: $(2, 5)^T$.",
+          "Example 2: For $B = \\begin{pmatrix} 7 & 8 \\\\ 9 & 10 \\\\ 11 & 12 \\end{pmatrix}$, we have $B \\in \\mathbb{R}^{3 \\times 2}$, $b_{23} = $ undefined (no third column), $b_{31} = 11$.",
+          "Example 3: A column vector $\\mathbf{v} = \\begin{pmatrix} 1 \\\\ 2 \\\\ 3 \\end{pmatrix}$ is a $3 \\times 1$ matrix. A row vector $\\mathbf{u} = (4, 5, 6)$ is a $1 \\times 3$ matrix."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Matrix Dimensions",
+          "latex": "$A \\in \\mathbb{R}^{m \\times n}$ has shape $(m, n)$",
+          "description": "Always specify rows first, then columns"
+        },
+        {
+          "name": "Element Access",
+          "latex": "$a_{ij}$ or $A[i-1][j-1]$ (in 0-indexed Python)",
+          "description": "Access element at row $i$, column $j$"
+        },
+        {
+          "name": "Row Extraction",
+          "latex": "$\\mathbf{a}_i = (a_{i1}, a_{i2}, \\ldots, a_{in})$",
+          "description": "Extract the $i$-th row as a vector"
+        },
+        {
+          "name": "Column Extraction",
+          "latex": "$\\mathbf{a}^{(j)} = (a_{1j}, a_{2j}, \\ldots, a_{mj})^T$",
+          "description": "Extract the $j$-th column as a vector"
+        }
+      ],
+      "exercise": {
+        "description": "Implement two functions: one to extract a specific row from a matrix, and another to extract a specific column. Both should return -1 if the index is out of bounds. Matrices are represented as list[list[int|float]] in Python.",
+        "function_signature": "def get_row(matrix: list[list[int|float]], row_index: int) -> list[int|float]|int:\ndef get_column(matrix: list[list[int|float]], col_index: int) -> list[int|float]|int:",
+        "starter_code": "def get_row(matrix: list[list[int|float]], row_index: int) -> list[int|float]|int:\n    # Check if row_index is valid (0-indexed)\n    # Return the row at row_index or -1 if invalid\n    pass\n\ndef get_column(matrix: list[list[int|float]], col_index: int) -> list[int|float]|int:\n    # Check if col_index is valid\n    # Extract all elements at position col_index from each row\n    # Return as a list or -1 if invalid\n    pass",
+        "test_cases": [
+          {
+            "input": "get_row([[1, 2, 3], [4, 5, 6]], 0)",
+            "expected": "[1, 2, 3]",
+            "explanation": "Row 0 contains the first row of the matrix"
+          },
+          {
+            "input": "get_row([[1, 2, 3], [4, 5, 6]], 2)",
+            "expected": "-1",
+            "explanation": "Row index 2 is out of bounds (only rows 0 and 1 exist)"
+          },
+          {
+            "input": "get_column([[1, 2, 3], [4, 5, 6]], 1)",
+            "expected": "[2, 5]",
+            "explanation": "Column 1 contains elements at index 1 from each row: 2 from row 0, 5 from row 1"
+          },
+          {
+            "input": "get_column([[1, 2], [3, 4], [5, 6]], 0)",
+            "expected": "[1, 3, 5]",
+            "explanation": "Column 0 contains first elements from all three rows"
+          },
+          {
+            "input": "get_column([[1, 2, 3], [4, 5, 6]], 3)",
+            "expected": "-1",
+            "explanation": "Column index 3 is out of bounds (only columns 0, 1, 2 exist)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row and column indices (transposing the access pattern)",
+        "Using 1-based indexing in Python (Python uses 0-based indexing)",
+        "Forgetting to validate indices before accessing elements",
+        "Assuming all rows have the same length (jagged arrays)",
+        "Not handling empty matrices correctly"
+      ],
+      "hint": "For get_row, directly access matrix[row_index] after bounds checking. For get_column, iterate through each row and collect the element at col_index from each row into a new list.",
+      "references": [
+        "Matrix indexing conventions",
+        "Two-dimensional array access patterns",
+        "Linear algebra notation"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Matrix Dimension Compatibility and Shape Validation",
+      "relation_to_problem": "Before multiplying matrices A and B, we must verify dimensional compatibility: the number of columns in A must equal the number of rows in B. This validation prevents runtime errors and implements the mathematical constraint for matrix multiplication.",
+      "prerequisites": [
+        "Matrix representation",
+        "Understanding of matrix dimensions",
+        "Conditional logic"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical constraint for matrix multiplication compatibility",
+        "Determine the shape of the resulting matrix from input matrices",
+        "Implement dimension checking logic for matrix operations"
+      ],
+      "math_content": {
+        "definition": "Two matrices $A \\in \\mathbb{R}^{m \\times n}$ and $B \\in \\mathbb{R}^{p \\times q}$ are **compatible for multiplication** (in the order $AB$) if and only if $n = p$. The resulting matrix $C = AB$ has dimensions $m \\times q$. Formally: $$A_{m \\times n} \\cdot B_{n \\times q} = C_{m \\times q}$$ The middle dimensions must match, and the outer dimensions determine the result shape.",
+        "notation": "$\\text{shape}(A) = (m, n)$ denotes the dimensions of matrix $A$; $\\text{cols}(A) = n$ denotes the number of columns; $\\text{rows}(A) = m$ denotes the number of rows",
+        "theorem": "**Theorem (Dimension Compatibility)**: Given matrices $A \\in \\mathbb{R}^{m \\times n}$ and $B \\in \\mathbb{R}^{p \\times q}$, the product $AB$ exists if and only if $n = p$. When it exists, $AB \\in \\mathbb{R}^{m \\times q}$. The product $BA$ may not exist even when $AB$ exists.",
+        "proof_sketch": "By the definition of matrix multiplication, element $c_{ik}$ of $C = AB$ is computed as $c_{ik} = \\sum_{j=1}^{n} a_{ij}b_{jk}$. This summation requires that index $j$ ranges over valid column indices of $A$ (from 1 to $n$) and valid row indices of $B$ (from 1 to $p$). For this to be well-defined, we need $n = p$. The resulting matrix has $m$ rows (one for each row of $A$) and $q$ columns (one for each column of $B$), giving shape $m \\times q$.",
+        "examples": [
+          "Example 1: $A$ is $2 \\times 3$, $B$ is $3 \\times 4$. Since $\\text{cols}(A) = 3 = \\text{rows}(B)$, multiplication is valid. Result $C = AB$ is $2 \\times 4$.",
+          "Example 2: $A$ is $2 \\times 3$, $B$ is $2 \\times 4$. Since $\\text{cols}(A) = 3 \\neq 2 = \\text{rows}(B)$, multiplication $AB$ is undefined.",
+          "Example 3: $A$ is $3 \\times 2$, $B$ is $2 \\times 3$. $AB$ exists and is $3 \\times 3$. $BA$ also exists and is $2 \\times 2$. Note that $AB$ and $BA$ have different shapes!",
+          "Example 4: Square matrices: $A$ is $n \\times n$, $B$ is $n \\times n$. Both $AB$ and $BA$ exist and are $n \\times n$, but generally $AB \\neq BA$ (non-commutative)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Compatibility Condition",
+          "latex": "$\\text{cols}(A) = \\text{rows}(B)$",
+          "description": "Essential prerequisite for matrix multiplication to be defined"
+        },
+        {
+          "name": "Result Dimensions",
+          "latex": "$\\text{shape}(AB) = (\\text{rows}(A), \\text{cols}(B))$",
+          "description": "Determine output matrix size from input matrices"
+        },
+        {
+          "name": "Dimension Formula",
+          "latex": "$(m \\times n) \\cdot (n \\times q) = (m \\times q)$",
+          "description": "The inner dimensions cancel, outer dimensions remain"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that checks if two matrices can be multiplied (in the order A * B) and returns the resulting shape as a tuple (rows, cols) if valid, or -1 if incompatible. The function should extract dimensions from the matrix representations (list of lists).",
+        "function_signature": "def check_matrix_mult_compatibility(a: list[list[int|float]], b: list[list[int|float]]) -> tuple[int, int]|int:",
+        "starter_code": "def check_matrix_mult_compatibility(a: list[list[int|float]], b: list[list[int|float]]) -> tuple[int, int]|int:\n    # Get dimensions of matrix a: rows_a, cols_a\n    # Get dimensions of matrix b: rows_b, cols_b\n    # Check if cols_a == rows_b\n    # If yes, return (rows_a, cols_b)\n    # If no, return -1\n    pass",
+        "test_cases": [
+          {
+            "input": "check_matrix_mult_compatibility([[1, 2, 3], [4, 5, 6]], [[1, 2], [3, 4], [5, 6]])",
+            "expected": "(2, 2)",
+            "explanation": "A is 2x3, B is 3x2. cols(A)=3 equals rows(B)=3, so compatible. Result is 2x2."
+          },
+          {
+            "input": "check_matrix_mult_compatibility([[1, 2], [3, 4]], [[5, 6, 7], [8, 9, 10]])",
+            "expected": "(2, 3)",
+            "explanation": "A is 2x2, B is 2x3. cols(A)=2 equals rows(B)=2, so compatible. Result is 2x3."
+          },
+          {
+            "input": "check_matrix_mult_compatibility([[1, 2], [3, 4]], [[5, 6], [7, 8], [9, 10]])",
+            "expected": "-1",
+            "explanation": "A is 2x2, B is 3x2. cols(A)=2 does not equal rows(B)=3, so incompatible."
+          },
+          {
+            "input": "check_matrix_mult_compatibility([[1]], [[2]])",
+            "expected": "(1, 1)",
+            "explanation": "A is 1x1, B is 1x1. Both have matching dimensions, result is 1x1 (scalar as matrix)."
+          },
+          {
+            "input": "check_matrix_mult_compatibility([[1, 2, 3]], [[4], [5], [6]])",
+            "expected": "(1, 1)",
+            "explanation": "A is 1x3 (row vector), B is 3x1 (column vector). This is essentially a dot product, result is 1x1."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Checking rows(A) == cols(B) instead of cols(A) == rows(B)",
+        "Not handling empty matrices or matrices with inconsistent row lengths",
+        "Confusing the order of dimensions in the result tuple",
+        "Assuming square matrices (not all matrices are square)",
+        "Forgetting that matrix multiplication is not commutative (AB and BA have different requirements)"
+      ],
+      "hint": "For a matrix represented as list[list], the number of rows is len(matrix), and the number of columns is len(matrix[0]) (assuming non-empty matrix). Compare cols of first matrix with rows of second matrix.",
+      "references": [
+        "Matrix multiplication prerequisites",
+        "Linear transformations composition",
+        "Dimension analysis in linear algebra"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Computing Single Matrix Elements via Row-Column Dot Product",
+      "relation_to_problem": "Each element $c_{ik}$ in the product matrix $C = AB$ is computed as the dot product of row $i$ from matrix $A$ and column $k$ from matrix $B$. This is the core computational unit of matrix multiplication.",
+      "prerequisites": [
+        "Dot product computation",
+        "Matrix row and column extraction",
+        "Index notation"
+      ],
+      "learning_objectives": [
+        "Understand how individual elements of the product matrix are computed",
+        "Apply the formula $c_{ik} = \\sum_{j=1}^{n} a_{ij}b_{jk}$ computationally",
+        "Connect row-column operations to the overall matrix multiplication structure"
+      ],
+      "math_content": {
+        "definition": "Given matrices $A \\in \\mathbb{R}^{m \\times n}$ and $B \\in \\mathbb{R}^{n \\times q}$, the element $c_{ik}$ at row $i$ and column $k$ of the product matrix $C = AB$ is computed as: $$c_{ik} = \\sum_{j=1}^{n} a_{ij}b_{jk} = a_{i1}b_{1k} + a_{i2}b_{2k} + \\cdots + a_{in}b_{nk}$$ This is precisely the dot product of the $i$-th row of $A$ with the $k$-th column of $B$: $$c_{ik} = \\mathbf{a}_i \\cdot \\mathbf{b}^{(k)}$$ where $\\mathbf{a}_i = (a_{i1}, a_{i2}, \\ldots, a_{in})$ and $\\mathbf{b}^{(k)} = (b_{1k}, b_{2k}, \\ldots, b_{nk})^T$.",
+        "notation": "$c_{ik}$ denotes element at row $i$, column $k$ of result matrix $C$; $\\mathbf{a}_i$ is the $i$-th row vector of $A$; $\\mathbf{b}^{(k)}$ is the $k$-th column vector of $B$; $\\sum_{j=1}^{n}$ sums over the shared dimension",
+        "theorem": "**Theorem (Element-wise Matrix Multiplication Formula)**: For compatible matrices $A \\in \\mathbb{R}^{m \\times n}$ and $B \\in \\mathbb{R}^{n \\times q}$, every element of $C = AB$ satisfies: $$(C)_{ik} = \\sum_{j=1}^{n} (A)_{ij}(B)_{jk} = \\text{dot}(\\text{row}_i(A), \\text{col}_k(B))$$ for $1 \\leq i \\leq m$ and $1 \\leq k \\leq q$.",
+        "proof_sketch": "By the definition of matrix multiplication as a composition of linear transformations, the $i$-th row of $C$ represents how the $i$-th basis vector is transformed by $A$ then $B$. Computing $(AB)\\mathbf{e}_k$ where $\\mathbf{e}_k$ is the $k$-th standard basis vector yields the $k$-th column of $AB$. The element at position $(i,k)$ is obtained by projecting onto the $i$-th coordinate, which mathematically reduces to the dot product formula above.",
+        "examples": [
+          "Example 1: $A = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}$, $B = \\begin{pmatrix} 5 & 6 \\\\ 7 & 8 \\end{pmatrix}$. Compute $c_{11}$: Row 1 of $A$ is $(1, 2)$, Column 1 of $B$ is $(5, 7)^T$. Thus $c_{11} = 1(5) + 2(7) = 5 + 14 = 19$.",
+          "Example 2: Same matrices, compute $c_{22}$: Row 2 of $A$ is $(3, 4)$, Column 2 of $B$ is $(6, 8)^T$. Thus $c_{22} = 3(6) + 4(8) = 18 + 32 = 50$.",
+          "Example 3: $A = \\begin{pmatrix} 1 & 0 & 2 \\end{pmatrix}$ (1×3), $B = \\begin{pmatrix} 3 \\\\ 4 \\\\ 5 \\end{pmatrix}$ (3×1). Compute $c_{11}$: Row 1 of $A$ is $(1, 0, 2)$, Column 1 of $B$ is $(3, 4, 5)^T$. Thus $c_{11} = 1(3) + 0(4) + 2(5) = 3 + 0 + 10 = 13$. The result is a $1 \\times 1$ matrix (scalar)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Matrix Element Formula",
+          "latex": "$c_{ik} = \\sum_{j=1}^{n} a_{ij}b_{jk}$",
+          "description": "Compute each element of the product matrix using this summation"
+        },
+        {
+          "name": "Row-Column Dot Product",
+          "latex": "$c_{ik} = \\mathbf{a}_i \\cdot \\mathbf{b}^{(k)}$",
+          "description": "Alternative formulation: dot product of row $i$ from $A$ and column $k$ from $B$"
+        },
+        {
+          "name": "Expanded Form",
+          "latex": "$c_{ik} = a_{i1}b_{1k} + a_{i2}b_{2k} + \\cdots + a_{in}b_{nk}$",
+          "description": "Explicit sum showing all terms in the computation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes a single element of the matrix product C = A * B, given the matrices and the desired position (i, k). Return the computed value, or -1 if the position is invalid or matrices are incompatible. Use your previous functions for dot product and extracting rows/columns.",
+        "function_signature": "def matrix_element_at(a: list[list[int|float]], b: list[list[int|float]], i: int, k: int) -> int|float:",
+        "starter_code": "def matrix_element_at(a: list[list[int|float]], b: list[list[int|float]], i: int, k: int) -> int|float:\n    # 1. Check if matrices are compatible for multiplication\n    # 2. Verify that position (i, k) is valid in the result matrix\n    # 3. Extract row i from matrix a\n    # 4. Extract column k from matrix b\n    # 5. Compute and return their dot product\n    pass",
+        "test_cases": [
+          {
+            "input": "matrix_element_at([[1, 2], [3, 4]], [[5, 6], [7, 8]], 0, 0)",
+            "expected": "19",
+            "explanation": "Row 0 of A: [1,2], Column 0 of B: [5,7]. Dot product: 1*5 + 2*7 = 19"
+          },
+          {
+            "input": "matrix_element_at([[1, 2], [3, 4]], [[5, 6], [7, 8]], 1, 1)",
+            "expected": "50",
+            "explanation": "Row 1 of A: [3,4], Column 1 of B: [6,8]. Dot product: 3*6 + 4*8 = 50"
+          },
+          {
+            "input": "matrix_element_at([[1, 2, 3]], [[4], [5], [6]], 0, 0)",
+            "expected": "32",
+            "explanation": "Row 0 of A: [1,2,3], Column 0 of B: [4,5,6]. Dot product: 1*4 + 2*5 + 3*6 = 32"
+          },
+          {
+            "input": "matrix_element_at([[1, 2], [3, 4]], [[5, 6], [7, 8]], 2, 0)",
+            "expected": "-1",
+            "explanation": "Row index 2 is out of bounds for result matrix (only rows 0 and 1 exist)"
+          },
+          {
+            "input": "matrix_element_at([[1, 2], [3, 4]], [[5, 6, 7], [8, 9, 10]], 0, 3)",
+            "expected": "-1",
+            "explanation": "Column index 3 is out of bounds for result matrix (only columns 0, 1, 2 exist)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Extracting column from A or row from B instead of row from A and column from B",
+        "Forgetting to validate the position (i, k) against the result matrix dimensions",
+        "Using 1-based indexing when the function expects 0-based indices",
+        "Not checking matrix compatibility before attempting computation",
+        "Confusing the order of indices (transposing i and k)"
+      ],
+      "hint": "First validate that the matrices can be multiplied and that (i, k) is within bounds of the result matrix. Then extract the i-th row from A and k-th column from B, and compute their dot product using your previously implemented function.",
+      "references": [
+        "Dot product applications",
+        "Linear transformations",
+        "Matrix multiplication definition"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Constructing the Full Result Matrix via Nested Iteration",
+      "relation_to_problem": "To compute the complete product matrix C = A * B, we must iterate over all valid positions (i, k) and compute each element $c_{ik}$. This requires nested loops over rows of A and columns of B, applying the element computation formula at each position.",
+      "prerequisites": [
+        "Single element computation",
+        "Nested loops",
+        "Matrix initialization",
+        "Dimension compatibility checking"
+      ],
+      "learning_objectives": [
+        "Understand the algorithmic structure of matrix multiplication",
+        "Implement nested iteration to populate all elements of the result matrix",
+        "Analyze computational complexity of the matrix multiplication algorithm",
+        "Handle matrix creation and initialization in Python"
+      ],
+      "math_content": {
+        "definition": "The **matrix multiplication algorithm** computes all elements of $C = AB$ where $A \\in \\mathbb{R}^{m \\times n}$ and $B \\in \\mathbb{R}^{n \\times q}$. The algorithm structure is: $$\\text{for } i = 1 \\text{ to } m: \\\\ \\quad \\text{for } k = 1 \\text{ to } q: \\\\ \\quad\\quad c_{ik} = \\sum_{j=1}^{n} a_{ij}b_{jk}$$ This triple-nested structure (two outer loops for position, one inner loop/sum for computation) has time complexity $\\Theta(mnq)$.",
+        "notation": "$m$ = number of rows in $A$ (and $C$); $n$ = shared dimension (cols of $A$, rows of $B$); $q$ = number of columns in $B$ (and $C$); $i$ = row index; $k$ = column index; $j$ = summation index",
+        "theorem": "**Theorem (Matrix Multiplication Complexity)**: The standard algorithm for multiplying an $m \\times n$ matrix with an $n \\times q$ matrix requires $\\Theta(mnq)$ scalar multiplications and $\\Theta(mnq)$ scalar additions. For square $n \\times n$ matrices, this simplifies to $\\Theta(n^3)$.",
+        "proof_sketch": "The result matrix $C$ has $m \\times q$ elements. Each element $c_{ik}$ requires computing a sum of $n$ products (the dot product of a row of length $n$ with a column of length $n$). Thus, total operations: $(mq)$ elements $\\times$ $n$ operations per element $= mnq$ operations. For square matrices where $m = n = q$, this becomes $n^3$.",
+        "examples": [
+          "Example 1 (Small matrices): $A$ is $2 \\times 3$, $B$ is $3 \\times 2$. Result is $2 \\times 2$ (4 elements). Each element needs 3 multiplications. Total: $2 \\times 2 \\times 3 = 12$ multiplications.",
+          "Example 2 (Square matrices): $A$ and $B$ are both $100 \\times 100$. Result is $100 \\times 100$. Total operations: $100 \\times 100 \\times 100 = 1,000,000$ multiplications.",
+          "Example 3 (Complete computation): $A = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}$, $B = \\begin{pmatrix} 5 & 6 \\\\ 7 & 8 \\end{pmatrix}$. Result $C = \\begin{pmatrix} 19 & 22 \\\\ 43 & 50 \\end{pmatrix}$ computed via: $c_{11}=19, c_{12}=22, c_{21}=43, c_{22}=50$ using the element formula four times."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Matrix Product",
+          "latex": "$C = AB$ where $(C)_{ik} = \\sum_{j=1}^{n} (A)_{ij}(B)_{jk}$",
+          "description": "Definition applied to all elements of the result matrix"
+        },
+        {
+          "name": "Algorithmic Structure",
+          "latex": "$\\text{for } i \\in [1,m], k \\in [1,q]: c_{ik} = \\sum_{j=1}^{n} a_{ij}b_{jk}$",
+          "description": "Nested loop structure for computing all elements"
+        },
+        {
+          "name": "Time Complexity",
+          "latex": "$T(m,n,q) = \\Theta(mnq)$",
+          "description": "Asymptotic running time of standard matrix multiplication"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the full matrix product C = A * B. Return -1 if the matrices are incompatible. The result should be a list[list[int|float]] representing the product matrix. Initialize the result matrix with the correct dimensions, then use nested loops to compute each element.",
+        "function_signature": "def matrix_multiply(a: list[list[int|float]], b: list[list[int|float]]) -> list[list[int|float]]|int:",
+        "starter_code": "def matrix_multiply(a: list[list[int|float]], b: list[list[int|float]]) -> list[list[int|float]]|int:\n    # 1. Check matrix compatibility (cols of A == rows of B)\n    # 2. If incompatible, return -1\n    # 3. Determine result dimensions: (rows_a, cols_b)\n    # 4. Initialize result matrix with zeros\n    # 5. Use nested loops: outer for rows (i), inner for columns (k)\n    # 6. For each position (i,k), compute dot product of row i from A and column k from B\n    # 7. Return the completed result matrix\n    pass",
+        "test_cases": [
+          {
+            "input": "matrix_multiply([[1, 2], [3, 4]], [[5, 6], [7, 8]])",
+            "expected": "[[19, 22], [43, 50]]",
+            "explanation": "2x2 * 2x2 = 2x2. Elements: c11=1*5+2*7=19, c12=1*6+2*8=22, c21=3*5+4*7=43, c22=3*6+4*8=50"
+          },
+          {
+            "input": "matrix_multiply([[1, 2, 3], [4, 5, 6]], [[7, 8], [9, 10], [11, 12]])",
+            "expected": "[[58, 64], [139, 154]]",
+            "explanation": "2x3 * 3x2 = 2x2. c11=1*7+2*9+3*11=58, c12=1*8+2*10+3*12=64, c21=4*7+5*9+6*11=139, c22=4*8+5*10+6*12=154"
+          },
+          {
+            "input": "matrix_multiply([[1, 2]], [[3], [4]])",
+            "expected": "[[11]]",
+            "explanation": "1x2 * 2x1 = 1x1. Single element: 1*3+2*4=11"
+          },
+          {
+            "input": "matrix_multiply([[1, 0], [0, 1]], [[5, 6], [7, 8]])",
+            "expected": "[[5, 6], [7, 8]]",
+            "explanation": "Identity matrix (2x2) multiplied by any 2x2 matrix returns the same matrix"
+          },
+          {
+            "input": "matrix_multiply([[1, 2], [3, 4]], [[5, 6, 7], [8, 9, 10]])",
+            "expected": "[[21, 24, 27], [47, 54, 61]]",
+            "explanation": "2x2 * 2x3 = 2x3. Six elements computed using row-column dot products"
+          },
+          {
+            "input": "matrix_multiply([[1, 2], [3, 4]], [[5, 6], [7, 8], [9, 10]])",
+            "expected": "-1",
+            "explanation": "2x2 * 3x2: cols(A)=2 but rows(B)=3, incompatible dimensions"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Initializing result matrix with wrong dimensions (using dimensions of A or B instead of (rows_A, cols_B))",
+        "Swapping loop indices (iterating k before i or using wrong index in result assignment)",
+        "Not properly implementing the dot product within the nested loops",
+        "Creating jagged arrays or not properly initializing nested lists in Python",
+        "Forgetting to handle the compatibility check before attempting multiplication"
+      ],
+      "hint": "Initialize the result as [[0 for _ in range(cols_b)] for _ in range(rows_a)]. Use two nested loops: outer iterates over rows of A (index i), inner iterates over columns of B (index k). For each (i, k), extract row i from A and column k from B, compute their dot product, and assign to result[i][k].",
+      "references": [
+        "Algorithm design",
+        "Computational complexity",
+        "Nested iteration patterns",
+        "Matrix operations implementation"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Edge Cases and Matrix Multiplication Properties",
+      "relation_to_problem": "A robust implementation must handle special cases: empty matrices, identity matrices, zero matrices, and matrices with incompatible dimensions. Understanding these edge cases and key properties (associativity, non-commutativity) ensures correctness.",
+      "prerequisites": [
+        "Full matrix multiplication implementation",
+        "Matrix properties",
+        "Error handling"
+      ],
+      "learning_objectives": [
+        "Identify and handle edge cases in matrix multiplication",
+        "Verify implementation correctness using matrix properties",
+        "Understand special matrices (identity, zero) and their behavior",
+        "Implement comprehensive input validation"
+      ],
+      "math_content": {
+        "definition": "Several **special matrices** have unique properties under multiplication: \\n\\n**Identity Matrix**: $I_n$ is an $n \\times n$ matrix with 1s on the diagonal and 0s elsewhere. For any $A \\in \\mathbb{R}^{m \\times n}$: $$AI_n = A \\quad \\text{and} \\quad I_mA = A$$ \\n**Zero Matrix**: $O_{m \\times n}$ has all elements equal to 0. For any compatible matrices: $$AO = O \\quad \\text{and} \\quad OB = O$$ \\n**Empty Matrix**: A matrix with zero rows or zero columns is considered empty and matrix multiplication involving empty matrices follows dimension rules but produces empty results.",
+        "notation": "$I_n$ = identity matrix of size $n \\times n$; $O_{m \\times n}$ = zero matrix of size $m \\times n$; $A^T$ = transpose of matrix $A$; $\\emptyset$ or dimension $(0, n)$ or $(m, 0)$ = empty matrix",
+        "theorem": "**Theorem (Matrix Multiplication Properties)**:\\n1. **Associativity**: $(AB)C = A(BC)$ when dimensions allow\\n2. **Non-commutativity**: $AB \\neq BA$ in general\\n3. **Distributivity**: $A(B + C) = AB + AC$ and $(A + B)C = AC + BC$\\n4. **Identity**: $AI = A$ and $IA = A$ where $I$ is appropriately sized\\n5. **Zero absorption**: $AO = O$ and $OB = O$ where $O$ is appropriately sized",
+        "proof_sketch": "**Identity property**: For $(AI)_{ik} = \\sum_j a_{ij}(I)_{jk}$. Since $(I)_{jk} = 1$ if $j=k$ and 0 otherwise, only the $j=k$ term survives: $(AI)_{ik} = a_{ik}(I)_{kk} = a_{ik} \\cdot 1 = a_{ik}$, proving $AI = A$.\\n\\n**Zero property**: For $(AO)_{ik} = \\sum_j a_{ij} \\cdot 0 = 0$, so all elements of $AO$ are zero.\\n\\n**Non-commutativity**: Counterexample given in earlier examples shows $AB \\neq BA$ for typical matrices.",
+        "examples": [
+          "Example 1 (Identity): $A = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}$, $I = \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix}$. Then $AI = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix} = A$.",
+          "Example 2 (Zero): $A = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}$, $O = \\begin{pmatrix} 0 & 0 \\\\ 0 & 0 \\end{pmatrix}$. Then $AO = \\begin{pmatrix} 0 & 0 \\\\ 0 & 0 \\end{pmatrix} = O$.",
+          "Example 3 (Empty): $A$ is $2 \\times 0$ (empty), $B$ is $0 \\times 3$ (empty). Result $AB$ is $2 \\times 3$ but contains no actual data (all positions undefined or treated as empty).",
+          "Example 4 (Non-square identity): $A$ is $2 \\times 3$. Then $I_3 A = A$ (using $3 \\times 3$ identity on left) and $A I_3 = A$ (using $3 \\times 3$ identity on right)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Identity Matrix Definition",
+          "latex": "$(I_n)_{ij} = \\delta_{ij} = \\begin{cases} 1 & \\text{if } i = j \\\\ 0 & \\text{if } i \\neq j \\end{cases}$",
+          "description": "Kronecker delta defines the identity matrix"
+        },
+        {
+          "name": "Identity Property",
+          "latex": "$AI = IA = A$ (with appropriately sized $I$)",
+          "description": "Multiplying by identity leaves matrix unchanged"
+        },
+        {
+          "name": "Associativity",
+          "latex": "$(AB)C = A(BC)$",
+          "description": "Grouping doesn't matter (when dimensions allow)"
+        }
+      ],
+      "exercise": {
+        "description": "Enhance your matrix multiplication function to handle all edge cases properly. Test it with: (1) identity matrices, (2) zero matrices, (3) incompatible dimensions, (4) single-element matrices, (5) rectangular matrices. The function should return -1 for invalid inputs (incompatible dimensions, empty matrices with non-zero dimension) and correctly compute products for all valid cases.",
+        "function_signature": "def matrixmul(a: list[list[int|float]], b: list[list[int|float]]) -> list[list[int|float]]|int:",
+        "starter_code": "def matrixmul(a: list[list[int|float]], b: list[list[int|float]]) -> list[list[int|float]]|int:\n    # Handle edge cases:\n    # 1. Check for empty matrices\n    # 2. Validate matrix dimensions are consistent (all rows same length)\n    # 3. Check compatibility: cols(A) == rows(B)\n    # 4. If any check fails, return -1\n    # 5. Initialize result matrix\n    # 6. Compute all elements using nested loops and dot products\n    # 7. Return result\n    pass",
+        "test_cases": [
+          {
+            "input": "matrixmul([[1, 0], [0, 1]], [[5, 6], [7, 8]])",
+            "expected": "[[5, 6], [7, 8]]",
+            "explanation": "Identity matrix property: I * B = B"
+          },
+          {
+            "input": "matrixmul([[1, 2], [3, 4]], [[1, 0], [0, 1]])",
+            "expected": "[[1, 2], [3, 4]]",
+            "explanation": "Identity matrix property: A * I = A"
+          },
+          {
+            "input": "matrixmul([[1, 2], [3, 4]], [[0, 0], [0, 0]])",
+            "expected": "[[0, 0], [0, 0]]",
+            "explanation": "Zero matrix property: A * O = O"
+          },
+          {
+            "input": "matrixmul([[5]], [[3]])",
+            "expected": "[[15]]",
+            "explanation": "1x1 matrices (scalars): 5 * 3 = 15"
+          },
+          {
+            "input": "matrixmul([[1, 2, 3]], [[1], [2], [3]])",
+            "expected": "[[14]]",
+            "explanation": "Row vector * column vector = dot product as 1x1 matrix: 1*1+2*2+3*3=14"
+          },
+          {
+            "input": "matrixmul([[1], [2], [3]], [[1, 2, 3]])",
+            "expected": "[[1, 2, 3], [2, 4, 6], [3, 6, 9]]",
+            "explanation": "Column vector * row vector = outer product (3x3 matrix)"
+          },
+          {
+            "input": "matrixmul([[1, 2]], [[3, 4], [5, 6], [7, 8]])",
+            "expected": "-1",
+            "explanation": "Incompatible: 1x2 cannot multiply 3x2 (cols(A)=2, rows(B)=3)"
+          },
+          {
+            "input": "matrixmul([], [[1, 2]])",
+            "expected": "-1",
+            "explanation": "Empty matrix A is invalid input"
+          },
+          {
+            "input": "matrixmul([[1, 2], [3, 4]], [])",
+            "expected": "-1",
+            "explanation": "Empty matrix B is invalid input"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking if input matrices are empty or have inconsistent row lengths",
+        "Failing to validate compatibility before initializing result matrix",
+        "Incorrect handling of 1x1 matrices (treating them differently from general case)",
+        "Not recognizing that identity and zero properties are consequences of the general algorithm",
+        "Attempting to handle empty matrices as special cases instead of rejecting them"
+      ],
+      "hint": "Your general matrix multiplication algorithm should handle identity and zero matrices automatically without special cases—they follow the same rules. Focus on: (1) validating inputs (non-empty, consistent dimensions, compatible), (2) correctly extracting dimensions, (3) proper nested loop structure, (4) accurate dot product computation for each element.",
+      "references": [
+        "Matrix algebra properties",
+        "Special matrices in linear algebra",
+        "Software engineering: edge case handling",
+        "Input validation patterns"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,515 @@
+{
+  "problem_id": 84,
+  "title": "Phi Transformation for Polynomial Features",
+  "category": "Linear Algebra",
+  "difficulty": "easy",
+  "description": "Write a Python function to perform a Phi Transformation that maps input features into a higher-dimensional space by generating polynomial features. The transformation allows models like linear regression to fit nonlinear data by introducing new feature dimensions that represent polynomial combinations of the original input features. The function should take a list of numerical data and a degree as inputs, and return a nested list where each inner list represents the transformed features of a data point. If the degree is less than 0, the function should return an empty list.",
+  "example": {
+    "input": "data = [1.0, 2.0], degree = 2",
+    "output": "[[1.0, 1.0, 1.0], [1.0, 2.0, 4.0]]",
+    "reasoning": "The Phi Transformation generates polynomial features for each data point up to the specified degree. For data = [1.0, 2.0] and degree = 2, the transformation creates a nested list where each row contains powers of the data point from 0 to 2."
+  },
+  "starter_code": "import numpy as np\n\ndef phi_transform(data: list[float], degree: int) -> list[list[float]]:\n\t\"\"\"\n\tPerform a Phi Transformation to map input features into a higher-dimensional space by generating polynomial features.\n\n\tArgs:\n\t\tdata (list[float]): A list of numerical values to transform.\n\t\tdegree (int): The degree of the polynomial expansion.\n\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Polynomial Powers and Exponentiation",
+      "relation_to_problem": "Understanding exponentiation is fundamental to computing polynomial features, as each feature is a power of the original input (x^0, x^1, x^2, ..., x^d).",
+      "prerequisites": [
+        "Basic arithmetic operations",
+        "Understanding of variables"
+      ],
+      "learning_objectives": [
+        "Define and compute powers of real numbers",
+        "Understand the mathematical notation for exponentiation",
+        "Implement efficient exponentiation for non-negative integer powers"
+      ],
+      "math_content": {
+        "definition": "For a real number $x \\in \\mathbb{R}$ and a non-negative integer $n \\in \\mathbb{N}_0$, exponentiation is defined recursively as: $x^0 = 1$ for all $x \\neq 0$, and $x^n = x \\cdot x^{n-1}$ for $n \\geq 1$. This operation represents repeated multiplication of $x$ by itself $n$ times.",
+        "notation": "$x^n$ where $x$ is the base and $n$ is the exponent (power)",
+        "theorem": "For any real number $x$ and non-negative integers $m, n$: (1) $x^m \\cdot x^n = x^{m+n}$, (2) $(x^m)^n = x^{mn}$, (3) $x^m / x^n = x^{m-n}$ for $x \\neq 0$",
+        "proof_sketch": "Property (1): $x^m \\cdot x^n = (\\underbrace{x \\cdot x \\cdots x}_{m \\text{ times}}) \\cdot (\\underbrace{x \\cdot x \\cdots x}_{n \\text{ times}}) = \\underbrace{x \\cdot x \\cdots x}_{m+n \\text{ times}} = x^{m+n}$",
+        "examples": [
+          "Example 1: $2^3 = 2 \\cdot 2 \\cdot 2 = 8$",
+          "Example 2: $5^0 = 1$ (by definition)",
+          "Example 3: $3^4 = 3 \\cdot 3 \\cdot 3 \\cdot 3 = 81$",
+          "Example 4: $(-2)^3 = (-2) \\cdot (-2) \\cdot (-2) = -8$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Power Zero",
+          "latex": "$x^0 = 1$",
+          "description": "Any non-zero number raised to the power 0 equals 1"
+        },
+        {
+          "name": "Power One",
+          "latex": "$x^1 = x$",
+          "description": "Any number raised to the power 1 equals itself"
+        },
+        {
+          "name": "General Power",
+          "latex": "$x^n = \\prod_{i=1}^{n} x$",
+          "description": "The product of x multiplied by itself n times"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the power of a number for non-negative integer exponents. This is the fundamental operation for generating polynomial features.",
+        "function_signature": "def compute_power(base: float, exponent: int) -> float:",
+        "starter_code": "def compute_power(base: float, exponent: int) -> float:\n    \"\"\"\n    Compute base raised to the power of exponent.\n    \n    Args:\n        base: The base number\n        exponent: Non-negative integer exponent\n    \n    Returns:\n        The result of base^exponent\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_power(2.0, 3)",
+            "expected": "8.0",
+            "explanation": "2^3 = 2 * 2 * 2 = 8"
+          },
+          {
+            "input": "compute_power(5.0, 0)",
+            "expected": "1.0",
+            "explanation": "Any non-zero number to the power 0 equals 1"
+          },
+          {
+            "input": "compute_power(3.0, 1)",
+            "expected": "3.0",
+            "explanation": "Any number to the power 1 equals itself"
+          },
+          {
+            "input": "compute_power(1.5, 2)",
+            "expected": "2.25",
+            "explanation": "1.5^2 = 1.5 * 1.5 = 2.25"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that x^0 = 1 for all x ≠ 0",
+        "Confusing exponentiation with multiplication (e.g., thinking 2^3 = 6 instead of 8)",
+        "Not handling the edge case of exponent = 0 properly"
+      ],
+      "hint": "Use a loop to multiply the base by itself the required number of times, or use Python's built-in ** operator",
+      "references": [
+        "Exponentiation",
+        "Powers of numbers",
+        "Mathematical notation for polynomials"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Sequence Generation and Iteration",
+      "relation_to_problem": "To generate all polynomial features from degree 0 to d, we need to iterate through a sequence of exponents and compute each corresponding power. This teaches the control flow needed for the transformation.",
+      "prerequisites": [
+        "Exponentiation",
+        "Loops and iteration",
+        "Lists and arrays"
+      ],
+      "learning_objectives": [
+        "Generate sequences of consecutive integers",
+        "Apply operations to each element of a sequence",
+        "Build lists dynamically using iteration"
+      ],
+      "math_content": {
+        "definition": "A finite sequence of degree $d$ is an ordered list of elements $(a_0, a_1, a_2, \\ldots, a_d)$ where each $a_i$ is computed by applying a function $f$ to the index $i$. For polynomial features, we use $f(i) = x^i$ where $i \\in \\{0, 1, 2, \\ldots, d\\}$.",
+        "notation": "$\\{a_i\\}_{i=0}^{d}$ represents the sequence from index 0 to d",
+        "theorem": "Range Theorem: For non-negative integers $n$, the set $\\{0, 1, 2, \\ldots, n\\}$ contains exactly $n+1$ elements. This is crucial because polynomial features of degree $d$ produce $d+1$ features.",
+        "proof_sketch": "The set $\\{0, 1, 2, \\ldots, n\\}$ can be counted by inclusion: starting from 0 and incrementing by 1 exactly $n$ times reaches $n$, giving us $n+1$ total values including both endpoints.",
+        "examples": [
+          "Example 1: For degree 2, the sequence of exponents is $\\{0, 1, 2\\}$ (3 elements)",
+          "Example 2: Applying $f(i) = 3^i$ to $\\{0, 1, 2\\}$ gives $\\{1, 3, 9\\}$",
+          "Example 3: For degree 0, we get only $\\{0\\}$, resulting in a single feature"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sequence Length",
+          "latex": "$|\\{0, 1, \\ldots, d\\}| = d + 1$",
+          "description": "A sequence from 0 to d inclusive has d+1 elements"
+        },
+        {
+          "name": "Polynomial Feature Sequence",
+          "latex": "$\\{x^i\\}_{i=0}^{d} = \\{x^0, x^1, x^2, \\ldots, x^d\\}$",
+          "description": "The sequence of powers from 0 to d"
+        }
+      ],
+      "exercise": {
+        "description": "Given a base value and a maximum degree, generate a list of all powers from degree 0 to the maximum degree. This directly builds one row of the polynomial feature transformation.",
+        "function_signature": "def generate_powers(base: float, max_degree: int) -> list[float]:",
+        "starter_code": "def generate_powers(base: float, max_degree: int) -> list[float]:\n    \"\"\"\n    Generate all powers of base from 0 to max_degree.\n    \n    Args:\n        base: The base number to raise to various powers\n        max_degree: The maximum degree (inclusive)\n    \n    Returns:\n        A list [base^0, base^1, base^2, ..., base^max_degree]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "generate_powers(2.0, 3)",
+            "expected": "[1.0, 2.0, 4.0, 8.0]",
+            "explanation": "Powers of 2 from degree 0 to 3: [2^0, 2^1, 2^2, 2^3]"
+          },
+          {
+            "input": "generate_powers(3.0, 2)",
+            "expected": "[1.0, 3.0, 9.0]",
+            "explanation": "Powers of 3 from degree 0 to 2: [3^0, 3^1, 3^2]"
+          },
+          {
+            "input": "generate_powers(1.0, 4)",
+            "expected": "[1.0, 1.0, 1.0, 1.0, 1.0]",
+            "explanation": "All powers of 1 equal 1"
+          },
+          {
+            "input": "generate_powers(5.0, 0)",
+            "expected": "[1.0]",
+            "explanation": "Only degree 0, which is 5^0 = 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Generating only d elements instead of d+1 (forgetting to include degree 0)",
+        "Starting the sequence at 1 instead of 0",
+        "Not handling max_degree = 0 correctly (should return a list with one element)"
+      ],
+      "hint": "Use the range() function to iterate from 0 to max_degree inclusive, and compute each power in the loop",
+      "references": [
+        "Sequences and series",
+        "List comprehensions in Python",
+        "Range function"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Vector Spaces and Feature Mapping",
+      "relation_to_problem": "The Phi transformation is a mapping from a lower-dimensional space to a higher-dimensional space. Understanding this mathematically explains why polynomial features enable linear models to fit nonlinear data.",
+      "prerequisites": [
+        "Vector spaces",
+        "Functions and mappings",
+        "Dimensionality"
+      ],
+      "learning_objectives": [
+        "Understand feature space transformations",
+        "Recognize how dimensionality increases with polynomial expansion",
+        "Formalize the mathematical structure of the Phi transformation"
+      ],
+      "math_content": {
+        "definition": "A feature mapping $\\Phi: \\mathbb{R} \\to \\mathbb{R}^{d+1}$ is a function that transforms a scalar input into a vector in a higher-dimensional space. For polynomial features of degree $d$, the mapping is defined as $\\Phi(x) = (x^0, x^1, x^2, \\ldots, x^d)^T$, where the superscript $T$ denotes transpose.",
+        "notation": "$\\Phi: \\mathbb{R} \\to \\mathbb{R}^{d+1}$ represents a mapping from 1D to (d+1)D space",
+        "theorem": "Dimensionality Theorem: The Phi transformation of degree $d$ maps a 1-dimensional input space $\\mathbb{R}$ to a $(d+1)$-dimensional feature space $\\mathbb{R}^{d+1}$. This increased dimensionality allows linear models in the feature space to represent nonlinear functions in the original input space.",
+        "proof_sketch": "Each input $x \\in \\mathbb{R}$ (1 dimension) is mapped to $\\Phi(x) = (1, x, x^2, \\ldots, x^d)$ which contains $d+1$ components. Since these components are generally linearly independent (for $x \\neq 0, 1$), the feature space has dimension $d+1$.",
+        "examples": [
+          "Example 1: For $x = 2$ and $d = 2$, $\\Phi(2) = (1, 2, 4) \\in \\mathbb{R}^3$",
+          "Example 2: For $x = -1$ and $d = 3$, $\\Phi(-1) = (1, -1, 1, -1) \\in \\mathbb{R}^4$",
+          "Example 3: The linear model in feature space $f(\\Phi(x)) = w_0 \\cdot 1 + w_1 \\cdot x + w_2 \\cdot x^2$ represents a quadratic function in original space"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Phi Transformation",
+          "latex": "$\\Phi(x) = (x^0, x^1, x^2, \\ldots, x^d)^T$",
+          "description": "Maps a scalar to a vector of its powers"
+        },
+        {
+          "name": "Feature Dimension",
+          "latex": "$\\dim(\\Phi(x)) = d + 1$",
+          "description": "The dimensionality of the transformed feature vector"
+        },
+        {
+          "name": "Linear Model in Feature Space",
+          "latex": "$f(x) = \\mathbf{w}^T \\Phi(x) = \\sum_{i=0}^{d} w_i x^i$",
+          "description": "Linear combination of features represents a polynomial"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that transforms a single scalar value into its polynomial feature vector. This is the core transformation that maps from input space to feature space.",
+        "function_signature": "def phi_transform_single(x: float, degree: int) -> list[float]:",
+        "starter_code": "def phi_transform_single(x: float, degree: int) -> list[float]:\n    \"\"\"\n    Transform a single value into polynomial feature space.\n    \n    Args:\n        x: The input value to transform\n        degree: The degree of polynomial expansion\n    \n    Returns:\n        The feature vector [x^0, x^1, ..., x^degree]\n        Returns empty list if degree < 0\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "phi_transform_single(3.0, 2)",
+            "expected": "[1.0, 3.0, 9.0]",
+            "explanation": "Transform 3 with degree 2: [3^0, 3^1, 3^2]"
+          },
+          {
+            "input": "phi_transform_single(2.0, 0)",
+            "expected": "[1.0]",
+            "explanation": "Degree 0 transformation contains only the bias term"
+          },
+          {
+            "input": "phi_transform_single(-2.0, 3)",
+            "expected": "[1.0, -2.0, 4.0, -8.0]",
+            "explanation": "Transform -2 with degree 3, note alternating signs"
+          },
+          {
+            "input": "phi_transform_single(5.0, -1)",
+            "expected": "[]",
+            "explanation": "Negative degree returns empty list"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to include the bias term (x^0 = 1)",
+        "Not handling negative degrees properly",
+        "Confusing the output dimension (should be d+1, not d)"
+      ],
+      "hint": "Check if degree is negative first, then generate the sequence of powers from 0 to degree",
+      "references": [
+        "Feature engineering",
+        "Kernel methods",
+        "Polynomial basis functions"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Matrix Representation and Batch Transformation",
+      "relation_to_problem": "The final solution requires transforming multiple data points, not just one. This introduces the concept of applying the Phi transformation to a collection of inputs, resulting in a matrix structure.",
+      "prerequisites": [
+        "Feature mapping",
+        "Matrices and vectors",
+        "List operations"
+      ],
+      "learning_objectives": [
+        "Apply transformations to multiple inputs simultaneously",
+        "Understand the matrix structure of transformed data",
+        "Build nested list structures programmatically"
+      ],
+      "math_content": {
+        "definition": "For a dataset $\\mathbf{X} = \\{x_1, x_2, \\ldots, x_n\\}$ of $n$ samples, the batch Phi transformation produces a design matrix $\\mathbf{\\Phi} \\in \\mathbb{R}^{n \\times (d+1)}$ where each row $i$ contains $\\Phi(x_i)$. Formally: $\\mathbf{\\Phi} = \\begin{bmatrix} \\Phi(x_1)^T \\\\ \\Phi(x_2)^T \\\\ \\vdots \\\\ \\Phi(x_n)^T \\end{bmatrix} = \\begin{bmatrix} 1 & x_1 & x_1^2 & \\cdots & x_1^d \\\\ 1 & x_2 & x_2^2 & \\cdots & x_2^d \\\\ \\vdots & \\vdots & \\vdots & \\ddots & \\vdots \\\\ 1 & x_n & x_n^2 & \\cdots & x_n^d \\end{bmatrix}$",
+        "notation": "$\\mathbf{\\Phi} \\in \\mathbb{R}^{n \\times (d+1)}$ represents an n-by-(d+1) matrix, $\\Phi_{ij}$ is the element in row i, column j",
+        "theorem": "Design Matrix Structure Theorem: For $n$ data points transformed with degree $d$, the resulting design matrix has shape $(n, d+1)$ where element $\\Phi_{ij} = x_i^j$ for $i \\in \\{1, \\ldots, n\\}$ and $j \\in \\{0, \\ldots, d\\}$. The first column is always all ones (bias column).",
+        "proof_sketch": "Each of the $n$ input values $x_i$ is independently transformed to a $(d+1)$-dimensional vector $\\Phi(x_i)$. Stacking these row vectors vertically produces an $n \\times (d+1)$ matrix. The element at position $(i,j)$ is the $j$-th component of $\\Phi(x_i)$, which by definition is $x_i^j$.",
+        "examples": [
+          "Example 1: For $\\mathbf{X} = \\{1, 2\\}$ and $d = 2$: $\\mathbf{\\Phi} = \\begin{bmatrix} 1 & 1 & 1 \\\\ 1 & 2 & 4 \\end{bmatrix}$",
+          "Example 2: For $\\mathbf{X} = \\{-1, 0, 1\\}$ and $d = 1$: $\\mathbf{\\Phi} = \\begin{bmatrix} 1 & -1 \\\\ 1 & 0 \\\\ 1 & 1 \\end{bmatrix}$",
+          "Example 3: Empty input list produces empty matrix: $\\mathbf{X} = \\{\\}$ gives $\\mathbf{\\Phi} = $ empty list"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Design Matrix",
+          "latex": "$\\mathbf{\\Phi}_{ij} = x_i^j$",
+          "description": "Element at row i, column j is the j-th power of the i-th data point"
+        },
+        {
+          "name": "Matrix Shape",
+          "latex": "$\\mathbf{\\Phi} \\in \\mathbb{R}^{n \\times (d+1)}$",
+          "description": "n rows (samples) by d+1 columns (features)"
+        },
+        {
+          "name": "Bias Column",
+          "latex": "$\\mathbf{\\Phi}_{:,0} = \\mathbf{1}_n$",
+          "description": "First column is all ones (x^0 = 1)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that transforms a list of data points into a nested list (matrix) of polynomial features. Each row should contain the transformed features for one data point.",
+        "function_signature": "def transform_dataset(data: list[float], degree: int) -> list[list[float]]:",
+        "starter_code": "def transform_dataset(data: list[float], degree: int) -> list[list[float]]:\n    \"\"\"\n    Transform a list of values into polynomial feature matrix.\n    \n    Args:\n        data: List of input values\n        degree: Degree of polynomial expansion\n    \n    Returns:\n        Nested list where each inner list is the feature vector for one data point\n        Returns empty list if degree < 0 or data is empty\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "transform_dataset([1.0, 2.0], 2)",
+            "expected": "[[1.0, 1.0, 1.0], [1.0, 2.0, 4.0]]",
+            "explanation": "Transform [1, 2] with degree 2, producing 2 rows with 3 features each"
+          },
+          {
+            "input": "transform_dataset([3.0], 3)",
+            "expected": "[[1.0, 3.0, 9.0, 27.0]]",
+            "explanation": "Single data point produces single row with 4 features"
+          },
+          {
+            "input": "transform_dataset([], 2)",
+            "expected": "[]",
+            "explanation": "Empty input produces empty output"
+          },
+          {
+            "input": "transform_dataset([1.0, 2.0], -1)",
+            "expected": "[]",
+            "explanation": "Negative degree returns empty list"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling empty input lists correctly",
+        "Transposing the matrix (making d+1 rows instead of n rows)",
+        "Not propagating the degree validation to all data points"
+      ],
+      "hint": "Use a loop or list comprehension to apply the single-value transformation to each element in the input list",
+      "references": [
+        "Design matrices in regression",
+        "Feature matrices",
+        "Batch processing"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Input Validation and Edge Cases",
+      "relation_to_problem": "Robust implementations must handle invalid inputs gracefully. The problem specifies that negative degrees should return an empty list, and we must ensure the function behaves correctly for all edge cases.",
+      "prerequisites": [
+        "Conditional logic",
+        "Function validation",
+        "Type checking"
+      ],
+      "learning_objectives": [
+        "Identify edge cases in mathematical functions",
+        "Implement proper input validation",
+        "Handle boundary conditions correctly"
+      ],
+      "math_content": {
+        "definition": "A well-defined mathematical function must specify its domain (valid inputs) and codomain (possible outputs). For the Phi transformation, the natural domain is $\\mathbb{R} \\times \\mathbb{N}_0$ (real numbers and non-negative integers), but the problem extends this by defining behavior for negative degrees: $\\Phi(\\mathbf{X}, d) = \\emptyset$ (empty set) when $d < 0$.",
+        "notation": "$\\text{dom}(\\Phi) = \\mathbb{R}^n \\times \\mathbb{Z}$ with extended definition for $d < 0$",
+        "theorem": "Completeness Theorem: A function implementation is complete if and only if it produces a well-defined output for every input in its domain. For Phi transformation, this requires handling: (1) empty input lists, (2) negative degrees, (3) zero degree, (4) single and multiple data points.",
+        "proof_sketch": "Consider the partition of inputs: $d < 0$ (invalid), $d = 0$ (minimal), $d > 0$ (general case), and $|\\mathbf{X}| = 0$ (empty data). For each partition element, the function must produce the specified output: empty list for $d < 0$ or $|\\mathbf{X}| = 0$, single column of ones for $d = 0$, and general transformation otherwise.",
+        "examples": [
+          "Example 1: $\\Phi([1, 2], -1) = []$ (negative degree case)",
+          "Example 2: $\\Phi([], 5) = []$ (empty input case)",
+          "Example 3: $\\Phi([3], 0) = [[1]]$ (minimal valid case)",
+          "Example 4: $\\Phi([0, 0], 2) = [[1, 0, 0], [1, 0, 0]]$ (zero values are valid)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Domain Validation",
+          "latex": "$\\text{valid}(d) = \\begin{cases} \\text{true} & \\text{if } d \\geq 0 \\\\ \\text{false} & \\text{if } d < 0 \\end{cases}$",
+          "description": "Degree must be non-negative"
+        },
+        {
+          "name": "Empty Case",
+          "latex": "$\\Phi(\\emptyset, d) = \\emptyset$",
+          "description": "Empty input produces empty output regardless of degree"
+        },
+        {
+          "name": "Zero Special Case",
+          "latex": "$0^j = \\begin{cases} 1 & \\text{if } j = 0 \\\\ 0 & \\text{if } j > 0 \\end{cases}$",
+          "description": "Zero raised to any positive power is zero, but 0^0 = 1"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a validation function that checks if inputs to the Phi transformation are valid, and returns appropriate results for edge cases.",
+        "function_signature": "def validate_and_transform(data: list[float], degree: int) -> list[list[float]]:",
+        "starter_code": "def validate_and_transform(data: list[float], degree: int) -> list[list[float]]:\n    \"\"\"\n    Validate inputs and transform data with proper edge case handling.\n    \n    Args:\n        data: List of input values (can be empty)\n        degree: Degree of polynomial expansion (can be negative)\n    \n    Returns:\n        Transformed features or empty list for invalid inputs\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "validate_and_transform([1.0, 2.0], 2)",
+            "expected": "[[1.0, 1.0, 1.0], [1.0, 2.0, 4.0]]",
+            "explanation": "Valid inputs produce normal transformation"
+          },
+          {
+            "input": "validate_and_transform([5.0], -3)",
+            "expected": "[]",
+            "explanation": "Negative degree returns empty list"
+          },
+          {
+            "input": "validate_and_transform([], 10)",
+            "expected": "[]",
+            "explanation": "Empty data returns empty list"
+          },
+          {
+            "input": "validate_and_transform([0.0], 3)",
+            "expected": "[[1.0, 0.0, 0.0, 0.0]]",
+            "explanation": "Zero is a valid input value"
+          },
+          {
+            "input": "validate_and_transform([2.5, -1.5], 1)",
+            "expected": "[[1.0, 2.5], [1.0, -1.5]]",
+            "explanation": "Negative values and decimals are valid"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking for negative degrees before processing",
+        "Treating empty list as an error instead of a valid edge case",
+        "Incorrectly handling zero values (0^0 should be 1)",
+        "Not testing with negative input values"
+      ],
+      "hint": "Check for invalid conditions (degree < 0 or empty data) at the start, return empty list immediately if found, otherwise proceed with transformation",
+      "references": [
+        "Input validation",
+        "Edge case testing",
+        "Defensive programming"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Phi Transformation Synthesis",
+      "relation_to_problem": "This final sub-quest synthesizes all previous concepts into the complete solution, combining power computation, sequence generation, feature mapping, batch processing, and validation into a single cohesive function.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Function composition",
+        "Integration of components"
+      ],
+      "learning_objectives": [
+        "Synthesize multiple mathematical concepts into one solution",
+        "Implement the complete Phi transformation efficiently",
+        "Understand the relationship between all components"
+      ],
+      "math_content": {
+        "definition": "The complete Phi Transformation is a function $\\Phi: \\mathbb{R}^n \\times \\mathbb{Z} \\to \\mathbb{R}^{n \\times (d+1)} \\cup \\{\\emptyset\\}$ defined as: $\\Phi(\\mathbf{X}, d) = \\begin{cases} \\emptyset & \\text{if } d < 0 \\text{ or } |\\mathbf{X}| = 0 \\\\ \\begin{bmatrix} \\Phi(x_1)^T \\\\ \\vdots \\\\ \\Phi(x_n)^T \\end{bmatrix} & \\text{otherwise} \\end{cases}$ where $\\Phi(x_i) = (x_i^0, x_i^1, \\ldots, x_i^d)^T$ for each $x_i \\in \\mathbf{X}$.",
+        "notation": "$\\Phi: \\mathbb{R}^n \\times \\mathbb{Z} \\to \\mathbb{R}^{n \\times (d+1)} \\cup \\{\\emptyset\\}$ with $\\Phi(\\mathbf{X}, d)$ producing the design matrix",
+        "theorem": "Polynomial Basis Theorem: Any polynomial function $p(x) = \\sum_{i=0}^{d} a_i x^i$ of degree $d$ can be represented as a linear combination of the transformed features: $p(x) = \\mathbf{a}^T \\Phi(x)$ where $\\mathbf{a} = (a_0, a_1, \\ldots, a_d)^T$. This is the fundamental reason why polynomial feature transformation enables linear models to fit nonlinear data.",
+        "proof_sketch": "By definition, $\\Phi(x) = (1, x, x^2, \\ldots, x^d)^T$. The dot product $\\mathbf{a}^T \\Phi(x) = \\sum_{i=0}^{d} a_i x^i$ directly represents a polynomial. Conversely, any polynomial of degree $d$ can be written in this form by choosing appropriate coefficients $a_i$. Thus, linear regression in the transformed feature space $\\Phi(x)$ is equivalent to polynomial regression in the original space $x$.",
+        "examples": [
+          "Example 1: Complete transformation $\\Phi([1, 2], 2) = [[1, 1, 1], [1, 2, 4]]$ showing all components",
+          "Example 2: Edge case $\\Phi([3], -1) = []$ demonstrating validation",
+          "Example 3: Linear model $f(x) = 2 + 3x + x^2$ represented as $\\mathbf{w}^T \\Phi(x)$ with $\\mathbf{w} = (2, 3, 1)^T$ and $d = 2$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Transformation",
+          "latex": "$\\Phi(\\mathbf{X}, d) = \\begin{bmatrix} x_1^0 & x_1^1 & \\cdots & x_1^d \\\\ \\vdots & \\vdots & \\ddots & \\vdots \\\\ x_n^0 & x_n^1 & \\cdots & x_n^d \\end{bmatrix}$",
+          "description": "Full design matrix construction"
+        },
+        {
+          "name": "Polynomial Representation",
+          "latex": "$p(x) = \\mathbf{w}^T \\Phi(x) = \\sum_{i=0}^{d} w_i x^i$",
+          "description": "Linear model in feature space equals polynomial in original space"
+        },
+        {
+          "name": "Dimensionality Expansion",
+          "latex": "$\\mathbb{R}^n \\xrightarrow{\\Phi} \\mathbb{R}^{n \\times (d+1)}$",
+          "description": "Transformation increases feature dimension from 1 to d+1"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete Phi transformation that takes a list of numerical data and a degree, and returns the full polynomial feature matrix. This should integrate all concepts: validation, power computation, sequence generation, and batch transformation.",
+        "function_signature": "def phi_transform_complete(data: list[float], degree: int) -> list[list[float]]:",
+        "starter_code": "def phi_transform_complete(data: list[float], degree: int) -> list[list[float]]:\n    \"\"\"\n    Perform complete Phi Transformation mapping input features to polynomial feature space.\n    \n    Args:\n        data: List of numerical values to transform\n        degree: Degree of polynomial expansion\n    \n    Returns:\n        Nested list where each inner list contains [x^0, x^1, ..., x^degree] for each x in data\n        Returns empty list if degree < 0\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "phi_transform_complete([1.0, 2.0], 2)",
+            "expected": "[[1.0, 1.0, 1.0], [1.0, 2.0, 4.0]]",
+            "explanation": "Standard case: two data points with degree 2"
+          },
+          {
+            "input": "phi_transform_complete([3.0], 3)",
+            "expected": "[[1.0, 3.0, 9.0, 27.0]]",
+            "explanation": "Single data point with degree 3"
+          },
+          {
+            "input": "phi_transform_complete([0.5, 1.5, 2.5], 1)",
+            "expected": "[[1.0, 0.5], [1.0, 1.5], [1.0, 2.5]]",
+            "explanation": "Multiple decimal values with degree 1"
+          },
+          {
+            "input": "phi_transform_complete([2.0], -5)",
+            "expected": "[]",
+            "explanation": "Negative degree returns empty list"
+          },
+          {
+            "input": "phi_transform_complete([], 3)",
+            "expected": "[]",
+            "explanation": "Empty input returns empty list"
+          },
+          {
+            "input": "phi_transform_complete([-1.0, 0.0, 1.0], 2)",
+            "expected": "[[1.0, -1.0, 1.0], [1.0, 0.0, 0.0], [1.0, 1.0, 1.0]]",
+            "explanation": "Handles negative values and zero correctly"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not combining validation with transformation logic",
+        "Inefficient nested loops when a cleaner solution exists",
+        "Not maintaining consistent structure (all inner lists should have same length)",
+        "Forgetting to test with various edge cases (negative values, zero, empty lists)"
+      ],
+      "hint": "Start with validation checks, then apply the per-element transformation to each data point using the patterns from previous sub-quests. Consider using list comprehensions or loops to build the result efficiently.",
+      "references": [
+        "Polynomial regression",
+        "Feature engineering for machine learning",
+        "Kernel methods and feature maps",
+        "Linear algebra in data science"
+      ]
+    }
+  ]
+}

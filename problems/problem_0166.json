@@ -1,0 +1,35 @@
+{
+  "description": "R2l2ZW4gYW4gTURQIChNYXJrb3YgRGVjaXNpb24gUHJvY2Vzcykgc3BlY2lmaWVkIGJ5IGEgc2V0IG9mIHN0YXRlcywgYWN0aW9ucywgdHJhbnNpdGlvbiBwcm9iYWJpbGl0aWVzLCBhbmQgcmV3YXJkcywgd3JpdGUgYSBmdW5jdGlvbiB0byBjb21wdXRlIHRoZSBleHBlY3RlZCB2YWx1ZSBvZiB0YWtpbmcgYSBwYXJ0aWN1bGFyIGFjdGlvbiBpbiBhIHBhcnRpY3VsYXIgc3RhdGUsIGFzc3VtaW5nIGEgZGlzY291bnQgZmFjdG9yIGdhbW1hLiBVc2Ugb25seSBOdW1QeS4=",
+  "id": "166",
+  "test_cases": [
+    {
+      "test": "import numpy as np\nstates = [0, 1]\nactions = ['a', 'b']\n# P[s][a][s'] = prob of s' if taking action a in s\nP = {\n    0: {'a': {0: 0.5, 1: 0.5}, 'b': {0: 1.0}},\n    1: {'a': {1: 1.0}, 'b': {0: 0.7, 1: 0.3}}\n}\nR = {\n    0: {'a': {0: 5, 1: 10}, 'b': {0: 2}},\n    1: {'a': {1: 0}, 'b': {0: -1, 1: 3}}\n}\ngamma = 0.9\nV = np.array([1.0, 2.0])\nprint(round(expected_action_value(0, 'a', P, R, V, gamma), 4))",
+      "expected_output": "8.85"
+    },
+    {
+      "test": "import numpy as np\nstates = [0, 1]\nactions = ['a', 'b']\nP = {\n    0: {'a': {0: 0.5, 1: 0.5}, 'b': {0: 1.0}},\n    1: {'a': {1: 1.0}, 'b': {0: 0.7, 1: 0.3}}\n}\nR = {\n    0: {'a': {0: 5, 1: 10}, 'b': {0: 2}},\n    1: {'a': {1: 0}, 'b': {0: -1, 1: 3}}\n}\ngamma = 0.5\nV = np.array([2.0, 0.0])\nprint(round(expected_action_value(1, 'b', P, R, V, gamma), 4))",
+      "expected_output": "0.9"
+    }
+  ],
+  "difficulty": "medium",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "states = [0, 1]\nactions = ['a', 'b']\nP = {0: {'a': {0: 0.5, 1: 0.5}, 'b': {0: 1.0}}, 1: {'a': {1: 1.0}, 'b': {0: 0.7, 1: 0.3}}}\nR = {0: {'a': {0: 5, 1: 10}, 'b': {0: 2}}, 1: {'a': {1: 0}, 'b': {0: -1, 1: 3}}}\ngamma = 0.9\nV = np.array([1.0, 2.0])\nprint(expected_action_value(0, 'a', P, R, V, gamma))",
+    "output": "8.85",
+    "reasoning": "For state 0 and action 'a':\n  - Next state 0: 0.5 * (5 + 0.9*1.0) = 0.5 * 5.9 = 2.95\n  - Next state 1: 0.5 * (10 + 0.9*2.0) = 0.5 * 11.8 = 5.9\n  Total: 2.95 + 5.9 = 8.85"
+  },
+  "category": "Reinforcement Learning",
+  "starter_code": "import numpy as np\n\ndef expected_action_value(state, action, P, R, V, gamma):\n    \"\"\"\n    Computes the expected value of taking `action` in `state` for the given MDP.\n    Args:\n      state: int or str, the current state\n      action: str, the chosen action\n      P: dict of dicts, P[s][a][s'] = prob of next state s' if a in s\n      R: dict of dicts, R[s][a][s'] = reward for (s, a, s')\n      V: np.ndarray, the value function vector, indexed by state\n      gamma: float, discount factor\n    Returns:\n      float: expected value\n    \"\"\"\n    # Your code here\n    pass",
+  "title": "Evaluate Expected Value in a Markov Decision Process",
+  "learn_section": "IyAqKk1hcmtvdiBEZWNpc2lvbiBQcm9jZXNzIChNRFApKioKCkEgKipNYXJrb3YgRGVjaXNpb24gUHJvY2VzcyAoTURQKSoqIGlzIGEgbWF0aGVtYXRpY2FsIGZyYW1ld29yayB1c2VkIHRvIGRlc2NyaWJlIGVudmlyb25tZW50cyBpbiByZWluZm9yY2VtZW50IGxlYXJuaW5nIHdoZXJlIG91dGNvbWVzIGFyZSBwYXJ0bHkgcmFuZG9tIGFuZCBwYXJ0bHkgdW5kZXIgdGhlIGNvbnRyb2wgb2YgYSBkZWNpc2lvbi1tYWtlciAoYWdlbnQpLgoKLS0tCgojIyAqKkNvcmUgQ29tcG9uZW50cyoqCi0gKipTdGF0ZXMgKCRTJCk6KiogQWxsIHBvc3NpYmxlIGNvbmZpZ3VyYXRpb25zIG9yIHNpdHVhdGlvbnMgdGhlIGFnZW50IGNhbiBiZSBpbi4KLSAqKkFjdGlvbnMgKCRBJCk6KiogQ2hvaWNlcyBhdmFpbGFibGUgdG8gdGhlIGFnZW50IGluIGVhY2ggc3RhdGUuCi0gKipUcmFuc2l0aW9uIFByb2JhYmlsaXRpZXMgKCRQJCk6KiogUHJvYmFiaWxpdHkgJFAocyd8cywgYSkkIG9mIG1vdmluZyB0byBzdGF0ZSAkcyckIGZyb20gc3RhdGUgJHMkIGFmdGVyIHRha2luZyBhY3Rpb24gJGEkLgotICoqUmV3YXJkcyAoJFIkKToqKiBJbW1lZGlhdGUgcmV3YXJkIHJlY2VpdmVkIGZvciB0cmFuc2l0aW9uaW5nIGZyb20gJHMkIHRvICRzJyQgdmlhIGFjdGlvbiAkYSQuCi0gKipEaXNjb3VudCBGYWN0b3IgKCRcZ2FtbWEkKToqKiBBIHZhbHVlICQwIFxsZXEgXGdhbW1hIFxsZXEgMSQgdGhhdCBkaXNjb3VudHMgZnV0dXJlIHJld2FyZHMuCgotLS0KCiMjICoqVGhlIE1hcmtvdiBQcm9wZXJ0eSoqClRoZSBmdXR1cmUgc3RhdGUgZGVwZW5kcyBvbmx5IG9uIHRoZSBjdXJyZW50IHN0YXRlIGFuZCBhY3Rpb24sIG5vdCBvbiBhbnkgcHJldmlvdXMgc3RhdGVzIG9yIGFjdGlvbnMuCgotLS0KCiMjICoqRXhwZWN0ZWQgVmFsdWUgb2YgYW4gQWN0aW9uKioKRm9yIGEgZ2l2ZW4gc3RhdGUgJHMkLCBhY3Rpb24gJGEkLCBhbmQgdmFsdWUgZnVuY3Rpb24gJFYocykkLCB0aGUgKipleHBlY3RlZCB2YWx1ZSoqIG9mIHRha2luZyBhY3Rpb24gJGEkIGluICRzJCBpczoKCiQkClEocywgYSkgPSBcc3VtX3tzJ30gUChzJyB8IHMsIGEpIFxiaWdbIFIocywgYSwgcycpICsgXGdhbW1hIFYocycpIFxiaWddCiQkCgotICRRKHMsIGEpJDogRXhwZWN0ZWQgcmV0dXJuIChhY3Rpb24tdmFsdWUpIG9mICRhJCBpbiAkcyQKLSAkUChzJyB8IHMsIGEpJDogUHJvYmFiaWxpdHkgb2YgZW5kaW5nIGluICRzJyQgYWZ0ZXIgJChzLCBhKSQKLSAkUihzLCBhLCBzJykkOiBSZXdhcmQgZm9yIHRyYW5zaXRpb24KLSAkXGdhbW1hJDogRGlzY291bnQgZmFjdG9yCi0gJFYocycpJDogVmFsdWUgb2YgbmV4dCBzdGF0ZSAkcyckCgotLS0KCiMjICoqU3VtbWFyeSoqCk1EUHMgYWxsb3cgdXMgdG8gbW9kZWwgc2VxdWVudGlhbCBkZWNpc2lvbi1tYWtpbmcgcHJvYmxlbXMsIHdoZXJlIGFjdGlvbnMgYWZmZWN0IGJvdGggaW1tZWRpYXRlIHJld2FyZHMgYW5kIGZ1dHVyZSBzdGF0ZXMuIENhbGN1bGF0aW5nIHRoZSBleHBlY3RlZCB2YWx1ZSBvZiBhY3Rpb25zIGlzIGNlbnRyYWwgZm9yIHBsYW5uaW5nIGFuZCBsZWFybmluZyBvcHRpbWFsIHN0cmF0ZWdpZXMu",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/moe18",
+      "name": "Moe Chabot"
+    }
+  ],
+  "description_decoded": "Given an MDP (Markov Decision Process) specified by a set of states, actions, transition probabilities, and rewards, write a function to compute the expected value of taking a particular action in a particular state, assuming a discount factor gamma. Use only NumPy.",
+  "learn_section_decoded": "# **Markov Decision Process (MDP)**\n\nA **Markov Decision Process (MDP)** is a mathematical framework used to describe environments in reinforcement learning where outcomes are partly random and partly under the control of a decision-maker (agent).\n\n---\n\n## **Core Components**\n- **States ($S$):** All possible configurations or situations the agent can be in.\n- **Actions ($A$):** Choices available to the agent in each state.\n- **Transition Probabilities ($P$):** Probability $P(s'|s, a)$ of moving to state $s'$ from state $s$ after taking action $a$.\n- **Rewards ($R$):** Immediate reward received for transitioning from $s$ to $s'$ via action $a$.\n- **Discount Factor ($\\gamma$):** A value $0 \\leq \\gamma \\leq 1$ that discounts future rewards.\n\n---\n\n## **The Markov Property**\nThe future state depends only on the current state and action, not on any previous states or actions.\n\n---\n\n## **Expected Value of an Action**\nFor a given state $s$, action $a$, and value function $V(s)$, the **expected value** of taking action $a$ in $s$ is:\n\n$$\nQ(s, a) = \\sum_{s'} P(s' | s, a) \\big[ R(s, a, s') + \\gamma V(s') \\big]\n$$\n\n- $Q(s, a)$: Expected return (action-value) of $a$ in $s$\n- $P(s' | s, a)$: Probability of ending in $s'$ after $(s, a)$\n- $R(s, a, s')$: Reward for transition\n- $\\gamma$: Discount factor\n- $V(s')$: Value of next state $s'$\n\n---\n\n## **Summary**\nMDPs allow us to model sequential decision-making problems, where actions affect both immediate rewards and future states. Calculating the expected value of actions is central for planning and learning optimal strategies."
+}

@@ -1,0 +1,409 @@
+{
+  "problem_id": 256,
+  "title": "Calculate Davies-Bouldin Index for Clustering Evaluation",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "Implement a function to calculate the Davies-Bouldin Index (DBI) for evaluating clustering quality. The DBI measures the average similarity between each cluster and its most similar cluster, where similarity is defined as a ratio of within-cluster scatter to between-cluster separation.\n\nFor each cluster, calculate the scatter (average Euclidean distance of points to the cluster centroid). Then for each pair of clusters, compute their similarity ratio using the sum of their scatters divided by the distance between their centroids. The DBI is the average of the maximum similarity ratios across all clusters.\n\nGiven:\n- X: a numpy array of shape (n_samples, n_features) containing data points\n- labels: a numpy array of shape (n_samples,) containing cluster assignments for each point\n\nReturn the Davies-Bouldin Index rounded to 4 decimal places. If there is only one cluster, return 0.0. Lower values indicate better clustering with more compact and well-separated clusters.",
+  "example": {
+    "input": "X = np.array([[1, 1], [1.5, 1.5], [2, 2], [10, 10], [10.5, 10.5], [11, 11]])\nlabels = np.array([0, 0, 0, 1, 1, 1])",
+    "output": "0.0741",
+    "reasoning": "Cluster 0 has centroid [1.5, 1.5] with scatter 0.4714. Cluster 1 has centroid [10.5, 10.5] with scatter 0.4714. The distance between centroids is 12.73. The similarity ratio R = (0.4714 + 0.4714) / 12.73 = 0.0741. Since there are only two clusters, DBI = 0.0741. The low value indicates well-separated clusters."
+  },
+  "starter_code": "import numpy as np\n\ndef davies_bouldin_index(X, labels):\n    \"\"\"\n    Calculate the Davies-Bouldin Index for clustering evaluation.\n    \n    Parameters:\n    X: numpy array of shape (n_samples, n_features) - data points\n    labels: numpy array of shape (n_samples,) - cluster labels\n    \n    Returns:\n    float: Davies-Bouldin Index rounded to 4 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Euclidean Distance and Cluster Centroids",
+      "relation_to_problem": "Computing cluster centroids and Euclidean distances is the foundational operation for calculating both within-cluster scatter and between-cluster separation in the Davies-Bouldin Index.",
+      "prerequisites": [
+        "Multidimensional arrays",
+        "Basic linear algebra",
+        "Vector norms"
+      ],
+      "learning_objectives": [
+        "Compute the centroid (mean) of a set of points in n-dimensional space",
+        "Calculate Euclidean distance between two points or between a point and centroid",
+        "Understand the L2 norm as the basis for distance calculations"
+      ],
+      "math_content": {
+        "definition": "The **centroid** $\\mu$ of a set of points $\\{x_1, x_2, \\ldots, x_n\\}$ in $\\mathbb{R}^d$ is the arithmetic mean: $$\\mu = \\frac{1}{n} \\sum_{i=1}^{n} x_i$$ where each $x_i \\in \\mathbb{R}^d$ and the summation is performed component-wise. The **Euclidean distance** (L2 norm) between two points $x, y \\in \\mathbb{R}^d$ is: $$\\|x - y\\|_2 = \\sqrt{\\sum_{j=1}^{d} (x_j - y_j)^2}$$",
+        "notation": "$\\mu$ = centroid vector, $x_i$ = individual point, $n$ = number of points, $d$ = dimensionality, $\\|\\cdot\\|_2$ = Euclidean norm",
+        "theorem": "**Theorem (Centroid Minimizes Sum of Squared Distances)**: The centroid $\\mu$ minimizes the sum of squared Euclidean distances to all points: $$\\mu = \\arg\\min_{c \\in \\mathbb{R}^d} \\sum_{i=1}^{n} \\|x_i - c\\|_2^2$$",
+        "proof_sketch": "To prove, take the derivative of $f(c) = \\sum_{i=1}^{n} \\|x_i - c\\|_2^2$ with respect to $c$ and set to zero: $$\\frac{\\partial f}{\\partial c} = -2\\sum_{i=1}^{n} (x_i - c) = 0 \\implies c = \\frac{1}{n}\\sum_{i=1}^{n} x_i = \\mu$$. The second derivative is positive definite, confirming this is a minimum.",
+        "examples": [
+          "Points: $\\{(1, 2), (3, 4), (5, 6)\\}$. Centroid: $\\mu = \\frac{1}{3}[(1+3+5), (2+4+6)] = (3, 4)$",
+          "Distance from $(1, 2)$ to $(3, 4)$: $\\|(1,2) - (3,4)\\|_2 = \\sqrt{(1-3)^2 + (2-4)^2} = \\sqrt{8} \\approx 2.828$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Centroid Formula",
+          "latex": "$\\mu = \\frac{1}{n} \\sum_{i=1}^{n} x_i$",
+          "description": "Use to find the center point of a cluster"
+        },
+        {
+          "name": "Euclidean Distance",
+          "latex": "$\\|x - y\\|_2 = \\sqrt{\\sum_{j=1}^{d} (x_j - y_j)^2}$",
+          "description": "Use to measure separation between points or centroids"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the centroid of a cluster and calculates the Euclidean distance from each point to the centroid. This is essential for measuring cluster compactness.",
+        "function_signature": "def compute_centroid_and_distances(points: np.ndarray) -> tuple[np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef compute_centroid_and_distances(points):\n    \"\"\"\n    Compute the centroid and distances from each point to the centroid.\n    \n    Parameters:\n    points: numpy array of shape (n_points, n_features)\n    \n    Returns:\n    tuple: (centroid, distances) where\n        - centroid: numpy array of shape (n_features,)\n        - distances: numpy array of shape (n_points,)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_centroid_and_distances(np.array([[1, 1], [2, 2], [3, 3]]))",
+            "expected": "(np.array([2., 2.]), np.array([1.4142, 0., 1.4142]))",
+            "explanation": "Centroid is (2, 2). Point (1,1) is sqrt(2) away, (2,2) is 0 away, (3,3) is sqrt(2) away"
+          },
+          {
+            "input": "compute_centroid_and_distances(np.array([[0, 0], [4, 0], [0, 3]]))",
+            "expected": "(np.array([1.333, 1.]), np.array([1.6667, 2.8284, 2.3570]))",
+            "explanation": "Centroid is approximately (4/3, 1). Calculate each Euclidean distance to verify compactness"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to compute the centroid component-wise (axis parameter in numpy)",
+        "Not using the square root when calculating Euclidean distance",
+        "Confusing Manhattan distance (L1) with Euclidean distance (L2)",
+        "Failing to handle single-point clusters (distance should be 0)"
+      ],
+      "hint": "Use numpy.mean() with the correct axis parameter to compute centroids efficiently. Use numpy.linalg.norm() or manual square root of squared differences for distances.",
+      "references": [
+        "Vector spaces and norms",
+        "Centroid properties in statistics",
+        "Distance metrics in machine learning"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Within-Cluster Scatter Measurement",
+      "relation_to_problem": "The scatter $S_i$ quantifies cluster compactness and forms the numerator in the Davies-Bouldin similarity ratio. Lower scatter indicates tighter, more cohesive clusters.",
+      "prerequisites": [
+        "Euclidean distance calculation",
+        "Cluster centroids",
+        "Average aggregation"
+      ],
+      "learning_objectives": [
+        "Define and compute within-cluster scatter as average distance to centroid",
+        "Understand scatter as a measure of cluster cohesion",
+        "Handle multiple clusters with different sizes correctly"
+      ],
+      "math_content": {
+        "definition": "The **within-cluster scatter** $S_i$ for cluster $C_i$ containing $n_i$ points is the average Euclidean distance from each point to the cluster centroid $\\mu_i$: $$S_i = \\frac{1}{n_i} \\sum_{x \\in C_i} \\|x - \\mu_i\\|_2$$ where $\\mu_i = \\frac{1}{n_i} \\sum_{x \\in C_i} x$ is the centroid of cluster $C_i$. This metric quantifies the **compactness** or **cohesion** of the cluster.",
+        "notation": "$S_i$ = scatter of cluster $i$, $C_i$ = set of points in cluster $i$, $n_i = |C_i|$ = number of points in cluster $i$, $\\mu_i$ = centroid of cluster $i$",
+        "theorem": "**Theorem (Scatter Properties)**: (1) $S_i \\geq 0$ with equality iff all points in $C_i$ are identical. (2) $S_i$ is invariant under translation of all points by the same vector. (3) $S_i$ scales linearly with uniform scaling: $S_{\\alpha C_i} = \\alpha S_i$ for $\\alpha > 0$.",
+        "proof_sketch": "(1) Since $\\|\\cdot\\|_2 \\geq 0$ and equality holds iff $x = \\mu_i$ for all $x$, then $S_i \\geq 0$. (2) If we translate all points by $t$, the new centroid is $\\mu_i' = \\mu_i + t$, so $\\|x + t - (\\mu_i + t)\\|_2 = \\|x - \\mu_i\\|_2$. (3) For scaling, $\\mu_{\\alpha C_i} = \\alpha \\mu_i$, so $\\|\\alpha x - \\alpha \\mu_i\\|_2 = \\alpha\\|x - \\mu_i\\|_2$.",
+        "examples": [
+          "Cluster with points $\\{(1,1), (2,2), (3,3)\\}$: $\\mu = (2,2)$, distances are $\\{\\sqrt{2}, 0, \\sqrt{2}\\}$, so $S = \\frac{\\sqrt{2} + 0 + \\sqrt{2}}{3} = \\frac{2\\sqrt{2}}{3} \\approx 0.9428$",
+          "Tight cluster $\\{(5,5), (5.1,5), (5,5.1)\\}$: Very small scatter indicates high cohesion"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Within-Cluster Scatter",
+          "latex": "$S_i = \\frac{1}{n_i} \\sum_{x \\in C_i} \\|x - \\mu_i\\|_2$",
+          "description": "Measures average distance from points to their cluster center; lower is better"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the scatter (average distance to centroid) for each cluster given data points and their cluster labels. This measures how compact each cluster is.",
+        "function_signature": "def compute_cluster_scatters(X: np.ndarray, labels: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_cluster_scatters(X, labels):\n    \"\"\"\n    Compute the scatter (average distance to centroid) for each cluster.\n    \n    Parameters:\n    X: numpy array of shape (n_samples, n_features) - data points\n    labels: numpy array of shape (n_samples,) - cluster assignments\n    \n    Returns:\n    numpy array of shape (n_clusters,) - scatter value for each cluster\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_cluster_scatters(np.array([[1,1], [1.5,1.5], [2,2], [10,10], [10.5,10.5], [11,11]]), np.array([0,0,0,1,1,1]))",
+            "expected": "np.array([0.4714, 0.4714])",
+            "explanation": "Two symmetric clusters with identical scatter. Cluster 0 centroid is (1.5, 1.5), cluster 1 centroid is (10.5, 10.5), both have the same spread"
+          },
+          {
+            "input": "compute_cluster_scatters(np.array([[0,0], [1,1], [10,10]]), np.array([0,0,1]))",
+            "expected": "np.array([0.7071, 0.0])",
+            "explanation": "Cluster 0 has two points with scatter ~0.707, cluster 1 has one point with scatter 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not computing a separate centroid for each cluster",
+        "Dividing by total number of points instead of points per cluster",
+        "Forgetting to handle clusters with single points (scatter should be 0)",
+        "Using squared distances instead of actual Euclidean distances"
+      ],
+      "hint": "Iterate over unique cluster labels, extract points for each cluster, compute its centroid, then average the distances from points to that centroid.",
+      "references": [
+        "Cluster cohesion metrics",
+        "Within-cluster sum of squares (WCSS)",
+        "K-means objective function"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Between-Cluster Separation Distance",
+      "relation_to_problem": "The distance between cluster centroids $M_{ij}$ forms the denominator in the Davies-Bouldin similarity ratio. Greater separation leads to better clustering and lower DBI values.",
+      "prerequisites": [
+        "Cluster centroids",
+        "Euclidean distance",
+        "Pairwise comparisons"
+      ],
+      "learning_objectives": [
+        "Compute pairwise distances between all cluster centroids",
+        "Understand separation as a measure of cluster distinctness",
+        "Build distance matrices for efficient pairwise calculations"
+      ],
+      "math_content": {
+        "definition": "The **between-cluster separation** $M_{ij}$ for clusters $C_i$ and $C_j$ is the Euclidean distance between their centroids: $$M_{ij} = \\|\\mu_i - \\mu_j\\|_2 = \\sqrt{\\sum_{k=1}^{d} (\\mu_{i,k} - \\mu_{j,k})^2}$$ where $\\mu_i$ and $\\mu_j$ are the centroids of clusters $i$ and $j$ respectively. This measures how **separated** or **distinct** the two clusters are in feature space.",
+        "notation": "$M_{ij}$ = separation distance between clusters $i$ and $j$, $\\mu_i, \\mu_j$ = centroids, $d$ = number of features",
+        "theorem": "**Theorem (Distance Matrix Properties)**: The matrix $M = [M_{ij}]$ of pairwise centroid distances satisfies: (1) **Symmetry**: $M_{ij} = M_{ji}$. (2) **Non-negativity**: $M_{ij} \\geq 0$ with $M_{ii} = 0$. (3) **Triangle inequality**: $M_{ij} \\leq M_{ik} + M_{kj}$ for any cluster $k$. These are the properties of a metric space.",
+        "proof_sketch": "(1) By definition, $\\|\\mu_i - \\mu_j\\|_2 = \\|\\mu_j - \\mu_i\\|_2$. (2) The Euclidean norm is always non-negative, and $\\|\\mu_i - \\mu_i\\|_2 = \\|0\\|_2 = 0$. (3) The triangle inequality follows from the triangle inequality of the Euclidean norm: $\\|\\mu_i - \\mu_j\\|_2 \\leq \\|\\mu_i - \\mu_k\\|_2 + \\|\\mu_k - \\mu_j\\|_2$.",
+        "examples": [
+          "Centroids: $\\mu_1 = (0, 0)$, $\\mu_2 = (3, 4)$. Separation: $M_{12} = \\sqrt{3^2 + 4^2} = 5$",
+          "For 3 clusters with centroids $(0,0)$, $(1,0)$, $(0,1)$: $M_{12} = 1$, $M_{13} = 1$, $M_{23} = \\sqrt{2} \\approx 1.414$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Between-Cluster Separation",
+          "latex": "$M_{ij} = \\|\\mu_i - \\mu_j\\|_2$",
+          "description": "Distance between centroids; higher values indicate better separation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes all pairwise distances between cluster centroids. This creates a separation matrix needed for evaluating cluster distinctness.",
+        "function_signature": "def compute_centroid_distances(X: np.ndarray, labels: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_centroid_distances(X, labels):\n    \"\"\"\n    Compute pairwise Euclidean distances between all cluster centroids.\n    \n    Parameters:\n    X: numpy array of shape (n_samples, n_features) - data points\n    labels: numpy array of shape (n_samples,) - cluster assignments\n    \n    Returns:\n    numpy array of shape (n_clusters, n_clusters) - distance matrix where\n    element [i,j] is the distance between centroids of clusters i and j\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_centroid_distances(np.array([[1,1], [2,2], [10,10], [11,11]]), np.array([0,0,1,1]))",
+            "expected": "np.array([[0., 12.7279], [12.7279, 0.]])",
+            "explanation": "Cluster 0 centroid: (1.5, 1.5), Cluster 1 centroid: (10.5, 10.5). Distance: sqrt((10.5-1.5)^2 + (10.5-1.5)^2) = 9*sqrt(2) ≈ 12.7279"
+          },
+          {
+            "input": "compute_centroid_distances(np.array([[0,0], [1,0], [0,1]]), np.array([0,1,2]))",
+            "expected": "np.array([[0., 1., 1.], [1., 0., 1.4142], [1., 1.4142, 0.]])",
+            "explanation": "Three single-point clusters form a right triangle. Diagonal is 0, off-diagonal distances match triangle sides"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not making the distance matrix symmetric",
+        "Computing distances between points instead of centroids",
+        "Forgetting that diagonal elements should be 0",
+        "Inefficiently computing distances (can use broadcasting or vectorized operations)"
+      ],
+      "hint": "First compute centroids for each cluster, then create a pairwise distance matrix. Consider using scipy.spatial.distance.cdist or manual broadcasting for efficiency.",
+      "references": [
+        "Distance matrices",
+        "Cluster separation metrics",
+        "Pairwise distance computation"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Similarity Ratio Between Cluster Pairs",
+      "relation_to_problem": "The similarity ratio $R_{ij}$ combines scatter and separation to quantify how similar clusters i and j are. This is the core component of the Davies-Bouldin Index calculation.",
+      "prerequisites": [
+        "Within-cluster scatter",
+        "Between-cluster separation",
+        "Ratio interpretation"
+      ],
+      "learning_objectives": [
+        "Understand the similarity ratio as a normalized measure of cluster overlap",
+        "Compute pairwise similarity ratios for all cluster pairs",
+        "Interpret why lower ratios indicate better clustering"
+      ],
+      "math_content": {
+        "definition": "The **similarity ratio** $R_{ij}$ between clusters $C_i$ and $C_j$ is defined as: $$R_{ij} = \\frac{S_i + S_j}{M_{ij}}$$ where $S_i, S_j$ are the within-cluster scatters and $M_{ij}$ is the separation distance between centroids. This ratio balances cluster compactness (numerator) against separation (denominator). **Lower values** indicate more distinct, well-separated clusters.",
+        "notation": "$R_{ij}$ = similarity ratio between clusters $i$ and $j$, $S_i$ = scatter of cluster $i$, $M_{ij}$ = centroid separation",
+        "theorem": "**Theorem (Similarity Ratio Bounds)**: For any two clusters $i \\neq j$: (1) $R_{ij} > 0$ if both clusters are non-empty. (2) $R_{ij} \\to 0$ as $M_{ij} \\to \\infty$ (perfect separation). (3) $R_{ij} \\to \\infty$ as $M_{ij} \\to 0$ (overlapping clusters). (4) For fixed separation, $R_{ij}$ increases with scatter (less compact clusters).",
+        "proof_sketch": "(1) Since $S_i, S_j \\geq 0$ (with at least one positive for non-trivial clusters) and $M_{ij} > 0$ for $i \\neq j$, the ratio is positive. (2) As clusters move apart, $M_{ij}$ grows while $S_i + S_j$ remains constant, so $R_{ij} \\to 0$. (3) As centroids converge, $M_{ij} \\to 0$ making $R_{ij} \\to \\infty$. (4) Derivative $\\frac{\\partial R_{ij}}{\\partial S_i} = \\frac{1}{M_{ij}} > 0$ shows increasing scatter increases similarity.",
+        "examples": [
+          "Well-separated clusters: $S_1 = 0.5$, $S_2 = 0.5$, $M_{12} = 10$. Then $R_{12} = \\frac{0.5+0.5}{10} = 0.1$ (low, good clustering)",
+          "Overlapping clusters: $S_1 = 2$, $S_2 = 3$, $M_{12} = 1$. Then $R_{12} = \\frac{2+3}{1} = 5$ (high, poor clustering)",
+          "Asymmetric case: $S_1 = 0.2$, $S_2 = 1.0$, $M_{12} = 5$. Then $R_{12} = \\frac{1.2}{5} = 0.24$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Similarity Ratio",
+          "latex": "$R_{ij} = \\frac{S_i + S_j}{M_{ij}}$",
+          "description": "Ratio of combined scatter to separation; lower indicates better cluster distinction"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the similarity ratio matrix for all cluster pairs. Each element R[i,j] represents how similar clusters i and j are, with lower values indicating better separation.",
+        "function_signature": "def compute_similarity_ratios(scatters: np.ndarray, distances: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_similarity_ratios(scatters, distances):\n    \"\"\"\n    Compute pairwise similarity ratios between clusters.\n    \n    Parameters:\n    scatters: numpy array of shape (n_clusters,) - scatter for each cluster\n    distances: numpy array of shape (n_clusters, n_clusters) - pairwise centroid distances\n    \n    Returns:\n    numpy array of shape (n_clusters, n_clusters) - similarity ratio matrix\n    Note: Diagonal elements (i=j) should be set to 0 or np.inf (will be ignored)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_similarity_ratios(np.array([0.5, 0.5]), np.array([[0., 10.], [10., 0.]]))",
+            "expected": "np.array([[np.inf, 0.1], [0.1, np.inf]])",
+            "explanation": "R_01 = (0.5 + 0.5) / 10 = 0.1. Diagonal set to inf (or 0) as clusters don't compare with themselves"
+          },
+          {
+            "input": "compute_similarity_ratios(np.array([1.0, 2.0, 0.5]), np.array([[0., 5., 8.], [5., 0., 6.], [8., 6., 0.]]))",
+            "expected": "np.array([[np.inf, 0.6, 0.1875], [0.6, np.inf, 0.4167], [0.1875, 0.4167, np.inf]])",
+            "explanation": "R_01 = (1+2)/5 = 0.6, R_02 = (1+0.5)/8 = 0.1875, R_12 = (2+0.5)/6 ≈ 0.4167"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the diagonal (i=i) case properly - division by zero",
+        "Computing R_ij and R_ji separately (they're identical by symmetry)",
+        "Using subtraction instead of addition in the numerator",
+        "Forgetting to check for zero separation distance (would cause division by zero)"
+      ],
+      "hint": "Use broadcasting to compute the similarity matrix efficiently. The numerator is scatter[i] + scatter[j] for all pairs, divided element-wise by the distance matrix. Set diagonal to a sentinel value.",
+      "references": [
+        "Cluster validity indices",
+        "Davies-Bouldin Index components",
+        "Normalized cluster metrics"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Maximum Similarity and Davies-Bouldin Index",
+      "relation_to_problem": "The DBI is computed by finding each cluster's most similar neighbor (max similarity ratio) and averaging across all clusters. This final aggregation produces the overall clustering quality score.",
+      "prerequisites": [
+        "Similarity ratios",
+        "Maximum operations",
+        "Mean aggregation"
+      ],
+      "learning_objectives": [
+        "Find the maximum similarity ratio for each cluster (worst-case neighbor)",
+        "Understand why we take the maximum rather than average of similarities",
+        "Compute the final Davies-Bouldin Index from maximum similarities",
+        "Handle edge cases like single clusters"
+      ],
+      "math_content": {
+        "definition": "For each cluster $C_i$, the **maximum similarity** $R_i$ represents the highest similarity with any other cluster: $$R_i = \\max_{j \\neq i} R_{ij} = \\max_{j \\neq i} \\frac{S_i + S_j}{M_{ij}}$$ The **Davies-Bouldin Index** is the average of these maximum similarities across all $k$ clusters: $$\\text{DBI} = \\frac{1}{k} \\sum_{i=1}^{k} R_i$$ For $k = 1$ (single cluster), DBI is defined as 0 by convention.",
+        "notation": "$R_i$ = maximum similarity for cluster $i$, $k$ = number of clusters, $\\text{DBI}$ = Davies-Bouldin Index",
+        "theorem": "**Theorem (DBI Properties)**: (1) $\\text{DBI} \\geq 0$ with equality only when all clusters are infinitely separated. (2) Lower DBI indicates better clustering. (3) DBI is **scale-invariant**: uniformly scaling all data by $\\alpha > 0$ doesn't change DBI. (4) DBI is **translation-invariant**: shifting all data by a vector doesn't change DBI.",
+        "proof_sketch": "(1) Since $R_{ij} > 0$ for non-trivial cases, $R_i \\geq 0$ and thus $\\text{DBI} \\geq 0$. (2) Lower DBI means clusters are more compact relative to their separation. (3) Under scaling by $\\alpha$: $S_i' = \\alpha S_i$ and $M_{ij}' = \\alpha M_{ij}$, so $R_{ij}' = \\frac{\\alpha(S_i + S_j)}{\\alpha M_{ij}} = R_{ij}$. (4) Translation preserves relative positions, so centroids shift identically and all distances remain unchanged.",
+        "examples": [
+          "Two well-separated clusters: $R_1 = 0.1$, $R_2 = 0.1$. Then $\\text{DBI} = \\frac{0.1 + 0.1}{2} = 0.1$ (excellent)",
+          "Three clusters with varying separation: $R_1 = 0.2$, $R_2 = 0.5$, $R_3 = 0.15$. Then $\\text{DBI} = \\frac{0.2 + 0.5 + 0.15}{3} \\approx 0.283$",
+          "Single cluster: $k = 1$, so $\\text{DBI} = 0$ by definition (no comparisons possible)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Maximum Similarity per Cluster",
+          "latex": "$R_i = \\max_{j \\neq i} R_{ij}$",
+          "description": "Find each cluster's most similar neighbor (worst-case scenario)"
+        },
+        {
+          "name": "Davies-Bouldin Index",
+          "latex": "$\\text{DBI} = \\frac{1}{k} \\sum_{i=1}^{k} R_i$",
+          "description": "Average of maximum similarities; lower is better, minimum is 0"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the final step: given a similarity ratio matrix, compute the maximum similarity for each cluster (excluding self-comparison), then return the average as the Davies-Bouldin Index. This completes the clustering evaluation metric.",
+        "function_signature": "def compute_davies_bouldin_from_similarities(similarity_matrix: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_davies_bouldin_from_similarities(similarity_matrix):\n    \"\"\"\n    Compute Davies-Bouldin Index from similarity ratio matrix.\n    \n    Parameters:\n    similarity_matrix: numpy array of shape (n_clusters, n_clusters)\n                      where element [i,j] is R_ij (similarity between clusters i and j)\n                      Diagonal should be 0 or inf (will be excluded from max)\n    \n    Returns:\n    float: Davies-Bouldin Index rounded to 4 decimal places\n           Returns 0.0 if only one cluster exists\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_davies_bouldin_from_similarities(np.array([[np.inf, 0.1], [0.1, np.inf]]))",
+            "expected": "0.1",
+            "explanation": "Two clusters: R_0 = max(0.1) = 0.1, R_1 = max(0.1) = 0.1. DBI = (0.1 + 0.1)/2 = 0.1"
+          },
+          {
+            "input": "compute_davies_bouldin_from_similarities(np.array([[np.inf, 0.6, 0.1875], [0.6, np.inf, 0.4167], [0.1875, 0.4167, np.inf]]))",
+            "expected": "0.4681",
+            "explanation": "Three clusters: R_0 = max(0.6, 0.1875) = 0.6, R_1 = max(0.6, 0.4167) = 0.6, R_2 = max(0.1875, 0.4167) = 0.4167. DBI = (0.6 + 0.6 + 0.4167)/3 ≈ 0.5389"
+          },
+          {
+            "input": "compute_davies_bouldin_from_similarities(np.array([[np.inf]]))",
+            "expected": "0.0",
+            "explanation": "Single cluster: no other clusters to compare with, return 0.0 by convention"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Including diagonal elements when computing maximum (leads to inf or 0)",
+        "Not handling the k=1 case (should return 0.0)",
+        "Taking minimum instead of maximum similarity ratios",
+        "Forgetting to average the maximum similarities at the end",
+        "Not rounding to 4 decimal places as specified"
+      ],
+      "hint": "Use numpy.max with appropriate axis, but exclude diagonal elements. For a 2D array, consider setting diagonal to -inf before taking max, or use masking. Handle the single-cluster edge case first.",
+      "references": [
+        "Davies-Bouldin Index interpretation",
+        "Cluster validity metrics comparison",
+        "Internal clustering evaluation"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Davies-Bouldin Index Implementation",
+      "relation_to_problem": "This integrates all previous concepts - centroids, scatter, separation, similarity ratios, and maximum selection - into the complete Davies-Bouldin Index calculation from raw data and labels.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Vectorized numpy operations",
+        "Edge case handling"
+      ],
+      "learning_objectives": [
+        "Combine all components into a complete DBI implementation",
+        "Efficiently compute DBI using vectorized operations",
+        "Handle edge cases: single cluster, empty clusters, identical points",
+        "Validate implementation against known test cases"
+      ],
+      "math_content": {
+        "definition": "The complete **Davies-Bouldin Index** algorithm: Given data $X \\in \\mathbb{R}^{n \\times d}$ and labels $\\ell \\in \\{0,1,\\ldots,k-1\\}^n$: $$\\text{Step 1: } \\mu_i = \\frac{1}{n_i} \\sum_{x \\in C_i} x \\quad \\forall i \\in \\{0,\\ldots,k-1\\}$$ $$\\text{Step 2: } S_i = \\frac{1}{n_i} \\sum_{x \\in C_i} \\|x - \\mu_i\\|_2 \\quad \\forall i$$ $$\\text{Step 3: } M_{ij} = \\|\\mu_i - \\mu_j\\|_2 \\quad \\forall i,j$$ $$\\text{Step 4: } R_{ij} = \\frac{S_i + S_j}{M_{ij}} \\quad \\forall i \\neq j$$ $$\\text{Step 5: } R_i = \\max_{j \\neq i} R_{ij} \\quad \\forall i$$ $$\\text{Step 6: } \\text{DBI} = \\frac{1}{k} \\sum_{i=1}^{k} R_i$$",
+        "notation": "$X$ = data matrix, $\\ell$ = label vector, $k$ = number of clusters, $C_i = \\{x_j : \\ell_j = i\\}$ = cluster $i$",
+        "theorem": "**Theorem (Computational Complexity)**: The Davies-Bouldin Index can be computed in $O(ndk + k^2d)$ time, where $n$ = number of samples, $d$ = number of features, $k$ = number of clusters. Space complexity is $O(nk + k^2)$.",
+        "proof_sketch": "Centroid computation: $O(nd)$ for summing plus $O(kd)$ for averaging = $O(nd + kd)$. Scatter computation: $O(nd)$ for distances plus $O(n)$ for aggregation = $O(nd)$. Separation matrix: $O(k^2 d)$ for all pairwise centroid distances. Similarity ratios: $O(k^2)$. Max and average: $O(k)$. Total: $O(nd) + O(k^2 d) + O(k^2) = O(ndk + k^2 d)$.",
+        "examples": [
+          "Example 1: Two well-separated clusters in 2D. Each cluster has 3 points tightly grouped. Expected DBI < 0.2.",
+          "Example 2: Three overlapping clusters in 3D. Points from different clusters intermingle. Expected DBI > 1.0.",
+          "Example 3: Single cluster of 10 points. By convention, DBI = 0.0 (no inter-cluster comparison)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete DBI Formula",
+          "latex": "$\\text{DBI} = \\frac{1}{k} \\sum_{i=1}^{k} \\max_{j \\neq i} \\frac{S_i + S_j}{\\|\\mu_i - \\mu_j\\|_2}$",
+          "description": "Full formula combining all steps; lower values indicate better clustering"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete Davies-Bouldin Index calculation by combining all previous concepts. Your function should handle real-world data with multiple clusters, compute all intermediate metrics efficiently, and return the final DBI score. This is a synthesis of all previous sub-quests.",
+        "function_signature": "def davies_bouldin_index(X: np.ndarray, labels: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef davies_bouldin_index(X, labels):\n    \"\"\"\n    Calculate the Davies-Bouldin Index for clustering evaluation.\n    \n    Parameters:\n    X: numpy array of shape (n_samples, n_features) - data points\n    labels: numpy array of shape (n_samples,) - cluster labels\n    \n    Returns:\n    float: Davies-Bouldin Index rounded to 4 decimal places\n           Returns 0.0 if there is only one cluster\n    \"\"\"\n    # Your code here\n    # Step 1: Compute centroids for each cluster\n    # Step 2: Compute scatter (S_i) for each cluster\n    # Step 3: Compute pairwise centroid distances (M_ij)\n    # Step 4: Compute similarity ratios (R_ij)\n    # Step 5: Find maximum similarity for each cluster (R_i)\n    # Step 6: Return average of R_i values\n    pass",
+        "test_cases": [
+          {
+            "input": "davies_bouldin_index(np.array([[1, 1], [1.5, 1.5], [2, 2], [10, 10], [10.5, 10.5], [11, 11]]), np.array([0, 0, 0, 1, 1, 1]))",
+            "expected": "0.0741",
+            "explanation": "Two symmetric well-separated clusters. S_0 = S_1 ≈ 0.4714, M_01 ≈ 12.73. R_01 = (0.4714+0.4714)/12.73 ≈ 0.0741. DBI = 0.0741 (excellent separation)"
+          },
+          {
+            "input": "davies_bouldin_index(np.array([[0, 0], [1, 1], [2, 2]]), np.array([0, 0, 0]))",
+            "expected": "0.0",
+            "explanation": "Single cluster with 3 points. By convention, return 0.0 since there are no inter-cluster comparisons"
+          },
+          {
+            "input": "davies_bouldin_index(np.array([[0, 0], [0, 1], [1, 0], [10, 10], [10, 11]]), np.array([0, 0, 0, 1, 1]))",
+            "expected": "0.0764",
+            "explanation": "Two clusters with different sizes. Cluster 0 has 3 points, cluster 1 has 2 points. Both are compact relative to their large separation"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling single-cluster case (k=1) - should return 0.0",
+        "Computing all metrics from scratch instead of using previous sub-quest functions",
+        "Inefficient nested loops instead of vectorized numpy operations",
+        "Forgetting to round final result to 4 decimal places",
+        "Not validating that labels contain consecutive integers starting from 0",
+        "Division by zero when clusters have identical centroids (rare but possible)"
+      ],
+      "hint": "Build this function by composing solutions from previous sub-quests. First handle the edge case, then compute centroids, scatters, distances, similarities, and finally aggregate. Use numpy's unique() to find cluster IDs and boolean indexing to extract cluster points efficiently.",
+      "references": [
+        "scikit-learn davies_bouldin_score implementation",
+        "Cluster validation techniques",
+        "Internal vs external clustering metrics"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "description": "SW1wbGVtZW50IHRoZSBPdmVybGFwcGluZyBNYXggUG9vbGluZyBvcGVyYXRpb24uIFVubGlrZSBzdGFuZGFyZCBtYXggcG9vbGluZywgb3ZlcmxhcHBpbmcgcG9vbGluZyB1c2VzIGEgc3RyaWRlIHNtYWxsZXIgdGhhbiB0aGUga2VybmVsIHNpemUsIGNhdXNpbmcgcG9vbGluZyByZWdpb25zIHRvIG92ZXJsYXAuIEdpdmVuIGEgNEQgdGVuc29yIGlucHV0IChOLCBDLCBILCBXKSwgYXBwbHkgMkQgbWF4IHBvb2xpbmcgd2l0aCBhIHNwZWNpZmllZCBrZXJuZWwgc2l6ZSBhbmQgc3RyaWRlLCB3aGVyZSBzdHJpZGUgPCBrZXJuZWxfc2l6ZS4gVXNlIGNlaWwgbW9kZSBmb3Igb3V0cHV0IGRpbWVuc2lvbnMsIHdoaWNoIGFsbG93cyBwYXJ0aWFsIHdpbmRvd3MgYXQgYm91bmRhcmllcy4=",
+  "id": "190",
+  "test_cases": [
+    {
+      "test": "x = np.arange(1, 17).reshape(1, 1, 4, 4)\nprint(overlapping_max_pool2d(x, 3, 2))",
+      "expected_output": "[[[[11. 12.]\n   [15. 16.]]]]"
+    },
+    {
+      "test": "np.random.seed(0)\nx = np.random.randn(1, 2, 5, 5)\nres = overlapping_max_pool2d(x, 3, 2)\nprint(res.shape)",
+      "expected_output": "(1, 2, 2, 2)"
+    }
+  ],
+  "difficulty": "medium",
+  "pytorch_difficulty": "easy",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "x = np.arange(1, 17).reshape(1, 1, 4, 4); print(overlapping_max_pool2d(x, kernel_size=3, stride=2))",
+    "output": "[[[[11. 12.]\n   [15. 16.]]]]",
+    "reasoning": "Each 3x3 window overlaps by 1 element (since stride=2). With ceil mode, the output is 2x2. The top-left window covers indices (0:3, 0:3) → max=11; top-right covers (0:3, 2:4) → max=12; bottom-left covers (2:4, 0:3) → max=15; bottom-right covers (2:4, 2:4) → max=16."
+  },
+  "category": "Deep Learning",
+  "pytorch_starter_code": "aW1wb3J0IHRvcmNoCmltcG9ydCB0b3JjaC5ubi5mdW5jdGlvbmFsIGFzIEYKCmRlZiBvdmVybGFwcGluZ19tYXhfcG9vbDJkKHg6IHRvcmNoLlRlbnNvciwga2VybmVsX3NpemU6IGludCA9IDMsIHN0cmlkZTogaW50ID0gMikgLT4gdG9yY2guVGVuc29yOgogICAgIiIiQXBwbHkgb3ZlcmxhcHBpbmcgbWF4IHBvb2xpbmcgdXNpbmcgUHlUb3JjaC4iIiIKICAgICMgWW91ciBjb2RlIGhlcmUKICAgIHBhc3M=",
+  "createdAt": "December 15, 2025 at 7:09:55 AM UTC-0500",
+  "title": "Overlapping Max Pooling",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/SohamD34",
+      "name": "caesar"
+    }
+  ],
+  "pytorch_test_cases": [
+    {
+      "test": "import torch\nx = torch.arange(1, 17, dtype=torch.float32).view(1, 1, 4, 4)\nprint(overlapping_max_pool2d(x, 3, 2))",
+      "expected_output": "tensor([[[[11., 12.],\n          [15., 16.]]]])"
+    },
+    {
+      "test": "import torch\nx = torch.arange(1, 10, dtype=torch.float32).view(1, 1, 3, 3)\nprint(overlapping_max_pool2d(x, 2, 1))",
+      "expected_output": "tensor([[[[5., 6.],\n          [8., 9.]]]])"
+    }
+  ],
+  "starter_code": "import numpy as np\n\ndef overlapping_max_pool2d(x: np.ndarray, kernel_size: int = 3, stride: int = 2) -> np.ndarray:\n    \"\"\"\n    Applies overlapping max pooling to a 4D tensor (N, C, H, W).\n    Uses ceil mode for output dimensions.\n\n    Args:\n        x: Input array of shape (N, C, H, W)\n        kernel_size: Size of pooling window (int)\n        stride: Stride between pooling windows (int)\n\n    Returns:\n        A 4D tensor after overlapping pooling.\n    \"\"\"\n    # Your code here\n    pass",
+  "learn_section": "IyMgVW5kZXJzdGFuZGluZyBPdmVybGFwcGluZyBNYXggUG9vbGluZwoKVGhlIGtleSBkaWZmZXJlbmNlIGZyb20gdHJhZGl0aW9uYWwgcG9vbGluZyBpcyB0aGF0IHRoZSAqKnN0cmlkZSAocykqKiBpcyBzbWFsbGVyIHRoYW4gdGhlICoqa2VybmVsIHNpemUgKGspKiosIGFsbG93aW5nIHBvb2xpbmcgcmVnaW9ucyB0byBvdmVybGFwLiBUaGlzIGltcHJvdmVzIGdlbmVyYWxpemF0aW9uIGFuZCByZWR1Y2VzIG92ZXJmaXR0aW5nLgoKIyMjIE1hdGhlbWF0aWNhbCBEZWZpbml0aW9uCgpGb3IgYSAyRCBpbnB1dCB0ZW5zb3IgJHgkIG9mIHNoYXBlICQoQywgSCwgVykkLCB0aGUgb3V0cHV0IG9mIG1heCBwb29saW5nIGF0IHBvc2l0aW9uICQoaSwgaikkIGlzOgoKJCQKeV97YyxpLGp9ID0gXG1heF97MCBcbGVxIG0gPCBrLCAwIFxsZXEgbiA8IGt9IHhfe2MsIGkgXGNkb3QgcyArIG0sIGogXGNkb3QgcyArIG59CiQkCgp3aGVyZToKLSAkayQ6IHBvb2xpbmcgd2luZG93IHNpemUgKGhlaWdodCBhbmQgd2lkdGgpCi0gJHMkOiBzdHJpZGUgKHN0ZXAgYmV0d2VlbiB3aW5kb3dzKQoKSW4gKipvdmVybGFwcGluZyBwb29saW5nKiosICRzIDwgayQsIGUuZy4gJGs9Mywgcz0yJC4KCiMjIyBPdXRwdXQgU2l6ZSBDYWxjdWxhdGlvbiAoQ2VpbCBNb2RlKQoKVXNpbmcgY2VpbCBtb2RlLCB0aGUgb3V0cHV0IGRpbWVuc2lvbnMgYXJlOgoKJCQKXHRleHR7b3V0fV9oID0gXGxlZnRcbGNlaWwgXGZyYWN7SCAtIGt9e3N9IFxyaWdodFxyY2VpbCArIDEKJCQKCiQkClx0ZXh0e291dH1fdyA9IFxsZWZ0XGxjZWlsIFxmcmFje1cgLSBrfXtzfSBccmlnaHRccmNlaWwgKyAxCiQkCgpDZWlsIG1vZGUgYWxsb3dzIHBhcnRpYWwgd2luZG93cyBhdCBib3VuZGFyaWVzLCBlbnN1cmluZyBubyBpbnB1dCBlbGVtZW50cyBhcmUgaWdub3JlZC4KCiMjIyBJbnR1aXRpb24KCi0gKipPdmVybGFwcGluZyoqIHJlZ2lvbnMgcHJvdmlkZSBzbW9vdGhlciB0cmFuc2l0aW9ucyBiZXR3ZWVuIHBvb2xlZCBhcmVhcy4KLSBFbmNvdXJhZ2VzICoqZmVhdHVyZSBjb250aW51aXR5KiogYW5kICoqcmVkdWNlcyBvdmVyZml0dGluZyoqLgotIEFsZXhOZXQgdXNlZCAkMyBcdGltZXMgMyQgcG9vbGluZyB3aXRoIGEgc3RyaWRlIG9mIDIuCgojIyMgRXhhbXBsZQoKRm9yIGEgNMOXNCBpbnB1dCB3aXRoIGtlcm5lbCBzaXplIDMgYW5kIHN0cmlkZSAyOgoKJCQKXGJlZ2lue2JtYXRyaXh9CjEgJiAyICYgMyAmIDQgXFwKNSAmIDYgJiA3ICYgOCBcXAo5ICYgMTAgJiAxMSAmIDEyIFxcCjEzICYgMTQgJiAxNSAmIDE2ClxlbmR7Ym1hdHJpeH0KXHhyaWdodGFycm93W2s9MyxzPTJde1x0ZXh0e2NlaWwgbW9kZX19IApcYmVnaW57Ym1hdHJpeH0KMTEgJiAxMiBcXAoxNSAmIDE2ClxlbmR7Ym1hdHJpeH0KJCQKCk91dHB1dCBzaXplOiAkXGxjZWlsKDQtMykvMlxyY2VpbCArIDEgPSAyJAoKVGhlIGZvdXIgcG9vbGluZyB3aW5kb3dzIGFyZToKLSBUb3AtbGVmdCAoMDozLCAwOjMpOiBtYXggPSAxMQotIFRvcC1yaWdodCAoMDozLCAyOjQpOiBtYXggPSAxMiAocGFydGlhbCB3aW5kb3cpCi0gQm90dG9tLWxlZnQgKDI6NCwgMDozKTogbWF4ID0gMTUgKHBhcnRpYWwgd2luZG93KQotIEJvdHRvbS1yaWdodCAoMjo0LCAyOjQpOiBtYXggPSAxNiAocGFydGlhbCB3aW5kb3cp",
+  "description_decoded": "Implement the Overlapping Max Pooling operation. Unlike standard max pooling, overlapping pooling uses a stride smaller than the kernel size, causing pooling regions to overlap. Given a 4D tensor input (N, C, H, W), apply 2D max pooling with a specified kernel size and stride, where stride < kernel_size. Use ceil mode for output dimensions, which allows partial windows at boundaries.",
+  "learn_section_decoded": "## Understanding Overlapping Max Pooling\n\nThe key difference from traditional pooling is that the **stride (s)** is smaller than the **kernel size (k)**, allowing pooling regions to overlap. This improves generalization and reduces overfitting.\n\n### Mathematical Definition\n\nFor a 2D input tensor $x$ of shape $(C, H, W)$, the output of max pooling at position $(i, j)$ is:\n\n$$\ny_{c,i,j} = \\max_{0 \\leq m < k, 0 \\leq n < k} x_{c, i \\cdot s + m, j \\cdot s + n}\n$$\n\nwhere:\n- $k$: pooling window size (height and width)\n- $s$: stride (step between windows)\n\nIn **overlapping pooling**, $s < k$, e.g. $k=3, s=2$.\n\n### Output Size Calculation (Ceil Mode)\n\nUsing ceil mode, the output dimensions are:\n\n$$\n\\text{out}_h = \\left\\lceil \\frac{H - k}{s} \\right\\rceil + 1\n$$\n\n$$\n\\text{out}_w = \\left\\lceil \\frac{W - k}{s} \\right\\rceil + 1\n$$\n\nCeil mode allows partial windows at boundaries, ensuring no input elements are ignored.\n\n### Intuition\n\n- **Overlapping** regions provide smoother transitions between pooled areas.\n- Encourages **feature continuity** and **reduces overfitting**.\n- AlexNet used $3 \\times 3$ pooling with a stride of 2.\n\n### Example\n\nFor a 4×4 input with kernel size 3 and stride 2:\n\n$$\n\\begin{bmatrix}\n1 & 2 & 3 & 4 \\\\\n5 & 6 & 7 & 8 \\\\\n9 & 10 & 11 & 12 \\\\\n13 & 14 & 15 & 16\n\\end{bmatrix}\n\\xrightarrow[k=3,s=2]{\\text{ceil mode}} \n\\begin{bmatrix}\n11 & 12 \\\\\n15 & 16\n\\end{bmatrix}\n$$\n\nOutput size: $\\lceil(4-3)/2\\rceil + 1 = 2$\n\nThe four pooling windows are:\n- Top-left (0:3, 0:3): max = 11\n- Top-right (0:3, 2:4): max = 12 (partial window)\n- Bottom-left (2:4, 0:3): max = 15 (partial window)\n- Bottom-right (2:4, 2:4): max = 16 (partial window)"
+}

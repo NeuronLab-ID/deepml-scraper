@@ -1,0 +1,475 @@
+{
+  "problem_id": 18,
+  "title": "Implement K-Fold Cross-Validation",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "Implement a function to generate train and test splits for K-Fold Cross-Validation. Your task is to divide the dataset into k folds and return a list of train-test indices for each fold.",
+  "example": {
+    "input": "k_fold_cross_validation(np.array([0,1,2,3,4,5,6,7,8,9]), np.array([0,1,2,3,4,5,6,7,8,9]), k=5, shuffle=False)",
+    "output": "[([2, 3, 4, 5, 6, 7, 8, 9], [0, 1]), ([0, 1, 4, 5, 6, 7, 8, 9], [2, 3]), ([0, 1, 2, 3, 6, 7, 8, 9], [4, 5]), ([0, 1, 2, 3, 4, 5, 8, 9], [6, 7]), ([0, 1, 2, 3, 4, 5, 6, 7], [8, 9])]",
+    "reasoning": "The function splits the dataset into 5 folds without shuffling and returns train-test splits for each iteration."
+  },
+  "starter_code": "import numpy as np\n\ndef k_fold_cross_validation(X: np.ndarray, y: np.ndarray, k=5, shuffle=True):\n    \"\"\"\n    Implement k-fold cross-validation by returning train-test indices.\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Set Partitioning and Disjoint Subsets",
+      "relation_to_problem": "Understanding set partitioning is fundamental to dividing the dataset into k disjoint folds where each data point appears in exactly one fold.",
+      "prerequisites": [
+        "Basic set theory",
+        "Array indexing in Python",
+        "NumPy array operations"
+      ],
+      "learning_objectives": [
+        "Understand formal definition of set partitions and disjoint sets",
+        "Compute partition sizes when n is not divisible by k",
+        "Implement array splitting into equal or near-equal sized chunks"
+      ],
+      "math_content": {
+        "definition": "A partition of a set $D$ is a collection of non-empty subsets $\\{F_1, F_2, \\ldots, F_k\\}$ such that: (1) $F_i \\cap F_j = \\emptyset$ for all $i \\neq j$ (disjoint property), (2) $\\bigcup_{i=1}^{k} F_i = D$ (exhaustive property), and (3) $F_i \\neq \\emptyset$ for all $i$ (non-empty property).",
+        "notation": "$D$ = dataset with $n$ elements, $F_i$ = fold $i$ with cardinality $|F_i|$, $k$ = number of folds",
+        "theorem": "For any dataset $D$ with $n$ elements partitioned into $k$ folds, if $n = qk + r$ where $0 \\leq r < k$ (by division algorithm), then $r$ folds will have size $\\lceil n/k \\rceil = q+1$ and $(k-r)$ folds will have size $\\lfloor n/k \\rfloor = q$.",
+        "proof_sketch": "By the division algorithm, $n = qk + r$. If we assign $q+1$ elements to $r$ folds and $q$ elements to $k-r$ folds, the total is $r(q+1) + (k-r)q = rq + r + kq - rq = kq + r = n$. This ensures all elements are used exactly once.",
+        "examples": [
+          "Example 1: $n=10, k=5$: $10 = 2 \\cdot 5 + 0$, so all 5 folds have size $2$",
+          "Example 2: $n=11, k=5$: $11 = 2 \\cdot 5 + 1$, so 1 fold has size $3$ and 4 folds have size $2$",
+          "Example 3: $n=13, k=5$: $13 = 2 \\cdot 5 + 3$, so 3 folds have size $3$ and 2 folds have size $2$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Fold Size Formula",
+          "latex": "$|F_i| = \\begin{cases} \\lceil n/k \\rceil & \\text{if } i \\leq (n \\bmod k) \\\\ \\lfloor n/k \\rfloor & \\text{otherwise} \\end{cases}$",
+          "description": "Determines the size of fold $i$ when dividing $n$ elements into $k$ folds"
+        },
+        {
+          "name": "Verification Property",
+          "latex": "$\\sum_{i=1}^{k} |F_i| = n$",
+          "description": "Ensures all data points are assigned to exactly one fold"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the size of each fold given dataset size n and number of folds k. Return a list of k integers representing fold sizes.",
+        "function_signature": "def compute_fold_sizes(n: int, k: int) -> list:",
+        "starter_code": "def compute_fold_sizes(n: int, k: int) -> list:\n    \"\"\"\n    Compute the size of each fold for k-fold partitioning.\n    Args:\n        n: Total number of data points\n        k: Number of folds\n    Returns:\n        List of k integers representing the size of each fold\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_fold_sizes(10, 5)",
+            "expected": "[2, 2, 2, 2, 2]",
+            "explanation": "10 divided by 5 gives quotient 2 and remainder 0, so all folds have size 2"
+          },
+          {
+            "input": "compute_fold_sizes(11, 5)",
+            "expected": "[3, 2, 2, 2, 2]",
+            "explanation": "11 divided by 5 gives quotient 2 and remainder 1, so 1 fold has size 3 and 4 folds have size 2"
+          },
+          {
+            "input": "compute_fold_sizes(13, 5)",
+            "expected": "[3, 3, 3, 2, 2]",
+            "explanation": "13 divided by 5 gives quotient 2 and remainder 3, so 3 folds have size 3 and 2 folds have size 2"
+          },
+          {
+            "input": "compute_fold_sizes(7, 3)",
+            "expected": "[3, 2, 2]",
+            "explanation": "7 divided by 3 gives quotient 2 and remainder 1, so 1 fold has size 3 and 2 folds have size 2"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using integer division without accounting for remainder, leading to lost data points",
+        "Distributing remainder elements to the last folds instead of first folds, violating standard partition conventions",
+        "Not verifying that sum of fold sizes equals n"
+      ],
+      "hint": "Use the modulo operator (%) to find the remainder and distribute these extra elements to the first r folds.",
+      "references": [
+        "Division algorithm",
+        "Discrete mathematics: set partitions",
+        "NumPy array_split function"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Array Shuffling and Random Permutations",
+      "relation_to_problem": "Shuffling ensures that data is randomly distributed across folds, preventing systematic bias when the original dataset has ordering (e.g., sorted by class label).",
+      "prerequisites": [
+        "NumPy random module",
+        "In-place vs. copy operations",
+        "Random seed for reproducibility"
+      ],
+      "learning_objectives": [
+        "Understand why random shuffling is important in cross-validation",
+        "Implement Fisher-Yates shuffle algorithm",
+        "Manage random state for reproducible experiments"
+      ],
+      "math_content": {
+        "definition": "A random permutation $\\pi$ of a sequence $S = (s_1, s_2, \\ldots, s_n)$ is a bijective mapping $\\pi: \\{1, 2, \\ldots, n\\} \\to \\{1, 2, \\ldots, n\\}$ such that each of the $n!$ possible permutations has equal probability $\\frac{1}{n!}$. The shuffled sequence is $(s_{\\pi(1)}, s_{\\pi(2)}, \\ldots, s_{\\pi(n)})$.",
+        "notation": "$\\pi$ = permutation function, $S$ = original sequence, $S'$ = shuffled sequence, $n!$ = total number of permutations",
+        "theorem": "Fisher-Yates shuffle algorithm generates a uniformly random permutation in $O(n)$ time. For each position $i$ from $n$ down to $2$, we select a random index $j$ where $1 \\leq j \\leq i$ and swap elements at positions $i$ and $j$.",
+        "proof_sketch": "By induction: (1) Base case: For $n=1$, there is only one permutation. (2) Inductive step: Assume algorithm works for sequences of length $k-1$. At step $k$, we choose element for position $k$ with probability $1/k$ from all $k$ remaining elements, then recursively permute the first $k-1$ elements. By induction hypothesis, each of the $(k-1)!$ arrangements of first $k-1$ elements is equally likely, so each of $k!$ permutations has probability $\\frac{1}{k} \\cdot \\frac{1}{(k-1)!} = \\frac{1}{k!}$.",
+        "examples": [
+          "Example 1: Sequence [1, 2, 3] has $3! = 6$ possible permutations: [1,2,3], [1,3,2], [2,1,3], [2,3,1], [3,1,2], [3,2,1], each with probability $1/6$",
+          "Example 2: For k-fold CV with ordered data [class0, class0, class1, class1], shuffling prevents first fold from containing only class0 samples"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Permutation Count",
+          "latex": "$|\\text{Perm}(S)| = n!$",
+          "description": "Total number of possible permutations of n elements"
+        },
+        {
+          "name": "Uniform Distribution",
+          "latex": "$P(\\pi) = \\frac{1}{n!} \\quad \\forall \\pi \\in \\text{Perm}(S)$",
+          "description": "Each permutation has equal probability in a fair shuffle"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that creates shuffled indices for a dataset. The function should optionally shuffle based on a boolean flag and return an array of indices from 0 to n-1.",
+        "function_signature": "def create_indices(n: int, shuffle: bool = True, seed: int = None) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef create_indices(n: int, shuffle: bool = True, seed: int = None) -> np.ndarray:\n    \"\"\"\n    Create indices for dataset with optional shuffling.\n    Args:\n        n: Number of data points\n        shuffle: Whether to shuffle indices\n        seed: Random seed for reproducibility (optional)\n    Returns:\n        Array of indices from 0 to n-1\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "create_indices(5, shuffle=False)",
+            "expected": "array([0, 1, 2, 3, 4])",
+            "explanation": "When shuffle=False, return sequential indices"
+          },
+          {
+            "input": "create_indices(5, shuffle=True, seed=42)",
+            "expected": "array([3, 4, 1, 0, 2]) or similar shuffled result",
+            "explanation": "When shuffle=True with seed, return reproducible shuffled indices"
+          },
+          {
+            "input": "len(np.unique(create_indices(100, shuffle=True)))",
+            "expected": "100",
+            "explanation": "Shuffled indices must contain all unique values from 0 to 99"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Modifying original data instead of working with indices",
+        "Not setting random seed, making results non-reproducible",
+        "Using shuffle methods that don't guarantee uniform distribution",
+        "Forgetting to return a copy when shuffle=False, causing unintended mutations"
+      ],
+      "hint": "Use np.arange() to create sequential indices and np.random.shuffle() for in-place shuffling. Consider np.random.seed() for reproducibility.",
+      "references": [
+        "Fisher-Yates shuffle algorithm",
+        "NumPy random module documentation",
+        "Reproducible machine learning experiments"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Index-Based Data Slicing and Complementary Sets",
+      "relation_to_problem": "In k-fold CV, for each iteration we need to extract test fold indices and compute the complement as training indices, which requires understanding set complement operations.",
+      "prerequisites": [
+        "Boolean indexing in NumPy",
+        "Set theory: complement operation",
+        "List comprehension in Python"
+      ],
+      "learning_objectives": [
+        "Compute the complement of a subset relative to a universal set",
+        "Extract array indices for train and test splits",
+        "Implement efficient index-based data partitioning"
+      ],
+      "math_content": {
+        "definition": "Given a universal set $U$ and a subset $A \\subseteq U$, the complement of $A$ relative to $U$ is defined as $A^c = U \\setminus A = \\{x \\in U : x \\notin A\\}$. In k-fold cross-validation, for iteration $i$, the test set is fold $F_i$ and the training set is its complement $D_{\\text{train}}^{(i)} = D \\setminus F_i = \\bigcup_{j \\neq i} F_j$.",
+        "notation": "$U$ = universal set (all indices), $A$ = subset (test indices), $A^c$ = complement (training indices), $\\setminus$ = set difference operator",
+        "theorem": "Properties of set complement: (1) $(A^c)^c = A$ (double complement), (2) $A \\cup A^c = U$ (union with complement), (3) $A \\cap A^c = \\emptyset$ (intersection with complement), (4) $|A| + |A^c| = |U|$ (cardinality relation).",
+        "proof_sketch": "Property (3): Assume $x \\in A \\cap A^c$. Then $x \\in A$ and $x \\in A^c$. But $x \\in A^c$ means $x \\notin A$, which contradicts $x \\in A$. Therefore, $A \\cap A^c = \\emptyset$. Property (4) follows directly: every element in $U$ is either in $A$ or $A^c$ (but not both), so $|A| + |A^c| = |U|$.",
+        "examples": [
+          "Example 1: $U = \\{0,1,2,3,4\\}$, $A = \\{1,3\\}$, then $A^c = \\{0,2,4\\}$",
+          "Example 2: In 5-fold CV with indices [0,1,2,3,4,5,6,7,8,9], if fold 2 is test set [4,5], then training set is [0,1,2,3,6,7,8,9]",
+          "Example 3: Verification: $|\\{4,5\\}| + |\\{0,1,2,3,6,7,8,9\\}| = 2 + 8 = 10 = |U|$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Set Complement",
+          "latex": "$D_{\\text{train}}^{(i)} = D \\setminus F_i = \\{x \\in D : x \\notin F_i\\}$",
+          "description": "Training set is complement of test fold relative to full dataset"
+        },
+        {
+          "name": "Cardinality Verification",
+          "latex": "$|D_{\\text{train}}^{(i)}| + |F_i| = n$",
+          "description": "Training and test sizes must sum to total dataset size"
+        },
+        {
+          "name": "Training Set Size",
+          "latex": "$|D_{\\text{train}}^{(i)}| = n - |F_i| = n - \\lceil n/k \\rceil \\text{ or } n - \\lfloor n/k \\rfloor$",
+          "description": "Training set contains all data except the test fold"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes training indices given the full set of indices and test indices. The function should return all indices that are NOT in the test set.",
+        "function_signature": "def get_train_indices(all_indices: np.ndarray, test_indices: np.ndarray) -> list:",
+        "starter_code": "import numpy as np\n\ndef get_train_indices(all_indices: np.ndarray, test_indices: np.ndarray) -> list:\n    \"\"\"\n    Compute training indices as complement of test indices.\n    Args:\n        all_indices: Array of all available indices\n        test_indices: Array of indices designated for testing\n    Returns:\n        List of training indices (all_indices \\ test_indices)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "get_train_indices(np.array([0,1,2,3,4]), np.array([0,1]))",
+            "expected": "[2, 3, 4]",
+            "explanation": "Remove test indices [0,1] from all indices [0,1,2,3,4], leaving [2,3,4]"
+          },
+          {
+            "input": "get_train_indices(np.array([0,1,2,3,4,5,6,7,8,9]), np.array([4,5]))",
+            "expected": "[0, 1, 2, 3, 6, 7, 8, 9]",
+            "explanation": "Complement of [4,5] in [0-9] is [0,1,2,3,6,7,8,9]"
+          },
+          {
+            "input": "len(get_train_indices(np.array(range(100)), np.array([10,20,30])))",
+            "expected": "97",
+            "explanation": "Removing 3 test indices from 100 total leaves 97 training indices"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not preserving the order of indices in the training set",
+        "Including test indices in training set (data leakage)",
+        "Using inefficient nested loops instead of set operations or boolean indexing",
+        "Forgetting to convert NumPy arrays to sets for set difference operations"
+      ],
+      "hint": "Use NumPy's setdiff1d function or boolean masking with np.isin() to efficiently compute set difference.",
+      "references": [
+        "Set difference operations",
+        "NumPy setdiff1d",
+        "Boolean indexing in NumPy"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Sequential Fold Generation with Index Ranges",
+      "relation_to_problem": "To create k folds, we need to partition indices into consecutive ranges based on computed fold sizes, mapping each index to its appropriate fold.",
+      "prerequisites": [
+        "Cumulative sums",
+        "Array slicing with start:end notation",
+        "Fold size computation from Step 1"
+      ],
+      "learning_objectives": [
+        "Compute cumulative boundaries for fold ranges",
+        "Extract contiguous subsequences using slice notation",
+        "Generate all k folds from a single index array"
+      ],
+      "math_content": {
+        "definition": "For a partitioned dataset with fold sizes $(s_1, s_2, \\ldots, s_k)$ where $\\sum_{i=1}^k s_i = n$, we define cumulative boundaries as $b_0 = 0$ and $b_i = \\sum_{j=1}^i s_j$ for $i = 1, 2, \\ldots, k$. Then fold $F_i$ contains indices $[b_{i-1}, b_i)$, i.e., $F_i = \\{\\text{idx}_{b_{i-1}}, \\text{idx}_{b_{i-1}+1}, \\ldots, \\text{idx}_{b_i-1}\\}$.",
+        "notation": "$s_i$ = size of fold $i$, $b_i$ = cumulative boundary after fold $i$, $[a, b)$ = half-open interval from $a$ (inclusive) to $b$ (exclusive)",
+        "theorem": "Cumulative sum property: If boundaries are defined as $b_i = \\sum_{j=1}^i s_j$, then (1) $b_0 = 0$, (2) $b_k = n$, (3) $b_i - b_{i-1} = s_i$ for all $i \\in \\{1, \\ldots, k\\}$, ensuring each fold has exactly its designated size.",
+        "proof_sketch": "Property (1) is by definition. Property (2): $b_k = \\sum_{j=1}^k s_j = n$ by partition completeness. Property (3): $b_i - b_{i-1} = \\sum_{j=1}^i s_j - \\sum_{j=1}^{i-1} s_j = s_i$ by telescoping sum.",
+        "examples": [
+          "Example 1: Fold sizes [2,2,2,2,2] → boundaries [0,2,4,6,8,10] → folds: [0:2], [2:4], [4:6], [6:8], [8:10]",
+          "Example 2: Fold sizes [3,3,3,2,2] → boundaries [0,3,6,9,11,13] → folds: [0:3], [3:6], [6:9], [9:11], [11:13]",
+          "Example 3: For indices [0,1,2,3,4,5,6,7,8,9] with boundaries [0,2,4,6,8,10], fold 0 is indices[0:2]=[0,1], fold 1 is indices[2:4]=[2,3], etc."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cumulative Boundary",
+          "latex": "$b_i = \\sum_{j=1}^{i} s_j = b_{i-1} + s_i$",
+          "description": "Boundary after fold i is sum of sizes of first i folds"
+        },
+        {
+          "name": "Fold Index Range",
+          "latex": "$F_i = \\text{indices}[b_{i-1} : b_i]$",
+          "description": "Fold i contains indices from boundary i-1 (inclusive) to boundary i (exclusive)"
+        },
+        {
+          "name": "Boundary Verification",
+          "latex": "$b_k = n \\text{ and } b_0 = 0$",
+          "description": "First boundary is 0, last boundary equals total dataset size"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that generates all k folds given an array of indices and fold sizes. Return a list of k arrays, where each array contains the indices for that fold.",
+        "function_signature": "def generate_folds(indices: np.ndarray, fold_sizes: list) -> list:",
+        "starter_code": "import numpy as np\n\ndef generate_folds(indices: np.ndarray, fold_sizes: list) -> list:\n    \"\"\"\n    Generate k folds from indices based on fold sizes.\n    Args:\n        indices: Array of all indices (possibly shuffled)\n        fold_sizes: List of k integers representing size of each fold\n    Returns:\n        List of k arrays, where each array contains indices for that fold\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "generate_folds(np.array([0,1,2,3,4,5,6,7,8,9]), [2,2,2,2,2])",
+            "expected": "[array([0,1]), array([2,3]), array([4,5]), array([6,7]), array([8,9])]",
+            "explanation": "Equal fold sizes create 5 folds of 2 elements each"
+          },
+          {
+            "input": "generate_folds(np.array([0,1,2,3,4,5,6,7,8,9,10]), [3,3,3,2])",
+            "expected": "[array([0,1,2]), array([3,4,5]), array([6,7,8]), array([9,10])]",
+            "explanation": "First 3 folds have size 3, last fold has size 2"
+          },
+          {
+            "input": "sum(len(fold) for fold in generate_folds(np.array(range(50)), [10,10,10,10,10]))",
+            "expected": "50",
+            "explanation": "Total elements across all folds must equal original dataset size"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Off-by-one errors in slice indices (using closed intervals instead of half-open)",
+        "Not using cumulative sums, leading to incorrect fold boundaries",
+        "Returning overlapping folds that violate disjoint property",
+        "Not handling the last fold correctly when remainder exists"
+      ],
+      "hint": "Use np.cumsum() to compute cumulative boundaries, then use array slicing indices[start:end] for each fold.",
+      "references": [
+        "Cumulative sums",
+        "NumPy cumsum function",
+        "Python slice notation"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Iterative Train-Test Split Generation",
+      "relation_to_problem": "The core of k-fold CV is iterating through each fold as test set while using remaining folds as training set, producing k distinct train-test splits.",
+      "prerequisites": [
+        "All previous concepts: partitioning, shuffling, complementary sets, fold generation"
+      ],
+      "learning_objectives": [
+        "Iterate over k folds to generate k train-test splits",
+        "Apply set complement operation for each iteration",
+        "Verify mathematical properties: disjoint test sets, complete coverage"
+      ],
+      "math_content": {
+        "definition": "K-fold cross-validation generates $k$ training-validation pairs: $\\{(D_{\\text{train}}^{(1)}, D_{\\text{val}}^{(1)}), (D_{\\text{train}}^{(2)}, D_{\\text{val}}^{(2)}), \\ldots, (D_{\\text{train}}^{(k)}, D_{\\text{val}}^{(k)})\\}$ where for each iteration $i \\in \\{1, 2, \\ldots, k\\}$: (1) $D_{\\text{val}}^{(i)} = F_i$, (2) $D_{\\text{train}}^{(i)} = D \\setminus F_i = \\bigcup_{j \\neq i} F_j$, (3) $D_{\\text{train}}^{(i)} \\cap D_{\\text{val}}^{(i)} = \\emptyset$.",
+        "notation": "$D_{\\text{train}}^{(i)}$ = training set for iteration $i$, $D_{\\text{val}}^{(i)}$ = validation set for iteration $i$, $k$ = number of folds/iterations",
+        "theorem": "Coverage theorem: In k-fold CV, (1) each observation appears in exactly one validation set: $\\bigcup_{i=1}^k D_{\\text{val}}^{(i)} = D$ and $D_{\\text{val}}^{(i)} \\cap D_{\\text{val}}^{(j)} = \\emptyset$ for $i \\neq j$, (2) each observation appears in exactly $k-1$ training sets, (3) total training instances across all folds: $\\sum_{i=1}^k |D_{\\text{train}}^{(i)}| = n(k-1)$.",
+        "proof_sketch": "Part (1): Since $\\{F_1, \\ldots, F_k\\}$ forms a partition of $D$, we have $\\bigcup_{i=1}^k F_i = D$ and $F_i \\cap F_j = \\emptyset$ for $i \\neq j$. Since $D_{\\text{val}}^{(i)} = F_i$, the validation sets inherit these properties. Part (2): An observation in $F_i$ is excluded from training only in iteration $i$, so it appears in training sets for iterations $\\{1, \\ldots, k\\} \\setminus \\{i\\}$, which contains $k-1$ iterations. Part (3): $\\sum_{i=1}^k |D_{\\text{train}}^{(i)}| = \\sum_{i=1}^k (n - |F_i|) = kn - \\sum_{i=1}^k |F_i| = kn - n = n(k-1)$.",
+        "examples": [
+          "Example: $n=10, k=5$, fold sizes all 2. Iteration 1: test=[0,1], train=[2,3,4,5,6,7,8,9] (8 samples). Iteration 2: test=[2,3], train=[0,1,4,5,6,7,8,9] (8 samples). Total training samples: $10 \\times 4 = 40$.",
+          "Verification: Each of 10 observations appears in 4 training sets, confirming $k-1=4$ training appearances per observation."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Training Set Complement",
+          "latex": "$D_{\\text{train}}^{(i)} = D \\setminus F_i = \\bigcup_{j=1, j \\neq i}^{k} F_j$",
+          "description": "Training set is union of all folds except fold i"
+        },
+        {
+          "name": "Validation Set Assignment",
+          "latex": "$D_{\\text{val}}^{(i)} = F_i$",
+          "description": "Fold i serves as validation set in iteration i"
+        },
+        {
+          "name": "Disjoint Property",
+          "latex": "$D_{\\text{train}}^{(i)} \\cap D_{\\text{val}}^{(i)} = \\emptyset \\quad \\forall i$",
+          "description": "No data leakage: training and validation sets are disjoint in each iteration"
+        },
+        {
+          "name": "Coverage Property",
+          "latex": "$\\bigcup_{i=1}^{k} D_{\\text{val}}^{(i)} = D$",
+          "description": "Every observation is validated exactly once across all iterations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that generates all k train-test splits given a list of fold arrays. For each fold i, return a tuple of (train_indices, test_indices) where test_indices is fold i and train_indices is the union of all other folds.",
+        "function_signature": "def generate_train_test_splits(folds: list) -> list:",
+        "starter_code": "def generate_train_test_splits(folds: list) -> list:\n    \"\"\"\n    Generate k train-test splits for k-fold cross-validation.\n    Args:\n        folds: List of k arrays, where each array contains indices for one fold\n    Returns:\n        List of k tuples (train_indices, test_indices)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "generate_train_test_splits([np.array([0,1]), np.array([2,3]), np.array([4,5]), np.array([6,7]), np.array([8,9])])",
+            "expected": "[([2,3,4,5,6,7,8,9], [0,1]), ([0,1,4,5,6,7,8,9], [2,3]), ([0,1,2,3,6,7,8,9], [4,5]), ([0,1,2,3,4,5,8,9], [6,7]), ([0,1,2,3,4,5,6,7], [8,9])]",
+            "explanation": "Each fold serves as test set once, while remaining folds form training set"
+          },
+          {
+            "input": "len(generate_train_test_splits([np.array([0,1,2]), np.array([3,4]), np.array([5,6,7,8])]))",
+            "expected": "3",
+            "explanation": "For 3 folds, generate 3 train-test splits"
+          },
+          {
+            "input": "all(len(set(train) & set(test)) == 0 for train, test in generate_train_test_splits([np.array([0,1]), np.array([2,3]), np.array([4,5])]))",
+            "expected": "True",
+            "explanation": "Train and test sets must be disjoint in every split"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Including test fold in training set (data leakage)",
+        "Not converting fold arrays to lists before concatenating",
+        "Returning train/test in wrong order in tuple",
+        "Creating overlapping or missing indices across iterations"
+      ],
+      "hint": "For iteration i, concatenate all folds except fold i to create training indices, and use fold i as test indices.",
+      "references": [
+        "K-fold cross-validation algorithm",
+        "Train-test split methodology",
+        "Data leakage prevention"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete K-Fold Cross-Validation Implementation",
+      "relation_to_problem": "Integrate all previous concepts—shuffling, partitioning, fold generation, and train-test splitting—into a complete k-fold cross-validation function that matches the required interface.",
+      "prerequisites": [
+        "All previous sub-quests: Steps 1-5"
+      ],
+      "learning_objectives": [
+        "Synthesize all learned concepts into a cohesive implementation",
+        "Handle edge cases: non-divisible n, shuffle vs. no-shuffle",
+        "Return properly formatted train-test splits as list of tuples"
+      ],
+      "math_content": {
+        "definition": "The complete k-fold cross-validation algorithm: Given dataset $D$ with $n$ observations and parameter $k$, the algorithm (1) optionally shuffles the dataset indices to create random partition, (2) partitions indices into $k$ disjoint folds $\\{F_1, \\ldots, F_k\\}$ satisfying partition properties, (3) for each iteration $i \\in \\{1, \\ldots, k\\}$, constructs training set $D_{\\text{train}}^{(i)} = D \\setminus F_i$ and validation set $D_{\\text{val}}^{(i)} = F_i$, (4) returns the sequence of $k$ train-test index pairs.",
+        "notation": "$D$ = dataset, $n = |D|$ = dataset size, $k$ = number of folds, shuffle $\\in \\{\\text{True}, \\text{False}\\}$ = whether to randomize",
+        "theorem": "Correctness properties of k-fold CV: (1) Partition completeness: $\\bigcup_{i=1}^k D_{\\text{val}}^{(i)} = D$, (2) Disjoint validation: $D_{\\text{val}}^{(i)} \\cap D_{\\text{val}}^{(j)} = \\emptyset$ for $i \\neq j$, (3) No data leakage: $D_{\\text{train}}^{(i)} \\cap D_{\\text{val}}^{(i)} = \\emptyset$ for all $i$, (4) Balanced folds: $||F_i| - |F_j|| \\leq 1$ for all $i, j$.",
+        "proof_sketch": "Properties (1) and (2) follow from partition definition. Property (3) follows from set complement: $D_{\\text{train}}^{(i)} = D \\setminus F_i$ implies $D_{\\text{train}}^{(i)} \\cap F_i = \\emptyset$. Property (4): By division algorithm $n = qk + r$, all folds have size $q$ or $q+1$, differing by at most 1.",
+        "examples": [
+          "Complete example: $n=10, k=5$, shuffle=False. Indices [0,1,2,3,4,5,6,7,8,9] → fold sizes [2,2,2,2,2] → boundaries [0,2,4,6,8,10] → folds [[0,1],[2,3],[4,5],[6,7],[8,9]] → 5 train-test splits as specified in problem",
+          "Example with shuffle: Same setup but shuffle=True with seed would randomly permute indices first, then partition into folds"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Algorithm Complexity",
+          "latex": "$O(n + k \\cdot n) = O(kn)$",
+          "description": "Time complexity: O(n) for shuffling, O(kn) for generating k training sets"
+        },
+        {
+          "name": "Space Complexity",
+          "latex": "$O(kn)$",
+          "description": "Storing k training sets each with approximately (k-1)n/k elements"
+        },
+        {
+          "name": "Training Set Size Range",
+          "latex": "$\\lfloor n(k-1)/k \\rfloor \\leq |D_{\\text{train}}^{(i)}| \\leq \\lceil n(k-1)/k \\rceil$",
+          "description": "Training set size varies slightly depending on test fold size"
+        }
+      ],
+      "exercise": {
+        "description": "Combine all learned concepts to implement the complete k_fold_cross_validation function. The function should: (1) optionally shuffle indices, (2) compute fold sizes, (3) generate folds, (4) create k train-test splits, (5) return list of (train_indices, test_indices) tuples. This is the building block that, when combined with actual data slicing, solves the main problem.",
+        "function_signature": "def k_fold_cross_validation_indices(n: int, k: int = 5, shuffle: bool = True, seed: int = None) -> list:",
+        "starter_code": "import numpy as np\n\ndef k_fold_cross_validation_indices(n: int, k: int = 5, shuffle: bool = True, seed: int = None) -> list:\n    \"\"\"\n    Generate train-test index splits for k-fold cross-validation.\n    Args:\n        n: Number of data points in dataset\n        k: Number of folds (default: 5)\n        shuffle: Whether to shuffle data before splitting (default: True)\n        seed: Random seed for reproducibility (optional)\n    Returns:\n        List of k tuples (train_indices, test_indices)\n    \"\"\"\n    # Your code here - integrate all concepts from previous sub-quests\n    pass",
+        "test_cases": [
+          {
+            "input": "k_fold_cross_validation_indices(10, k=5, shuffle=False)",
+            "expected": "[([2,3,4,5,6,7,8,9], [0,1]), ([0,1,4,5,6,7,8,9], [2,3]), ([0,1,2,3,6,7,8,9], [4,5]), ([0,1,2,3,4,5,8,9], [6,7]), ([0,1,2,3,4,5,6,7], [8,9])]",
+            "explanation": "Without shuffling, creates sequential folds matching the problem example"
+          },
+          {
+            "input": "len(k_fold_cross_validation_indices(100, k=10, shuffle=True, seed=42))",
+            "expected": "10",
+            "explanation": "Returns exactly k train-test splits"
+          },
+          {
+            "input": "all(len(set(train) & set(test)) == 0 for train, test in k_fold_cross_validation_indices(50, k=5, shuffle=True))",
+            "expected": "True",
+            "explanation": "Verifies no data leakage: train and test are disjoint in all folds"
+          },
+          {
+            "input": "set().union(*[set(test) for train, test in k_fold_cross_validation_indices(20, k=4, shuffle=False)]) == set(range(20))",
+            "expected": "True",
+            "explanation": "Verifies coverage: all indices appear exactly once across all test sets"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not maintaining index ordering within train/test sets",
+        "Forgetting to handle shuffle parameter correctly",
+        "Not converting NumPy arrays to lists for return format",
+        "Edge case: not handling when k=n (leave-one-out CV)",
+        "Not setting random seed before shuffling when seed is provided"
+      ],
+      "hint": "This exercise synthesizes all previous steps: create indices (Step 2), compute fold sizes (Step 1), generate folds (Step 4), create train-test splits (Step 5). The main problem adds data array slicing on top of this index generation.",
+      "references": [
+        "scikit-learn KFold implementation",
+        "Cross-validation best practices",
+        "Stratified vs. standard k-fold"
+      ]
+    }
+  ]
+}

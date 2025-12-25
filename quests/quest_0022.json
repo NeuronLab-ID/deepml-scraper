@@ -1,0 +1,531 @@
+{
+  "problem_id": 22,
+  "title": "Sigmoid Activation Function Understanding",
+  "category": "Deep Learning",
+  "difficulty": "easy",
+  "description": "Write a Python function that computes the output of the sigmoid activation function given an input value z. The function should return the output rounded to four decimal places.",
+  "example": {
+    "input": "z = 0",
+    "output": "0.5",
+    "reasoning": "The sigmoid function is defined as σ(z) = 1 / (1 + exp(-z)). For z = 0, exp(-0) = 1, hence the output is 1 / (1 + 1) = 0.5."
+  },
+  "starter_code": "import math\n\ndef sigmoid(z: float) -> float:\n\t#Your code here\n\treturn result",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Exponential Functions and Euler's Number",
+      "relation_to_problem": "The sigmoid function's denominator contains $e^{-z}$ (exponential function), which is the core computational component that needs to be evaluated first before computing the sigmoid output.",
+      "prerequisites": [
+        "Basic algebra",
+        "Function evaluation",
+        "Understanding of real numbers"
+      ],
+      "learning_objectives": [
+        "Understand Euler's number $e$ and its mathematical significance",
+        "Compute exponential functions $e^x$ for positive and negative values",
+        "Recognize how exponential functions behave asymptotically",
+        "Implement exponential computation using Python's math library"
+      ],
+      "math_content": {
+        "definition": "**Definition 1 (Euler's Number).** Euler's number $e$ is a mathematical constant approximately equal to 2.71828, formally defined as: $$e = \\lim_{n \\to \\infty} \\left(1 + \\frac{1}{n}\\right)^n = \\sum_{k=0}^{\\infty} \\frac{1}{k!}$$\n\n**Definition 2 (Exponential Function).** The exponential function with base $e$ is defined as: $$\\exp(x) = e^x = \\sum_{k=0}^{\\infty} \\frac{x^k}{k!}$$ where $x \\in \\mathbb{R}$ is the exponent.",
+        "notation": "$e$ = Euler's number (≈ 2.71828), $e^x$ = exponential function, $\\exp(x)$ = alternative notation for $e^x$",
+        "theorem": "**Theorem 1 (Exponential Properties).** For all $x, y \\in \\mathbb{R}$:\n1. $e^{x+y} = e^x \\cdot e^y$ (Product rule)\n2. $e^{-x} = \\frac{1}{e^x}$ (Negative exponent rule)\n3. $e^0 = 1$ (Identity)\n4. $\\lim_{x \\to -\\infty} e^x = 0$ and $\\lim_{x \\to +\\infty} e^x = +\\infty$ (Asymptotic behavior)",
+        "proof_sketch": "For the negative exponent rule: By the product rule, $e^x \\cdot e^{-x} = e^{x+(-x)} = e^0 = 1$. Therefore, $e^{-x} = \\frac{1}{e^x}$. This transformation is crucial for the sigmoid function as it converts $e^{-z}$ into a more computationally stable form.",
+        "examples": [
+          "**Example 1:** Compute $e^2 \\approx 2.71828^2 \\approx 7.389$",
+          "**Example 2:** Compute $e^{-2} = \\frac{1}{e^2} \\approx \\frac{1}{7.389} \\approx 0.135$",
+          "**Example 3:** For $z = 0$ in sigmoid, we need $e^{-0} = e^0 = 1$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Negative Exponent",
+          "latex": "$e^{-x} = \\frac{1}{e^x}$",
+          "description": "Essential for converting negative exponents to reciprocals, used directly in sigmoid computation"
+        },
+        {
+          "name": "Zero Exponent",
+          "latex": "$e^0 = 1$",
+          "description": "Used when the input to sigmoid is exactly zero"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes $e^{-x}$ for any real number $x$ using Python's math library. This is the exact computation needed for the sigmoid denominator. Return the result rounded to four decimal places.",
+        "function_signature": "def compute_exp_negative(x: float) -> float:",
+        "starter_code": "import math\n\ndef compute_exp_negative(x: float) -> float:\n    # Compute e^(-x) and round to 4 decimal places\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_exp_negative(0)",
+            "expected": "1.0",
+            "explanation": "When $x = 0$, $e^{-0} = e^0 = 1$ by the zero exponent property"
+          },
+          {
+            "input": "compute_exp_negative(1)",
+            "expected": "0.3679",
+            "explanation": "When $x = 1$, $e^{-1} = \\frac{1}{e} \\approx 0.3679$"
+          },
+          {
+            "input": "compute_exp_negative(-2)",
+            "expected": "7.3891",
+            "explanation": "When $x = -2$, $e^{-(-2)} = e^2 \\approx 7.3891$"
+          },
+          {
+            "input": "compute_exp_negative(2)",
+            "expected": "0.1353",
+            "explanation": "When $x = 2$, $e^{-2} = \\frac{1}{e^2} \\approx 0.1353$"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing $e^{-x}$ with $-e^x$ (the negative sign is in the exponent, not multiplying the result)",
+        "Forgetting that $e^{-x} = \\frac{1}{e^x}$ (not computing the reciprocal)",
+        "Using incorrect Python syntax like `e^x` instead of `math.exp(x)`",
+        "Not importing the math module before using math.exp()"
+      ],
+      "hint": "Use Python's `math.exp()` function to compute $e^x$, then apply the negative exponent rule. Remember to round the final result.",
+      "references": [
+        "Exponential functions in calculus",
+        "Python math module documentation",
+        "Properties of exponents"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Algebraic Manipulation: Computing Sums in Denominators",
+      "relation_to_problem": "The sigmoid function has the form $\\frac{1}{1 + e^{-z}}$, requiring us to first compute $1 + e^{-z}$ before taking the reciprocal. This step teaches the denominator computation.",
+      "prerequisites": [
+        "Exponential function evaluation",
+        "Basic arithmetic operations",
+        "Order of operations"
+      ],
+      "learning_objectives": [
+        "Compute expressions of the form $1 + a$ where $a$ is a computed value",
+        "Understand the order of operations in compound expressions",
+        "Recognize how adding 1 to exponential values affects the result",
+        "Build the denominator component of the sigmoid function"
+      ],
+      "math_content": {
+        "definition": "**Definition (Denominator Expression).** For the sigmoid function, the denominator is defined as: $$D(z) = 1 + e^{-z}$$ where $z \\in \\mathbb{R}$ is the input value. This quantity is always positive since $e^{-z} > 0$ for all $z$.",
+        "notation": "$D(z)$ = denominator of sigmoid function, $z$ = input value",
+        "theorem": "**Theorem 2 (Denominator Bounds).** For all $z \\in \\mathbb{R}$, the denominator satisfies: $$1 < D(z) < +\\infty$$ More specifically:\n- As $z \\to +\\infty$, $D(z) \\to 1^+$ (approaches 1 from above)\n- As $z \\to -\\infty$, $D(z) \\to +\\infty$\n- At $z = 0$, $D(0) = 1 + e^0 = 1 + 1 = 2$",
+        "proof_sketch": "Since $e^{-z} > 0$ for all $z \\in \\mathbb{R}$, we have $1 + e^{-z} > 1$. For large positive $z$, $e^{-z} \\to 0$, so $D(z) \\to 1$. For large negative $z$, $e^{-z} \\to +\\infty$, so $D(z) \\to +\\infty$. The denominator never equals 1 or reaches infinity at any finite $z$.",
+        "examples": [
+          "**Example 1:** For $z = 0$: $D(0) = 1 + e^{-0} = 1 + 1 = 2$",
+          "**Example 2:** For $z = 2$: $D(2) = 1 + e^{-2} = 1 + 0.1353 = 1.1353$",
+          "**Example 3:** For $z = -2$: $D(-2) = 1 + e^{-(-2)} = 1 + e^2 = 1 + 7.3891 = 8.3891$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sigmoid Denominator",
+          "latex": "$D(z) = 1 + e^{-z}$",
+          "description": "The denominator that will be used to compute the final sigmoid value"
+        },
+        {
+          "name": "Denominator at Zero",
+          "latex": "$D(0) = 2$",
+          "description": "Special case when input is zero, leading to sigmoid output of 0.5"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the denominator $1 + e^{-z}$ for the sigmoid function. This combines your knowledge of exponential evaluation with basic addition. Return the result rounded to four decimal places.",
+        "function_signature": "def sigmoid_denominator(z: float) -> float:",
+        "starter_code": "import math\n\ndef sigmoid_denominator(z: float) -> float:\n    # Compute 1 + e^(-z) and round to 4 decimal places\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "sigmoid_denominator(0)",
+            "expected": "2.0",
+            "explanation": "When $z = 0$: $1 + e^{-0} = 1 + 1 = 2$"
+          },
+          {
+            "input": "sigmoid_denominator(2)",
+            "expected": "1.1353",
+            "explanation": "When $z = 2$: $1 + e^{-2} = 1 + 0.1353 \\approx 1.1353$"
+          },
+          {
+            "input": "sigmoid_denominator(-2)",
+            "expected": "8.3891",
+            "explanation": "When $z = -2$: $1 + e^{2} = 1 + 7.3891 \\approx 8.3891$"
+          },
+          {
+            "input": "sigmoid_denominator(5)",
+            "expected": "1.0067",
+            "explanation": "When $z = 5$: $1 + e^{-5} = 1 + 0.0067 \\approx 1.0067$"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing $e^{-z}$ first but forgetting to add 1 before returning",
+        "Adding 1 before computing the exponential: $e^{-z+1}$ instead of $1 + e^{-z}$",
+        "Incorrect order of operations leading to $(1 + e)^{-z}$",
+        "Rounding intermediate values instead of only the final result"
+      ],
+      "hint": "Break this into two steps: first compute $e^{-z}$, then add 1 to that result. Make sure to follow the correct order of operations.",
+      "references": [
+        "Order of operations (PEMDAS)",
+        "Composite function evaluation",
+        "Denominator expressions in rational functions"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Reciprocals and Division: The Structure of Rational Functions",
+      "relation_to_problem": "The sigmoid function has the form $\\frac{1}{1 + e^{-z}}$, which is a reciprocal. This step teaches how to compute $\\frac{1}{D}$ for a given denominator $D$.",
+      "prerequisites": [
+        "Division operations",
+        "Understanding of fractions",
+        "Denominator computation"
+      ],
+      "learning_objectives": [
+        "Understand reciprocals and their mathematical properties",
+        "Compute expressions of the form $\\frac{1}{D}$ where $D$ is a positive real number",
+        "Recognize how reciprocals transform large values to small values and vice versa",
+        "Connect the reciprocal operation to the final sigmoid structure"
+      ],
+      "math_content": {
+        "definition": "**Definition 3 (Reciprocal Function).** For any non-zero real number $x \\in \\mathbb{R} \\setminus \\{0\\}$, the reciprocal is defined as: $$f(x) = \\frac{1}{x}$$\n\n**Definition 4 (Sigmoid as Reciprocal).** The sigmoid function can be expressed as a reciprocal function: $$\\sigma(z) = \\frac{1}{D(z)} = \\frac{1}{1 + e^{-z}}$$ where $D(z) = 1 + e^{-z}$ is the denominator computed in the previous step.",
+        "notation": "$\\frac{1}{x}$ = reciprocal of $x$, $\\sigma(z)$ = sigmoid function output",
+        "theorem": "**Theorem 3 (Reciprocal Properties).** For positive real numbers $x > 0$:\n1. If $x > 1$, then $0 < \\frac{1}{x} < 1$ (reciprocal is between 0 and 1)\n2. If $x = 1$, then $\\frac{1}{x} = 1$ (reciprocal equals the value)\n3. As $x \\to +\\infty$, $\\frac{1}{x} \\to 0$ (reciprocal approaches zero)\n4. As $x \\to 1^+$, $\\frac{1}{x} \\to 1^-$ (reciprocal approaches 1 from below)\n\n**Corollary (Sigmoid Range).** Since $D(z) > 1$ for all $z \\in \\mathbb{R}$, we have $0 < \\sigma(z) < 1$ for all $z$, explaining why sigmoid outputs are in the interval $(0,1)$.",
+        "proof_sketch": "Given $D(z) = 1 + e^{-z}$ and knowing that $e^{-z} > 0$, we have $D(z) > 1$ for all finite $z$. By reciprocal property (1), $\\sigma(z) = \\frac{1}{D(z)} < 1$. Since $D(z)$ is finite and positive, $\\sigma(z) > 0$. Therefore, $\\sigma(z) \\in (0, 1)$.",
+        "examples": [
+          "**Example 1:** For $z = 0$: $\\sigma(0) = \\frac{1}{D(0)} = \\frac{1}{2} = 0.5$",
+          "**Example 2:** For $z = 2$ with $D(2) = 1.1353$: $\\sigma(2) = \\frac{1}{1.1353} \\approx 0.8808$",
+          "**Example 3:** For $z = -2$ with $D(-2) = 8.3891$: $\\sigma(-2) = \\frac{1}{8.3891} \\approx 0.1192$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Reciprocal Operation",
+          "latex": "$\\frac{1}{x} = x^{-1}$",
+          "description": "Alternative notation for reciprocal, showing it as a negative exponent"
+        },
+        {
+          "name": "Sigmoid as Reciprocal",
+          "latex": "$\\sigma(z) = \\frac{1}{1 + e^{-z}}$",
+          "description": "The complete sigmoid formula expressed as a reciprocal of the denominator"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a positive denominator value and returns its reciprocal $\\frac{1}{D}$. This operation transforms the denominator into the sigmoid output range. Return the result rounded to four decimal places.",
+        "function_signature": "def compute_reciprocal(denominator: float) -> float:",
+        "starter_code": "def compute_reciprocal(denominator: float) -> float:\n    # Compute 1 / denominator and round to 4 decimal places\n    # Assume denominator > 0\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_reciprocal(2.0)",
+            "expected": "0.5",
+            "explanation": "When $D = 2$: $\\frac{1}{2} = 0.5$ (this is the sigmoid output for $z=0$)"
+          },
+          {
+            "input": "compute_reciprocal(1.1353)",
+            "expected": "0.8808",
+            "explanation": "When $D = 1.1353$: $\\frac{1}{1.1353} \\approx 0.8808$ (sigmoid output for $z=2$)"
+          },
+          {
+            "input": "compute_reciprocal(8.3891)",
+            "expected": "0.1192",
+            "explanation": "When $D = 8.3891$: $\\frac{1}{8.3891} \\approx 0.1192$ (sigmoid output for $z=-2$)"
+          },
+          {
+            "input": "compute_reciprocal(1.0067)",
+            "expected": "0.9933",
+            "explanation": "When $D = 1.0067$: $\\frac{1}{1.0067} \\approx 0.9933$ (sigmoid output for $z=5$)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Attempting to compute $\\frac{D}{1}$ instead of $\\frac{1}{D}$ (inverting the fraction incorrectly)",
+        "Forgetting to handle division by zero (though in sigmoid context, denominator is always positive)",
+        "Rounding before taking the reciprocal instead of after",
+        "Using integer division // instead of floating-point division /"
+      ],
+      "hint": "In Python, simply divide 1 by the denominator value using the / operator. Remember that the smaller the denominator, the larger the reciprocal.",
+      "references": [
+        "Reciprocal functions",
+        "Rational functions",
+        "Range transformations through reciprocals"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Function Composition: Building the Complete Sigmoid",
+      "relation_to_problem": "This step synthesizes all previous concepts by composing them into the complete sigmoid function $\\sigma(z) = \\frac{1}{1 + e^{-z}}$, teaching how to chain mathematical operations correctly.",
+      "prerequisites": [
+        "Exponential evaluation",
+        "Denominator computation",
+        "Reciprocal calculation",
+        "Function composition"
+      ],
+      "learning_objectives": [
+        "Understand function composition as chaining multiple operations",
+        "Implement the complete sigmoid function by combining all previous steps",
+        "Verify that the output always lies in the interval (0, 1)",
+        "Apply proper rounding to match the required precision"
+      ],
+      "math_content": {
+        "definition": "**Definition 5 (Sigmoid Activation Function).** The sigmoid function $\\sigma: \\mathbb{R} \\to (0,1)$ is defined as: $$\\sigma(z) = \\frac{1}{1 + e^{-z}}$$ This can be viewed as a composition of three functions:\n1. $f_1(z) = -z$ (negation)\n2. $f_2(x) = e^x$ (exponential)\n3. $f_3(y) = \\frac{1}{1+y}$ (reciprocal of sum)\n\nThus, $\\sigma(z) = f_3(f_2(f_1(z))) = f_3(f_2(-z)) = f_3(e^{-z}) = \\frac{1}{1 + e^{-z}}$",
+        "notation": "$\\sigma(z)$ = sigmoid output, $z \\in \\mathbb{R}$ = input (pre-activation), $\\circ$ = function composition operator",
+        "theorem": "**Theorem 4 (Sigmoid Output Range).** For all $z \\in \\mathbb{R}$: $$0 < \\sigma(z) < 1$$ Furthermore:\n- $\\lim_{z \\to -\\infty} \\sigma(z) = 0$ (approaches 0 for very negative inputs)\n- $\\lim_{z \\to +\\infty} \\sigma(z) = 1$ (approaches 1 for very positive inputs)\n- $\\sigma(0) = 0.5$ (outputs exactly 0.5 at zero)\n- $\\sigma(-z) = 1 - \\sigma(z)$ (symmetry property)",
+        "proof_sketch": "**Range proof:** Since $e^{-z} > 0$ for all $z$, we have $1 + e^{-z} > 1$, thus $0 < \\frac{1}{1 + e^{-z}} < 1$.\n\n**Symmetry proof:** $$\\sigma(-z) = \\frac{1}{1 + e^z} = \\frac{1}{1 + e^z} \\cdot \\frac{e^{-z}}{e^{-z}} = \\frac{e^{-z}}{e^{-z} + 1}$$ $$1 - \\sigma(z) = 1 - \\frac{1}{1 + e^{-z}} = \\frac{1 + e^{-z} - 1}{1 + e^{-z}} = \\frac{e^{-z}}{1 + e^{-z}} = \\sigma(-z)$$",
+        "examples": [
+          "**Example 1:** $\\sigma(0) = \\frac{1}{1 + e^0} = \\frac{1}{1 + 1} = \\frac{1}{2} = 0.5$",
+          "**Example 2:** $\\sigma(2) = \\frac{1}{1 + e^{-2}} = \\frac{1}{1 + 0.1353} = \\frac{1}{1.1353} \\approx 0.8808$",
+          "**Example 3:** $\\sigma(-2) = \\frac{1}{1 + e^{2}} = \\frac{1}{1 + 7.3891} = \\frac{1}{8.3891} \\approx 0.1192$",
+          "**Example 4 (Symmetry):** $\\sigma(-2) = 0.1192$ and $1 - \\sigma(2) = 1 - 0.8808 = 0.1192$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sigmoid Function",
+          "latex": "$\\sigma(z) = \\frac{1}{1 + e^{-z}}$",
+          "description": "The complete sigmoid activation function definition"
+        },
+        {
+          "name": "Sigmoid at Zero",
+          "latex": "$\\sigma(0) = 0.5$",
+          "description": "Important special case: sigmoid always outputs 0.5 when input is 0"
+        },
+        {
+          "name": "Symmetry Property",
+          "latex": "$\\sigma(-z) = 1 - \\sigma(z)$",
+          "description": "The sigmoid function is symmetric around the point (0, 0.5)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete sigmoid function by composing all previous operations: (1) compute $e^{-z}$, (2) add 1 to get the denominator, (3) take the reciprocal. However, do NOT simply copy the mathematical formula—instead, break it into clear steps to demonstrate your understanding of the composition. Return the result rounded to four decimal places.",
+        "function_signature": "def sigmoid_composition(z: float) -> float:",
+        "starter_code": "import math\n\ndef sigmoid_composition(z: float) -> float:\n    # Step 1: Compute e^(-z)\n    # Step 2: Compute 1 + e^(-z)\n    # Step 3: Compute 1 / (1 + e^(-z))\n    # Step 4: Round to 4 decimal places\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "sigmoid_composition(0)",
+            "expected": "0.5",
+            "explanation": "At $z=0$: $\\sigma(0) = \\frac{1}{1+1} = 0.5$, the midpoint of sigmoid"
+          },
+          {
+            "input": "sigmoid_composition(2)",
+            "expected": "0.8808",
+            "explanation": "At $z=2$: $\\sigma(2) = \\frac{1}{1 + e^{-2}} \\approx 0.8808$"
+          },
+          {
+            "input": "sigmoid_composition(-2)",
+            "expected": "0.1192",
+            "explanation": "At $z=-2$: $\\sigma(-2) = \\frac{1}{1 + e^{2}} \\approx 0.1192$"
+          },
+          {
+            "input": "sigmoid_composition(5)",
+            "expected": "0.9933",
+            "explanation": "At $z=5$: $\\sigma(5) = \\frac{1}{1 + e^{-5}} \\approx 0.9933$ (approaching upper limit)"
+          },
+          {
+            "input": "sigmoid_composition(-5)",
+            "expected": "0.0067",
+            "explanation": "At $z=-5$: $\\sigma(-5) = \\frac{1}{1 + e^{5}} \\approx 0.0067$ (approaching lower limit)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Skipping intermediate steps and computing everything in one expression without clarity",
+        "Incorrect operator precedence: computing $(1 + e)^{-z}$ instead of $1 + e^{-z}$",
+        "Rounding intermediate values instead of only the final output",
+        "Forgetting that the output must always be between 0 and 1 (good sanity check)",
+        "Not handling extreme values properly (very large positive or negative z)"
+      ],
+      "hint": "Build this step-by-step using intermediate variables for clarity. First store $e^{-z}$, then store $1 + e^{-z}$, then compute the reciprocal. This makes debugging easier and shows clear understanding of composition.",
+      "references": [
+        "Function composition",
+        "Order of operations in complex expressions",
+        "Activation functions in neural networks"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Numerical Precision and Rounding in Scientific Computing",
+      "relation_to_problem": "The problem requires output rounded to four decimal places. This step teaches proper rounding techniques and numerical precision considerations essential for scientific computing.",
+      "prerequisites": [
+        "Basic arithmetic",
+        "Floating-point numbers",
+        "Sigmoid function implementation"
+      ],
+      "learning_objectives": [
+        "Understand floating-point representation and precision in computers",
+        "Apply correct rounding to a specified number of decimal places",
+        "Distinguish between truncation and rounding",
+        "Implement the round() function correctly in Python"
+      ],
+      "math_content": {
+        "definition": "**Definition 6 (Rounding to n Decimal Places).** For a real number $x$ and positive integer $n$, rounding to $n$ decimal places produces the value $y$ such that: $$y = \\frac{\\lfloor x \\cdot 10^n + 0.5 \\rfloor}{10^n}$$ where $\\lfloor \\cdot \\rfloor$ is the floor function. Alternatively, $y$ is the value with at most $n$ decimal places that minimizes $|x - y|$.\n\n**Definition 7 (IEEE 754 Rounding Modes).** The IEEE 754 standard defines several rounding modes:\n- **Round to nearest, ties to even** (default in Python)\n- Round toward zero (truncation)\n- Round toward $+\\infty$ (ceiling)\n- Round toward $-\\infty$ (floor)",
+        "notation": "$\\text{round}(x, n)$ = round $x$ to $n$ decimal places, $|x|$ = absolute value of $x$",
+        "theorem": "**Theorem 5 (Rounding Error Bound).** When rounding a value $x$ to $n$ decimal places, the absolute error is bounded by: $$|x - \\text{round}(x, n)| \\leq \\frac{1}{2} \\cdot 10^{-n}$$ For $n=4$ decimal places, the maximum error is $0.00005 = 5 \\times 10^{-5}$.",
+        "proof_sketch": "Rounding to $n$ decimal places finds the nearest value on the grid $\\{k \\cdot 10^{-n} : k \\in \\mathbb{Z}\\}$. The maximum distance to the nearest grid point is half the grid spacing, which is $\\frac{1}{2} \\cdot 10^{-n}$.",
+        "examples": [
+          "**Example 1:** $\\text{round}(0.88079, 4) = 0.8808$ (nearest value with 4 decimals)",
+          "**Example 2:** $\\text{round}(0.11920, 4) = 0.1192$ (trailing zero removed)",
+          "**Example 3:** $\\text{round}(0.49995, 4) = 0.5000 = 0.5$ (rounds up at midpoint)",
+          "**Example 4:** $\\text{round}(0.50005, 4) = 0.5000 = 0.5$ (ties to even: rounds to even digit)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Python Round Function",
+          "latex": "$\\text{round}(x, n)$",
+          "description": "Python's built-in function to round $x$ to $n$ decimal places"
+        },
+        {
+          "name": "Rounding Error",
+          "latex": "$\\epsilon \\leq 5 \\times 10^{-5}$",
+          "description": "Maximum error when rounding to 4 decimal places"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a floating-point sigmoid output (potentially with many decimal places) and returns it rounded to exactly four decimal places. This ensures outputs match the required precision format.",
+        "function_signature": "def round_to_precision(value: float, decimals: int = 4) -> float:",
+        "starter_code": "def round_to_precision(value: float, decimals: int = 4) -> float:\n    # Round value to the specified number of decimal places\n    # Default is 4 decimal places for sigmoid output\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "round_to_precision(0.5)",
+            "expected": "0.5",
+            "explanation": "Exact value 0.5 remains 0.5 when rounded to 4 decimals"
+          },
+          {
+            "input": "round_to_precision(0.880797077978)",
+            "expected": "0.8808",
+            "explanation": "Rounds 0.880797... to 4 decimal places: 0.8808"
+          },
+          {
+            "input": "round_to_precision(0.119202922022)",
+            "expected": "0.1192",
+            "explanation": "Rounds 0.119202... to 4 decimal places: 0.1192"
+          },
+          {
+            "input": "round_to_precision(0.993307149076)",
+            "expected": "0.9933",
+            "explanation": "Rounds 0.993307... to 4 decimal places: 0.9933"
+          },
+          {
+            "input": "round_to_precision(0.006692850924)",
+            "expected": "0.0067",
+            "explanation": "Rounds 0.006692... to 4 decimal places: 0.0067"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using truncation (removing digits) instead of rounding (finding nearest value)",
+        "Rounding multiple times (e.g., first to 6 decimals, then to 4) which can accumulate errors",
+        "Using string formatting for rounding, which doesn't actually change the numerical value",
+        "Forgetting the second parameter in round() function (defaults to 0 if omitted)",
+        "Assuming round(x, 4) returns a value that always displays 4 decimal places (Python removes trailing zeros)"
+      ],
+      "hint": "Python's built-in round() function takes two parameters: the value to round and the number of decimal places. Use round(value, 4) to round to 4 decimal places.",
+      "references": [
+        "IEEE 754 floating-point standard",
+        "Numerical precision in computing",
+        "Python round() function documentation"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Sigmoid Implementation with All Components",
+      "relation_to_problem": "This final step integrates all previous concepts into a single, complete sigmoid function implementation that matches the problem requirements exactly.",
+      "prerequisites": [
+        "Exponential functions",
+        "Denominator computation",
+        "Reciprocals",
+        "Function composition",
+        "Rounding"
+      ],
+      "learning_objectives": [
+        "Synthesize all previous sub-quest concepts into one complete function",
+        "Implement the sigmoid function following best practices",
+        "Verify correctness using comprehensive test cases",
+        "Understand the sigmoid's role in neural networks and machine learning",
+        "Apply proper code structure and documentation"
+      ],
+      "math_content": {
+        "definition": "**Definition 8 (Complete Sigmoid Activation).** The sigmoid activation function with specified precision is defined as: $$\\sigma_4(z) = \\text{round}\\left(\\frac{1}{1 + e^{-z}}, 4\\right)$$ where the subscript 4 indicates rounding to 4 decimal places. This function maps $\\mathbb{R} \\to [0,1]$ (approximately, given rounding).",
+        "notation": "$\\sigma_4(z)$ = rounded sigmoid output, $z$ = pre-activation input (neuron weighted sum)",
+        "theorem": "**Theorem 6 (Sigmoid Properties Summary).** The sigmoid function satisfies:\n1. **Monotonicity**: $\\frac{d\\sigma(z)}{dz} = \\sigma(z)(1 - \\sigma(z)) > 0$ for all $z$, so $\\sigma$ is strictly increasing\n2. **Boundedness**: $0 < \\sigma(z) < 1$ for all $z \\in \\mathbb{R}$\n3. **Central symmetry**: $\\sigma(0) = 0.5$ and $\\sigma(-z) + \\sigma(z) = 1$\n4. **Asymptotic behavior**: $\\lim_{z \\to -\\infty} \\sigma(z) = 0$ and $\\lim_{z \\to +\\infty} \\sigma(z) = 1$\n5. **Maximum derivative**: $\\max_z \\frac{d\\sigma(z)}{dz} = 0.25$ at $z = 0$",
+        "proof_sketch": "**Monotonicity:** The derivative $\\sigma'(z) = \\sigma(z)(1-\\sigma(z))$ is positive since $0 < \\sigma(z) < 1$ implies both factors are positive.\n\n**Application in Neural Networks:** In a binary classification neuron, if the pre-activation is $z = \\mathbf{w}^T\\mathbf{x} + b$ (weighted sum of inputs plus bias), then $\\sigma(z)$ represents the probability that the input belongs to class 1: $P(y=1|\\mathbf{x}) = \\sigma(z)$. Values $\\sigma(z) > 0.5$ predict class 1, while $\\sigma(z) < 0.5$ predict class 0.",
+        "examples": [
+          "**Example 1 (Binary Classification):** If a neuron computes $z = 0.5 \\cdot 4 + 0.2 \\cdot 3 + (-1) = 2 + 0.6 - 1 = 1.6$, then $\\sigma(1.6) \\approx 0.8320$, predicting class 1 with 83.2% probability.",
+          "**Example 2 (Threshold at 0):** An input $z = 0$ gives $\\sigma(0) = 0.5$, the decision boundary where the model is maximally uncertain.",
+          "**Example 3 (Saturation):** For $z = 10$, $\\sigma(10) \\approx 0.9999$, showing the function saturates near 1 for large positive inputs."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Sigmoid",
+          "latex": "$\\sigma(z) = \\frac{1}{1 + e^{-z}}$",
+          "description": "Full sigmoid definition combining all components"
+        },
+        {
+          "name": "Sigmoid Derivative",
+          "latex": "$\\sigma'(z) = \\sigma(z)(1 - \\sigma(z))$",
+          "description": "Derivative used in backpropagation (bonus knowledge for gradient-based learning)"
+        },
+        {
+          "name": "Logit (Inverse Sigmoid)",
+          "latex": "$z = \\log\\left(\\frac{\\sigma}{1-\\sigma}\\right)$",
+          "description": "Inverse function mapping probabilities back to pre-activations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete sigmoid activation function that takes any real number $z$ as input and returns $\\sigma(z)$ rounded to four decimal places. This function should combine all concepts from previous sub-quests: exponential evaluation, denominator computation, reciprocal calculation, and proper rounding. Test your implementation thoroughly with edge cases.",
+        "function_signature": "def sigmoid(z: float) -> float:",
+        "starter_code": "import math\n\ndef sigmoid(z: float) -> float:\n    # Implement the sigmoid function: σ(z) = 1 / (1 + e^(-z))\n    # Return result rounded to 4 decimal places\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "sigmoid(0)",
+            "expected": "0.5",
+            "explanation": "At the origin: $\\sigma(0) = \\frac{1}{1+1} = 0.5$, the decision boundary"
+          },
+          {
+            "input": "sigmoid(2)",
+            "expected": "0.8808",
+            "explanation": "Positive input: $\\sigma(2) = \\frac{1}{1 + e^{-2}} \\approx 0.8808$"
+          },
+          {
+            "input": "sigmoid(-2)",
+            "expected": "0.1192",
+            "explanation": "Negative input: $\\sigma(-2) = \\frac{1}{1 + e^{2}} \\approx 0.1192$"
+          },
+          {
+            "input": "sigmoid(5)",
+            "expected": "0.9933",
+            "explanation": "Large positive: $\\sigma(5) \\approx 0.9933$, approaching upper bound"
+          },
+          {
+            "input": "sigmoid(-5)",
+            "expected": "0.0067",
+            "explanation": "Large negative: $\\sigma(-5) \\approx 0.0067$, approaching lower bound"
+          },
+          {
+            "input": "sigmoid(10)",
+            "expected": "1.0",
+            "explanation": "Very large positive: $\\sigma(10) \\approx 0.9999 \\approx 1.0$ after rounding"
+          },
+          {
+            "input": "sigmoid(-10)",
+            "expected": "0.0",
+            "explanation": "Very large negative: $\\sigma(-10) \\approx 0.0000 \\approx 0.0$ after rounding"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing $(1 + e)^{-z}$ instead of $1 + e^{-z}$ due to operator precedence errors",
+        "Forgetting to round the final result to 4 decimal places",
+        "Not importing the math module for exponential computation",
+        "Attempting to compute $e^{-z}$ manually instead of using math.exp()",
+        "Rounding intermediate values (like $e^{-z}$) instead of only the final output",
+        "Not testing edge cases like very large positive/negative values",
+        "Assuming the function returns exactly 0 or 1 (it only approaches these asymptotically)"
+      ],
+      "hint": "Combine everything you've learned: (1) use math.exp() to compute $e^{-z}$, (2) add 1 to get the denominator, (3) take the reciprocal using division, (4) round to 4 decimal places using round(). Write clear, readable code with good variable names.",
+      "references": [
+        "Activation functions in deep learning",
+        "Binary classification with logistic regression",
+        "Gradient descent and backpropagation",
+        "Neural network architectures",
+        "Numerical stability in machine learning"
+      ]
+    }
+  ]
+}

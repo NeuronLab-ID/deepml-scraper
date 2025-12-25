@@ -1,0 +1,518 @@
+{
+  "problem_id": 111,
+  "title": "Compute Pointwise Mutual Information",
+  "category": "NLP",
+  "difficulty": "medium",
+  "description": "Implement a function to compute the Pointwise Mutual Information (PMI) given the joint occurrence count of two events, their individual counts, and the total number of samples. PMI measures how much the actual joint occurrence of events differs from what we would expect by chance.",
+  "example": {
+    "input": "compute_pmi(50, 200, 300, 1000)",
+    "output": "-0.263",
+    "reasoning": "The PMI calculation compares the actual joint probability (50/1000 = 0.05) to the product of the individual probabilities (200/1000 * 300/1000 = 0.06). Thus, PMI = log₂(0.05 / (0.2 * 0.3)) ≈ -0.263, indicating the events co-occur slightly less than expected by chance."
+  },
+  "starter_code": "import numpy as np\n\ndef compute_pmi(joint_counts, total_counts_x, total_counts_y, total_samples):\n\t# Implement PMI calculation here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Probability Theory Foundations: Computing Empirical Probabilities from Counts",
+      "relation_to_problem": "PMI requires calculating P(x), P(y), and P(x,y) from count data. This sub-quest teaches how to convert raw counts into probability estimates using maximum likelihood estimation.",
+      "prerequisites": [
+        "Basic arithmetic",
+        "Understanding of fractions",
+        "Concept of relative frequency"
+      ],
+      "learning_objectives": [
+        "Define probability as a measure on a sample space with values in [0,1]",
+        "Apply the frequency interpretation of probability to compute empirical probabilities",
+        "Understand the relationship between counts and probability mass functions",
+        "Recognize when probabilities are well-defined (non-zero denominators)"
+      ],
+      "math_content": {
+        "definition": "Let $\\Omega$ be a sample space and let $A \\subseteq \\Omega$ be an event. The **empirical probability** of $A$ given $n$ observations is defined as $\\hat{P}(A) = \\frac{\\text{count}(A)}{n}$ where $\\text{count}(A)$ is the number of times event $A$ occurred in the $n$ observations. This is the maximum likelihood estimator (MLE) for the true probability $P(A)$ under the assumption that observations are independent and identically distributed (i.i.d.).",
+        "notation": "$n$ = total number of samples, $\\text{count}(A)$ = frequency of event $A$, $\\hat{P}(A)$ = empirical probability estimate, $P(A)$ = true (unknown) probability",
+        "theorem": "**Kolmogorov Axioms for Probability**: For any probability measure $P$ on sample space $\\Omega$: (1) $P(A) \\geq 0$ for all events $A$, (2) $P(\\Omega) = 1$, (3) For disjoint events $A_1, A_2, \\ldots$, we have $P(\\bigcup_{i=1}^{\\infty} A_i) = \\sum_{i=1}^{\\infty} P(A_i)$. The empirical probability $\\hat{P}$ satisfies these axioms when counts are non-negative and sum correctly.",
+        "proof_sketch": "Verification: (1) Since $\\text{count}(A) \\geq 0$ and $n > 0$, we have $\\hat{P}(A) \\geq 0$. (2) $\\hat{P}(\\Omega) = \\frac{n}{n} = 1$. (3) For disjoint events $A_i$, $\\text{count}(\\bigcup A_i) = \\sum \\text{count}(A_i)$, so $\\hat{P}(\\bigcup A_i) = \\frac{\\sum \\text{count}(A_i)}{n} = \\sum \\hat{P}(A_i)$.",
+        "examples": [
+          "If a word 'cat' appears 50 times in a corpus of 1000 words, then $\\hat{P}(\\text{cat}) = \\frac{50}{1000} = 0.05$",
+          "If we observe 200 occurrences of event $x$ in 1000 trials, then $\\hat{P}(x) = \\frac{200}{1000} = 0.2 = 20\\%$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Empirical Probability",
+          "latex": "$\\hat{P}(A) = \\frac{\\text{count}(A)}{n}$",
+          "description": "Use this to convert observed counts into probability estimates. Valid when $n > 0$."
+        },
+        {
+          "name": "Normalization Constraint",
+          "latex": "$\\sum_{i} \\hat{P}(A_i) = 1$",
+          "description": "For a partition of the sample space, probabilities must sum to 1."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes counts for two events and the total sample size, then returns their individual empirical probabilities. This is the first building block for PMI calculation.",
+        "function_signature": "def compute_probabilities(count_x: int, count_y: int, total_samples: int) -> tuple[float, float]:",
+        "starter_code": "def compute_probabilities(count_x: int, count_y: int, total_samples: int) -> tuple[float, float]:\n    \"\"\"\n    Compute empirical probabilities P(x) and P(y) from counts.\n    \n    Args:\n        count_x: Number of times event x occurred\n        count_y: Number of times event y occurred\n        total_samples: Total number of observations\n    \n    Returns:\n        Tuple of (P(x), P(y))\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_probabilities(200, 300, 1000)",
+            "expected": "(0.2, 0.3)",
+            "explanation": "P(x) = 200/1000 = 0.2 and P(y) = 300/1000 = 0.3. These represent the marginal probabilities of each event."
+          },
+          {
+            "input": "compute_probabilities(50, 100, 500)",
+            "expected": "(0.1, 0.2)",
+            "explanation": "P(x) = 50/500 = 0.1 and P(y) = 100/500 = 0.2. Lower counts result in lower probabilities."
+          },
+          {
+            "input": "compute_probabilities(1, 1, 10)",
+            "expected": "(0.1, 0.1)",
+            "explanation": "Rare events with count 1 out of 10 samples each have probability 0.1."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check that total_samples > 0 before division (leads to division by zero)",
+        "Confusing counts with probabilities (counts are integers, probabilities are in [0,1])",
+        "Not validating that count_x and count_y are non-negative",
+        "Assuming count_x + count_y must equal total_samples (they don't - these are marginal counts, not joint counts)"
+      ],
+      "hint": "The empirical probability is simply the count divided by the total. Make sure your function returns values between 0 and 1.",
+      "references": [
+        "Kolmogorov probability axioms",
+        "Maximum likelihood estimation",
+        "Frequency interpretation of probability",
+        "Empirical distributions"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Joint Probability and Statistical Independence",
+      "relation_to_problem": "PMI compares the actual joint probability P(x,y) with the product P(x)·P(y). Understanding when events are independent is crucial for interpreting PMI values.",
+      "prerequisites": [
+        "Empirical probability calculation",
+        "Multiplication rule for probabilities",
+        "Set theory (intersection of events)"
+      ],
+      "learning_objectives": [
+        "Define joint probability for two events",
+        "State and prove the independence condition for events",
+        "Compute joint probability from co-occurrence counts",
+        "Distinguish between marginal and joint probability distributions"
+      ],
+      "math_content": {
+        "definition": "The **joint probability** of two events $A$ and $B$ is defined as $P(A \\cap B)$, often written $P(A, B)$, which represents the probability that both events occur simultaneously. Two events $A$ and $B$ are **statistically independent** if and only if $P(A \\cap B) = P(A) \\cdot P(B)$. If this equality does not hold, the events are dependent.",
+        "notation": "$P(x, y)$ or $P(x \\cap y)$ = joint probability of $x$ and $y$, $P(x)$ = marginal probability of $x$, $P(y)$ = marginal probability of $y$, $\\text{count}(x, y)$ = number of times $x$ and $y$ co-occur",
+        "theorem": "**Independence Test**: Events $A$ and $B$ are independent if and only if $P(A|B) = P(A)$ (equivalently, $P(B|A) = P(B)$), which is equivalent to $P(A,B) = P(A) \\cdot P(B)$. For empirical distributions: $\\hat{P}(x,y) = \\hat{P}(x) \\cdot \\hat{P}(y)$ indicates approximate independence.",
+        "proof_sketch": "By definition of conditional probability, $P(A|B) = \\frac{P(A,B)}{P(B)}$ when $P(B) > 0$. If $A$ and $B$ are independent, then $P(A|B) = P(A)$, so $\\frac{P(A,B)}{P(B)} = P(A)$, which gives $P(A,B) = P(A) \\cdot P(B)$. Conversely, if $P(A,B) = P(A) \\cdot P(B)$, then $P(A|B) = \\frac{P(A) \\cdot P(B)}{P(B)} = P(A)$, showing independence.",
+        "examples": [
+          "If words 'neural' and 'network' co-occur 50 times in 1000 documents, $\\hat{P}(\\text{neural}, \\text{network}) = \\frac{50}{1000} = 0.05$",
+          "If $P(x) = 0.2$, $P(y) = 0.3$, and events are independent, then $P(x,y) = 0.2 \\times 0.3 = 0.06$. If actual $P(x,y) = 0.05 < 0.06$, events co-occur less than expected by independence."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Joint Probability (Empirical)",
+          "latex": "$\\hat{P}(x,y) = \\frac{\\text{count}(x,y)}{n}$",
+          "description": "Compute joint probability from co-occurrence counts."
+        },
+        {
+          "name": "Independence Condition",
+          "latex": "$P(x,y) = P(x) \\cdot P(y)$",
+          "description": "Equality holds if and only if events are independent. PMI measures deviation from this."
+        },
+        {
+          "name": "Marginal from Joint",
+          "latex": "$P(x) = \\sum_y P(x,y)$",
+          "description": "Marginalization: sum joint probabilities over all values of $y$ to get $P(x)$."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the joint probability from co-occurrence counts and compares it with the product of marginal probabilities to determine if events appear more or less associated than independence would predict.",
+        "function_signature": "def compute_joint_probability(joint_count: int, count_x: int, count_y: int, total_samples: int) -> dict:",
+        "starter_code": "def compute_joint_probability(joint_count: int, count_x: int, count_y: int, total_samples: int) -> dict:\n    \"\"\"\n    Compute joint probability and compare with independence assumption.\n    \n    Args:\n        joint_count: Number of times x and y co-occur\n        count_x: Number of times x occurs\n        count_y: Number of times y occurs\n        total_samples: Total number of observations\n    \n    Returns:\n        Dictionary with keys: 'p_xy' (joint probability), \n        'p_x_times_p_y' (product of marginals),\n        'association' (string: 'positive', 'negative', or 'independent')\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_joint_probability(50, 200, 300, 1000)",
+            "expected": "{'p_xy': 0.05, 'p_x_times_p_y': 0.06, 'association': 'negative'}",
+            "explanation": "P(x,y) = 50/1000 = 0.05, P(x)·P(y) = (200/1000)·(300/1000) = 0.06. Since 0.05 < 0.06, events co-occur less than expected (negative association)."
+          },
+          {
+            "input": "compute_joint_probability(80, 200, 300, 1000)",
+            "expected": "{'p_xy': 0.08, 'p_x_times_p_y': 0.06, 'association': 'positive'}",
+            "explanation": "P(x,y) = 0.08 > 0.06 = P(x)·P(y), indicating events co-occur more than expected (positive association)."
+          },
+          {
+            "input": "compute_joint_probability(60, 200, 300, 1000)",
+            "expected": "{'p_xy': 0.06, 'p_x_times_p_y': 0.06, 'association': 'independent'}",
+            "explanation": "P(x,y) = 0.06 = P(x)·P(y), suggesting approximate independence."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing joint_count with count_x or count_y (joint_count ≤ min(count_x, count_y))",
+        "Thinking that count_x + count_y = total_samples (marginal counts can overlap)",
+        "Not handling the case where joint_count = 0 (leads to undefined PMI later)",
+        "Comparing probabilities for equality using == in floating point (use tolerance instead)"
+      ],
+      "hint": "First compute P(x,y), P(x), and P(y) separately. Then compare P(x,y) with P(x)·P(y) to determine the type of association.",
+      "references": [
+        "Joint probability distribution",
+        "Statistical independence",
+        "Contingency tables",
+        "Conditional probability"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Logarithms in Information Theory: The Base-2 Logarithm",
+      "relation_to_problem": "PMI uses log₂ to measure information content. Understanding logarithms, especially with base 2, is essential for computing and interpreting PMI values in bits.",
+      "prerequisites": [
+        "Exponential functions",
+        "Properties of logarithms",
+        "Change of base formula"
+      ],
+      "learning_objectives": [
+        "Define the logarithm as the inverse of exponentiation",
+        "Apply logarithm properties to simplify expressions",
+        "Understand why base-2 logarithms measure information in bits",
+        "Compute log₂ using natural logarithm or log₁₀ with change of base"
+      ],
+      "math_content": {
+        "definition": "The **logarithm base $b$** of a positive number $x$, denoted $\\log_b(x)$, is the exponent to which $b$ must be raised to obtain $x$. Formally: $y = \\log_b(x)$ if and only if $b^y = x$ where $b > 0, b \\neq 1$ and $x > 0$. The **binary logarithm** is $\\log_2(x)$, commonly used in information theory because it measures information in **bits**.",
+        "notation": "$\\log_2(x)$ or $\\lg(x)$ = logarithm base 2, $\\ln(x)$ = natural logarithm (base $e$), $\\log_{10}(x)$ = common logarithm, $\\log(x)$ without subscript typically means natural logarithm in mathematics",
+        "theorem": "**Logarithm Properties**: For $a, b > 0$ and $b \\neq 1$: (1) $\\log_b(xy) = \\log_b(x) + \\log_b(y)$ (Product Rule), (2) $\\log_b(\\frac{x}{y}) = \\log_b(x) - \\log_b(y)$ (Quotient Rule), (3) $\\log_b(x^r) = r\\log_b(x)$ (Power Rule), (4) $\\log_b(b) = 1$, (5) $\\log_b(1) = 0$. **Change of Base**: $\\log_b(x) = \\frac{\\log_k(x)}{\\log_k(b)}$ for any valid base $k$.",
+        "proof_sketch": "Product Rule: Let $\\log_b(x) = m$ and $\\log_b(y) = n$, so $b^m = x$ and $b^n = y$. Then $xy = b^m \\cdot b^n = b^{m+n}$, which means $\\log_b(xy) = m + n = \\log_b(x) + \\log_b(y)$. Change of Base: Let $y = \\log_b(x)$, so $b^y = x$. Taking $\\log_k$ of both sides: $\\log_k(b^y) = \\log_k(x)$, thus $y\\log_k(b) = \\log_k(x)$, giving $y = \\frac{\\log_k(x)}{\\log_k(b)}$.",
+        "examples": [
+          "$\\log_2(8) = 3$ because $2^3 = 8$. This means 8 can be represented with 3 bits.",
+          "$\\log_2(0.5) = -1$ because $2^{-1} = 0.5$. Probabilities less than 1 have negative logarithms.",
+          "$\\log_2(\\frac{0.05}{0.06}) = \\log_2(0.05) - \\log_2(0.06) \\approx -4.322 - (-4.059) = -0.263$ (this is the PMI value from the problem example)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Change of Base to Natural Log",
+          "latex": "$\\log_2(x) = \\frac{\\ln(x)}{\\ln(2)}$",
+          "description": "Use this to compute log₂ in programming languages that only provide natural logarithm (ln or log in NumPy)."
+        },
+        {
+          "name": "Quotient Rule for Logarithms",
+          "latex": "$\\log_2\\left(\\frac{a}{b}\\right) = \\log_2(a) - \\log_2(b)$",
+          "description": "Essential for PMI calculation: log of a ratio equals difference of logs."
+        },
+        {
+          "name": "Sign of Logarithm",
+          "latex": "$\\log_2(x) > 0 \\iff x > 1$; $\\log_2(x) < 0 \\iff 0 < x < 1$; $\\log_2(x) = 0 \\iff x = 1$",
+          "description": "Determines the sign of PMI: positive when events co-occur more than expected."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the base-2 logarithm of a ratio of two positive numbers. This is the core mathematical operation in PMI calculation.",
+        "function_signature": "def compute_log2_ratio(numerator: float, denominator: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_log2_ratio(numerator: float, denominator: float) -> float:\n    \"\"\"\n    Compute log₂(numerator / denominator).\n    \n    Args:\n        numerator: Positive number (numerator of ratio)\n        denominator: Positive number (denominator of ratio)\n    \n    Returns:\n        log₂(numerator / denominator)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_log2_ratio(0.05, 0.06)",
+            "expected": "-0.263 (approximately)",
+            "explanation": "log₂(0.05/0.06) = log₂(0.8333...) ≈ -0.263. The negative value indicates the numerator is less than the denominator."
+          },
+          {
+            "input": "compute_log2_ratio(0.08, 0.06)",
+            "expected": "0.415 (approximately)",
+            "explanation": "log₂(0.08/0.06) = log₂(1.333...) ≈ 0.415. Positive value indicates numerator exceeds denominator."
+          },
+          {
+            "input": "compute_log2_ratio(0.06, 0.06)",
+            "expected": "0.0",
+            "explanation": "log₂(1) = 0. When numerator equals denominator, the ratio is 1 and log is 0."
+          },
+          {
+            "input": "compute_log2_ratio(8, 1)",
+            "expected": "3.0",
+            "explanation": "log₂(8) = 3 since 2³ = 8."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using natural log without converting to base-2 (results in different scale)",
+        "Not handling division by zero when denominator is 0",
+        "Not handling logarithm of non-positive numbers (undefined in real numbers)",
+        "Forgetting that log(a/b) = log(a) - log(b), computing the ratio first can lose precision"
+      ],
+      "hint": "Use NumPy's log2 function or convert using the change of base formula: log₂(x) = ln(x) / ln(2). Remember to validate inputs are positive.",
+      "references": [
+        "Information theory",
+        "Shannon entropy",
+        "Binary logarithm",
+        "Logarithm identities",
+        "Change of base formula"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Pointwise Mutual Information: Definition and Information-Theoretic Interpretation",
+      "relation_to_problem": "This sub-quest provides the formal mathematical definition of PMI and explains its connection to information theory. PMI measures how much information one event provides about another.",
+      "prerequisites": [
+        "Empirical probability from counts",
+        "Joint probability and independence",
+        "Base-2 logarithms"
+      ],
+      "learning_objectives": [
+        "Define Pointwise Mutual Information formally",
+        "Interpret PMI as a measure of association strength",
+        "Understand the connection between PMI and self-information",
+        "Recognize when PMI is positive, negative, zero, or undefined"
+      ],
+      "math_content": {
+        "definition": "The **Pointwise Mutual Information** (PMI) between two events $x$ and $y$ is defined as: $$\\text{PMI}(x,y) = \\log_2\\left(\\frac{P(x,y)}{P(x) \\cdot P(y)}\\right)$$ where $P(x,y)$ is the joint probability, and $P(x), P(y)$ are marginal probabilities. PMI quantifies the log-ratio of observed joint probability to the expected joint probability under independence. It measures the amount of information (in bits) that observing event $x$ provides about event $y$, and vice versa.",
+        "notation": "$\\text{PMI}(x,y)$ = pointwise mutual information between $x$ and $y$ (in bits when using log₂), $I(x;y)$ = mutual information (related but different - averaged over all outcomes), $P(x,y)$ = joint probability, $P(x)P(y)$ = expected joint probability under independence",
+        "theorem": "**Information-Theoretic Interpretation**: PMI can be expressed as $\\text{PMI}(x,y) = \\log_2\\frac{P(x|y)}{P(x)} = \\log_2\\frac{P(y|x)}{P(y)}$. This shows that PMI measures the logarithm of how much observing $y$ changes the probability of $x$ (or vice versa). **Sign Properties**: (1) $\\text{PMI}(x,y) > 0$ when events co-occur more than expected (positive association), (2) $\\text{PMI}(x,y) < 0$ when events co-occur less than expected (negative association), (3) $\\text{PMI}(x,y) = 0$ when events are independent, (4) $\\text{PMI}(x,y)$ is undefined when $P(x,y) = 0$.",
+        "proof_sketch": "Starting from the definition: $\\text{PMI}(x,y) = \\log_2\\frac{P(x,y)}{P(x)P(y)}$. By conditional probability, $P(x,y) = P(x|y)P(y)$, so $\\text{PMI}(x,y) = \\log_2\\frac{P(x|y)P(y)}{P(x)P(y)} = \\log_2\\frac{P(x|y)}{P(x)}$. This equals $\\log_2 P(x|y) - \\log_2 P(x)$, the difference in self-information. For independence: if $P(x,y) = P(x)P(y)$, then $\\text{PMI}(x,y) = \\log_2(1) = 0$.",
+        "examples": [
+          "Words 'neural' and 'network': If $P(\\text{neural}) = 0.01$, $P(\\text{network}) = 0.02$, and they co-occur with $P(\\text{neural}, \\text{network}) = 0.005$, then $\\text{PMI} = \\log_2(\\frac{0.005}{0.01 \\times 0.02}) = \\log_2(\\frac{0.005}{0.0002}) = \\log_2(25) \\approx 4.64$ bits. Strong positive association.",
+          "From problem example: $P(x,y) = 50/1000 = 0.05$, $P(x)P(y) = 0.2 \\times 0.3 = 0.06$, so $\\text{PMI} = \\log_2(0.05/0.06) \\approx -0.263$ bits. Slight negative association."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "PMI Definition",
+          "latex": "$\\text{PMI}(x,y) = \\log_2\\left(\\frac{P(x,y)}{P(x) \\cdot P(y)}\\right)$",
+          "description": "The fundamental formula for computing pointwise mutual information."
+        },
+        {
+          "name": "PMI via Conditional Probability",
+          "latex": "$\\text{PMI}(x,y) = \\log_2\\frac{P(x|y)}{P(x)} = \\log_2\\frac{P(y|x)}{P(y)}$",
+          "description": "Alternative formulation showing PMI measures how much observing one event changes the probability of the other."
+        },
+        {
+          "name": "PMI from Logarithm Difference",
+          "latex": "$\\text{PMI}(x,y) = \\log_2 P(x,y) - \\log_2 P(x) - \\log_2 P(y)$",
+          "description": "Computational form using logarithm properties - useful for numerical stability."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes PMI given three probability values: P(x,y), P(x), and P(y). This isolates the core PMI calculation from the probability estimation step.",
+        "function_signature": "def compute_pmi_from_probabilities(p_xy: float, p_x: float, p_y: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_pmi_from_probabilities(p_xy: float, p_x: float, p_y: float) -> float:\n    \"\"\"\n    Compute PMI given joint and marginal probabilities.\n    \n    Args:\n        p_xy: Joint probability P(x,y)\n        p_x: Marginal probability P(x)\n        p_y: Marginal probability P(y)\n    \n    Returns:\n        PMI(x,y) in bits\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_pmi_from_probabilities(0.05, 0.2, 0.3)",
+            "expected": "-0.263 (approximately)",
+            "explanation": "PMI = log₂(0.05 / (0.2 × 0.3)) = log₂(0.05 / 0.06) ≈ -0.263. Negative PMI indicates events co-occur less than expected."
+          },
+          {
+            "input": "compute_pmi_from_probabilities(0.08, 0.2, 0.3)",
+            "expected": "0.415 (approximately)",
+            "explanation": "PMI = log₂(0.08 / 0.06) = log₂(1.333...) ≈ 0.415. Positive PMI indicates positive association."
+          },
+          {
+            "input": "compute_pmi_from_probabilities(0.06, 0.2, 0.3)",
+            "expected": "0.0",
+            "explanation": "PMI = log₂(0.06 / 0.06) = log₂(1) = 0. Zero PMI indicates statistical independence."
+          },
+          {
+            "input": "compute_pmi_from_probabilities(0.01, 0.1, 0.1)",
+            "expected": "0.0 (approximately)",
+            "explanation": "PMI = log₂(0.01 / 0.01) = 0. Events are independent."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not validating that probabilities are in (0, 1] - PMI is undefined for P(x,y) = 0",
+        "Confusing PMI with mutual information I(X;Y) - PMI is for specific outcomes, MI is averaged",
+        "Forgetting to use log₂ instead of natural log (results in different units - nats vs bits)",
+        "Not handling numerical instability when probabilities are very small (use log-space computation)",
+        "Misinterpreting negative PMI as 'no association' - it indicates negative association, not independence"
+      ],
+      "hint": "Apply the logarithm quotient rule: log(a/b) = log(a) - log(b). Compute log₂(p_xy) - log₂(p_x) - log₂(p_y) for better numerical stability.",
+      "references": [
+        "Pointwise Mutual Information",
+        "Mutual Information",
+        "Self-information",
+        "Kullback-Leibler divergence",
+        "Word association measures in NLP"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Edge Cases and Numerical Considerations in PMI Computation",
+      "relation_to_problem": "Real-world data contains edge cases: zero counts, rare events, and numerical precision issues. This sub-quest addresses practical considerations for robust PMI implementation.",
+      "prerequisites": [
+        "PMI definition and calculation",
+        "Floating-point arithmetic",
+        "Domain constraints for logarithms"
+      ],
+      "learning_objectives": [
+        "Identify when PMI is undefined (zero joint probability)",
+        "Understand numerical instability with very small probabilities",
+        "Apply strategies for handling edge cases in production code",
+        "Recognize the connection between PMI and PPMI (Positive PMI)"
+      ],
+      "math_content": {
+        "definition": "**Undefined PMI**: When $P(x,y) = 0$ (events never co-occur), PMI is undefined because $\\log_2(0)$ is $-\\infty$. **Numerical Underflow**: When probabilities are extremely small (e.g., $10^{-300}$), floating-point arithmetic may round to zero. **Positive PMI (PPMI)**: A variant that addresses negative PMI by setting $\\text{PPMI}(x,y) = \\max(\\text{PMI}(x,y), 0)$, used in word embeddings to focus on positive associations.",
+        "notation": "$\\epsilon$ = small positive constant for smoothing (e.g., $10^{-10}$), $\\text{PPMI}(x,y)$ = Positive PMI, $-\\infty$ = negative infinity (limiting value of $\\log_2(0)$)",
+        "theorem": "**Domain Constraints**: PMI is defined if and only if $P(x,y) > 0$, $P(x) > 0$, and $P(y) > 0$. **Bounds on PMI**: $\\text{PMI}(x,y) \\leq -\\log_2 \\max(P(x), P(y))$. The maximum occurs when one event always implies the other. There is no lower bound except $-\\infty$ when events are mutually exclusive.",
+        "proof_sketch": "For PMI to be defined, we need $P(x,y) > 0$ (else $\\log_2(0)$ undefined), and $P(x), P(y) > 0$ (else division by zero in denominator). Upper bound: Since $P(x,y) \\leq \\min(P(x), P(y))$ (joint cannot exceed marginals), we have $\\frac{P(x,y)}{P(x)P(y)} \\leq \\frac{\\min(P(x), P(y))}{P(x)P(y)} = \\frac{1}{\\max(P(x), P(y))}$. Taking $\\log_2$ gives the bound.",
+        "examples": [
+          "If 'quantum' and 'physics' never co-occur ($\\text{count}(x,y) = 0$), PMI is undefined. Common handling: treat as $-\\infty$ or use Laplace smoothing.",
+          "With smoothing: Add $\\alpha = 1$ to all counts. If $\\text{count}(x,y) = 0$, $\\text{count}(x) = 10$, $\\text{count}(y) = 20$, $n = 1000$, smoothed: $P(x,y) = \\frac{0+1}{1000+4} \\approx 0.001$.",
+          "PPMI example: If $\\text{PMI}(x,y) = -0.263$, then $\\text{PPMI}(x,y) = \\max(-0.263, 0) = 0$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Domain Check",
+          "latex": "$P(x,y) > 0 \\land P(x) > 0 \\land P(y) > 0$",
+          "description": "Necessary conditions for PMI to be defined. Check before computing logarithms."
+        },
+        {
+          "name": "Laplace Smoothing",
+          "latex": "$\\hat{P}_{\\text{smooth}}(x,y) = \\frac{\\text{count}(x,y) + \\alpha}{n + \\alpha k}$",
+          "description": "Add pseudo-count $\\alpha$ to handle zero counts. $k$ is the number of possible outcomes."
+        },
+        {
+          "name": "Positive PMI",
+          "latex": "$\\text{PPMI}(x,y) = \\max(0, \\text{PMI}(x,y))$",
+          "description": "Clamp negative PMI to zero. Used in word2vec and other NLP applications."
+        },
+        {
+          "name": "Log-Space Computation",
+          "latex": "$\\text{PMI}(x,y) = \\log_2 P(x,y) - \\log_2 P(x) - \\log_2 P(y)$",
+          "description": "Compute in log-space to avoid numerical underflow with very small probabilities."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a robust PMI calculator that validates inputs, handles edge cases, and optionally applies smoothing. This extends the basic PMI formula with real-world safeguards.",
+        "function_signature": "def compute_pmi_robust(joint_count: int, count_x: int, count_y: int, total_samples: int, smoothing: float = 0.0) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_pmi_robust(joint_count: int, count_x: int, count_y: int, total_samples: int, smoothing: float = 0.0) -> float:\n    \"\"\"\n    Compute PMI with input validation and optional smoothing.\n    \n    Args:\n        joint_count: Number of times x and y co-occur\n        count_x: Number of times x occurs\n        count_y: Number of times y occurs\n        total_samples: Total number of observations\n        smoothing: Pseudo-count for Laplace smoothing (default 0 = no smoothing)\n    \n    Returns:\n        PMI value in bits, or -inf if events never co-occur (when smoothing=0)\n    \n    Raises:\n        ValueError: If inputs are invalid (negative counts, zero total_samples)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_pmi_robust(50, 200, 300, 1000)",
+            "expected": "-0.263 (approximately)",
+            "explanation": "Standard PMI calculation without smoothing for the main problem example."
+          },
+          {
+            "input": "compute_pmi_robust(0, 100, 200, 1000)",
+            "expected": "-inf",
+            "explanation": "Events never co-occur. Without smoothing, PMI is negative infinity."
+          },
+          {
+            "input": "compute_pmi_robust(0, 100, 200, 1000, smoothing=1.0)",
+            "expected": "-9.97 (approximately)",
+            "explanation": "With Laplace smoothing, zero count becomes (0+1)/(1000+4) ≈ 0.001, making PMI defined but very negative."
+          },
+          {
+            "input": "compute_pmi_robust(100, 200, 300, 1000)",
+            "expected": "0.737 (approximately)",
+            "explanation": "Strong positive association: P(x,y) = 0.1, P(x)P(y) = 0.06, PMI = log₂(0.1/0.06) ≈ 0.737."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking for zero joint_count before computing log (causes -inf or error)",
+        "Forgetting to validate that counts are non-negative integers",
+        "Applying smoothing inconsistently (must add to numerator and denominator)",
+        "Using 0.0 instead of -inf for undefined PMI (causes confusion in downstream code)",
+        "Not handling the case where count_x or count_y is zero (marginal probabilities must be positive)"
+      ],
+      "hint": "First validate all inputs (non-negative counts, positive total_samples). Then check if joint_count is zero. If smoothing is applied, add the smoothing constant to all relevant counts before computing probabilities.",
+      "references": [
+        "Laplace smoothing",
+        "Add-one smoothing",
+        "Positive PMI (PPMI)",
+        "Numerical stability",
+        "Floating-point arithmetic",
+        "NLP preprocessing techniques"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete PMI Pipeline: From Raw Counts to Information Measure",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts to solve the complete PMI problem: converting raw counts to probabilities, computing the ratio, and taking the logarithm.",
+      "prerequisites": [
+        "All previous sub-quests: probability from counts",
+        "joint probability",
+        "logarithms",
+        "PMI definition",
+        "edge case handling"
+      ],
+      "learning_objectives": [
+        "Integrate probability estimation and PMI calculation into a single pipeline",
+        "Apply all validation and edge case handling techniques",
+        "Interpret PMI values in the context of the original problem",
+        "Understand PMI variants and their use cases in NLP"
+      ],
+      "math_content": {
+        "definition": "The **complete PMI computation** from raw counts consists of three stages: (1) **Probability Estimation**: Compute empirical probabilities $\\hat{P}(x) = \\frac{\\text{count}_x}{n}$, $\\hat{P}(y) = \\frac{\\text{count}_y}{n}$, $\\hat{P}(x,y) = \\frac{\\text{count}_{xy}}{n}$. (2) **Independence Ratio**: Calculate $r = \\frac{\\hat{P}(x,y)}{\\hat{P}(x) \\cdot \\hat{P}(y)}$. (3) **Information Measure**: Compute $\\text{PMI}(x,y) = \\log_2(r)$. This pipeline transforms frequency data into an information-theoretic association measure.",
+        "notation": "$\\text{count}_{xy}$ = joint occurrence count, $\\text{count}_x$, $\\text{count}_y$ = marginal counts, $n$ = total samples, $r$ = independence ratio",
+        "theorem": "**PMI Interpretation Ranges**: (1) $\\text{PMI} > 2$: Strong positive association (events co-occur $2^2 = 4$ times more than expected), (2) $0 < \\text{PMI} < 2$: Weak positive association, (3) $\\text{PMI} = 0$: Independence (events unrelated), (4) $-2 < \\text{PMI} < 0$: Weak negative association, (5) $\\text{PMI} < -2$: Strong negative association (events avoid each other). **Relation to Mutual Information**: $I(X;Y) = \\sum_x \\sum_y P(x,y) \\cdot \\text{PMI}(x,y)$ - MI is the expected PMI over all outcome pairs.",
+        "proof_sketch": "The interpretation follows from $2^{\\text{PMI}} = \\frac{P(x,y)}{P(x)P(y)}$. If $\\text{PMI} = 2$, then $\\frac{P(x,y)}{P(x)P(y)} = 4$, meaning events co-occur 4× more than expected. For MI: $I(X;Y) = \\sum_{x,y} P(x,y) \\log_2 \\frac{P(x,y)}{P(x)P(y)} = \\mathbb{E}[\\text{PMI}(X,Y)]$ where expectation is over the joint distribution.",
+        "examples": [
+          "Main problem: Given $(\\text{joint}=50, \\text{count}_x=200, \\text{count}_y=300, n=1000)$: (1) $P(x,y) = 0.05$, $P(x) = 0.2$, $P(y) = 0.3$. (2) $r = 0.05/(0.2 \\times 0.3) = 0.833$. (3) $\\text{PMI} = \\log_2(0.833) \\approx -0.263$ bits.",
+          "NLP application: 'data' appears 1000 times, 'science' 800 times, co-occur 200 times in 10000 documents. $\\text{PMI} = \\log_2(\\frac{200/10000}{(1000/10000)(800/10000)}) = \\log_2(\\frac{0.02}{0.08}) = \\log_2(2.5) \\approx 1.32$ bits. Positive association.",
+          "Interpretation: A PMI of 1.32 means 'data' and 'science' co-occur about $2^{1.32} \\approx 2.5$ times more often than if they were independent."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete PMI Formula from Counts",
+          "latex": "$\\text{PMI}(x,y) = \\log_2\\left(\\frac{\\text{count}_{xy} \\cdot n}{\\text{count}_x \\cdot \\text{count}_y}\\right)$",
+          "description": "Direct formula from counts, derived by substituting probability definitions into PMI formula."
+        },
+        {
+          "name": "PMI Decomposition",
+          "latex": "$\\text{PMI}(x,y) = \\log_2\\text{count}_{xy} + \\log_2 n - \\log_2\\text{count}_x - \\log_2\\text{count}_y$",
+          "description": "Log-space computation for numerical stability. Useful when counts are very large or very small."
+        },
+        {
+          "name": "Association Ratio",
+          "latex": "$2^{\\text{PMI}(x,y)} = \\frac{P(x,y)}{P(x)P(y)}$",
+          "description": "Exponentiating PMI gives the multiplicative factor by which events co-occur more (>1) or less (<1) than expected."
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete PMI function exactly as specified in the main problem. This combines all previous sub-quest learnings into the final solution.",
+        "function_signature": "def compute_pmi(joint_counts: int, total_counts_x: int, total_counts_y: int, total_samples: int) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_pmi(joint_counts: int, total_counts_x: int, total_counts_y: int, total_samples: int) -> float:\n    \"\"\"\n    Compute Pointwise Mutual Information from count data.\n    \n    Args:\n        joint_counts: Number of times x and y co-occur\n        total_counts_x: Number of times x occurs\n        total_counts_y: Number of times y occurs\n        total_samples: Total number of observations\n    \n    Returns:\n        PMI(x,y) in bits (base-2 logarithm)\n    \n    The function should:\n    - Calculate empirical probabilities from counts\n    - Compute the ratio of joint to independent probabilities\n    - Return the base-2 logarithm of this ratio\n    - Round to 3 decimal places\n    \"\"\"\n    # Your code here - integrate all concepts from previous sub-quests\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_pmi(50, 200, 300, 1000)",
+            "expected": "-0.263",
+            "explanation": "Main problem example: P(x,y)=0.05, P(x)=0.2, P(y)=0.3. PMI = log₂(0.05/0.06) ≈ -0.263. Slight negative association."
+          },
+          {
+            "input": "compute_pmi(100, 200, 300, 1000)",
+            "expected": "0.737",
+            "explanation": "P(x,y)=0.1, P(x)P(y)=0.06. PMI = log₂(0.1/0.06) = log₂(1.667) ≈ 0.737. Positive association."
+          },
+          {
+            "input": "compute_pmi(60, 200, 300, 1000)",
+            "expected": "0.0",
+            "explanation": "P(x,y)=0.06 = P(x)P(y). PMI = log₂(1) = 0. Statistical independence."
+          },
+          {
+            "input": "compute_pmi(200, 1000, 800, 10000)",
+            "expected": "1.322",
+            "explanation": "P(x,y)=0.02, P(x)=0.1, P(y)=0.08. PMI = log₂(0.02/0.008) = log₂(2.5) ≈ 1.322. Strong positive association."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Mixing up the order of parameters (joint_counts vs total_counts)",
+        "Not converting counts to probabilities before computing PMI",
+        "Using natural log instead of base-2 log (wrong units)",
+        "Not rounding the final result to appropriate precision",
+        "Forgetting to handle edge cases like zero joint_counts",
+        "Computing (joint_counts / total_counts_x) / total_counts_y instead of (joint_counts / total_samples) / ((total_counts_x / total_samples) * (total_counts_y / total_samples))"
+      ],
+      "hint": "Follow the three-stage pipeline: (1) compute all three probabilities by dividing counts by total_samples, (2) calculate the ratio of joint probability to the product of marginal probabilities, (3) take log₂ of this ratio. Use np.log2() for the logarithm.",
+      "references": [
+        "Pointwise Mutual Information in NLP",
+        "Word association measures",
+        "Topic modeling coherence",
+        "Feature selection using PMI",
+        "Word embeddings and co-occurrence statistics",
+        "Church & Hanks (1990) - Word Association Norms"
+      ]
+    }
+  ]
+}

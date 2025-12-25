@@ -1,0 +1,443 @@
+{
+  "problem_id": 191,
+  "title": "PCA Color Augmentation",
+  "category": "Computer Vision",
+  "difficulty": "hard",
+  "description": "Implement the PCA color distortion technique used in AlexNet for data augmentation. This method applies PCA to the RGB pixel values of natural images, then adds multiples of the principal components with magnitudes proportional to the corresponding eigenvalues times a random variable. Given an RGB image (H, W, 3), compute the principal components of RGB values and apply the color distortion with specified alpha values.",
+  "example": {
+    "input": "np.random.seed(42)\nimage = np.random.randint(0, 256, (2, 2, 3)).astype(np.uint8)\nalpha = np.array([0.1, -0.05, 0.03])\nresult = pca_color_augmentation(image, alpha)\nprint(result)",
+    "output": "[[[ 97  98  99]\n  [144 145 146]]\n\n [[243 244 245]\n  [ 32  33  34]]]",
+    "reasoning": "The function computes PCA on the RGB pixel values, then applies a color distortion based on the principal components weighted by alpha values. The distortion is added to all pixels and the result is clamped to [0, 255]."
+  },
+  "starter_code": "import numpy as np\n\ndef pca_color_augmentation(image: np.ndarray, alpha: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Apply PCA color augmentation to an RGB image.\n    \n    Args:\n        image: RGB image of shape (H, W, 3) with values in [0, 255]\n        alpha: Array of 3 random coefficients for principal components\n    \n    Returns:\n        Augmented image of shape (H, W, 3) with values clamped to [0, 255]\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Mean-Centered Data and Covariance Matrix",
+      "relation_to_problem": "Computing the covariance matrix of RGB pixel values is the first critical step in PCA color augmentation, as it captures the variance and correlation structure of colors in the image.",
+      "prerequisites": [
+        "Linear Algebra Basics",
+        "Matrix Operations",
+        "Basic Statistics"
+      ],
+      "learning_objectives": [
+        "Understand why mean-centering is necessary for PCA",
+        "Compute covariance matrices from data",
+        "Interpret covariance matrix elements in terms of color relationships"
+      ],
+      "math_content": {
+        "definition": "Given a data matrix $X \\in \\mathbb{R}^{n \\times p}$ where $n$ observations have $p$ features, the **mean-centered data** is $\\bar{X} = X - \\mathbf{1}_n \\mu^T$ where $\\mu = \\frac{1}{n}\\sum_{i=1}^{n} x_i$ is the mean vector. The **sample covariance matrix** is defined as: $$C = \\frac{1}{n-1}\\bar{X}^T\\bar{X} \\in \\mathbb{R}^{p \\times p}$$",
+        "notation": "$X$: data matrix, $\\mu$: mean vector, $C$: covariance matrix, $n$: number of samples, $p$: number of features",
+        "theorem": "**Theorem (Properties of Covariance Matrix)**: The covariance matrix $C$ is (1) symmetric: $C = C^T$, (2) positive semi-definite: $x^TCx \\geq 0$ for all $x \\in \\mathbb{R}^p$, and (3) diagonal elements $C_{ii}$ represent variance of feature $i$, while off-diagonal elements $C_{ij}$ represent covariance between features $i$ and $j$.",
+        "proof_sketch": "Symmetry follows from $C^T = \\frac{1}{n-1}(\\bar{X}^T\\bar{X})^T = \\frac{1}{n-1}\\bar{X}^T\\bar{X} = C$. Positive semi-definiteness: for any $x \\in \\mathbb{R}^p$, we have $x^TCx = \\frac{1}{n-1}x^T\\bar{X}^T\\bar{X}x = \\frac{1}{n-1}||\\bar{X}x||^2 \\geq 0$.",
+        "examples": [
+          "For RGB data $X = \\begin{bmatrix}100 & 50 & 30\\\\120 & 60 & 40\\\\110 & 55 & 35\\end{bmatrix}$, compute $\\mu = [110, 55, 35]^T$, then $\\bar{X} = \\begin{bmatrix}-10 & -5 & -5\\\\10 & 5 & 5\\\\0 & 0 & 0\\end{bmatrix}$",
+          "Covariance $C = \\frac{1}{2}\\bar{X}^T\\bar{X} = \\begin{bmatrix}100 & 50 & 50\\\\50 & 25 & 25\\\\50 & 25 & 25\\end{bmatrix}$ shows strong correlation between G and B channels"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Mean Vector",
+          "latex": "$\\mu = \\frac{1}{n}\\sum_{i=1}^{n} x_i = \\frac{1}{n}X^T\\mathbf{1}_n$",
+          "description": "Compute average RGB values across all pixels"
+        },
+        {
+          "name": "Covariance Matrix",
+          "latex": "$C = \\frac{1}{n-1}\\bar{X}^T\\bar{X}$",
+          "description": "Captures variance and correlation of RGB channels"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the mean-centered data and covariance matrix for RGB pixel values. This is the foundation for PCA analysis.",
+        "function_signature": "def compute_covariance_matrix(pixels: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef compute_covariance_matrix(pixels: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:\n    \"\"\"\n    Compute mean, mean-centered data, and covariance matrix for RGB pixels.\n    \n    Args:\n        pixels: Array of shape (n, 3) containing RGB pixel values\n    \n    Returns:\n        mean: Array of shape (3,) containing mean RGB values\n        centered: Array of shape (n, 3) containing mean-centered data\n        cov_matrix: Array of shape (3, 3) containing covariance matrix\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_covariance_matrix(np.array([[100, 50, 30], [120, 60, 40], [110, 55, 35]]))",
+            "expected": "mean=[110., 55., 35.], cov_matrix shape (3,3) with cov_matrix[0,0]=100.0",
+            "explanation": "Mean should be computed correctly, and covariance matrix diagonal shows variance in each channel"
+          },
+          {
+            "input": "compute_covariance_matrix(np.array([[255, 0, 0], [0, 255, 0], [0, 0, 255]]))",
+            "expected": "High variance in diagonal, negative covariances off-diagonal",
+            "explanation": "Pure RGB colors have high variance and negative correlations"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to divide by (n-1) instead of n for sample covariance",
+        "Not properly reshaping image data from (H, W, 3) to (H*W, 3)",
+        "Using integer arithmetic instead of float, causing precision loss"
+      ],
+      "hint": "Remember that for an image of shape (H, W, 3), you need to reshape it to (H*W, 3) to get all pixels as rows before computing statistics.",
+      "references": [
+        "Sample Covariance Matrix",
+        "Mean Centering in Statistics",
+        "Variance and Covariance"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Eigenvalue Decomposition of Symmetric Matrices",
+      "relation_to_problem": "Eigenvalue decomposition of the covariance matrix reveals the principal components (eigenvectors) and their importance (eigenvalues), which determine the directions and magnitudes of color distortions.",
+      "prerequisites": [
+        "Linear Algebra",
+        "Matrix Diagonalization",
+        "Orthogonal Matrices"
+      ],
+      "learning_objectives": [
+        "Understand the spectral theorem for symmetric matrices",
+        "Compute eigenvalues and eigenvectors numerically",
+        "Interpret eigenvalues as variance explained along principal directions"
+      ],
+      "math_content": {
+        "definition": "An **eigenvalue** $\\lambda$ and **eigenvector** $v$ of a matrix $A \\in \\mathbb{R}^{n \\times n}$ satisfy: $$Av = \\lambda v, \\quad v \\neq 0$$ The **eigenvalue decomposition** is: $$A = P\\Lambda P^{-1}$$ where $P$ contains eigenvectors as columns and $\\Lambda$ is diagonal with eigenvalues.",
+        "notation": "$\\lambda_i$: $i$-th eigenvalue, $v_i$: $i$-th eigenvector, $P = [v_1 | v_2 | \\cdots | v_n]$: eigenvector matrix, $\\Lambda = \\text{diag}(\\lambda_1, \\lambda_2, \\ldots, \\lambda_n)$",
+        "theorem": "**Spectral Theorem**: Let $C \\in \\mathbb{R}^{n \\times n}$ be a real symmetric matrix. Then: (1) All eigenvalues $\\lambda_i$ are real, (2) Eigenvectors corresponding to distinct eigenvalues are orthogonal, (3) $C$ can be decomposed as $C = P\\Lambda P^T$ where $P$ is orthogonal ($P^TP = I$) and $\\Lambda$ is diagonal. Furthermore, $\\text{trace}(C) = \\sum_{i=1}^{n}\\lambda_i$ and $\\det(C) = \\prod_{i=1}^{n}\\lambda_i$.",
+        "proof_sketch": "For symmetric matrices, the characteristic polynomial has real roots (eigenvalues). For distinct $\\lambda_i \\neq \\lambda_j$ with $Cv_i = \\lambda_i v_i$ and $Cv_j = \\lambda_j v_j$, we have $\\lambda_i v_i^T v_j = (Cv_i)^T v_j = v_i^T C^T v_j = v_i^T Cv_j = \\lambda_j v_i^T v_j$, thus $(\\lambda_i - \\lambda_j)v_i^T v_j = 0$, implying $v_i^T v_j = 0$. The Gram-Schmidt process can normalize and orthogonalize eigenvectors to form $P$.",
+        "examples": [
+          "For $C = \\begin{bmatrix}3 & 1\\\\1 & 3\\end{bmatrix}$, eigenvalues are $\\lambda_1 = 4, \\lambda_2 = 2$ with eigenvectors $v_1 = \\frac{1}{\\sqrt{2}}[1, 1]^T, v_2 = \\frac{1}{\\sqrt{2}}[1, -1]^T$",
+          "For RGB covariance $C = \\begin{bmatrix}100 & 50 & 50\\\\50 & 25 & 25\\\\50 & 25 & 25\\end{bmatrix}$, the largest eigenvalue corresponds to the direction of maximum color variance"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Characteristic Equation",
+          "latex": "$\\det(C - \\lambda I) = 0$",
+          "description": "Solve to find eigenvalues"
+        },
+        {
+          "name": "Spectral Decomposition",
+          "latex": "$C = P\\Lambda P^T = \\sum_{i=1}^{n}\\lambda_i v_i v_i^T$",
+          "description": "Decompose covariance matrix for symmetric case"
+        },
+        {
+          "name": "Variance Explained",
+          "latex": "$\\text{variance explained by } v_i = \\frac{\\lambda_i}{\\sum_{j=1}^{n}\\lambda_j}$",
+          "description": "Proportion of total variance along $i$-th principal component"
+        }
+      ],
+      "exercise": {
+        "description": "Implement eigenvalue decomposition for a 3×3 symmetric covariance matrix. Return eigenvalues sorted in descending order along with their corresponding eigenvectors. This determines the principal components for color augmentation.",
+        "function_signature": "def compute_eigen_decomposition(cov_matrix: np.ndarray) -> tuple[np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef compute_eigen_decomposition(cov_matrix: np.ndarray) -> tuple[np.ndarray, np.ndarray]:\n    \"\"\"\n    Compute eigenvalue decomposition of a symmetric covariance matrix.\n    \n    Args:\n        cov_matrix: Symmetric matrix of shape (3, 3)\n    \n    Returns:\n        eigenvalues: Array of shape (3,) sorted in descending order\n        eigenvectors: Array of shape (3, 3) where column i is eigenvector for eigenvalue i\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_eigen_decomposition(np.array([[4, 2, 0], [2, 4, 0], [0, 0, 1]]))",
+            "expected": "eigenvalues approximately [6., 2., 1.], eigenvectors are orthonormal",
+            "explanation": "Eigenvalues sum to trace=9, largest eigenvalue dominates, eigenvectors should satisfy P^T P = I"
+          },
+          {
+            "input": "compute_eigen_decomposition(np.array([[100, 50, 50], [50, 25, 25], [50, 25, 25]]))",
+            "expected": "eigenvalues approximately [150., 0., 0.], rank-deficient matrix",
+            "explanation": "Covariance matrix has rank 1, so two eigenvalues are zero"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not sorting eigenvalues in descending order - PCA requires components ordered by importance",
+        "Forgetting that eigenvectors must be orthonormal (unit length and perpendicular)",
+        "Confusing left and right eigenvectors - ensure you're using column eigenvectors",
+        "Numerical instability with near-zero eigenvalues"
+      ],
+      "hint": "Use NumPy's linalg.eigh() for symmetric matrices (more stable than eig()). Remember to sort eigenvalues in descending order and reorder corresponding eigenvectors.",
+      "references": [
+        "Spectral Theorem",
+        "Principal Component Analysis",
+        "Eigenvalue Algorithms"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Principal Component Analysis (PCA) Theory",
+      "relation_to_problem": "PCA transforms the RGB color space into a new coordinate system where axes represent directions of maximum variance, enabling meaningful color augmentations along these principal directions.",
+      "prerequisites": [
+        "Covariance Matrices",
+        "Eigenvalue Decomposition",
+        "Linear Transformations"
+      ],
+      "learning_objectives": [
+        "Understand PCA as a dimensionality reduction and decorrelation technique",
+        "Compute principal components from data",
+        "Project data onto principal component space and reconstruct"
+      ],
+      "math_content": {
+        "definition": "**Principal Component Analysis (PCA)** is a technique that finds an orthogonal transformation $P$ such that the transformed data $Y = \\bar{X}P$ has a diagonal covariance matrix. The columns of $P$ are called **principal components** and are the eigenvectors of $C = \\frac{1}{n-1}\\bar{X}^T\\bar{X}$, ordered by decreasing eigenvalue magnitude. The $i$-th principal component $p_i$ points in the direction of the $i$-th largest variance in the data.",
+        "notation": "$\\bar{X} \\in \\mathbb{R}^{n \\times p}$: mean-centered data, $P \\in \\mathbb{R}^{p \\times p}$: principal component matrix, $Y = \\bar{X}P$: transformed data, $\\Lambda$: diagonal matrix of eigenvalues",
+        "theorem": "**PCA Optimality Theorem**: The first $k$ principal components span the $k$-dimensional linear subspace that minimizes the reconstruction error: $$P_k^* = \\arg\\min_{P_k \\in \\mathbb{R}^{p \\times k}, P_k^T P_k = I} \\mathbb{E}[||x - P_k P_k^T x||^2]$$ where $P_k^*$ consists of the $k$ eigenvectors with largest eigenvalues. Equivalently, they maximize the variance of the projected data: $$P_k^* = \\arg\\max_{P_k \\in \\mathbb{R}^{p \\times k}, P_k^T P_k = I} \\text{Var}(\\bar{X}P_k)$$",
+        "proof_sketch": "The total variance is $\\text{tr}(C) = \\sum_{i=1}^{p}\\lambda_i$. When projecting onto $k$ components, the retained variance is $\\sum_{i=1}^{k}\\lambda_i$. Since $\\lambda_1 \\geq \\lambda_2 \\geq \\cdots \\geq \\lambda_p$, selecting the first $k$ eigenvectors maximizes $\\sum_{i=1}^{k}\\lambda_i$, thus maximizing retained variance. For reconstruction error, $\\mathbb{E}[||x - \\hat{x}||^2] = \\sum_{i=k+1}^{p}\\lambda_i$, which is minimized by keeping the largest eigenvalues.",
+        "examples": [
+          "For RGB image data, PC1 typically represents overall brightness/intensity, PC2 represents warm vs. cool tones, PC3 represents saturation",
+          "If $C = \\text{diag}(100, 25, 1)$ (already diagonal), then data is uncorrelated and PCA components are simply the standard basis vectors"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "PCA Transformation",
+          "latex": "$Y = \\bar{X}P$",
+          "description": "Project mean-centered data onto principal components"
+        },
+        {
+          "name": "Reconstruction",
+          "latex": "$\\hat{X} = YP^T + \\mathbf{1}_n\\mu^T = \\bar{X}PP^T + \\mathbf{1}_n\\mu^T$",
+          "description": "Reconstruct original data from principal component scores"
+        },
+        {
+          "name": "Variance Retained",
+          "latex": "$\\frac{\\sum_{i=1}^{k}\\lambda_i}{\\sum_{i=1}^{p}\\lambda_i}$",
+          "description": "Proportion of variance explained by first $k$ components"
+        }
+      ],
+      "exercise": {
+        "description": "Implement full PCA on RGB pixel data: compute principal components, transform data to PC space, and verify that the transformed data has a diagonal covariance matrix. This validates the PCA process needed for color augmentation.",
+        "function_signature": "def perform_pca(pixels: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef perform_pca(pixels: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:\n    \"\"\"\n    Perform PCA on RGB pixel values.\n    \n    Args:\n        pixels: Array of shape (n, 3) containing RGB pixel values\n    \n    Returns:\n        mean: Array of shape (3,) - mean RGB values\n        principal_components: Array of shape (3, 3) - eigenvectors as columns\n        eigenvalues: Array of shape (3,) - sorted in descending order\n        transformed: Array of shape (n, 3) - data in PC space\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "perform_pca(np.array([[255, 0, 0], [0, 255, 0], [0, 0, 255], [128, 128, 128]]))",
+            "expected": "Covariance of transformed data should be diagonal (off-diagonal ≈ 0)",
+            "explanation": "PCA decorrelates the data, making covariance matrix diagonal"
+          },
+          {
+            "input": "perform_pca(np.random.randint(0, 256, (100, 3)))",
+            "expected": "Sum of eigenvalues equals trace of original covariance matrix",
+            "explanation": "PCA preserves total variance: tr(C) = sum(eigenvalues)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Applying PCA to non-centered data - must subtract mean first",
+        "Using eigenvectors of X^T X instead of covariance matrix (n-1 scaling matters)",
+        "Not checking that principal components are orthonormal",
+        "Confusing principal components (eigenvectors) with principal component scores (transformed data)"
+      ],
+      "hint": "The transformed data Y = X_centered @ P should have a diagonal covariance matrix equal to Λ. Verify this property to ensure correct PCA implementation.",
+      "references": [
+        "PCA Tutorial",
+        "Dimensionality Reduction",
+        "Karhunen-Loève Transform"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Weighted Linear Combinations and Color Space Perturbations",
+      "relation_to_problem": "The color distortion in PCA augmentation is a weighted linear combination of principal components, where weights are proportional to eigenvalues and random coefficients, creating realistic color variations.",
+      "prerequisites": [
+        "Linear Combinations",
+        "PCA",
+        "Random Sampling"
+      ],
+      "learning_objectives": [
+        "Understand how to construct perturbations in principal component space",
+        "Compute weighted sums using eigenvalues and random coefficients",
+        "Map perturbations back to original RGB space"
+      ],
+      "math_content": {
+        "definition": "A **weighted linear combination** of vectors $\\{v_1, v_2, \\ldots, v_k\\}$ with weights $\\{w_1, w_2, \\ldots, w_k\\}$ is: $$y = \\sum_{i=1}^{k} w_i v_i = w_1 v_1 + w_2 v_2 + \\cdots + w_k v_k$$ In PCA color augmentation, the perturbation is: $$\\delta = \\sum_{i=1}^{3} \\alpha_i \\sqrt{\\lambda_i} \\, p_i = P \\cdot (\\alpha \\odot \\sqrt{\\lambda})$$ where $\\alpha_i \\sim \\mathcal{N}(0, \\sigma^2)$ are random coefficients, $\\lambda_i$ are eigenvalues, $p_i$ are eigenvectors (principal components), and $\\odot$ denotes element-wise multiplication.",
+        "notation": "$\\delta \\in \\mathbb{R}^3$: color perturbation vector, $\\alpha \\in \\mathbb{R}^3$: random coefficients, $\\lambda \\in \\mathbb{R}^3$: eigenvalues, $P \\in \\mathbb{R}^{3 \\times 3}$: principal components matrix",
+        "theorem": "**AlexNet Color Augmentation**: For an RGB image with pixel matrix $X$, PCA yields $P$ (eigenvectors) and $\\lambda$ (eigenvalues). The augmented image is: $$X_{\\text{aug}} = X + \\mathbf{1}_{n} \\delta^T$$ where $\\delta = P \\cdot (\\alpha \\odot \\sqrt{\\lambda})$ and $\\alpha_i \\sim \\mathcal{N}(0, 0.1)$. This adds the same perturbation to every pixel, shifting the entire color distribution while preserving spatial structure.",
+        "proof_sketch": "The scaling by $\\sqrt{\\lambda_i}$ makes perturbations proportional to the standard deviation along each principal component (since $\\lambda_i$ is variance). Random $\\alpha_i$ samples different points in the color distribution. The matrix multiplication $P \\cdot w$ transforms from PC space back to RGB space, where $w_i = \\alpha_i \\sqrt{\\lambda_i}$ controls magnitude along the $i$-th principal direction.",
+        "examples": [
+          "If PC1 represents brightness with $\\lambda_1 = 100$, then $\\alpha_1 = 0.1$ gives perturbation $0.1 \\cdot \\sqrt{100} = 1.0$ unit of brightness change",
+          "For $\\alpha = [0.1, -0.05, 0.03]$, $\\lambda = [100, 25, 4]$, we get $w = [0.1\\cdot 10, -0.05\\cdot 5, 0.03\\cdot 2] = [1.0, -0.25, 0.06]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Weight Computation",
+          "latex": "$w_i = \\alpha_i \\sqrt{\\lambda_i}$",
+          "description": "Scale random coefficient by standard deviation of $i$-th component"
+        },
+        {
+          "name": "Perturbation Vector",
+          "latex": "$\\delta = P \\cdot w = \\sum_{i=1}^{3} w_i p_i$",
+          "description": "Transform weighted PC coefficients to RGB space"
+        },
+        {
+          "name": "Element-wise Form",
+          "latex": "$\\delta = P \\cdot (\\alpha \\odot \\sqrt{\\lambda})$",
+          "description": "Vectorized computation of perturbation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement computation of the color perturbation vector given principal components, eigenvalues, and random alpha coefficients. This directly builds the distortion component of the augmentation algorithm.",
+        "function_signature": "def compute_color_perturbation(principal_components: np.ndarray, eigenvalues: np.ndarray, alpha: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_color_perturbation(principal_components: np.ndarray, eigenvalues: np.ndarray, alpha: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute the color perturbation vector for PCA augmentation.\n    \n    Args:\n        principal_components: Array of shape (3, 3) with eigenvectors as columns\n        eigenvalues: Array of shape (3,) containing eigenvalues\n        alpha: Array of shape (3,) containing random coefficients\n    \n    Returns:\n        perturbation: Array of shape (3,) representing RGB color shift\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_color_perturbation(np.eye(3), np.array([100., 25., 4.]), np.array([0.1, -0.05, 0.03]))",
+            "expected": "np.array([1.0, -0.25, 0.06])",
+            "explanation": "With identity matrix PCs, perturbation directly equals [α₁√λ₁, α₂√λ₂, α₃√λ₃]"
+          },
+          {
+            "input": "compute_color_perturbation(np.eye(3), np.array([0., 0., 0.]), np.array([1., 1., 1.]))",
+            "expected": "np.array([0., 0., 0.])",
+            "explanation": "Zero eigenvalues result in zero perturbation regardless of alpha"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to take square root of eigenvalues - should use sqrt(λᵢ) not λᵢ",
+        "Using eigenvalues instead of eigenvectors in the linear combination",
+        "Incorrect matrix multiplication order - should be P @ weights, not weights @ P",
+        "Not handling negative eigenvalues (numerical errors) - eigenvalues should be non-negative for covariance matrices"
+      ],
+      "hint": "Remember the formula: perturbation = P @ (alpha * sqrt(eigenvalues)). The element-wise multiplication happens before the matrix-vector product.",
+      "references": [
+        "Linear Combinations",
+        "AlexNet Paper",
+        "Data Augmentation Techniques"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Pixel Value Clamping and Numerical Stability",
+      "relation_to_problem": "After applying color perturbations, pixel values may fall outside the valid [0, 255] range. Proper clamping and type handling ensures the augmented image remains valid for display and training.",
+      "prerequisites": [
+        "Array Broadcasting",
+        "Data Types",
+        "Numerical Computing"
+      ],
+      "learning_objectives": [
+        "Understand why clamping is necessary after augmentation",
+        "Handle floating-point to integer conversions correctly",
+        "Manage numerical edge cases and overflow"
+      ],
+      "math_content": {
+        "definition": "The **clamping** or **clipping** function restricts a value to a specified range $[a, b]$: $$\\text{clamp}(x, a, b) = \\begin{cases} a & \\text{if } x < a \\\\ x & \\text{if } a \\leq x \\leq b \\\\ b & \\text{if } x > b \\end{cases}$$ For RGB images, we require: $$X_{\\text{valid}} = \\text{clamp}(X_{\\text{aug}}, 0, 255)$$ where pixel values are restricted to $[0, 255]$ for 8-bit images.",
+        "notation": "$X_{\\text{aug}} \\in \\mathbb{R}^{H \\times W \\times 3}$: augmented image (may contain invalid values), $X_{\\text{valid}}$: clamped image with values in $[0, 255]$",
+        "theorem": "**Broadcasting Rule for Perturbation**: When adding a perturbation vector $\\delta \\in \\mathbb{R}^3$ to an image $X \\in \\mathbb{R}^{H \\times W \\times 3}$, NumPy broadcasting applies $\\delta$ to each pixel: $$X_{\\text{aug}}[i,j,:] = X[i,j,:] + \\delta \\quad \\forall i \\in \\{1,\\ldots,H\\}, j \\in \\{1,\\ldots,W\\}$$ This is equivalent to $X_{\\text{aug}} = X + \\mathbf{1}_{H \\times W} \\otimes \\delta$ where $\\otimes$ denotes outer product.",
+        "proof_sketch": "NumPy's broadcasting automatically expands $\\delta$ from shape $(3,)$ to match $(H, W, 3)$ by replicating along the first two dimensions. The addition $X + \\delta$ applies element-wise in the last dimension. Mathematically, this is equivalent to adding the same $\\delta$ to every pixel location, shifting the entire color distribution uniformly.",
+        "examples": [
+          "If $\\delta = [10, -5, 3]$ and pixel $p = [250, 10, 100]$, then $p_{\\text{aug}} = [260, 5, 103]$, which clamps to $[255, 5, 103]$",
+          "For grayscale perturbation $\\delta = [50, 50, 50]$ on pixel $[200, 200, 200]$, result is $[250, 250, 250]$ (brightening)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Augmentation with Broadcasting",
+          "latex": "$X_{\\text{aug}} = X + \\delta$",
+          "description": "Add perturbation to all pixels via NumPy broadcasting"
+        },
+        {
+          "name": "Clamping",
+          "latex": "$X_{\\text{valid}} = \\max(0, \\min(255, X_{\\text{aug}}))$",
+          "description": "Ensure pixel values are in valid range"
+        },
+        {
+          "name": "Type Conversion",
+          "latex": "$X_{\\text{uint8}} = \\lfloor X_{\\text{valid}} + 0.5 \\rfloor$",
+          "description": "Round to nearest integer for 8-bit representation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the final step of PCA augmentation: apply a color perturbation to an entire image and clamp the results to valid pixel range. Handle floating-point arithmetic and ensure correct output data type.",
+        "function_signature": "def apply_and_clamp_perturbation(image: np.ndarray, perturbation: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef apply_and_clamp_perturbation(image: np.ndarray, perturbation: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Apply color perturbation to image and clamp to valid range [0, 255].\n    \n    Args:\n        image: Array of shape (H, W, 3) with dtype uint8, values in [0, 255]\n        perturbation: Array of shape (3,) representing RGB shift\n    \n    Returns:\n        augmented: Array of shape (H, W, 3) with dtype uint8, values clamped to [0, 255]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "apply_and_clamp_perturbation(np.array([[[250, 10, 100]]], dtype=np.uint8), np.array([10., -5., 3.]))",
+            "expected": "np.array([[[255, 5, 103]]], dtype=np.uint8)",
+            "explanation": "Values outside [0,255] are clamped: 260→255, 5→5, 103→103"
+          },
+          {
+            "input": "apply_and_clamp_perturbation(np.ones((2, 2, 3), dtype=np.uint8) * 128, np.array([-200., 100., 50.]))",
+            "expected": "All pixels become [0, 228, 178] after clamping",
+            "explanation": "Large negative perturbation clamps first channel to 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not converting uint8 to float before adding perturbation - causes overflow/underflow",
+        "Forgetting to convert back to uint8 after clamping - leaves as float64",
+        "Using np.round() before clamp instead of after - can still produce invalid values",
+        "Clamping before adding perturbation instead of after"
+      ],
+      "hint": "Convert image to float, add perturbation, clamp to [0, 255], then convert back to uint8. Use np.clip() for efficient clamping.",
+      "references": [
+        "NumPy Broadcasting",
+        "Data Type Conversions",
+        "Image Processing Basics"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete PCA Color Augmentation Pipeline",
+      "relation_to_problem": "This integrates all previous concepts into the complete algorithm: compute PCA on RGB pixels, generate color perturbation, apply to image, and clamp. This is the exact technique used in AlexNet training.",
+      "prerequisites": [
+        "Covariance Matrix",
+        "Eigendecomposition",
+        "PCA",
+        "Linear Combinations",
+        "Array Operations"
+      ],
+      "learning_objectives": [
+        "Integrate all PCA augmentation steps into a complete pipeline",
+        "Understand the full algorithm flow from image to augmented image",
+        "Handle edge cases like rank-deficient covariance matrices"
+      ],
+      "math_content": {
+        "definition": "**PCA Color Augmentation Algorithm**: Given an RGB image $X \\in [0,255]^{H \\times W \\times 3}$ and random coefficients $\\alpha \\in \\mathbb{R}^3$:\n\n1. Reshape: $X_{\\text{flat}} \\leftarrow \\text{reshape}(X, (H \\cdot W, 3))$\n2. Center: $\\mu \\leftarrow \\text{mean}(X_{\\text{flat}})$, $\\bar{X} \\leftarrow X_{\\text{flat}} - \\mu$\n3. Covariance: $C \\leftarrow \\frac{1}{n-1}\\bar{X}^T\\bar{X}$\n4. Eigen: $(\\Lambda, P) \\leftarrow \\text{eigh}(C)$, sort descending\n5. Perturb: $\\delta \\leftarrow P \\cdot (\\alpha \\odot \\sqrt{\\Lambda})$\n6. Augment: $X_{\\text{aug}} \\leftarrow X + \\delta$\n7. Clamp: $X_{\\text{out}} \\leftarrow \\text{clip}(X_{\\text{aug}}, 0, 255)$",
+        "notation": "$H, W$: image dimensions, $n = H \\cdot W$: number of pixels, $C \\in \\mathbb{R}^{3 \\times 3}$: covariance matrix, $P \\in \\mathbb{R}^{3 \\times 3}$: eigenvectors, $\\Lambda \\in \\mathbb{R}^3$: eigenvalues",
+        "theorem": "**Augmentation Invariants**: The PCA color augmentation satisfies: (1) **Shape preservation**: $\\text{shape}(X_{\\text{out}}) = \\text{shape}(X)$, (2) **Range validity**: $X_{\\text{out}} \\in [0, 255]^{H \\times W \\times 3}$, (3) **Spatial structure**: Perturbation is uniform across all pixels, preserving spatial relationships and edges, (4) **Stochasticity**: Different $\\alpha$ values produce different augmentations from the same image.",
+        "proof_sketch": "Shape is preserved through reshape and broadcasting operations. Range validity follows from the clamping step. Spatial structure preservation: since $\\delta$ is added uniformly to all pixels, relative intensities between neighboring pixels remain approximately the same (up to clamping effects). Stochasticity is guaranteed by random sampling of $\\alpha$.",
+        "examples": [
+          "For a sunset image with warm tones, PC1 might represent overall brightness, PC2 warm/cool balance. Positive $\\alpha_2$ makes image warmer, negative makes it cooler.",
+          "For a grayscale-like image (low color saturation), eigenvalues $\\lambda_2, \\lambda_3 \\approx 0$, so augmentation primarily affects brightness via $\\lambda_1$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Full Pipeline",
+          "latex": "$X_{\\text{out}} = \\text{clip}(X + P \\cdot (\\alpha \\odot \\sqrt{\\Lambda}), 0, 255)$",
+          "description": "Complete augmentation in one expression"
+        },
+        {
+          "name": "Expected Perturbation Magnitude",
+          "latex": "$\\mathbb{E}[||\\delta||^2] = \\sum_{i=1}^{3} \\sigma_\\alpha^2 \\lambda_i$",
+          "description": "If $\\alpha_i \\sim \\mathcal{N}(0, \\sigma_\\alpha^2)$, expected squared magnitude of color shift"
+        },
+        {
+          "name": "Variance Preservation",
+          "latex": "$\\text{Var}(X_{\\text{pixels}}) \\approx \\text{Var}(X_{\\text{aug, pixels}})$",
+          "description": "Augmentation approximately preserves overall color variance"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete PCA color augmentation function that takes an RGB image and alpha coefficients, performs all steps of the algorithm, and returns the augmented image. This is the final integration exercise.",
+        "function_signature": "def pca_color_augmentation_pipeline(image: np.ndarray, alpha: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef pca_color_augmentation_pipeline(image: np.ndarray, alpha: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Apply complete PCA color augmentation pipeline.\n    \n    Args:\n        image: RGB image of shape (H, W, 3) with dtype uint8, values in [0, 255]\n        alpha: Array of 3 random coefficients for principal components\n    \n    Returns:\n        Augmented image of shape (H, W, 3) with dtype uint8, values in [0, 255]\n    \n    Steps:\n        1. Reshape image to (H*W, 3) for PCA\n        2. Compute mean and covariance matrix\n        3. Compute eigenvalues and eigenvectors\n        4. Compute perturbation vector\n        5. Apply perturbation to original image\n        6. Clamp to [0, 255] and convert to uint8\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "np.random.seed(42); img = np.random.randint(0, 256, (2, 2, 3), dtype=np.uint8); pca_color_augmentation_pipeline(img, np.array([0.1, -0.05, 0.03]))",
+            "expected": "Modified version of input image with consistent color shift applied to all pixels",
+            "explanation": "All pixels receive the same RGB perturbation computed from PCA"
+          },
+          {
+            "input": "pca_color_augmentation_pipeline(np.ones((10, 10, 3), dtype=np.uint8) * 128, np.array([0., 0., 0.]))",
+            "expected": "Unchanged image (all pixels remain [128, 128, 128])",
+            "explanation": "Zero alpha coefficients produce zero perturbation"
+          },
+          {
+            "input": "pca_color_augmentation_pipeline(np.array([[[255, 255, 255]], [[0, 0, 0]]], dtype=np.uint8), np.array([1., 1., 1.]))",
+            "expected": "Clamped to [0, 255] even with large alpha values",
+            "explanation": "Output must always be valid uint8 image regardless of alpha magnitude"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing PCA on non-reshaped image - must flatten to (H*W, 3) first",
+        "Not preserving original image shape - must reshape back to (H, W, 3)",
+        "Computing covariance on uint8 data - convert to float first to avoid overflow",
+        "Applying perturbation in wrong color space - must be in RGB space",
+        "Not handling edge case where all pixels are identical (covariance is zero)"
+      ],
+      "hint": "Follow the exact steps outlined: reshape, compute PCA components, compute perturbation, broadcast add to original image, clamp, return. Each previous exercise corresponds to one step.",
+      "references": [
+        "AlexNet Paper (Krizhevsky et al., 2012)",
+        "ImageNet Classification",
+        "Data Augmentation Survey"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,472 @@
+{
+  "problem_id": 3,
+  "title": "Reshape Matrix",
+  "category": "Linear Algebra",
+  "difficulty": "easy",
+  "description": "Write a Python function that reshapes a given matrix into a specified shape. if it cant be reshaped return back an empty list `[ ]`",
+  "example": {
+    "input": "a = [[1,2,3,4],[5,6,7,8]], new_shape = (4, 2)",
+    "output": "[[1, 2], [3, 4], [5, 6], [7, 8]]",
+    "reasoning": "The given matrix is reshaped from 2x4 to 4x2."
+  },
+  "starter_code": "import numpy as np\n\ndef reshape_matrix(a: list[list[int|float]], new_shape: tuple[int, int]) -> list[list[int|float]]:\n\t#Write your code here and return a python list after reshaping by using numpy's tolist() method\n\treturn reshaped_matrix",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Matrix Dimensions and Element Counting",
+      "relation_to_problem": "Before reshaping a matrix, we must verify that the total number of elements is preserved. This sub-quest teaches how to calculate matrix dimensions and validate reshape compatibility.",
+      "prerequisites": [
+        "Basic arithmetic",
+        "Understanding of matrix notation",
+        "Multiplication of integers"
+      ],
+      "learning_objectives": [
+        "Calculate the total number of elements in a matrix given its dimensions",
+        "Understand the relationship between matrix shape (m × n) and total element count",
+        "Verify whether two shapes have the same number of total elements"
+      ],
+      "math_content": {
+        "definition": "A matrix $M \\in \\mathbb{R}^{m \\times n}$ is a rectangular array with $m$ rows and $n$ columns. The **cardinality** (total number of elements) of $M$ is given by $|M| = m \\times n$.",
+        "notation": "$m$ = number of rows, $n$ = number of columns, $|M|$ = total element count",
+        "theorem": "**Reshape Compatibility Theorem**: A matrix $M \\in \\mathbb{R}^{m \\times n}$ can be reshaped to dimensions $p \\times q$ if and only if $mn = pq$.",
+        "proof_sketch": "Since reshaping preserves all elements without adding or removing any, the total count must remain constant. If $mn \\neq pq$, we would need to add or remove elements, which violates the definition of reshaping. Conversely, if $mn = pq$, there exists a bijection between element positions in both shapes, making the reshape valid.",
+        "examples": [
+          "Matrix $M$ with shape $(2, 4)$ has $|M| = 2 \\times 4 = 8$ elements. Can be reshaped to $(4, 2)$ since $4 \\times 2 = 8$.",
+          "Matrix $N$ with shape $(3, 5)$ has $|N| = 15$ elements. Cannot be reshaped to $(4, 4)$ since $4 \\times 4 = 16 \\neq 15$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Matrix Element Count",
+          "latex": "$|M| = m \\times n$",
+          "description": "Calculate total elements in an $m \\times n$ matrix"
+        },
+        {
+          "name": "Reshape Compatibility Condition",
+          "latex": "$m \\times n = p \\times q$",
+          "description": "Necessary and sufficient condition for reshaping from $(m,n)$ to $(p,q)$"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes the original shape (m, n) and target shape (p, q) and determines if reshaping is possible by checking if the total element counts match.",
+        "function_signature": "def can_reshape(original_shape: tuple[int, int], new_shape: tuple[int, int]) -> bool:",
+        "starter_code": "def can_reshape(original_shape: tuple[int, int], new_shape: tuple[int, int]) -> bool:\n    # Calculate total elements in original shape\n    # Calculate total elements in new shape\n    # Return True if they match, False otherwise\n    pass",
+        "test_cases": [
+          {
+            "input": "can_reshape((2, 4), (4, 2))",
+            "expected": "True",
+            "explanation": "Both shapes have 8 total elements: 2×4 = 8 and 4×2 = 8"
+          },
+          {
+            "input": "can_reshape((3, 5), (4, 4))",
+            "expected": "False",
+            "explanation": "Original has 15 elements (3×5) but target has 16 (4×4)"
+          },
+          {
+            "input": "can_reshape((1, 10), (5, 2))",
+            "expected": "True",
+            "explanation": "Both shapes have 10 elements"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle edge cases where dimensions are 0",
+        "Comparing shapes directly instead of comparing total element counts",
+        "Not validating that dimensions are positive integers"
+      ],
+      "hint": "The key insight is that reshaping is a bijection - every element in the original must map to exactly one position in the reshaped matrix.",
+      "references": [
+        "Matrix dimensions",
+        "Cardinality",
+        "Bijective functions"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Matrix Linearization and Row-Major Ordering",
+      "relation_to_problem": "Reshaping requires converting a 2D matrix into a linear sequence. This sub-quest teaches the row-major storage scheme used by Python/NumPy to flatten matrices.",
+      "prerequisites": [
+        "Matrix indexing",
+        "Array traversal",
+        "Understanding of nested loops"
+      ],
+      "learning_objectives": [
+        "Understand row-major (C-style) vs column-major (Fortran-style) ordering",
+        "Convert a 2D matrix into a 1D sequence using row-major order",
+        "Calculate the linear index for any element at position (i,j)"
+      ],
+      "math_content": {
+        "definition": "**Row-Major Ordering** (C-style): For a matrix $M \\in \\mathbb{R}^{m \\times n}$, elements are stored sequentially by rows. Element $M_{i,j}$ (0-indexed) at row $i$ and column $j$ occupies linear position $k = i \\cdot n + j$ in the flattened representation.",
+        "notation": "$M_{i,j}$ = element at row $i$, column $j$ (0-indexed), $k$ = linear index, $n$ = number of columns",
+        "theorem": "**Linearization Bijection**: The mapping $\\phi: \\{0,1,\\ldots,m-1\\} \\times \\{0,1,\\ldots,n-1\\} \\to \\{0,1,\\ldots,mn-1\\}$ defined by $\\phi(i,j) = i \\cdot n + j$ is a bijection. This establishes a one-to-one correspondence between 2D positions and linear indices.",
+        "proof_sketch": "**Injectivity**: If $(i_1, j_1) \\neq (i_2, j_2)$, then either $i_1 \\neq i_2$ or $j_1 \\neq j_2$. If $i_1 \\neq i_2$, then $|i_1 \\cdot n - i_2 \\cdot n| \\geq n > j_2 - j_1$, so $\\phi(i_1,j_1) \\neq \\phi(i_2,j_2)$. **Surjectivity**: For any $k \\in \\{0,\\ldots,mn-1\\}$, set $i = \\lfloor k/n \\rfloor$ and $j = k \\bmod n$, then $\\phi(i,j) = k$. Thus $\\phi$ is bijective.",
+        "examples": [
+          "For $M = \\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{bmatrix}$, row-major linearization gives sequence $[1, 2, 3, 4, 5, 6]$",
+          "Element $M_{1,2} = 6$ at position $(1,2)$ has linear index $k = 1 \\cdot 3 + 2 = 5$ (0-indexed)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "2D to Linear Index (Row-Major)",
+          "latex": "$k = i \\cdot n + j$",
+          "description": "Convert 2D position $(i,j)$ to linear index $k$ in row-major order"
+        },
+        {
+          "name": "Linear to 2D Position (Row-Major)",
+          "latex": "$i = \\lfloor k / n \\rfloor, \\quad j = k \\bmod n$",
+          "description": "Convert linear index $k$ back to 2D position $(i,j)$"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes a 2D matrix and returns a 1D list containing all elements in row-major order (left-to-right, top-to-bottom traversal).",
+        "function_signature": "def flatten_matrix(matrix: list[list[int|float]]) -> list[int|float]:",
+        "starter_code": "def flatten_matrix(matrix: list[list[int|float]]) -> list[int|float]:\n    # Create empty result list\n    # Iterate through rows from top to bottom\n    # For each row, iterate through columns from left to right\n    # Append each element to result\n    pass",
+        "test_cases": [
+          {
+            "input": "flatten_matrix([[1, 2, 3], [4, 5, 6]])",
+            "expected": "[1, 2, 3, 4, 5, 6]",
+            "explanation": "Elements are read row by row: first row [1,2,3], then second row [4,5,6]"
+          },
+          {
+            "input": "flatten_matrix([[1, 2], [3, 4], [5, 6], [7, 8]])",
+            "expected": "[1, 2, 3, 4, 5, 6, 7, 8]",
+            "explanation": "4×2 matrix flattened row-wise into 8 elements"
+          },
+          {
+            "input": "flatten_matrix([[10]])",
+            "expected": "[10]",
+            "explanation": "Single element matrix remains unchanged when flattened"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row-major with column-major order (iterating columns first instead of rows)",
+        "Using incorrect index formula (e.g., j·m + i instead of i·n + j)",
+        "Not handling empty matrices or single-row/single-column matrices"
+      ],
+      "hint": "Think of reading a book: you read left-to-right across each line, then move to the next line. Matrix linearization follows the same pattern.",
+      "references": [
+        "Array storage schemes",
+        "Index mapping",
+        "Matrix vectorization"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Inverse Mapping: Linear to 2D Reconstruction",
+      "relation_to_problem": "After flattening a matrix, we need to redistribute elements into a new shape. This sub-quest teaches how to map linear indices back to 2D positions in the target shape.",
+      "prerequisites": [
+        "Integer division",
+        "Modulo operation",
+        "Matrix indexing"
+      ],
+      "learning_objectives": [
+        "Convert a linear index to 2D coordinates in a target shape",
+        "Understand the inverse transformation of linearization",
+        "Apply quotient-remainder theorem for index calculation"
+      ],
+      "math_content": {
+        "definition": "**Index Reconstruction**: Given a linear sequence of $N$ elements and target shape $(p, q)$ where $pq = N$, the element at linear position $k$ (0-indexed) maps to 2D position $(i, j)$ in the reshaped matrix using: $i = \\lfloor k / q \\rfloor$ (row index) and $j = k \\bmod q$ (column index).",
+        "notation": "$k$ = linear index (0 to $N-1$), $(i,j)$ = 2D position in target shape, $q$ = number of columns in target shape",
+        "theorem": "**Division Algorithm**: For any integers $k$ and $q$ where $q > 0$, there exist unique integers $i$ (quotient) and $j$ (remainder) such that $k = i \\cdot q + j$ with $0 \\leq j < q$. This guarantees that the mapping from linear indices to 2D positions is well-defined and unique.",
+        "proof_sketch": "The division algorithm is a fundamental result in number theory. For our application: Given $k \\in \\{0, 1, \\ldots, pq-1\\}$ and target shape $(p, q)$, we have $i = \\lfloor k/q \\rfloor \\in \\{0, \\ldots, p-1\\}$ and $j = k \\bmod q \\in \\{0, \\ldots, q-1\\}$. Since $k = iq + j$ and this representation is unique, each linear index maps to exactly one 2D position.",
+        "examples": [
+          "For target shape $(4, 2)$ and linear index $k=5$: $i = \\lfloor 5/2 \\rfloor = 2$, $j = 5 \\bmod 2 = 1$, so position is $(2, 1)$",
+          "For target shape $(3, 3)$ and linear index $k=7$: $i = \\lfloor 7/3 \\rfloor = 2$, $j = 7 \\bmod 3 = 1$, so position is $(2, 1)$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Row Index from Linear Index",
+          "latex": "$i = \\lfloor k / q \\rfloor$",
+          "description": "Calculate which row an element belongs to in target shape with $q$ columns"
+        },
+        {
+          "name": "Column Index from Linear Index",
+          "latex": "$j = k \\bmod q$",
+          "description": "Calculate which column an element belongs to in target shape with $q$ columns"
+        },
+        {
+          "name": "Verification Identity",
+          "latex": "$k = i \\cdot q + j$",
+          "description": "Verify that 2D position $(i,j)$ correctly reconstructs linear index $k$"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes a flattened 1D list and a target shape (rows, cols), and returns a 2D matrix with elements redistributed according to row-major order.",
+        "function_signature": "def unflatten_to_matrix(flat_list: list[int|float], target_shape: tuple[int, int]) -> list[list[int|float]]:",
+        "starter_code": "def unflatten_to_matrix(flat_list: list[int|float], target_shape: tuple[int, int]) -> list[list[int|float]]:\n    # Extract target rows and columns\n    # Create empty 2D matrix structure\n    # For each element in flat_list at index k:\n    #   Calculate row i = k // cols\n    #   Calculate col j = k % cols\n    #   Place element at position (i, j)\n    # Return the 2D matrix\n    pass",
+        "test_cases": [
+          {
+            "input": "unflatten_to_matrix([1, 2, 3, 4, 5, 6], (2, 3))",
+            "expected": "[[1, 2, 3], [4, 5, 6]]",
+            "explanation": "6 elements into 2×3: indices 0-2 go to row 0, indices 3-5 go to row 1"
+          },
+          {
+            "input": "unflatten_to_matrix([1, 2, 3, 4, 5, 6, 7, 8], (4, 2))",
+            "expected": "[[1, 2], [3, 4], [5, 6], [7, 8]]",
+            "explanation": "8 elements into 4×2: each pair of consecutive elements forms one row"
+          },
+          {
+            "input": "unflatten_to_matrix([10, 20, 30, 40], (1, 4))",
+            "expected": "[[10, 20, 30, 40]]",
+            "explanation": "All elements go into a single row"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using the wrong divisor (using number of rows instead of columns for calculation)",
+        "Forgetting to initialize the 2D matrix structure before filling it",
+        "Off-by-one errors when converting between 0-indexed and 1-indexed positions"
+      ],
+      "hint": "The column count determines how many elements fit in each row. Use integer division to find which row, and modulo to find position within that row.",
+      "references": [
+        "Division algorithm",
+        "Quotient and remainder",
+        "Array restructuring"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Validating Matrix Input and Extracting Dimensions",
+      "relation_to_problem": "Before reshaping, we must validate that the input is a proper matrix and extract its dimensions. This sub-quest teaches how to handle real-world nested list inputs.",
+      "prerequisites": [
+        "Nested lists in Python",
+        "Type checking",
+        "Basic validation logic"
+      ],
+      "learning_objectives": [
+        "Validate that a nested list represents a valid matrix (rectangular structure)",
+        "Extract the number of rows and columns from a nested list",
+        "Handle edge cases like empty matrices and inconsistent row lengths"
+      ],
+      "math_content": {
+        "definition": "A **valid matrix** represented as a nested list must satisfy: (1) All rows have the same length (rectangular property), (2) Each row is a list of numeric values, (3) The structure has at least one element or is explicitly empty $[]$. Formally, if $M$ is represented as $[r_0, r_1, \\ldots, r_{m-1}]$ where each $r_i$ is a row, then $|r_0| = |r_1| = \\cdots = |r_{m-1}| = n$ for some fixed $n$.",
+        "notation": "$m$ = number of rows, $n$ = number of columns, $r_i$ = $i$-th row, $|r_i|$ = length of $i$-th row",
+        "theorem": "**Matrix Regularity Condition**: A nested list $L = [r_0, r_1, \\ldots, r_{m-1}]$ represents a valid $m \\times n$ matrix if and only if: (1) $m \\geq 1$ or $L = []$, (2) For all $i \\in \\{0, \\ldots, m-1\\}$, $|r_i| = n$ for some constant $n \\geq 1$.",
+        "proof_sketch": "**Necessity**: If $L$ represents a valid matrix, it must be rectangular by definition, so all rows have equal length. **Sufficiency**: If all rows have equal length $n$, we can define a bijection to $\\mathbb{R}^{m \\times n}$ by mapping $r_i[j]$ to $M_{i,j}$. This bijection preserves the matrix structure.",
+        "examples": [
+          "Valid matrix: $[[1,2,3], [4,5,6]]$ has 2 rows, both with 3 elements → $2 \\times 3$ matrix",
+          "Invalid matrix: $[[1,2], [3,4,5]]$ has inconsistent row lengths (2 vs 3) → not a valid matrix",
+          "Edge case: $[[]]$ is ambiguous; $[]$ represents empty matrix with shape $(0, 0)$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Row Count",
+          "latex": "$m = |L|$",
+          "description": "Number of rows equals the length of the outer list"
+        },
+        {
+          "name": "Column Count",
+          "latex": "$n = |r_0|$ (if $m > 0$)",
+          "description": "Number of columns equals the length of the first row (when matrix is non-empty)"
+        },
+        {
+          "name": "Regularity Check",
+          "latex": "$\\forall i \\in \\{0,\\ldots,m-1\\}: |r_i| = n$",
+          "description": "All rows must have the same length for valid matrix"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes a nested list and returns its shape as (rows, cols). If the input is not a valid rectangular matrix, return None. Handle empty matrices by returning (0, 0).",
+        "function_signature": "def get_matrix_shape(matrix: list[list[int|float]]) -> tuple[int, int] | None:",
+        "starter_code": "def get_matrix_shape(matrix: list[list[int|float]]) -> tuple[int, int] | None:\n    # Handle empty matrix case\n    # Get number of rows\n    # Get number of columns from first row\n    # Check all rows have same length\n    # Return (rows, cols) if valid, None otherwise\n    pass",
+        "test_cases": [
+          {
+            "input": "get_matrix_shape([[1, 2, 3], [4, 5, 6]])",
+            "expected": "(2, 3)",
+            "explanation": "Valid 2×3 matrix with all rows having 3 elements"
+          },
+          {
+            "input": "get_matrix_shape([[1, 2], [3, 4, 5]])",
+            "expected": "None",
+            "explanation": "Invalid matrix: row 1 has 2 elements but row 2 has 3 elements"
+          },
+          {
+            "input": "get_matrix_shape([])",
+            "expected": "(0, 0)",
+            "explanation": "Empty matrix has shape (0, 0)"
+          },
+          {
+            "input": "get_matrix_shape([[1, 2, 3, 4]])",
+            "expected": "(1, 4)",
+            "explanation": "Single-row matrix is valid"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling empty matrix case separately",
+        "Assuming first row length without checking remaining rows",
+        "Not validating that each row is actually a list",
+        "Returning (1, 0) instead of (0, 0) for empty matrices"
+      ],
+      "hint": "Check the length of the first row to determine column count, then verify all other rows match this length.",
+      "references": [
+        "Matrix representation",
+        "Data validation",
+        "Rectangular arrays"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Error Handling and Edge Case Management",
+      "relation_to_problem": "The problem requires returning an empty list [] when reshaping is impossible. This sub-quest teaches how to identify and handle all failure conditions gracefully.",
+      "prerequisites": [
+        "Conditional logic",
+        "Return statements",
+        "Understanding of function contracts"
+      ],
+      "learning_objectives": [
+        "Identify all conditions under which reshaping should fail",
+        "Implement proper error handling without raising exceptions",
+        "Return appropriate default values for invalid inputs"
+      ],
+      "math_content": {
+        "definition": "**Reshape Validity Conditions**: A reshape operation from shape $(m, n)$ to shape $(p, q)$ is valid if and only if: (1) Input is a valid rectangular matrix, (2) $m \\times n = p \\times q$ (element count preservation), (3) $p \\geq 0$ and $q \\geq 0$ (non-negative dimensions). If any condition fails, the operation is **undefined** and must return a sentinel value.",
+        "notation": "$(m, n)$ = original shape, $(p, q)$ = target shape, $\\emptyset$ = empty result (represented as $[]$ in Python)",
+        "theorem": "**Failure Mode Completeness**: The set of failure conditions $\\mathcal{F} = \\{F_1, F_2, F_3\\}$ where $F_1$ = \"invalid input matrix\", $F_2$ = \"element count mismatch\", $F_3$ = \"negative dimensions\" is complete. That is, if none of these conditions hold, the reshape operation is guaranteed to succeed.",
+        "proof_sketch": "We show that $\\mathcal{F}$ covers all possible failure modes: (1) If input is invalid, reshape is undefined by definition. (2) If $mn \\neq pq$, bijection doesn't exist (proven in sub-quest 1). (3) If $p < 0$ or $q < 0$, the target shape is not a valid dimension specification. These exhaust all failure possibilities; their negation implies success.",
+        "examples": [
+          "Input $[[1,2], [3]]$ fails $F_1$ (invalid matrix: inconsistent row lengths)",
+          "Reshape $(2,3) \\to (2,2)$ fails $F_2$ (element count: $6 \\neq 4$)",
+          "Target shape $(3, -1)$ fails $F_3$ (negative dimension is invalid)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Validity Predicate",
+          "latex": "$V(M, (p,q)) = \\text{valid}(M) \\land (mn = pq) \\land (p \\geq 0) \\land (q \\geq 0)$",
+          "description": "Boolean predicate indicating whether reshape is valid"
+        },
+        {
+          "name": "Output Function",
+          "latex": "$\\text{reshape}(M, (p,q)) = \\begin{cases} M' & \\text{if } V(M, (p,q)) \\\\ \\emptyset & \\text{otherwise} \\end{cases}$",
+          "description": "Return reshaped matrix or empty list based on validity"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that validates whether a reshape operation should proceed. Return True if valid, False if any error condition is detected. Check: matrix validity, dimension compatibility, and target shape validity.",
+        "function_signature": "def validate_reshape(matrix: list[list[int|float]], target_shape: tuple[int, int]) -> bool:",
+        "starter_code": "def validate_reshape(matrix: list[list[int|float]], target_shape: tuple[int, int]) -> bool:\n    # Check if matrix is valid (all rows same length)\n    # Get original shape (m, n)\n    # Extract target dimensions (p, q)\n    # Check if p >= 0 and q >= 0\n    # Check if m*n == p*q\n    # Return True only if all checks pass\n    pass",
+        "test_cases": [
+          {
+            "input": "validate_reshape([[1, 2, 3], [4, 5, 6]], (2, 3))",
+            "expected": "True",
+            "explanation": "Valid matrix with shape (2,3), target (2,3) has same element count"
+          },
+          {
+            "input": "validate_reshape([[1, 2], [3, 4]], (3, 2))",
+            "expected": "False",
+            "explanation": "Valid matrix but 2×2=4 ≠ 3×2=6, element count mismatch"
+          },
+          {
+            "input": "validate_reshape([[1, 2], [3, 4, 5]], (2, 2))",
+            "expected": "False",
+            "explanation": "Invalid matrix (irregular rows), fails even before dimension check"
+          },
+          {
+            "input": "validate_reshape([[1, 2, 3, 4]], (-1, 4))",
+            "expected": "False",
+            "explanation": "Negative dimension in target shape is invalid"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Checking only element count without validating matrix structure",
+        "Allowing negative dimensions in target shape",
+        "Not handling the case where target shape has zero dimensions",
+        "Raising exceptions instead of returning False"
+      ],
+      "hint": "Validate in order: first check input validity, then check target shape validity, finally check element count compatibility.",
+      "references": [
+        "Precondition checking",
+        "Defensive programming",
+        "Function contracts"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Reshape Operation with Integration",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts to implement the complete reshape algorithm: validate input, flatten, check compatibility, and reconstruct in the new shape.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Function composition",
+        "Algorithm design"
+      ],
+      "learning_objectives": [
+        "Integrate multiple operations into a cohesive algorithm",
+        "Implement the complete reshape pipeline with proper error handling",
+        "Apply the mathematical theory to produce a working solution"
+      ],
+      "math_content": {
+        "definition": "**Complete Reshape Algorithm**: Given matrix $M \\in \\mathbb{R}^{m \\times n}$ and target shape $(p, q)$, the reshape operation $\\Phi: \\mathbb{R}^{m \\times n} \\to \\mathbb{R}^{p \\times q} \\cup \\{\\emptyset\\}$ is defined as the composition $\\Phi = \\psi \\circ \\phi$ where $\\phi$ flattens the matrix to a linear sequence and $\\psi$ reconstructs it in the target shape, provided $mn = pq$.",
+        "notation": "$\\phi: \\mathbb{R}^{m \\times n} \\to \\mathbb{R}^{mn}$ = linearization map, $\\psi: \\mathbb{R}^{pq} \\to \\mathbb{R}^{p \\times q}$ = reconstruction map, $\\Phi = \\psi \\circ \\phi$ = complete reshape",
+        "theorem": "**Reshape Correctness**: If $mn = pq$, then $\\Phi(M)$ produces a matrix $M' \\in \\mathbb{R}^{p \\times q}$ such that: (1) $M'$ contains all elements of $M$ in their original order under row-major linearization, (2) Element $M_{i,j}$ in the original matrix appears at position $M'_{i',j'}$ where $k = in + j$ and $k = i'q + j'$ for the same linear index $k$.",
+        "proof_sketch": "The composition $\\Phi = \\psi \\circ \\phi$ works as follows: $\\phi(M)$ creates a bijection from 2D positions in $M$ to linear indices $\\{0, \\ldots, mn-1\\}$. Since $mn = pq$, we can define $\\psi$ as a bijection from $\\{0, \\ldots, pq-1\\}$ to 2D positions in $M'$. The composition $\\psi \\circ \\phi$ is thus a bijection from $M$ to $M'$ that preserves element ordering in linear space.",
+        "examples": [
+          "For $M = \\begin{bmatrix} 1 & 2 & 3 & 4 \\\\ 5 & 6 & 7 & 8 \\end{bmatrix}$ and target $(4,2)$: $\\phi(M) = [1,2,3,4,5,6,7,8]$, then $\\psi([1,2,3,4,5,6,7,8]) = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\\\ 5 & 6 \\\\ 7 & 8 \\end{bmatrix}$",
+          "Element $M_{1,2} = 7$ at position $(1,2)$ has linear index $k = 1 \\cdot 4 + 2 = 6$. In target shape $(4,2)$, index 6 maps to row $\\lfloor 6/2 \\rfloor = 3$, column $6 \\bmod 2 = 0$, giving $M'_{3,0} = 7$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Reshape Composition",
+          "latex": "$\\Phi(M) = \\psi(\\phi(M))$",
+          "description": "Reshape as composition of flatten and reconstruct operations"
+        },
+        {
+          "name": "Element Position Transformation",
+          "latex": "$M_{i,j} \\xrightarrow{k = in+j} M'_{\\lfloor k/q \\rfloor, k \\bmod q}$",
+          "description": "Direct formula for where element at $(i,j)$ ends up in reshaped matrix"
+        },
+        {
+          "name": "Algorithm Complexity",
+          "latex": "$O(mn) = O(pq)$",
+          "description": "Time complexity is linear in the number of elements (necessary to copy all data)"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that implements the complete reshape pipeline. Use functions from previous sub-quests (or reimplement their logic): validate input, flatten to 1D, check dimension compatibility, reconstruct to target shape. Return empty list [] for any invalid input or incompatible dimensions.",
+        "function_signature": "def reshape_with_validation(matrix: list[list[int|float]], target_shape: tuple[int, int]) -> list[list[int|float]]:",
+        "starter_code": "def reshape_with_validation(matrix: list[list[int|float]], target_shape: tuple[int, int]) -> list[list[int|float]]:\n    # Step 1: Validate matrix structure and get original shape\n    # Step 2: Check if target shape is valid (non-negative dimensions)\n    # Step 3: Verify element count compatibility\n    # Step 4: Flatten matrix to 1D list\n    # Step 5: Reconstruct into target shape\n    # Return result or [] if any validation fails\n    pass",
+        "test_cases": [
+          {
+            "input": "reshape_with_validation([[1, 2, 3, 4], [5, 6, 7, 8]], (4, 2))",
+            "expected": "[[1, 2], [3, 4], [5, 6], [7, 8]]",
+            "explanation": "Valid reshape from 2×4 to 4×2, all 8 elements redistributed"
+          },
+          {
+            "input": "reshape_with_validation([[1, 2], [3, 4]], (1, 4))",
+            "expected": "[[1, 2, 3, 4]]",
+            "explanation": "Valid reshape from 2×2 to 1×4, flattening to single row"
+          },
+          {
+            "input": "reshape_with_validation([[1, 2, 3], [4, 5, 6]], (4, 2))",
+            "expected": "[]",
+            "explanation": "Invalid: 2×3=6 elements cannot fill 4×2=8 positions"
+          },
+          {
+            "input": "reshape_with_validation([[1, 2], [3, 4, 5]], (2, 2))",
+            "expected": "[]",
+            "explanation": "Invalid input matrix with irregular rows"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not validating input before attempting to reshape",
+        "Forgetting to check for negative or zero dimensions in edge cases",
+        "Implementing column-major instead of row-major ordering",
+        "Not returning empty list [] when reshape fails",
+        "Attempting to reshape without verifying element count compatibility"
+      ],
+      "hint": "This combines all previous sub-quests: validation (sub-quest 4-5), flattening (sub-quest 2), compatibility check (sub-quest 1), and reconstruction (sub-quest 3). Handle each step sequentially with early exit on failure.",
+      "references": [
+        "Algorithm composition",
+        "Function pipelines",
+        "Matrix transformations",
+        "NumPy reshape operation"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "title": "Feature Scaling Implementation",
+  "description": "V3JpdGUgYSBQeXRob24gZnVuY3Rpb24gdGhhdCBwZXJmb3JtcyBmZWF0dXJlIHNjYWxpbmcgb24gYSBkYXRhc2V0IHVzaW5nIGJvdGggc3RhbmRhcmRpemF0aW9uIGFuZCBtaW4tbWF4IG5vcm1hbGl6YXRpb24uIFRoZSBmdW5jdGlvbiBzaG91bGQgdGFrZSBhIDJEIE51bVB5IGFycmF5IGFzIGlucHV0LCB3aGVyZSBlYWNoIHJvdyByZXByZXNlbnRzIGEgZGF0YSBzYW1wbGUgYW5kIGVhY2ggY29sdW1uIHJlcHJlc2VudHMgYSBmZWF0dXJlLiBJdCBzaG91bGQgcmV0dXJuIHR3byAyRCBOdW1QeSBhcnJheXM6IG9uZSBzY2FsZWQgYnkgc3RhbmRhcmRpemF0aW9uIGFuZCBvbmUgYnkgbWluLW1heCBub3JtYWxpemF0aW9uLiBNYWtlIHN1cmUgYWxsIHJlc3VsdHMgYXJlIHJvdW5kZWQgdG8gdGhlIG5lYXJlc3QgNHRoIGRlY2ltYWwu",
+  "mdx_file": "4dd47007-3ac7-45ba-a3e4-fee0545e0c0c.mdx",
+  "tinygrad_difficulty": "easy",
+  "tinygrad_starter_code": "ZnJvbSB0aW55Z3JhZC50ZW5zb3IgaW1wb3J0IFRlbnNvcgoKZGVmIGZlYXR1cmVfc2NhbGluZ190ZyhkYXRhKSAtPiB0dXBsZVtUZW5zb3IsIFRlbnNvcl06CiAgICAiIiIKICAgIFN0YW5kYXJkaXplIGFuZCBNaW4tTWF4IG5vcm1hbGl6ZSBpbnB1dCBkYXRhIHVzaW5nIHRpbnlncmFkLgogICAgSW5wdXQ6IFRlbnNvciBvciBjb252ZXJ0aWJsZSBvZiBzaGFwZSAobSxuKS4KICAgIFJldHVybnMgKHN0YW5kYXJkaXplZF9kYXRhLCBub3JtYWxpemVkX2RhdGEpLCBib3RoIHJvdW5kZWQgdG8gNCBkZWNpbWFscy4KICAgICIiIgogICAgZGF0YV90ID0gVGVuc29yKGRhdGEpLmZsb2F0KCkKICAgICMgWW91ciBpbXBsZW1lbnRhdGlvbiBoZXJlCiAgICBwYXNzCg==",
+  "test_cases": [
+    {
+      "test": "print(feature_scaling(np.array([[1, 2], [3, 4], [5, 6]])))",
+      "expected_output": "([[-1.2247, -1.2247], [0.0, 0.0], [1.2247, 1.2247]], [[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])"
+    }
+  ],
+  "pytorch_difficulty": "easy",
+  "likes": "0",
+  "difficulty": "easy",
+  "video": "https://youtu.be/RrEbO-lbg84?si=hk2qk-26eUyXh0Ee",
+  "cuda_test_cases": [
+    {
+      "test": "#include <iostream>\n#include <vector>\n#include <utility>\nstd::pair<std::vector<std::vector<float>>, std::vector<std::vector<float>>> feature_scaling(const std::vector<std::vector<float>>& data);\nint main() { auto [s,n]=feature_scaling({{1,2},{3,4},{5,6}}); std::cout<<\"Standardized: [[\"<<s[0][0]<<\", \"<<s[0][1]<<\"], [\"<<s[1][0]<<\", \"<<s[1][1]<<\"], [\"<<s[2][0]<<\", \"<<s[2][1]<<\"]]\"<<std::endl; std::cout<<\"Normalized: [[\"<<n[0][0]<<\", \"<<n[0][1]<<\"], [\"<<n[1][0]<<\", \"<<n[1][1]<<\"], [\"<<n[2][0]<<\", \"<<n[2][1]<<\"]]\"<<std::endl; return 0; }",
+      "expected_output": "Standardized: [[-1.2247, -1.2247], [0, 0], [1.2247, 1.2247]]\nNormalized: [[0, 0], [0.5, 0.5], [1, 1]]"
+    }
+  ],
+  "cuda_difficulty": "easy",
+  "example": {
+    "input": "data = np.array([[1, 2], [3, 4], [5, 6]])",
+    "output": "([[-1.2247, -1.2247], [0.0, 0.0], [1.2247, 1.2247]], [[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])",
+    "reasoning": "Standardization rescales the feature to have a mean of 0 and a standard deviation of 1.\n        Min-max normalization rescales the feature to a range of [0, 1], where the minimum feature value\n        maps to 0 and the maximum to 1."
+  },
+  "dislikes": "0",
+  "category": "Machine Learning",
+  "starter_code": "def feature_scaling(data: np.ndarray) -> (np.ndarray, np.ndarray):\n\t# Your code here\n\treturn standardized_data, normalized_data",
+  "learn_section": "CiMjIEZlYXR1cmUgU2NhbGluZyBUZWNobmlxdWVzCgpGZWF0dXJlIHNjYWxpbmcgaXMgY3J1Y2lhbCBpbiBtYW55IG1hY2hpbmUgbGVhcm5pbmcgYWxnb3JpdGhtcyB0aGF0IGFyZSBzZW5zaXRpdmUgdG8gdGhlIG1hZ25pdHVkZSBvZiBmZWF0dXJlcy4gVGhpcyBpbmNsdWRlcyBhbGdvcml0aG1zIHRoYXQgdXNlIGRpc3RhbmNlIG1lYXN1cmVzLCBsaWtlIGstbmVhcmVzdCBuZWlnaGJvcnMsIGFuZCBncmFkaWVudCBkZXNjZW50LWJhc2VkIGFsZ29yaXRobXMsIGxpa2UgbGluZWFyIHJlZ3Jlc3Npb24uCgojIyMgU3RhbmRhcmRpemF0aW9uClN0YW5kYXJkaXphdGlvbiAob3IgWi1zY29yZSBub3JtYWxpemF0aW9uKSBpcyB0aGUgcHJvY2VzcyB3aGVyZSBmZWF0dXJlcyBhcmUgcmVzY2FsZWQgc28gdGhhdCB0aGV5IGhhdmUgdGhlIHByb3BlcnRpZXMgb2YgYSBzdGFuZGFyZCBub3JtYWwgZGlzdHJpYnV0aW9uIHdpdGggYSBtZWFuIG9mIHplcm8gYW5kIGEgc3RhbmRhcmQgZGV2aWF0aW9uIG9mIG9uZToKJCQKeiA9IFxmcmFjeyh4IC0gXG11KX17XHNpZ21hfQokJAp3aGVyZSBcKCB4IFwpIGlzIHRoZSBvcmlnaW5hbCBmZWF0dXJlLCBcKCBcbXUgXCkgaXMgdGhlIG1lYW4gb2YgdGhhdCBmZWF0dXJlLCBhbmQgXCggXHNpZ21hIFwpIGlzIHRoZSBzdGFuZGFyZCBkZXZpYXRpb24uCgojIyMgTWluLU1heCBOb3JtYWxpemF0aW9uCk1pbi1tYXggbm9ybWFsaXphdGlvbiByZXNjYWxlcyB0aGUgZmVhdHVyZSB0byBhIGZpeGVkIHJhbmdlLCB0eXBpY2FsbHkgMCB0byAxLCBvciBpdCBjYW4gYmUgc2hpZnRlZCB0byBhbnkgcmFuZ2UgXChbYSwgYl1cKSBieSB0cmFuc2Zvcm1pbmcgdGhlIGRhdGEgdXNpbmcgdGhlIGZvcm11bGE6CiQkCngnID0gXGZyYWN7KHggLSBcdGV4dHttaW59KHgpKX17KFx0ZXh0e21heH0oeCkgLSBcdGV4dHttaW59KHgpKX0gXHRpbWVzIChcdGV4dHttYXh9IC0gXHRleHR7bWlufSkgKyBcdGV4dHttaW59CiQkCndoZXJlIFwoIHggXCkgaXMgdGhlIG9yaWdpbmFsIHZhbHVlLCBcKCBcdGV4dHttaW59KHgpIFwpIGlzIHRoZSBtaW5pbXVtIHZhbHVlIGZvciB0aGF0IGZlYXR1cmUsIFwoIFx0ZXh0e21heH0oeCkgXCkgaXMgdGhlIG1heGltdW0gdmFsdWUsIGFuZCBcKCBcdGV4dHttaW59IFwpIGFuZCBcKCBcdGV4dHttYXh9IFwpIGFyZSB0aGUgbmV3IG1pbmltdW0gYW5kIG1heGltdW0gdmFsdWVzIGZvciB0aGUgc2NhbGVkIGRhdGEuCgojIyMgS2V5IFBvaW50cwotICoqRXF1YWwgQ29udHJpYnV0aW9uKio6IEltcGxlbWVudGluZyB0aGVzZSBzY2FsaW5nIHRlY2huaXF1ZXMgZW5zdXJlcyB0aGF0IGZlYXR1cmVzIGNvbnRyaWJ1dGUgZXF1YWxseSB0byB0aGUgZGV2ZWxvcG1lbnQgb2YgdGhlIG1vZGVsLgotICoqSW1wcm92ZWQgQ29udmVyZ2VuY2UqKjogRmVhdHVyZSBzY2FsaW5nIGNhbiBzaWduaWZpY2FudGx5IGltcHJvdmUgdGhlIGNvbnZlcmdlbmNlIHNwZWVkIG9mIGxlYXJuaW5nIGFsZ29yaXRobXMuCgpUaGlzIHN0cnVjdHVyZWQgZXhwbGFuYXRpb24gb3V0bGluZXMgdGhlIGltcG9ydGFuY2Ugb2YgZmVhdHVyZSBzY2FsaW5nIGFuZCBkZXNjcmliZXMgdHdvIGNvbW1vbmx5IHVzZWQgdGVjaG5pcXVlcyB3aXRoIHRoZWlyIG1hdGhlbWF0aWNhbCBmb3JtdWxhcy4K",
+  "cuda_starter_code": "I2luY2x1ZGUgPGN1ZGFfcnVudGltZS5oPgojaW5jbHVkZSA8aW9zdHJlYW0+CiNpbmNsdWRlIDx2ZWN0b3I+CiNpbmNsdWRlIDx1dGlsaXR5PgoKc3RkOjpwYWlyPHN0ZDo6dmVjdG9yPHN0ZDo6dmVjdG9yPGZsb2F0Pj4sIHN0ZDo6dmVjdG9yPHN0ZDo6dmVjdG9yPGZsb2F0Pj4+IGZlYXR1cmVfc2NhbGluZyhjb25zdCBzdGQ6OnZlY3RvcjxzdGQ6OnZlY3RvcjxmbG9hdD4+JiBkYXRhKTs=",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/moe18",
+      "name": "Moe Chabot"
+    }
+  ],
+  "pytorch_test_cases": [
+    {
+      "test": "import torch\nstd, norm = feature_scaling([[1.0,2.0],[3.0,4.0],[5.0,6.0]])\nprint(std.numpy().tolist(), norm.numpy().tolist())",
+      "expected_output": "[[-1.2246999740600586, -1.2246999740600586], [0.0, 0.0], [1.2246999740600586, 1.2246999740600586]] [[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]]"
+    },
+    {
+      "test": "import torch\nstd, norm = feature_scaling(torch.tensor([[10.0,0.0],[20.0,5.0]]))\nprint(std.numpy().tolist(), norm.numpy().tolist())",
+      "expected_output": "[[-1.0, -1.0], [1.0, 1.0]] [[0.0, 0.0], [1.0, 1.0]]"
+    }
+  ],
+  "tinygrad_test_cases": [
+    {
+      "test": "from tinygrad.tensor import Tensor\nstd, norm = feature_scaling_tg([[1.0,2.0],[3.0,4.0],[5.0,6.0]])\nprint(std.numpy().tolist(), norm.numpy().tolist())",
+      "expected_output": "[[-1.2247, -1.2247], [0.0, 0.0], [1.2247, 1.2247]] [[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]]"
+    },
+    {
+      "test": "from tinygrad.tensor import Tensor\nstd, norm = feature_scaling_tg(Tensor([[10.0,0.0],[20.0,5.0]]))\nprint(std.numpy().tolist(), norm.numpy().tolist())",
+      "expected_output": "[[-1.0, -1.0], [1.0, 1.0]] [[0.0, 0.0], [1.0, 1.0]]"
+    }
+  ],
+  "pytorch_starter_code": "aW1wb3J0IHRvcmNoCgpkZWYgZmVhdHVyZV9zY2FsaW5nKGRhdGEpIC0+IHR1cGxlW3RvcmNoLlRlbnNvciwgdG9yY2guVGVuc29yXToKICAgICIiIgogICAgU3RhbmRhcmRpemUgYW5kIE1pbi1NYXggbm9ybWFsaXplIGlucHV0IGRhdGEgdXNpbmcgUHlUb3JjaC4KICAgIElucHV0OiBUZW5zb3Igb3IgY29udmVydGlibGUgb2Ygc2hhcGUgKG0sbikuCiAgICBSZXR1cm5zIChzdGFuZGFyZGl6ZWRfZGF0YSwgbm9ybWFsaXplZF9kYXRhKSwgYm90aCByb3VuZGVkIHRvIDQgZGVjaW1hbHMuCiAgICAiIiIKICAgIGRhdGFfdCA9IHRvcmNoLmFzX3RlbnNvcihkYXRhLCBkdHlwZT10b3JjaC5mbG9hdCkKICAgICMgWW91ciBpbXBsZW1lbnRhdGlvbiBoZXJlCiAgICBwYXNzCg==",
+  "description_decoded": "Write a Python function that performs feature scaling on a dataset using both standardization and min-max normalization. The function should take a 2D NumPy array as input, where each row represents a data sample and each column represents a feature. It should return two 2D NumPy arrays: one scaled by standardization and one by min-max normalization. Make sure all results are rounded to the nearest 4th decimal.",
+  "learn_section_decoded": "\n## Feature Scaling Techniques\n\nFeature scaling is crucial in many machine learning algorithms that are sensitive to the magnitude of features. This includes algorithms that use distance measures, like k-nearest neighbors, and gradient descent-based algorithms, like linear regression.\n\n### Standardization\nStandardization (or Z-score normalization) is the process where features are rescaled so that they have the properties of a standard normal distribution with a mean of zero and a standard deviation of one:\n$$\nz = \\frac{(x - \\mu)}{\\sigma}\n$$\nwhere \\( x \\) is the original feature, \\( \\mu \\) is the mean of that feature, and \\( \\sigma \\) is the standard deviation.\n\n### Min-Max Normalization\nMin-max normalization rescales the feature to a fixed range, typically 0 to 1, or it can be shifted to any range \\([a, b]\\) by transforming the data using the formula:\n$$\nx' = \\frac{(x - \\text{min}(x))}{(\\text{max}(x) - \\text{min}(x))} \\times (\\text{max} - \\text{min}) + \\text{min}\n$$\nwhere \\( x \\) is the original value, \\( \\text{min}(x) \\) is the minimum value for that feature, \\( \\text{max}(x) \\) is the maximum value, and \\( \\text{min} \\) and \\( \\text{max} \\) are the new minimum and maximum values for the scaled data.\n\n### Key Points\n- **Equal Contribution**: Implementing these scaling techniques ensures that features contribute equally to the development of the model.\n- **Improved Convergence**: Feature scaling can significantly improve the convergence speed of learning algorithms.\n\nThis structured explanation outlines the importance of feature scaling and describes two commonly used techniques with their mathematical formulas.\n",
+  "tinygrad_starter_code_decoded": "from tinygrad.tensor import Tensor\n\ndef feature_scaling_tg(data) -> tuple[Tensor, Tensor]:\n    \"\"\"\n    Standardize and Min-Max normalize input data using tinygrad.\n    Input: Tensor or convertible of shape (m,n).\n    Returns (standardized_data, normalized_data), both rounded to 4 decimals.\n    \"\"\"\n    data_t = Tensor(data).float()\n    # Your implementation here\n    pass\n"
+}

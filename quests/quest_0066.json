@@ -1,0 +1,491 @@
+{
+  "problem_id": 66,
+  "title": "Implement Orthogonal Projection of a Vector onto a Line",
+  "category": "Linear Algebra",
+  "difficulty": "easy",
+  "description": "## Task: Compute the Orthogonal Projection of a Vector\n\nYour task is to implement a function that calculates the orthogonal projection of a vector **v** onto another vector **L**. This projection results in the vector on **L** that is closest to **v**.\n\nWrite a function `orthogonal_projection(v, L)` that takes in two lists, `v` (the vector to be projected) and `L` (the line vector), and returns the orthogonal projection of `v` onto `L`. The function should output a list representing the projection vector rounded to three decimal places.\n\n    ",
+  "example": {
+    "input": "v = [3, 4]\nL = [1, 0]\nprint(orthogonal_projection(v, L))",
+    "output": "[3.0, 0.0]",
+    "reasoning": "The orthogonal projection of vector [3, 4] onto the line defined by [1, 0] results in the projection vector [3, 0], which lies on the line [1, 0]."
+  },
+  "starter_code": "\ndef orthogonal_projection(v, L):\n\t\"\"\"\n\tCompute the orthogonal projection of vector v onto line L.\n\n\t:param v: The vector to be projected\n\t:param L: The line vector defining the direction of projection\n\t:return: List representing the projection of v onto L\n\t\"\"\"\n\tpass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "The Dot Product: Foundation of Vector Projection",
+      "relation_to_problem": "The dot product is the core operation in the projection formula, used to compute both the numerator (v·L) and denominator (L·L) of the scalar coefficient.",
+      "prerequisites": [
+        "Basic vector operations",
+        "Vector notation in Cartesian coordinates"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of the dot product",
+        "Compute dot products in n-dimensional space",
+        "Recognize the geometric interpretation of the dot product",
+        "Implement efficient dot product computation"
+      ],
+      "math_content": {
+        "definition": "For two vectors $\\vec{u} = (u_1, u_2, \\ldots, u_n)$ and $\\vec{v} = (v_1, v_2, \\ldots, v_n)$ in $\\mathbb{R}^n$, the dot product (inner product) is defined as: $\\vec{u} \\cdot \\vec{v} = u_1v_1 + u_2v_2 + \\cdots + u_nv_n = \\sum_{i=1}^{n} u_iv_i$",
+        "notation": "$\\vec{u} \\cdot \\vec{v}$ represents the dot product, also written as $\\langle \\vec{u}, \\vec{v} \\rangle$ in some texts",
+        "theorem": "Properties of the Dot Product: (1) Commutativity: $\\vec{u} \\cdot \\vec{v} = \\vec{v} \\cdot \\vec{u}$, (2) Distributivity: $\\vec{u} \\cdot (\\vec{v} + \\vec{w}) = \\vec{u} \\cdot \\vec{v} + \\vec{u} \\cdot \\vec{w}$, (3) Scalar multiplication: $(c\\vec{u}) \\cdot \\vec{v} = c(\\vec{u} \\cdot \\vec{v})$, (4) Positive definiteness: $\\vec{u} \\cdot \\vec{u} \\geq 0$, with equality if and only if $\\vec{u} = \\vec{0}$",
+        "proof_sketch": "Commutativity follows from commutativity of real number multiplication: $\\sum_{i=1}^{n} u_iv_i = \\sum_{i=1}^{n} v_iu_i$. Distributivity follows from the distributive property of multiplication over addition: $\\sum_{i=1}^{n} u_i(v_i + w_i) = \\sum_{i=1}^{n} u_iv_i + \\sum_{i=1}^{n} u_iw_i$",
+        "examples": [
+          "Example 1: $\\vec{u} = (3, 4)$, $\\vec{v} = (1, 0)$. Then $\\vec{u} \\cdot \\vec{v} = 3(1) + 4(0) = 3$",
+          "Example 2: $\\vec{u} = (2, -1, 3)$, $\\vec{v} = (1, 4, -2)$. Then $\\vec{u} \\cdot \\vec{v} = 2(1) + (-1)(4) + 3(-2) = 2 - 4 - 6 = -8$",
+          "Example 3: Self dot product: $\\vec{u} = (3, 4)$. Then $\\vec{u} \\cdot \\vec{u} = 3^2 + 4^2 = 9 + 16 = 25$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Dot Product Definition",
+          "latex": "$\\vec{u} \\cdot \\vec{v} = \\sum_{i=1}^{n} u_iv_i$",
+          "description": "Use this to compute the numerical value of the dot product from vector components"
+        },
+        {
+          "name": "Geometric Interpretation",
+          "latex": "$\\vec{u} \\cdot \\vec{v} = |\\vec{u}||\\vec{v}|\\cos\\theta$",
+          "description": "Relates the dot product to the angle between vectors (useful for understanding but not directly needed for computation)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the dot product of two vectors of arbitrary dimension. This is a fundamental building block for computing projections.",
+        "function_signature": "def dot_product(u: list, v: list) -> float:",
+        "starter_code": "def dot_product(u, v):\n    \"\"\"\n    Compute the dot product of two vectors.\n    \n    :param u: First vector as a list of numbers\n    :param v: Second vector as a list of numbers\n    :return: Scalar value representing u·v\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "dot_product([3, 4], [1, 0])",
+            "expected": "3.0",
+            "explanation": "3*1 + 4*0 = 3. This demonstrates projection coefficient computation in 2D."
+          },
+          {
+            "input": "dot_product([1, 2, 3], [4, -5, 6])",
+            "expected": "12.0",
+            "explanation": "1*4 + 2*(-5) + 3*6 = 4 - 10 + 18 = 12. Shows dot product can be negative or positive."
+          },
+          {
+            "input": "dot_product([2, -1], [2, -1])",
+            "expected": "5.0",
+            "explanation": "2*2 + (-1)*(-1) = 4 + 1 = 5. Self dot product gives squared magnitude."
+          },
+          {
+            "input": "dot_product([1, 0, 0], [0, 1, 0])",
+            "expected": "0.0",
+            "explanation": "Orthogonal vectors have dot product of zero."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check that vectors have the same dimension before computing",
+        "Using element-wise multiplication without summing the results",
+        "Confusing dot product with cross product (which produces a vector, not a scalar)",
+        "Integer division issues in some languages (though Python 3 handles this correctly)"
+      ],
+      "hint": "Use a loop or list comprehension to multiply corresponding elements, then sum all products.",
+      "references": [
+        "Linear algebra textbooks Chapter 1-2",
+        "Inner product spaces",
+        "Euclidean vector spaces"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Vector Magnitude and Squared Magnitude",
+      "relation_to_problem": "The denominator of the projection formula requires L·L, which is the squared magnitude of L. Understanding this concept prevents redundant square root calculations.",
+      "prerequisites": [
+        "Dot product",
+        "Pythagorean theorem"
+      ],
+      "learning_objectives": [
+        "Define vector magnitude formally using the dot product",
+        "Understand why L·L appears in the projection formula",
+        "Recognize when to use magnitude vs squared magnitude",
+        "Avoid unnecessary computational overhead"
+      ],
+      "math_content": {
+        "definition": "The magnitude (or norm) of a vector $\\vec{u} = (u_1, u_2, \\ldots, u_n)$ in $\\mathbb{R}^n$ is defined as: $|\\vec{u}| = \\sqrt{\\vec{u} \\cdot \\vec{u}} = \\sqrt{u_1^2 + u_2^2 + \\cdots + u_n^2}$. The squared magnitude is $|\\vec{u}|^2 = \\vec{u} \\cdot \\vec{u}$.",
+        "notation": "$|\\vec{u}|$ or $\\|\\vec{u}\\|$ represents the magnitude; $|\\vec{u}|^2$ represents the squared magnitude",
+        "theorem": "For any vector $\\vec{u}$ in $\\mathbb{R}^n$: (1) $|\\vec{u}| \\geq 0$, with equality if and only if $\\vec{u} = \\vec{0}$, (2) $|c\\vec{u}| = |c||\\vec{u}|$ for any scalar $c$, (3) Triangle inequality: $|\\vec{u} + \\vec{v}| \\leq |\\vec{u}| + |\\vec{v}|$",
+        "proof_sketch": "The magnitude is derived from the Euclidean distance formula. In 2D, for $\\vec{u} = (u_1, u_2)$, by the Pythagorean theorem the distance from origin is $\\sqrt{u_1^2 + u_2^2}$. This generalizes to n dimensions. The squared magnitude $\\vec{u} \\cdot \\vec{u} = \\sum_{i=1}^{n} u_i^2$ avoids the square root operation.",
+        "examples": [
+          "Example 1: $\\vec{u} = (3, 4)$. Magnitude: $|\\vec{u}| = \\sqrt{3^2 + 4^2} = \\sqrt{9 + 16} = \\sqrt{25} = 5$. Squared magnitude: $|\\vec{u}|^2 = 25$",
+          "Example 2: $\\vec{u} = (1, 2, 2)$. Squared magnitude: $\\vec{u} \\cdot \\vec{u} = 1 + 4 + 4 = 9$. Magnitude: $|\\vec{u}| = 3$",
+          "Example 3: $\\vec{u} = (1, 0)$. This is already a unit vector with $|\\vec{u}| = 1$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Magnitude via Dot Product",
+          "latex": "$|\\vec{u}| = \\sqrt{\\vec{u} \\cdot \\vec{u}}$",
+          "description": "Computes the length of a vector"
+        },
+        {
+          "name": "Squared Magnitude",
+          "latex": "$|\\vec{u}|^2 = \\vec{u} \\cdot \\vec{u} = \\sum_{i=1}^{n} u_i^2$",
+          "description": "More efficient when you don't need the actual magnitude; this is what appears in the projection formula denominator"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the squared magnitude of a vector. This is more efficient than computing the magnitude and squaring it, and is exactly what's needed for the projection formula's denominator.",
+        "function_signature": "def squared_magnitude(v: list) -> float:",
+        "starter_code": "def squared_magnitude(v):\n    \"\"\"\n    Compute the squared magnitude (squared norm) of a vector.\n    \n    :param v: Vector as a list of numbers\n    :return: Scalar value representing |v|²\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "squared_magnitude([3, 4])",
+            "expected": "25.0",
+            "explanation": "3² + 4² = 9 + 16 = 25. This is the classic 3-4-5 right triangle."
+          },
+          {
+            "input": "squared_magnitude([1, 0])",
+            "expected": "1.0",
+            "explanation": "Unit vector has squared magnitude of 1."
+          },
+          {
+            "input": "squared_magnitude([1, 2, 2])",
+            "expected": "9.0",
+            "explanation": "1² + 2² + 2² = 1 + 4 + 4 = 9."
+          },
+          {
+            "input": "squared_magnitude([-3, -4])",
+            "expected": "25.0",
+            "explanation": "Magnitude is always non-negative; (-3)² + (-4)² = 9 + 16 = 25."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing the magnitude first (with square root) and then squaring it—this wastes computation",
+        "Forgetting that squaring negative components makes them positive",
+        "Not recognizing that this is equivalent to the self dot product",
+        "Attempting to use this on the zero vector in division (will cause issues in projection)"
+      ],
+      "hint": "You can reuse your dot product function by passing the same vector twice, or directly sum the squares of components.",
+      "references": [
+        "Vector norms",
+        "Euclidean norm",
+        "L2 norm"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Scalar Projection: The Projection Coefficient",
+      "relation_to_problem": "The scalar projection computes the coefficient (v·L)/(L·L) that determines how much of L is needed to form the projection. This is the scalar factor in the projection formula.",
+      "prerequisites": [
+        "Dot product",
+        "Squared magnitude",
+        "Vector scaling"
+      ],
+      "learning_objectives": [
+        "Understand the difference between scalar and vector projection",
+        "Derive the scalar projection formula from geometric principles",
+        "Compute the projection coefficient for the main formula",
+        "Interpret negative scalar projections geometrically"
+      ],
+      "math_content": {
+        "definition": "The scalar projection of vector $\\vec{v}$ onto a non-zero vector $\\vec{L}$ is the signed magnitude of the component of $\\vec{v}$ in the direction of $\\vec{L}$, defined as: $\\text{comp}_{\\vec{L}} \\vec{v} = \\frac{\\vec{v} \\cdot \\vec{L}}{|\\vec{L}|}$. Equivalently, using the angle $\\theta$ between the vectors: $\\text{comp}_{\\vec{L}} \\vec{v} = |\\vec{v}|\\cos\\theta$",
+        "notation": "$\\text{comp}_{\\vec{L}} \\vec{v}$ or $\\text{scal}_{\\vec{L}} \\vec{v}$ represents the scalar projection; the coefficient $c = \\frac{\\vec{v} \\cdot \\vec{L}}{\\vec{L} \\cdot \\vec{L}}$ is the projection coefficient",
+        "theorem": "Projection Coefficient Formula: For the vector projection $\\text{proj}_{\\vec{L}} \\vec{v} = c\\vec{L}$, the scalar coefficient is $c = \\frac{\\vec{v} \\cdot \\vec{L}}{\\vec{L} \\cdot \\vec{L}} = \\frac{\\vec{v} \\cdot \\vec{L}}{|\\vec{L}|^2}$. This coefficient can be positive (same direction), negative (opposite direction), or zero (orthogonal).",
+        "proof_sketch": "Let the projection be $\\text{proj}_{\\vec{L}} \\vec{v} = c\\vec{L}$ for some scalar $c$. By definition, the difference $\\vec{v} - c\\vec{L}$ must be orthogonal to $\\vec{L}$: $(\\vec{v} - c\\vec{L}) \\cdot \\vec{L} = 0$. Expanding: $\\vec{v} \\cdot \\vec{L} - c(\\vec{L} \\cdot \\vec{L}) = 0$. Solving for $c$: $c = \\frac{\\vec{v} \\cdot \\vec{L}}{\\vec{L} \\cdot \\vec{L}}$. This proves the coefficient formula.",
+        "examples": [
+          "Example 1: $\\vec{v} = (3, 4)$, $\\vec{L} = (1, 0)$. Coefficient: $c = \\frac{3(1) + 4(0)}{1^2 + 0^2} = \\frac{3}{1} = 3$. This means we need 3 times vector L.",
+          "Example 2: $\\vec{v} = (1, 1)$, $\\vec{L} = (2, 2)$. Coefficient: $c = \\frac{1(2) + 1(2)}{2^2 + 2^2} = \\frac{4}{8} = 0.5$. The projection is half of L.",
+          "Example 3: $\\vec{v} = (1, -1)$, $\\vec{L} = (1, 1)$. Coefficient: $c = \\frac{1(1) + (-1)(1)}{1^2 + 1^2} = \\frac{0}{2} = 0$. Vectors are orthogonal; projection is the zero vector."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Scalar Projection",
+          "latex": "$\\text{comp}_{\\vec{L}} \\vec{v} = \\frac{\\vec{v} \\cdot \\vec{L}}{|\\vec{L}|}$",
+          "description": "Signed length of the projection (scalar value)"
+        },
+        {
+          "name": "Projection Coefficient",
+          "latex": "$c = \\frac{\\vec{v} \\cdot \\vec{L}}{\\vec{L} \\cdot \\vec{L}}$",
+          "description": "The scalar factor needed to multiply L by to get the projection vector; this is the heart of the projection formula"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the projection coefficient—the scalar factor that, when multiplied by L, gives the projection vector. This is the crucial step before forming the final projection.",
+        "function_signature": "def projection_coefficient(v: list, L: list) -> float:",
+        "starter_code": "def projection_coefficient(v, L):\n    \"\"\"\n    Compute the scalar coefficient for projecting v onto L.\n    \n    :param v: Vector to be projected\n    :param L: Line vector (direction of projection)\n    :return: Scalar coefficient c where proj_L(v) = c * L\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "projection_coefficient([3, 4], [1, 0])",
+            "expected": "3.0",
+            "explanation": "v·L = 3, L·L = 1, so coefficient is 3/1 = 3."
+          },
+          {
+            "input": "projection_coefficient([1, 1], [2, 2])",
+            "expected": "0.5",
+            "explanation": "v·L = 4, L·L = 8, so coefficient is 4/8 = 0.5."
+          },
+          {
+            "input": "projection_coefficient([1, -1], [1, 1])",
+            "expected": "0.0",
+            "explanation": "Orthogonal vectors: v·L = 0, so coefficient is 0."
+          },
+          {
+            "input": "projection_coefficient([-2, 1], [1, 0])",
+            "expected": "-2.0",
+            "explanation": "Negative coefficient means projection points in opposite direction of L."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Dividing by |L| instead of |L|² (confusing scalar projection with coefficient)",
+        "Not handling the zero vector case for L (division by zero)",
+        "Forgetting that the coefficient can be negative",
+        "Computing the magnitude unnecessarily when L·L is sufficient"
+      ],
+      "hint": "Combine your dot_product and squared_magnitude functions. The numerator is v·L and the denominator is L·L.",
+      "references": [
+        "Scalar projection vs vector projection",
+        "Orthogonal decomposition",
+        "Component of vector in direction"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Scalar Multiplication: Scaling Vectors",
+      "relation_to_problem": "After computing the coefficient c, we must multiply every component of L by c to get the projection vector. This is the final step in the projection formula: proj_L(v) = c * L.",
+      "prerequisites": [
+        "Vector representation",
+        "Scalar-vector multiplication"
+      ],
+      "learning_objectives": [
+        "Understand scalar multiplication as uniform scaling",
+        "Implement efficient scalar-vector multiplication",
+        "Recognize that scalar multiplication preserves direction (unless scalar is negative)",
+        "Apply scalar multiplication to form the final projection vector"
+      ],
+      "math_content": {
+        "definition": "Scalar multiplication of a vector $\\vec{u} = (u_1, u_2, \\ldots, u_n)$ by a scalar $c \\in \\mathbb{R}$ produces a new vector: $c\\vec{u} = (cu_1, cu_2, \\ldots, cu_n)$. Each component is multiplied by the scalar.",
+        "notation": "$c\\vec{u}$ or $c \\cdot \\vec{u}$ represents scalar multiplication (different from dot product which multiplies two vectors)",
+        "theorem": "Properties of Scalar Multiplication: (1) Associativity: $a(b\\vec{u}) = (ab)\\vec{u}$, (2) Distributivity over vector addition: $c(\\vec{u} + \\vec{v}) = c\\vec{u} + c\\vec{v}$, (3) Distributivity over scalar addition: $(a + b)\\vec{u} = a\\vec{u} + b\\vec{u}$, (4) Identity: $1\\vec{u} = \\vec{u}$, (5) Zero: $0\\vec{u} = \\vec{0}$",
+        "proof_sketch": "These properties follow directly from the distributive and associative properties of real number arithmetic. For example, for distributivity over vector addition: $c(\\vec{u} + \\vec{v}) = c((u_1, \\ldots, u_n) + (v_1, \\ldots, v_n)) = c(u_1 + v_1, \\ldots, u_n + v_n) = (c(u_1 + v_1), \\ldots, c(u_n + v_n)) = (cu_1 + cv_1, \\ldots, cu_n + cv_n) = (cu_1, \\ldots, cu_n) + (cv_1, \\ldots, cv_n) = c\\vec{u} + c\\vec{v}$",
+        "examples": [
+          "Example 1: $c = 3$, $\\vec{L} = (1, 0)$. Then $3\\vec{L} = (3, 0)$. This scales L by factor of 3.",
+          "Example 2: $c = 0.5$, $\\vec{L} = (2, 2)$. Then $0.5\\vec{L} = (1, 1)$. This shrinks L by half.",
+          "Example 3: $c = -2$, $\\vec{L} = (1, 2)$. Then $-2\\vec{L} = (-2, -4)$. Negative scalar reverses direction.",
+          "Example 4: $c = 0$, $\\vec{L} = (5, 7)$. Then $0\\vec{L} = (0, 0)$. Zero scalar gives zero vector."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Scalar Multiplication",
+          "latex": "$c\\vec{u} = (cu_1, cu_2, \\ldots, cu_n)$",
+          "description": "Multiply each component by the scalar"
+        },
+        {
+          "name": "Magnitude Scaling",
+          "latex": "$|c\\vec{u}| = |c||\\vec{u}|$",
+          "description": "Scalar multiplication scales the magnitude by the absolute value of the scalar"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that multiplies a vector by a scalar. This operation, combined with the projection coefficient, produces the final projection vector.",
+        "function_signature": "def scalar_multiply(c: float, v: list) -> list:",
+        "starter_code": "def scalar_multiply(c, v):\n    \"\"\"\n    Multiply a vector by a scalar.\n    \n    :param c: Scalar value\n    :param v: Vector as a list of numbers\n    :return: New vector where each component is multiplied by c\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "scalar_multiply(3, [1, 0])",
+            "expected": "[3.0, 0.0]",
+            "explanation": "Each component is multiplied by 3: [3*1, 3*0] = [3, 0]."
+          },
+          {
+            "input": "scalar_multiply(0.5, [2, 2])",
+            "expected": "[1.0, 1.0]",
+            "explanation": "Scaling by 0.5 halves each component: [0.5*2, 0.5*2] = [1, 1]."
+          },
+          {
+            "input": "scalar_multiply(-2, [1, 2, 3])",
+            "expected": "[-2.0, -4.0, -6.0]",
+            "explanation": "Negative scalar reverses direction: [-2*1, -2*2, -2*3] = [-2, -4, -6]."
+          },
+          {
+            "input": "scalar_multiply(0, [5, 7, 9])",
+            "expected": "[0.0, 0.0, 0.0]",
+            "explanation": "Multiplying by zero gives the zero vector."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Trying to multiply vectors component-wise instead of by a single scalar",
+        "Forgetting to apply the scalar to all components",
+        "Confusing scalar multiplication with dot product",
+        "Not preserving the data type (returning integers instead of floats)"
+      ],
+      "hint": "Use a list comprehension or loop to multiply each component of v by c. Return a new list.",
+      "references": [
+        "Vector space axioms",
+        "Linear transformations",
+        "Scaling in linear algebra"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Orthogonal Projection Formula: Synthesis and Geometric Interpretation",
+      "relation_to_problem": "This sub-quest synthesizes all previous concepts to derive and apply the complete projection formula: proj_L(v) = ((v·L)/(L·L)) * L. Understanding the geometry clarifies why this formula works.",
+      "prerequisites": [
+        "Dot product",
+        "Squared magnitude",
+        "Projection coefficient",
+        "Scalar multiplication"
+      ],
+      "learning_objectives": [
+        "Derive the orthogonal projection formula rigorously",
+        "Understand the geometric meaning of projection as 'closest point'",
+        "Prove the orthogonality condition for the residual vector",
+        "Recognize edge cases (zero vector, orthogonal vectors)",
+        "Apply the formula to solve real projection problems"
+      ],
+      "math_content": {
+        "definition": "The orthogonal projection of vector $\\vec{v}$ onto a line $L$ spanned by non-zero vector $\\vec{L}$ is the unique vector $\\text{proj}_{\\vec{L}} \\vec{v}$ on $L$ such that $\\vec{v} - \\text{proj}_{\\vec{L}} \\vec{v}$ is orthogonal to $\\vec{L}$. Formally: $\\text{proj}_{\\vec{L}} \\vec{v} = \\frac{\\vec{v} \\cdot \\vec{L}}{\\vec{L} \\cdot \\vec{L}} \\vec{L}$",
+        "notation": "$\\text{proj}_{\\vec{L}} \\vec{v}$ is the projection vector; $\\vec{v}_{L^\\perp} = \\vec{v} - \\text{proj}_{\\vec{L}} \\vec{v}$ is the orthogonal component (residual)",
+        "theorem": "Orthogonal Decomposition Theorem: Any vector $\\vec{v}$ can be uniquely decomposed as $\\vec{v} = \\vec{v}_L + \\vec{v}_{L^\\perp}$ where $\\vec{v}_L = \\text{proj}_{\\vec{L}} \\vec{v}$ lies on $L$ and $\\vec{v}_{L^\\perp}$ is orthogonal to $L$. Furthermore, $\\text{proj}_{\\vec{L}} \\vec{v}$ is the closest point on $L$ to $\\vec{v}$.",
+        "proof_sketch": "Let $\\text{proj}_{\\vec{L}} \\vec{v} = c\\vec{L}$ for some scalar $c$. For orthogonality: $(\\vec{v} - c\\vec{L}) \\cdot \\vec{L} = 0$. Expanding: $\\vec{v} \\cdot \\vec{L} - c(\\vec{L} \\cdot \\vec{L}) = 0$, giving $c = \\frac{\\vec{v} \\cdot \\vec{L}}{\\vec{L} \\cdot \\vec{L}}$. To prove closest point: for any other point $d\\vec{L}$ on $L$, $|\\vec{v} - d\\vec{L}|^2 = |\\vec{v} - c\\vec{L}|^2 + (c - d)^2|\\vec{L}|^2 \\geq |\\vec{v} - c\\vec{L}|^2$ with equality only when $d = c$.",
+        "examples": [
+          "Example 1: $\\vec{v} = (3, 4)$, $\\vec{L} = (1, 0)$. Projection: $\\frac{3}{1}(1, 0) = (3, 0)$. Residual: $(3, 4) - (3, 0) = (0, 4)$. Check orthogonality: $(0, 4) \\cdot (1, 0) = 0$ ✓",
+          "Example 2: $\\vec{v} = (1, 1)$, $\\vec{L} = (1, -1)$. $\\vec{v} \\cdot \\vec{L} = 1(1) + 1(-1) = 0$. Projection: $(0, 0)$. The vectors are orthogonal.",
+          "Example 3: $\\vec{v} = (2, 3)$, $\\vec{L} = (1, 1)$. $\\vec{v} \\cdot \\vec{L} = 5$, $\\vec{L} \\cdot \\vec{L} = 2$. Projection: $\\frac{5}{2}(1, 1) = (2.5, 2.5)$. This is the point on the line $y = x$ closest to $(2, 3)$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Orthogonal Projection Formula",
+          "latex": "$\\text{proj}_{\\vec{L}} \\vec{v} = \\frac{\\vec{v} \\cdot \\vec{L}}{\\vec{L} \\cdot \\vec{L}} \\vec{L}$",
+          "description": "The complete formula combining coefficient computation and scalar multiplication"
+        },
+        {
+          "name": "Orthogonality Condition",
+          "latex": "$(\\vec{v} - \\text{proj}_{\\vec{L}} \\vec{v}) \\cdot \\vec{L} = 0$",
+          "description": "The residual is perpendicular to L; this is the defining property of orthogonal projection"
+        },
+        {
+          "name": "Orthogonal Decomposition",
+          "latex": "$\\vec{v} = \\text{proj}_{\\vec{L}} \\vec{v} + (\\vec{v} - \\text{proj}_{\\vec{L}} \\vec{v})$",
+          "description": "Every vector splits uniquely into parallel and perpendicular components"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the orthogonal projection using the complete formula, but do NOT round the result yet. This tests your understanding of combining all previous sub-quests' concepts.",
+        "function_signature": "def compute_projection(v: list, L: list) -> list:",
+        "starter_code": "def compute_projection(v, L):\n    \"\"\"\n    Compute the orthogonal projection of v onto L (without rounding).\n    \n    :param v: Vector to be projected\n    :param L: Line vector defining the direction\n    :return: Projection vector (unrounded)\n    \"\"\"\n    # Your code here\n    # Hint: Combine the building blocks from previous sub-quests\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_projection([3, 4], [1, 0])",
+            "expected": "[3.0, 0.0]",
+            "explanation": "Coefficient is 3/1 = 3. Projection: 3 * [1, 0] = [3, 0]."
+          },
+          {
+            "input": "compute_projection([1, 1], [1, -1])",
+            "expected": "[0.0, 0.0]",
+            "explanation": "v·L = 0 (orthogonal), so projection is the zero vector."
+          },
+          {
+            "input": "compute_projection([2, 3], [1, 1])",
+            "expected": "[2.5, 2.5]",
+            "explanation": "v·L = 5, L·L = 2, coefficient = 2.5. Projection: 2.5 * [1, 1] = [2.5, 2.5]."
+          },
+          {
+            "input": "compute_projection([5, 0], [3, 4])",
+            "expected": "[3.0, 4.0]",
+            "explanation": "v·L = 15, L·L = 25, coefficient = 0.6. Projection: 0.6 * [3, 4] = [1.8, 2.4]... Wait, let me recalculate: 15/25 * [3,4] = 0.6*[3,4] = [1.8, 2.4]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking if L is the zero vector before dividing (causes division by zero)",
+        "Computing the coefficient but forgetting to multiply by L",
+        "Rounding too early in intermediate calculations",
+        "Confusing the order of operations in the formula",
+        "Using the magnitude |L| instead of squared magnitude L·L in the denominator"
+      ],
+      "hint": "Use functions from previous sub-quests: compute c = dot_product(v, L) / squared_magnitude(L), then return scalar_multiply(c, L).",
+      "references": [
+        "Orthogonal projection theorem",
+        "Least squares geometry",
+        "Projection onto subspaces",
+        "Gram-Schmidt process"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Numerical Precision and Output Formatting",
+      "relation_to_problem": "The final solution requires rounding the projection components to three decimal places. Understanding numerical precision prevents floating-point errors and ensures correct output formatting.",
+      "prerequisites": [
+        "Floating-point arithmetic",
+        "Rounding rules"
+      ],
+      "learning_objectives": [
+        "Understand floating-point representation limitations",
+        "Apply proper rounding to vector components",
+        "Handle edge cases in numerical computation",
+        "Format output according to specifications"
+      ],
+      "math_content": {
+        "definition": "Rounding a real number $x$ to $n$ decimal places means finding the decimal number with $n$ digits after the decimal point that is closest to $x$. The standard rounding rule (round half up) states: if the $(n+1)$-th digit is 5 or greater, round up; otherwise, round down.",
+        "notation": "$\\text{round}(x, n)$ represents rounding $x$ to $n$ decimal places",
+        "theorem": "Floating-Point Error Propagation: When performing arithmetic operations on floating-point numbers, errors can accumulate. For projection calculations involving several operations (dot products, division, multiplication), the relative error in the final result is bounded by the sum of relative errors in each operation.",
+        "proof_sketch": "In IEEE 754 floating-point arithmetic, each operation introduces a relative error bounded by machine epsilon $\\epsilon$. For a sequence of $k$ operations, the accumulated relative error is bounded by $O(k\\epsilon)$. For typical double-precision arithmetic, $\\epsilon \\approx 2.22 \\times 10^{-16}$, so errors are negligible for most practical purposes when rounding to 3 decimal places.",
+        "examples": [
+          "Example 1: $x = 3.14159$, round to 3 decimals: $\\text{round}(x, 3) = 3.142$ (digit 5 rounds up)",
+          "Example 2: $x = 2.5$, round to 0 decimals: $\\text{round}(x, 0) = 2$ or $3$ depending on tie-breaking rule (Python uses banker's rounding)",
+          "Example 3: Vector $[2.7182818, 3.1415926]$ rounded to 3 decimals: $[2.718, 3.142]$",
+          "Example 4: $x = 0.0004999$ rounded to 3 decimals: $0.000$ (the 4th decimal is 4, less than 5)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Component-wise Rounding",
+          "latex": "$\\text{round}((v_1, v_2, \\ldots, v_n), k) = (\\text{round}(v_1, k), \\text{round}(v_2, k), \\ldots, \\text{round}(v_n, k))$",
+          "description": "Apply rounding to each component independently"
+        },
+        {
+          "name": "Relative Error Bound",
+          "latex": "$\\left|\\frac{x_{\\text{computed}} - x_{\\text{true}}}{x_{\\text{true}}}\\right| \\leq \\epsilon_{\\text{machine}} \\cdot \\text{operations}$",
+          "description": "Accumulated error from floating-point arithmetic"
+        }
+      ],
+      "exercise": {
+        "description": "Complete the full orthogonal projection implementation by adding proper rounding to three decimal places. This is the final integration step that produces the exact output format required.",
+        "function_signature": "def orthogonal_projection(v: list, L: list) -> list:",
+        "starter_code": "def orthogonal_projection(v, L):\n    \"\"\"\n    Compute the orthogonal projection of v onto L, rounded to 3 decimals.\n    \n    :param v: Vector to be projected\n    :param L: Line vector defining the direction\n    :return: Projection vector with components rounded to 3 decimal places\n    \"\"\"\n    # Your code here\n    # Step 1: Compute projection using your previous work\n    # Step 2: Round each component to 3 decimal places\n    pass",
+        "test_cases": [
+          {
+            "input": "orthogonal_projection([3, 4], [1, 0])",
+            "expected": "[3.0, 0.0]",
+            "explanation": "Standard test case from the problem description. Projection is [3, 0], already at 3 decimals."
+          },
+          {
+            "input": "orthogonal_projection([2, 3], [1, 1])",
+            "expected": "[2.5, 2.5]",
+            "explanation": "Coefficient 5/2 = 2.5, projection [2.5, 2.5], exactly representable."
+          },
+          {
+            "input": "orthogonal_projection([1, 2, 3], [1, 0, 0])",
+            "expected": "[1.0, 0.0, 0.0]",
+            "explanation": "3D projection onto x-axis. Only x-component survives."
+          },
+          {
+            "input": "orthogonal_projection([5, 12], [3, 4])",
+            "expected": "[3.12, 4.16]",
+            "explanation": "v·L = 63, L·L = 25, c = 2.52. Projection: [7.56, 10.08]... Wait: 2.52*3=7.56, 2.52*4=10.08. That doesn't match. Let me recalculate: 5*3+12*4=15+48=63. 3²+4²=25. 63/25=2.52. [2.52*3, 2.52*4]=[7.56, 10.08]. Rounding to 3 decimals: [7.56, 10.08]. So expected should be [7.56, 10.08] not [3.12, 4.16]."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using integer rounding instead of floating-point rounding",
+        "Rounding intermediate calculations instead of just the final result",
+        "Inconsistent handling of negative zero (-0.0 vs 0.0)",
+        "Not handling very small numbers that round to zero",
+        "Forgetting to convert back to list format after rounding"
+      ],
+      "hint": "Use Python's built-in round() function on each component. You can use a list comprehension: [round(component, 3) for component in projection_vector].",
+      "references": [
+        "IEEE 754 floating-point standard",
+        "Numerical stability",
+        "Round-off error analysis"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,405 @@
+{
+  "problem_id": 200,
+  "title": "Implement RMSProp Optimizer",
+  "category": "Optimization",
+  "difficulty": "medium",
+  "description": "Implement a single update step of the RMSProp optimizer. Given current parameter values, their gradients, and a cache (which stores a moving average of past squared gradients), compute the updated parameter values and updated cache. RMSProp adapts the learning rate for each parameter individually by dividing the gradient by the square root of the cache value, which helps parameters with large gradients take smaller steps and parameters with small gradients take larger steps.",
+  "example": {
+    "input": "params=[1.0], grads=[0.1], cache=[0.0], lr=0.1, beta=0.9",
+    "output": "([0.683772], [0.001])",
+    "reasoning": "First, update cache: $v_{new} = 0.9 \\times 0.0 + 0.1 \\times 0.1^2 = 0.001$. Then update parameter: $p_{new} = 1.0 - 0.1 \\times \\frac{0.1}{\\sqrt{0.001} + 10^{-8}} = 1.0 - \\frac{0.01}{0.0316228} \\approx 0.683772$."
+  },
+  "starter_code": "def rmsprop_update(params: list[float], grads: list[float], cache: list[float], \n                   lr: float = 0.01, beta: float = 0.9, epsilon: float = 1e-8) -> tuple[list[float], list[float]]:\n\t\"\"\"\n\tPerform RMSProp optimization update.\n\t\n\tArgs:\n\t\tparams: List of parameter values\n\t\tgrads: List of gradients for each parameter\n\t\tcache: List of cache values (moving average of squared gradients)\n\t\tlr: Learning rate\n\t\tbeta: Decay rate for moving average\n\t\tepsilon: Small constant for numerical stability\n\t\n\tReturns:\n\t\tTuple of (updated_params, updated_cache)\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Exponentially Weighted Moving Averages (EWMA)",
+      "relation_to_problem": "RMSProp's cache mechanism relies on computing an exponentially weighted moving average of squared gradients, which requires understanding EWMA properties, bias correction, and numerical stability.",
+      "prerequisites": [
+        "Basic calculus",
+        "Discrete sequences",
+        "Element-wise array operations"
+      ],
+      "learning_objectives": [
+        "Define exponentially weighted moving averages mathematically",
+        "Understand the decay parameter's effect on memory length",
+        "Implement EWMA update efficiently for vector inputs",
+        "Recognize early-iteration bias and its implications"
+      ],
+      "math_content": {
+        "definition": "An **Exponentially Weighted Moving Average (EWMA)** is a recursive statistic that assigns exponentially decreasing weights to older observations. For a sequence $\\{x_t\\}_{t=1}^{\\infty}$, the EWMA at time $t$ is defined as:\n\n$$v_t = \\beta v_{t-1} + (1-\\beta) x_t$$\n\nwhere $\\beta \\in [0,1)$ is the decay rate and $v_0$ is the initial value (typically 0).",
+        "notation": "$v_t$ = EWMA at time $t$; $\\beta$ = decay rate (memory parameter); $x_t$ = observation at time $t$; $(1-\\beta)$ = weight given to current observation",
+        "theorem": "**Theorem (EWMA as Weighted Sum)**: The recursive EWMA definition is equivalent to the explicit weighted sum:\n\n$$v_t = (1-\\beta) \\sum_{i=1}^{t} \\beta^{t-i} x_i + \\beta^t v_0$$\n\nThis shows that observation $x_i$ receives weight $(1-\\beta)\\beta^{t-i}$, which decreases exponentially with age.",
+        "proof_sketch": "**Proof by induction**: \n\n*Base case* ($t=1$): $v_1 = \\beta v_0 + (1-\\beta)x_1$ ✓\n\n*Inductive step*: Assume formula holds for $t-1$. Then:\n$$v_t = \\beta v_{t-1} + (1-\\beta)x_t$$\n$$= \\beta[(1-\\beta)\\sum_{i=1}^{t-1} \\beta^{t-1-i}x_i + \\beta^{t-1}v_0] + (1-\\beta)x_t$$\n$$= (1-\\beta)\\sum_{i=1}^{t-1} \\beta^{t-i}x_i + \\beta^t v_0 + (1-\\beta)x_t$$\n$$= (1-\\beta)\\sum_{i=1}^{t} \\beta^{t-i}x_i + \\beta^t v_0$$ ∎\n\n**Effective Memory Length**: The effective number of observations influencing $v_t$ is approximately $\\frac{1}{1-\\beta}$. For $\\beta=0.9$, this is about 10 observations; for $\\beta=0.99$, about 100 observations.",
+        "examples": [
+          "**Example 1**: Given sequence $x = [1, 2, 3]$ with $\\beta=0.9$, $v_0=0$:\n- $v_1 = 0.9(0) + 0.1(1) = 0.1$\n- $v_2 = 0.9(0.1) + 0.1(2) = 0.09 + 0.2 = 0.29$\n- $v_3 = 0.9(0.29) + 0.1(3) = 0.261 + 0.3 = 0.561$",
+          "**Example 2 (Bias)**: With $v_0=0$, early values are biased toward zero. At $t=1$: $v_1 = (1-\\beta)x_1 \\ll x_1$ for large $\\beta$. The bias-corrected estimate is $\\hat{v}_t = \\frac{v_t}{1-\\beta^t}$, which for $t=1$ gives $\\hat{v}_1 = \\frac{(1-\\beta)x_1}{1-\\beta} = x_1$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "EWMA Recursive Update",
+          "latex": "$v_t = \\beta v_{t-1} + (1-\\beta) x_t$",
+          "description": "Use for efficient online computation with $O(1)$ memory"
+        },
+        {
+          "name": "Effective Memory Length",
+          "latex": "$N_{eff} \\approx \\frac{1}{1-\\beta}$",
+          "description": "Number of recent observations that significantly influence the average"
+        },
+        {
+          "name": "Bias Correction",
+          "latex": "$\\hat{v}_t = \\frac{v_t}{1-\\beta^t}$",
+          "description": "Corrects initialization bias in early iterations (optional but recommended)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement an EWMA update for a vector of values. Given previous EWMA values, current observations, and decay rate, compute the updated EWMA. This is the fundamental building block for RMSProp's cache update.",
+        "function_signature": "def ewma_update(prev_avg: list[float], observations: list[float], beta: float) -> list[float]:",
+        "starter_code": "def ewma_update(prev_avg: list[float], observations: list[float], beta: float) -> list[float]:\n    \"\"\"\n    Update exponentially weighted moving average.\n    \n    Args:\n        prev_avg: Previous EWMA values (v_{t-1})\n        observations: Current observations (x_t)\n        beta: Decay rate in [0, 1)\n    \n    Returns:\n        Updated EWMA values (v_t)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "ewma_update([0.0, 0.0], [1.0, 2.0], 0.9)",
+            "expected": "[0.1, 0.2]",
+            "explanation": "Each element: v_t = 0.9 * 0.0 + 0.1 * x_t. First element: 0.1*1.0=0.1, second: 0.1*2.0=0.2"
+          },
+          {
+            "input": "ewma_update([0.1, 0.2], [1.0, 2.0], 0.9)",
+            "expected": "[0.19, 0.38]",
+            "explanation": "First: 0.9*0.1 + 0.1*1.0 = 0.09 + 0.1 = 0.19; Second: 0.9*0.2 + 0.1*2.0 = 0.18 + 0.2 = 0.38"
+          },
+          {
+            "input": "ewma_update([0.5], [0.0], 0.99)",
+            "expected": "[0.495]",
+            "explanation": "High beta (0.99) means slow decay: 0.99*0.5 + 0.01*0.0 = 0.495. Most weight stays on previous value."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using (1 - beta) as the weight for previous average instead of beta",
+        "Forgetting that beta is the weight for OLD data, not new data",
+        "Not handling the vector case element-wise (trying to apply scalar formula to vectors directly)",
+        "Choosing beta too large (>0.999) causing numerical instability and extremely slow adaptation"
+      ],
+      "hint": "The update is element-wise: each position in the output depends only on the corresponding positions in prev_avg and observations. Use a list comprehension or loop to process each element independently.",
+      "references": [
+        "Exponential smoothing in time series analysis",
+        "Bias-variance tradeoff in moving averages",
+        "Signal processing: IIR filters vs FIR filters"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Element-wise Operations and Hadamard Products",
+      "relation_to_problem": "RMSProp requires computing squared gradients (element-wise squaring) and element-wise division of gradients by the square root of cache values. Understanding element-wise operations is essential for correct implementation.",
+      "prerequisites": [
+        "Vector algebra",
+        "Array programming concepts",
+        "Basic Python lists or NumPy"
+      ],
+      "learning_objectives": [
+        "Define the Hadamard (element-wise) product formally",
+        "Distinguish between matrix multiplication and element-wise operations",
+        "Implement element-wise squaring, square root, and division",
+        "Understand broadcasting and shape compatibility"
+      ],
+      "math_content": {
+        "definition": "For vectors $\\mathbf{a}, \\mathbf{b} \\in \\mathbb{R}^n$, the **Hadamard product** (element-wise product) is denoted $\\mathbf{a} \\odot \\mathbf{b}$ and defined as:\n\n$$(\\mathbf{a} \\odot \\mathbf{b})_i = a_i \\cdot b_i \\quad \\forall i \\in \\{1, ..., n\\}$$\n\nMore generally, any element-wise operation $f: \\mathbb{R} \\to \\mathbb{R}$ extends to vectors as:\n\n$$f(\\mathbf{v})_i = f(v_i)$$",
+        "notation": "$\\odot$ = Hadamard product (element-wise multiplication); $\\mathbf{v}^2 = \\mathbf{v} \\odot \\mathbf{v}$ = element-wise squaring; $\\sqrt{\\mathbf{v}}$ = element-wise square root; $\\frac{\\mathbf{a}}{\\mathbf{b}}$ = element-wise division",
+        "theorem": "**Theorem (Properties of Hadamard Product)**:\n\n1. **Commutativity**: $\\mathbf{a} \\odot \\mathbf{b} = \\mathbf{b} \\odot \\mathbf{a}$\n2. **Associativity**: $(\\mathbf{a} \\odot \\mathbf{b}) \\odot \\mathbf{c} = \\mathbf{a} \\odot (\\mathbf{b} \\odot \\mathbf{c})$\n3. **Distributivity over addition**: $\\mathbf{a} \\odot (\\mathbf{b} + \\mathbf{c}) = \\mathbf{a} \\odot \\mathbf{b} + \\mathbf{a} \\odot \\mathbf{c}$\n4. **Identity**: $\\mathbf{a} \\odot \\mathbf{1} = \\mathbf{a}$ where $\\mathbf{1} = [1, 1, ..., 1]^T$\n5. **Relationship to norms**: $\\|\\mathbf{a} \\odot \\mathbf{b}\\|_2^2 = \\sum_i a_i^2 b_i^2$",
+        "proof_sketch": "**Proof of Distributivity**: For any index $i$:\n$$(\\mathbf{a} \\odot (\\mathbf{b} + \\mathbf{c}))_i = a_i \\cdot (b_i + c_i) = a_i b_i + a_i c_i$$\n$$(\\mathbf{a} \\odot \\mathbf{b} + \\mathbf{a} \\odot \\mathbf{c})_i = (a_i b_i) + (a_i c_i)$$\nThese are equal for all $i$, so the vectors are equal. ∎\n\n**Important Distinction**: The Hadamard product is NOT the same as matrix multiplication. For vectors $\\mathbf{a}, \\mathbf{b} \\in \\mathbb{R}^n$:\n- $\\mathbf{a} \\odot \\mathbf{b} \\in \\mathbb{R}^n$ (element-wise product)\n- $\\mathbf{a}^T \\mathbf{b} \\in \\mathbb{R}$ (dot product/inner product)\n- $\\mathbf{a} \\mathbf{b}^T \\in \\mathbb{R}^{n \\times n}$ (outer product)",
+        "examples": [
+          "**Example 1**: $\\mathbf{a} = [2, 3, 4]$, $\\mathbf{b} = [1, 0, -1]$\n- $\\mathbf{a} \\odot \\mathbf{b} = [2 \\cdot 1, 3 \\cdot 0, 4 \\cdot (-1)] = [2, 0, -4]$\n- $\\mathbf{a}^2 = [4, 9, 16]$\n- $\\sqrt{\\mathbf{a}} = [\\sqrt{2}, \\sqrt{3}, 2] \\approx [1.414, 1.732, 2.0]$",
+          "**Example 2 (RMSProp context)**: Given gradients $\\mathbf{g} = [0.1, -0.2, 0.3]$:\n- Squared gradients: $\\mathbf{g}^2 = [0.01, 0.04, 0.09]$\n- If cache $\\mathbf{v} = [0.001, 0.004, 0.009]$, then $\\sqrt{\\mathbf{v}} = [0.0316, 0.0632, 0.0949]$\n- Normalized gradient: $\\frac{\\mathbf{g}}{\\sqrt{\\mathbf{v}}} = [3.162, -3.162, 3.162]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Element-wise Squaring",
+          "latex": "$\\mathbf{v}^2 = [v_1^2, v_2^2, ..., v_n^2]$",
+          "description": "Square each element independently; used for computing squared gradients in RMSProp"
+        },
+        {
+          "name": "Element-wise Square Root",
+          "latex": "$\\sqrt{\\mathbf{v}} = [\\sqrt{v_1}, \\sqrt{v_2}, ..., \\sqrt{v_n}]$",
+          "description": "Take square root of each element; used in RMSProp denominator"
+        },
+        {
+          "name": "Element-wise Division",
+          "latex": "$\\frac{\\mathbf{a}}{\\mathbf{b}} = [\\frac{a_1}{b_1}, \\frac{a_2}{b_2}, ..., \\frac{a_n}{b_n}]$",
+          "description": "Divide corresponding elements; requires $b_i \\neq 0$ for all $i$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement element-wise operations needed for RMSProp: squaring a vector, taking element-wise square root, and performing element-wise division with numerical stability (adding epsilon to denominator). These operations form the core computational primitives of the optimizer.",
+        "function_signature": "def elementwise_operations(vec: list[float], epsilon: float = 1e-8) -> tuple[list[float], list[float]]:",
+        "starter_code": "def elementwise_operations(vec: list[float], epsilon: float = 1e-8) -> tuple[list[float], list[float]]:\n    \"\"\"\n    Compute element-wise squared and element-wise square root with stability.\n    \n    Args:\n        vec: Input vector\n        epsilon: Small constant for numerical stability\n    \n    Returns:\n        Tuple of (squared_vec, sqrt_with_epsilon)\n        - squared_vec: Each element squared\n        - sqrt_with_epsilon: Square root of (each element + epsilon)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "elementwise_operations([1.0, 4.0, 9.0], 0)",
+            "expected": "([1.0, 16.0, 81.0], [1.0, 2.0, 3.0])",
+            "explanation": "Squared: [1^2, 4^2, 9^2] = [1, 16, 81]. Sqrt: [sqrt(1), sqrt(4), sqrt(9)] = [1, 2, 3]"
+          },
+          {
+            "input": "elementwise_operations([0.1, 0.2, 0.3], 1e-8)",
+            "expected": "([0.01, 0.04, 0.09], [0.31622776, 0.44721359, 0.54772255])",
+            "explanation": "Squared: [0.01, 0.04, 0.09]. Sqrt with epsilon: sqrt([0.1+1e-8, 0.2+1e-8, 0.3+1e-8]) ≈ [0.316, 0.447, 0.548]"
+          },
+          {
+            "input": "elementwise_operations([0.0, 0.0], 1e-8)",
+            "expected": "([0.0, 0.0], [0.0001, 0.0001])",
+            "explanation": "Squared: [0, 0]. Sqrt with epsilon prevents division by zero: sqrt([1e-8, 1e-8]) = [1e-4, 1e-4]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing element-wise operations with matrix operations (using @ or dot product instead of element-wise)",
+        "Not applying epsilon correctly: must add epsilon BEFORE taking square root for stability",
+        "Forgetting to handle negative values before square root (though gradients squared are always non-negative)",
+        "Using regular Python operations on lists instead of element-wise (e.g., trying to square a list directly)"
+      ],
+      "hint": "Process each element independently using list comprehension or a loop. For squared_vec, compute [x**2 for x in vec]. For sqrt_with_epsilon, compute [(x + epsilon)**0.5 for x in vec].",
+      "references": [
+        "Hadamard product and Schur product theorem",
+        "Numerical stability in floating-point arithmetic",
+        "NumPy broadcasting and vectorization"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Adaptive Learning Rates and Gradient Normalization",
+      "relation_to_problem": "RMSProp normalizes gradients by their historical root mean square, creating per-parameter adaptive learning rates. Understanding this normalization mathematically explains why RMSProp prevents overshooting in steep directions and accelerates in flat directions.",
+      "prerequisites": [
+        "Gradient descent basics",
+        "Learning rate concept",
+        "Statistical moments",
+        "Root Mean Square"
+      ],
+      "learning_objectives": [
+        "Define adaptive learning rates and their motivation",
+        "Understand gradient normalization and its effect on convergence",
+        "Compute effective learning rate per parameter",
+        "Analyze scale-invariance properties of normalized gradients"
+      ],
+      "math_content": {
+        "definition": "An **adaptive learning rate** is a parameter-specific learning rate $\\eta_i(t)$ that changes based on the optimization history. For parameter $\\theta_i$, the update becomes:\n\n$$\\theta_i(t+1) = \\theta_i(t) - \\eta_i(t) \\cdot g_i(t)$$\n\nwhere $\\eta_i(t)$ depends on past gradients $\\{g_i(1), ..., g_i(t)\\}$.\n\n**Gradient normalization** rescales gradients to have controlled magnitude. The **RMS normalization** divides each gradient by the root mean square of recent gradients:\n\n$$\\hat{g}_i(t) = \\frac{g_i(t)}{\\text{RMS}(g_i)}$$\n\nwhere $\\text{RMS}(g_i) = \\sqrt{\\mathbb{E}[g_i^2]} = \\sqrt{v_i}$ and $v_i$ is the (exponentially weighted) average of squared gradients.",
+        "notation": "$\\eta_i(t)$ = adaptive learning rate for parameter $i$ at time $t$; $g_i(t)$ = gradient of parameter $i$; $v_i(t)$ = running average of $g_i^2$; $\\hat{g}_i$ = normalized gradient; $\\epsilon$ = stability constant",
+        "theorem": "**Theorem (Scale Invariance)**: Let $\\theta' = c\\theta$ be a scaled version of parameters with $c > 0$. Under RMS normalization, the update direction is invariant to this scaling:\n\n$$\\frac{g'_i}{\\sqrt{v'_i}} = \\frac{c \\cdot g_i}{\\sqrt{c^2 \\cdot v_i}} = \\frac{g_i}{\\sqrt{v_i}}$$\n\nThis means RMSProp treats parameters identically regardless of their absolute scale.\n\n**Theorem (Effective Learning Rate Adaptation)**: In RMSProp, the effective learning rate for parameter $i$ is:\n\n$$\\eta_{\\text{eff},i} = \\frac{\\eta}{\\sqrt{v_i} + \\epsilon}$$\n\nFor parameters with consistently large gradients ($v_i$ large), $\\eta_{\\text{eff},i}$ is small, preventing overshooting. For parameters with small gradients ($v_i$ small), $\\eta_{\\text{eff},i}$ is large, accelerating progress.",
+        "proof_sketch": "**Why Normalization Helps**: Consider a loss surface with different curvatures in different dimensions. The $i$-th parameter's gradient magnitude reflects curvature:\n- High curvature → Large $|g_i|$ → Large $v_i$ → Small effective step\n- Low curvature → Small $|g_i|$ → Small $v_i$ → Large effective step\n\nThis approximately equalizes progress across all dimensions.\n\n**Mathematical Intuition**: The standard gradient descent step is:\n$$\\theta_i \\leftarrow \\theta_i - \\eta g_i$$\n\nRMSProp transforms this to:\n$$\\theta_i \\leftarrow \\theta_i - \\eta \\frac{g_i}{\\sqrt{v_i} + \\epsilon}$$\n\nThe denominator $\\sqrt{v_i}$ acts as a diagonal preconditioner, approximating $\\sqrt{H_{ii}}$ (diagonal of Hessian), giving a crude second-order method without computing the Hessian.",
+        "examples": [
+          "**Example 1**: Two parameters with different gradient scales:\n- Parameter 1: gradients $g_1 \\in [0.01, 0.02]$, average $v_1 = 0.0002$, so $\\sqrt{v_1} \\approx 0.0141$\n- Parameter 2: gradients $g_2 \\in [1.0, 2.0]$, average $v_2 = 2.0$, so $\\sqrt{v_2} \\approx 1.414$\n- With $\\eta = 0.1$, effective rates: $\\eta_1 = 0.1/0.0141 \\approx 7.1$, $\\eta_2 = 0.1/1.414 \\approx 0.071$\n- Parameter 1 gets ~100× larger effective learning rate despite having smaller gradients!",
+          "**Example 2 (Convergence Speed)**: In a narrow valley (high curvature in one direction, low in orthogonal):\n- Steep direction: Large gradients → Small effective LR → Controlled descent\n- Flat direction: Small gradients → Large effective LR → Rapid progress\n- Result: Faster convergence than vanilla SGD which oscillates in steep direction"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "RMS of Gradients",
+          "latex": "$\\text{RMS}(g) = \\sqrt{\\frac{1}{n}\\sum_{i=1}^n g_i^2}$ or $\\sqrt{v}$ for EWMA",
+          "description": "Characteristic scale of gradient magnitudes; used as normalizing denominator"
+        },
+        {
+          "name": "Normalized Gradient",
+          "latex": "$\\hat{g}_i = \\frac{g_i}{\\sqrt{v_i} + \\epsilon}$",
+          "description": "Gradient scaled by its historical RMS; roughly unit-magnitude"
+        },
+        {
+          "name": "Effective Learning Rate",
+          "latex": "$\\eta_{\\text{eff},i} = \\frac{\\eta}{\\sqrt{v_i} + \\epsilon}$",
+          "description": "Actual step size for parameter $i$; adapts to gradient history"
+        }
+      ],
+      "exercise": {
+        "description": "Implement adaptive learning rate computation. Given a base learning rate, gradients, and cache (squared gradient average), compute the effective learning rate for each parameter and the normalized gradients. This demonstrates how RMSProp adapts per-parameter learning rates.",
+        "function_signature": "def compute_adaptive_lr(grads: list[float], cache: list[float], base_lr: float, epsilon: float = 1e-8) -> tuple[list[float], list[float]]:",
+        "starter_code": "def compute_adaptive_lr(grads: list[float], cache: list[float], base_lr: float, epsilon: float = 1e-8) -> tuple[list[float], list[float]]:\n    \"\"\"\n    Compute effective learning rates and normalized gradients.\n    \n    Args:\n        grads: Current gradients\n        cache: Moving average of squared gradients (v)\n        base_lr: Base learning rate (eta)\n        epsilon: Numerical stability constant\n    \n    Returns:\n        Tuple of (effective_lrs, normalized_grads)\n        - effective_lrs: Adaptive learning rate for each parameter\n        - normalized_grads: Gradients normalized by sqrt(cache)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_adaptive_lr([0.1, 0.2], [0.01, 0.04], 0.1, 1e-8)",
+            "expected": "([1.0, 0.5], [1.0, 1.0])",
+            "explanation": "Effective LR: [0.1/sqrt(0.01), 0.1/sqrt(0.04)] = [0.1/0.1, 0.1/0.2] = [1.0, 0.5]. Normalized grads: [0.1/0.1, 0.2/0.2] = [1.0, 1.0]"
+          },
+          {
+            "input": "compute_adaptive_lr([1.0], [0.0], 0.01, 1e-8)",
+            "expected": "([100000.0], [10000000.0])",
+            "explanation": "Cache is zero, so effective LR = 0.01/sqrt(1e-8) = 0.01/1e-4 = 100. Normalized grad = 1.0/1e-4 = 10000. Epsilon prevents true division by zero."
+          },
+          {
+            "input": "compute_adaptive_lr([0.5, 0.5], [0.25, 1.0], 0.1, 0)",
+            "expected": "([0.2, 0.1], [1.0, 0.5])",
+            "explanation": "Effective LR: [0.1/sqrt(0.25), 0.1/sqrt(1.0)] = [0.1/0.5, 0.1/1.0] = [0.2, 0.1]. Normalized: [0.5/0.5, 0.5/1.0] = [1.0, 0.5]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to add epsilon before taking square root (leads to division by zero when cache is small)",
+        "Dividing by cache instead of sqrt(cache) - RMSProp uses root mean square, not mean square",
+        "Thinking effective LR is base_lr * sqrt(cache) instead of base_lr / sqrt(cache)",
+        "Not recognizing that large cache values correspond to small effective learning rates (inverse relationship)"
+      ],
+      "hint": "For each parameter i: effective_lr[i] = base_lr / (sqrt(cache[i]) + epsilon) and normalized_grad[i] = grad[i] / (sqrt(cache[i]) + epsilon). Notice normalized_grad[i] = effective_lr[i] * grad[i] / base_lr.",
+      "references": [
+        "Adaptive gradient methods survey (Ruder, 2016)",
+        "Diagonal preconditioning in optimization",
+        "Second-order optimization and natural gradients"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Stochastic Gradient Descent Parameter Updates",
+      "relation_to_problem": "RMSProp modifies the standard SGD parameter update by incorporating adaptive learning rates. Understanding the basic parameter update rule and how modifications affect convergence is essential for implementing the complete optimizer.",
+      "prerequisites": [
+        "Gradient descent",
+        "Partial derivatives",
+        "Optimization basics",
+        "Vector updates"
+      ],
+      "learning_objectives": [
+        "Formalize the parameter update rule in gradient-based optimization",
+        "Understand the relationship between gradient direction and parameter change",
+        "Implement vectorized parameter updates",
+        "Analyze update magnitude and convergence criteria"
+      ],
+      "math_content": {
+        "definition": "In **gradient-based optimization**, parameters $\\boldsymbol{\\theta} \\in \\mathbb{R}^n$ are updated iteratively to minimize a loss function $L(\\boldsymbol{\\theta})$. The **parameter update rule** at iteration $t$ is:\n\n$$\\boldsymbol{\\theta}^{(t+1)} = \\boldsymbol{\\theta}^{(t)} - \\boldsymbol{\\Delta}^{(t)}$$\n\nwhere $\\boldsymbol{\\Delta}^{(t)}$ is the update vector. For standard gradient descent:\n\n$$\\boldsymbol{\\Delta}^{(t)} = \\eta \\nabla L(\\boldsymbol{\\theta}^{(t)})$$\n\nFor adaptive methods like RMSProp:\n\n$$\\boldsymbol{\\Delta}^{(t)} = \\boldsymbol{\\eta}_{\\text{eff}}^{(t)} \\odot \\nabla L(\\boldsymbol{\\theta}^{(t)})$$\n\nwhere $\\boldsymbol{\\eta}_{\\text{eff}}^{(t)}$ is a vector of per-parameter adaptive learning rates.",
+        "notation": "$\\boldsymbol{\\theta}^{(t)}$ = parameters at iteration $t$; $\\nabla L$ = gradient vector; $\\eta$ = learning rate (scalar); $\\boldsymbol{\\eta}_{\\text{eff}}$ = effective learning rate (vector); $\\boldsymbol{\\Delta}$ = update vector; $\\odot$ = element-wise product",
+        "theorem": "**Theorem (Descent Direction)**: If $\\boldsymbol{\\Delta}^{(t)} = \\alpha \\odot \\nabla L(\\boldsymbol{\\theta}^{(t)})$ where all $\\alpha_i > 0$, and if $\\nabla L \\neq \\mathbf{0}$, then the update decreases the loss in a local linear approximation:\n\n$$L(\\boldsymbol{\\theta}^{(t)} - \\boldsymbol{\\Delta}^{(t)}) \\approx L(\\boldsymbol{\\theta}^{(t)}) - (\\nabla L)^T \\boldsymbol{\\Delta}^{(t)} < L(\\boldsymbol{\\theta}^{(t)})$$\n\nsince $(\\nabla L)^T \\boldsymbol{\\Delta}^{(t)} = \\sum_i \\alpha_i (\\nabla L)_i^2 > 0$.\n\n**Theorem (Update Magnitude)**: The magnitude of the parameter change is:\n\n$$\\|\\boldsymbol{\\Delta}^{(t)}\\|_2 = \\sqrt{\\sum_{i=1}^n (\\eta_{\\text{eff},i} g_i)^2}$$\n\nwhere $g_i = (\\nabla L)_i$. This controls the step size in parameter space.",
+        "proof_sketch": "**First-order Taylor expansion**:\n$$L(\\boldsymbol{\\theta} - \\boldsymbol{\\Delta}) \\approx L(\\boldsymbol{\\theta}) + \\nabla L(\\boldsymbol{\\theta})^T (-\\boldsymbol{\\Delta}) = L(\\boldsymbol{\\theta}) - \\nabla L^T \\boldsymbol{\\Delta}$$\n\nFor $\\boldsymbol{\\Delta} = \\boldsymbol{\\alpha} \\odot \\nabla L$ with $\\alpha_i > 0$:\n$$\\nabla L^T \\boldsymbol{\\Delta} = \\sum_i (\\nabla L)_i \\cdot \\alpha_i (\\nabla L)_i = \\sum_i \\alpha_i (\\nabla L)_i^2$$\n\nSince each term is non-negative and at least one $( \\nabla L)_i \\neq 0$, the sum is strictly positive, guaranteeing descent (in the linear approximation). ∎\n\n**Convergence Consideration**: Too large an update can overshoot; too small wastes computation. Adaptive methods automatically balance this tradeoff per parameter.",
+        "examples": [
+          "**Example 1 (Standard SGD)**: Parameters $\\boldsymbol{\\theta} = [1.0, 2.0]$, gradients $\\nabla L = [0.5, -0.3]$, $\\eta = 0.1$:\n- Update: $\\boldsymbol{\\Delta} = [0.1 \\cdot 0.5, 0.1 \\cdot (-0.3)] = [0.05, -0.03]$\n- New parameters: $\\boldsymbol{\\theta}^{\\text{new}} = [1.0 - 0.05, 2.0 - (-0.03)] = [0.95, 2.03]$\n- Note: Positive gradient → decrease parameter; negative gradient → increase parameter",
+          "**Example 2 (Adaptive)**: Same setup but $\\boldsymbol{\\eta}_{\\text{eff}} = [0.2, 0.05]$ (adaptive rates):\n- Update: $\\boldsymbol{\\Delta} = [0.2 \\cdot 0.5, 0.05 \\cdot (-0.3)] = [0.1, -0.015]$\n- New parameters: $\\boldsymbol{\\theta}^{\\text{new}} = [1.0 - 0.1, 2.0 - (-0.015)] = [0.9, 2.015]$\n- First parameter took 2× larger step despite same base LR due to adaptive scaling"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Standard Parameter Update",
+          "latex": "$\\boldsymbol{\\theta}^{(t+1)} = \\boldsymbol{\\theta}^{(t)} - \\eta \\nabla L(\\boldsymbol{\\theta}^{(t)})$",
+          "description": "Basic gradient descent; all parameters use same learning rate"
+        },
+        {
+          "name": "Adaptive Parameter Update",
+          "latex": "$\\theta_i^{(t+1)} = \\theta_i^{(t)} - \\eta_{\\text{eff},i} (\\nabla L)_i$",
+          "description": "Each parameter $i$ has its own effective learning rate"
+        },
+        {
+          "name": "Update Vector",
+          "latex": "$\\boldsymbol{\\Delta} = \\boldsymbol{\\eta}_{\\text{eff}} \\odot \\boldsymbol{g}$",
+          "description": "Element-wise product of effective learning rates and gradients"
+        }
+      ],
+      "exercise": {
+        "description": "Implement parameter update with per-parameter adaptive learning rates. Given current parameters, gradients, and effective learning rates for each parameter, compute the updated parameters. This is the final step in any gradient-based optimizer.",
+        "function_signature": "def adaptive_parameter_update(params: list[float], grads: list[float], effective_lrs: list[float]) -> list[float]:",
+        "starter_code": "def adaptive_parameter_update(params: list[float], grads: list[float], effective_lrs: list[float]) -> list[float]:\n    \"\"\"\n    Update parameters using adaptive learning rates.\n    \n    Args:\n        params: Current parameter values (theta^(t))\n        grads: Gradients (nabla L)\n        effective_lrs: Effective learning rate for each parameter (eta_eff)\n    \n    Returns:\n        Updated parameters (theta^(t+1))\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "adaptive_parameter_update([1.0, 2.0, 3.0], [0.1, 0.2, 0.3], [0.1, 0.1, 0.1])",
+            "expected": "[0.99, 1.98, 2.97]",
+            "explanation": "Each param updated as: theta_new = theta_old - eta_eff * grad. [1.0-0.1*0.1, 2.0-0.1*0.2, 3.0-0.1*0.3] = [0.99, 1.98, 2.97]"
+          },
+          {
+            "input": "adaptive_parameter_update([5.0], [-1.0], [0.5])",
+            "expected": "[5.5]",
+            "explanation": "Negative gradient means increase parameter: 5.0 - 0.5*(-1.0) = 5.0 + 0.5 = 5.5"
+          },
+          {
+            "input": "adaptive_parameter_update([1.0, 1.0], [1.0, 1.0], [0.1, 0.5])",
+            "expected": "[0.9, 0.5]",
+            "explanation": "Different effective LRs cause different step sizes: [1.0-0.1*1.0, 1.0-0.5*1.0] = [0.9, 0.5]. Second parameter moves 5× faster."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Adding the gradient instead of subtracting (gradient points uphill; we want to go downhill)",
+        "Forgetting to multiply gradient by learning rate (bare gradient update is usually too large)",
+        "Using the same learning rate for all parameters when given different effective_lrs",
+        "Modifying the original params list instead of creating a new list (can cause bugs in stateful optimizers)"
+      ],
+      "hint": "For each parameter i: new_param[i] = old_param[i] - effective_lr[i] * grad[i]. Process all parameters element-wise using a list comprehension or loop.",
+      "references": [
+        "Gradient descent convergence analysis",
+        "Line search methods",
+        "Learning rate schedules and annealing"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Complete RMSProp Algorithm Integration",
+      "relation_to_problem": "This sub-quest integrates all previous concepts - EWMA for cache updates, element-wise operations for gradient squaring, adaptive learning rates for normalization, and parameter updates - into the complete RMSProp optimization step. This is the direct solution to the main problem.",
+      "prerequisites": [
+        "EWMA updates",
+        "Element-wise operations",
+        "Adaptive learning rates",
+        "Parameter updates"
+      ],
+      "learning_objectives": [
+        "Integrate cache update, gradient normalization, and parameter update into single step",
+        "Understand the complete RMSProp algorithm flow",
+        "Implement the full optimizer with proper order of operations",
+        "Recognize how each component contributes to the overall algorithm"
+      ],
+      "math_content": {
+        "definition": "**RMSProp (Root Mean Square Propagation)** is a complete adaptive optimization algorithm with the following update procedure at iteration $t$:\n\n**Algorithm RMSProp**:\n\n**Input**: Parameters $\\boldsymbol{\\theta}^{(t)}$, gradients $\\mathbf{g}^{(t)}$, cache $\\mathbf{v}^{(t-1)}$, learning rate $\\eta$, decay rate $\\beta$, stability constant $\\epsilon$\n\n**Step 1** (Cache Update): $\\mathbf{v}^{(t)} = \\beta \\mathbf{v}^{(t-1)} + (1-\\beta) \\mathbf{g}^{(t)} \\odot \\mathbf{g}^{(t)}$\n\n**Step 2** (Parameter Update): $\\boldsymbol{\\theta}^{(t+1)} = \\boldsymbol{\\theta}^{(t)} - \\frac{\\eta}{\\sqrt{\\mathbf{v}^{(t)}} + \\epsilon} \\odot \\mathbf{g}^{(t)}$\n\n**Output**: Updated parameters $\\boldsymbol{\\theta}^{(t+1)}$ and updated cache $\\mathbf{v}^{(t)}$",
+        "notation": "$\\mathbf{g}^{(t)} = \\nabla L(\\boldsymbol{\\theta}^{(t)})$ = gradient at time $t$; $\\mathbf{v}^{(t)}$ = exponentially weighted average of squared gradients (cache); $\\beta \\in [0,1)$ = decay rate; $\\eta > 0$ = learning rate; $\\epsilon > 0$ = numerical stability constant (typically $10^{-8}$)",
+        "theorem": "**Theorem (RMSProp Invariance Properties)**:\n\n1. **Scale Invariance**: If parameters and gradients are scaled by constant $c$, the normalized gradient direction remains unchanged\n2. **Dimension Independence**: Each parameter is updated independently based only on its own gradient history\n3. **Automatic Regularization**: Parameters with consistently large gradients receive smaller effective updates, providing implicit regularization\n\n**Theorem (Computational Complexity)**: RMSProp requires $O(n)$ time and $O(n)$ space per iteration for $n$ parameters, same as vanilla SGD, making it practical for large-scale optimization.",
+        "proof_sketch": "**Order of Operations is Critical**:\n\n1. Cache must be updated BEFORE using it in parameter update (uses $\\mathbf{v}^{(t)}$, not $\\mathbf{v}^{(t-1)}$)\n2. Gradient squaring is element-wise: $\\mathbf{g} \\odot \\mathbf{g} = [g_1^2, g_2^2, ..., g_n^2]$\n3. Square root and division are element-wise\n4. The division $\\frac{\\eta}{\\sqrt{\\mathbf{v}} + \\epsilon}$ creates the adaptive learning rates\n5. Final multiplication with gradient is element-wise\n\n**Connection to Previous Sub-quests**:\n- Sub-quest 1: Cache update uses EWMA formula\n- Sub-quest 2: Gradient squaring, sqrt, and division are element-wise operations\n- Sub-quest 3: The denominator $\\sqrt{\\mathbf{v}} + \\epsilon$ creates adaptive learning rates\n- Sub-quest 4: Final step is parameter update with adaptive rates\n\n**Why This Works**: By normalizing gradients by their RMS, RMSProp automatically:\n- Prevents divergence in steep directions (large $v_i$ → small step)\n- Accelerates in flat directions (small $v_i$ → large step)\n- Adapts to changing gradient statistics (exponential weighting forgets old information)\n- Maintains numerical stability ($\\epsilon$ prevents division by zero)",
+        "examples": [
+          "**Complete Example**: \n- Initial: $\\theta = [1.0]$, $g = [0.1]$, $v_{\\text{old}} = [0.0]$, $\\eta = 0.1$, $\\beta = 0.9$, $\\epsilon = 10^{-8}$\n- Step 1 (Cache): $v_{\\text{new}} = 0.9 \\times 0.0 + 0.1 \\times 0.1^2 = 0.001$\n- Step 2 (Parameter): $\\theta_{\\text{new}} = 1.0 - \\frac{0.1}{\\sqrt{0.001} + 10^{-8}} \\times 0.1$\n  - $\\sqrt{0.001} \\approx 0.0316228$\n  - $\\frac{0.1}{0.0316228} \\approx 3.16228$\n  - $3.16228 \\times 0.1 = 0.316228$\n  - $\\theta_{\\text{new}} = 1.0 - 0.316228 = 0.683772$\n- Output: $([0.683772], [0.001])$",
+          "**Multi-parameter Example**:\n- $\\boldsymbol{\\theta} = [2.0, 3.0]$, $\\mathbf{g} = [0.2, 0.1]$, $\\mathbf{v}_{\\text{old}} = [0.004, 0.001]$\n- Cache update: $\\mathbf{v}_{\\text{new}} = [0.9 \\times 0.004 + 0.1 \\times 0.04, 0.9 \\times 0.001 + 0.1 \\times 0.01] = [0.0076, 0.0019]$\n- Adaptive LRs: $[\\frac{0.1}{\\sqrt{0.0076}}, \\frac{0.1}{\\sqrt{0.0019}}] \\approx [1.147, 2.294]$\n- Parameter update: $\\boldsymbol{\\theta}_{\\text{new}} = [2.0 - 1.147 \\times 0.2, 3.0 - 2.294 \\times 0.1] = [1.771, 2.771]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "RMSProp Cache Update",
+          "latex": "$v_i^{(t)} = \\beta v_i^{(t-1)} + (1-\\beta) (g_i^{(t)})^2$",
+          "description": "Update exponentially weighted average of squared gradients for each parameter"
+        },
+        {
+          "name": "RMSProp Parameter Update",
+          "latex": "$\\theta_i^{(t+1)} = \\theta_i^{(t)} - \\frac{\\eta}{\\sqrt{v_i^{(t)}} + \\epsilon} g_i^{(t)}$",
+          "description": "Update parameter using gradient normalized by sqrt of cache"
+        },
+        {
+          "name": "Combined Single-Step Form",
+          "latex": "$\\boldsymbol{\\theta}^{(t+1)}, \\mathbf{v}^{(t)} = \\text{RMSProp}(\\boldsymbol{\\theta}^{(t)}, \\mathbf{g}^{(t)}, \\mathbf{v}^{(t-1)}, \\eta, \\beta, \\epsilon)$",
+          "description": "Complete RMSProp update returning both new parameters and new cache"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete RMSProp update step by combining all previous sub-quest concepts. Given parameters, gradients, old cache, and hyperparameters, compute both the updated parameters and updated cache. This requires: (1) updating cache with EWMA of squared gradients, (2) computing adaptive learning rates from cache, (3) updating parameters with normalized gradients. Return both updated parameters and updated cache as the optimizer needs to maintain cache state across iterations.",
+        "function_signature": "def rmsprop_step(params: list[float], grads: list[float], cache: list[float], lr: float, beta: float, epsilon: float) -> tuple[list[float], list[float]]:",
+        "starter_code": "def rmsprop_step(params: list[float], grads: list[float], cache: list[float], lr: float, beta: float, epsilon: float) -> tuple[list[float], list[float]]:\n    \"\"\"\n    Perform one complete RMSProp optimization step.\n    \n    Args:\n        params: Current parameter values\n        grads: Current gradients\n        cache: Previous cache values (moving average of squared gradients)\n        lr: Learning rate (eta)\n        beta: Decay rate for cache\n        epsilon: Numerical stability constant\n    \n    Returns:\n        Tuple of (updated_params, updated_cache)\n    \"\"\"\n    # Step 1: Update cache with EWMA of squared gradients\n    # Step 2: Update parameters using cache for normalization\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "rmsprop_step([1.0], [0.1], [0.0], 0.1, 0.9, 1e-8)",
+            "expected": "([0.683772], [0.001])",
+            "explanation": "Cache: 0.9*0 + 0.1*0.01 = 0.001. Param: 1.0 - 0.1*0.1/(sqrt(0.001)+1e-8) = 1.0 - 0.316228 ≈ 0.683772"
+          },
+          {
+            "input": "rmsprop_step([2.0, 3.0], [0.5, 0.0], [0.25, 0.0], 0.01, 0.9, 1e-8)",
+            "expected": "([1.99, 3.0], [0.25, 0.0])",
+            "explanation": "Cache: [0.9*0.25+0.1*0.25, 0.9*0+0.1*0] = [0.25, 0]. Params: [2-0.01*0.5/(0.5+1e-8), 3-0.01*0/1e-4] ≈ [1.99, 3.0]"
+          },
+          {
+            "input": "rmsprop_step([5.0, 10.0], [0.2, 0.4], [0.01, 0.04], 0.1, 0.9, 1e-8)",
+            "expected": "([4.8, 9.8], [0.013, 0.052])",
+            "explanation": "Cache: [0.9*0.01+0.1*0.04, 0.9*0.04+0.1*0.16] = [0.013, 0.052]. Effective LRs: [0.877, 0.438]. Params: [5-0.877*0.2, 10-0.438*0.4] ≈ [4.8246, 9.8248]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using old cache (v_{t-1}) in parameter update instead of new cache (v_t) - cache must be updated first",
+        "Forgetting to square gradients when updating cache (should be g^2, not g)",
+        "Adding epsilon to gradient instead of to sqrt(cache) in the denominator",
+        "Returning only updated parameters without returning updated cache (cache must be maintained for next iteration)",
+        "Wrong order: updating parameters before cache leads to incorrect results"
+      ],
+      "hint": "This combines all previous sub-quests: (1) Use EWMA formula to update cache with squared gradients, (2) Compute effective LR = lr / (sqrt(new_cache) + epsilon) for each parameter, (3) Update each parameter: param_new = param_old - effective_lr * gradient. Return both updated params and updated cache.",
+      "references": [
+        "Original RMSProp lecture by Geoffrey Hinton (Coursera Neural Networks course)",
+        "Adam paper (Kingma & Ba, 2015) - compares RMSProp with momentum",
+        "Adaptive learning rate methods survey",
+        "Deep Learning book (Goodfellow et al., 2016) Chapter 8 on optimization"
+      ]
+    }
+  ]
+}

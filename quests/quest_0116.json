@@ -1,0 +1,519 @@
+{
+  "problem_id": 116,
+  "title": "Derivative of a Polynomial",
+  "category": "Calculus",
+  "difficulty": "easy",
+  "description": "Implement a function that computes the derivative of a polynomial term of the form `c * x^n` at a given point `x`, where `c` is a coefficient and `n` is the exponent. The function should return the value of the derivative, accounting for the coefficient in the power rule. This is useful for understanding how polynomials change at specific points in machine learning optimization problems.",
+  "example": {
+    "input": "poly_term_derivative(2.0, 3.0, 2.0)",
+    "output": "12.0",
+    "reasoning": "For the term 2 * x^2, the derivative is 2 * 2 * x^(2-1) = 4 * x. At x = 3, this evaluates to 4 * 3 = 12.0."
+  },
+  "starter_code": "def poly_term_derivative(c: float, x: float, n: float) -> float:\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Exponentiation and the Power Function",
+      "relation_to_problem": "The derivative of x^n requires understanding how power functions behave and how to evaluate them at specific points, which is the foundation for applying the power rule.",
+      "prerequisites": [
+        "Basic algebra",
+        "Function notation",
+        "Order of operations"
+      ],
+      "learning_objectives": [
+        "Define and evaluate power functions for positive, negative, and zero exponents",
+        "Understand the relationship between exponent value and function behavior",
+        "Implement power function evaluation programmatically"
+      ],
+      "math_content": {
+        "definition": "A **power function** is a function of the form $f(x) = x^n$ where $n$ is a real number called the exponent. For any real number $x$ and exponent $n$, $x^n$ represents $x$ multiplied by itself $n$ times when $n$ is a positive integer.",
+        "notation": "$x^n$ where $x$ is the base and $n$ is the exponent. $x^0 = 1$ for $x \\neq 0$, $x^{-n} = \\frac{1}{x^n}$, $x^{1/n} = \\sqrt[n]{x}$",
+        "theorem": "**Exponent Rules**: For real numbers $x$ and exponents $m, n$: (1) $x^m \\cdot x^n = x^{m+n}$, (2) $\\frac{x^m}{x^n} = x^{m-n}$, (3) $(x^m)^n = x^{mn}$, (4) $x^0 = 1$ when $x \\neq 0$",
+        "proof_sketch": "The zero exponent rule follows from the quotient rule: $x^0 = x^{n-n} = \\frac{x^n}{x^n} = 1$ for any $x \\neq 0$. Negative exponents arise from $x^{-n} = x^{0-n} = \\frac{x^0}{x^n} = \\frac{1}{x^n}$.",
+        "examples": [
+          "$2^3 = 8$ (positive integer exponent)",
+          "$5^0 = 1$ (zero exponent)",
+          "$2^{-2} = \\frac{1}{2^2} = \\frac{1}{4} = 0.25$ (negative exponent)",
+          "$4^{0.5} = \\sqrt{4} = 2$ (fractional exponent)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Power Function",
+          "latex": "$f(x) = x^n$",
+          "description": "Evaluates x raised to the power n"
+        },
+        {
+          "name": "Zero Exponent",
+          "latex": "$x^0 = 1$ for $x \\neq 0$",
+          "description": "Any non-zero number to the power 0 equals 1"
+        },
+        {
+          "name": "Negative Exponent",
+          "latex": "$x^{-n} = \\frac{1}{x^n}$",
+          "description": "Negative exponents represent reciprocals"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that evaluates a power function x^n at a given point x. Handle positive, negative, and zero exponents correctly.",
+        "function_signature": "def power_function(x: float, n: float) -> float:",
+        "starter_code": "def power_function(x: float, n: float) -> float:\n    # Your code here\n    # Evaluate x raised to the power n\n    pass",
+        "test_cases": [
+          {
+            "input": "power_function(2.0, 3.0)",
+            "expected": "8.0",
+            "explanation": "2^3 = 2 * 2 * 2 = 8"
+          },
+          {
+            "input": "power_function(5.0, 0.0)",
+            "expected": "1.0",
+            "explanation": "Any non-zero number to the power 0 equals 1"
+          },
+          {
+            "input": "power_function(2.0, -2.0)",
+            "expected": "0.25",
+            "explanation": "2^(-2) = 1/(2^2) = 1/4 = 0.25"
+          },
+          {
+            "input": "power_function(3.0, 2.0)",
+            "expected": "9.0",
+            "explanation": "3^2 = 3 * 3 = 9"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that x^0 = 1 for any x ≠ 0, not 0",
+        "Incorrectly handling negative exponents as negative results instead of reciprocals",
+        "Not considering that 0^0 is undefined in mathematics"
+      ],
+      "hint": "Python's ** operator or pow() function can compute powers for any real exponents.",
+      "references": [
+        "Exponent rules",
+        "Power functions",
+        "Floating point arithmetic"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Polynomial Terms and the Constant Multiple",
+      "relation_to_problem": "The derivative problem involves terms of the form c * x^n where c is a coefficient. Understanding how to evaluate and manipulate these polynomial terms is essential before applying differentiation rules.",
+      "prerequisites": [
+        "Power functions",
+        "Multiplication of real numbers",
+        "Function composition"
+      ],
+      "learning_objectives": [
+        "Define polynomial terms with coefficients",
+        "Evaluate polynomial terms at specific points",
+        "Understand how coefficients scale function values"
+      ],
+      "math_content": {
+        "definition": "A **polynomial term** is an expression of the form $c \\cdot x^n$ where $c \\in \\mathbb{R}$ is called the **coefficient** and $n \\in \\mathbb{R}$ is the **exponent** (or **degree** when $n$ is a non-negative integer). The term represents a monomial function $f(x) = c \\cdot x^n$.",
+        "notation": "$c \\cdot x^n$ or simply $cx^n$ where $c$ is the coefficient and $n$ is the exponent. When $c = 1$, we write $x^n$. When $n = 1$, we write $cx$. When $n = 0$, the term reduces to the constant $c$.",
+        "theorem": "**Constant Multiple Property**: For a function $f(x)$ and constant $c$, the function $g(x) = c \\cdot f(x)$ scales all output values of $f$ by factor $c$. That is, $g(x) = c \\cdot f(x)$ means every value is multiplied by $c$.",
+        "proof_sketch": "By definition of multiplication, $(c \\cdot f)(x) = c \\cdot f(x)$ distributes the constant across the function evaluation. This is a direct consequence of the distributive property of real numbers.",
+        "examples": [
+          "$3 \\cdot x^2$ at $x = 2$: $3 \\cdot 2^2 = 3 \\cdot 4 = 12$",
+          "$-2 \\cdot x^3$ at $x = 3$: $-2 \\cdot 3^3 = -2 \\cdot 27 = -54$",
+          "$5 \\cdot x^0$ at $x = 7$: $5 \\cdot 7^0 = 5 \\cdot 1 = 5$ (reduces to constant)",
+          "$0.5 \\cdot x^{-1}$ at $x = 4$: $0.5 \\cdot 4^{-1} = 0.5 \\cdot 0.25 = 0.125$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Polynomial Term Evaluation",
+          "latex": "$f(x) = c \\cdot x^n$",
+          "description": "Evaluates a polynomial term by first computing x^n, then multiplying by coefficient c"
+        },
+        {
+          "name": "Constant Term",
+          "latex": "$c \\cdot x^0 = c$",
+          "description": "When exponent is 0, the term simplifies to just the coefficient"
+        },
+        {
+          "name": "Linear Term",
+          "latex": "$c \\cdot x^1 = cx$",
+          "description": "When exponent is 1, this is a linear term"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that evaluates a single polynomial term c * x^n at a given value of x. This builds toward evaluating derivatives by first mastering term evaluation.",
+        "function_signature": "def polynomial_term(c: float, x: float, n: float) -> float:",
+        "starter_code": "def polynomial_term(c: float, x: float, n: float) -> float:\n    # Your code here\n    # Evaluate c * x^n\n    pass",
+        "test_cases": [
+          {
+            "input": "polynomial_term(3.0, 2.0, 2.0)",
+            "expected": "12.0",
+            "explanation": "3 * 2^2 = 3 * 4 = 12"
+          },
+          {
+            "input": "polynomial_term(-2.0, 3.0, 3.0)",
+            "expected": "-54.0",
+            "explanation": "-2 * 3^3 = -2 * 27 = -54"
+          },
+          {
+            "input": "polynomial_term(5.0, 7.0, 0.0)",
+            "expected": "5.0",
+            "explanation": "5 * 7^0 = 5 * 1 = 5, reduces to constant"
+          },
+          {
+            "input": "polynomial_term(2.0, 4.0, 1.0)",
+            "expected": "8.0",
+            "explanation": "2 * 4^1 = 2 * 4 = 8, linear term"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing x^n before multiplying by c, but getting the order wrong in code",
+        "Forgetting to handle the special case when n = 0 (should return c, not c * x)",
+        "Treating negative coefficients incorrectly with negative exponents"
+      ],
+      "hint": "First compute the power x^n, then multiply the result by the coefficient c. Use your power_function from the previous exercise.",
+      "references": [
+        "Polynomial functions",
+        "Monomial terms",
+        "Function evaluation"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "The Power Rule for Derivatives",
+      "relation_to_problem": "The power rule is the fundamental theorem needed to compute the derivative of x^n. Understanding this rule is essential for solving the main problem of finding derivatives of polynomial terms.",
+      "prerequisites": [
+        "Power functions",
+        "Concept of rate of change",
+        "Limits (intuitive understanding)"
+      ],
+      "learning_objectives": [
+        "State and apply the power rule for differentiation",
+        "Understand the theoretical foundation of the power rule",
+        "Compute derivatives of power functions symbolically"
+      ],
+      "math_content": {
+        "definition": "The **derivative** of a function $f(x)$ at a point $x$ is defined as the limit: $$\\frac{df}{dx} = f'(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}$$ This measures the instantaneous rate of change of $f$ at $x$, or equivalently, the slope of the tangent line to $f$ at point $(x, f(x))$.",
+        "notation": "Multiple notations exist: $f'(x)$ (Lagrange), $\\frac{df}{dx}$ (Leibniz), $\\frac{d}{dx}f(x)$ (operator notation), $Df(x)$ (Euler). All represent the derivative of $f$ with respect to $x$.",
+        "theorem": "**Power Rule**: For any real number $n \\neq 0$, if $f(x) = x^n$, then $$f'(x) = nx^{n-1}$$ Special case: If $n = 0$, then $f(x) = 1$ (constant), and $f'(x) = 0$.",
+        "proof_sketch": "For $f(x) = x^n$, using the limit definition: $$f'(x) = \\lim_{h \\to 0} \\frac{(x+h)^n - x^n}{h}$$ Using the binomial theorem, $(x+h)^n = x^n + nx^{n-1}h + O(h^2)$. Substituting: $$f'(x) = \\lim_{h \\to 0} \\frac{nx^{n-1}h + O(h^2)}{h} = \\lim_{h \\to 0} (nx^{n-1} + O(h)) = nx^{n-1}$$",
+        "examples": [
+          "$f(x) = x^3 \\Rightarrow f'(x) = 3x^{3-1} = 3x^2$",
+          "$f(x) = x^5 \\Rightarrow f'(x) = 5x^{5-1} = 5x^4$",
+          "$f(x) = x^1 \\Rightarrow f'(x) = 1 \\cdot x^{1-1} = x^0 = 1$",
+          "$f(x) = x^{-2} \\Rightarrow f'(x) = -2x^{-2-1} = -2x^{-3}$",
+          "$f(x) = x^0 = 1 \\Rightarrow f'(x) = 0$ (constant function)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Power Rule",
+          "latex": "$\\frac{d}{dx}(x^n) = nx^{n-1}$",
+          "description": "Brings down the exponent as a coefficient and reduces the exponent by 1"
+        },
+        {
+          "name": "Derivative Definition",
+          "latex": "$f'(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}$",
+          "description": "Formal limit definition of the derivative"
+        },
+        {
+          "name": "Constant Rule",
+          "latex": "$\\frac{d}{dx}(c) = 0$",
+          "description": "The derivative of any constant is zero"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the new exponent and coefficient when taking the derivative of x^n symbolically. Return a tuple (new_coefficient, new_exponent) representing the derivative nx^(n-1). This doesn't evaluate at a point yet - just applies the power rule symbolically.",
+        "function_signature": "def power_rule_symbolic(n: float) -> tuple[float, float]:",
+        "starter_code": "def power_rule_symbolic(n: float) -> tuple[float, float]:\n    # Your code here\n    # Apply power rule to x^n to get nx^(n-1)\n    # Return (coefficient, exponent) of the derivative\n    pass",
+        "test_cases": [
+          {
+            "input": "power_rule_symbolic(3.0)",
+            "expected": "(3.0, 2.0)",
+            "explanation": "Derivative of x^3 is 3x^2, so coefficient=3, exponent=2"
+          },
+          {
+            "input": "power_rule_symbolic(5.0)",
+            "expected": "(5.0, 4.0)",
+            "explanation": "Derivative of x^5 is 5x^4, so coefficient=5, exponent=4"
+          },
+          {
+            "input": "power_rule_symbolic(1.0)",
+            "expected": "(1.0, 0.0)",
+            "explanation": "Derivative of x^1 is 1*x^0 = 1, so coefficient=1, exponent=0"
+          },
+          {
+            "input": "power_rule_symbolic(0.0)",
+            "expected": "(0.0, 0.0)",
+            "explanation": "Derivative of constant x^0=1 is 0, represented as 0*x^0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to reduce the exponent by 1 after bringing it down as coefficient",
+        "Incorrectly handling n=0 case (derivative should be 0, not undefined)",
+        "Applying the power rule as n*x^n instead of n*x^(n-1)",
+        "Confusing the symbolic derivative formula with numerical evaluation"
+      ],
+      "hint": "The power rule says: bring down the exponent as a coefficient, then subtract 1 from the exponent. Handle the n=0 case specially.",
+      "references": [
+        "Differentiation rules",
+        "Calculus fundamentals",
+        "Tangent lines and slopes"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "The Constant Multiple Rule for Derivatives",
+      "relation_to_problem": "Since our problem involves derivatives of c * x^n (not just x^n), we need the constant multiple rule which states that constants factor out of derivatives.",
+      "prerequisites": [
+        "Power rule",
+        "Derivative definition",
+        "Linearity properties"
+      ],
+      "learning_objectives": [
+        "State and prove the constant multiple rule",
+        "Apply the constant multiple rule to polynomial terms",
+        "Understand how differentiation distributes over scalar multiplication"
+      ],
+      "math_content": {
+        "definition": "The **constant multiple rule** states that for a constant $c \\in \\mathbb{R}$ and differentiable function $f(x)$: $$\\frac{d}{dx}[c \\cdot f(x)] = c \\cdot \\frac{d}{dx}[f(x)] = c \\cdot f'(x)$$ In other words, constants factor out of the derivative operation.",
+        "notation": "$(cf)' = cf'$ or $\\frac{d}{dx}(cf) = c\\frac{df}{dx}$ where $c$ is constant and $f$ is a function of $x$",
+        "theorem": "**Constant Multiple Rule**: If $f$ is differentiable at $x$ and $c$ is a constant, then $cf$ is differentiable at $x$ and $(cf)'(x) = cf'(x)$. This follows from the linearity of the limit operator.",
+        "proof_sketch": "Using the limit definition of derivative: $$(cf)'(x) = \\lim_{h \\to 0} \\frac{c \\cdot f(x+h) - c \\cdot f(x)}{h} = \\lim_{h \\to 0} c \\cdot \\frac{f(x+h) - f(x)}{h} = c \\cdot \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h} = c \\cdot f'(x)$$ The constant $c$ can be factored out of the limit since it doesn't depend on $h$.",
+        "examples": [
+          "$\\frac{d}{dx}(3x^2) = 3 \\cdot \\frac{d}{dx}(x^2) = 3 \\cdot 2x = 6x$",
+          "$\\frac{d}{dx}(-5x^4) = -5 \\cdot \\frac{d}{dx}(x^4) = -5 \\cdot 4x^3 = -20x^3$",
+          "$\\frac{d}{dx}(2x) = 2 \\cdot \\frac{d}{dx}(x) = 2 \\cdot 1 = 2$",
+          "$\\frac{d}{dx}(7) = \\frac{d}{dx}(7 \\cdot x^0) = 7 \\cdot \\frac{d}{dx}(1) = 7 \\cdot 0 = 0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Constant Multiple Rule",
+          "latex": "$\\frac{d}{dx}[c \\cdot f(x)] = c \\cdot f'(x)$",
+          "description": "Constants can be factored out when taking derivatives"
+        },
+        {
+          "name": "Combined with Power Rule",
+          "latex": "$\\frac{d}{dx}(cx^n) = c \\cdot nx^{n-1} = cnx^{n-1}$",
+          "description": "Derivative of a polynomial term: multiply coefficient by exponent, reduce exponent by 1"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that applies both the constant multiple rule and power rule symbolically to a term c * x^n. Return a tuple (new_coefficient, new_exponent) representing the derivative after applying both rules.",
+        "function_signature": "def derivative_term_symbolic(c: float, n: float) -> tuple[float, float]:",
+        "starter_code": "def derivative_term_symbolic(c: float, n: float) -> tuple[float, float]:\n    # Your code here\n    # Apply constant multiple rule and power rule to c * x^n\n    # Return (coefficient, exponent) of the derivative\n    pass",
+        "test_cases": [
+          {
+            "input": "derivative_term_symbolic(3.0, 2.0)",
+            "expected": "(6.0, 1.0)",
+            "explanation": "Derivative of 3x^2: coefficient = 3*2 = 6, exponent = 2-1 = 1, result is 6x"
+          },
+          {
+            "input": "derivative_term_symbolic(2.0, 3.0)",
+            "expected": "(6.0, 2.0)",
+            "explanation": "Derivative of 2x^3: coefficient = 2*3 = 6, exponent = 3-1 = 2, result is 6x^2"
+          },
+          {
+            "input": "derivative_term_symbolic(-5.0, 4.0)",
+            "expected": "(-20.0, 3.0)",
+            "explanation": "Derivative of -5x^4: coefficient = -5*4 = -20, exponent = 4-1 = 3"
+          },
+          {
+            "input": "derivative_term_symbolic(7.0, 0.0)",
+            "expected": "(0.0, 0.0)",
+            "explanation": "Derivative of 7 (constant): is 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to multiply the original coefficient c by the exponent n",
+        "Only applying one rule (power rule) and forgetting the coefficient",
+        "Incorrectly handling negative coefficients with the multiplication",
+        "Not treating the n=0 case specially (constant terms have derivative 0)"
+      ],
+      "hint": "Combine both rules: factor out the constant c, apply power rule to x^n to get nx^(n-1), then multiply c by n to get the final coefficient cn.",
+      "references": [
+        "Linearity of differentiation",
+        "Differentiation rules",
+        "Polynomial derivatives"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Evaluating Derivatives at Specific Points",
+      "relation_to_problem": "The final step combines symbolic differentiation with numerical evaluation. We must compute the derivative formula and then evaluate it at a given x value.",
+      "prerequisites": [
+        "Power rule",
+        "Constant multiple rule",
+        "Function evaluation",
+        "Polynomial terms"
+      ],
+      "learning_objectives": [
+        "Distinguish between symbolic derivatives and numerical evaluation",
+        "Evaluate derivative formulas at specific points",
+        "Combine differentiation and evaluation in correct sequence"
+      ],
+      "math_content": {
+        "definition": "**Evaluating a derivative at a point** means first finding the derivative formula $f'(x)$ symbolically, then substituting a specific value of $x$ to compute $f'(x_0)$ where $x_0$ is the point of interest. This gives the instantaneous rate of change of $f$ at $x = x_0$.",
+        "notation": "$f'(x_0)$ or $\\left.\\frac{df}{dx}\\right|_{x=x_0}$ represents the derivative of $f$ evaluated at $x = x_0$. The vertical bar with subscript notation emphasizes the evaluation step.",
+        "theorem": "**Two-Step Process**: To find the derivative of $f(x) = cx^n$ at point $x = x_0$: (1) Apply differentiation rules to get $f'(x) = cnx^{n-1}$, (2) Evaluate at $x_0$ to get $f'(x_0) = cn{x_0}^{n-1}$.",
+        "proof_sketch": "This follows from function composition. If $g(x) = cnx^{n-1}$ is the derivative function, then $g(x_0) = cn{x_0}^{n-1}$ by substitution. The process is: differentiate first (symbolic manipulation), then evaluate (arithmetic computation).",
+        "examples": [
+          "$f(x) = 2x^3$ at $x=3$: $f'(x) = 6x^2$, so $f'(3) = 6(3)^2 = 6 \\cdot 9 = 54$",
+          "$f(x) = 3x^2$ at $x=2$: $f'(x) = 6x$, so $f'(2) = 6(2) = 12$",
+          "$f(x) = -4x^5$ at $x=1$: $f'(x) = -20x^4$, so $f'(1) = -20(1)^4 = -20$",
+          "$f(x) = 5x$ at $x=7$: $f'(x) = 5$, so $f'(7) = 5$ (derivative is constant)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Derivative of Polynomial Term",
+          "latex": "$\\frac{d}{dx}(cx^n) = cnx^{n-1}$",
+          "description": "Symbolic derivative formula combining constant multiple and power rules"
+        },
+        {
+          "name": "Evaluation at Point",
+          "latex": "$f'(x_0) = cn{x_0}^{n-1}$",
+          "description": "Numerical value of derivative at specific point x_0"
+        },
+        {
+          "name": "Special Case for Linear",
+          "latex": "If $n=1$: $\\frac{d}{dx}(cx) = c$",
+          "description": "Derivative of linear term is just the coefficient"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the derivative of c * x^n and evaluates it at a given point x. This is the penultimate step - combining symbolic differentiation with numerical evaluation.",
+        "function_signature": "def evaluate_derivative(c: float, x: float, n: float) -> float:",
+        "starter_code": "def evaluate_derivative(c: float, x: float, n: float) -> float:\n    # Your code here\n    # Step 1: Apply derivative rules to get cn*x^(n-1)\n    # Step 2: Evaluate at the given x\n    pass",
+        "test_cases": [
+          {
+            "input": "evaluate_derivative(2.0, 3.0, 3.0)",
+            "expected": "54.0",
+            "explanation": "Derivative of 2x^3 is 6x^2, evaluated at x=3: 6*(3^2) = 54"
+          },
+          {
+            "input": "evaluate_derivative(3.0, 2.0, 2.0)",
+            "expected": "12.0",
+            "explanation": "Derivative of 3x^2 is 6x, evaluated at x=2: 6*2 = 12"
+          },
+          {
+            "input": "evaluate_derivative(-4.0, 1.0, 5.0)",
+            "expected": "-20.0",
+            "explanation": "Derivative of -4x^5 is -20x^4, evaluated at x=1: -20*(1^4) = -20"
+          },
+          {
+            "input": "evaluate_derivative(5.0, 7.0, 1.0)",
+            "expected": "5.0",
+            "explanation": "Derivative of 5x is 5 (constant), independent of x"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Evaluating at x first, then differentiating (wrong order - must differentiate first)",
+        "Forgetting to raise x to the new power (n-1) during evaluation",
+        "Not handling the n=0 case (constant function has derivative 0 everywhere)",
+        "Confusing the symbolic formula cn*x^(n-1) with the evaluated result cn*(x_0)^(n-1)"
+      ],
+      "hint": "First compute the derivative coefficient (c * n) and new exponent (n - 1), then evaluate the resulting power function at x.",
+      "references": [
+        "Function evaluation",
+        "Derivative evaluation",
+        "Instantaneous rate of change"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Edge Cases and Robustness in Derivative Computation",
+      "relation_to_problem": "Real-world implementations must handle special cases: zero exponents (constants), linear terms, and negative exponents. This final sub-quest ensures robust implementation of the complete solution.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Conditional logic",
+        "Edge case analysis"
+      ],
+      "learning_objectives": [
+        "Identify and handle special cases in polynomial derivatives",
+        "Implement robust derivative computation with proper edge case handling",
+        "Understand the mathematical meaning behind edge cases"
+      ],
+      "math_content": {
+        "definition": "**Edge cases** in derivative computation are inputs that require special consideration: (1) $n=0$ (constant functions), (2) $n=1$ (linear functions), (3) negative exponents, (4) $c=0$ (zero coefficient). Each has well-defined mathematical behavior but may require careful implementation.",
+        "notation": "For edge cases: $\\frac{d}{dx}(c) = 0$ when $n=0$; $\\frac{d}{dx}(cx) = c$ when $n=1$; $\\frac{d}{dx}(cx^{-n}) = -cnx^{-n-1}$ for negative $n$",
+        "theorem": "**Edge Case Behavior**: (1) Constants have zero derivative: $\\frac{d}{dx}(c) = 0$. (2) Linear functions have constant derivative: $\\frac{d}{dx}(cx) = c$. (3) Zero coefficient yields zero derivative: $\\frac{d}{dx}(0 \\cdot x^n) = 0$ for all $n$. (4) Negative exponents follow the same power rule: $\\frac{d}{dx}(x^{-n}) = -nx^{-n-1}$.",
+        "proof_sketch": "(1) For $f(x) = c$: $f'(x) = \\lim_{h \\to 0} \\frac{c - c}{h} = \\lim_{h \\to 0} 0 = 0$. (2) For $f(x) = cx^1$: $f'(x) = c \\cdot 1 \\cdot x^0 = c$. (3) For $f(x) = 0$: $f'(x) = 0$ by linearity. (4) Negative exponents use the same power rule derivation.",
+        "examples": [
+          "$f(x) = 5$ (constant): $f'(x) = 0$, so $f'(3) = 0$",
+          "$f(x) = 7x$ (linear): $f'(x) = 7$, so $f'(4) = 7$",
+          "$f(x) = 0 \\cdot x^{100}$: $f'(x) = 0$, so $f'(2) = 0$",
+          "$f(x) = 2x^{-3}$ at $x=2$: $f'(x) = -6x^{-4}$, so $f'(2) = -6(2)^{-4} = -6/16 = -0.375$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Constant Derivative",
+          "latex": "$\\frac{d}{dx}(c) = 0$ when $n=0$",
+          "description": "Any constant has derivative zero"
+        },
+        {
+          "name": "Linear Derivative",
+          "latex": "$\\frac{d}{dx}(cx) = c$ when $n=1$",
+          "description": "Linear functions have constant slope c"
+        },
+        {
+          "name": "Zero Coefficient",
+          "latex": "$\\frac{d}{dx}(0 \\cdot x^n) = 0$",
+          "description": "Zero coefficient makes entire derivative zero"
+        },
+        {
+          "name": "General Formula",
+          "latex": "$f'(x_0) = cn{x_0}^{n-1}$ for $n \\neq 0$",
+          "description": "Works for all cases including negative and fractional exponents"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete robust derivative function that handles all edge cases properly. Given c, x, and n, compute the value of the derivative of c*x^n at point x, handling constants, linear terms, zero coefficients, and negative exponents correctly.",
+        "function_signature": "def poly_term_derivative_robust(c: float, x: float, n: float) -> float:",
+        "starter_code": "def poly_term_derivative_robust(c: float, x: float, n: float) -> float:\n    # Your code here\n    # Compute derivative of c * x^n at point x\n    # Handle edge cases: n=0, n=1, c=0, negative n\n    pass",
+        "test_cases": [
+          {
+            "input": "poly_term_derivative_robust(2.0, 3.0, 2.0)",
+            "expected": "12.0",
+            "explanation": "Standard case: derivative of 2x^2 at x=3 is 4*3=12"
+          },
+          {
+            "input": "poly_term_derivative_robust(5.0, 10.0, 0.0)",
+            "expected": "0.0",
+            "explanation": "Edge case n=0: derivative of constant 5 is 0"
+          },
+          {
+            "input": "poly_term_derivative_robust(7.0, 4.0, 1.0)",
+            "expected": "7.0",
+            "explanation": "Edge case n=1: derivative of 7x is constant 7"
+          },
+          {
+            "input": "poly_term_derivative_robust(0.0, 5.0, 3.0)",
+            "expected": "0.0",
+            "explanation": "Edge case c=0: derivative of 0*x^3 is 0"
+          },
+          {
+            "input": "poly_term_derivative_robust(2.0, 2.0, -3.0)",
+            "expected": "-0.75",
+            "explanation": "Negative exponent: derivative of 2x^(-3) is -6x^(-4), at x=2: -6/(2^4)=-6/16=-0.375... wait, -6*2^(-4) = -6/16 = -3/8 = -0.375"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking for n=0 case first, leading to 0^(-1) errors",
+        "Forgetting that c=0 makes the entire derivative 0 regardless of n and x",
+        "Incorrectly handling negative exponents in the evaluation step",
+        "Computing x^(n-1) when n=0, which could cause issues with x=0"
+      ],
+      "hint": "Check special cases first: if n=0 return 0; if c=0 return 0. Then apply the general formula: new_coef = c*n, new_exp = n-1, result = new_coef * x^new_exp.",
+      "references": [
+        "Edge case handling",
+        "Robust programming",
+        "Derivative computation",
+        "Numerical stability"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "title": "Implement K-Fold Cross-Validation",
+  "description": "SW1wbGVtZW50IGEgZnVuY3Rpb24gdG8gZ2VuZXJhdGUgdHJhaW4gYW5kIHRlc3Qgc3BsaXRzIGZvciBLLUZvbGQgQ3Jvc3MtVmFsaWRhdGlvbi4gWW91ciB0YXNrIGlzIHRvIGRpdmlkZSB0aGUgZGF0YXNldCBpbnRvIGsgZm9sZHMgYW5kIHJldHVybiBhIGxpc3Qgb2YgdHJhaW4tdGVzdCBpbmRpY2VzIGZvciBlYWNoIGZvbGQu",
+  "mdx_file": "22190adc-bf0a-4187-870f-085cc174903a.mdx",
+  "tinygrad_difficulty": "medium",
+  "id": "18",
+  "test_cases": [
+    {
+      "test": "import numpy as np\nnp.random.seed(42)\nprint(k_fold_cross_validation(np.array([0,1,2,3,4,5,6,7,8,9]), np.array([0,1,2,3,4,5,6,7,8,9]), k=5, shuffle=False))",
+      "expected_output": "[([2, 3, 4, 5, 6, 7, 8, 9], [0, 1]), ([0, 1, 4, 5, 6, 7, 8, 9], [2, 3]), ([0, 1, 2, 3, 6, 7, 8, 9], [4, 5]), ([0, 1, 2, 3, 4, 5, 8, 9], [6, 7]), ([0, 1, 2, 3, 4, 5, 6, 7], [8, 9])]"
+    },
+    {
+      "test": "import numpy as np\nnp.random.seed(42)\nprint(k_fold_cross_validation(np.array([0,1,2,3,4,5,6,7,8,9]), np.array([0,1,2,3,4,5,6,7,8,9]), k=2, shuffle=True))",
+      "expected_output": "[([2, 9, 4, 3, 6], [8, 1, 5, 0, 7]), ([8, 1, 5, 0, 7], [2, 9, 4, 3, 6])]"
+    }
+  ],
+  "tinygrad_starter_code": "ZGVmIGtfZm9sZF9jcm9zc192YWxpZGF0aW9uX3RnKFgsIHksIGs9NSwgc2h1ZmZsZT1UcnVlKSAtPiBsaXN0W3R1cGxlW2xpc3RbaW50XSwgbGlzdFtpbnRdXV06CiAgICAiIiIKICAgIFJldHVybiB0cmFpbi90ZXN0IGluZGV4IHNwbGl0cyBmb3Igay1mb2xkIGNyb3NzLXZhbGlkYXRpb24gdXNpbmcgcHVyZSBQeXRob24gb3IgdGlueWdyYWQuCiAgICBYOiBsaXN0IG9yIFRlbnNvciBvZiBzaGFwZSAobl9zYW1wbGVzLCAuLi4pCiAgICB5OiBsaXN0IG9yIFRlbnNvciBvZiBzaGFwZSAobl9zYW1wbGVzLCAuLi4pCiAgICBrOiBudW1iZXIgb2YgZm9sZHMKICAgIHNodWZmbGU6IHdoZXRoZXIgdG8gc2h1ZmZsZSBpbmRpY2VzIGJlZm9yZSBzcGxpdHRpbmcKICAgIFJldHVybnMgbGlzdCBvZiAodHJhaW5faWR4LCB0ZXN0X2lkeCkgcGFpcnMsIGVhY2ggYXMgUHl0aG9uIGxpc3RzIG9mIGludHMuCiAgICAiIiIKICAgICMgWW91ciBpbXBsZW1lbnRhdGlvbiBoZXJlCiAgICBwYXNzCg==",
+  "difficulty": "medium",
+  "pytorch_difficulty": "medium",
+  "likes": "0",
+  "video": "",
+  "cuda_test_cases": [
+    {
+      "test": "#include <iostream>\n#include <vector>\n#include <utility>\nstd::vector<std::pair<std::vector<int>, std::vector<int>>> k_fold_cross_validation(int n_samples, int k, bool shuffle);\nint main() { auto r=k_fold_cross_validation(10,2,false); std::cout<<\"[([\";\n    for(int i=0;i<r[0].first.size();i++){std::cout<<r[0].first[i];if(i<r[0].first.size()-1)std::cout<<\", \";}\n    std::cout<<\"], [\";\n    for(int i=0;i<r[0].second.size();i++){std::cout<<r[0].second[i];if(i<r[0].second.size()-1)std::cout<<\", \";}\n    std::cout<<\"]), ([\";\n    for(int i=0;i<r[1].first.size();i++){std::cout<<r[1].first[i];if(i<r[1].first.size()-1)std::cout<<\", \";}\n    std::cout<<\"], [\";\n    for(int i=0;i<r[1].second.size();i++){std::cout<<r[1].second[i];if(i<r[1].second.size()-1)std::cout<<\", \";}\n    std::cout<<\"])]\"<<std::endl; return 0; }",
+      "expected_output": "[([5, 6, 7, 8, 9], [0, 1, 2, 3, 4]), ([0, 1, 2, 3, 4], [5, 6, 7, 8, 9])]"
+    }
+  ],
+  "cuda_difficulty": "easy",
+  "dislikes": "0",
+  "example": {
+    "input": "k_fold_cross_validation(np.array([0,1,2,3,4,5,6,7,8,9]), np.array([0,1,2,3,4,5,6,7,8,9]), k=5, shuffle=False)",
+    "output": "[([2, 3, 4, 5, 6, 7, 8, 9], [0, 1]), ([0, 1, 4, 5, 6, 7, 8, 9], [2, 3]), ([0, 1, 2, 3, 6, 7, 8, 9], [4, 5]), ([0, 1, 2, 3, 4, 5, 8, 9], [6, 7]), ([0, 1, 2, 3, 4, 5, 6, 7], [8, 9])]",
+    "reasoning": "The function splits the dataset into 5 folds without shuffling and returns train-test splits for each iteration."
+  },
+  "category": "Machine Learning",
+  "starter_code": "import numpy as np\n\ndef k_fold_cross_validation(X: np.ndarray, y: np.ndarray, k=5, shuffle=True):\n    \"\"\"\n    Implement k-fold cross-validation by returning train-test indices.\n    \"\"\"\n    # Your code here\n    pass",
+  "learn_section": "IyMgVW5kZXJzdGFuZGluZyBLLUZvbGQgQ3Jvc3MtVmFsaWRhdGlvbgoKSy1Gb2xkIENyb3NzLVZhbGlkYXRpb24gaXMgYSByZXNhbXBsaW5nIHRlY2huaXF1ZSB1c2VkIHRvIGV2YWx1YXRlIG1hY2hpbmUgbGVhcm5pbmcgbW9kZWxzIGJ5IHBhcnRpdGlvbmluZyB0aGUgZGF0YXNldCBpbnRvIG11bHRpcGxlIGZvbGRzLgoKIyMjIEhvdyBpdCBXb3JrcwoxLiBUaGUgZGF0YXNldCBpcyBzcGxpdCBpbnRvICoqayoqIGVxdWFsIChvciBhbG1vc3QgZXF1YWwpIHBhcnRzIGNhbGxlZCBmb2xkcy4KMi4gRWFjaCBmb2xkIGlzIHVzZWQgKipvbmNlKiogYXMgYSB0ZXN0IHNldCwgd2hpbGUgdGhlIHJlbWFpbmluZyAqKmstMSoqIGZvbGRzIGZvcm0gdGhlIHRyYWluaW5nIHNldC4KMy4gVGhlIHByb2Nlc3MgaXMgcmVwZWF0ZWQgKiprIHRpbWVzKiosIGVuc3VyaW5nIGVhY2ggZm9sZCBzZXJ2ZXMgYXMgYSB0ZXN0IHNldCBleGFjdGx5IG9uY2UuCgojIyMgV2h5IFVzZSBLLUZvbGQgQ3Jvc3MtVmFsaWRhdGlvbj8KLSBJdCBwcm92aWRlcyBhIG1vcmUgKipyb2J1c3QqKiBlc3RpbWF0ZSBvZiBtb2RlbCBwZXJmb3JtYW5jZSB0aGFuIGEgc2luZ2xlIHRyYWluLXRlc3Qgc3BsaXQuCi0gUmVkdWNlcyBiaWFzIGludHJvZHVjZWQgYnkgYSBzaW5nbGUgdHJhaW5pbmcvdGVzdGluZyBzcGxpdC4KLSBBbGxvd3MgZXZhbHVhdGlvbiBhY3Jvc3MgbXVsdGlwbGUgZGF0YSBkaXN0cmlidXRpb25zLgoKIyMjIEltcGxlbWVudGF0aW9uIFN0ZXBzCjEuIFNodWZmbGUgdGhlIGRhdGEgaWYgcmVxdWlyZWQuCjIuIFNwbGl0IHRoZSBkYXRhc2V0IGludG8gKiprKiogZXF1YWwgKG9yIG5lYXJseSBlcXVhbCkgZm9sZHMuCjMuIEl0ZXJhdGUgb3ZlciBlYWNoIGZvbGQsIHVzaW5nIGl0IGFzIHRoZSB0ZXN0IHNldCB3aGlsZSB1c2luZyB0aGUgcmVtYWluaW5nIGRhdGEgYXMgdGhlIHRyYWluaW5nIHNldC4KNC4gUmV0dXJuIHRyYWluLXRlc3QgaW5kaWNlcyBmb3IgZWFjaCBpdGVyYXRpb24uCgpCeSBpbXBsZW1lbnRpbmcgdGhpcyBmdW5jdGlvbiwgeW91IHdpbGwgbGVhcm4gaG93IHRvICoqc3BsaXQgYSBkYXRhc2V0IGZvciBjcm9zcy12YWxpZGF0aW9uKiosIGEgY3J1Y2lhbCBzdGVwIGluIG1vZGVsIGV2YWx1YXRpb24u",
+  "cuda_starter_code": "I2luY2x1ZGUgPGN1ZGFfcnVudGltZS5oPgojaW5jbHVkZSA8aW9zdHJlYW0+CiNpbmNsdWRlIDx2ZWN0b3I+CiNpbmNsdWRlIDx1dGlsaXR5PgoKc3RkOjp2ZWN0b3I8c3RkOjpwYWlyPHN0ZDo6dmVjdG9yPGludD4sIHN0ZDo6dmVjdG9yPGludD4+PiBrX2ZvbGRfY3Jvc3NfdmFsaWRhdGlvbihpbnQgbl9zYW1wbGVzLCBpbnQgaywgYm9vbCBzaHVmZmxlKTs=",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/peppermin-t",
+      "name": "Yinjia Chen"
+    },
+    {
+      "profile_link": "https://github.com/moe18",
+      "name": "Moe Chabot"
+    }
+  ],
+  "pytorch_test_cases": [
+    {
+      "test": "res = k_fold_cross_validation(list(range(6)), list(range(6)), k=3, shuffle=False)\nprint(res)",
+      "expected_output": "[(2, 3, 4, 5), [0, 1]], [0, 1, 4, 5, [2, 3]], [0, 1, 2, 3, [4, 5]]"
+    },
+    {
+      "test": "res = k_fold_cross_validation(list(range(8)), list(range(8)), k=4, shuffle=False)\nprint(res)",
+      "expected_output": "[([2,3,4,5,6,7], [0,1]), ([0,1,4,5,6,7], [2,3]), ([0,1,2,3,6,7], [4,5]), ([0,1,2,3,4,5], [6,7])]"
+    }
+  ],
+  "tinygrad_test_cases": [
+    {
+      "test": "res = k_fold_cross_validation_tg(list(range(6)), list(range(6)), k=3, shuffle=False)\nprint(res)",
+      "expected_output": "[([2, 3, 4, 5], [0, 1]), ([0, 1, 4, 5], [2, 3]), ([0, 1, 2, 3], [4, 5])]"
+    },
+    {
+      "test": "res = k_fold_cross_validation_tg(list(range(8)), list(range(8)), k=4, shuffle=False)\nprint(res)",
+      "expected_output": "[([2, 3, 4, 5, 6, 7], [0, 1]), ([0, 1, 4, 5, 6, 7], [2, 3]), ([0, 1, 2, 3, 6, 7], [4, 5]), ([0, 1, 2, 3, 4, 5], [6, 7])]"
+    }
+  ],
+  "pytorch_starter_code": "aW1wb3J0IHRvcmNoCgpkZWYga19mb2xkX2Nyb3NzX3ZhbGlkYXRpb24oWCwgeSwgaz01LCBzaHVmZmxlPVRydWUpIC0+IGxpc3RbdHVwbGVbbGlzdFtpbnRdLCBsaXN0W2ludF1dXToKICAgICIiIgogICAgUmV0dXJuIHRyYWluL3Rlc3QgaW5kZXggc3BsaXRzIGZvciBrLWZvbGQgY3Jvc3MtdmFsaWRhdGlvbiB1c2luZyBQeVRvcmNoLgogICAgWDogVGVuc29yIG9yIGNvbnZlcnRpYmxlIG9mIHNoYXBlIChuX3NhbXBsZXMsIC4uLikKICAgIHk6IFRlbnNvciBvciBjb252ZXJ0aWJsZSBvZiBzaGFwZSAobl9zYW1wbGVzLCAuLi4pCiAgICBrOiBudW1iZXIgb2YgZm9sZHMKICAgIHNodWZmbGU6IHdoZXRoZXIgdG8gc2h1ZmZsZSBpbmRpY2VzIGJlZm9yZSBzcGxpdHRpbmcKICAgIFJldHVybnMgbGlzdCBvZiAodHJhaW5faWR4LCB0ZXN0X2lkeCkgcGFpcnMsIGVhY2ggYXMgUHl0aG9uIGxpc3RzIG9mIGludHMuCiAgICAiIiIKICAgIFhfdCA9IHRvcmNoLmFzX3RlbnNvcihYKQogICAgbl9zYW1wbGVzID0gWF90LnNpemUoMCkKICAgIGluZGljZXMgPSB0b3JjaC5hcmFuZ2Uobl9zYW1wbGVzKQogICAgaWYgc2h1ZmZsZToKICAgICAgICBpbmRpY2VzID0gaW5kaWNlc1t0b3JjaC5yYW5kcGVybShuX3NhbXBsZXMpXQogICAgIyBjb21wdXRlIGZvbGQgc2l6ZXMKICAgIGJhc2UgPSBuX3NhbXBsZXMgLy8gawogICAgZXh0cmFzID0gbl9zYW1wbGVzICUgawogICAgZm9sZF9zaXplcyA9IFtiYXNlICsgKDEgaWYgaSA8IGV4dHJhcyBlbHNlIDApIGZvciBpIGluIHJhbmdlKGspXQogICAgIyBzcGxpdCBpbnRvIGZvbGRzCiAgICBmb2xkcyA9IFtdCiAgICBzdGFydCA9IDAKICAgIGZvciBmcyBpbiBmb2xkX3NpemVzOgogICAgICAgIGZvbGRzLmFwcGVuZChpbmRpY2VzW3N0YXJ0OnN0YXJ0K2ZzXS50b2xpc3QoKSkKICAgICAgICBzdGFydCArPSBmcwogICAgIyBidWlsZCB0cmFpbi90ZXN0IHBhaXJzCiAgICByZXN1bHQgPSBbXQogICAgZm9yIGkgaW4gcmFuZ2Uoayk6CiAgICAgICAgdGVzdF9pZHggPSBmb2xkc1tpXQogICAgICAgIHRyYWluX2lkeCA9IFtpZHggZm9yIGosIGYgaW4gZW51bWVyYXRlKGZvbGRzKSBpZiBqICE9IGkgZm9yIGlkeCBpbiBmXQogICAgICAgIHJlc3VsdC5hcHBlbmQoKHRyYWluX2lkeCwgdGVzdF9pZHgpKQogICAgcmV0dXJuIHJlc3VsdAo=",
+  "description_decoded": "Implement a function to generate train and test splits for K-Fold Cross-Validation. Your task is to divide the dataset into k folds and return a list of train-test indices for each fold.",
+  "learn_section_decoded": "## Understanding K-Fold Cross-Validation\n\nK-Fold Cross-Validation is a resampling technique used to evaluate machine learning models by partitioning the dataset into multiple folds.\n\n### How it Works\n1. The dataset is split into **k** equal (or almost equal) parts called folds.\n2. Each fold is used **once** as a test set, while the remaining **k-1** folds form the training set.\n3. The process is repeated **k times**, ensuring each fold serves as a test set exactly once.\n\n### Why Use K-Fold Cross-Validation?\n- It provides a more **robust** estimate of model performance than a single train-test split.\n- Reduces bias introduced by a single training/testing split.\n- Allows evaluation across multiple data distributions.\n\n### Implementation Steps\n1. Shuffle the data if required.\n2. Split the dataset into **k** equal (or nearly equal) folds.\n3. Iterate over each fold, using it as the test set while using the remaining data as the training set.\n4. Return train-test indices for each iteration.\n\nBy implementing this function, you will learn how to **split a dataset for cross-validation**, a crucial step in model evaluation.",
+  "tinygrad_starter_code_decoded": "def k_fold_cross_validation_tg(X, y, k=5, shuffle=True) -> list[tuple[list[int], list[int]]]:\n    \"\"\"\n    Return train/test index splits for k-fold cross-validation using pure Python or tinygrad.\n    X: list or Tensor of shape (n_samples, ...)\n    y: list or Tensor of shape (n_samples, ...)\n    k: number of folds\n    shuffle: whether to shuffle indices before splitting\n    Returns list of (train_idx, test_idx) pairs, each as Python lists of ints.\n    \"\"\"\n    # Your implementation here\n    pass\n"
+}

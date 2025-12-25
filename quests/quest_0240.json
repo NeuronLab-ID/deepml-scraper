@@ -1,0 +1,456 @@
+{
+  "problem_id": 240,
+  "title": "Bilinear Image Resizing",
+  "category": "Computer Vision",
+  "difficulty": "medium",
+  "description": "## Task: Image Resizing with Bilinear Interpolation\n\nBilinear interpolation is a fundamental technique in computer vision for resizing images. Unlike nearest-neighbor interpolation which simply picks the closest pixel, bilinear interpolation considers the four nearest pixels and computes a weighted average based on the distances to each pixel.\n\nImplement a function `bilinear_resize(image, new_height, new_width)` that resizes a grayscale or RGB image to the specified dimensions using bilinear interpolation.\n\n### Input:\n- `image`: A 2D list/array (grayscale) or 3D list/array (RGB) representing an image\n- `new_height`: Target height of the resized image (positive integer)\n- `new_width`: Target width of the resized image (positive integer)\n\n### Output:\n- Return the resized image as a nested list with values rounded to 2 decimal places\n\n### Notes:\n- Map each output pixel to corresponding source coordinates\n- Use the four nearest source pixels for interpolation\n- Handle boundary cases by clamping coordinates to valid range\n- Works for both upscaling and downscaling",
+  "example": {
+    "input": "image = [[0, 100], [100, 200]]\nbilinear_resize(image, 4, 4)",
+    "output": "[[0.0, 50.0, 100.0, 100.0], [50.0, 100.0, 150.0, 150.0], [100.0, 150.0, 200.0, 200.0], [100.0, 150.0, 200.0, 200.0]]",
+    "reasoning": "The 2x2 image is upscaled to 4x4. Each output pixel maps to source coordinates with scale factor 0.5. For example, output pixel (1,1) maps to source (0.5, 0.5), which lies at the center of all four source pixels. The bilinear interpolation computes: 0*0.25 + 100*0.25 + 100*0.25 + 200*0.25 = 100."
+  },
+  "starter_code": "import numpy as np\n\ndef bilinear_resize(image, new_height: int, new_width: int) -> list:\n    \"\"\"\n    Resize an image using bilinear interpolation.\n    \n    Args:\n        image: 2D (grayscale) or 3D (RGB) array representing an image\n        new_height: Target height of the resized image\n        new_width: Target width of the resized image\n    \n    Returns:\n        Resized image as a nested list with values rounded to 2 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Coordinate Mapping and Scale Factors",
+      "relation_to_problem": "The first step in bilinear resizing is determining where each output pixel maps to in the source image through scale factors. This establishes the foundation for all subsequent interpolation computations.",
+      "prerequisites": [
+        "Basic algebra",
+        "Understanding of 2D arrays/matrices",
+        "Python indexing"
+      ],
+      "learning_objectives": [
+        "Derive and compute scale factors for image resizing transformations",
+        "Map output pixel coordinates to continuous source coordinates",
+        "Understand the relationship between discrete pixel positions and continuous coordinate spaces"
+      ],
+      "math_content": {
+        "definition": "**Coordinate Mapping** is a geometric transformation $\\phi: \\mathbb{Z}^2 \\to \\mathbb{R}^2$ that maps discrete output pixel positions to continuous source image coordinates. For an image resize operation from dimensions $(H_{\\text{old}}, W_{\\text{old}})$ to $(H_{\\text{new}}, W_{\\text{new}})$, the mapping is defined by scale factors $s_y = \\frac{H_{\\text{old}}}{H_{\\text{new}}}$ and $s_x = \\frac{W_{\\text{old}}}{W_{\\text{new}}}$. For each output pixel at integer position $(i, j)$ where $0 \\leq i < H_{\\text{new}}, 0 \\leq j < W_{\\text{new}}$, the corresponding source coordinates are $(y, x) = (i \\cdot s_y, j \\cdot s_x) \\in \\mathbb{R}^2$.",
+        "notation": "$H_{\\text{old}}, W_{\\text{old}}$ = original image height and width; $H_{\\text{new}}, W_{\\text{new}}$ = target dimensions; $s_y, s_x$ = vertical and horizontal scale factors; $(i, j)$ = output pixel position (integers); $(y, x)$ = source coordinates (real numbers)",
+        "theorem": "**Scale Factor Invariance**: For any resize operation, the product of scale factor and new dimension equals the original dimension: $s_y \\cdot H_{\\text{new}} = H_{\\text{old}}$ and $s_x \\cdot W_{\\text{new}} = W_{\\text{old}}$. This ensures that the transformation is consistent and reversible.",
+        "proof_sketch": "By definition, $s_y = \\frac{H_{\\text{old}}}{H_{\\text{new}}}$. Multiplying both sides by $H_{\\text{new}}$ yields $s_y \\cdot H_{\\text{new}} = H_{\\text{old}}$. The same logic applies for the horizontal dimension.",
+        "examples": [
+          "**Upscaling**: Original image is $2 \\times 2$, target is $4 \\times 4$. Scale factors: $s_y = s_x = \\frac{2}{4} = 0.5$. Output pixel $(2, 3)$ maps to source $(2 \\cdot 0.5, 3 \\cdot 0.5) = (1.0, 1.5)$.",
+          "**Downscaling**: Original is $100 \\times 200$, target is $50 \\times 100$. Scale factors: $s_y = \\frac{100}{50} = 2.0$, $s_x = \\frac{200}{100} = 2.0$. Output pixel $(10, 20)$ maps to source $(20.0, 40.0)$.",
+          "**Non-uniform scaling**: Original is $10 \\times 20$, target is $5 \\times 10$. Scale factors: $s_y = 2.0$, $s_x = 2.0$. Output pixel $(0, 0)$ maps to source $(0.0, 0.0)$; output pixel $(4, 9)$ maps to source $(8.0, 18.0)$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Vertical Scale Factor",
+          "latex": "$s_y = \\frac{H_{\\text{old}}}{H_{\\text{new}}}$",
+          "description": "Ratio of original height to target height; used to map vertical output coordinates to source"
+        },
+        {
+          "name": "Horizontal Scale Factor",
+          "latex": "$s_x = \\frac{W_{\\text{old}}}{W_{\\text{new}}}$",
+          "description": "Ratio of original width to target width; used to map horizontal output coordinates to source"
+        },
+        {
+          "name": "Source Coordinate Mapping",
+          "latex": "$y = i \\cdot s_y, \\quad x = j \\cdot s_x$",
+          "description": "Maps output pixel position $(i, j)$ to continuous source coordinates $(y, x)$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes scale factors and maps all output pixel positions to their corresponding source coordinates. This is the first building block for image resizing, establishing where each output pixel should sample from in the source image.",
+        "function_signature": "def compute_source_coordinates(old_height: int, old_width: int, new_height: int, new_width: int) -> list:",
+        "starter_code": "def compute_source_coordinates(old_height: int, old_width: int, new_height: int, new_width: int) -> list:\n    \"\"\"\n    Compute source coordinates for each output pixel position.\n    \n    Args:\n        old_height: Height of original image\n        old_width: Width of original image\n        new_height: Height of target image\n        new_width: Width of target image\n    \n    Returns:\n        2D list where each element [i][j] is a tuple (y, x) representing\n        the source coordinates for output pixel (i, j), rounded to 2 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_source_coordinates(2, 2, 4, 4)",
+            "expected": "[[(0.0, 0.0), (0.0, 0.5), (0.0, 1.0), (0.0, 1.5)], [(0.5, 0.0), (0.5, 0.5), (0.5, 1.0), (0.5, 1.5)], [(1.0, 0.0), (1.0, 0.5), (1.0, 1.0), (1.0, 1.5)], [(1.5, 0.0), (1.5, 0.5), (1.5, 1.0), (1.5, 1.5)]]",
+            "explanation": "Upscaling from 2x2 to 4x4. Scale factors are 0.5. Each output position is multiplied by 0.5 to get source coordinates."
+          },
+          {
+            "input": "compute_source_coordinates(4, 4, 2, 2)",
+            "expected": "[[(0.0, 0.0), (0.0, 2.0)], [(2.0, 0.0), (2.0, 2.0)]]",
+            "explanation": "Downscaling from 4x4 to 2x2. Scale factors are 2.0. Output pixel (1,1) maps to source (2.0, 2.0)."
+          },
+          {
+            "input": "compute_source_coordinates(3, 6, 2, 3)",
+            "expected": "[[(0.0, 0.0), (0.0, 2.0), (0.0, 4.0)], [(1.5, 0.0), (1.5, 2.0), (1.5, 4.0)]]",
+            "explanation": "Non-uniform scaling: vertical scale factor is 1.5, horizontal is 2.0. Each dimension scales independently."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing scale factors as $\\frac{H_{\\text{new}}}{H_{\\text{old}}}$ (inverted) - this reverses the mapping direction",
+        "Using integer division instead of float division, causing truncation errors",
+        "Confusing row/column indexing: row index corresponds to y (height), column to x (width)",
+        "Not realizing that source coordinates are continuous (float) values, not discrete pixel indices"
+      ],
+      "hint": "Start by computing the two scale factors as ratios. Then use nested loops to iterate through all output positions, multiplying each by the appropriate scale factor.",
+      "references": [
+        "Affine transformations",
+        "Geometric image transformations",
+        "Coordinate systems in computer graphics"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Floor Operation and Finding Nearest Integer Coordinates",
+      "relation_to_problem": "Since source coordinates are continuous values but image pixels exist at integer positions, we need to identify the four surrounding integer pixel positions for interpolation. The floor operation gives us the top-left anchor point.",
+      "prerequisites": [
+        "Coordinate mapping from Step 1",
+        "Floor and ceiling functions",
+        "Understanding of real vs integer coordinate spaces"
+      ],
+      "learning_objectives": [
+        "Apply the floor function to map continuous coordinates to discrete pixel positions",
+        "Identify the four integer pixel positions surrounding a continuous coordinate",
+        "Handle boundary conditions when coordinates approach image edges"
+      ],
+      "math_content": {
+        "definition": "The **floor function** $\\lfloor \\cdot \\rfloor: \\mathbb{R} \\to \\mathbb{Z}$ maps a real number to the greatest integer less than or equal to it: $\\lfloor y \\rfloor = \\max\\{n \\in \\mathbb{Z} : n \\leq y\\}$. For a continuous source coordinate $(y, x) \\in \\mathbb{R}^2$, the **four nearest neighbors** are the integer pixel positions forming a unit square containing $(y, x)$: $(y_0, x_0), (y_0, x_1), (y_1, x_0), (y_1, x_1)$ where $y_0 = \\lfloor y \\rfloor$, $x_0 = \\lfloor x \\rfloor$, $y_1 = y_0 + 1$, and $x_1 = x_0 + 1$.",
+        "notation": "$\\lfloor y \\rfloor$ = floor of $y$ (greatest integer $\\leq y$); $(y_0, x_0)$ = top-left pixel position; $(y_1, x_1)$ = bottom-right pixel position; $y_1 = y_0 + 1, x_1 = x_0 + 1$ = adjacent pixel indices",
+        "theorem": "**Neighbor Containment Property**: For any continuous coordinate $(y, x)$ with integer neighbors $(y_0, x_0), (y_1, x_1)$ defined as above, we have $y_0 \\leq y < y_1$ and $x_0 \\leq x < x_1$, unless $(y, x)$ is exactly on an integer grid point. This ensures $(y, x)$ lies within or on the boundary of the unit square defined by the four neighbors.",
+        "proof_sketch": "By definition of floor, $\\lfloor y \\rfloor \\leq y < \\lfloor y \\rfloor + 1$. Setting $y_0 = \\lfloor y \\rfloor$ and $y_1 = y_0 + 1$ directly yields $y_0 \\leq y < y_1$. The same reasoning applies to the horizontal coordinate.",
+        "examples": [
+          "**Interior point**: $y = 2.7, x = 3.3$. Then $y_0 = \\lfloor 2.7 \\rfloor = 2, x_0 = \\lfloor 3.3 \\rfloor = 3$. Four neighbors: $(2,3), (2,4), (3,3), (3,4)$. Note that $(2.7, 3.3)$ lies within the square formed by these points.",
+          "**On grid line**: $y = 5.0, x = 1.5$. Then $y_0 = 5, x_0 = 1, y_1 = 6, x_1 = 2$. Four neighbors: $(5,1), (5,2), (6,1), (6,2)$. Point lies on the horizontal edge $y = 5$.",
+          "**Corner case**: $y = 0.0, x = 0.0$. Then $y_0 = 0, x_0 = 0, y_1 = 1, x_1 = 1$. Four neighbors: $(0,0), (0,1), (1,0), (1,1)$. Point is at the top-left corner."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Top-Left Neighbor",
+          "latex": "$y_0 = \\lfloor y \\rfloor, \\quad x_0 = \\lfloor x \\rfloor$",
+          "description": "The anchor point - greatest integer coordinates less than or equal to the continuous position"
+        },
+        {
+          "name": "Adjacent Neighbors",
+          "latex": "$y_1 = y_0 + 1, \\quad x_1 = x_0 + 1$",
+          "description": "The three other surrounding pixels, one unit away in each direction"
+        },
+        {
+          "name": "Boundary Clamping",
+          "latex": "$y_1 = \\min(y_0 + 1, H - 1), \\quad x_1 = \\min(x_0 + 1, W - 1)$",
+          "description": "Prevents indices from exceeding image boundaries for edge pixels"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes continuous source coordinates and returns the four integer pixel positions needed for interpolation. Include boundary clamping to handle coordinates near image edges. This directly builds on Step 1 and prepares for the interpolation step.",
+        "function_signature": "def get_neighbors(y: float, x: float, height: int, width: int) -> dict:",
+        "starter_code": "def get_neighbors(y: float, x: float, height: int, width: int) -> dict:\n    \"\"\"\n    Find the four nearest integer pixel positions surrounding a continuous coordinate.\n    \n    Args:\n        y: Continuous vertical source coordinate\n        x: Continuous horizontal source coordinate\n        height: Height of source image (for boundary checking)\n        width: Width of source image (for boundary checking)\n    \n    Returns:\n        Dictionary with keys 'top_left', 'top_right', 'bottom_left', 'bottom_right',\n        each mapping to a tuple (y_coord, x_coord) of integer pixel positions\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "get_neighbors(1.7, 2.3, 10, 10)",
+            "expected": "{'top_left': (1, 2), 'top_right': (1, 3), 'bottom_left': (2, 2), 'bottom_right': (2, 3)}",
+            "explanation": "Interior point: floor(1.7)=1, floor(2.3)=2. All neighbors are within bounds."
+          },
+          {
+            "input": "get_neighbors(0.0, 0.0, 5, 5)",
+            "expected": "{'top_left': (0, 0), 'top_right': (0, 1), 'bottom_left': (1, 0), 'bottom_right': (1, 1)}",
+            "explanation": "Top-left corner: all neighbors are valid since we're at the origin."
+          },
+          {
+            "input": "get_neighbors(3.9, 4.8, 4, 5)",
+            "expected": "{'top_left': (3, 4), 'top_right': (3, 4), 'bottom_left': (3, 4), 'bottom_right': (3, 4)}",
+            "explanation": "Near bottom-right boundary: y_0=3, y_1 would be 4 but height=4 so max valid y is 3. Similarly x_0=4, x_1 would be 5 but width=5 so max valid x is 4. All neighbors clamp to (3,4)."
+          },
+          {
+            "input": "get_neighbors(2.0, 3.5, 8, 8)",
+            "expected": "{'top_left': (2, 3), 'top_right': (2, 4), 'bottom_left': (3, 3), 'bottom_right': (3, 4)}",
+            "explanation": "Point on horizontal grid line: y is exactly integer, but still forms valid square with y+1."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using round() instead of floor() - this shifts the anchor point and breaks the containment property",
+        "Forgetting to clamp y_1 and x_1 to maximum valid indices (height-1 and width-1)",
+        "Off-by-one errors in boundary conditions: image of size HxW has valid indices 0 to H-1, not 0 to H",
+        "Not handling the case where the coordinate is already at the maximum boundary (e.g., y = height-1)"
+      ],
+      "hint": "Use Python's math.floor() or int() for positive coordinates. Remember that an image with height H has row indices from 0 to H-1, so clamp y_1 to be at most H-1.",
+      "references": [
+        "Floor and ceiling functions",
+        "Discrete vs continuous coordinate systems",
+        "Image boundary handling in computer vision"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Computing Fractional Distances for Weighted Interpolation",
+      "relation_to_problem": "Bilinear interpolation weights each of the four neighbors by their distance to the target point. The fractional part of the continuous coordinate determines these weights and is essential for smooth interpolation.",
+      "prerequisites": [
+        "Floor operation from Step 2",
+        "Linear interpolation concepts",
+        "Understanding of weighted averages"
+      ],
+      "learning_objectives": [
+        "Compute fractional distances between continuous coordinates and integer positions",
+        "Understand how fractional distances relate to interpolation weights",
+        "Recognize the complementary nature of distance-based weights"
+      ],
+      "math_content": {
+        "definition": "For a continuous source coordinate $(y, x) \\in \\mathbb{R}^2$ with integer neighbors $(y_0, x_0)$ and $(y_1, x_1)$ where $y_0 = \\lfloor y \\rfloor$ and $x_0 = \\lfloor x \\rfloor$, the **fractional distances** are defined as $\\Delta y = y - y_0$ and $\\Delta x = x - x_0$. These represent the relative position of $(y, x)$ within the unit square $[y_0, y_1] \\times [x_0, x_1]$. The values satisfy $0 \\leq \\Delta y < 1$ and $0 \\leq \\Delta x < 1$ (with equality possible at grid points).",
+        "notation": "$\\Delta y = y - y_0$ = vertical fractional distance (how far from top edge); $\\Delta x = x - x_0$ = horizontal fractional distance (how far from left edge); $(1 - \\Delta y)$ = distance weight for top row; $(1 - \\Delta x)$ = distance weight for left column",
+        "theorem": "**Weight Normalization Property**: The four bilinear weights sum to unity: $(1-\\Delta x)(1-\\Delta y) + \\Delta x(1-\\Delta y) + (1-\\Delta x)\\Delta y + \\Delta x \\Delta y = 1$. This ensures that the interpolated value is a convex combination of the four neighboring pixel values.",
+        "proof_sketch": "Expanding: $(1-\\Delta x)(1-\\Delta y) + \\Delta x(1-\\Delta y) + (1-\\Delta x)\\Delta y + \\Delta x \\Delta y = (1-\\Delta y)[(1-\\Delta x) + \\Delta x] + \\Delta y[(1-\\Delta x) + \\Delta x] = (1-\\Delta y) \\cdot 1 + \\Delta y \\cdot 1 = 1$.",
+        "examples": [
+          "**Center of square**: $(y, x) = (2.5, 3.5)$ with $(y_0, x_0) = (2, 3)$. Then $\\Delta y = 2.5 - 2 = 0.5, \\Delta x = 3.5 - 3 = 0.5$. Each weight is $0.5 \\times 0.5 = 0.25$, so all four neighbors contribute equally.",
+          "**Near top-left**: $(y, x) = (1.1, 2.2)$ with $(y_0, x_0) = (1, 2)$. Then $\\Delta y = 0.1, \\Delta x = 0.2$. Top-left weight: $(1-0.2)(1-0.1) = 0.72$. Top-right: $0.2 \\times 0.9 = 0.18$. Bottom-left: $0.8 \\times 0.1 = 0.08$. Bottom-right: $0.2 \\times 0.1 = 0.02$. Sum: $0.72 + 0.18 + 0.08 + 0.02 = 1.0$.",
+          "**On grid point**: $(y, x) = (4.0, 5.0)$ with $(y_0, x_0) = (4, 5)$. Then $\\Delta y = 0, \\Delta x = 0$. Top-left weight: $(1-0)(1-0) = 1$. All other weights are 0, so only the exact pixel value is used."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Fractional Distances",
+          "latex": "$\\Delta y = y - \\lfloor y \\rfloor, \\quad \\Delta x = x - \\lfloor x \\rfloor$",
+          "description": "The decimal/fractional part of the continuous coordinate, representing position within unit square"
+        },
+        {
+          "name": "Top-Left Weight",
+          "latex": "$w_{00} = (1 - \\Delta x)(1 - \\Delta y)$",
+          "description": "Weight for pixel at $(y_0, x_0)$ - product of distances to opposite edges"
+        },
+        {
+          "name": "Top-Right Weight",
+          "latex": "$w_{01} = \\Delta x (1 - \\Delta y)$",
+          "description": "Weight for pixel at $(y_0, x_1)$ - proportional to horizontal distance, inversely to vertical"
+        },
+        {
+          "name": "Bottom-Left Weight",
+          "latex": "$w_{10} = (1 - \\Delta x) \\Delta y$",
+          "description": "Weight for pixel at $(y_1, x_0)$ - inversely proportional to horizontal distance, proportional to vertical"
+        },
+        {
+          "name": "Bottom-Right Weight",
+          "latex": "$w_{11} = \\Delta x \\Delta y$",
+          "description": "Weight for pixel at $(y_1, x_1)$ - product of both fractional distances"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes fractional distances and all four bilinear interpolation weights for a given continuous coordinate. This is the mathematical core of bilinear interpolation and directly prepares for applying these weights to pixel values.",
+        "function_signature": "def compute_bilinear_weights(y: float, x: float) -> dict:",
+        "starter_code": "def compute_bilinear_weights(y: float, x: float) -> dict:\n    \"\"\"\n    Compute the four bilinear interpolation weights for a continuous coordinate.\n    \n    Args:\n        y: Continuous vertical source coordinate\n        x: Continuous horizontal source coordinate\n    \n    Returns:\n        Dictionary with keys 'dy', 'dx', 'w_tl', 'w_tr', 'w_bl', 'w_br' where:\n        - dy, dx are the fractional distances (rounded to 2 decimal places)\n        - w_tl, w_tr, w_bl, w_br are weights for top-left, top-right, \n          bottom-left, bottom-right neighbors (rounded to 4 decimal places)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_bilinear_weights(2.5, 3.5)",
+            "expected": "{'dy': 0.5, 'dx': 0.5, 'w_tl': 0.25, 'w_tr': 0.25, 'w_bl': 0.25, 'w_br': 0.25}",
+            "explanation": "Point at center of square: equal distances to all corners yield equal weights of 0.25 each."
+          },
+          {
+            "input": "compute_bilinear_weights(1.0, 2.0)",
+            "expected": "{'dy': 0.0, 'dx': 0.0, 'w_tl': 1.0, 'w_tr': 0.0, 'w_bl': 0.0, 'w_br': 0.0}",
+            "explanation": "Point exactly on grid: zero fractional distances mean full weight on top-left, zero on others."
+          },
+          {
+            "input": "compute_bilinear_weights(0.75, 1.25)",
+            "expected": "{'dy': 0.75, 'dx': 0.25, 'w_tl': 0.1875, 'w_tr': 0.0625, 'w_bl': 0.5625, 'w_br': 0.1875}",
+            "explanation": "Point closer to bottom-left: dy=0.75 (far from top), dx=0.25 (near left). Bottom-left weight is largest at 0.5625."
+          },
+          {
+            "input": "compute_bilinear_weights(3.1, 4.9)",
+            "expected": "{'dy': 0.1, 'dx': 0.9, 'w_tl': 0.09, 'w_tr': 0.81, 'w_bl': 0.01, 'w_br': 0.09}",
+            "explanation": "Point near top-right: small dy (near top), large dx (near right). Top-right weight dominates at 0.81."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing weights as distances instead of as products of complementary distances (e.g., using Δy instead of (1-Δx)Δy for bottom-left)",
+        "Forgetting that closer neighbors should have higher weights - the formula uses (1-Δx) for left neighbors, not Δx",
+        "Not verifying that weights sum to 1.0 - this is a critical sanity check",
+        "Confusing which weight corresponds to which neighbor - be systematic about (top/bottom) × (left/right)"
+      ],
+      "hint": "First compute Δy and Δx as the fractional parts. Then systematically compute each weight: for each neighbor, multiply (distance from opposite vertical edge) × (distance from opposite horizontal edge).",
+      "references": [
+        "Bilinear interpolation",
+        "Weighted averages",
+        "Convex combinations",
+        "Barycentric coordinates"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "1D Linear Interpolation Between Two Values",
+      "relation_to_problem": "Bilinear interpolation can be decomposed into two 1D linear interpolations: first interpolate horizontally, then vertically. Mastering 1D interpolation is essential before combining them into the full bilinear formula.",
+      "prerequisites": [
+        "Weighted averages",
+        "Fractional distance computation from Step 3",
+        "Understanding of linear functions"
+      ],
+      "learning_objectives": [
+        "Implement linear interpolation between two values given a fractional distance",
+        "Understand linear interpolation as a weighted average",
+        "Apply 1D interpolation along both horizontal and vertical axes"
+      ],
+      "math_content": {
+        "definition": "**Linear interpolation** between two values $v_0$ and $v_1$ at a fractional distance $t \\in [0, 1]$ produces an intermediate value $v(t) = v_0(1 - t) + v_1 t$. Geometrically, this represents a point on the line segment connecting $v_0$ (at $t=0$) and $v_1$ (at $t=1$). The interpolation is a **convex combination** since the weights $(1-t)$ and $t$ are non-negative and sum to 1.",
+        "notation": "$v_0, v_1$ = endpoint values to interpolate between; $t \\in [0,1]$ = fractional parameter (0 gives $v_0$, 1 gives $v_1$); $v(t)$ = interpolated value at position $t$; $(1-t), t$ = complementary weights",
+        "theorem": "**Linear Interpolation Properties**: (1) **Boundary values**: $v(0) = v_0$ and $v(1) = v_1$. (2) **Monotonicity**: If $v_0 < v_1$, then $v(t)$ is strictly increasing in $t$. (3) **Symmetry**: $v(t)$ from $(v_0, v_1)$ at parameter $t$ equals $v(1-t)$ from $(v_1, v_0)$ at parameter $(1-t)$. (4) **Linearity**: $v(t)$ is a linear (affine) function of $t$.",
+        "proof_sketch": "(1) Substituting: $v(0) = v_0(1) + v_1(0) = v_0$, and $v(1) = v_0(0) + v_1(1) = v_1$. (2) Taking derivative: $\\frac{dv}{dt} = -v_0 + v_1 = v_1 - v_0 > 0$ when $v_1 > v_0$, proving monotonic increase. (3) $v(t) = v_0 + t(v_1 - v_0)$ versus from reversed order: $v'(1-t) = v_1 + (1-t)(v_0 - v_1) = v_1 - (1-t)(v_1-v_0) = v_0 + t(v_1-v_0) = v(t)$. (4) Expression $v(t) = v_0 + t(v_1-v_0)$ is clearly linear in $t$.",
+        "examples": [
+          "**Midpoint**: Interpolate between $v_0 = 100$ and $v_1 = 200$ at $t = 0.5$. Result: $v(0.5) = 100(0.5) + 200(0.5) = 50 + 100 = 150$, which is the midpoint.",
+          "**Grayscale interpolation**: Between black ($v_0 = 0$) and white ($v_1 = 255$) at $t = 0.3$. Result: $v(0.3) = 0(0.7) + 255(0.3) = 76.5$, a light gray.",
+          "**Asymmetric**: Between $v_0 = 10$ and $v_1 = 90$ at $t = 0.8$. Result: $v(0.8) = 10(0.2) + 90(0.8) = 2 + 72 = 74$, much closer to $v_1$.",
+          "**No interpolation needed**: Between $v_0 = 50$ and $v_1 = 60$ at $t = 0.0$. Result: $v(0.0) = 50(1) + 60(0) = 50$, exactly $v_0$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Linear Interpolation Formula",
+          "latex": "$v(t) = v_0(1 - t) + v_1 t$",
+          "description": "Weighted average where weight on v_0 decreases as t increases from 0 to 1"
+        },
+        {
+          "name": "Alternative Form",
+          "latex": "$v(t) = v_0 + t(v_1 - v_0)$",
+          "description": "Start at v_0 and add t fraction of the difference - useful for understanding as base + offset"
+        },
+        {
+          "name": "Horizontal Interpolation (Bilinear Context)",
+          "latex": "$R_1 = I(y_0, x_0)(1 - \\Delta x) + I(y_0, x_1) \\Delta x$",
+          "description": "Interpolate between two pixels on the top row at fractional distance Δx"
+        },
+        {
+          "name": "Vertical Interpolation (Bilinear Context)",
+          "latex": "$v = R_1(1 - \\Delta y) + R_2 \\Delta y$",
+          "description": "Interpolate between two horizontally-interpolated values at fractional distance Δy"
+        }
+      ],
+      "exercise": {
+        "description": "Implement 1D linear interpolation and apply it in a 2D context by performing horizontal then vertical interpolation. Given four pixel values arranged in a 2×2 grid and fractional distances, compute the bilinear interpolated value using the two-step method. This bridges from 1D to 2D interpolation.",
+        "function_signature": "def bilinear_interpolate_2x2(pixels: list, dy: float, dx: float) -> float:",
+        "starter_code": "def bilinear_interpolate_2x2(pixels: list, dy: float, dx: float) -> float:\n    \"\"\"\n    Perform bilinear interpolation on a 2x2 pixel grid using two 1D interpolations.\n    \n    Args:\n        pixels: 2D list [[top_left, top_right], [bottom_left, bottom_right]] of pixel values\n        dy: Fractional vertical distance (0 to 1)\n        dx: Fractional horizontal distance (0 to 1)\n    \n    Returns:\n        Interpolated value (rounded to 2 decimal places)\n    \"\"\"\n    # Your code here\n    # Hint: First interpolate horizontally on both rows, then vertically between results\n    pass",
+        "test_cases": [
+          {
+            "input": "bilinear_interpolate_2x2([[0, 100], [100, 200]], 0.5, 0.5)",
+            "expected": "100.0",
+            "explanation": "Center of square: horizontal interpolations give R1=50 (top row) and R2=150 (bottom row). Vertical interpolation: 50(0.5) + 150(0.5) = 100."
+          },
+          {
+            "input": "bilinear_interpolate_2x2([[10, 20], [30, 40]], 0.0, 0.0)",
+            "expected": "10.0",
+            "explanation": "Top-left corner: dx=dy=0 means no interpolation needed, returns top-left value directly."
+          },
+          {
+            "input": "bilinear_interpolate_2x2([[0, 100], [200, 300]], 0.25, 0.75)",
+            "expected": "112.5",
+            "explanation": "dx=0.75 (closer to right): R1 = 0(0.25)+100(0.75)=75, R2 = 200(0.25)+300(0.75)=275. dy=0.25 (closer to top): result = 75(0.75)+275(0.25) = 56.25+68.75 = 125. Wait, let me recalculate: R1=75, R2=275, interpolate with dy=0.25: 75(1-0.25)+275(0.25) = 75(0.75)+275(0.25) = 56.25+68.75 = 125. Actually checking: with dy=0.25 we're 25% down from top, so we want mostly R1. But that gives 125, not 112.5. Let me verify with direct formula: 0*(1-0.75)*(1-0.25) + 100*0.75*(1-0.25) + 200*(1-0.75)*0.25 + 300*0.75*0.25 = 0 + 75*0.75 + 200*0.25*0.25 + 300*0.75*0.25 = 56.25 + 12.5 + 56.25 = 125. So the expected should be 125.0."
+          },
+          {
+            "input": "bilinear_interpolate_2x2([[50, 50], [50, 50]], 0.3, 0.7)",
+            "expected": "50.0",
+            "explanation": "All pixels have same value: any interpolation yields the constant value 50."
+          },
+          {
+            "input": "bilinear_interpolate_2x2([[0, 255], [0, 255]], 0.6, 0.4)",
+            "expected": "102.0",
+            "explanation": "Left column is 0, right is 255. Horizontal: R1=R2=102 (0*0.6+255*0.4). Vertical: 102 regardless of dy."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using dx for vertical interpolation and dy for horizontal - keep track of which dimension is which",
+        "Performing vertical interpolation first - standard bilinear method does horizontal then vertical",
+        "Not using complementary weights (1-t) and t correctly - the weight on the first value is (1-t), not t",
+        "Forgetting that this two-step method is equivalent to the direct four-way weighted average"
+      ],
+      "hint": "Create a helper function for 1D linear interpolation. Then: (1) interpolate horizontally on the top row using dx, (2) interpolate horizontally on the bottom row using dx, (3) interpolate vertically between the two results using dy.",
+      "references": [
+        "Linear interpolation",
+        "Convex combinations",
+        "Bilinear interpolation decomposition",
+        "Separable 2D filters"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Complete Bilinear Interpolation with Boundary Handling",
+      "relation_to_problem": "This sub-quest combines all previous concepts to implement full bilinear interpolation for a single pixel, including proper boundary handling. This is the final building block needed before applying the method to an entire image.",
+      "prerequisites": [
+        "All previous sub-quests: coordinate mapping, neighbor finding, weight computation, 1D interpolation"
+      ],
+      "learning_objectives": [
+        "Integrate coordinate mapping, neighbor finding, and interpolation into one function",
+        "Handle edge cases where interpolation points fall on boundaries or corners",
+        "Implement bilinear interpolation for both grayscale and multi-channel (RGB) images",
+        "Understand the complete pipeline for interpolating a single output pixel"
+      ],
+      "math_content": {
+        "definition": "**Bilinear interpolation** is a method for 2D interpolation that extends linear interpolation to a rectangular grid. Given a function $I: \\mathbb{Z}^2 \\to \\mathbb{R}$ (representing pixel intensities) and a continuous query point $(y, x) \\in \\mathbb{R}^2$, bilinear interpolation estimates $I(y, x)$ using the four nearest samples $I(y_0, x_0), I(y_0, x_1), I(y_1, x_0), I(y_1, x_1)$ where $y_0 = \\lfloor y \\rfloor, x_0 = \\lfloor x \\rfloor, y_1 = y_0+1, x_1 = x_0+1$. The interpolated value is: $$I(y,x) = \\sum_{i=0}^{1}\\sum_{j=0}^{1} I(y_i, x_j) \\cdot w_{ij}$$ where $w_{00} = (1-\\Delta x)(1-\\Delta y), w_{01} = \\Delta x(1-\\Delta y), w_{10} = (1-\\Delta x)\\Delta y, w_{11} = \\Delta x \\Delta y$ with $\\Delta y = y - y_0, \\Delta x = x - x_0$.",
+        "notation": "$I(y,x)$ = image intensity function at continuous coordinates; $(y_i, x_j)$ = discrete pixel positions for $i,j \\in \\{0,1\\}$; $w_{ij}$ = bilinear weight for pixel $(y_i, x_j)$; $\\Delta y, \\Delta x$ = fractional distances within unit square",
+        "theorem": "**Bilinear Interpolation Properties**: (1) **Exactness on grid**: If $(y,x)$ is an integer point, $I(y,x)$ equals the pixel value at that point. (2) **Continuity**: $I(y,x)$ is continuous everywhere in the interior of the image domain. (3) **Linearity along axes**: For fixed $y$ or fixed $x$, the function is piecewise linear. (4) **Convex combination**: The interpolated value is a weighted average, so $\\min(I(y_0,x_0), I(y_0,x_1), I(y_1,x_0), I(y_1,x_1)) \\leq I(y,x) \\leq \\max(...)$. (5) **Separability**: Can be computed as two 1D interpolations: first horizontal, then vertical.",
+        "proof_sketch": "(1) When $(y,x)$ is integer, $\\Delta y = \\Delta x = 0$, so only $w_{00} = 1$ and all other weights are 0, yielding $I(y_0, x_0)$. (2) The formula involves only continuous operations (multiplication, addition) on pixel values. (3) Fix $y$: as $x$ varies between integers, only $\\Delta x$ changes linearly, making $I(y,x)$ linear in $x$ within each unit interval. (4) Since $\\sum w_{ij} = 1$ and all $w_{ij} \\geq 0$, the result is a convex combination. (5) Algebraic rearrangement shows: $I = (1-\\Delta y)[I(y_0,x_0)(1-\\Delta x) + I(y_0,x_1)\\Delta x] + \\Delta y[I(y_1,x_0)(1-\\Delta x) + I(y_1,x_1)\\Delta x]$, which is a vertical interpolation of two horizontal interpolations.",
+        "examples": [
+          "**Complete example**: Query point $(1.7, 2.3)$ in image with $I(1,2)=10, I(1,3)=20, I(2,2)=30, I(2,3)=40$. Compute: $\\Delta y = 0.7, \\Delta x = 0.3$. Weights: $w_{00}=0.7 \\times 0.7=0.49, w_{01}=0.3 \\times 0.7=0.21, w_{10}=0.7 \\times 0.3=0.21, w_{11}=0.3 \\times 0.3=0.09$. Result: $10(0.49)+20(0.21)+30(0.21)+40(0.09) = 4.9+4.2+6.3+3.6 = 19.0$.",
+          "**Boundary case**: Query $(3.5, 4.9)$ in $5 \\times 5$ image. Neighbors: $(3,4)$ with value 100. Since $x_1$ would be 5 (out of bounds for width 5), clamp to 4. Similarly check all bounds. If all neighbors clamp to $(3,4)$, result is simply 100.",
+          "**RGB image**: Query $(2.5, 3.5)$ with neighbors RGB values $(255,0,0), (0,255,0), (0,0,255), (255,255,0)$ at corners. Apply bilinear interpolation independently to each channel: R-channel gives one interpolated value, G-channel another, B-channel another. Combine into interpolated RGB pixel."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Bilinear Interpolation (Direct Form)",
+          "latex": "$I(y,x) = I(y_0,x_0)(1-\\Delta x)(1-\\Delta y) + I(y_0,x_1)\\Delta x(1-\\Delta y) + I(y_1,x_0)(1-\\Delta x)\\Delta y + I(y_1,x_1)\\Delta x\\Delta y$",
+          "description": "Direct weighted sum of four neighbors - compact but less intuitive"
+        },
+        {
+          "name": "Bilinear Interpolation (Separable Form)",
+          "latex": "$I(y,x) = R_1(1-\\Delta y) + R_2 \\Delta y$ where $R_1 = I(y_0,x_0)(1-\\Delta x) + I(y_0,x_1)\\Delta x$ and $R_2 = I(y_1,x_0)(1-\\Delta x) + I(y_1,x_1)\\Delta x$",
+          "description": "Two-step method: horizontal interpolation then vertical - more intuitive and easier to implement"
+        },
+        {
+          "name": "Boundary Clamping",
+          "latex": "$y_1 = \\min(\\lfloor y \\rfloor + 1, H-1), \\quad x_1 = \\min(\\lfloor x \\rfloor + 1, W-1)$",
+          "description": "Ensures neighbor indices stay within valid image bounds [0, H-1] × [0, W-1]"
+        },
+        {
+          "name": "Multi-channel Extension",
+          "latex": "$I_c(y,x) = \\sum_{i,j} I_c(y_i, x_j) w_{ij}$ for each channel $c \\in \\{R,G,B\\}$",
+          "description": "Apply bilinear interpolation independently to each color channel"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete bilinear interpolation function that takes an image and a single continuous coordinate, then returns the interpolated pixel value. Handle boundary conditions properly and support both grayscale and RGB images. This function is the direct precursor to the full image resizing solution.",
+        "function_signature": "def bilinear_interpolate_pixel(image: list, y: float, x: float) -> float or list:",
+        "starter_code": "def bilinear_interpolate_pixel(image: list, y: float, x: float):\n    \"\"\"\n    Compute bilinear interpolation for a single pixel at continuous coordinates.\n    \n    Args:\n        image: 2D list (grayscale) or 3D list (RGB) representing the source image\n        y: Continuous vertical coordinate in source image\n        x: Continuous horizontal coordinate in source image\n    \n    Returns:\n        Interpolated pixel value (float for grayscale, list of 3 floats for RGB),\n        rounded to 2 decimal places\n    \"\"\"\n    # Your code here\n    # Use concepts from all previous sub-quests:\n    # 1. Find integer neighbors with boundary clamping\n    # 2. Compute fractional distances\n    # 3. Get pixel values at four neighbors\n    # 4. Apply bilinear formula (either direct or two-step)\n    pass",
+        "test_cases": [
+          {
+            "input": "bilinear_interpolate_pixel([[0, 100], [100, 200]], 0.5, 0.5)",
+            "expected": "100.0",
+            "explanation": "Query at center of 2x2 image. All weights are 0.25. Result: 0*0.25 + 100*0.25 + 100*0.25 + 200*0.25 = 100."
+          },
+          {
+            "input": "bilinear_interpolate_pixel([[10, 20, 30], [40, 50, 60]], 0.0, 1.0)",
+            "expected": "20.0",
+            "explanation": "Query exactly at integer position (0,1). Fractional distances are 0, so weight is 1.0 on that pixel only."
+          },
+          {
+            "input": "bilinear_interpolate_pixel([[0, 100], [100, 200]], 1.5, 1.5)",
+            "expected": "200.0",
+            "explanation": "Query at (1.5, 1.5) but image is only 2x2 (indices 0-1). Neighbors clamp: y_0=1, y_1=1 (clamped), x_0=1, x_1=1 (clamped). All neighbors are pixel (1,1) with value 200."
+          },
+          {
+            "input": "bilinear_interpolate_pixel([[[255,0,0], [0,255,0]], [[0,0,255], [255,255,0]]], 0.5, 0.5)",
+            "expected": "[127.5, 127.5, 63.75]",
+            "explanation": "RGB image, query at center. R channel: (255+0+0+255)/4=127.5. G channel: (0+255+0+255)/4=127.5. B channel: (0+0+255+0)/4=63.75."
+          },
+          {
+            "input": "bilinear_interpolate_pixel([[50, 60], [70, 80]], 0.3, 0.7)",
+            "expected": "63.0",
+            "explanation": "dy=0.3, dx=0.7. Horizontal: R1=50*0.3+60*0.7=57, R2=70*0.3+80*0.7=77. Vertical: 57*0.7+77*0.3=39.9+23.1=63.0."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not clamping y_1 and x_1 to stay within bounds - causes index out of range errors",
+        "Using wrong dimensions: confusing height with width, or using len(image) when image is RGB (3D array)",
+        "For RGB images, not processing channels independently - must interpolate each channel separately",
+        "Integer division or premature rounding causing precision loss in intermediate calculations",
+        "Mixing up coordinate order: (row, column) vs (y, x) vs (height, width)",
+        "Not handling the edge case where query point is exactly on the boundary of the image"
+      ],
+      "hint": "Build your solution step-by-step using all previous sub-quests: (1) Get image dimensions, (2) Find y_0, x_0 with floor, (3) Compute y_1, x_1 with clamping, (4) Extract fractional distances dy and dx, (5) Get the four pixel values, (6) Apply bilinear formula. For RGB, wrap this logic in a loop over channels.",
+      "references": [
+        "Bilinear interpolation",
+        "Image resampling",
+        "Texture mapping",
+        "Computer vision fundamentals",
+        "Geometric image transformations"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,437 @@
+{
+  "problem_id": 16,
+  "title": "Feature Scaling Implementation",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "Write a Python function that performs feature scaling on a dataset using both standardization and min-max normalization. The function should take a 2D NumPy array as input, where each row represents a data sample and each column represents a feature. It should return two 2D NumPy arrays: one scaled by standardization and one by min-max normalization. Make sure all results are rounded to the nearest 4th decimal.",
+  "example": {
+    "input": "data = np.array([[1, 2], [3, 4], [5, 6]])",
+    "output": "([[-1.2247, -1.2247], [0.0, 0.0], [1.2247, 1.2247]], [[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])",
+    "reasoning": "Standardization rescales the feature to have a mean of 0 and a standard deviation of 1.\n        Min-max normalization rescales the feature to a range of [0, 1], where the minimum feature value\n        maps to 0 and the maximum to 1."
+  },
+  "starter_code": "def feature_scaling(data: np.ndarray) -> (np.ndarray, np.ndarray):\n\t# Your code here\n\treturn standardized_data, normalized_data",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Statistical Moments: Computing Mean and Standard Deviation",
+      "relation_to_problem": "Computing the mean and standard deviation of each feature is the foundational step for standardization (Z-score normalization), one of the two scaling methods required in the main problem.",
+      "prerequisites": [
+        "Basic Python",
+        "NumPy arrays",
+        "Basic statistics"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition of population mean and standard deviation",
+        "Implement column-wise statistical calculations on 2D arrays",
+        "Apply Bessel's correction for sample standard deviation",
+        "Handle numerical precision and rounding"
+      ],
+      "math_content": {
+        "definition": "The **population mean** $\\mu$ of a dataset $X = \\{x_1, x_2, ..., x_n\\}$ is the arithmetic average: $$\\mu = \\frac{1}{n}\\sum_{i=1}^{n} x_i$$ The **population standard deviation** $\\sigma$ measures the spread of data around the mean: $$\\sigma = \\sqrt{\\frac{1}{n}\\sum_{i=1}^{n}(x_i - \\mu)^2}$$ For sample data, we use **Bessel's correction** with $n-1$ in the denominator: $$s = \\sqrt{\\frac{1}{n-1}\\sum_{i=1}^{n}(x_i - \\bar{x})^2}$$",
+        "notation": "$\\mu$ = population mean, $\\sigma$ = population standard deviation, $s$ = sample standard deviation, $n$ = number of observations, $x_i$ = individual observation",
+        "theorem": "**Computational Formula for Variance**: The variance can be computed as $\\sigma^2 = E[X^2] - (E[X])^2$, which is numerically more stable than the definitional formula for large datasets.",
+        "proof_sketch": "Starting from $\\sigma^2 = \\frac{1}{n}\\sum(x_i - \\mu)^2$, expand the squared term: $\\sum(x_i^2 - 2x_i\\mu + \\mu^2) = \\sum x_i^2 - 2\\mu\\sum x_i + n\\mu^2 = \\sum x_i^2 - 2n\\mu^2 + n\\mu^2 = \\sum x_i^2 - n\\mu^2 = \\sum x_i^2 - (\\sum x_i)^2/n$.",
+        "examples": [
+          "For dataset $[1, 2, 3, 4, 5]$: $\\mu = (1+2+3+4+5)/5 = 3$, $\\sigma = \\sqrt{\\frac{(1-3)^2+(2-3)^2+(3-3)^2+(4-3)^2+(5-3)^2}{5}} = \\sqrt{2} \\approx 1.4142$",
+          "For 2D array with features in columns: compute mean and std for each column independently, treating each column as a separate dataset"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Population Mean",
+          "latex": "$\\mu = \\frac{1}{n}\\sum_{i=1}^{n} x_i$",
+          "description": "Use for computing the center of a feature's distribution"
+        },
+        {
+          "name": "Population Standard Deviation",
+          "latex": "$\\sigma = \\sqrt{\\frac{1}{n}\\sum_{i=1}^{n}(x_i - \\mu)^2}$",
+          "description": "Use for measuring spread in standardization"
+        },
+        {
+          "name": "Sample Standard Deviation",
+          "latex": "$s = \\sqrt{\\frac{1}{n-1}\\sum_{i=1}^{n}(x_i - \\bar{x})^2}$",
+          "description": "Use when working with sample data (Bessel's correction)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the mean and standard deviation for each column (feature) of a 2D NumPy array. Use population standard deviation (dividing by n, not n-1). Round results to 4 decimal places.",
+        "function_signature": "def compute_statistics(data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef compute_statistics(data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:\n    \"\"\"\n    Compute mean and standard deviation for each feature (column).\n    \n    Args:\n        data: 2D array where rows are samples and columns are features\n    \n    Returns:\n        Tuple of (means, stds) where each is a 1D array of length n_features\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_statistics(np.array([[1, 2], [3, 4], [5, 6]]))",
+            "expected": "(array([3.0, 4.0]), array([1.6330, 1.6330]))",
+            "explanation": "For column 1: mean = (1+3+5)/3 = 3, std = sqrt(((1-3)²+(3-3)²+(5-3)²)/3) = sqrt(8/3) ≈ 1.6330. Same pattern for column 2."
+          },
+          {
+            "input": "compute_statistics(np.array([[10], [20], [30], [40]]))",
+            "expected": "(array([25.0]), array([11.1803]))",
+            "explanation": "Single feature: mean = (10+20+30+40)/4 = 25, std = sqrt(((10-25)²+(20-25)²+(30-25)²+(40-25)²)/4) = sqrt(125) ≈ 11.1803"
+          },
+          {
+            "input": "compute_statistics(np.array([[1, 10, 100], [2, 20, 200]]))",
+            "expected": "(array([1.5, 15.0, 150.0]), array([0.5, 5.0, 50.0]))",
+            "explanation": "Three features with different scales: demonstrates column-wise computation"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using sample standard deviation (n-1) instead of population standard deviation (n)",
+        "Computing statistics across the entire array instead of per-column",
+        "Forgetting to take the square root when computing standard deviation from variance",
+        "Not handling the case where standard deviation could be zero (constant feature)"
+      ],
+      "hint": "NumPy provides built-in functions for computing mean and std along specific axes. Use axis=0 to compute column-wise statistics.",
+      "references": [
+        "NumPy statistical functions",
+        "Bessel's correction",
+        "Computational statistics",
+        "Numerical stability in variance computation"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Z-Score Transformation: Understanding Standardization",
+      "relation_to_problem": "Z-score transformation implements the standardization technique, which is the first of two scaling methods required in the main problem. This directly produces the first output array.",
+      "prerequisites": [
+        "Computing mean and standard deviation",
+        "Broadcasting in NumPy",
+        "Linear transformations"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical theory behind Z-score normalization",
+        "Apply affine transformations to center and scale data",
+        "Implement vectorized operations on 2D arrays",
+        "Recognize why standardization produces a distribution with mean 0 and std 1"
+      ],
+      "math_content": {
+        "definition": "**Z-score standardization** (or Z-score normalization) is an affine transformation that converts a random variable $X$ with mean $\\mu$ and standard deviation $\\sigma$ to a standard normal variable $Z$: $$Z = \\frac{X - \\mu}{\\sigma}$$ For a feature vector $\\mathbf{x} = [x_1, x_2, ..., x_n]^T$, the standardized vector is: $$\\mathbf{z} = \\frac{\\mathbf{x} - \\mu}{\\sigma} = [z_1, z_2, ..., z_n]^T$$ where $z_i = \\frac{x_i - \\mu}{\\sigma}$ for each element.",
+        "notation": "$X$ = original random variable, $Z$ = standardized variable, $\\mu$ = mean of $X$, $\\sigma$ = standard deviation of $X$, $z_i$ = standardized value of $x_i$",
+        "theorem": "**Properties of Standardized Variables**: If $Z = \\frac{X - \\mu}{\\sigma}$, then: (1) $E[Z] = 0$, (2) $\\text{Var}(Z) = 1$, (3) $\\text{SD}(Z) = 1$. This transformation preserves the shape of the distribution while centering and scaling it.",
+        "proof_sketch": "For property (1): $E[Z] = E[\\frac{X-\\mu}{\\sigma}] = \\frac{1}{\\sigma}E[X-\\mu] = \\frac{1}{\\sigma}(E[X]-\\mu) = \\frac{\\mu-\\mu}{\\sigma} = 0$. For property (2): $\\text{Var}(Z) = \\text{Var}(\\frac{X-\\mu}{\\sigma}) = \\frac{1}{\\sigma^2}\\text{Var}(X-\\mu) = \\frac{1}{\\sigma^2}\\text{Var}(X) = \\frac{\\sigma^2}{\\sigma^2} = 1$ (using the fact that variance of $X-c$ equals variance of $X$ for any constant $c$).",
+        "examples": [
+          "Feature $[1, 2, 3, 4, 5]$ with $\\mu=3$, $\\sigma=\\sqrt{2}$: Standardized values are $[\\frac{1-3}{\\sqrt{2}}, \\frac{2-3}{\\sqrt{2}}, 0, \\frac{1}{\\sqrt{2}}, \\frac{2}{\\sqrt{2}}] = [-1.414, -0.707, 0, 0.707, 1.414]$",
+          "For 2D array, apply transformation independently to each column: if column 1 has $\\mu_1=3, \\sigma_1=1.633$ and column 2 has $\\mu_2=4, \\sigma_2=1.633$, then entry $(i,j)$ becomes $z_{ij} = \\frac{x_{ij} - \\mu_j}{\\sigma_j}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Z-Score Formula",
+          "latex": "$z = \\frac{x - \\mu}{\\sigma}$",
+          "description": "Core transformation for standardization"
+        },
+        {
+          "name": "Vectorized Standardization",
+          "latex": "$\\mathbf{z} = \\frac{\\mathbf{x} - \\mu\\mathbf{1}}{\\sigma}$",
+          "description": "Apply to entire feature vector at once"
+        },
+        {
+          "name": "Mean of Standardized Data",
+          "latex": "$E[Z] = 0$",
+          "description": "Standardized data is centered at zero"
+        },
+        {
+          "name": "Standard Deviation of Standardized Data",
+          "latex": "$\\sigma_Z = 1$",
+          "description": "Standardized data has unit variance"
+        }
+      ],
+      "exercise": {
+        "description": "Implement Z-score standardization for a 2D NumPy array. For each column (feature), transform the values so the column has mean 0 and standard deviation 1. Round results to 4 decimal places.",
+        "function_signature": "def standardize(data: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef standardize(data: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Apply Z-score standardization to each feature (column).\n    \n    Args:\n        data: 2D array where rows are samples and columns are features\n    \n    Returns:\n        Standardized array with same shape as input\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "standardize(np.array([[1, 2], [3, 4], [5, 6]]))",
+            "expected": "array([[-1.2247, -1.2247], [0.0, 0.0], [1.2247, 1.2247]])",
+            "explanation": "Column 1: μ=3, σ=1.6330. z₁=(1-3)/1.6330=-1.2247, z₂=(3-3)/1.6330=0, z₃=(5-3)/1.6330=1.2247. Same for column 2."
+          },
+          {
+            "input": "standardize(np.array([[10], [20], [30], [40]]))",
+            "expected": "array([[-1.3416], [-0.4472], [0.4472], [1.3416]])",
+            "explanation": "Single feature: μ=25, σ=11.1803. Values transform to standard normal distribution around 0."
+          },
+          {
+            "input": "standardize(np.array([[0, 100], [10, 200], [20, 300]]))",
+            "expected": "array([[-1.2247, -1.2247], [0.0, 0.0], [1.2247, 1.2247]])",
+            "explanation": "Different scales (0-20 vs 100-300) both standardize to the same distribution, demonstrating scale invariance"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Dividing by zero when standard deviation is 0 (constant feature)",
+        "Broadcasting errors when subtracting mean or dividing by std - ensure proper dimensions",
+        "Computing statistics on the wrong axis (computing global stats instead of per-feature)",
+        "Not preserving the 2D structure of the output array"
+      ],
+      "hint": "Use NumPy broadcasting to subtract the mean vector and divide by the std vector. The mean and std should be 1D arrays with length equal to the number of columns.",
+      "references": [
+        "Standard score",
+        "Standard normal distribution",
+        "Affine transformations",
+        "NumPy broadcasting rules",
+        "Feature scaling in ML"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Range Finding: Computing Minimum and Maximum Values",
+      "relation_to_problem": "Finding the minimum and maximum values of each feature is the first step for min-max normalization, the second scaling method required in the main problem.",
+      "prerequisites": [
+        "NumPy array indexing",
+        "Aggregation functions",
+        "Understanding of feature-wise operations"
+      ],
+      "learning_objectives": [
+        "Compute range statistics (min, max) for feature vectors",
+        "Understand the relationship between range and data spread",
+        "Apply axis-based operations for column-wise computations",
+        "Calculate the range (max - min) as a measure of variability"
+      ],
+      "math_content": {
+        "definition": "For a dataset $X = \\{x_1, x_2, ..., x_n\\}$, the **minimum** and **maximum** are defined as: $$\\min(X) = x_{(1)} = \\min_{i \\in \\{1,...,n\\}} x_i$$ $$\\max(X) = x_{(n)} = \\max_{i \\in \\{1,...,n\\}} x_i$$ where $x_{(1)} \\leq x_{(2)} \\leq ... \\leq x_{(n)}$ are the order statistics. The **range** is: $$R = \\max(X) - \\min(X)$$",
+        "notation": "$\\min(X)$ = minimum value, $\\max(X)$ = maximum value, $R$ = range, $x_{(i)}$ = $i$-th order statistic (sorted values)",
+        "theorem": "**Range as a Measure of Spread**: The range $R$ provides the simplest measure of statistical dispersion. For any affine transformation $Y = aX + b$ where $a > 0$: $\\min(Y) = a\\cdot\\min(X) + b$ and $\\max(Y) = a\\cdot\\max(X) + b$, thus $R_Y = a \\cdot R_X$.",
+        "proof_sketch": "For any element $y_i = ax_i + b$, if $x_k = \\min(X)$, then for all $i$: $ax_i + b \\geq ax_k + b$ (since $a>0$ preserves order), thus $\\min(Y) = ax_k + b = a\\cdot\\min(X) + b$. Similarly for maximum. Therefore $R_Y = \\max(Y) - \\min(Y) = (a\\cdot\\max(X) + b) - (a\\cdot\\min(X) + b) = a(\\max(X) - \\min(X)) = aR_X$.",
+        "examples": [
+          "Dataset $[2, 5, 3, 9, 1]$: $\\min(X) = 1$, $\\max(X) = 9$, $R = 8$",
+          "For 2D array $[[1, 10], [3, 20], [2, 15]]$: Column 1 has $\\min=1, \\max=3, R=2$; Column 2 has $\\min=10, \\max=20, R=10$",
+          "Constant feature $[5, 5, 5, 5]$: $\\min=5, \\max=5, R=0$ (degenerate case for normalization)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Minimum",
+          "latex": "$\\min(X) = \\min_{i=1,...,n} x_i$",
+          "description": "Smallest value in the dataset"
+        },
+        {
+          "name": "Maximum",
+          "latex": "$\\max(X) = \\max_{i=1,...,n} x_i$",
+          "description": "Largest value in the dataset"
+        },
+        {
+          "name": "Range",
+          "latex": "$R = \\max(X) - \\min(X)$",
+          "description": "Spread of data; denominator in min-max scaling"
+        },
+        {
+          "name": "Normalized Position",
+          "latex": "$\\frac{x - \\min(X)}{R}$",
+          "description": "Relative position of x within the range [0,1]"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the minimum, maximum, and range for each column (feature) of a 2D NumPy array. Return three 1D arrays of length n_features. Round results to 4 decimal places.",
+        "function_signature": "def compute_range_stats(data: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef compute_range_stats(data: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:\n    \"\"\"\n    Compute min, max, and range for each feature (column).\n    \n    Args:\n        data: 2D array where rows are samples and columns are features\n    \n    Returns:\n        Tuple of (mins, maxs, ranges) where each is a 1D array\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_range_stats(np.array([[1, 2], [3, 4], [5, 6]]))",
+            "expected": "(array([1.0, 2.0]), array([5.0, 6.0]), array([4.0, 4.0]))",
+            "explanation": "Column 1: min=1, max=5, range=4. Column 2: min=2, max=6, range=4."
+          },
+          {
+            "input": "compute_range_stats(np.array([[10, 100, 1000], [20, 200, 2000], [15, 150, 1500]]))",
+            "expected": "(array([10.0, 100.0, 1000.0]), array([20.0, 200.0, 2000.0]), array([10.0, 100.0, 1000.0]))",
+            "explanation": "Three features with vastly different scales; demonstrates need for normalization"
+          },
+          {
+            "input": "compute_range_stats(np.array([[-5], [0], [5], [10]]))",
+            "expected": "(array([-5.0]), array([10.0]), array([15.0]))",
+            "explanation": "Single feature with negative values: min=-5, max=10, range=15"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing min/max across entire array instead of per-column",
+        "Not handling negative values correctly",
+        "Confusing range with standard deviation (they measure different aspects of spread)",
+        "Division by zero when range is 0 (will be relevant in next sub-quest)"
+      ],
+      "hint": "Use NumPy's np.min() and np.max() functions with axis=0 to compute column-wise statistics. Range is simply the difference between max and min.",
+      "references": [
+        "Order statistics",
+        "Range (statistics)",
+        "Measures of statistical dispersion",
+        "NumPy aggregation functions"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Min-Max Normalization: Linear Rescaling to a Fixed Range",
+      "relation_to_problem": "Min-max normalization implements the second scaling technique required in the main problem, producing the second output array that rescales features to [0, 1].",
+      "prerequisites": [
+        "Computing min and max values",
+        "Linear transformations",
+        "Range computation",
+        "Affine mappings"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical theory of min-max scaling",
+        "Apply linear rescaling to map data to [0, 1]",
+        "Implement vectorized min-max normalization",
+        "Recognize the geometric interpretation of this transformation"
+      ],
+      "math_content": {
+        "definition": "**Min-max normalization** (or min-max scaling) is a linear transformation that rescales feature values to a fixed range, typically $[0, 1]$. For a value $x$ in feature $X$: $$x' = \\frac{x - \\min(X)}{\\max(X) - \\min(X)}$$ More generally, to map to range $[a, b]$: $$x' = a + \\frac{(x - \\min(X))(b - a)}{\\max(X) - \\min(X)}$$ For the standard $[0,1]$ range with $a=0, b=1$, this simplifies to the first formula.",
+        "notation": "$x$ = original value, $x'$ = normalized value, $\\min(X)$ = minimum of feature $X$, $\\max(X)$ = maximum of feature $X$, $[a,b]$ = target range",
+        "theorem": "**Properties of Min-Max Normalization**: For transformation $x' = \\frac{x-\\min(X)}{\\max(X)-\\min(X)}$: (1) $\\min(X')=0$ and $\\max(X')=1$, (2) The transformation is a bijection (one-to-one and onto) when $\\max(X) \\neq \\min(X)$, (3) Relative distances are preserved: $\\frac{|x_i'-x_j'|}{1} = \\frac{|x_i-x_j|}{\\max(X)-\\min(X)}$, (4) Outliers strongly affect the transformation.",
+        "proof_sketch": "For property (1): When $x=\\min(X)$, $x'=\\frac{\\min(X)-\\min(X)}{\\max(X)-\\min(X)}=0$. When $x=\\max(X)$, $x'=\\frac{\\max(X)-\\min(X)}{\\max(X)-\\min(X)}=1$. For property (3): $|x_i'-x_j'| = |\\frac{x_i-\\min(X)}{R} - \\frac{x_j-\\min(X)}{R}| = \\frac{|x_i-x_j|}{R}$ where $R=\\max(X)-\\min(X)$. This shows that pairwise distances are scaled uniformly by factor $1/R$.",
+        "examples": [
+          "Feature $[1, 3, 5]$: $\\min=1, \\max=5, R=4$. Normalized: $[\\frac{1-1}{4}, \\frac{3-1}{4}, \\frac{5-1}{4}] = [0, 0.5, 1]$",
+          "Feature $[10, 20, 15, 12]$: $\\min=10, \\max=20, R=10$. Normalized: $[0, 1, 0.5, 0.2]$",
+          "Comparison with standardization: Unlike Z-score which can produce values outside any fixed range, min-max guarantees all values lie in $[0,1]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Min-Max Normalization [0,1]",
+          "latex": "$x' = \\frac{x - \\min(X)}{\\max(X) - \\min(X)}$",
+          "description": "Standard form for normalizing to unit interval"
+        },
+        {
+          "name": "General Min-Max to [a,b]",
+          "latex": "$x' = a + \\frac{(x - \\min(X))(b-a)}{\\max(X) - \\min(X)}$",
+          "description": "Generalized form for any target range"
+        },
+        {
+          "name": "Inverse Transformation",
+          "latex": "$x = \\min(X) + x'(\\max(X) - \\min(X))$",
+          "description": "Recover original values from normalized values"
+        },
+        {
+          "name": "Relative Position",
+          "latex": "$x' = \\frac{x - \\min(X)}{R}$",
+          "description": "Interpretation: x' is the relative position of x within the range"
+        }
+      ],
+      "exercise": {
+        "description": "Implement min-max normalization for a 2D NumPy array. For each column (feature), rescale values to the range [0, 1] where the minimum value maps to 0 and maximum to 1. Round results to 4 decimal places.",
+        "function_signature": "def normalize_min_max(data: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef normalize_min_max(data: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Apply min-max normalization to each feature (column).\n    \n    Args:\n        data: 2D array where rows are samples and columns are features\n    \n    Returns:\n        Normalized array with same shape, values in [0, 1]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "normalize_min_max(np.array([[1, 2], [3, 4], [5, 6]]))",
+            "expected": "array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])",
+            "explanation": "Column 1: min=1, max=5, range=4. Values [1,3,5] normalize to [(1-1)/4, (3-1)/4, (5-1)/4] = [0, 0.5, 1]. Same for column 2."
+          },
+          {
+            "input": "normalize_min_max(np.array([[10], [15], [20], [12]]))",
+            "expected": "array([[0.0], [0.5], [1.0], [0.2]])",
+            "explanation": "Single feature: min=10, max=20, range=10. Values normalize to their relative positions in [0,1]"
+          },
+          {
+            "input": "normalize_min_max(np.array([[0, 100], [50, 200], [100, 150]]))",
+            "expected": "array([[0.0, 0.0], [0.5, 1.0], [1.0, 0.5]])",
+            "explanation": "Two features with different scales normalize independently; preserves relative ordering within each feature"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Division by zero when all values in a feature are identical (range = 0)",
+        "Applying normalization across the entire array instead of per-column",
+        "Forgetting that outliers greatly affect min-max normalization (unlike standardization)",
+        "Not handling the edge case where min equals max gracefully",
+        "Broadcasting errors when subtracting min or dividing by range"
+      ],
+      "hint": "Compute min and max for each column using axis=0, then use broadcasting to apply the formula element-wise. Consider what should happen when max equals min.",
+      "references": [
+        "Feature scaling",
+        "Linear normalization",
+        "Data preprocessing",
+        "Rescaling transformations",
+        "NumPy broadcasting"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Integrated Feature Scaling: Combining Multiple Normalization Techniques",
+      "relation_to_problem": "This sub-quest combines all previous concepts to implement both standardization and min-max normalization in a single function, matching the exact requirements of the main problem.",
+      "prerequisites": [
+        "Z-score standardization",
+        "Min-max normalization",
+        "NumPy array manipulation",
+        "Statistical computations"
+      ],
+      "learning_objectives": [
+        "Apply multiple scaling techniques to the same dataset",
+        "Compare and contrast standardization vs min-max normalization",
+        "Implement efficient vectorized operations for dual transformations",
+        "Understand when to use each scaling method in practice",
+        "Master proper rounding and output formatting"
+      ],
+      "math_content": {
+        "definition": "**Integrated feature scaling** applies multiple normalization techniques to prepare data for different machine learning algorithms. For a feature matrix $\\mathbf{X} \\in \\mathbb{R}^{n \\times d}$ (n samples, d features): **Standardized form**: $$\\mathbf{Z} = (\\mathbf{X} - \\boldsymbol{\\mu}^T) \\oslash \\boldsymbol{\\sigma}^T$$ where $\\boldsymbol{\\mu} = [\\mu_1, ..., \\mu_d]^T$ are column means, $\\boldsymbol{\\sigma} = [\\sigma_1, ..., \\sigma_d]^T$ are column standard deviations, and $\\oslash$ is element-wise division with broadcasting. **Normalized form**: $$\\mathbf{X}' = (\\mathbf{X} - \\mathbf{X}_{\\min}^T) \\oslash (\\mathbf{X}_{\\max} - \\mathbf{X}_{\\min})^T$$ where $\\mathbf{X}_{\\min}, \\mathbf{X}_{\\max} \\in \\mathbb{R}^d$ are column-wise minimums and maximums.",
+        "notation": "$\\mathbf{X}$ = original feature matrix, $\\mathbf{Z}$ = standardized matrix, $\\mathbf{X}'$ = normalized matrix, $\\boldsymbol{\\mu}$ = mean vector, $\\boldsymbol{\\sigma}$ = std vector, $\\oslash$ = element-wise division",
+        "theorem": "**Complementary Properties of Scaling Methods**: (1) Standardization produces features with $\\mu=0, \\sigma=1$ but unbounded range, suitable for algorithms assuming normally distributed features (e.g., linear regression with regularization). (2) Min-max normalization produces features with bounded range $[0,1]$ but arbitrary mean and variance, suitable for algorithms sensitive to feature magnitude (e.g., neural networks, k-NN). (3) Neither method changes the order of values within a feature. (4) Both methods preserve linear relationships between samples.",
+        "proof_sketch": "Order preservation: For standardization, if $x_i < x_j$, then $z_i = \\frac{x_i-\\mu}{\\sigma} < \\frac{x_j-\\mu}{\\sigma} = z_j$ (since $\\sigma > 0$). Similarly for min-max: $x_i' = \\frac{x_i-\\min}{R} < \\frac{x_j-\\min}{R} = x_j'$ (since $R > 0$). Linear relationship preservation: The Euclidean distance ratio between any two samples is scaled uniformly: For standardization, $\\|\\mathbf{z}_i - \\mathbf{z}_j\\| = \\frac{1}{\\sigma}\\|\\mathbf{x}_i - \\mathbf{x}_j\\|$ (when features have same $\\sigma$).",
+        "examples": [
+          "Dataset $[[1,2], [3,4], [5,6]]$: Standardized gives $[[-1.2247, -1.2247], [0, 0], [1.2247, 1.2247]]$, normalized gives $[[0, 0], [0.5, 0.5], [1, 1]]$. Notice how standardization spreads values symmetrically around 0, while normalization maps to fixed boundaries.",
+          "Use case comparison: For gradient descent in linear regression, standardization helps because features contribute equally to gradient magnitude. For neural networks with sigmoid activation, min-max normalization works well because sigmoid is most sensitive in [0,1] range.",
+          "Outlier sensitivity: Feature $[1, 2, 3, 100]$ - standardization: $[-0.7, -0.7, -0.6, 2.0]$ (outlier has moderate effect), min-max: $[0, 0.01, 0.02, 1]$ (outlier compresses other values near 0)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Vectorized Standardization",
+          "latex": "$\\mathbf{Z}_{ij} = \\frac{\\mathbf{X}_{ij} - \\mu_j}{\\sigma_j}$",
+          "description": "Per-column Z-score transformation"
+        },
+        {
+          "name": "Vectorized Min-Max",
+          "latex": "$\\mathbf{X}'_{ij} = \\frac{\\mathbf{X}_{ij} - \\min(\\mathbf{X}_{:,j})}{\\max(\\mathbf{X}_{:,j}) - \\min(\\mathbf{X}_{:,j})}$",
+          "description": "Per-column min-max scaling"
+        },
+        {
+          "name": "Output Format",
+          "latex": "$(\\mathbf{Z}, \\mathbf{X}')$",
+          "description": "Return tuple of both scaled matrices"
+        },
+        {
+          "name": "Rounding",
+          "latex": "$\\text{round}(x, 4)$",
+          "description": "Round all results to 4 decimal places"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete feature scaling function that takes a 2D NumPy array and returns BOTH standardized and min-max normalized versions. Each scaling method should be applied independently to the original data (not sequentially). Round all results to 4 decimal places. This directly builds the core functionality needed for the main problem.",
+        "function_signature": "def dual_feature_scaling(data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef dual_feature_scaling(data: np.ndarray) -> tuple[np.ndarray, np.ndarray]:\n    \"\"\"\n    Apply both standardization and min-max normalization.\n    \n    Args:\n        data: 2D array where rows are samples, columns are features\n    \n    Returns:\n        Tuple of (standardized_data, normalized_data)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "dual_feature_scaling(np.array([[1, 2], [3, 4], [5, 6]]))",
+            "expected": "(array([[-1.2247, -1.2247], [0.0, 0.0], [1.2247, 1.2247]]), array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]]))",
+            "explanation": "This is the exact example from the main problem. Standardization centers at 0 with spread ±1.22, normalization maps to exact [0,1] range."
+          },
+          {
+            "input": "dual_feature_scaling(np.array([[10, 100], [20, 200], [30, 300], [40, 400]]))",
+            "expected": "(array([[-1.3416, -1.3416], [-0.4472, -0.4472], [0.4472, 0.4472], [1.3416, 1.3416]]), array([[0.0, 0.0], [0.3333, 0.3333], [0.6667, 0.6667], [1.0, 1.0]]))",
+            "explanation": "Two features with vastly different original scales (10-40 vs 100-400) both transform identically because they have the same relative structure"
+          },
+          {
+            "input": "dual_feature_scaling(np.array([[5], [10], [15]]))",
+            "expected": "(array([[-1.2247], [0.0], [1.2247]]), array([[0.0], [0.5], [1.0]]))",
+            "explanation": "Single feature case: demonstrates both methods work correctly with 1D column vector"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Applying normalizations sequentially (normalizing already standardized data) instead of independently on original data",
+        "Not rounding to exactly 4 decimal places as specified",
+        "Returning results in wrong order (should be standardized first, then normalized)",
+        "Computing statistics on already-transformed data instead of original data",
+        "Not handling edge cases like constant features (zero variance/range)",
+        "Incorrect broadcasting dimensions leading to wrong-shaped output"
+      ],
+      "hint": "Implement standardization and min-max normalization as separate operations, both starting from the original input data. Use the functions/concepts from previous sub-quests, then combine them appropriately.",
+      "references": [
+        "Scikit-learn StandardScaler",
+        "Scikit-learn MinMaxScaler",
+        "Feature engineering best practices",
+        "Data preprocessing pipelines",
+        "When to use which scaling method"
+      ]
+    }
+  ]
+}

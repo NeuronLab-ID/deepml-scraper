@@ -1,0 +1,533 @@
+{
+  "problem_id": 119,
+  "title": "Solve System of Linear Equations Using Cramer's Rule",
+  "category": "Linear Algebra for Machine Learning",
+  "difficulty": "medium",
+  "description": "Implement a function to solve a system of linear equations $Ax = b$ using Cramer's Rule. The function should take a square coefficient matrix $A$ and a constant vector $b$, and return the solution vector $x$. If the system has no unique solution (i.e., the determinant of $A$ is zero), return -1.",
+  "example": {
+    "input": "A = [[2, -1, 3], [4, 2, 1], [-6, 1, -2]], b = [5, 10, -3]",
+    "output": "[0.1667 3.3333 2.6667]",
+    "reasoning": "We compute the determinant of A and then replace each column with vector b to compute the determinants of modified matrices. These are then used in the formula $x_i = \\frac{\\det(A_i)}{\\det(A)}$ to get the solution."
+  },
+  "starter_code": "import numpy as np\n\ndef cramers_rule(A, b):\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Computing Determinants of 2×2 and 3×3 Matrices",
+      "relation_to_problem": "Cramer's Rule requires computing determinants of the coefficient matrix A and all modified matrices A_i. This is the foundational operation for the entire algorithm.",
+      "prerequisites": [
+        "Matrix notation",
+        "Basic matrix operations",
+        "Array indexing"
+      ],
+      "learning_objectives": [
+        "Understand the geometric interpretation of determinants as signed area/volume",
+        "Compute determinants of 2×2 matrices using the direct formula",
+        "Compute determinants of 3×3 matrices using cofactor expansion",
+        "Recognize when a determinant is zero and its implications for system solvability"
+      ],
+      "math_content": {
+        "definition": "The determinant is a scalar function $\\det: \\mathbb{R}^{n \\times n} \\to \\mathbb{R}$ that maps a square matrix to a real number. It encodes information about the matrix's invertibility, the volume scaling factor of the linear transformation it represents, and whether the transformation preserves or reverses orientation.",
+        "notation": "$\\det(A)$ or $|A|$ denotes the determinant of matrix $A$. For a matrix $A = (a_{ij})$, we write $\\det(A) = |a_{ij}|$.",
+        "theorem": "A square matrix $A$ is invertible (nonsingular) if and only if $\\det(A) \\neq 0$. When $\\det(A) = 0$, the matrix is singular and represents a linear transformation that collapses the space into a lower dimension.",
+        "proof_sketch": "For a 2×2 matrix $A = \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$, the determinant $\\det(A) = ad - bc$ represents the signed area of the parallelogram formed by the column vectors. If this area is zero, the vectors are collinear and the matrix has no inverse. For larger matrices, the determinant can be computed recursively using cofactor expansion: $\\det(A) = \\sum_{j=1}^{n} (-1)^{i+j} a_{ij} M_{ij}$ where $M_{ij}$ is the minor obtained by deleting row $i$ and column $j$.",
+        "examples": [
+          "For $A = \\begin{pmatrix} 3 & 2 \\\\ 1 & 4 \\end{pmatrix}$, we have $\\det(A) = (3)(4) - (2)(1) = 12 - 2 = 10$.",
+          "For $B = \\begin{pmatrix} 1 & 2 & 3 \\\\ 0 & 4 & 5 \\\\ 0 & 0 & 6 \\end{pmatrix}$ (upper triangular), $\\det(B) = 1 \\cdot 4 \\cdot 6 = 24$ (product of diagonal elements).",
+          "For $C = \\begin{pmatrix} 2 & 1 & 3 \\\\ 1 & 0 & 1 \\\\ -1 & 2 & 0 \\end{pmatrix}$, expanding along row 2: $\\det(C) = -(1)\\begin{vmatrix} 1 & 3 \\\\ 2 & 0 \\end{vmatrix} + 0 - (1)\\begin{vmatrix} 2 & 1 \\\\ -1 & 2 \\end{vmatrix} = -1(0-6) - 1(4-(-1)) = 6 - 5 = 1$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "2×2 Determinant",
+          "latex": "$\\det\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} = ad - bc$",
+          "description": "Direct formula for 2×2 matrices - compute the product of the main diagonal minus the product of the anti-diagonal"
+        },
+        {
+          "name": "3×3 Determinant (Sarrus' Rule)",
+          "latex": "$\\det\\begin{pmatrix} a & b & c \\\\ d & e & f \\\\ g & h & i \\end{pmatrix} = aei + bfg + cdh - ceg - afh - bdi$",
+          "description": "Memory aid for 3×3 determinants: sum of products along three diagonals minus sum of products along three anti-diagonals"
+        },
+        {
+          "name": "Cofactor Expansion",
+          "latex": "$\\det(A) = \\sum_{j=1}^{n} (-1)^{i+j} a_{ij} \\det(M_{ij})$",
+          "description": "General recursive formula expanding along row $i$, where $M_{ij}$ is the $(n-1) \\times (n-1)$ minor matrix"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the determinant of a square matrix. For this exercise, handle 2×2 and 3×3 matrices using direct formulas. Return the determinant as a floating-point number.",
+        "function_signature": "def compute_determinant(matrix: list[list[float]]) -> float:",
+        "starter_code": "def compute_determinant(matrix):\n    # Your code here\n    # Hint: Check the size of the matrix first\n    # For 2x2: use the formula ad - bc\n    # For 3x3: use cofactor expansion or Sarrus' rule\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_determinant([[3, 2], [1, 4]])",
+            "expected": "10.0",
+            "explanation": "Using the 2×2 formula: (3)(4) - (2)(1) = 12 - 2 = 10"
+          },
+          {
+            "input": "compute_determinant([[2, -1], [4, 3]])",
+            "expected": "10.0",
+            "explanation": "(2)(3) - (-1)(4) = 6 + 4 = 10"
+          },
+          {
+            "input": "compute_determinant([[1, 2, 3], [0, 4, 5], [0, 0, 6]])",
+            "expected": "24.0",
+            "explanation": "Upper triangular matrix: product of diagonal elements = 1 × 4 × 6 = 24"
+          },
+          {
+            "input": "compute_determinant([[2, -1, 3], [4, 2, 1], [-6, 1, -2]])",
+            "expected": "-36.0",
+            "explanation": "This is the coefficient matrix from the main problem. Using cofactor expansion yields -36."
+          },
+          {
+            "input": "compute_determinant([[1, 2], [2, 4]])",
+            "expected": "0.0",
+            "explanation": "Singular matrix: (1)(4) - (2)(2) = 0. The rows are linearly dependent (row 2 = 2 × row 1)."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to alternate signs in cofactor expansion (the (-1)^(i+j) factor)",
+        "Confusing row expansion with column expansion (both are valid but must be consistent)",
+        "Arithmetic errors in 3×3 determinants when applying Sarrus' rule",
+        "Not handling the edge case of singular matrices (determinant = 0)",
+        "Attempting to compute determinants of non-square matrices"
+      ],
+      "hint": "For 3×3 matrices, expanding along the first row is often simplest. Remember that each element is multiplied by the determinant of the 2×2 submatrix obtained by removing that element's row and column, with alternating signs.",
+      "references": [
+        "Cofactor expansion (Laplace expansion)",
+        "Geometric interpretation of determinants",
+        "Properties of determinants (multiplicativity, row operations)",
+        "Sarrus' rule for 3×3 matrices"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Matrix Column Replacement Operations",
+      "relation_to_problem": "To apply Cramer's Rule, we must create n modified matrices A_i by replacing the i-th column of A with the constant vector b. This operation must be performed correctly for each variable.",
+      "prerequisites": [
+        "Matrix indexing and slicing",
+        "Deep vs shallow copying",
+        "Matrix dimensions"
+      ],
+      "learning_objectives": [
+        "Understand the structure of the modified matrices A_i in Cramer's Rule",
+        "Implement column replacement without mutating the original matrix",
+        "Verify that replaced columns maintain proper matrix dimensions",
+        "Recognize the pattern of column replacement across all variables"
+      ],
+      "math_content": {
+        "definition": "Given a matrix $A \\in \\mathbb{R}^{n \\times n}$ with columns $\\mathbf{a}_1, \\mathbf{a}_2, \\ldots, \\mathbf{a}_n$ and a vector $\\mathbf{b} \\in \\mathbb{R}^n$, the matrix $A_i$ is formed by replacing the $i$-th column of $A$ with $\\mathbf{b}$: $$A_i = [\\mathbf{a}_1 | \\cdots | \\mathbf{a}_{i-1} | \\mathbf{b} | \\mathbf{a}_{i+1} | \\cdots | \\mathbf{a}_n]$$",
+        "notation": "$A_i$ denotes the matrix obtained from $A$ by replacing column $i$ with vector $\\mathbf{b}$. The notation $[\\mathbf{v}_1 | \\mathbf{v}_2 | \\cdots | \\mathbf{v}_n]$ indicates a matrix with columns $\\mathbf{v}_1, \\mathbf{v}_2, \\ldots, \\mathbf{v}_n$.",
+        "theorem": "For Cramer's Rule, if $A\\mathbf{x} = \\mathbf{b}$ and $\\det(A) \\neq 0$, then the solution component $x_i = \\frac{\\det(A_i)}{\\det(A)}$ where $A_i$ is constructed as defined above. The correctness follows from the properties of determinants under column operations.",
+        "proof_sketch": "Consider the identity $A\\mathbf{x} = \\mathbf{b}$ written as $\\sum_{j=1}^{n} x_j \\mathbf{a}_j = \\mathbf{b}$. When we form $A_i$ by replacing column $i$ with $\\mathbf{b}$, the determinant $\\det(A_i)$ can be expanded as $\\det(A_i) = \\det([\\mathbf{a}_1 | \\cdots | \\mathbf{a}_{i-1} | \\mathbf{b} | \\mathbf{a}_{i+1} | \\cdots | \\mathbf{a}_n])$. By multilinearity of the determinant and substituting $\\mathbf{b} = \\sum_{j=1}^{n} x_j \\mathbf{a}_j$, we obtain $\\det(A_i) = x_i \\det(A)$ after simplification using determinant properties.",
+        "examples": [
+          "For $A = \\begin{pmatrix} 2 & -1 \\\\ 4 & 3 \\end{pmatrix}$ and $\\mathbf{b} = \\begin{pmatrix} 5 \\\\ 10 \\end{pmatrix}$, we have $A_1 = \\begin{pmatrix} 5 & -1 \\\\ 10 & 3 \\end{pmatrix}$ and $A_2 = \\begin{pmatrix} 2 & 5 \\\\ 4 & 10 \\end{pmatrix}$.",
+          "For a 3×3 system with $A = \\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\\\ 7 & 8 & 9 \\end{pmatrix}$ and $\\mathbf{b} = \\begin{pmatrix} 1 \\\\ 2 \\\\ 3 \\end{pmatrix}$, then $A_2 = \\begin{pmatrix} 1 & 1 & 3 \\\\ 4 & 2 & 6 \\\\ 7 & 3 & 9 \\end{pmatrix}$ (middle column replaced)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Column Replacement Definition",
+          "latex": "$A_i = [\\mathbf{a}_1 | \\cdots | \\mathbf{a}_{i-1} | \\mathbf{b} | \\mathbf{a}_{i+1} | \\cdots | \\mathbf{a}_n]$",
+          "description": "The modified matrix preserves all columns except the i-th, which is replaced by the constant vector b"
+        },
+        {
+          "name": "Column Extraction",
+          "latex": "$\\mathbf{a}_j = \\begin{pmatrix} a_{1j} \\\\ a_{2j} \\\\ \\vdots \\\\ a_{nj} \\end{pmatrix}$",
+          "description": "The j-th column of matrix A consists of elements from all rows in column j"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a square matrix A, a vector b, and a column index i (0-indexed), and returns a new matrix A_i where the i-th column of A has been replaced with vector b. The original matrix A must not be modified.",
+        "function_signature": "def replace_column(A: list[list[float]], b: list[float], col_index: int) -> list[list[float]]:",
+        "starter_code": "def replace_column(A, b, col_index):\n    # Your code here\n    # Hint: Create a copy of A first to avoid modifying the original\n    # Then replace the elements in the specified column\n    pass",
+        "test_cases": [
+          {
+            "input": "replace_column([[2, -1], [4, 3]], [5, 10], 0)",
+            "expected": "[[5, -1], [10, 3]]",
+            "explanation": "First column (index 0) replaced with vector [5, 10], second column unchanged"
+          },
+          {
+            "input": "replace_column([[2, -1], [4, 3]], [5, 10], 1)",
+            "expected": "[[2, 5], [4, 10]]",
+            "explanation": "Second column (index 1) replaced with vector [5, 10], first column unchanged"
+          },
+          {
+            "input": "replace_column([[1, 2, 3], [4, 5, 6], [7, 8, 9]], [10, 11, 12], 1)",
+            "expected": "[[1, 10, 3], [4, 11, 6], [7, 12, 9]]",
+            "explanation": "Middle column (index 1) of a 3×3 matrix replaced with the vector [10, 11, 12]"
+          },
+          {
+            "input": "replace_column([[2, -1, 3], [4, 2, 1], [-6, 1, -2]], [5, 10, -3], 0)",
+            "expected": "[[5, -1, 3], [10, 2, 1], [-3, 1, -2]]",
+            "explanation": "This creates A_1 for the main problem's example system"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Modifying the original matrix A instead of creating a copy (mutation bug)",
+        "Using shallow copy instead of deep copy for nested lists",
+        "Off-by-one errors with column indexing (confusing 0-indexed vs 1-indexed)",
+        "Incorrectly iterating when b and A have mismatched dimensions",
+        "Replacing a row instead of a column due to indexing confusion"
+      ],
+      "hint": "In Python, when working with nested lists representing matrices, use list comprehension to create a deep copy. Remember that A[row][col] accesses the element at the given row and column.",
+      "references": [
+        "Deep copying vs shallow copying in Python",
+        "Matrix representation as list of lists",
+        "Column-major vs row-major ordering",
+        "NumPy array slicing for column operations"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Existence and Uniqueness of Solutions via Determinants",
+      "relation_to_problem": "Before applying Cramer's Rule, we must verify that det(A) ≠ 0 to ensure a unique solution exists. If det(A) = 0, the system is either inconsistent or has infinitely many solutions, requiring us to return -1.",
+      "prerequisites": [
+        "Determinant computation",
+        "Matrix invertibility",
+        "Linear independence"
+      ],
+      "learning_objectives": [
+        "Understand the relationship between det(A) and solution existence",
+        "Distinguish between consistent and inconsistent systems",
+        "Implement checks for numerical stability (near-zero determinants)",
+        "Recognize when to abort Cramer's Rule and return error codes"
+      ],
+      "math_content": {
+        "definition": "A system of linear equations $A\\mathbf{x} = \\mathbf{b}$ where $A \\in \\mathbb{R}^{n \\times n}$ is said to be **non-singular** if $\\det(A) \\neq 0$, **singular** if $\\det(A) = 0$. A non-singular system has a unique solution, while a singular system has either zero or infinitely many solutions.",
+        "notation": "$\\text{rank}(A)$ denotes the rank of matrix $A$ (the dimension of its column space). $[A|\\mathbf{b}]$ denotes the augmented matrix formed by appending $\\mathbf{b}$ as an additional column to $A$.",
+        "theorem": "**Fundamental Theorem of Linear Systems**: For the system $A\\mathbf{x} = \\mathbf{b}$ with $A \\in \\mathbb{R}^{n \\times n}$: (1) If $\\det(A) \\neq 0$, the system has exactly one solution $\\mathbf{x} = A^{-1}\\mathbf{b}$. (2) If $\\det(A) = 0$ and $\\text{rank}(A) = \\text{rank}([A|\\mathbf{b}])$, the system has infinitely many solutions. (3) If $\\det(A) = 0$ and $\\text{rank}(A) < \\text{rank}([A|\\mathbf{b}])$, the system is inconsistent (no solution).",
+        "proof_sketch": "Case 1: If $\\det(A) \\neq 0$, then $A$ is invertible, so multiplying both sides by $A^{-1}$ gives $\\mathbf{x} = A^{-1}\\mathbf{b}$, which is unique. Case 2: If $\\det(A) = 0$, the columns of $A$ are linearly dependent, meaning $A$ maps $\\mathbb{R}^n$ onto a proper subspace of dimension $r = \\text{rank}(A) < n$. If $\\mathbf{b}$ lies in this subspace (i.e., $\\mathbf{b} \\in \\text{Col}(A)$), then solutions exist and form an affine subspace of dimension $n - r$. If $\\mathbf{b} \\notin \\text{Col}(A)$, no solution exists.",
+        "examples": [
+          "Unique solution: $A = \\begin{pmatrix} 2 & 1 \\\\ 1 & 3 \\end{pmatrix}$, $\\mathbf{b} = \\begin{pmatrix} 5 \\\\ 6 \\end{pmatrix}$. Since $\\det(A) = 6 - 1 = 5 \\neq 0$, a unique solution exists.",
+          "Infinitely many solutions: $A = \\begin{pmatrix} 1 & 2 \\\\ 2 & 4 \\end{pmatrix}$, $\\mathbf{b} = \\begin{pmatrix} 3 \\\\ 6 \\end{pmatrix}$. Here $\\det(A) = 0$ and row 2 = 2 × row 1, and $b_2 = 2 b_1$, so solutions are $\\mathbf{x} = \\begin{pmatrix} 3 - 2t \\\\ t \\end{pmatrix}$ for any $t \\in \\mathbb{R}$.",
+          "No solution: $A = \\begin{pmatrix} 1 & 2 \\\\ 2 & 4 \\end{pmatrix}$, $\\mathbf{b} = \\begin{pmatrix} 3 \\\\ 7 \\end{pmatrix}$. Here $\\det(A) = 0$ but $b_2 \\neq 2 b_1$, so the system is inconsistent."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Invertibility Criterion",
+          "latex": "$A \\text{ is invertible} \\iff \\det(A) \\neq 0$",
+          "description": "A square matrix has an inverse if and only if its determinant is non-zero"
+        },
+        {
+          "name": "Rank-Nullity Theorem",
+          "latex": "$\\text{rank}(A) + \\text{nullity}(A) = n$",
+          "description": "For an n×n matrix, the dimension of the column space plus the dimension of the null space equals n"
+        },
+        {
+          "name": "Solution Space Dimension",
+          "latex": "$\\dim(\\text{Solution Set}) = n - \\text{rank}(A)$ when solutions exist",
+          "description": "The number of free variables in the solution equals n minus the rank of A"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that checks whether a system of linear equations has a unique solution by examining the determinant of the coefficient matrix. Return True if det(A) is significantly different from zero (use a tolerance of 1e-10 for numerical stability), and False otherwise.",
+        "function_signature": "def has_unique_solution(A: list[list[float]], tolerance: float = 1e-10) -> bool:",
+        "starter_code": "def has_unique_solution(A, tolerance=1e-10):\n    # Your code here\n    # Hint: Compute det(A) and check if |det(A)| > tolerance\n    # You can reuse your determinant function from step 1\n    pass",
+        "test_cases": [
+          {
+            "input": "has_unique_solution([[2, 1], [1, 3]])",
+            "expected": "True",
+            "explanation": "det(A) = 6 - 1 = 5 ≠ 0, so unique solution exists"
+          },
+          {
+            "input": "has_unique_solution([[1, 2], [2, 4]])",
+            "expected": "False",
+            "explanation": "det(A) = 4 - 4 = 0, singular matrix, no unique solution"
+          },
+          {
+            "input": "has_unique_solution([[2, -1, 3], [4, 2, 1], [-6, 1, -2]])",
+            "expected": "True",
+            "explanation": "det(A) = -36 ≠ 0, this is the main problem's coefficient matrix with unique solution"
+          },
+          {
+            "input": "has_unique_solution([[1, 2, 3], [2, 4, 6], [3, 6, 9]])",
+            "expected": "False",
+            "explanation": "det(A) = 0 because all rows are scalar multiples of each other (linearly dependent)"
+          },
+          {
+            "input": "has_unique_solution([[1, 0, 0], [0, 1, 0], [0, 0, 1]])",
+            "expected": "True",
+            "explanation": "Identity matrix has det = 1, always has unique solution"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using exact equality (det(A) == 0) instead of tolerance-based comparison due to floating-point errors",
+        "Not considering numerical stability - very small but non-zero determinants can lead to ill-conditioned systems",
+        "Forgetting that det(A) = 0 doesn't tell us whether the system is inconsistent or has infinite solutions",
+        "Computing determinants inefficiently for large matrices (Cramer's Rule becomes impractical for n > 4)",
+        "Not handling special cases like the identity matrix or diagonal matrices"
+      ],
+      "hint": "Floating-point arithmetic can produce very small non-zero values instead of exact zeros. Always use a tolerance threshold when checking if a determinant is zero.",
+      "references": [
+        "Condition number of matrices",
+        "Numerical stability in linear algebra",
+        "Rank theorem and solution spaces",
+        "Gaussian elimination vs Cramer's Rule efficiency"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Computing Individual Solution Components Using Cramer's Formula",
+      "relation_to_problem": "Once we've verified det(A) ≠ 0, we compute each solution component x_i using the formula x_i = det(A_i) / det(A). This requires combining column replacement with determinant computation.",
+      "prerequisites": [
+        "Determinant computation",
+        "Column replacement",
+        "Solution existence checking"
+      ],
+      "learning_objectives": [
+        "Apply Cramer's Rule formula to compute individual variables",
+        "Combine matrix modification and determinant operations efficiently",
+        "Understand the computational complexity of Cramer's Rule",
+        "Implement the formula with proper numerical precision"
+      ],
+      "math_content": {
+        "definition": "**Cramer's Rule** states that for a system $A\\mathbf{x} = \\mathbf{b}$ where $A \\in \\mathbb{R}^{n \\times n}$ and $\\det(A) \\neq 0$, the $i$-th component of the unique solution vector $\\mathbf{x}$ is given by: $$x_i = \\frac{\\det(A_i)}{\\det(A)}$$ where $A_i$ is the matrix formed by replacing the $i$-th column of $A$ with the constant vector $\\mathbf{b}$.",
+        "notation": "$x_i$ denotes the $i$-th component of the solution vector $\\mathbf{x} = (x_1, x_2, \\ldots, x_n)^T$. The subscript $i$ ranges from $1$ to $n$ for an $n \\times n$ system.",
+        "theorem": "**Cramer's Rule Correctness**: If $\\det(A) \\neq 0$, then the solution $\\mathbf{x}$ computed by Cramer's Rule satisfies $A\\mathbf{x} = \\mathbf{b}$. Furthermore, this is the unique solution to the system.",
+        "proof_sketch": "Starting from $A\\mathbf{x} = \\mathbf{b}$, we can write $\\sum_{j=1}^{n} x_j \\mathbf{a}_j = \\mathbf{b}$ where $\\mathbf{a}_j$ are the columns of $A$. Consider $A_i = [\\mathbf{a}_1 | \\cdots | \\mathbf{a}_{i-1} | \\mathbf{b} | \\mathbf{a}_{i+1} | \\cdots | \\mathbf{a}_n]$. By multilinearity of determinants: $$\\det(A_i) = \\det[\\mathbf{a}_1 | \\cdots | \\mathbf{a}_{i-1} | \\sum_{j=1}^{n} x_j \\mathbf{a}_j | \\mathbf{a}_{i+1} | \\cdots | \\mathbf{a}_n]$$ Using the property that determinants are linear in each column and that having two identical columns makes the determinant zero, only the term with $x_i \\mathbf{a}_i$ survives: $$\\det(A_i) = x_i \\det(A)$$ Therefore, $x_i = \\frac{\\det(A_i)}{\\det(A)}$.",
+        "examples": [
+          "For the 2×2 system $\\begin{cases} 2x + y = 5 \\\\ x + 3y = 6 \\end{cases}$, we have $A = \\begin{pmatrix} 2 & 1 \\\\ 1 & 3 \\end{pmatrix}$, $\\mathbf{b} = \\begin{pmatrix} 5 \\\\ 6 \\end{pmatrix}$. Then $\\det(A) = 5$, $A_1 = \\begin{pmatrix} 5 & 1 \\\\ 6 & 3 \\end{pmatrix}$ with $\\det(A_1) = 9$, and $A_2 = \\begin{pmatrix} 2 & 5 \\\\ 1 & 6 \\end{pmatrix}$ with $\\det(A_2) = 7$. Thus $x = \\frac{9}{5} = 1.8$ and $y = \\frac{7}{5} = 1.4$.",
+          "For the main problem example with $A = \\begin{pmatrix} 2 & -1 & 3 \\\\ 4 & 2 & 1 \\\\ -6 & 1 & -2 \\end{pmatrix}$ and $\\mathbf{b} = \\begin{pmatrix} 5 \\\\ 10 \\\\ -3 \\end{pmatrix}$, we have $\\det(A) = -36$. Computing: $\\det(A_1) = -6$, $\\det(A_2) = -120$, $\\det(A_3) = -96$. Therefore: $x_1 = \\frac{-6}{-36} = 0.1667$, $x_2 = \\frac{-120}{-36} = 3.3333$, $x_3 = \\frac{-96}{-36} = 2.6667$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cramer's Rule",
+          "latex": "$x_i = \\frac{\\det(A_i)}{\\det(A)}$ for $i = 1, 2, \\ldots, n$",
+          "description": "Each variable is the ratio of the determinant of the modified matrix to the determinant of the coefficient matrix"
+        },
+        {
+          "name": "Computational Complexity",
+          "latex": "$O(n! \\cdot n) \\approx O(n \\cdot n!)$ operations",
+          "description": "Computing n+1 determinants each with O(n!) complexity makes Cramer's Rule impractical for large systems"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes a single solution component x_i using Cramer's Rule. Given the coefficient matrix A, constant vector b, the variable index i (0-indexed), and the precomputed det(A), return the value of x_i. Assume det(A) is non-zero.",
+        "function_signature": "def compute_variable_cramers(A: list[list[float]], b: list[float], var_index: int, det_A: float) -> float:",
+        "starter_code": "def compute_variable_cramers(A, b, var_index, det_A):\n    # Your code here\n    # Hint: Use your replace_column function to create A_i\n    # Then compute det(A_i) and divide by det_A\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_variable_cramers([[2, 1], [1, 3]], [5, 6], 0, 5.0)",
+            "expected": "1.8",
+            "explanation": "A_1 has det = 9, so x_1 = 9/5 = 1.8"
+          },
+          {
+            "input": "compute_variable_cramers([[2, 1], [1, 3]], [5, 6], 1, 5.0)",
+            "expected": "1.4",
+            "explanation": "A_2 has det = 7, so x_2 = 7/5 = 1.4"
+          },
+          {
+            "input": "compute_variable_cramers([[2, -1, 3], [4, 2, 1], [-6, 1, -2]], [5, 10, -3], 0, -36.0)",
+            "expected": "0.16666666666666666",
+            "explanation": "First variable of main problem: det(A_1) = -6, x_1 = -6/-36 ≈ 0.1667"
+          },
+          {
+            "input": "compute_variable_cramers([[2, -1, 3], [4, 2, 1], [-6, 1, -2]], [5, 10, -3], 1, -36.0)",
+            "expected": "3.3333333333333335",
+            "explanation": "Second variable of main problem: det(A_2) = -120, x_2 = -120/-36 ≈ 3.3333"
+          },
+          {
+            "input": "compute_variable_cramers([[2, -1, 3], [4, 2, 1], [-6, 1, -2]], [5, 10, -3], 2, -36.0)",
+            "expected": "2.6666666666666665",
+            "explanation": "Third variable of main problem: det(A_3) = -96, x_3 = -96/-36 ≈ 2.6667"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing det(A) repeatedly for each variable instead of reusing the precomputed value",
+        "Off-by-one errors when converting between 0-indexed (programming) and 1-indexed (mathematical) notation",
+        "Not preserving sufficient floating-point precision in intermediate calculations",
+        "Forgetting to create a fresh copy of A when forming each A_i, leading to accumulated modifications",
+        "Division by zero when det(A) is very small (should be caught earlier, but defensive programming helps)"
+      ],
+      "hint": "Efficiency matters: compute det(A) once and pass it to this function. Each call should only compute one additional determinant (det(A_i)).",
+      "references": [
+        "Multilinearity of determinants",
+        "Column space and linear combinations",
+        "Comparison with Gaussian elimination efficiency",
+        "IEEE 754 floating-point precision"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Assembling the Complete Solution Vector",
+      "relation_to_problem": "The final step synthesizes all previous concepts: check solvability, compute all n solution components using Cramer's Rule, and assemble them into the solution vector. Handle the edge case of singular matrices by returning -1.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "List/array construction",
+        "Error handling"
+      ],
+      "learning_objectives": [
+        "Integrate all components of Cramer's Rule into a complete algorithm",
+        "Implement proper control flow for solvability checking",
+        "Construct the solution vector with correct ordering",
+        "Handle edge cases and return appropriate error codes",
+        "Understand when Cramer's Rule is appropriate vs other methods"
+      ],
+      "math_content": {
+        "definition": "The **complete Cramer's Rule algorithm** for solving $A\\mathbf{x} = \\mathbf{b}$ consists of: (1) Verify $\\det(A) \\neq 0$; if not, return failure. (2) For each $i \\in \\{1, 2, \\ldots, n\\}$, compute $x_i = \\frac{\\det(A_i)}{\\det(A)}$. (3) Return $\\mathbf{x} = (x_1, x_2, \\ldots, x_n)^T$ as the solution vector.",
+        "notation": "$\\mathbf{x} = (x_1, x_2, \\ldots, x_n)^T \\in \\mathbb{R}^n$ represents the solution vector as a column vector. In implementations, this is typically represented as a 1D array or list.",
+        "theorem": "**Algorithmic Complexity of Cramer's Rule**: For an $n \\times n$ system, Cramer's Rule requires computing $n+1$ determinants. Using cofactor expansion, each determinant takes $O(n!)$ operations, giving total complexity $O(n \\cdot n!)$. This is worse than Gaussian elimination's $O(n^3)$, making Cramer's Rule impractical for $n > 4$.",
+        "proof_sketch": "The algorithm requires: (1) One computation of $\\det(A)$: $O(n!)$ operations. (2) For each of $n$ variables, one column replacement ($O(n^2)$) and one determinant computation ($O(n!)$). Total: $O((n+1) \\cdot n!) \\in O(n \\cdot n!)$. By comparison, Gaussian elimination with back-substitution achieves $O(n^3)$ through row reduction without computing determinants. The factorial growth makes Cramer's Rule impractical: for $n=10$, we have $10! = 3,628,800$ vs $10^3 = 1,000$.",
+        "examples": [
+          "Complete solution for $\\begin{cases} 3x + 2y = 7 \\\\ x + 4y = 9 \\end{cases}$: Step 1: $\\det(A) = 12 - 2 = 10 \\neq 0$ ✓. Step 2: $\\det(A_1) = 28 - 18 = 10$, $x = 1$. Step 3: $\\det(A_2) = 27 - 7 = 20$, $y = 2$. Solution: $\\mathbf{x} = \\begin{pmatrix} 1 \\\\ 2 \\end{pmatrix}$.",
+          "Singular system: $\\begin{cases} 2x + 4y = 6 \\\\ x + 2y = 5 \\end{cases}$: Step 1: $\\det(A) = 4 - 4 = 0$. Return error code -1 (no unique solution).",
+          "Main problem complete solution: Given $A = \\begin{pmatrix} 2 & -1 & 3 \\\\ 4 & 2 & 1 \\\\ -6 & 1 & -2 \\end{pmatrix}$, $\\mathbf{b} = \\begin{pmatrix} 5 \\\\ 10 \\\\ -3 \\end{pmatrix}$. Compute $\\det(A) = -36$, then $x_1 = 0.1667$, $x_2 = 3.3333$, $x_3 = 2.6667$. Return $\\mathbf{x} = [0.1667, 3.3333, 2.6667]$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Algorithm",
+          "latex": "$\\mathbf{x} = \\begin{cases} (x_1, x_2, \\ldots, x_n)^T \\text{ where } x_i = \\frac{\\det(A_i)}{\\det(A)} & \\text{if } \\det(A) \\neq 0 \\\\ \\text{undefined} & \\text{if } \\det(A) = 0 \\end{cases}$",
+          "description": "The solution vector components are computed via Cramer's Rule only when the system is non-singular"
+        },
+        {
+          "name": "Verification",
+          "latex": "$A\\mathbf{x} = \\mathbf{b}$ should hold after computation",
+          "description": "The computed solution can be verified by matrix-vector multiplication"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified version of Cramer's Rule that works for 2×2 and 3×3 systems. Given matrices A and vector b, return the solution vector as a list of floats if a unique solution exists. If det(A) = 0 (within tolerance 1e-10), return -1. Do not use NumPy's built-in linear algebra solvers.",
+        "function_signature": "def solve_system_cramers(A: list[list[float]], b: list[float]) -> list[float] | int:",
+        "starter_code": "def solve_system_cramers(A, b):\n    # Your code here\n    # Step 1: Compute det(A), check if it's non-zero\n    # Step 2: If singular, return -1\n    # Step 3: For each variable, compute x_i using Cramer's Rule\n    # Step 4: Return the solution vector as a list\n    pass",
+        "test_cases": [
+          {
+            "input": "solve_system_cramers([[3, 2], [1, 4]], [7, 9])",
+            "expected": "[1.0, 2.0]",
+            "explanation": "det(A) = 10, x = 10/10 = 1, y = 20/10 = 2"
+          },
+          {
+            "input": "solve_system_cramers([[2, 4], [1, 2]], [6, 3])",
+            "expected": "-1",
+            "explanation": "det(A) = 0, singular system, return error code"
+          },
+          {
+            "input": "solve_system_cramers([[1, 0, 0], [0, 1, 0], [0, 0, 1]], [3, 5, 7])",
+            "expected": "[3.0, 5.0, 7.0]",
+            "explanation": "Identity matrix: x = b directly (det(A) = 1, each A_i replaces one column with b)"
+          },
+          {
+            "input": "solve_system_cramers([[2, -1, 3], [4, 2, 1], [-6, 1, -2]], [5, 10, -3])",
+            "expected": "[0.16666666666666666, 3.3333333333333335, 2.6666666666666665]",
+            "explanation": "Main problem example: exact solution computed using Cramer's Rule"
+          },
+          {
+            "input": "solve_system_cramers([[1, 2, 3], [2, 4, 6], [1, 1, 1]], [6, 12, 3])",
+            "expected": "-1",
+            "explanation": "Singular 3×3 matrix (row 2 = 2 × row 1), det(A) = 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Returning individual values instead of assembling them into a list/vector",
+        "Wrong ordering of solution components (mixing up x_1, x_2, x_3)",
+        "Not handling the singular case before attempting to compute solutions",
+        "Returning 0 or empty list instead of -1 for singular systems",
+        "Inefficiently recomputing det(A) for each variable instead of once at the start",
+        "Not testing the solution by verifying Ax = b"
+      ],
+      "hint": "Structure your solution clearly: (1) compute det(A) once, (2) check singularity, (3) loop through indices to compute each x_i, (4) collect results into a list. This makes the algorithm easy to debug and understand.",
+      "references": [
+        "Algorithm design patterns",
+        "Error handling best practices",
+        "When to use Cramer's Rule vs Gaussian elimination",
+        "Numerical linear algebra textbooks (Trefethen & Bau, Golub & Van Loan)"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Optimization and Practical Considerations",
+      "relation_to_problem": "While the basic algorithm works, practical implementations must consider numerical stability, efficiency optimizations, and proper integration with numpy. This final quest addresses production-ready implementation details.",
+      "prerequisites": [
+        "Complete Cramer's Rule implementation",
+        "NumPy basics",
+        "Floating-point arithmetic"
+      ],
+      "learning_objectives": [
+        "Leverage NumPy for efficient determinant computation and matrix operations",
+        "Implement robust floating-point comparison with appropriate tolerances",
+        "Understand the limitations and appropriate use cases for Cramer's Rule",
+        "Compare Cramer's Rule with alternative solution methods",
+        "Format output correctly for the problem specification"
+      ],
+      "math_content": {
+        "definition": "**Numerical stability** in linear algebra refers to how sensitive an algorithm is to rounding errors in floating-point arithmetic. An algorithm is **numerically stable** if small perturbations in input lead to proportionally small changes in output. The **condition number** $\\kappa(A) = \\|A\\| \\cdot \\|A^{-1}\\|$ quantifies how errors in $\\mathbf{b}$ affect errors in $\\mathbf{x}$.",
+        "notation": "$\\epsilon_{\\text{machine}}$ denotes machine epsilon, the smallest floating-point number such that $1 + \\epsilon_{\\text{machine}} \\neq 1$ in floating-point arithmetic (approximately $2.22 \\times 10^{-16}$ for double precision).",
+        "theorem": "**Sensitivity of Linear Systems**: For $A\\mathbf{x} = \\mathbf{b}$ with perturbation $A\\mathbf{\\tilde{x}} = \\mathbf{b} + \\delta\\mathbf{b}$, the relative error is bounded by: $$\\frac{\\|\\mathbf{x} - \\mathbf{\\tilde{x}}\\|}{\\|\\mathbf{x}\\|} \\leq \\kappa(A) \\frac{\\|\\delta\\mathbf{b}\\|}{\\|\\mathbf{b}\\|}$$ This shows that ill-conditioned systems ($\\kappa(A) \\gg 1$) amplify input errors significantly.",
+        "proof_sketch": "From $A\\mathbf{x} = \\mathbf{b}$ and $A\\mathbf{\\tilde{x}} = \\mathbf{b} + \\delta\\mathbf{b}$, we get $A(\\mathbf{x} - \\mathbf{\\tilde{x}}) = -\\delta\\mathbf{b}$, so $\\mathbf{x} - \\mathbf{\\tilde{x}} = -A^{-1}\\delta\\mathbf{b}$. Taking norms: $\\|\\mathbf{x} - \\mathbf{\\tilde{x}}\\| \\leq \\|A^{-1}\\| \\cdot \\|\\delta\\mathbf{b}\\|$. Since $\\|\\mathbf{b}\\| = \\|A\\mathbf{x}\\| \\leq \\|A\\| \\cdot \\|\\mathbf{x}\\|$, we have $1/\\|\\mathbf{x}\\| \\leq \\|A\\|/\\|\\mathbf{b}\\|$. Combining these yields the condition number bound.",
+        "examples": [
+          "Well-conditioned: $A = \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix}$ has $\\kappa(A) = 1$. Small errors in $\\mathbf{b}$ cause equally small errors in $\\mathbf{x}$.",
+          "Ill-conditioned: $A = \\begin{pmatrix} 1 & 1 \\\\ 1 & 1.0001 \\end{pmatrix}$ has $\\kappa(A) \\approx 40000$. A 0.01% error in $\\mathbf{b}$ can cause 400% error in $\\mathbf{x}$.",
+          "Cramer's Rule vs Gaussian Elimination: For a $3 \\times 3$ system, Cramer's Rule requires computing 4 determinants (each with 6 multiplications via Sarrus), totaling ~24 multiplications plus divisions. Gaussian elimination requires ~$n^3/3 = 9$ multiplications for LU decomposition plus ~$n^2 = 9$ for back-substitution, totaling ~18 operations, plus better numerical stability."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Condition Number",
+          "latex": "$\\kappa(A) = \\|A\\| \\cdot \\|A^{-1}\\|$",
+          "description": "Measures sensitivity of the system to perturbations; systems with κ(A) > 10^6 are considered ill-conditioned"
+        },
+        {
+          "name": "Relative Tolerance Check",
+          "latex": "$|\\det(A)| < \\epsilon \\cdot \\max_{i,j} |a_{ij}|$ indicates singularity",
+          "description": "Scale-invariant check for near-zero determinants using element-wise maximum"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the production-ready version of Cramer's Rule using NumPy's np.linalg.det() for determinant computation. The function should match the problem specification exactly: return the solution vector for non-singular systems and -1 for singular systems. Use a tolerance of 1e-10 for determinant checks. Format output as a NumPy array with 4 decimal places when displaying.",
+        "function_signature": "def cramers_rule(A: list[list[float]], b: list[float]) -> np.ndarray | int:",
+        "starter_code": "import numpy as np\n\ndef cramers_rule(A, b):\n    # Your code here\n    # Step 1: Convert to numpy arrays if needed\n    # Step 2: Compute det(A) using np.linalg.det\n    # Step 3: Check if |det(A)| < 1e-10, return -1 if singular\n    # Step 4: For each variable, create A_i and compute x_i\n    # Step 5: Return solution as numpy array\n    pass",
+        "test_cases": [
+          {
+            "input": "cramers_rule([[2, -1, 3], [4, 2, 1], [-6, 1, -2]], [5, 10, -3])",
+            "expected": "array([0.16666667, 3.33333333, 2.66666667])",
+            "explanation": "Main problem example: non-singular system with unique solution"
+          },
+          {
+            "input": "cramers_rule([[1, 2], [2, 4]], [3, 6])",
+            "expected": "-1",
+            "explanation": "Singular 2×2 system: det(A) = 0"
+          },
+          {
+            "input": "cramers_rule([[4, 2], [2, 1]], [10, 5])",
+            "expected": "-1",
+            "explanation": "Singular system with infinite solutions (rows are proportional)"
+          },
+          {
+            "input": "cramers_rule([[1, 0, 0], [0, 2, 0], [0, 0, 3]], [4, 10, 15])",
+            "expected": "array([4., 5., 5.])",
+            "explanation": "Diagonal matrix: each x_i = b_i / A_ii, easy to verify"
+          },
+          {
+            "input": "cramers_rule([[2, 1, -1], [-3, -1, 2], [-2, 1, 2]], [8, -11, -3])",
+            "expected": "array([2., 3., -1.])",
+            "explanation": "Another 3×3 system to verify correctness"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not converting input lists to NumPy arrays before using NumPy functions",
+        "Using np.linalg.solve() instead of implementing Cramer's Rule as required",
+        "Forgetting to return exactly -1 (not [-1] or array([-1])) for singular systems",
+        "Not using np.copy() when creating A_i, leading to modification of original A",
+        "Inefficient implementation that converts between lists and arrays repeatedly",
+        "Not handling edge cases like very small but non-zero determinants properly"
+      ],
+      "hint": "NumPy's array slicing and copying make column replacement elegant: A_i = A.copy(); A_i[:, i] = b. This creates a deep copy and replaces column i in one step.",
+      "references": [
+        "NumPy documentation for np.linalg.det",
+        "Condition number computation with np.linalg.cond",
+        "Comparison with np.linalg.solve for benchmarking",
+        "LAPACK routines used by NumPy",
+        "Higham's 'Accuracy and Stability of Numerical Algorithms'"
+      ]
+    }
+  ]
+}

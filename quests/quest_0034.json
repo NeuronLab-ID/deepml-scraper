@@ -1,0 +1,416 @@
+{
+  "problem_id": 34,
+  "title": "One-Hot Encoding of Nominal Values",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "Write a Python function to perform one-hot encoding of nominal values. The function should take in a 1D numpy array x of integer values and an optional integer n_col representing the number of columns for the one-hot encoded array. If n_col is not provided, it should be automatically determined from the input array.",
+  "example": {
+    "input": "x = np.array([0, 1, 2, 1, 0])\n    output = to_categorical(x)\n    print(output)",
+    "output": "# [[1. 0. 0.]\n    #  [0. 1. 0.]\n    #  [0. 0. 1.]\n    #  [0. 1. 0.]\n    #  [1. 0. 0.]]",
+    "reasoning": "Each element in the input array is transformed into a one-hot encoded vector,\n    where the index corresponding to the value in the input array is set to 1, \n    and all other indices are set to 0."
+  },
+  "starter_code": "import numpy as np\n\ndef to_categorical(x, n_col=None):\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Standard Basis Vectors in Euclidean Space",
+      "relation_to_problem": "One-hot encoding transforms each category into a standard basis vector in ℝᴷ. Understanding basis vectors is fundamental to grasping why one-hot encoding works and how it represents categorical data geometrically.",
+      "prerequisites": [
+        "Basic linear algebra",
+        "Vector spaces",
+        "Set theory"
+      ],
+      "learning_objectives": [
+        "Define standard basis vectors formally in ℝⁿ",
+        "Understand orthonormality and linear independence of basis vectors",
+        "Implement programmatic generation of standard basis vectors",
+        "Recognize the geometric interpretation of basis vectors"
+      ],
+      "math_content": {
+        "definition": "The standard basis for ℝⁿ is the set of n vectors {𝐞₁, 𝐞₂, ..., 𝐞ₙ} where each 𝐞ᵢ ∈ ℝⁿ has a 1 in the i-th position and 0 in all other positions. Formally, 𝐞ᵢ = (δᵢ₁, δᵢ₂, ..., δᵢₙ)ᵀ where δᵢⱼ is the Kronecker delta function.",
+        "notation": "$\\mathbf{e}_i$ = i-th standard basis vector; $\\delta_{ij}$ = Kronecker delta = 1 if i=j, 0 otherwise; $\\mathbb{R}^n$ = n-dimensional Euclidean space",
+        "theorem": "Orthonormality Property: The standard basis vectors form an orthonormal set, meaning ⟨𝐞ᵢ, 𝐞ⱼ⟩ = 𝐞ᵢ · 𝐞ⱼ = δᵢⱼ for all i, j ∈ {1, 2, ..., n}.",
+        "proof_sketch": "For the dot product 𝐞ᵢ · 𝐞ⱼ = Σₖ₌₁ⁿ (𝐞ᵢ)ₖ(𝐞ⱼ)ₖ. Since (𝐞ᵢ)ₖ = δᵢₖ and (𝐞ⱼ)ₖ = δⱼₖ, we have Σₖ₌₁ⁿ δᵢₖδⱼₖ = δᵢⱼ. This equals 1 when i=j (same vector, unit length) and 0 when i≠j (orthogonal vectors).",
+        "examples": [
+          "For ℝ³: 𝐞₁ = [1, 0, 0]ᵀ, 𝐞₂ = [0, 1, 0]ᵀ, 𝐞₃ = [0, 0, 1]ᵀ",
+          "Verification of orthonormality: 𝐞₁ · 𝐞₂ = 1×0 + 0×1 + 0×0 = 0; 𝐞₁ · 𝐞₁ = 1×1 + 0×0 + 0×0 = 1"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Standard Basis Vector Definition",
+          "latex": "$\\mathbf{e}_i = (\\delta_{i1}, \\delta_{i2}, \\ldots, \\delta_{in})^T \\in \\mathbb{R}^n$",
+          "description": "Use to construct the i-th basis vector with 1 at position i and 0 elsewhere"
+        },
+        {
+          "name": "Kronecker Delta",
+          "latex": "$\\delta_{ij} = \\begin{cases} 1 & \\text{if } i = j \\\\ 0 & \\text{if } i \\neq j \\end{cases}$",
+          "description": "The fundamental building block for creating indicator functions and basis vectors"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that generates the i-th standard basis vector in ℝⁿ. This is the core operation in one-hot encoding: mapping an integer index to its corresponding basis vector.",
+        "function_signature": "def create_basis_vector(i: int, n: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef create_basis_vector(i: int, n: int) -> np.ndarray:\n    \"\"\"\n    Create the i-th standard basis vector in R^n.\n    \n    Args:\n        i: Index of the basis vector (0-indexed)\n        n: Dimension of the vector space\n    \n    Returns:\n        A numpy array representing the i-th basis vector\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "create_basis_vector(0, 3)",
+            "expected": "np.array([1., 0., 0.])",
+            "explanation": "The 0-th basis vector in ℝ³ has 1 at index 0 and 0 elsewhere"
+          },
+          {
+            "input": "create_basis_vector(2, 5)",
+            "expected": "np.array([0., 0., 1., 0., 0.])",
+            "explanation": "The 2nd basis vector in ℝ⁵ has 1 at index 2 and 0 at all other positions"
+          },
+          {
+            "input": "create_basis_vector(1, 3)",
+            "expected": "np.array([0., 1., 0.])",
+            "explanation": "The 1st basis vector in ℝ³ demonstrates the middle position being activated"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using 1-indexing instead of 0-indexing when i represents the position",
+        "Creating integer arrays instead of float arrays (affects numerical stability)",
+        "Not validating that 0 ≤ i < n, allowing out-of-bounds access",
+        "Confusing the dimension n with the index i"
+      ],
+      "hint": "Think about creating a zero vector first, then setting exactly one element to 1. Use numpy's zeros function and array indexing.",
+      "references": [
+        "Linear Algebra and Its Applications by Gilbert Strang",
+        "Standard basis in Euclidean space",
+        "Orthonormal basis properties"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Bijective Mappings and Cardinality of Categorical Variables",
+      "relation_to_problem": "One-hot encoding creates a bijection between the set of categories {0, 1, ..., K-1} and the set of standard basis vectors. Understanding this mapping ensures we correctly determine the number of columns needed and handle the full range of categories.",
+      "prerequisites": [
+        "Set theory",
+        "Function properties (injection, surjection, bijection)",
+        "Cardinality"
+      ],
+      "learning_objectives": [
+        "Define bijective functions and their properties formally",
+        "Compute the cardinality of a categorical variable from data",
+        "Understand why one-hot encoding dimension must equal the number of unique categories",
+        "Implement automatic detection of category count from input arrays"
+      ],
+      "math_content": {
+        "definition": "A function f: A → B is bijective (one-to-one and onto) if it is both injective and surjective. For categorical encoding, we construct φ: C → {𝐞₁, ..., 𝐞ₖ} where C = {0, 1, ..., K-1} is the set of categories and K = |C| is the cardinality of C.",
+        "notation": "|S| = cardinality (number of elements) of set S; φ = encoding function; C = set of categories; K = |C| = number of unique categories",
+        "theorem": "Information Preservation Theorem: A bijective encoding φ: C → ℝᴷ allows perfect recovery of the original category from the encoded representation. If φ(cᵢ) = φ(cⱼ), then cᵢ = cⱼ (injectivity), and every standard basis vector corresponds to exactly one category (surjectivity onto the basis).",
+        "proof_sketch": "Injectivity: Suppose φ(cᵢ) = φ(cⱼ). Then 𝐞ᵢ = 𝐞ⱼ. Since basis vectors are distinct for i ≠ j, we must have i = j, thus cᵢ = cⱼ. Surjectivity: For each basis vector 𝐞ₖ, there exists category cₖ ∈ C such that φ(cₖ) = 𝐞ₖ. Combined, φ is bijective.",
+        "examples": [
+          "For C = {0, 1, 2}, |C| = 3, so we need exactly 3 basis vectors in ℝ³",
+          "Given data x = [0, 2, 1, 2, 0], the unique categories are {0, 1, 2}, so K = 3",
+          "If n_col is manually specified as 5 but data only contains {0, 1, 2}, we use n_col = 5 to allow for categories 3 and 4 that may appear in test data"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cardinality Formula",
+          "latex": "$K = |C| = |\\{c_1, c_2, \\ldots, c_m\\}|$",
+          "description": "Count the number of unique categories in the dataset"
+        },
+        {
+          "name": "Automatic Dimension Determination",
+          "latex": "$K = \\max(x) + 1$ for $x \\in \\{0, 1, \\ldots, m\\}$",
+          "description": "When categories are 0-indexed integers, K is one more than the maximum value"
+        },
+        {
+          "name": "Encoding Dimensionality",
+          "latex": "$\\dim(\\phi(c)) = K$ for all $c \\in C$",
+          "description": "Every encoded vector must have the same dimension K"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that determines the appropriate dimension K for one-hot encoding given an input array x and an optional n_col parameter. This solves the critical problem of deciding how many columns the output matrix needs.",
+        "function_signature": "def determine_n_col(x: np.ndarray, n_col: int = None) -> int:",
+        "starter_code": "import numpy as np\n\ndef determine_n_col(x: np.ndarray, n_col: int = None) -> int:\n    \"\"\"\n    Determine the number of columns for one-hot encoding.\n    \n    Args:\n        x: 1D array of integer category labels (0-indexed)\n        n_col: Optional manual specification of number of columns\n    \n    Returns:\n        The number of columns K needed for one-hot encoding\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "determine_n_col(np.array([0, 1, 2, 1, 0]), n_col=None)",
+            "expected": "3",
+            "explanation": "Maximum value is 2, so we need 3 columns (indices 0, 1, 2)"
+          },
+          {
+            "input": "determine_n_col(np.array([0, 2, 4]), n_col=None)",
+            "expected": "5",
+            "explanation": "Maximum value is 4, requiring 5 columns even though only 3 categories appear"
+          },
+          {
+            "input": "determine_n_col(np.array([0, 1, 2]), n_col=7)",
+            "expected": "7",
+            "explanation": "When n_col is specified, use it to allow for unseen categories"
+          },
+          {
+            "input": "determine_n_col(np.array([1, 1, 1]), n_col=None)",
+            "expected": "2",
+            "explanation": "Only category 1 appears, but we need columns for 0 and 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using len(np.unique(x)) instead of max(x) + 1, which fails when categories are not contiguous (e.g., [0, 2, 5])",
+        "Forgetting that 0-indexed categories mean K = max + 1, not K = max",
+        "Not handling the case when n_col is explicitly provided but is less than max(x) + 1",
+        "Assuming categories start at 1 instead of 0"
+      ],
+      "hint": "When n_col is None, compute it from the data. When n_col is provided, use it directly. Remember the relationship between maximum category value and dimension for 0-indexed categories.",
+      "references": [
+        "Set theory and cardinality",
+        "Bijective functions in discrete mathematics",
+        "NumPy array operations: max, unique"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Matrix Construction and Sparse Binary Representations",
+      "relation_to_problem": "One-hot encoding produces a sparse binary matrix where each row is a standard basis vector. Understanding matrix dimensions, initialization, and population is essential for implementing the transformation efficiently.",
+      "prerequisites": [
+        "Matrix algebra",
+        "Array indexing",
+        "Memory allocation"
+      ],
+      "learning_objectives": [
+        "Understand the structure of one-hot encoded matrices as collections of basis vectors",
+        "Calculate the correct output matrix dimensions from input size and category count",
+        "Implement efficient matrix initialization with the correct data type",
+        "Recognize the sparsity pattern: exactly one 1 per row, all other entries 0"
+      ],
+      "math_content": {
+        "definition": "Given an input array x = (x₁, x₂, ..., xₙ) where xᵢ ∈ {0, 1, ..., K-1}, the one-hot encoded matrix X_OH ∈ ℝⁿˣᴷ is defined as X_OH[i, j] = δₓᵢ,ⱼ = 1 if j = xᵢ, and 0 otherwise. Each row i is the basis vector φ(xᵢ) = 𝐞ₓᵢ.",
+        "notation": "X_OH = one-hot encoded matrix; n = number of samples; K = number of categories; X_OH[i, j] = element at row i, column j",
+        "theorem": "Sparsity Structure Theorem: The one-hot encoded matrix X_OH has exactly n nonzero entries (one per row), giving a sparsity ratio of (nK - n)/(nK) = 1 - 1/K. For large K, approximately (1 - 1/K) × 100% of entries are zero.",
+        "proof_sketch": "Each row represents a standard basis vector with exactly one 1 and (K-1) zeros. With n rows, total entries = nK. Nonzero entries = n (one per row). Zero entries = nK - n. Sparsity ratio = (nK - n)/(nK) = 1 - 1/K. As K → ∞, sparsity → 1 (100% sparse).",
+        "examples": [
+          "For x = [0, 1, 2, 1, 0], n = 5, K = 3, output shape is (5, 3)",
+          "Matrix structure: each row i contains a single 1 at column x[i]",
+          "For x = [2, 0, 1]: X_OH = [[0, 0, 1], [1, 0, 0], [0, 1, 0]], shape (3, 3)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Output Matrix Dimensions",
+          "latex": "$X_{OH} \\in \\mathbb{R}^{n \\times K}$ where $n = |x|$ and $K = $ number of categories",
+          "description": "The output is a 2D matrix with rows equal to input length and columns equal to category count"
+        },
+        {
+          "name": "Matrix Entry Definition",
+          "latex": "$X_{OH}[i, j] = \\delta_{x_i, j} = \\begin{cases} 1 & \\text{if } j = x_i \\\\ 0 & \\text{otherwise} \\end{cases}$",
+          "description": "Each matrix entry is determined by the Kronecker delta of the input value and column index"
+        },
+        {
+          "name": "Row Vector Extraction",
+          "latex": "$X_{OH}[i, :] = \\mathbf{e}_{x_i} = (\\delta_{x_i, 0}, \\delta_{x_i, 1}, \\ldots, \\delta_{x_i, K-1})^T$",
+          "description": "The i-th row is the basis vector corresponding to category x[i]"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that creates an initialized zero matrix of the correct shape for one-hot encoding, given the input array length and number of categories. This is a foundational step before populating the matrix with 1s.",
+        "function_signature": "def initialize_onehot_matrix(n_samples: int, n_categories: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef initialize_onehot_matrix(n_samples: int, n_categories: int) -> np.ndarray:\n    \"\"\"\n    Initialize a zero matrix for one-hot encoding.\n    \n    Args:\n        n_samples: Number of samples (rows)\n        n_categories: Number of categories (columns)\n    \n    Returns:\n        A zero-initialized matrix of shape (n_samples, n_categories) with float dtype\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "initialize_onehot_matrix(5, 3)",
+            "expected": "np.zeros((5, 3), dtype=float) with shape (5, 3)",
+            "explanation": "Creates a 5×3 zero matrix for 5 samples and 3 categories"
+          },
+          {
+            "input": "initialize_onehot_matrix(3, 4)",
+            "expected": "np.zeros((3, 4), dtype=float) with shape (3, 4)",
+            "explanation": "Matrix dimensions follow (n_samples, n_categories) convention"
+          },
+          {
+            "input": "initialize_onehot_matrix(1, 10)",
+            "expected": "np.zeros((1, 10), dtype=float) with shape (1, 10)",
+            "explanation": "Handles single sample with many categories"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Reversing the dimensions: using (K, n) instead of (n, K)",
+        "Using integer dtype instead of float dtype (affects compatibility with ML libraries)",
+        "Creating a 1D array instead of a 2D matrix when n_samples = 1",
+        "Not initializing to zeros, leading to undefined memory contents"
+      ],
+      "hint": "Use numpy.zeros() with the appropriate shape tuple. The data type should be float for numerical compatibility. Remember: rows represent samples, columns represent category dimensions.",
+      "references": [
+        "NumPy array creation routines",
+        "Matrix dimensions and indexing",
+        "Sparse matrix structures in machine learning"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Index-Based Matrix Population with Vectorized Operations",
+      "relation_to_problem": "After creating the zero matrix, we must efficiently populate it by setting the appropriate entries to 1. This requires understanding advanced indexing to map each input category to its corresponding matrix position.",
+      "prerequisites": [
+        "Array indexing",
+        "Integer arrays as indices",
+        "Broadcasting"
+      ],
+      "learning_objectives": [
+        "Master NumPy's advanced integer array indexing for simultaneous row-column selection",
+        "Understand how to vectorize the operation of placing 1s at computed positions",
+        "Implement the core transformation loop or vectorized operation for one-hot encoding",
+        "Recognize the index pair (i, x[i]) that specifies where to place each 1"
+      ],
+      "math_content": {
+        "definition": "Advanced integer indexing allows selection of specific matrix elements using arrays of row and column indices. For matrix M and index arrays I = (i₁, i₂, ..., iₘ) and J = (j₁, j₂, ..., jₘ), the operation M[I, J] simultaneously accesses elements M[i₁, j₁], M[i₂, j₂], ..., M[iₘ, jₘ].",
+        "notation": "I = row index array; J = column index array; M[I, J] = array of selected elements; np.arange(n) = [0, 1, 2, ..., n-1]",
+        "theorem": "Vectorized Index Assignment Theorem: For one-hot encoding, the row indices are I = [0, 1, 2, ..., n-1] = np.arange(n) and column indices are J = x (the input array itself). Setting X_OH[I, J] = 1 simultaneously places 1 at position (i, xᵢ) for all i ∈ {0, 1, ..., n-1}.",
+        "proof_sketch": "For each i ∈ {0, ..., n-1}, we need X_OH[i, xᵢ] = 1. With I = np.arange(n) and J = x, the advanced indexing operation X_OH[I, J] = 1 is equivalent to the loop: for i in range(n): X_OH[i, x[i]] = 1. NumPy's vectorization performs this in O(n) time without Python-level iteration.",
+        "examples": [
+          "If x = [2, 0, 1], then I = [0, 1, 2] and J = [2, 0, 1]. Assignment X_OH[I, J] = 1 sets X_OH[0, 2] = 1, X_OH[1, 0] = 1, X_OH[2, 1] = 1",
+          "For x = [1, 1, 0], I = [0, 1, 2], J = [1, 1, 0] gives X_OH[0, 1] = 1, X_OH[1, 1] = 1, X_OH[2, 0] = 1",
+          "Vectorized form X_OH[np.arange(len(x)), x] = 1 replaces the explicit loop"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Row Index Array",
+          "latex": "$I = [0, 1, 2, \\ldots, n-1]$",
+          "description": "Sequential indices for each sample, created via np.arange(n)"
+        },
+        {
+          "name": "Column Index Array",
+          "latex": "$J = x = [x_0, x_1, x_2, \\ldots, x_{n-1}]$",
+          "description": "The input array itself serves as column indices"
+        },
+        {
+          "name": "Vectorized Assignment",
+          "latex": "$X_{OH}[I, J] = 1 \\iff X_{OH}[i, x_i] = 1 \\ \\forall i \\in \\{0, \\ldots, n-1\\}$",
+          "description": "Advanced indexing notation for simultaneous assignment"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a pre-initialized zero matrix and an input array x, then populates the matrix by placing 1s at the correct positions using vectorized operations. This is the core transformation step of one-hot encoding.",
+        "function_signature": "def populate_onehot_matrix(matrix: np.ndarray, x: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef populate_onehot_matrix(matrix: np.ndarray, x: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Populate a zero matrix with 1s at positions specified by input array.\n    \n    Args:\n        matrix: Pre-initialized zero matrix of shape (n, K)\n        x: 1D array of category indices of length n\n    \n    Returns:\n        The populated one-hot encoded matrix (modifies matrix in-place and returns it)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "populate_onehot_matrix(np.zeros((3, 3)), np.array([0, 1, 2]))",
+            "expected": "np.array([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]])",
+            "explanation": "Places 1 at (0,0), (1,1), (2,2), creating an identity-like pattern"
+          },
+          {
+            "input": "populate_onehot_matrix(np.zeros((4, 3)), np.array([2, 1, 0, 1]))",
+            "expected": "np.array([[0., 0., 1.], [0., 1., 0.], [1., 0., 0.], [0., 1., 0.]])",
+            "explanation": "Each row has exactly one 1 at the column specified by x[i]"
+          },
+          {
+            "input": "populate_onehot_matrix(np.zeros((5, 4)), np.array([0, 0, 0, 0, 0]))",
+            "expected": "np.array([[1., 0., 0., 0.], [1., 0., 0., 0.], [1., 0., 0., 0.], [1., 0., 0., 0.], [1., 0., 0., 0.]])",
+            "explanation": "All samples belong to category 0, so first column is all 1s"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using a loop instead of vectorized indexing, sacrificing performance",
+        "Forgetting to create the row index array with np.arange(len(x))",
+        "Attempting to use x as a 2D index instead of pairing it with row indices",
+        "Not returning the modified matrix (though in-place modification works, returning is conventional)"
+      ],
+      "hint": "Create an array of row indices from 0 to n-1. Use x as column indices. Apply advanced indexing: matrix[row_indices, x] = 1. This vectorizes the operation without explicit loops.",
+      "references": [
+        "NumPy advanced indexing documentation",
+        "Vectorization in numerical computing",
+        "Integer array indexing"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Complete One-Hot Encoding Pipeline with Input Validation",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts: determining dimensions, creating matrices, and populating them. Additionally, it addresses practical concerns like input validation, edge cases, and proper handling of the optional n_col parameter.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Error handling",
+        "Function composition"
+      ],
+      "learning_objectives": [
+        "Synthesize all previous concepts into a complete one-hot encoding implementation",
+        "Implement robust input validation for array dimensions and data types",
+        "Handle edge cases: empty arrays, single-element arrays, specified vs. inferred n_col",
+        "Understand the complete encoding pipeline from raw input to final matrix"
+      ],
+      "math_content": {
+        "definition": "The complete one-hot encoding function φ_OH: ℤⁿ → ℝⁿˣᴷ maps a 1D array of n category labels to an n×K binary matrix. The process consists of three phases: (1) dimension determination K = max(n_col, max(x) + 1), (2) matrix initialization X_OH = 0_{n×K}, and (3) population X_OH[i, xᵢ] = 1 for all i.",
+        "notation": "φ_OH = complete encoding function; 0_{n×K} = n×K zero matrix; ℤⁿ = n-dimensional integer vector space",
+        "theorem": "Composition of Encoding Operations: The one-hot encoding function can be expressed as φ_OH = P ∘ I ∘ D where D(x, n_col) determines dimensions, I(n, K) initializes the matrix, and P(M, x) populates the matrix. This composition ensures correctness and modularity.",
+        "proof_sketch": "Let x be input. First, D(x, n_col) → K. Then I(|x|, K) → M where M is zero matrix. Finally, P(M, x) → X_OH where X_OH[i, xᵢ] = 1. Each operation is well-defined and their composition (P ∘ I ∘ D)(x, n_col) = X_OH produces valid one-hot encoding.",
+        "examples": [
+          "Complete example: x = [0, 1, 2, 1, 0], n_col = None → K = 3 → M = zeros(5, 3) → X_OH with 1s at (0,0), (1,1), (2,2), (3,1), (4,0)",
+          "Edge case: x = [], n_col = 5 → K = 5 → M = zeros(0, 5) → empty matrix with shape (0, 5)",
+          "Override case: x = [0, 1], n_col = 10 → K = 10 (not 2) → M = zeros(2, 10) → allows future categories 2-9"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Dimension Selection Logic",
+          "latex": "$K = \\begin{cases} n_{col} & \\text{if } n_{col} \\neq \\text{None} \\\\ \\max(x) + 1 & \\text{if } n_{col} = \\text{None} \\text{ and } |x| > 0 \\\\ 0 & \\text{if } n_{col} = \\text{None} \\text{ and } |x| = 0 \\end{cases}$",
+          "description": "Priority order for determining the number of categories"
+        },
+        {
+          "name": "Complete Encoding Pipeline",
+          "latex": "$\\phi_{OH}(x) = P(I(|x|, D(x, n_{col})), x)$",
+          "description": "Function composition representing the full encoding process"
+        },
+        {
+          "name": "Output Shape Verification",
+          "latex": "$\\text{shape}(\\phi_{OH}(x)) = (|x|, K)$ and $\\sum_{j=0}^{K-1} X_{OH}[i,j] = 1 \\ \\forall i$",
+          "description": "Invariants that must hold: correct dimensions and exactly one 1 per row"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete one-hot encoding function by combining all previous sub-components. This function must handle all edge cases, perform input validation, and produce a correctly shaped and populated output matrix. Test thoroughly with various inputs including edge cases.",
+        "function_signature": "def to_categorical(x: np.ndarray, n_col: int = None) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef to_categorical(x: np.ndarray, n_col: int = None) -> np.ndarray:\n    \"\"\"\n    Perform one-hot encoding of categorical integer array.\n    \n    Args:\n        x: 1D numpy array of non-negative integers representing categories\n        n_col: Optional number of columns. If None, inferred as max(x) + 1\n    \n    Returns:\n        2D numpy array of shape (len(x), n_col) with one-hot encoded vectors\n    \"\"\"\n    # Your code here\n    # Hints: \n    # 1. Handle edge cases (empty array)\n    # 2. Determine K using previous logic\n    # 3. Initialize matrix\n    # 4. Populate using vectorized indexing\n    # 5. Return the result\n    pass",
+        "test_cases": [
+          {
+            "input": "to_categorical(np.array([0, 1, 2, 1, 0]))",
+            "expected": "np.array([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.], [0., 1., 0.], [1., 0., 0.]])",
+            "explanation": "Standard case matching the problem example: 5 samples, 3 categories, automatic dimension inference"
+          },
+          {
+            "input": "to_categorical(np.array([0, 2]), n_col=5)",
+            "expected": "np.array([[1., 0., 0., 0., 0.], [0., 0., 1., 0., 0.]])",
+            "explanation": "Manual n_col specification creates extra columns for potential future categories"
+          },
+          {
+            "input": "to_categorical(np.array([3, 3, 3]))",
+            "expected": "np.array([[0., 0., 0., 1.], [0., 0., 0., 1.], [0., 0., 0., 1.]])",
+            "explanation": "All samples in same category (3) requires 4 columns (0-3)"
+          },
+          {
+            "input": "to_categorical(np.array([]))",
+            "expected": "np.zeros((0, 0))",
+            "explanation": "Empty input produces empty matrix with shape (0, 0)"
+          },
+          {
+            "input": "to_categorical(np.array([0]), n_col=1)",
+            "expected": "np.array([[1.]])",
+            "explanation": "Single sample, single category produces 1×1 matrix with value 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the empty array edge case, causing max() to fail",
+        "Forgetting that when n_col is None and array is empty, should return (0, 0) shaped matrix",
+        "Not considering that n_col might be larger than max(x) + 1 (intentional for future categories)",
+        "Using int instead of float dtype for the output matrix",
+        "Not validating that all values in x are non-negative integers",
+        "Creating inefficient loop-based implementation instead of vectorized operations"
+      ],
+      "hint": "Structure your solution in clear steps: (1) handle empty array, (2) determine K considering both x and n_col, (3) create zero matrix with shape (len(x), K), (4) use advanced indexing to place 1s, (5) return matrix. Each step builds on previous sub-quests.",
+      "references": [
+        "Scikit-learn OneHotEncoder implementation",
+        "Categorical data preprocessing in machine learning",
+        "NumPy best practices for numerical arrays"
+      ]
+    }
+  ]
+}

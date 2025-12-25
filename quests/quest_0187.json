@@ -1,0 +1,496 @@
+{
+  "problem_id": 187,
+  "title": "Build a Simple ETL Pipeline (MLOps)",
+  "category": "MLOps",
+  "difficulty": "medium",
+  "description": "## Problem\n\nImplement a simple ETL (Extract-Transform-Load) pipeline for model-ready data preparation.\n\nGiven a CSV-like string containing user events with columns: `user_id,event_type,value` (header included), write a function `run_etl(csv_text)` that:\n\n1. Extracts rows from the raw CSV text.\n2. Transforms data by:\n\t- Filtering only rows where `event_type == \"purchase\"`.\n\t- Converting `value` to float and dropping invalid rows.\n\t- Aggregating total purchase `value` per `user_id`.\n3. Loads the transformed results by returning a list of `(user_id, total_value)` tuples sorted by `user_id` ascending.\n\nAssume small inputs (no external libs), handle extra whitespace, and ignore blank lines.",
+  "example": {
+    "input": "run_etl(\"user_id,event_type,value\\n u1, purchase, 10.0\\n u2, view, 1.0\\n u1, purchase, 5\\n u3, purchase, not_a_number\\n u2, purchase, 3.5 \\n\\n\")",
+    "output": "[('u1', 15.0), ('u2', 3.5)]",
+    "reasoning": "Keep only purchases; convert values; drop invalid; aggregate per user; sort by user_id."
+  },
+  "starter_code": "# Implement your function below.\n\ndef run_etl(csv_text: str) -> list[tuple[str, float]]:\n\t\"\"\"Run a simple ETL pipeline over CSV text with header user_id,event_type,value.\n\n\tReturns a sorted list of (user_id, total_value) for event_type == \"purchase\".\n\t\"\"\"\n\t# TODO: implement extract, transform, and load steps\n\traise NotImplementedError",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "String Parsing and Tokenization Theory",
+      "relation_to_problem": "The Extract phase of ETL requires parsing CSV text into structured data, which relies on formal string tokenization and delimiter-based decomposition",
+      "prerequisites": [
+        "Basic string operations",
+        "ASCII character encoding",
+        "Array indexing"
+      ],
+      "learning_objectives": [
+        "Understand formal definitions of strings, tokens, and delimiters",
+        "Apply tokenization algorithms to CSV text structures",
+        "Handle whitespace normalization and empty sequences",
+        "Implement robust string splitting with edge case handling"
+      ],
+      "math_content": {
+        "definition": "Let $\\Sigma$ be an alphabet (finite set of symbols). A **string** $s$ over $\\Sigma$ is a finite sequence $s = c_1c_2...c_n$ where $c_i \\in \\Sigma$ for $i \\in [1,n]$, and $n = |s|$ is the **length**. The empty string $\\epsilon$ has length 0. A **delimiter** $d \\in \\Sigma^+$ is a non-empty string used to separate **tokens**. **Tokenization** is a function $T: \\Sigma^* \\times \\Sigma^+ \\to (\\Sigma^*)^*$ that maps a string and delimiter to a sequence of substrings.",
+        "notation": "$s \\in \\Sigma^*$ = string over alphabet $\\Sigma$, $|s|$ = length of string $s$, $d$ = delimiter, $T(s,d) = [t_1, t_2, ..., t_k]$ = tokenization result",
+        "theorem": "**Tokenization Decomposition Theorem**: For any string $s \\in \\Sigma^*$ and delimiter $d \\in \\Sigma^+$, there exists a unique tokenization $T(s,d) = [t_1, ..., t_k]$ such that $s = t_1 \\cdot d \\cdot t_2 \\cdot d \\cdot ... \\cdot d \\cdot t_k$ (where $\\cdot$ denotes concatenation) and no $t_i$ contains $d$ as a substring, except possibly $t_1$ or $t_k$ which may be empty.",
+        "proof_sketch": "Construct $T(s,d)$ by scanning $s$ left-to-right. Initialize $t_1 = \\epsilon$. For each position $i \\in [1,|s|-|d|+1]$, if $s[i:i+|d|-1] = d$, append current token to result, start new token, and skip $|d|$ positions. Otherwise, append $s[i]$ to current token. Uniqueness follows from deterministic left-to-right scan. Complexity: $O(|s| \\cdot |d|)$ naive, $O(|s|)$ with KMP algorithm.",
+        "examples": [
+          "Example 1: $s = \\text{\"a,b,c\"}$, $d = \\text{\",\"}$ $\\Rightarrow$ $T(s,d) = [\\text{\"a\"}, \\text{\"b\"}, \\text{\"c\"}]$",
+          "Example 2: $s = \\text{\"x,,y\"}$, $d = \\text{\",\"}$ $\\Rightarrow$ $T(s,d) = [\\text{\"x\"}, \\epsilon, \\text{\"y\"}]$ (empty token)",
+          "Example 3: With newline delimiter $d = \\text{\"\\textbackslash n\"}$: $s = \\text{\"row1\\textbackslash nrow2\\textbackslash n\"}$ $\\Rightarrow$ $T(s,d) = [\\text{\"row1\"}, \\text{\"row2\"}, \\epsilon]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Whitespace Normalization",
+          "latex": "$\\text{strip}(s) = s[i:j]$ where $i = \\min\\{k : s[k] \\notin W\\}$, $j = \\max\\{k : s[k] \\notin W\\}$, $W = \\{\\text{space, tab, newline}\\}$",
+          "description": "Removes leading and trailing whitespace from tokens; essential for robust CSV parsing"
+        },
+        {
+          "name": "Multi-level Tokenization",
+          "latex": "$T_2(s, d_1, d_2) = [T(t, d_2) : t \\in T(s, d_1)]$",
+          "description": "First split by $d_1$ (e.g., newlines), then split each result by $d_2$ (e.g., commas) for CSV structure"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that parses CSV-like text into a 2D structure. Split by newlines to get rows, then split each row by commas, stripping whitespace from each cell. Filter out completely empty rows.",
+        "function_signature": "def parse_csv_rows(csv_text: str) -> list[list[str]]:",
+        "starter_code": "def parse_csv_rows(csv_text: str) -> list[list[str]]:\n    \"\"\"\n    Parse CSV text into rows of cells.\n    \n    Args:\n        csv_text: Raw CSV string with newline-separated rows and comma-separated values\n    \n    Returns:\n        List of rows, where each row is a list of stripped cell values\n        Empty lines are excluded\n    \"\"\"\n    # TODO: Split by newlines, then by commas, strip whitespace, filter empty rows\n    pass",
+        "test_cases": [
+          {
+            "input": "parse_csv_rows(\"a,b,c\\nx,y,z\")",
+            "expected": "[['a', 'b', 'c'], ['x', 'y', 'z']]",
+            "explanation": "Basic 2x3 CSV with no whitespace issues"
+          },
+          {
+            "input": "parse_csv_rows(\" h1 , h2 \\n v1 , v2 \\n\\n\")",
+            "expected": "[['h1', 'h2'], ['v1', 'v2']]",
+            "explanation": "Whitespace around cells should be stripped; trailing empty line ignored"
+          },
+          {
+            "input": "parse_csv_rows(\"single\")",
+            "expected": "[['single']]",
+            "explanation": "Single cell with no delimiters"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to strip whitespace from tokens, leading to ' value' ≠ 'value' comparison failures",
+        "Not handling empty lines or trailing newlines, causing empty list entries",
+        "Using only split() without considering edge cases like consecutive delimiters",
+        "Assuming fixed column count without validation"
+      ],
+      "hint": "Use nested list comprehensions: first split by '\\n', then split each non-empty line by ',', applying strip() to each cell",
+      "references": [
+        "Formal Language Theory - tokenization and parsing",
+        "CSV RFC 4180 specification",
+        "String matching algorithms (KMP, Boyer-Moore)"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Predicate Logic and Filtering Operations",
+      "relation_to_problem": "The Transform phase requires filtering rows based on predicates (event_type == 'purchase'), which is formalized through Boolean logic and set comprehension",
+      "prerequisites": [
+        "Set theory",
+        "Boolean algebra",
+        "First-order logic",
+        "Sequence operations"
+      ],
+      "learning_objectives": [
+        "Define filtering formally using predicate functions and set builder notation",
+        "Understand complexity analysis of linear filtering",
+        "Apply filtering to structured data with multiple conditions",
+        "Implement efficient predicate-based data selection"
+      ],
+      "math_content": {
+        "definition": "Let $S$ be a set and $P: S \\to \\{\\text{true}, \\text{false}\\}$ be a **predicate** (Boolean-valued function). The **filter operation** is defined as $\\text{filter}(P, S) = \\{x \\in S : P(x) = \\text{true}\\}$. For sequences $L = [x_1, ..., x_n]$, filtering preserves order: $\\text{filter}(P, L) = [x_i : i \\in [1,n] \\land P(x_i)]$.",
+        "notation": "$P(x)$ = predicate applied to element $x$, $\\text{filter}(P, S)$ = filtered subset, $|\\text{filter}(P, S)| \\leq |S|$ = filtered size bound",
+        "theorem": "**Filter Preservation Theorem**: For sequences $L$ with ordering relation $<$ and predicate $P$, if $i < j$ and both $P(L[i])$ and $P(L[j])$ hold, then $L[i]$ appears before $L[j]$ in $\\text{filter}(P, L)$. Thus filtering preserves relative ordering of selected elements.",
+        "proof_sketch": "By construction, filter scans $L$ left-to-right at indices $1, 2, ..., n$. When $P(L[i]) = \\text{true}$, append $L[i]$ to result. Since $i < j$ implies $L[i]$ is examined before $L[j]$, and appending preserves order, the relative position is maintained. Complexity: $O(n)$ time, $O(k)$ space where $k = |\\text{filter}(P, L)|$.",
+        "examples": [
+          "Example 1: $L = [1,2,3,4,5]$, $P(x) = (x \\bmod 2 = 0)$ $\\Rightarrow$ $\\text{filter}(P, L) = [2, 4]$",
+          "Example 2: Records $R = [(\\text{\"u1\"}, \\text{\"view\"}), (\\text{\"u2\"}, \\text{\"purchase\"}), (\\text{\"u3\"}, \\text{\"purchase\"})]$, $P(r) = (r[1] = \\text{\"purchase\"})$ $\\Rightarrow$ $\\text{filter}(P, R) = [(\\text{\"u2\"}, \\text{\"purchase\"}), (\\text{\"u3\"}, \\text{\"purchase\"})]$",
+          "Example 3: Compound predicate with $P(x) = (x > 0) \\land (x < 10)$: $L = [-5, 3, 15, 7]$ $\\Rightarrow$ $\\text{filter}(P, L) = [3, 7]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Filter Cardinality Bound",
+          "latex": "$0 \\leq |\\text{filter}(P, S)| \\leq |S|$",
+          "description": "Filtering always produces a subset (possibly empty or equal to original); used for complexity bounds"
+        },
+        {
+          "name": "Composite Predicate (Conjunction)",
+          "latex": "$\\text{filter}(P_1 \\land P_2, S) = \\text{filter}(P_2, \\text{filter}(P_1, S))$",
+          "description": "Multiple filters can be composed sequentially or combined into one predicate"
+        },
+        {
+          "name": "Filter Selectivity",
+          "latex": "$\\sigma_P = \\frac{|\\text{filter}(P, S)|}{|S|}$",
+          "description": "Selectivity $\\sigma_P \\in [0,1]$ measures fraction of data passing the filter; critical for performance estimation"
+        }
+      ],
+      "exercise": {
+        "description": "Given a list of records (each record is a list of strings), filter to keep only records where a specified column matches a target value. This simulates filtering rows by event_type in the main ETL problem.",
+        "function_signature": "def filter_by_column(records: list[list[str]], column_index: int, target_value: str) -> list[list[str]]:",
+        "starter_code": "def filter_by_column(records: list[list[str]], column_index: int, target_value: str) -> list[list[str]]:\n    \"\"\"\n    Filter records to keep only those where records[i][column_index] == target_value.\n    \n    Args:\n        records: List of records (each record is a list of strings)\n        column_index: Index of column to check\n        target_value: Value to match\n    \n    Returns:\n        Filtered list of records matching the predicate\n    \"\"\"\n    # TODO: Apply filter predicate P(record) = (record[column_index] == target_value)\n    pass",
+        "test_cases": [
+          {
+            "input": "filter_by_column([['u1', 'purchase', '10'], ['u2', 'view', '5'], ['u3', 'purchase', '20']], 1, 'purchase')",
+            "expected": "[['u1', 'purchase', '10'], ['u3', 'purchase', '20']]",
+            "explanation": "Column index 1 (event_type) matches 'purchase' for first and third records"
+          },
+          {
+            "input": "filter_by_column([['a', 'b'], ['c', 'd']], 0, 'x')",
+            "expected": "[]",
+            "explanation": "No records match predicate; empty result"
+          },
+          {
+            "input": "filter_by_column([['x', 'y'], ['x', 'z']], 0, 'x')",
+            "expected": "[['x', 'y'], ['x', 'z']]",
+            "explanation": "All records match; original order preserved"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling index out of bounds when column_index >= len(record)",
+        "Modifying original list instead of creating new filtered list",
+        "Using wrong comparison operator (e.g., 'in' instead of '==') for exact matching",
+        "Forgetting that filtering returns a new sequence, not modifying in-place"
+      ],
+      "hint": "Use a list comprehension with an if clause: [record for record in records if condition]",
+      "references": [
+        "Predicate calculus and first-order logic",
+        "Database query selectivity and cardinality estimation",
+        "Functional programming: filter/map/reduce operations"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Type Coercion and Robust Parsing with Error Handling",
+      "relation_to_problem": "Converting string values to floats with graceful failure handling is essential for data quality in ETL; invalid data must be detected and excluded",
+      "prerequisites": [
+        "Type systems",
+        "Exception handling",
+        "Partial functions",
+        "Data validation"
+      ],
+      "learning_objectives": [
+        "Formalize type conversion as a partial function from strings to numeric types",
+        "Understand error handling strategies (exceptions vs. option types)",
+        "Implement robust parsing that separates valid from invalid data",
+        "Apply validation filtering to maintain data quality pipelines"
+      ],
+      "math_content": {
+        "definition": "A **type coercion** is a function $\\tau: D_1 \\rightharpoonup D_2$ from domain $D_1$ to codomain $D_2$. The symbol $\\rightharpoonup$ denotes a **partial function**: $\\tau$ is defined only on a subset $\\text{dom}(\\tau) \\subseteq D_1$. For string-to-float conversion, $\\tau_{\\text{float}}: \\Sigma^* \\rightharpoonup \\mathbb{R}$ maps valid numeric strings to real numbers. For $s \\in \\Sigma^*$, $\\tau_{\\text{float}}(s)$ is defined iff $s$ matches the regex $[-+]?[0-9]*.?[0-9]+([eE][-+]?[0-9]+)?$ (simplified float grammar).",
+        "notation": "$\\tau: A \\rightharpoonup B$ = partial function, $\\text{dom}(\\tau) = \\{x \\in A : \\tau(x) \\text{ is defined}\\}$ = domain of definition, $s \\in \\text{dom}(\\tau_{\\text{float}})$ = parseable string",
+        "theorem": "**Parse-Filter Composition Theorem**: Let $L = [s_1, ..., s_n]$ be a list of strings and $\\tau: \\Sigma^* \\rightharpoonup \\mathbb{R}$ be a partial parsing function. Define $\\text{safe_parse}(L, \\tau) = [(s_i, \\tau(s_i)) : s_i \\in L \\land s_i \\in \\text{dom}(\\tau)]$. Then $|\\text{safe_parse}(L, \\tau)| \\leq |L|$ and all results are valid type-converted pairs.",
+        "proof_sketch": "safe_parse iterates through $L$ at cost $O(n)$. For each $s_i$, attempt $\\tau(s_i)$. If $s_i \\in \\text{dom}(\\tau)$, parsing succeeds and we get $(s_i, \\tau(s_i))$; otherwise skip. Since we only include successful conversions, all output values are in $\\mathbb{R}$. The inequality follows from filtering operation. Complexity: $O(n \\cdot k)$ where $k$ is average string length for parsing.",
+        "examples": [
+          "Example 1: $\\tau_{\\text{float}}(\\text{\"3.14\"}) = 3.14 \\in \\mathbb{R}$, well-defined",
+          "Example 2: $\\tau_{\\text{float}}(\\text{\"not_a_number\"}) = \\bot$ (undefined), $\\text{\"not_a_number\"} \\notin \\text{dom}(\\tau_{\\text{float}})$",
+          "Example 3: $L = [\\text{\"10.5\"}, \\text{\"abc\"}, \\text{\"7\"}]$ $\\Rightarrow$ $\\text{safe_parse}(L, \\tau_{\\text{float}}) = [(\\text{\"10.5\"}, 10.5), (\\text{\"7\"}, 7.0)]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Parse Success Rate",
+          "latex": "$r_{\\text{success}} = \\frac{|\\{s \\in L : s \\in \\text{dom}(\\tau)\\}|}{|L|}$",
+          "description": "Fraction of inputs successfully parsed; data quality metric for ETL monitoring"
+        },
+        {
+          "name": "Option Type Encoding",
+          "latex": "$\\text{try_parse}(s) = \\begin{cases} \\text{Some}(\\tau(s)) & \\text{if } s \\in \\text{dom}(\\tau) \\\\ \\text{None} & \\text{otherwise} \\end{cases}$",
+          "description": "Wraps partial function result in option type to make totality explicit; avoids exceptions"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that converts a list of string values to floats, keeping only the successfully converted values along with their original indices. This builds toward handling invalid 'value' fields in the ETL pipeline.",
+        "function_signature": "def safe_convert_to_float(values: list[str]) -> list[tuple[int, float]]:",
+        "starter_code": "def safe_convert_to_float(values: list[str]) -> list[tuple[int, float]]:\n    \"\"\"\n    Convert string values to floats, keeping only valid conversions.\n    \n    Args:\n        values: List of string values to convert\n    \n    Returns:\n        List of (original_index, float_value) for successfully converted values\n    \"\"\"\n    # TODO: Try converting each value; on success, include (index, float); on failure, skip\n    pass",
+        "test_cases": [
+          {
+            "input": "safe_convert_to_float(['10.5', '20', 'invalid', '30.25'])",
+            "expected": "[(0, 10.5), (1, 20.0), (3, 30.25)]",
+            "explanation": "Indices 0, 1, 3 parse successfully; index 2 ('invalid') is skipped"
+          },
+          {
+            "input": "safe_convert_to_float(['abc', 'xyz'])",
+            "expected": "[]",
+            "explanation": "No valid floats; empty result"
+          },
+          {
+            "input": "safe_convert_to_float(['1.0', '2.0', '3.0'])",
+            "expected": "[(0, 1.0), (1, 2.0), (2, 3.0)]",
+            "explanation": "All values parse successfully with their indices"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using float() without try-except, causing program crash on invalid input",
+        "Losing track of original indices when filtering, making debugging impossible",
+        "Converting exceptions to default values (e.g., 0.0) instead of filtering out bad data",
+        "Not stripping whitespace before parsing, causing valid numbers like ' 3.5 ' to fail"
+      ],
+      "hint": "Enumerate through values with index, wrap float() conversion in try-except, and only append (index, converted_value) on success",
+      "references": [
+        "Type theory and partial functions",
+        "Exception handling vs. monadic error handling (Maybe/Option types)",
+        "Data validation patterns in ETL systems"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Grouping and Aggregation Theory",
+      "relation_to_problem": "The core of ETL transformation is aggregating purchase values per user_id, which requires understanding of grouping operations and reduction functions",
+      "prerequisites": [
+        "Equivalence relations",
+        "Partition theory",
+        "Associative operations",
+        "Hash tables"
+      ],
+      "learning_objectives": [
+        "Define grouping formally using equivalence relations and partitioning",
+        "Understand aggregation as reduction over groups with associative operators",
+        "Implement efficient hash-based grouping with O(n) average complexity",
+        "Apply group-by-aggregate pattern for data summarization"
+      ],
+      "math_content": {
+        "definition": "Let $S$ be a set and $\\sim$ be an **equivalence relation** on $S$ (reflexive, symmetric, transitive). The **equivalence class** of $x \\in S$ is $[x] = \\{y \\in S : y \\sim x\\}$. The set of equivalence classes $S/\\!\\sim$ forms a **partition** of $S$. A **grouping operation** $G: S \\times (S \\to K) \\to (K \\to 2^S)$ takes a dataset and key function $k: S \\to K$, producing a map from keys to groups: $G(S, k) = \\{g \\mapsto \\{x \\in S : k(x) = g\\} : g \\in k(S)\\}$. An **aggregation** $\\alpha$ applies a reduction function $f: 2^S \\to V$ to each group: $\\alpha(G(S,k), f) = \\{g \\mapsto f(G(S,k)[g]) : g \\in \\text{dom}(G(S,k))\\}$.",
+        "notation": "$[x]_\\sim$ = equivalence class of $x$, $k: S \\to K$ = key extraction function, $G(S, k)[g]$ = group with key $g$, $\\bigoplus: V \\times V \\to V$ = binary associative aggregation operator",
+        "theorem": "**Group-Aggregate Decomposition Theorem**: For dataset $D = \\{(k_1, v_1), ..., (k_n, v_n)\\}$ with keys $k_i \\in K$ and values $v_i \\in V$, and associative operator $\\bigoplus: V \\times V \\to V$ with identity $e$, the aggregate result is $A[k] = \\bigoplus_{i: k_i = k} v_i$ for each distinct key $k$. Using a hash map, this computes in $O(n)$ average time and $O(m)$ space where $m = |\\{k_i\\}|$ is the number of distinct keys.",
+        "proof_sketch": "Initialize empty hash map $H: K \\to V$. Scan pairs $(k_i, v_i)$ left-to-right. For each pair: if $k_i \\in H$, update $H[k_i] \\leftarrow H[k_i] \\bigoplus v_i$; otherwise set $H[k_i] \\leftarrow v_i$. After processing all $n$ pairs, $H[k]$ contains the aggregated value for key $k$. Correctness follows from associativity: $((v_1 \\bigoplus v_2) \\bigoplus v_3) \\bigoplus v_4 = v_1 \\bigoplus (v_2 \\bigoplus (v_3 \\bigoplus v_4))$. Hash table operations are $O(1)$ average, giving $O(n)$ total time.",
+        "examples": [
+          "Example 1: Sum aggregation with $D = [(\\text{\"u1\"}, 10), (\\text{\"u2\"}, 5), (\\text{\"u1\"}, 3)]$, $\\bigoplus = +$ $\\Rightarrow$ $A = \\{\\text{\"u1\"}: 13, \\text{\"u2\"}: 5\\}$",
+          "Example 2: Count aggregation with constant value 1: $D = [(\\text{\"a\"}, 1), (\\text{\"b\"}, 1), (\\text{\"a\"}, 1)]$ $\\Rightarrow$ $A = \\{\\text{\"a\"}: 2, \\text{\"b\"}: 1\\}$",
+          "Example 3: Maximum aggregation: $D = [(\\text{\"x\"}, 5), (\\text{\"x\"}, 10), (\\text{\"x\"}, 3)]$, $\\bigoplus = \\max$ $\\Rightarrow$ $A = \\{\\text{\"x\"}: 10\\}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Aggregation with Sum",
+          "latex": "$A[k] = \\sum_{i: k_i = k} v_i = v_{i_1} + v_{i_2} + \\cdots + v_{i_m}$",
+          "description": "Most common aggregation; sum operator is associative and commutative with identity 0"
+        },
+        {
+          "name": "Group Cardinality",
+          "latex": "$|G(S,k)[g]| = |\\{x \\in S : k(x) = g\\}|$",
+          "description": "Number of elements in group $g$; useful for computing averages as $\\text{avg}[g] = \\text{sum}[g] / |G(S,k)[g]|$"
+        },
+        {
+          "name": "Partition Property",
+          "latex": "$\\bigcup_{g \\in K} G(S,k)[g] = S \\land \\forall g_1 \\neq g_2: G(S,k)[g_1] \\cap G(S,k)[g_2] = \\emptyset$",
+          "description": "Groups form a partition: every element belongs to exactly one group"
+        }
+      ],
+      "exercise": {
+        "description": "Given a list of (key, value) pairs where values are floats, aggregate the sum of values for each distinct key. Return a list of (key, sum) tuples sorted by key. This directly simulates the user_id aggregation step in the ETL problem.",
+        "function_signature": "def aggregate_by_key(pairs: list[tuple[str, float]]) -> list[tuple[str, float]]:",
+        "starter_code": "def aggregate_by_key(pairs: list[tuple[str, float]]) -> list[tuple[str, float]]:\n    \"\"\"\n    Aggregate values by key using sum.\n    \n    Args:\n        pairs: List of (key, value) tuples\n    \n    Returns:\n        List of (key, total_value) sorted by key ascending\n    \"\"\"\n    # TODO: Use a dictionary to accumulate sums per key, then convert to sorted list\n    pass",
+        "test_cases": [
+          {
+            "input": "aggregate_by_key([('u1', 10.0), ('u2', 5.0), ('u1', 3.0), ('u3', 7.5)])",
+            "expected": "[('u1', 13.0), ('u2', 5.0), ('u3', 7.5)]",
+            "explanation": "u1 appears twice (10.0 + 3.0 = 13.0); results sorted by key"
+          },
+          {
+            "input": "aggregate_by_key([('a', 1.5), ('a', 2.5), ('a', 1.0)])",
+            "expected": "[('a', 5.0)]",
+            "explanation": "Single key with multiple values: 1.5 + 2.5 + 1.0 = 5.0"
+          },
+          {
+            "input": "aggregate_by_key([])",
+            "expected": "[]",
+            "explanation": "Empty input produces empty output"
+          },
+          {
+            "input": "aggregate_by_key([('z', 10.0), ('a', 5.0), ('m', 3.0)])",
+            "expected": "[('a', 5.0), ('m', 3.0), ('z', 10.0)]",
+            "explanation": "Each key appears once; sorted alphabetically"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not initializing dictionary entries correctly, causing KeyError on first occurrence",
+        "Forgetting to sort the final result by key, producing non-deterministic output",
+        "Using list of lists instead of dictionary, resulting in O(n²) complexity",
+        "Not handling empty input case, causing errors on edge cases"
+      ],
+      "hint": "Create an empty dictionary, iterate through pairs updating dict[key] = dict.get(key, 0) + value, then return sorted(dict.items())",
+      "references": [
+        "Equivalence relations and partition theory",
+        "MapReduce and distributed aggregation",
+        "Database GROUP BY operations and aggregate functions",
+        "Hash table complexity analysis"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Relational Algebra and Multi-Column Transformations",
+      "relation_to_problem": "ETL pipelines work with structured records (rows with multiple columns), requiring understanding of projection, selection, and combining multiple transformation operations",
+      "prerequisites": [
+        "Set operations",
+        "Cartesian products",
+        "Function composition",
+        "Relation theory"
+      ],
+      "learning_objectives": [
+        "Model tabular data as relations (sets of tuples) from relational algebra",
+        "Define projection, selection, and their composition in data transformations",
+        "Implement multi-column record processing with validation",
+        "Chain multiple operations to build complete transformation pipelines"
+      ],
+      "math_content": {
+        "definition": "A **relation** $R$ over schema $(A_1: D_1, ..., A_n: D_n)$ is a finite set of **tuples** $R \\subseteq D_1 \\times \\cdots \\times D_n$, where $A_i$ are **attributes** and $D_i$ are **domains**. The **selection** operator $\\sigma_{\\phi}(R) = \\{t \\in R : \\phi(t) = \\text{true}\\}$ filters tuples satisfying predicate $\\phi$. The **projection** operator $\\pi_{A_i, ..., A_k}(R) = \\{(t.A_i, ..., t.A_k) : t \\in R\\}$ extracts specific attributes. A **transformation** $T: R_1 \\to R_2$ is a function mapping input relation to output relation, often composed as $T = \\pi_B \\circ \\sigma_{\\phi} \\circ \\rho$ (project after select after rename).",
+        "notation": "$R \\subseteq D_1 \\times \\cdots \\times D_n$ = relation, $t.A$ = value of attribute $A$ in tuple $t$, $\\sigma_{\\phi}$ = selection with predicate $\\phi$, $\\pi_{A_1,...,A_k}$ = projection onto attributes, $\\circ$ = function composition",
+        "theorem": "**Transformation Composition Theorem**: Let $R$ be a relation, $\\phi$ a selection predicate, $f: D \\rightharpoonup D'$ a partial transformation function, and $\\pi$ a projection. The composed transformation $\\pi_{A'} \\circ (\\text{apply } f \\text{ to } A) \\circ \\sigma_{\\phi}$ produces: (1) Filter tuples by $\\phi$, (2) Apply $f$ to attribute $A$ (filtering undefined results), (3) Project specified attributes. Order matters: selecting before projecting preserves all needed attributes for predicates.",
+        "proof_sketch": "Start with relation $R$ of size $|R| = n$. After $\\sigma_{\\phi}$, size is $n_1 \\leq n$ (filtering). After applying partial function $f$ to attribute $A$ with validation, size is $n_2 \\leq n_1$ (removing invalid transformations). After projection $\\pi$, schema changes but cardinality stays $n_2$. Total complexity: $O(n)$ for selection, $O(n_1 \\cdot c_f)$ for transformation where $c_f$ is cost of $f$, $O(n_2)$ for projection = $O(n \\cdot c_f)$ overall.",
+        "examples": [
+          "Example 1: $R = \\{(\\text{\"u1\"}, \\text{\"purchase\"}, \\text{\"10\"}), (\\text{\"u2\"}, \\text{\"view\"}, \\text{\"5\"})\\}$ with schema $(\\text{user_id}, \\text{event_type}, \\text{value})$. $\\sigma_{\\text{event_type}=\\text{\"purchase\"}}(R) = \\{(\\text{\"u1\"}, \\text{\"purchase\"}, \\text{\"10\"})\\}$",
+          "Example 2: Apply $f = \\tau_{\\text{float}}$ to value attribute: $(\\text{\"u1\"}, \\text{\"purchase\"}, \\text{\"10\"}) \\mapsto (\\text{\"u1\"}, \\text{\"purchase\"}, 10.0)$",
+          "Example 3: Project to $(\\text{user_id}, \\text{value})$: $\\pi_{\\text{user_id}, \\text{value}}(\\{(\\text{\"u1\"}, \\text{\"purchase\"}, 10.0)\\}) = \\{(\\text{\"u1\"}, 10.0)\\}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Transformation Pipeline",
+          "latex": "$T(R) = \\text{aggregate} \\circ \\pi_{k,v} \\circ (\\text{apply } f) \\circ \\sigma_{\\phi}(R)$",
+          "description": "Complete ETL transformation: select → transform values → project columns → aggregate; order is critical"
+        },
+        {
+          "name": "Selection Cardinality Bound",
+          "latex": "$|\\sigma_{\\phi}(R)| \\leq |R|$ with equality iff $\\forall t \\in R: \\phi(t) = \\text{true}$",
+          "description": "Selection never increases size; useful for complexity analysis and capacity planning"
+        },
+        {
+          "name": "Projection Uniqueness",
+          "latex": "$|\\pi_A(R)| \\leq |R|$ with possible $< $ if duplicate values exist after projection",
+          "description": "Projection may reduce cardinality if projected attributes have duplicates (not relevant when projecting all key attributes)"
+        }
+      ],
+      "exercise": {
+        "description": "Given a list of records (each with fields [id, category, amount_str]), filter by category, convert amount_str to float (dropping invalid records), extract (id, amount) pairs, and aggregate by id. This combines all transformation steps from previous sub-quests.",
+        "function_signature": "def transform_and_aggregate(records: list[list[str]], target_category: str) -> list[tuple[str, float]]:",
+        "starter_code": "def transform_and_aggregate(records: list[list[str]], target_category: str) -> list[tuple[str, float]]:\n    \"\"\"\n    ETL transformation: filter, convert, project, aggregate.\n    \n    Args:\n        records: List of [id, category, amount_str] records\n        target_category: Category value to filter by\n    \n    Returns:\n        List of (id, total_amount) tuples sorted by id, after filtering, conversion, and aggregation\n    \"\"\"\n    # TODO: \n    # 1. Filter records where record[1] == target_category\n    # 2. Convert record[2] to float, skip if invalid\n    # 3. Extract (record[0], converted_value) pairs\n    # 4. Aggregate by id (sum values per id)\n    # 5. Sort by id and return\n    pass",
+        "test_cases": [
+          {
+            "input": "transform_and_aggregate([['u1', 'buy', '10'], ['u2', 'view', '5'], ['u1', 'buy', '3.5']], 'buy')",
+            "expected": "[('u1', 13.5)]",
+            "explanation": "Filter to 'buy' category (2 records), convert values (10.0, 3.5), aggregate u1: 10.0 + 3.5 = 13.5"
+          },
+          {
+            "input": "transform_and_aggregate([['a', 'x', '1'], ['b', 'x', 'bad'], ['c', 'x', '2']], 'x')",
+            "expected": "[('a', 1.0), ('c', 2.0)]",
+            "explanation": "All match category 'x', but 'b' has invalid value 'bad' and is dropped"
+          },
+          {
+            "input": "transform_and_aggregate([['u1', 'click', '10'], ['u2', 'view', '20']], 'purchase')",
+            "expected": "[]",
+            "explanation": "No records match target_category 'purchase'; empty result"
+          },
+          {
+            "input": "transform_and_aggregate([['x', 't', '5'], ['y', 't', '3'], ['x', 't', '2']], 't')",
+            "expected": "[('x', 7.0), ('y', 3.0)]",
+            "explanation": "All match 't'; x appears twice (5+2=7), y once (3); sorted output"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Applying operations in wrong order (e.g., aggregating before filtering), losing data",
+        "Not handling parse failures gracefully, causing crashes instead of filtering bad data",
+        "Forgetting to extract only needed columns after filtering, carrying unnecessary data",
+        "Not sorting final results, producing non-deterministic output for testing"
+      ],
+      "hint": "Chain operations: (1) list comprehension to filter by category, (2) another comprehension with try-except for float conversion, (3) dictionary to aggregate, (4) sorted() on dict.items()",
+      "references": [
+        "Relational algebra (Codd, 1970) - foundational database theory",
+        "Query optimization and operator ordering",
+        "ETL design patterns and data pipeline architecture"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Pipeline Orchestration and Composition",
+      "relation_to_problem": "The final ETL pipeline combines parsing, filtering, type conversion, projection, and aggregation into a single cohesive data transformation workflow",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Function composition",
+        "Pipeline architecture",
+        "Data validation"
+      ],
+      "learning_objectives": [
+        "Design end-to-end data pipelines by composing primitive operations",
+        "Understand separation of concerns: Extract, Transform, Load as distinct phases",
+        "Implement robust error handling across pipeline stages",
+        "Apply complexity analysis to multi-stage transformations"
+      ],
+      "math_content": {
+        "definition": "An **ETL pipeline** is a composite function $\\text{ETL} = L \\circ T \\circ E$ where $E: \\text{Raw} \\to \\text{Parsed}$ is the **extract** phase (parsing raw data), $T: \\text{Parsed} \\to \\text{Transformed}$ is the **transform** phase (filtering, converting, aggregating), and $L: \\text{Transformed} \\to \\text{Output}$ is the **load** phase (formatting results). Each phase is itself a composition: $T = T_n \\circ \\cdots \\circ T_1$ where $T_i$ are atomic transformations (filter, map, aggregate). The pipeline has **referential transparency** if order is preserved and intermediate states are well-defined.",
+        "notation": "$E(\\text{raw}) = \\text{parsed}$ = extraction result, $T(\\text{parsed}) = \\text{transformed}$ = transformation result, $L(\\text{transformed}) = \\text{output}$ = final output, $\\text{ETL} = L \\circ T \\circ E$",
+        "theorem": "**Pipeline Complexity Composition Theorem**: For ETL pipeline $L \\circ T \\circ E$ with $E$ having complexity $O(f_E(n))$, $T$ having $O(f_T(m))$ where $m \\leq n$ is output size of $E$, and $L$ having $O(f_L(k))$ where $k \\leq m$ is output size of $T$, the total complexity is $O(f_E(n) + f_T(m) + f_L(k))$. If transformations are linear ($f_i(x) = c_i \\cdot x$), and each stage filters data ($k \\leq m \\leq n$), then total complexity is $O(n)$ dominated by the first stage.",
+        "proof_sketch": "Execute stages sequentially. Stage $E$ processes $n$ input items in $O(f_E(n))$ time, producing $m$ items. Stage $T$ processes these $m$ items in $O(f_T(m))$ time, producing $k$ items. Stage $L$ processes $k$ items in $O(f_L(k))$. Total time is sum of stages. For linear operations with filtering ($c_i$ constant, $k \\leq m \\leq n$): $c_E \\cdot n + c_T \\cdot m + c_L \\cdot k \\leq c_E \\cdot n + c_T \\cdot n + c_L \\cdot n = (c_E + c_T + c_L) \\cdot n = O(n)$.",
+        "examples": [
+          "Example 1: CSV text → parsed rows (E) → filtered purchases (T₁) → converted values (T₂) → aggregated by user (T₃) → sorted list (L)",
+          "Example 2: Pipeline with 1000 input rows: E produces 1000 parsed rows, T₁ filters to 200 purchases, T₂ validates to 190 valid, T₃ aggregates to 50 users, L sorts 50 items. Total: O(1000 + 200 + 190 + 50·log(50)) ≈ O(1000) = O(n)",
+          "Example 3: Empty input: E produces 0 rows, pipeline short-circuits with O(n) parsing cost but minimal transformation cost"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "ETL Pipeline Definition",
+          "latex": "$\\text{ETL}(\\text{raw}) = \\text{sort}(\\text{aggregate}(\\text{project}(\\text{convert}(\\text{filter}(\\text{parse}(\\text{raw}))))))$",
+          "description": "Nested composition of all ETL stages; each function depends on output of previous"
+        },
+        {
+          "name": "Data Quality Metric",
+          "latex": "$Q = \\frac{|\\text{ETL}(\\text{raw})|}{|\\text{parse}(\\text{raw})|} \\in [0, 1]$",
+          "description": "Fraction of parsed records that survive all validation and transformation steps; monitors data quality"
+        },
+        {
+          "name": "Throughput Bound",
+          "latex": "$\\text{throughput} = \\frac{n}{f_E(n) + f_T(m) + f_L(k)}$ records/second",
+          "description": "Processing rate assuming sequential execution; for parallel stages, adjust with Amdahl's law"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified ETL pipeline that processes CSV-like text with header 'id,type,value'. Extract rows, filter by type=='target', convert value to float (dropping invalid), and return aggregated (id, sum) pairs sorted by id. This is one step away from the full solution.",
+        "function_signature": "def mini_etl(csv_text: str, target_type: str) -> list[tuple[str, float]]:",
+        "starter_code": "def mini_etl(csv_text: str, target_type: str) -> list[tuple[str, float]]:\n    \"\"\"\n    Mini ETL pipeline: parse CSV, filter by type, convert values, aggregate by id.\n    \n    Args:\n        csv_text: Raw CSV string with header 'id,type,value' and data rows\n        target_type: Type value to filter for (matches column 'type')\n    \n    Returns:\n        List of (id, total_value) tuples sorted by id ascending\n    \"\"\"\n    # TODO: Implement full pipeline\n    # Extract: parse CSV into rows\n    # Transform: filter by type, convert value column, aggregate by id\n    # Load: sort and return\n    pass",
+        "test_cases": [
+          {
+            "input": "mini_etl('id,type,value\\nu1,purchase,10\\nu2,view,5\\nu1,purchase,3', 'purchase')",
+            "expected": "[('u1', 13.0), ('u2', 0.0)]",
+            "explanation": "Parse 3 rows, filter to 2 'purchase' rows (u1:10, u1:3), aggregate u1→13.0; u2 has no purchases so not in output"
+          },
+          {
+            "input": "mini_etl('id,type,value\\na,x,1.5\\nb,y,2\\na,x,0.5', 'x')",
+            "expected": "[('a', 2.0)]",
+            "explanation": "Filter to type 'x' (2 rows for 'a'), sum 1.5+0.5=2.0"
+          },
+          {
+            "input": "mini_etl('id,type,value\\nx,t,bad\\ny,t,5', 't')",
+            "expected": "[('y', 5.0)]",
+            "explanation": "Both match type 't', but 'x' has invalid value and is dropped during conversion"
+          },
+          {
+            "input": "mini_etl('id,type,value', 'any')",
+            "expected": "[]",
+            "explanation": "Only header, no data rows; empty result"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not skipping the header row when parsing, treating it as data",
+        "Breaking the pipeline at any stage causing incomplete transformation",
+        "Not handling edge cases: empty input, all-invalid data, single user",
+        "Inefficient nested loops instead of using dictionary for aggregation",
+        "Forgetting to strip whitespace from parsed cells before comparison/conversion"
+      ],
+      "hint": "Structure code in three clearly separated sections (Extract, Transform, Load). Use intermediate variables for clarity: parsed_rows, filtered_rows, converted_pairs, aggregated_dict, sorted_result",
+      "references": [
+        "ETL design patterns (Kimball, 2004)",
+        "Functional programming and pipeline composition",
+        "Data engineering best practices",
+        "Complexity analysis of multi-stage algorithms"
+      ]
+    }
+  ]
+}

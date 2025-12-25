@@ -1,0 +1,36 @@
+{
+  "description": "IyMgUHJvYmxlbQoKSW1wbGVtZW50IGEgc2ltcGxlIEVUTCAoRXh0cmFjdC1UcmFuc2Zvcm0tTG9hZCkgcGlwZWxpbmUgZm9yIG1vZGVsLXJlYWR5IGRhdGEgcHJlcGFyYXRpb24uCgpHaXZlbiBhIENTVi1saWtlIHN0cmluZyBjb250YWluaW5nIHVzZXIgZXZlbnRzIHdpdGggY29sdW1uczogYHVzZXJfaWQsZXZlbnRfdHlwZSx2YWx1ZWAgKGhlYWRlciBpbmNsdWRlZCksIHdyaXRlIGEgZnVuY3Rpb24gYHJ1bl9ldGwoY3N2X3RleHQpYCB0aGF0OgoKMS4gRXh0cmFjdHMgcm93cyBmcm9tIHRoZSByYXcgQ1NWIHRleHQuCjIuIFRyYW5zZm9ybXMgZGF0YSBieToKCS0gRmlsdGVyaW5nIG9ubHkgcm93cyB3aGVyZSBgZXZlbnRfdHlwZSA9PSAicHVyY2hhc2UiYC4KCS0gQ29udmVydGluZyBgdmFsdWVgIHRvIGZsb2F0IGFuZCBkcm9wcGluZyBpbnZhbGlkIHJvd3MuCgktIEFnZ3JlZ2F0aW5nIHRvdGFsIHB1cmNoYXNlIGB2YWx1ZWAgcGVyIGB1c2VyX2lkYC4KMy4gTG9hZHMgdGhlIHRyYW5zZm9ybWVkIHJlc3VsdHMgYnkgcmV0dXJuaW5nIGEgbGlzdCBvZiBgKHVzZXJfaWQsIHRvdGFsX3ZhbHVlKWAgdHVwbGVzIHNvcnRlZCBieSBgdXNlcl9pZGAgYXNjZW5kaW5nLgoKQXNzdW1lIHNtYWxsIGlucHV0cyAobm8gZXh0ZXJuYWwgbGlicyksIGhhbmRsZSBleHRyYSB3aGl0ZXNwYWNlLCBhbmQgaWdub3JlIGJsYW5rIGxpbmVzLg==",
+  "id": "187",
+  "test_cases": [
+    {
+      "test": "print(run_etl('user_id,event_type,value\\n u1, purchase, 10.0\\n u2, view, 1.0\\n u1, purchase, 5\\n u3, purchase, not_a_number\\n u2, purchase, 3.5 \\n'))",
+      "expected_output": "[('u1', 15.0), ('u2', 3.5)]"
+    },
+    {
+      "test": "print(run_etl('user_id,event_type,value\\n'))",
+      "expected_output": "[]"
+    }
+  ],
+  "difficulty": "medium",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "run_etl(\"user_id,event_type,value\\n u1, purchase, 10.0\\n u2, view, 1.0\\n u1, purchase, 5\\n u3, purchase, not_a_number\\n u2, purchase, 3.5 \\n\\n\")",
+    "output": "[('u1', 15.0), ('u2', 3.5)]",
+    "reasoning": "Keep only purchases; convert values; drop invalid; aggregate per user; sort by user_id."
+  },
+  "category": "MLOps",
+  "starter_code": "# Implement your function below.\n\ndef run_etl(csv_text: str) -> list[tuple[str, float]]:\n\t\"\"\"Run a simple ETL pipeline over CSV text with header user_id,event_type,value.\n\n\tReturns a sorted list of (user_id, total_value) for event_type == \"purchase\".\n\t\"\"\"\n\t# TODO: implement extract, transform, and load steps\n\traise NotImplementedError",
+  "title": "Build a Simple ETL Pipeline (MLOps)",
+  "createdAt": "October 13, 2025 at 10:13:11 AM UTUTC-4",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/Jeet009",
+      "name": "Jeet Mukherjee"
+    }
+  ],
+  "learn_section": "IyMgU29sdXRpb24gRXhwbGFuYXRpb24KClRoaXMgdGFzayBtaXJyb3JzIGEgbWluaW1hbCBNTE9wcyBFVEwgZmxvdyB0aGF0IHByZXBhcmVzIGRhdGEgZm9yIGRvd25zdHJlYW0gbW9kZWxpbmcuCgojIyMgRVRMIGJyZWFrZG93bgotIEV4dHJhY3Q6IHBhcnNlIHJhdyBDU1YgdGV4dCwgaWdub3JlIGJsYW5rcywgYW5kIHNwbGl0IGludG8gaGVhZGVyIGFuZCByb3dzLgotIFRyYW5zZm9ybToKCS0gRmlsdGVyIG9ubHkgcmVsZXZhbnQgcmVjb3JkcyAoZXZlbnRfdHlwZSA9PSAicHVyY2hhc2UiKS4KCS0gQ2FzdCBgdmFsdWVgIHRvIGZsb2F0OyBkaXNjYXJkIGludmFsaWQgcm93cyB0byBtYWludGFpbiBkYXRhIHF1YWxpdHkuCgktIEFnZ3JlZ2F0ZSB0b3RhbCBwdXJjaGFzZSB2YWx1ZSBwZXIgdXNlciB0byBjcmVhdGUgY29tcGFjdCBmZWF0dXJlcy4KLSBMb2FkOiByZXR1cm4gYSBkZXRlcm1pbmlzdGljLCBzb3J0ZWQgbGlzdCBvZiBgKHVzZXJfaWQsIHRvdGFsX3ZhbHVlKWAuCgojIyMgV2h5IHRoaXMgZGVzaWduPwotIElucHV0IHNhbml0YXRpb24gcHJldmVudHMgcnVudGltZSBlcnJvcnMgYW5kIHBvb3ItcXVhbGl0eSBmZWF0dXJlcy4KLSBBZ2dyZWdhdGlvbiBjb21wcmVzc2VzIGV2ZW50LWxldmVsIGxvZ3MgaW50byB1c2VyLWxldmVsIGZlYXR1cmVzIGNvbW1vbmx5IHVzZWQgaW4gbW9kZWxzLgotIFNvcnRpbmcgcHJvZHVjZXMgc3RhYmxlLCB0ZXN0YWJsZSBvdXRwdXRzLgoKIyMjIENvbXBsZXhpdHkKLSBGb3IgTiByb3dzLCBwYXJzaW5nIGFuZCBhZ2dyZWdhdGlvbiBydW4gaW4gTyhOKTsgc29ydGluZyB1bmlxdWUgdXNlcnMgVSBjb3N0cyBPKFUgbG9nIFUpLgoKIyMjIEV4dGVuc2lvbnMKLSBBZGQgc2NoZW1hIHZhbGlkYXRpb24gYW5kIGxvZ2dpbmcuCi0gV3JpdGUgb3V0cHV0cyB0byBmaWxlcyBvciBkYXRhYmFzZXMuCi0gU2NoZWR1bGUgRVRMIHJ1bnMgYW5kIGFkZCBtb25pdG9yaW5nIGZvciBkcmlmdCBhbmQgZnJlc2huZXNzLg==",
+  "description_decoded": "## Problem\n\nImplement a simple ETL (Extract-Transform-Load) pipeline for model-ready data preparation.\n\nGiven a CSV-like string containing user events with columns: `user_id,event_type,value` (header included), write a function `run_etl(csv_text)` that:\n\n1. Extracts rows from the raw CSV text.\n2. Transforms data by:\n\t- Filtering only rows where `event_type == \"purchase\"`.\n\t- Converting `value` to float and dropping invalid rows.\n\t- Aggregating total purchase `value` per `user_id`.\n3. Loads the transformed results by returning a list of `(user_id, total_value)` tuples sorted by `user_id` ascending.\n\nAssume small inputs (no external libs), handle extra whitespace, and ignore blank lines.",
+  "learn_section_decoded": "## Solution Explanation\n\nThis task mirrors a minimal MLOps ETL flow that prepares data for downstream modeling.\n\n### ETL breakdown\n- Extract: parse raw CSV text, ignore blanks, and split into header and rows.\n- Transform:\n\t- Filter only relevant records (event_type == \"purchase\").\n\t- Cast `value` to float; discard invalid rows to maintain data quality.\n\t- Aggregate total purchase value per user to create compact features.\n- Load: return a deterministic, sorted list of `(user_id, total_value)`.\n\n### Why this design?\n- Input sanitation prevents runtime errors and poor-quality features.\n- Aggregation compresses event-level logs into user-level features commonly used in models.\n- Sorting produces stable, testable outputs.\n\n### Complexity\n- For N rows, parsing and aggregation run in O(N); sorting unique users U costs O(U log U).\n\n### Extensions\n- Add schema validation and logging.\n- Write outputs to files or databases.\n- Schedule ETL runs and add monitoring for drift and freshness."
+}

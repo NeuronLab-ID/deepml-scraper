@@ -1,0 +1,504 @@
+{
+  "problem_id": 201,
+  "title": "QR Decomposition",
+  "category": "Linear Algebra",
+  "difficulty": "hard",
+  "description": "Implement QR decomposition using the Gram-Schmidt process. Given a matrix A, decompose it into the product of an orthogonal matrix Q (where columns are orthonormal) and an upper triangular matrix R, such that A = Q @ R. Return both Q and R as a tuple of matrices.",
+  "example": {
+    "input": "A = [[3, 0], [4, 5]]",
+    "output": "Q = [[0.6, -0.8], [0.8, 0.6]], R = [[5.0, 4.0], [0.0, 3.0]]",
+    "reasoning": "Using Gram-Schmidt: First column of Q is normalized first column of A: $\\mathbf{q}_1 = \\frac{1}{5}[3, 4]^T = [0.6, 0.8]^T$. For the second column, subtract the projection onto $\\mathbf{q}_1$ and normalize. The matrix R stores the coefficients: $R_{11} = ||[3,4]^T|| = 5$, $R_{12} = \\mathbf{q}_1^T [0,5]^T = 4$, and $R_{22} = 3$."
+  },
+  "starter_code": "import numpy as np\n\ndef qr_decomposition(A: list[list[float]]) -> tuple[list[list[float]], list[list[float]]]:\n\t\"\"\"\n\tPerform QR decomposition using Gram-Schmidt process.\n\t\n\tArgs:\n\t\tA: An m x n matrix represented as list of lists\n\t\n\tReturns:\n\t\tTuple of (Q, R) where Q is orthogonal and R is upper triangular\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Vector Norms and Normalization in Euclidean Space",
+      "relation_to_problem": "Computing the length of column vectors and normalizing them to unit length is the foundation of Gram-Schmidt orthogonalization - every column in Q must be a normalized vector",
+      "prerequisites": [
+        "Basic vector operations",
+        "Square roots",
+        "Summation notation"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of the Euclidean norm (L2 norm)",
+        "Compute vector norms efficiently using component-wise operations",
+        "Normalize vectors to create unit vectors",
+        "Verify that normalized vectors have unit length"
+      ],
+      "math_content": {
+        "definition": "The **Euclidean norm** (or **L2 norm**) of a vector $\\mathbf{v} \\in \\mathbb{R}^n$ with components $v_1, v_2, \\ldots, v_n$ is defined as: $$||\\mathbf{v}|| = \\sqrt{\\sum_{i=1}^{n} v_i^2} = \\sqrt{v_1^2 + v_2^2 + \\cdots + v_n^2}$$ This measures the length or magnitude of the vector in Euclidean space.",
+        "notation": "$||\\mathbf{v}||$ = Euclidean norm of vector $\\mathbf{v}$; $v_i$ = the $i$-th component of vector $\\mathbf{v}$; $n$ = dimension of the vector",
+        "theorem": "**Unit Vector Theorem**: For any non-zero vector $\\mathbf{v} \\in \\mathbb{R}^n$, the normalized vector $\\hat{\\mathbf{v}} = \\frac{\\mathbf{v}}{||\\mathbf{v}||}$ satisfies $||\\hat{\\mathbf{v}}|| = 1$.",
+        "proof_sketch": "Let $\\hat{\\mathbf{v}} = \\frac{\\mathbf{v}}{||\\mathbf{v}||}$. Then: $$||\\hat{\\mathbf{v}}|| = \\left|\\left|\\frac{\\mathbf{v}}{||\\mathbf{v}||}\\right|\\right| = \\frac{1}{||\\mathbf{v}||} \\cdot ||\\mathbf{v}|| = 1$$ This uses the property that $||c\\mathbf{v}|| = |c| \\cdot ||\\mathbf{v}||$ for scalar $c$ and the fact that $||\\mathbf{v}|| > 0$ for non-zero vectors.",
+        "examples": [
+          "Example 1: Vector $\\mathbf{v} = [3, 4]^T$. Norm: $||\\mathbf{v}|| = \\sqrt{3^2 + 4^2} = \\sqrt{9 + 16} = \\sqrt{25} = 5$. Normalized: $\\hat{\\mathbf{v}} = [3/5, 4/5]^T = [0.6, 0.8]^T$. Verify: $0.6^2 + 0.8^2 = 0.36 + 0.64 = 1.0$ ✓",
+          "Example 2: Vector $\\mathbf{w} = [1, 0, 0]^T$. Norm: $||\\mathbf{w}|| = \\sqrt{1^2 + 0^2 + 0^2} = 1$. Already normalized: $\\hat{\\mathbf{w}} = [1, 0, 0]^T$",
+          "Example 3: Vector $\\mathbf{u} = [-2.4, 1.8]^T$. Norm: $||\\mathbf{u}|| = \\sqrt{(-2.4)^2 + 1.8^2} = \\sqrt{5.76 + 3.24} = \\sqrt{9} = 3$. Normalized: $\\hat{\\mathbf{u}} = [-0.8, 0.6]^T$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Euclidean Norm Formula",
+          "latex": "$||\\mathbf{v}|| = \\sqrt{\\sum_{i=1}^{n} v_i^2}$",
+          "description": "Use this to compute the length of any vector - essential for QR decomposition diagonal elements and normalization"
+        },
+        {
+          "name": "Vector Normalization Formula",
+          "latex": "$\\hat{\\mathbf{v}} = \\frac{\\mathbf{v}}{||\\mathbf{v}||} = \\frac{1}{||\\mathbf{v}||} \\mathbf{v}$",
+          "description": "Use this to convert any non-zero vector to a unit vector - this creates the columns of Q"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the Euclidean norm of a vector and normalizes it to unit length. This is the first fundamental operation in building orthonormal columns for the Q matrix.",
+        "function_signature": "def normalize_vector(v: list[float]) -> tuple[float, list[float]]:",
+        "starter_code": "import math\n\ndef normalize_vector(v: list[float]) -> tuple[float, list[float]]:\n    \"\"\"\n    Compute the Euclidean norm and return the normalized vector.\n    \n    Args:\n        v: A vector as a list of floats\n    \n    Returns:\n        Tuple of (norm, normalized_vector) where normalized_vector has unit length\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "normalize_vector([3.0, 4.0])",
+            "expected": "(5.0, [0.6, 0.8])",
+            "explanation": "The norm is sqrt(9+16)=5, and dividing each component by 5 gives [0.6, 0.8], which has unit length"
+          },
+          {
+            "input": "normalize_vector([1.0, 0.0, 0.0])",
+            "expected": "(1.0, [1.0, 0.0, 0.0])",
+            "explanation": "Already a unit vector, so normalization doesn't change it"
+          },
+          {
+            "input": "normalize_vector([-2.4, 1.8])",
+            "expected": "(3.0, [-0.8, 0.6])",
+            "explanation": "Norm is 3.0, and normalization gives [-0.8, 0.6] which represents the same direction with unit length"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to take the square root after summing squared components",
+        "Division by zero when the input vector is the zero vector",
+        "Not using floating point division, leading to integer division errors",
+        "Accumulating rounding errors by not using appropriate precision"
+      ],
+      "hint": "First compute the sum of squares of all components, then take the square root. For normalization, divide each component by this norm.",
+      "references": [
+        "Euclidean norm (L2 norm)",
+        "Vector normalization",
+        "Unit vectors",
+        "Inner product spaces"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Inner Products and Orthogonality",
+      "relation_to_problem": "The dot product is used to compute projections and verify orthogonality - it's central to Gram-Schmidt where we compute $\\mathbf{q}_i^T \\mathbf{a}_j$ to determine projection coefficients and build the R matrix",
+      "prerequisites": [
+        "Vector operations",
+        "Summation",
+        "Vector norms from Step 1"
+      ],
+      "learning_objectives": [
+        "Define and compute the inner product (dot product) of two vectors",
+        "Understand the geometric interpretation of inner products",
+        "Determine when two vectors are orthogonal",
+        "Apply the Cauchy-Schwarz inequality",
+        "Verify orthonormality conditions"
+      ],
+      "math_content": {
+        "definition": "The **inner product** (or **dot product**) of two vectors $\\mathbf{u}, \\mathbf{v} \\in \\mathbb{R}^n$ is defined as: $$\\langle \\mathbf{u}, \\mathbf{v} \\rangle = \\mathbf{u}^T \\mathbf{v} = \\sum_{i=1}^{n} u_i v_i = u_1 v_1 + u_2 v_2 + \\cdots + u_n v_n$$ This scalar quantity measures the degree of alignment between two vectors. Two vectors $\\mathbf{u}$ and $\\mathbf{v}$ are **orthogonal** (perpendicular) if and only if $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = 0$.",
+        "notation": "$\\langle \\mathbf{u}, \\mathbf{v} \\rangle$ or $\\mathbf{u} \\cdot \\mathbf{v}$ or $\\mathbf{u}^T \\mathbf{v}$ = inner product of vectors $\\mathbf{u}$ and $\\mathbf{v}$; $\\mathbf{u} \\perp \\mathbf{v}$ means $\\mathbf{u}$ is orthogonal to $\\mathbf{v}$",
+        "theorem": "**Orthonormality Criterion**: A set of vectors $\\{\\mathbf{q}_1, \\mathbf{q}_2, \\ldots, \\mathbf{q}_k\\}$ is orthonormal if and only if: $$\\mathbf{q}_i^T \\mathbf{q}_j = \\delta_{ij} = \\begin{cases} 1 & \\text{if } i = j \\\\ 0 & \\text{if } i \\neq j \\end{cases}$$ where $\\delta_{ij}$ is the Kronecker delta. This means each vector has unit length and all pairs are orthogonal.",
+        "proof_sketch": "For orthonormality: (1) **Unit length**: $\\mathbf{q}_i^T \\mathbf{q}_i = ||\\mathbf{q}_i||^2 = 1$ implies each vector is normalized. (2) **Orthogonality**: $\\mathbf{q}_i^T \\mathbf{q}_j = 0$ for $i \\neq j$ follows from the definition of orthogonality. The Kronecker delta notation compactly expresses both conditions. The converse follows by definition.",
+        "examples": [
+          "Example 1: $\\mathbf{u} = [0.6, 0.8]^T$, $\\mathbf{v} = [-0.8, 0.6]^T$. Check orthogonality: $\\mathbf{u}^T \\mathbf{v} = 0.6(-0.8) + 0.8(0.6) = -0.48 + 0.48 = 0$ ✓. Check normality: $||\\mathbf{u}||^2 = 0.36 + 0.64 = 1$ ✓, $||\\mathbf{v}||^2 = 0.64 + 0.36 = 1$ ✓. This is an orthonormal pair.",
+          "Example 2: $\\mathbf{a} = [1, 0, 0]^T$, $\\mathbf{b} = [0, 1, 0]^T$, $\\mathbf{c} = [0, 0, 1]^T$. All pairwise inner products are 0, and each has norm 1. Standard basis is orthonormal.",
+          "Example 3: $\\mathbf{p} = [3, 4]^T$, $\\mathbf{q} = [4, -3]^T$. Inner product: $3(4) + 4(-3) = 12 - 12 = 0$. They are orthogonal but not orthonormal (norms are 5 each)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Inner Product Formula",
+          "latex": "$\\langle \\mathbf{u}, \\mathbf{v} \\rangle = \\sum_{i=1}^{n} u_i v_i$",
+          "description": "Fundamental operation for computing projection coefficients in Gram-Schmidt - directly gives $R_{ij}$ entries"
+        },
+        {
+          "name": "Orthogonality Condition",
+          "latex": "$\\mathbf{u} \\perp \\mathbf{v} \\iff \\mathbf{u}^T \\mathbf{v} = 0$",
+          "description": "Use this to verify that columns of Q are mutually orthogonal"
+        },
+        {
+          "name": "Cauchy-Schwarz Inequality",
+          "latex": "$|\\langle \\mathbf{u}, \\mathbf{v} \\rangle| \\leq ||\\mathbf{u}|| \\cdot ||\\mathbf{v}||$",
+          "description": "Provides bounds on inner products - equality holds when vectors are parallel"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the inner product of two vectors and checks if a set of vectors is orthonormal. This validates the fundamental property of the Q matrix in QR decomposition.",
+        "function_signature": "def check_orthonormal(vectors: list[list[float]], tolerance: float = 1e-9) -> bool:",
+        "starter_code": "def inner_product(u: list[float], v: list[float]) -> float:\n    \"\"\"\n    Compute the inner product of two vectors.\n    \n    Args:\n        u, v: Vectors as lists of floats (must have same length)\n    \n    Returns:\n        The inner product (scalar)\n    \"\"\"\n    # Your code here\n    pass\n\ndef check_orthonormal(vectors: list[list[float]], tolerance: float = 1e-9) -> bool:\n    \"\"\"\n    Check if a set of vectors is orthonormal.\n    \n    Args:\n        vectors: List of vectors, each vector is a list of floats\n        tolerance: Numerical tolerance for floating point comparisons\n    \n    Returns:\n        True if vectors are orthonormal, False otherwise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "check_orthonormal([[0.6, 0.8], [-0.8, 0.6]])",
+            "expected": "True",
+            "explanation": "These vectors form an orthonormal set: each has norm 1, and their inner product is 0"
+          },
+          {
+            "input": "check_orthonormal([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])",
+            "expected": "True",
+            "explanation": "The standard basis vectors in R^3 are orthonormal"
+          },
+          {
+            "input": "check_orthonormal([[3.0, 4.0], [4.0, -3.0]])",
+            "expected": "False",
+            "explanation": "These vectors are orthogonal (inner product = 0) but not normalized (norms are 5, not 1)"
+          },
+          {
+            "input": "check_orthonormal([[1.0, 1.0], [1.0, -1.0]])",
+            "expected": "False",
+            "explanation": "These vectors are orthogonal but not normalized (each has norm sqrt(2))"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking both orthogonality (inner product = 0) and normality (norm = 1)",
+        "Using exact equality instead of tolerance-based comparison for floating point",
+        "Only checking consecutive pairs instead of all pairs for orthogonality",
+        "Confusing orthogonal with orthonormal - orthonormal requires unit length too"
+      ],
+      "hint": "For orthonormality, verify that the inner product of each vector with itself equals 1 (unit length), and the inner product of any two different vectors equals 0 (orthogonality). Use the tolerance parameter for floating point comparisons.",
+      "references": [
+        "Inner product spaces",
+        "Orthogonal and orthonormal vectors",
+        "Gram matrix",
+        "Kronecker delta"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Vector Projection onto Unit Vectors",
+      "relation_to_problem": "Projection is the core operation in Gram-Schmidt - to make each new column orthogonal to previous ones, we must remove (subtract) its projections onto all previously computed orthonormal vectors, and the projection coefficients become entries in R",
+      "prerequisites": [
+        "Vector norms (Step 1)",
+        "Inner products (Step 2)",
+        "Vector subtraction"
+      ],
+      "learning_objectives": [
+        "Derive and understand the projection formula for unit vectors",
+        "Compute the scalar projection coefficient",
+        "Compute the vector projection",
+        "Remove projections to create orthogonal components",
+        "Understand how projections relate to the R matrix entries"
+      ],
+      "math_content": {
+        "definition": "The **projection** of vector $\\mathbf{a}$ onto a unit vector $\\mathbf{q}$ (where $||\\mathbf{q}|| = 1$) is defined as: $$\\text{proj}_{\\mathbf{q}}(\\mathbf{a}) = (\\mathbf{q}^T \\mathbf{a}) \\mathbf{q}$$ This gives the component of $\\mathbf{a}$ in the direction of $\\mathbf{q}$. The scalar coefficient $\\mathbf{q}^T \\mathbf{a}$ is called the **scalar projection** or **projection coefficient**. For a general (non-unit) vector $\\mathbf{u}$, the projection formula is: $$\\text{proj}_{\\mathbf{u}}(\\mathbf{a}) = \\frac{\\mathbf{u}^T \\mathbf{a}}{\\mathbf{u}^T \\mathbf{u}} \\mathbf{u} = \\frac{\\mathbf{u}^T \\mathbf{a}}{||\\mathbf{u}||^2} \\mathbf{u}$$",
+        "notation": "$\\text{proj}_{\\mathbf{q}}(\\mathbf{a})$ = projection of $\\mathbf{a}$ onto $\\mathbf{q}$; $\\mathbf{q}^T \\mathbf{a}$ = scalar projection coefficient; $\\mathbf{a}^{\\perp}$ = component of $\\mathbf{a}$ orthogonal to $\\mathbf{q}$",
+        "theorem": "**Orthogonal Decomposition Theorem**: For any vector $\\mathbf{a}$ and unit vector $\\mathbf{q}$, we can uniquely decompose $\\mathbf{a}$ as: $$\\mathbf{a} = \\text{proj}_{\\mathbf{q}}(\\mathbf{a}) + \\mathbf{a}^{\\perp}$$ where $\\mathbf{a}^{\\perp} = \\mathbf{a} - \\text{proj}_{\\mathbf{q}}(\\mathbf{a})$ is orthogonal to $\\mathbf{q}$, i.e., $\\mathbf{q}^T \\mathbf{a}^{\\perp} = 0$. This is called the **orthogonal component** or **rejection**.",
+        "proof_sketch": "Let $\\mathbf{a}^{\\perp} = \\mathbf{a} - (\\mathbf{q}^T \\mathbf{a}) \\mathbf{q}$. To verify orthogonality: $$\\mathbf{q}^T \\mathbf{a}^{\\perp} = \\mathbf{q}^T [\\mathbf{a} - (\\mathbf{q}^T \\mathbf{a}) \\mathbf{q}] = \\mathbf{q}^T \\mathbf{a} - (\\mathbf{q}^T \\mathbf{a})(\\mathbf{q}^T \\mathbf{q}) = \\mathbf{q}^T \\mathbf{a} - \\mathbf{q}^T \\mathbf{a} = 0$$ since $\\mathbf{q}^T \\mathbf{q} = 1$ for unit vectors. Uniqueness follows from the orthogonality constraint.",
+        "examples": [
+          "Example 1: Project $\\mathbf{a} = [0, 5]^T$ onto $\\mathbf{q} = [0.6, 0.8]^T$. Scalar projection: $0.6(0) + 0.8(5) = 4$. Vector projection: $4[0.6, 0.8]^T = [2.4, 3.2]^T$. Orthogonal component: $[0, 5]^T - [2.4, 3.2]^T = [-2.4, 1.8]^T$. Verify: $0.6(-2.4) + 0.8(1.8) = -1.44 + 1.44 = 0$ ✓",
+          "Example 2: Project $\\mathbf{b} = [5, 5]^T$ onto $\\mathbf{q} = [1, 0]^T$. Scalar projection: $1(5) + 0(5) = 5$. Vector projection: $[5, 0]^T$. Orthogonal component: $[0, 5]^T$.",
+          "Example 3: Project $\\mathbf{c} = [3, 4]^T$ onto itself (normalized): $\\mathbf{q} = [0.6, 0.8]^T$. Scalar projection: $0.6(3) + 0.8(4) = 5$. Vector projection: $5[0.6, 0.8]^T = [3, 4]^T = \\mathbf{c}$. Orthogonal component: zero vector."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Projection onto Unit Vector",
+          "latex": "$\\text{proj}_{\\mathbf{q}}(\\mathbf{a}) = (\\mathbf{q}^T \\mathbf{a}) \\mathbf{q}$",
+          "description": "The fundamental formula for Gram-Schmidt - projects column $\\mathbf{a}_j$ onto previously computed unit vector $\\mathbf{q}_i$. The coefficient $\\mathbf{q}^T \\mathbf{a}$ becomes $R_{ij}$"
+        },
+        {
+          "name": "Orthogonal Component (Rejection)",
+          "latex": "$\\mathbf{a}^{\\perp} = \\mathbf{a} - \\text{proj}_{\\mathbf{q}}(\\mathbf{a}) = \\mathbf{a} - (\\mathbf{q}^T \\mathbf{a}) \\mathbf{q}$",
+          "description": "Removes the component in direction $\\mathbf{q}$ from $\\mathbf{a}$ - repeatedly applied in Gram-Schmidt to subtract all previous projections"
+        },
+        {
+          "name": "Multiple Projection Removal",
+          "latex": "$\\mathbf{v}_j = \\mathbf{a}_j - \\sum_{i=1}^{j-1} (\\mathbf{q}_i^T \\mathbf{a}_j) \\mathbf{q}_i$",
+          "description": "Gram-Schmidt formula: removes all projections onto previously computed orthonormal vectors"
+        }
+      ],
+      "exercise": {
+        "description": "Implement functions to compute the projection of a vector onto a unit vector and to remove this projection (compute the orthogonal component). This is the central operation in the Gram-Schmidt process.",
+        "function_signature": "def project_onto_unit_vector(a: list[float], q: list[float]) -> tuple[float, list[float], list[float]]:",
+        "starter_code": "def project_onto_unit_vector(a: list[float], q: list[float]) -> tuple[float, list[float], list[float]]:\n    \"\"\"\n    Project vector a onto unit vector q.\n    \n    Args:\n        a: Vector to project\n        q: Unit vector (assumed to have norm 1)\n    \n    Returns:\n        Tuple of (coefficient, projection_vector, orthogonal_component) where:\n        - coefficient is the scalar projection (q^T a)\n        - projection_vector is the vector projection onto q\n        - orthogonal_component is a - projection_vector\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "project_onto_unit_vector([0.0, 5.0], [0.6, 0.8])",
+            "expected": "(4.0, [2.4, 3.2], [-2.4, 1.8])",
+            "explanation": "Scalar projection is 0.6*0 + 0.8*5 = 4. Vector projection is 4*[0.6,0.8] = [2.4,3.2]. Orthogonal component is [0,5] - [2.4,3.2] = [-2.4,1.8], which is perpendicular to [0.6,0.8]"
+          },
+          {
+            "input": "project_onto_unit_vector([5.0, 5.0], [1.0, 0.0])",
+            "expected": "(5.0, [5.0, 0.0], [0.0, 5.0])",
+            "explanation": "Projection onto x-axis unit vector gives the x-component [5,0], leaving y-component [0,5] as orthogonal"
+          },
+          {
+            "input": "project_onto_unit_vector([3.0, 4.0], [0.6, 0.8])",
+            "expected": "(5.0, [3.0, 4.0], [0.0, 0.0])",
+            "explanation": "The vector [3,4] is already in the direction of [0.6,0.8], so the projection equals the original and orthogonal component is zero"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that the projection formula simplifies only when q is a unit vector",
+        "Not computing the scalar coefficient first - trying to project component-wise",
+        "Computing projection but forgetting to subtract it to get the orthogonal component",
+        "Sign errors when subtracting the projection",
+        "Assuming the orthogonal component automatically has the same norm as the original (it doesn't)"
+      ],
+      "hint": "First compute the scalar projection coefficient using the inner product. Then scale the unit vector q by this coefficient to get the vector projection. Finally, subtract the projection from the original vector to get the orthogonal component.",
+      "references": [
+        "Vector projection",
+        "Orthogonal decomposition",
+        "Vector rejection",
+        "Projection operators"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Gram-Schmidt Orthogonalization for Two Vectors",
+      "relation_to_problem": "This implements the core Gram-Schmidt algorithm for the simplest non-trivial case - converting two linearly independent vectors into two orthonormal vectors. This is exactly what happens when processing the first two columns of A in QR decomposition",
+      "prerequisites": [
+        "Vector normalization (Step 1)",
+        "Inner products and orthogonality (Step 2)",
+        "Vector projection (Step 3)"
+      ],
+      "learning_objectives": [
+        "Understand the step-by-step Gram-Schmidt procedure",
+        "Apply the algorithm to transform a basis into an orthonormal basis",
+        "Track the coefficients that form the R matrix",
+        "Verify the orthonormality of the result",
+        "Understand the relationship between input columns and output Q, R"
+      ],
+      "math_content": {
+        "definition": "The **Gram-Schmidt orthogonalization process** transforms a set of linearly independent vectors $\\{\\mathbf{a}_1, \\mathbf{a}_2, \\ldots, \\mathbf{a}_n\\}$ into an orthonormal set $\\{\\mathbf{q}_1, \\mathbf{q}_2, \\ldots, \\mathbf{q}_n\\}$ spanning the same subspace. For two vectors: **Step 1**: Normalize the first vector: $$\\mathbf{v}_1 = \\mathbf{a}_1, \\quad \\mathbf{q}_1 = \\frac{\\mathbf{v}_1}{||\\mathbf{v}_1||}$$ **Step 2**: Remove the projection of $\\mathbf{a}_2$ onto $\\mathbf{q}_1$ and normalize: $$\\mathbf{v}_2 = \\mathbf{a}_2 - (\\mathbf{q}_1^T \\mathbf{a}_2) \\mathbf{q}_1, \\quad \\mathbf{q}_2 = \\frac{\\mathbf{v}_2}{||\\mathbf{v}_2||}$$",
+        "notation": "$\\mathbf{a}_j$ = original input vectors (columns of A); $\\mathbf{v}_j$ = intermediate orthogonal (but not normalized) vectors; $\\mathbf{q}_j$ = output orthonormal vectors (columns of Q); $R_{ij}$ = coefficient matrix entries",
+        "theorem": "**QR Decomposition for 2×2 Case**: For a matrix $A = [\\mathbf{a}_1 \\mid \\mathbf{a}_2]$ with linearly independent columns, Gram-Schmidt produces $Q = [\\mathbf{q}_1 \\mid \\mathbf{q}_2]$ and: $$R = \\begin{pmatrix} R_{11} & R_{12} \\\\ 0 & R_{22} \\end{pmatrix} = \\begin{pmatrix} ||\\mathbf{v}_1|| & \\mathbf{q}_1^T \\mathbf{a}_2 \\\\ 0 & ||\\mathbf{v}_2|| \\end{pmatrix}$$ such that $A = QR$. The matrix $R$ is upper triangular with positive diagonal entries (by convention).",
+        "proof_sketch": "By construction: $\\mathbf{a}_1 = ||\\mathbf{v}_1|| \\mathbf{q}_1 = R_{11} \\mathbf{q}_1$ and $\\mathbf{a}_2 = (\\mathbf{q}_1^T \\mathbf{a}_2) \\mathbf{q}_1 + ||\\mathbf{v}_2|| \\mathbf{q}_2 = R_{12} \\mathbf{q}_1 + R_{22} \\mathbf{q}_2$. In matrix form: $$[\\mathbf{a}_1 \\mid \\mathbf{a}_2] = [\\mathbf{q}_1 \\mid \\mathbf{q}_2] \\begin{pmatrix} R_{11} & R_{12} \\\\ 0 & R_{22} \\end{pmatrix}$$ The $R_{21} = 0$ entry follows because $\\mathbf{v}_2$ is constructed orthogonal to $\\mathbf{q}_1$, so $\\mathbf{a}_2$ has no component along $\\mathbf{q}_2$ from $\\mathbf{q}_1$'s perspective beyond what's already captured in $R_{12}$.",
+        "examples": [
+          "Example: $A = \\begin{pmatrix} 3 & 0 \\\\ 4 & 5 \\end{pmatrix}$. Column 1: $\\mathbf{v}_1 = [3, 4]^T$, $||\\mathbf{v}_1|| = 5$, so $\\mathbf{q}_1 = [0.6, 0.8]^T$ and $R_{11} = 5$. Column 2: $R_{12} = \\mathbf{q}_1^T \\mathbf{a}_2 = 0.6(0) + 0.8(5) = 4$. Then $\\mathbf{v}_2 = [0, 5]^T - 4[0.6, 0.8]^T = [-2.4, 1.8]^T$. $||\\mathbf{v}_2|| = 3$, so $\\mathbf{q}_2 = [-0.8, 0.6]^T$ and $R_{22} = 3$. Result: $Q = \\begin{pmatrix} 0.6 & -0.8 \\\\ 0.8 & 0.6 \\end{pmatrix}$, $R = \\begin{pmatrix} 5 & 4 \\\\ 0 & 3 \\end{pmatrix}$",
+          "Example: Identity basis $A = \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix}$. Already orthonormal, so $Q = A$ and $R = I$.",
+          "Example: $A = \\begin{pmatrix} 1 & 1 \\\\ 0 & 1 \\end{pmatrix}$. Column 1: $\\mathbf{q}_1 = [1, 0]^T$, $R_{11} = 1$. Column 2: $R_{12} = 1$, $\\mathbf{v}_2 = [1,1]^T - [1,0]^T = [0,1]^T$, $\\mathbf{q}_2 = [0,1]^T$, $R_{22} = 1$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "First Column Processing",
+          "latex": "$\\mathbf{q}_1 = \\frac{\\mathbf{a}_1}{||\\mathbf{a}_1||}, \\quad R_{11} = ||\\mathbf{a}_1||$",
+          "description": "Initialize Gram-Schmidt: normalize the first column and record its norm"
+        },
+        {
+          "name": "Second Column Processing",
+          "latex": "$R_{12} = \\mathbf{q}_1^T \\mathbf{a}_2, \\quad \\mathbf{v}_2 = \\mathbf{a}_2 - R_{12} \\mathbf{q}_1, \\quad R_{22} = ||\\mathbf{v}_2||, \\quad \\mathbf{q}_2 = \\frac{\\mathbf{v}_2}{R_{22}}$",
+          "description": "Remove projection onto q₁, then normalize the remainder - this creates the second orthonormal column"
+        },
+        {
+          "name": "QR Relationship",
+          "latex": "$\\mathbf{a}_j = \\sum_{i=1}^{j} R_{ij} \\mathbf{q}_i$",
+          "description": "Each original column is expressed as a linear combination of orthonormal columns with coefficients from R"
+        }
+      ],
+      "exercise": {
+        "description": "Implement Gram-Schmidt orthogonalization for exactly two vectors, returning both the orthonormal vectors Q and the upper triangular coefficient matrix R. This is a 2×2 QR decomposition.",
+        "function_signature": "def gram_schmidt_two_vectors(a1: list[float], a2: list[float]) -> tuple[list[list[float]], list[list[float]]]:",
+        "starter_code": "def gram_schmidt_two_vectors(a1: list[float], a2: list[float]) -> tuple[list[list[float]], list[list[float]]]:\n    \"\"\"\n    Perform Gram-Schmidt on two vectors to produce Q and R for 2×2 QR decomposition.\n    \n    Args:\n        a1, a2: Two linearly independent vectors of the same dimension\n    \n    Returns:\n        Tuple (Q, R) where:\n        - Q is a list of two orthonormal vectors [q1, q2]\n        - R is a 2×2 upper triangular matrix [[R11, R12], [0, R22]]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "gram_schmidt_two_vectors([3.0, 4.0], [0.0, 5.0])",
+            "expected": "(Q=[[0.6, 0.8], [-0.8, 0.6]], R=[[5.0, 4.0], [0.0, 3.0]])",
+            "explanation": "First vector [3,4] normalizes to [0.6,0.8] with norm 5. Projecting [0,5] onto [0.6,0.8] gives coefficient 4, leaving orthogonal component [-2.4,1.8] which normalizes to [-0.8,0.6] with norm 3"
+          },
+          {
+            "input": "gram_schmidt_two_vectors([1.0, 0.0], [0.0, 1.0])",
+            "expected": "(Q=[[1.0, 0.0], [0.0, 1.0]], R=[[1.0, 0.0], [0.0, 1.0]])",
+            "explanation": "Standard basis vectors are already orthonormal, so Q equals input and R is identity"
+          },
+          {
+            "input": "gram_schmidt_two_vectors([1.0, 0.0], [1.0, 1.0])",
+            "expected": "(Q=[[1.0, 0.0], [0.0, 1.0]], R=[[1.0, 1.0], [0.0, 1.0]])",
+            "explanation": "After removing projection of [1,1] onto [1,0], we get [0,1] which is already normalized"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Processing columns out of order - must process a1 first, then a2",
+        "Forgetting to store the R coefficients during computation",
+        "Normalizing before removing projections - must remove projections first",
+        "Not checking for linear dependence - if ||v2|| = 0, the vectors are dependent",
+        "Storing R in the wrong position - remember R is upper triangular with zeros below diagonal"
+      ],
+      "hint": "Follow the algorithm strictly: (1) Normalize a1 to get q1, store norm as R11. (2) Compute R12 = q1·a2. (3) Compute v2 = a2 - R12*q1. (4) Store ||v2|| as R22 and normalize v2 to get q2. The zero entries in R below the diagonal come automatically from this procedure.",
+      "references": [
+        "Gram-Schmidt process",
+        "QR decomposition",
+        "Orthogonal basis",
+        "Upper triangular matrices"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Matrix Column Extraction and Multi-Column Gram-Schmidt",
+      "relation_to_problem": "Extend Gram-Schmidt to handle matrices with n columns - this requires iterating through all columns and progressively removing projections onto all previously computed orthonormal vectors, generalizing the two-vector case to arbitrary dimensions",
+      "prerequisites": [
+        "Gram-Schmidt for two vectors (Step 4)",
+        "Matrix representation",
+        "Nested loops"
+      ],
+      "learning_objectives": [
+        "Extract columns from a matrix representation",
+        "Generalize Gram-Schmidt to n vectors",
+        "Implement the nested loop structure for removing multiple projections",
+        "Build the complete upper triangular R matrix",
+        "Understand the computational structure of full QR decomposition"
+      ],
+      "math_content": {
+        "definition": "The **general Gram-Schmidt algorithm** for an $m \\times n$ matrix $A = [\\mathbf{a}_1 \\mid \\mathbf{a}_2 \\mid \\cdots \\mid \\mathbf{a}_n]$ with linearly independent columns proceeds iteratively for $j = 1, 2, \\ldots, n$: $$\\mathbf{v}_j = \\mathbf{a}_j - \\sum_{i=1}^{j-1} R_{ij} \\mathbf{q}_i \\quad \\text{where } R_{ij} = \\mathbf{q}_i^T \\mathbf{a}_j$$ $$R_{jj} = ||\\mathbf{v}_j||$$ $$\\mathbf{q}_j = \\frac{\\mathbf{v}_j}{R_{jj}}$$ This produces $Q = [\\mathbf{q}_1 \\mid \\cdots \\mid \\mathbf{q}_n]$ with orthonormal columns and an $n \\times n$ upper triangular matrix $R$ where $A = QR$.",
+        "notation": "$j$ = current column index being processed; $i$ = index of previously computed orthonormal vectors; $\\sum_{i=1}^{j-1}$ = sum over all previous columns",
+        "theorem": "**QR Decomposition Existence and Construction**: Every $m \\times n$ matrix $A$ with linearly independent columns ($m \\geq n$) has a QR decomposition $A = QR$ where $Q$ is $m \\times n$ with orthonormal columns and $R$ is $n \\times n$ upper triangular with positive diagonal entries. The Gram-Schmidt process provides an explicit construction algorithm with computational complexity $O(mn^2)$.",
+        "proof_sketch": "**By induction on the number of columns**: Base case ($n=1$): Single column is normalized to $\\mathbf{q}_1 = \\mathbf{a}_1/||\\mathbf{a}_1||$ with $R_{11} = ||\\mathbf{a}_1||$, giving $\\mathbf{a}_1 = R_{11}\\mathbf{q}_1$. Inductive step: Assume $[\\mathbf{a}_1 \\mid \\cdots \\mid \\mathbf{a}_{k}] = [\\mathbf{q}_1 \\mid \\cdots \\mid \\mathbf{q}_k] R_k$ holds. For column $k+1$, define $R_{i,k+1} = \\mathbf{q}_i^T \\mathbf{a}_{k+1}$ for $i \\leq k$, construct $\\mathbf{v}_{k+1} = \\mathbf{a}_{k+1} - \\sum_{i=1}^{k} R_{i,k+1} \\mathbf{q}_i$. By construction, $\\mathbf{q}_i^T \\mathbf{v}_{k+1} = 0$ for all $i \\leq k$ (orthogonality verified by substitution). Set $R_{k+1,k+1} = ||\\mathbf{v}_{k+1}||$ and $\\mathbf{q}_{k+1} = \\mathbf{v}_{k+1}/R_{k+1,k+1}$. Then $\\mathbf{a}_{k+1} = \\sum_{i=1}^{k+1} R_{i,k+1} \\mathbf{q}_i$, completing the induction.",
+        "examples": [
+          "Example: 3×3 matrix $A = \\begin{pmatrix} 1 & 0 & 0 \\\\ 0 & 1 & 1 \\\\ 0 & 0 & 1 \\end{pmatrix}$. Process column 1: $\\mathbf{q}_1 = [1,0,0]^T$, $R_{11}=1$. Process column 2: $R_{12}=0$, $\\mathbf{v}_2=[0,1,0]^T$, $\\mathbf{q}_2=[0,1,0]^T$, $R_{22}=1$. Process column 3: $R_{13}=0$, $R_{23}=1$, $\\mathbf{v}_3=[0,1,1]^T-1[0,1,0]^T=[0,0,1]^T$, $\\mathbf{q}_3=[0,0,1]^T$, $R_{33}=1$. Result: $Q=I$, $R = \\begin{pmatrix} 1 & 0 & 0 \\\\ 0 & 1 & 1 \\\\ 0 & 0 & 1 \\end{pmatrix}$",
+          "Example structure for general case: For column $j$, compute $n-j$ projections onto previous orthonormal vectors, accumulate their sum, subtract from original column, normalize remainder. Store projection coefficients in row $i$ of column $j$ of $R$ for $i < j$, and norm in diagonal $R_{jj}$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Off-diagonal R entries",
+          "latex": "$R_{ij} = \\mathbf{q}_i^T \\mathbf{a}_j \\quad \\text{for } i < j$",
+          "description": "Projection coefficients computed before orthogonalization - these are the upper triangular entries above the diagonal"
+        },
+        {
+          "name": "Orthogonalization step",
+          "latex": "$\\mathbf{v}_j = \\mathbf{a}_j - \\sum_{i=1}^{j-1} R_{ij} \\mathbf{q}_i$",
+          "description": "Remove all projections onto previously computed orthonormal vectors - the core nested loop"
+        },
+        {
+          "name": "Diagonal R entries",
+          "latex": "$R_{jj} = ||\\mathbf{v}_j||$",
+          "description": "Norm of the orthogonalized vector before normalization - positive diagonal entries"
+        },
+        {
+          "name": "Normalization",
+          "latex": "$\\mathbf{q}_j = \\frac{\\mathbf{v}_j}{R_{jj}}$",
+          "description": "Final step: convert orthogonal vector to orthonormal"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the full Gram-Schmidt algorithm for a matrix with any number of columns. This extends the two-vector case to handle arbitrary n×n (or m×n) matrices, producing the complete QR decomposition.",
+        "function_signature": "def gram_schmidt_process(A: list[list[float]]) -> tuple[list[list[float]], list[list[float]]]:",
+        "starter_code": "def gram_schmidt_process(A: list[list[float]]) -> tuple[list[list[float]], list[list[float]]]:\n    \"\"\"\n    Perform Gram-Schmidt orthogonalization on matrix A.\n    \n    Args:\n        A: m×n matrix as list of lists (rows), with linearly independent columns\n    \n    Returns:\n        Tuple (Q, R) where:\n        - Q: m×n matrix with orthonormal columns (as list of rows)\n        - R: n×n upper triangular matrix\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "gram_schmidt_process([[3, 0], [4, 5]])",
+            "expected": "(Q=[[0.6, -0.8], [0.8, 0.6]], R=[[5.0, 4.0], [0.0, 3.0]])",
+            "explanation": "2×2 case from problem example - validates against known solution"
+          },
+          {
+            "input": "gram_schmidt_process([[1, 0, 0], [0, 1, 0], [0, 0, 1]])",
+            "expected": "(Q=[[1, 0, 0], [0, 1, 0], [0, 0, 1]], R=[[1, 0, 0], [0, 1, 0], [0, 0, 1]])",
+            "explanation": "Identity matrix is already orthonormal - Q=A and R=I"
+          },
+          {
+            "input": "gram_schmidt_process([[1, 1], [0, 1], [0, 0]])",
+            "expected": "(Q=[[1, 0], [0, 1], [0, 0]], R=[[1, 1], [0, 1]])",
+            "explanation": "3×2 matrix - shows handling of m>n case"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row vs column representation - matrices as list-of-lists are row-major",
+        "Not initializing R with zeros - must explicitly set lower triangular entries to 0",
+        "Computing projections using non-normalized intermediate vectors instead of q_i",
+        "Off-by-one errors in loop indices when accumulating projections",
+        "Modifying the original column vectors during projection removal",
+        "Not handling the m×n case correctly when m > n (tall matrices)"
+      ],
+      "hint": "Structure your solution with two nested loops: outer loop over columns j (1 to n), inner loop over previously computed q_i (1 to j-1) to compute and accumulate projections. Extract columns from the input matrix, process each column to remove all previous projections, then normalize. Build Q column-by-column and R entry-by-entry.",
+      "references": [
+        "Gram-Schmidt algorithm",
+        "Matrix factorization",
+        "Numerical linear algebra",
+        "Column-oriented matrix operations"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete QR Decomposition Implementation with Verification",
+      "relation_to_problem": "Combine all previous components into a complete, production-ready QR decomposition function that handles the list-of-lists format, performs Gram-Schmidt, and verifies the decomposition properties A=QR and Q^TQ=I",
+      "prerequisites": [
+        "All previous steps",
+        "Matrix multiplication",
+        "Numerical tolerance"
+      ],
+      "learning_objectives": [
+        "Integrate all Gram-Schmidt components into a complete solution",
+        "Handle matrix representation conversion (list of lists format)",
+        "Implement matrix verification (checking A = QR)",
+        "Apply numerical tolerance for floating point comparisons",
+        "Structure code for clarity and correctness"
+      ],
+      "math_content": {
+        "definition": "A **complete QR decomposition implementation** takes a matrix $A \\in \\mathbb{R}^{m \\times n}$ represented as a list of lists (row-major format) and returns $(Q, R)$ in the same format, where: (1) $Q \\in \\mathbb{R}^{m \\times n}$ has orthonormal columns satisfying $Q^T Q = I_n$. (2) $R \\in \\mathbb{R}^{n \\times n}$ is upper triangular with $R_{ij} = 0$ for $i > j$ and $R_{ii} > 0$. (3) The decomposition satisfies $A = QR$. The implementation must handle: column extraction, iterative Gram-Schmidt with projection removal, matrix construction from columns, and numerical stability considerations.",
+        "notation": "$A[i][j]$ = element in row $i$, column $j$ of matrix $A$ (0-indexed); $m$ = number of rows; $n$ = number of columns; $\\epsilon$ = numerical tolerance for comparisons",
+        "theorem": "**Verification Conditions for QR Decomposition**: For computed matrices $Q$ and $R$ to be a valid QR decomposition of $A$, they must satisfy: (1) **Orthonormality**: $||Q^T Q - I||_F < \\epsilon$ where $|| \\cdot ||_F$ is the Frobenius norm. (2) **Reconstruction**: $||A - QR||_F < \\epsilon$. (3) **Upper triangular structure**: $|R_{ij}| < \\epsilon$ for all $i > j$. For well-conditioned matrices, typical tolerances are $\\epsilon \\sim 10^{-9}$ to $10^{-12}$.",
+        "proof_sketch": "The verification is empirical rather than proven - we compute both sides and check numerical equality within tolerance. For **orthonormality**: compute $G = Q^T Q$ and verify $G_{ij} \\approx \\delta_{ij}$. For **reconstruction**: compute $P = QR$ by matrix multiplication and verify $P_{ij} \\approx A_{ij}$ for all entries. The tolerance accounts for accumulated floating point errors in the Gram-Schmidt process (typically $O(n \\epsilon_{\\text{machine}})$ for classical Gram-Schmidt).",
+        "examples": [
+          "Example: After computing QR for $A = \\begin{pmatrix} 3 & 0 \\\\ 4 & 5 \\end{pmatrix}$, verify: (1) $Q^T Q = \\begin{pmatrix} 0.6 & 0.8 \\\\ -0.8 & 0.6 \\end{pmatrix} \\begin{pmatrix} 0.6 & -0.8 \\\\ 0.8 & 0.6 \\end{pmatrix} = \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix}$ ✓. (2) $QR = \\begin{pmatrix} 0.6 & -0.8 \\\\ 0.8 & 0.6 \\end{pmatrix} \\begin{pmatrix} 5 & 4 \\\\ 0 & 3 \\end{pmatrix} = \\begin{pmatrix} 3 & 0 \\\\ 4 & 5 \\end{pmatrix} = A$ ✓",
+          "Implementation structure: (1) Extract columns from row-major A. (2) Apply Gram-Schmidt to compute Q columns and R entries. (3) Convert column-format Q back to row-major. (4) Return (Q, R) as tuple of lists."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Matrix Multiplication for Verification",
+          "latex": "$(QR)_{ij} = \\sum_{k=1}^{n} Q_{ik} R_{kj}$",
+          "description": "Use this to verify that QR reconstructs A correctly"
+        },
+        {
+          "name": "Orthonormality Check",
+          "latex": "$(Q^T Q)_{ij} = \\sum_{k=1}^{m} Q_{ki} Q_{kj}$",
+          "description": "Should equal $\\delta_{ij}$ (1 if i=j, 0 otherwise) within numerical tolerance"
+        },
+        {
+          "name": "Frobenius Norm",
+          "latex": "$||A||_F = \\sqrt{\\sum_{i,j} A_{ij}^2}$",
+          "description": "Use to measure overall error in matrix equations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete QR decomposition function that matches the problem signature. It should take a matrix as list of lists, perform Gram-Schmidt orthogonalization, and return Q and R in the same format. This is the final integration of all previous sub-quests.",
+        "function_signature": "def qr_decomposition(A: list[list[float]]) -> tuple[list[list[float]], list[list[float]]]:",
+        "starter_code": "import numpy as np\n\ndef qr_decomposition(A: list[list[float]]) -> tuple[list[list[float]], list[list[float]]]:\n    \"\"\"\n    Perform QR decomposition using Gram-Schmidt process.\n    \n    Args:\n        A: An m x n matrix represented as list of lists (row-major)\n    \n    Returns:\n        Tuple of (Q, R) where Q is orthogonal and R is upper triangular\n        Both returned as list of lists in row-major format\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "qr_decomposition([[3, 0], [4, 5]])",
+            "expected": "(Q=[[0.6, -0.8], [0.8, 0.6]], R=[[5.0, 4.0], [0.0, 3.0]])",
+            "explanation": "Main problem example - verifies complete solution matches expected output"
+          },
+          {
+            "input": "qr_decomposition([[1, 1, 0], [1, 0, 1], [0, 1, 1]])",
+            "expected": "Valid Q (orthonormal columns) and R (upper triangular) such that A = QR",
+            "explanation": "3×3 case - tests scaling to larger matrices"
+          },
+          {
+            "input": "qr_decomposition([[12, -51, 4], [6, 167, -68], [-4, 24, -41]])",
+            "expected": "Valid Q and R matrices satisfying QR = A and Q^T Q = I",
+            "explanation": "Standard test matrix from numerical linear algebra literature"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the row-major to column-major conversion properly",
+        "Returning matrices in wrong format (columns instead of rows)",
+        "Not initializing R correctly with proper dimensions and zero lower triangle",
+        "Forgetting to handle edge cases (single column, square vs rectangular matrices)",
+        "Not using consistent indexing (mixing 0-based and 1-based)",
+        "Numerical instability from not handling near-zero norms"
+      ],
+      "hint": "Build upon your gram_schmidt_process from Step 5. The main additional work is: (1) Extract columns from the row-major input format. (2) Apply your existing Gram-Schmidt code. (3) Convert the Q columns back to row-major format. (4) Ensure R is formatted correctly as a row-major upper triangular matrix. Consider helper functions for matrix transpose and column extraction.",
+      "references": [
+        "QR decomposition algorithms",
+        "Gram-Schmidt orthogonalization",
+        "Matrix factorizations",
+        "Numerical linear algebra implementations",
+        "Modified Gram-Schmidt (for improved stability)"
+      ]
+    }
+  ]
+}

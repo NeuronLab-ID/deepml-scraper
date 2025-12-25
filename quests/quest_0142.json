@@ -1,0 +1,418 @@
+{
+  "problem_id": 142,
+  "title": "Gridworld Policy Evaluation",
+  "category": "Reinforcement Learning",
+  "difficulty": "medium",
+  "description": "Implement policy evaluation for a 5x5 gridworld. Given a policy (mapping each state to action probabilities), compute the state-value function $V(s)$ for each cell using the Bellman expectation equation. The agent can move up, down, left, or right, receiving a constant reward of -1 for each move. Terminal states (the four corners) are fixed at 0. Iterate until the largest change in $V$ is less than a given threshold. Only use Python built-ins and no external RL libraries.",
+  "example": {
+    "input": "policy = {(i, j): {'up': 0.25, 'down': 0.25, 'left': 0.25, 'right': 0.25} for i in range(5) for j in range(5)}\ngamma = 0.9\nthreshold = 0.001\nV = gridworld_policy_evaluation(policy, gamma, threshold)\nprint(round(V[2][2], 4))",
+    "output": "-7.0902",
+    "reasoning": "The policy is uniform (equal chance of each move). The agent receives -1 per step. After iterative updates, the center state value converges to about -7.09, and corners remain at 0."
+  },
+  "starter_code": "def gridworld_policy_evaluation(policy: dict, gamma: float, threshold: float) -> list[list[float]]:\n    \"\"\"\n    Evaluate state-value function for a policy on a 5x5 gridworld.\n    \n    Args:\n        policy: dict mapping (row, col) to action probability dicts\n        gamma: discount factor\n        threshold: convergence threshold\n    Returns:\n        5x5 list of floats\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Markov Decision Processes and the Bellman Expectation Equation",
+      "relation_to_problem": "The gridworld policy evaluation problem is fundamentally an MDP where we need to apply the Bellman expectation equation iteratively to compute state values under a given policy.",
+      "prerequisites": [
+        "Basic probability theory",
+        "Expected value",
+        "Linear algebra (vectors and matrices)"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of a Markov Decision Process (MDP)",
+        "Derive and interpret the Bellman expectation equation for policy evaluation",
+        "Apply the Bellman equation to compute state values for simple scenarios"
+      ],
+      "math_content": {
+        "definition": "A **Markov Decision Process (MDP)** is a tuple $(\\mathcal{S}, \\mathcal{A}, P, R, \\gamma)$ where: $\\mathcal{S}$ is a finite set of states, $\\mathcal{A}$ is a finite set of actions, $P: \\mathcal{S} \\times \\mathcal{A} \\times \\mathcal{S} \\to [0,1]$ is the state transition probability function where $P(s'|s,a)$ gives the probability of transitioning to state $s'$ from state $s$ after taking action $a$, $R: \\mathcal{S} \\times \\mathcal{A} \\times \\mathcal{S} \\to \\mathbb{R}$ is the reward function, and $\\gamma \\in [0,1]$ is the discount factor.",
+        "notation": "$V^\\pi(s)$ = state-value function under policy $\\pi$, representing the expected return starting from state $s$ and following policy $\\pi$. $\\pi(a|s)$ = probability of taking action $a$ in state $s$ under policy $\\pi$. $\\mathbb{E}_\\pi[\\cdot]$ = expectation under policy $\\pi$.",
+        "theorem": "**Bellman Expectation Equation**: For any policy $\\pi$ and state $s \\in \\mathcal{S}$, the state-value function satisfies: $$V^\\pi(s) = \\sum_{a \\in \\mathcal{A}} \\pi(a|s) \\sum_{s' \\in \\mathcal{S}} P(s'|s,a) \\left[R(s,a,s') + \\gamma V^\\pi(s')\\right]$$ This equation expresses the value of a state as the expected immediate reward plus the discounted value of successor states.",
+        "proof_sketch": "Start with the definition $V^\\pi(s) = \\mathbb{E}_\\pi[G_t | S_t = s]$ where $G_t = R_{t+1} + \\gamma R_{t+2} + \\gamma^2 R_{t+3} + \\cdots$ is the return. By the law of total expectation and the Markov property: $V^\\pi(s) = \\mathbb{E}_\\pi[R_{t+1} + \\gamma G_{t+1} | S_t = s] = \\sum_a \\pi(a|s) \\sum_{s'} P(s'|s,a)[R(s,a,s') + \\gamma \\mathbb{E}_\\pi[G_{t+1} | S_{t+1} = s']] = \\sum_a \\pi(a|s) \\sum_{s'} P(s'|s,a)[R(s,a,s') + \\gamma V^\\pi(s')]$.",
+        "examples": [
+          "**Example 1**: Consider a 2-state MDP with states $\\{s_1, s_2\\}$. Action $a$ transitions $s_1 \\to s_2$ with probability 1, receiving reward $r=1$. From $s_2$, the agent stays at $s_2$ with reward 0. Policy $\\pi$ always takes action $a$. With $\\gamma=0.9$: $V^\\pi(s_1) = 1 + 0.9 V^\\pi(s_2)$ and $V^\\pi(s_2) = 0 + 0.9 V^\\pi(s_2)$, giving $V^\\pi(s_2) = 0$ and $V^\\pi(s_1) = 1$.",
+          "**Example 2**: For a state with uniform random policy over 4 actions (up, down, left, right) each with probability 0.25, if all actions lead to different successor states with equal transition probability 1.0 and reward -1, the Bellman equation becomes: $V(s) = 0.25 \\times [(−1 + \\gamma V(s_{up})) + (−1 + \\gamma V(s_{down})) + (−1 + \\gamma V(s_{left})) + (−1 + \\gamma V(s_{right}))] = -1 + 0.25\\gamma[V(s_{up}) + V(s_{down}) + V(s_{left}) + V(s_{right})]$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Bellman Expectation Equation",
+          "latex": "$V^\\pi(s) = \\sum_{a} \\pi(a|s) \\sum_{s'} P(s'|s,a) [R(s,a,s') + \\gamma V^\\pi(s')]$",
+          "description": "Use this to express the value of any state as a function of successor state values"
+        },
+        {
+          "name": "Expected Return (Discounted)",
+          "latex": "$G_t = \\sum_{k=0}^{\\infty} \\gamma^k R_{t+k+1}$",
+          "description": "The cumulative discounted reward from time step t onwards"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes one Bellman update for a single state given its successor states' values. This is the core operation needed for policy evaluation. Given a state's action probabilities, successor states with their transition probabilities, rewards, and current values, compute the new value estimate.",
+        "function_signature": "def bellman_update(action_probs: dict, transitions: dict, gamma: float) -> float:",
+        "starter_code": "def bellman_update(action_probs: dict, transitions: dict, gamma: float) -> float:\n    \"\"\"\n    Compute one Bellman update for a state.\n    \n    Args:\n        action_probs: dict mapping action name to probability, e.g., {'up': 0.25, 'down': 0.25, ...}\n        transitions: dict mapping action to list of (next_state_value, reward, transition_prob) tuples\n                     e.g., {'up': [(v_next, reward, prob)], ...}\n        gamma: discount factor\n    \n    Returns:\n        Updated state value (float)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "bellman_update({'a1': 1.0}, {'a1': [(0.0, 1.0, 1.0)]}, 0.9)",
+            "expected": "1.0",
+            "explanation": "Deterministic action a1 with probability 1.0, leads to state with value 0, reward 1.0. Result: 1.0 * (1.0 + 0.9 * 0.0) = 1.0"
+          },
+          {
+            "input": "bellman_update({'up': 0.5, 'down': 0.5}, {'up': [(2.0, -1.0, 1.0)], 'down': [(3.0, -1.0, 1.0)]}, 0.9)",
+            "expected": "1.25",
+            "explanation": "Two actions with equal probability 0.5. Up: -1 + 0.9*2 = 0.8. Down: -1 + 0.9*3 = 1.7. Result: 0.5*0.8 + 0.5*1.7 = 1.25"
+          },
+          {
+            "input": "bellman_update({'left': 0.25, 'right': 0.25, 'up': 0.25, 'down': 0.25}, {'left': [(5.0, -1.0, 1.0)], 'right': [(5.0, -1.0, 1.0)], 'up': [(5.0, -1.0, 1.0)], 'down': [(5.0, -1.0, 1.0)]}, 0.9)",
+            "expected": "3.5",
+            "explanation": "Uniform policy over 4 actions, all lead to states with value 5.0, reward -1. Each action gives: -1 + 0.9*5 = 3.5. Result: 0.25*3.5*4 = 3.5"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to multiply by both the policy probability π(a|s) AND the transition probability P(s'|s,a)",
+        "Not including the immediate reward R(s,a,s') before adding the discounted future value",
+        "Confusing the discount factor γ with the policy probabilities",
+        "Applying the discount factor to the immediate reward (the reward is NOT discounted)"
+      ],
+      "hint": "The Bellman update is a weighted average over actions (weighted by policy probabilities), where each action's contribution is itself a weighted average over possible successor states (weighted by transition probabilities). Structure your code with nested loops or comprehensions.",
+      "references": [
+        "Sutton & Barto Chapter 3: Finite Markov Decision Processes",
+        "Bellman equations and dynamic programming",
+        "Markov property and state-value functions"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Deterministic Gridworld Dynamics and State Transitions",
+      "relation_to_problem": "Understanding how to model gridworld state transitions and boundary conditions is essential for implementing the transition dynamics P(s'|s,a) needed in the Bellman equation for the main problem.",
+      "prerequisites": [
+        "Coordinate systems",
+        "Basic control flow (conditionals)",
+        "Understanding of grid-based environments"
+      ],
+      "learning_objectives": [
+        "Model gridworld state transitions as a deterministic MDP",
+        "Implement boundary handling and wall collision logic",
+        "Compute successor states for gridworld actions"
+      ],
+      "math_content": {
+        "definition": "A **Gridworld** is a discrete MDP where states are cells in a 2D grid, typically represented as coordinates $(i, j)$ where $i \\in \\{0, 1, ..., H-1\\}$ is the row and $j \\in \\{0, 1, ..., W-1\\}$ is the column. The state space is $\\mathcal{S} = \\{(i,j) : 0 \\leq i < H, 0 \\leq j < W\\}$. Actions $\\mathcal{A} = \\{\\text{up}, \\text{down}, \\text{left}, \\text{right}\\}$ move the agent to adjacent cells.",
+        "notation": "$s = (i, j)$ = current state (grid cell). $s' = T(s, a)$ = successor state after taking action $a$ from state $s$. $\\mathcal{B}$ = set of boundary cells where $i=0$ or $i=H-1$ or $j=0$ or $j=W-1$. $\\mathcal{T} \\subseteq \\mathcal{S}$ = set of terminal states.",
+        "theorem": "**Deterministic Gridworld Transition Function**: For a gridworld without walls, the transition function $T: \\mathcal{S} \\times \\mathcal{A} \\to \\mathcal{S}$ is: $$T((i,j), a) = \\begin{cases} (\\max(0, i-1), j) & \\text{if } a = \\text{up} \\\\ (\\min(H-1, i+1), j) & \\text{if } a = \\text{down} \\\\ (i, \\max(0, j-1)) & \\text{if } a = \\text{left} \\\\ (i, \\min(W-1, j+1)) & \\text{if } a = \\text{right} \\end{cases}$$ At boundaries, the agent remains in the current cell if the action would move it out of bounds. For terminal states $s \\in \\mathcal{T}$, we have $T(s, a) = s$ for all actions $a$.",
+        "proof_sketch": "The determinism follows from the problem specification: each action deterministically attempts to move in one direction. The $\\max$ and $\\min$ operations enforce boundary constraints: $\\max(0, i-1)$ ensures the row doesn't go below 0 when moving up, and $\\min(H-1, i+1)$ ensures it doesn't exceed $H-1$ when moving down. Similar logic applies to columns. This makes $P(s'|s,a) = 1$ if $s' = T(s,a)$ and $P(s'|s,a) = 0$ otherwise, satisfying the probability axioms.",
+        "examples": [
+          "**Example 1**: In a 5×5 grid (indices 0-4), from state $(2, 2)$: up → $(1, 2)$, down → $(3, 2)$, left → $(2, 1)$, right → $(2, 3)$. All transitions are valid since we're not at boundaries.",
+          "**Example 2**: From boundary state $(0, 3)$ (top row): up → $(0, 3)$ (stays put), down → $(1, 3)$, left → $(0, 2)$, right → $(0, 4)$. The up action hits the boundary.",
+          "**Example 3**: From corner state $(0, 0)$: up → $(0, 0)$, down → $(1, 0)$, left → $(0, 0)$, right → $(0, 1)$. Two actions (up and left) result in staying at the same state."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Row Update for Vertical Actions",
+          "latex": "$i' = \\begin{cases} \\max(0, i-1) & \\text{if up} \\\\ \\min(H-1, i+1) & \\text{if down} \\\\ i & \\text{otherwise} \\end{cases}$",
+          "description": "Compute new row coordinate with boundary enforcement"
+        },
+        {
+          "name": "Column Update for Horizontal Actions",
+          "latex": "$j' = \\begin{cases} \\max(0, j-1) & \\text{if left} \\\\ \\min(W-1, j+1) & \\text{if right} \\\\ j & \\text{otherwise} \\end{cases}$",
+          "description": "Compute new column coordinate with boundary enforcement"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the next state for a gridworld given a current state and action. The grid is 5×5 with coordinates (row, col) where both range from 0 to 4. Handle boundary conditions by keeping the agent in bounds (if an action would move out of bounds, the agent stays in the current state). This function encodes the deterministic transition dynamics T(s,a).",
+        "function_signature": "def get_next_state(state: tuple, action: str, grid_size: int = 5) -> tuple:",
+        "starter_code": "def get_next_state(state: tuple, action: str, grid_size: int = 5) -> tuple:\n    \"\"\"\n    Compute next state in a gridworld.\n    \n    Args:\n        state: (row, col) tuple representing current position\n        action: one of 'up', 'down', 'left', 'right'\n        grid_size: dimension of the square grid (default 5 for 5x5)\n    \n    Returns:\n        (row, col) tuple representing next state\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "get_next_state((2, 2), 'up')",
+            "expected": "(1, 2)",
+            "explanation": "From center of grid, moving up decreases row by 1"
+          },
+          {
+            "input": "get_next_state((0, 0), 'up')",
+            "expected": "(0, 0)",
+            "explanation": "At top-left corner, moving up hits boundary and agent stays in place"
+          },
+          {
+            "input": "get_next_state((4, 4), 'right')",
+            "expected": "(4, 4)",
+            "explanation": "At bottom-right corner, moving right hits boundary and agent stays"
+          },
+          {
+            "input": "get_next_state((1, 3), 'down')",
+            "expected": "(2, 3)",
+            "explanation": "Moving down from (1,3) increases row by 1 to (2,3)"
+          },
+          {
+            "input": "get_next_state((2, 0), 'left')",
+            "expected": "(2, 0)",
+            "explanation": "At left boundary, moving left keeps agent at same position"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using 1-indexed coordinates instead of 0-indexed (grid goes from 0 to grid_size-1, not 1 to grid_size)",
+        "Confusing row and column order in tuples (row is vertical position, column is horizontal)",
+        "Inverting the direction logic (e.g., making 'up' increase row instead of decrease)",
+        "Forgetting to enforce boundaries with min/max operations, causing out-of-bounds states",
+        "Not handling the case where action doesn't change state (boundary collision)"
+      ],
+      "hint": "Use conditional logic to determine the row and column changes based on the action, then apply min() and max() operations to ensure the result stays within [0, grid_size-1] for both coordinates.",
+      "references": [
+        "Grid-based MDPs",
+        "Deterministic transition functions",
+        "Boundary condition handling in discrete domains"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Terminal States and Reward Functions in MDPs",
+      "relation_to_problem": "The gridworld problem specifies terminal states (four corners) that must have fixed values of 0. Understanding how to handle terminal states in the Bellman equation and model constant step rewards is crucial for correct policy evaluation.",
+      "prerequisites": [
+        "MDP fundamentals",
+        "Bellman expectation equation",
+        "Gridworld state representation"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical role of terminal states in value functions",
+        "Implement terminal state detection logic",
+        "Model constant reward functions correctly in the Bellman update"
+      ],
+      "math_content": {
+        "definition": "A **terminal state** $s_T \\in \\mathcal{T} \\subseteq \\mathcal{S}$ is an absorbing state where the episode ends. Formally, for all actions $a$: $P(s_T | s_T, a) = 1$ (the state transitions to itself) and $R(s_T, a, s_T) = 0$ (no further rewards). The value function satisfies $V^\\pi(s_T) = 0$ for all policies $\\pi$, since there are no future rewards from a terminal state.",
+        "notation": "$\\mathcal{T}$ = set of terminal states. $\\mathbb{1}_{\\mathcal{T}}(s) = \\begin{cases} 1 & \\text{if } s \\in \\mathcal{T} \\\\ 0 & \\text{otherwise} \\end{cases}$ = indicator function for terminal states. $r$ = constant step reward (scalar).",
+        "theorem": "**Modified Bellman Equation with Terminal States**: The Bellman expectation equation for non-terminal states is: $$V^\\pi(s) = \\begin{cases} 0 & \\text{if } s \\in \\mathcal{T} \\\\ \\sum_{a} \\pi(a|s) \\sum_{s'} P(s'|s,a) [R(s,a,s') + \\gamma V^\\pi(s')] & \\text{if } s \\notin \\mathcal{T} \\end{cases}$$ For constant reward $r$ per step: $R(s, a, s') = r$ for all non-terminal $s$. Terminal states don't require updates as their value is fixed.",
+        "proof_sketch": "From a terminal state $s_T$, the return is $G_t = 0$ since no more rewards are collected after termination. Therefore $V^\\pi(s_T) = \\mathbb{E}_\\pi[G_t | S_t = s_T] = \\mathbb{E}_\\pi[0] = 0$. For the absorbing property, since $P(s_T|s_T, a) = 1$ and $R(s_T, a, s_T) = 0$, even if we apply the Bellman equation: $V^\\pi(s_T) = \\sum_a \\pi(a|s_T) [0 + \\gamma \\cdot 0] = 0$, which is consistent. For constant reward environments, $R(s,a,s')$ is independent of $s, a, s'$ (as long as $s \\notin \\mathcal{T}$), simplifying computation.",
+        "examples": [
+          "**Example 1**: In a 5×5 gridworld where corners $(0,0), (0,4), (4,0), (4,4)$ are terminal, these four states always have $V(s_T) = 0$ regardless of policy or iteration.",
+          "**Example 2**: With constant reward $r=-1$ per step and $\\gamma=0.9$, if state $(1,1)$ can transition to $(0,1)$ (non-terminal, value 2.0) or $(0,0)$ (terminal) with equal probability under the policy, the value update for action 'up' (assuming it leads to this distribution) would be: $0.5 \\times (-1 + 0.9 \\times 2.0) + 0.5 \\times (-1 + 0.9 \\times 0) = 0.5 \\times 0.8 + 0.5 \\times (-1) = -0.1$.",
+          "**Example 3**: A state adjacent to a corner with uniform random policy: if 1 of 4 actions leads to a terminal state, that action contributes $0.25 \\times (r + \\gamma \\times 0) = 0.25r$ to the total value, while other actions contribute based on their non-terminal successors."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Terminal State Value",
+          "latex": "$V^\\pi(s_T) = 0 \\text{ for all } s_T \\in \\mathcal{T}$",
+          "description": "Terminal states have zero value by definition"
+        },
+        {
+          "name": "Constant Reward Bellman Update",
+          "latex": "$V^\\pi(s) = \\sum_{a} \\pi(a|s) \\sum_{s'} P(s'|s,a) [r + \\gamma V^\\pi(s')]$",
+          "description": "When reward is constant r for all transitions from non-terminal states"
+        },
+        {
+          "name": "Terminal State Check",
+          "latex": "$V_{k+1}(s) = \\mathbb{1}_{\\mathcal{S} \\setminus \\mathcal{T}}(s) \\cdot \\sum_{a} \\pi(a|s) \\sum_{s'} P(s'|s,a) [r + \\gamma V_k(s')]$",
+          "description": "Updates only applied to non-terminal states; indicator function zeros out terminal state updates"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs Bellman updates for a gridworld with terminal states and constant rewards. Given a 2D grid of current values, a policy dictionary, and parameters (gamma, reward), compute the updated values for all states. Terminal states (the four corners of a 5×5 grid) must remain at 0. Use deterministic transitions based on the gridworld dynamics from the previous sub-quest.",
+        "function_signature": "def update_values_with_terminals(values: list, policy: dict, gamma: float, reward: float) -> list:",
+        "starter_code": "def update_values_with_terminals(values: list, policy: dict, gamma: float, reward: float) -> list:\n    \"\"\"\n    Perform one Bellman update sweep for all states in a 5x5 gridworld.\n    \n    Args:\n        values: 5x5 nested list of current value estimates\n        policy: dict mapping (row, col) to action probability dict\n                e.g., {(0,1): {'up': 0.25, 'down': 0.25, 'left': 0.25, 'right': 0.25}}\n        gamma: discount factor\n        reward: constant step reward (typically negative)\n    \n    Returns:\n        5x5 nested list of updated values\n    \n    Note: Terminal states are (0,0), (0,4), (4,0), (4,4) and must remain 0\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "update_values_with_terminals([[0]*5 for _ in range(5)], {(i,j): {'up': 0.25, 'down': 0.25, 'left': 0.25, 'right': 0.25} for i in range(5) for j in range(5)}, 0.9, -1)[0][0]",
+            "expected": "0.0",
+            "explanation": "Terminal state (0,0) remains at 0 regardless of policy or neighbors"
+          },
+          {
+            "input": "update_values_with_terminals([[0]*5 for _ in range(5)], {(i,j): {'up': 0.25, 'down': 0.25, 'left': 0.25, 'right': 0.25} for i in range(5) for j in range(5)}, 0.9, -1)[0][1]",
+            "expected": "-1.0",
+            "explanation": "State (0,1) is non-terminal, neighbors all have value 0, so update gives: 0.25*4*(-1 + 0.9*0) = -1.0"
+          },
+          {
+            "input": "update_values_with_terminals([[i*0.5 for i in range(5)] for _ in range(5)], {(2,2): {'up': 1.0, 'down': 0.0, 'left': 0.0, 'right': 0.0}}, 0.5, -2.0, (2,2))",
+            "expected": "-1.0",
+            "explanation": "Deterministic up action from (2,2) goes to (1,2) with value 1.0. Update: 1.0*(-2.0 + 0.5*1.0) = -1.5. Wait, let me recalculate: -2.0 + 0.5*1.0 = -1.5"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Updating terminal state values instead of keeping them fixed at 0",
+        "Forgetting to add the reward r before the discounted successor value",
+        "Not initializing terminal states to 0 in the first place",
+        "Applying the discount factor to the reward (reward is immediate, not discounted)",
+        "Using the updated values during the sweep instead of the values from the previous iteration (should update all states based on old values simultaneously)"
+      ],
+      "hint": "First create a new grid to store updated values. For each state, check if it's terminal (one of the four corners). If terminal, set value to 0. Otherwise, iterate over all actions in the policy, compute the next state for each action, and apply the Bellman equation with constant reward.",
+      "references": [
+        "Terminal states in episodic MDPs",
+        "Absorbing states",
+        "Synchronous vs. asynchronous value updates",
+        "In-place vs. two-array value iteration"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Iterative Policy Evaluation and Convergence",
+      "relation_to_problem": "The main problem requires iterating the Bellman updates until convergence (when the maximum change is below a threshold). Understanding convergence criteria and iterative algorithms is essential for implementing the full policy evaluation algorithm.",
+      "prerequisites": [
+        "Bellman expectation equation",
+        "Fixed-point iteration",
+        "Convergence criteria in numerical methods"
+      ],
+      "learning_objectives": [
+        "Understand the convergence theory of iterative policy evaluation",
+        "Implement convergence checking with threshold-based stopping",
+        "Apply synchronous value updates across all states"
+      ],
+      "math_content": {
+        "definition": "**Iterative Policy Evaluation** is an algorithm that computes $V^\\pi$ by repeatedly applying the Bellman expectation equation as an update rule. Starting from an arbitrary initial value function $V_0$, we generate a sequence $\\{V_k\\}_{k=0}^{\\infty}$ where: $$V_{k+1}(s) = \\sum_{a} \\pi(a|s) \\sum_{s'} P(s'|s,a) [R(s,a,s') + \\gamma V_k(s')]$$ for all $s \\in \\mathcal{S}$. This is a **synchronous** update where all states are updated simultaneously using values from iteration $k$ to produce iteration $k+1$.",
+        "notation": "$V_k$ = value function estimate at iteration $k$. $\\delta_k = \\max_{s \\in \\mathcal{S}} |V_{k+1}(s) - V_k(s)|$ = maximum change in value across all states in iteration $k$. $\\theta$ = convergence threshold (stopping criterion). $V^*$ or $V^\\pi$ = true value function (fixed point of the Bellman operator).",
+        "theorem": "**Convergence of Iterative Policy Evaluation (Contraction Mapping Theorem)**: Define the Bellman operator $\\mathcal{T}^\\pi: \\mathbb{R}^{|\\mathcal{S}|} \\to \\mathbb{R}^{|\\mathcal{S}|}$ by $(\\mathcal{T}^\\pi V)(s) = \\sum_a \\pi(a|s) \\sum_{s'} P(s'|s,a)[R(s,a,s') + \\gamma V(s')]$. This operator is a $\\gamma$-contraction in the max-norm: $\\|\\mathcal{T}^\\pi V - \\mathcal{T}^\\pi U\\|_{\\infty} \\leq \\gamma \\|V - U\\|_{\\infty}$ for any value functions $V, U$. By the Banach fixed-point theorem, $\\mathcal{T}^\\pi$ has a unique fixed point $V^\\pi$, and the sequence $V_{k+1} = \\mathcal{T}^\\pi V_k$ converges to $V^\\pi$ at a geometric rate: $\\|V_k - V^\\pi\\|_{\\infty} \\leq \\gamma^k \\|V_0 - V^\\pi\\|_{\\infty}$.",
+        "proof_sketch": "To show $\\mathcal{T}^\\pi$ is a contraction: Let $V, U$ be arbitrary value functions. Then $|(\\mathcal{T}^\\pi V)(s) - (\\mathcal{T}^\\pi U)(s)| = |\\sum_a \\pi(a|s) \\sum_{s'} P(s'|s,a) \\gamma [V(s') - U(s')]| \\leq \\sum_a \\pi(a|s) \\sum_{s'} P(s'|s,a) \\gamma |V(s') - U(s')| \\leq \\gamma \\max_{s'} |V(s') - U(s')| = \\gamma \\|V - U\\|_{\\infty}$. The inequality uses the triangle inequality and the fact that $\\sum_a \\pi(a|s) \\sum_{s'} P(s'|s,a) = 1$. Since $\\gamma < 1$, $\\mathcal{T}^\\pi$ is a contraction, guaranteeing unique fixed point and convergence.",
+        "examples": [
+          "**Example 1**: With $\\gamma = 0.9$, the error decreases by at least factor 0.9 each iteration. If initial error is 100, after 10 iterations the error is at most $100 \\times 0.9^{10} \\approx 34.87$, after 20 iterations $\\approx 12.16$, after 50 iterations $\\approx 0.515$.",
+          "**Example 2**: To guarantee error $\\epsilon = 0.001$, starting from $\\|V_0 - V^\\pi\\|_{\\infty} = M$, we need $k$ such that $M \\gamma^k \\leq 0.001$, giving $k \\geq \\frac{\\log(0.001/M)}{\\log(\\gamma)}$. For $M=10, \\gamma=0.9$: $k \\geq \\frac{\\log(0.0001)}{\\log(0.9)} \\approx 87.4$, so at least 88 iterations.",
+          "**Example 3**: The stopping criterion $\\delta_k = \\max_s |V_{k+1}(s) - V_k(s)| < \\theta$ ensures that the algorithm stops when changes are small. If we want the final estimate to be within $\\epsilon$ of the true value, we can use $\\theta = \\epsilon(1-\\gamma)/(2\\gamma)$ derived from error bounds."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Synchronous Value Update",
+          "latex": "$V_{k+1}(s) = \\sum_{a} \\pi(a|s) \\sum_{s'} P(s'|s,a) [R(s,a,s') + \\gamma V_k(s')]$",
+          "description": "Update all states using values from previous iteration k"
+        },
+        {
+          "name": "Maximum Change (Delta)",
+          "latex": "$\\delta_k = \\max_{s \\in \\mathcal{S}} |V_{k+1}(s) - V_k(s)|$",
+          "description": "Largest absolute value change across all states; use for convergence check"
+        },
+        {
+          "name": "Convergence Criterion",
+          "latex": "$\\delta_k < \\theta \\implies \\text{stop iteration}$",
+          "description": "Algorithm terminates when maximum change falls below threshold θ"
+        },
+        {
+          "name": "Error Bound After k Iterations",
+          "latex": "$\\|V_k - V^\\pi\\|_{\\infty} \\leq \\gamma^k \\|V_0 - V^\\pi\\|_{\\infty}$",
+          "description": "Theoretical bound on approximation error after k iterations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement an iterative policy evaluation algorithm for a simple 3×3 gridworld with one terminal state at (1,1). Initialize all values to 0, and repeatedly apply Bellman updates until the maximum absolute change in any state value is below the threshold. Return both the final value function and the number of iterations required. This builds the iteration control logic needed for the full problem.",
+        "function_signature": "def iterative_policy_eval_simple(policy: dict, gamma: float, reward: float, threshold: float) -> tuple:",
+        "starter_code": "def iterative_policy_eval_simple(policy: dict, gamma: float, reward: float, threshold: float) -> tuple:\n    \"\"\"\n    Perform iterative policy evaluation on a 3x3 gridworld.\n    \n    Args:\n        policy: dict mapping (row, col) to action probability dict\n        gamma: discount factor\n        reward: constant step reward\n        threshold: convergence threshold (stop when max change < threshold)\n    \n    Returns:\n        tuple of (values, num_iterations) where:\n            - values is a 3x3 nested list of final state values\n            - num_iterations is the number of iterations performed\n    \n    Note: Terminal state is (1,1) (center) and must remain 0\n          Grid is 3x3 with coordinates (0,0) to (2,2)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "values, iters = iterative_policy_eval_simple({(i,j): {'up': 0.25, 'down': 0.25, 'left': 0.25, 'right': 0.25} for i in range(3) for j in range(3)}, 0.9, -1.0, 0.01); (round(values[0][0], 2), iters > 0)",
+            "expected": "(-3.31, True)",
+            "explanation": "Uniform random policy, center is terminal. Corner states have negative values due to -1 step cost. Algorithm should converge in multiple iterations."
+          },
+          {
+            "input": "values, iters = iterative_policy_eval_simple({(i,j): {'up': 0.25, 'down': 0.25, 'left': 0.25, 'right': 0.25} for i in range(3) for j in range(3)}, 0.5, -1.0, 0.001); values[1][1]",
+            "expected": "0.0",
+            "explanation": "Terminal state (1,1) must remain 0 throughout all iterations regardless of parameters"
+          },
+          {
+            "input": "values, iters = iterative_policy_eval_simple({(i,j): {'up': 0.25, 'down': 0.25, 'left': 0.25, 'right': 0.25} for i in range(3) for j in range(3)}, 0.9, -1.0, 1.0); iters",
+            "expected": "1",
+            "explanation": "With a very loose threshold (1.0), convergence happens quickly, possibly after just 1 iteration"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using in-place updates (modifying values during the sweep) instead of synchronous updates (using previous iteration's values)",
+        "Not properly tracking the maximum change delta across all states",
+        "Checking convergence before completing a full sweep of all states",
+        "Counting iterations incorrectly (should count each full sweep)",
+        "Not handling terminal states correctly in the iteration (they should not contribute to delta)",
+        "Stopping after a fixed number of iterations instead of checking the convergence criterion"
+      ],
+      "hint": "Use a while loop that continues until delta < threshold. In each iteration: (1) create a new grid for updated values, (2) sweep through all states and apply Bellman update, (3) compute the maximum absolute difference between new and old values, (4) replace old values with new values. Remember to skip updates for terminal states but they can still be used in computing neighbors' values.",
+      "references": [
+        "Contraction mapping theorem",
+        "Banach fixed-point theorem",
+        "Dynamic programming and value iteration",
+        "Sutton & Barto Chapter 4: Dynamic Programming"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Structured Implementation of Complete Policy Evaluation",
+      "relation_to_problem": "This sub-quest integrates all previous concepts into a complete, structured implementation approach for gridworld policy evaluation with multiple terminal states, preparing you to solve the main problem efficiently.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Understanding of 2D array manipulation in Python",
+        "Function decomposition and modularity"
+      ],
+      "learning_objectives": [
+        "Integrate Bellman updates, transition dynamics, terminal states, and iteration control into a cohesive algorithm",
+        "Structure code for clarity and correctness using helper functions",
+        "Verify correctness through systematic testing with known cases"
+      ],
+      "math_content": {
+        "definition": "**Complete Policy Evaluation Algorithm**: Given an MDP $(\\mathcal{S}, \\mathcal{A}, P, R, \\gamma)$, a policy $\\pi$, terminal states $\\mathcal{T}$, and convergence threshold $\\theta$, the algorithm computes $V^\\pi$ through the following procedure: (1) Initialize $V_0(s) = 0$ for all $s \\in \\mathcal{S}$. (2) Repeat until convergence: (a) $\\delta \\leftarrow 0$, (b) For each $s \\in \\mathcal{S} \\setminus \\mathcal{T}$: $v \\leftarrow V(s)$, $V(s) \\leftarrow \\sum_a \\pi(a|s) \\sum_{s'} P(s'|s,a)[R(s,a,s') + \\gamma V(s')]$, $\\delta \\leftarrow \\max(\\delta, |v - V(s)|)$. (c) If $\\delta < \\theta$, terminate and return $V$.",
+        "notation": "$N \\times N$ = grid dimensions. $\\mathcal{A} = \\{\\text{up, down, left, right}\\}$ = action set. $\\pi: \\mathcal{S} \\times \\mathcal{A} \\to [0,1]$ = stochastic policy. $V: \\mathcal{S} \\to \\mathbb{R}$ = value function represented as $N \\times N$ matrix. $\\delta_k$ = maximum value change in iteration $k$.",
+        "theorem": "**Correctness of Gridworld Policy Evaluation**: For a finite gridworld MDP with deterministic transitions, constant reward $r$, discount factor $\\gamma \\in [0,1)$, and any policy $\\pi$, the iterative policy evaluation algorithm converges to the unique solution $V^\\pi$ of the system of linear equations: $$V^\\pi(s) = \\sum_{a} \\pi(a|s) [r + \\gamma V^\\pi(T(s,a))] \\quad \\forall s \\in \\mathcal{S} \\setminus \\mathcal{T}$$ $$V^\\pi(s) = 0 \\quad \\forall s \\in \\mathcal{T}$$ where $T(s,a)$ is the deterministic transition function. The algorithm terminates in finite time for any $\\theta > 0$.",
+        "proof_sketch": "The system of equations is equivalent to the Bellman expectation equation for all states. For a finite state space with $|\\mathcal{S}| = n$, this is a system of $n$ linear equations in $n$ unknowns. The matrix form is $V = r\\mathbb{1} + \\gamma P^\\pi V$ where $P^\\pi$ is the transition matrix under policy $\\pi$. This can be rewritten as $(I - \\gamma P^\\pi)V = r\\mathbb{1}$. Since $\\gamma < 1$ and $P^\\pi$ is a stochastic matrix, $(I - \\gamma P^\\pi)$ is invertible, guaranteeing a unique solution. The iterative method converges because the Bellman operator is a contraction (proven in sub-quest 4). Finite termination follows because the error decreases geometrically and we stop when $\\delta_k < \\theta$.",
+        "examples": [
+          "**Example 1**: For a 5×5 gridworld with uniform random policy, $\\gamma=0.9$, $r=-1$, and terminal corners, the center state (2,2) converges to approximately -7.09. This can be verified: the center is equidistant from all corners, requiring multiple steps to reach any terminal state, accumulating rewards of -1 per step discounted by $\\gamma$.",
+          "**Example 2**: States adjacent to terminal states have higher (less negative) values than states far from terminals. For example, state (0,1) next to corner (0,0) might have value around -2 to -3, while center (2,2) has value around -7, reflecting that it takes fewer steps on average to reach termination from border states.",
+          "**Example 3**: The number of iterations required depends on $\\theta$ and $\\gamma$. With $\\gamma=0.9$ and $\\theta=0.001$, typical convergence occurs in 50-100 iterations. With $\\gamma=0.99$ (more future-looking), convergence takes longer (hundreds of iterations) because the contraction factor is closer to 1."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Bellman Update for Gridworld",
+          "latex": "$V_{k+1}(i,j) = \\begin{cases} 0 & \\text{if } (i,j) \\in \\mathcal{T} \\\\ \\sum_{a \\in \\mathcal{A}} \\pi(a|(i,j)) [r + \\gamma V_k(T((i,j), a))] & \\text{otherwise} \\end{cases}$",
+          "description": "Full update equation combining terminals, constant reward, and deterministic transitions"
+        },
+        {
+          "name": "Policy Probability Extraction",
+          "latex": "$\\pi(a|s) = \\text{policy}[s][a]$",
+          "description": "Extract action probability from policy dictionary structure"
+        },
+        {
+          "name": "Value Function as Matrix",
+          "latex": "$V \\in \\mathbb{R}^{N \\times N}, \\quad V[i][j] = V((i,j))$",
+          "description": "Value function represented as 2D array indexed by grid coordinates"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a modular policy evaluation system for a 4×4 gridworld with terminal states at the four corners. Break your solution into helper functions: one for checking if a state is terminal, one for getting next state given action (handling boundaries), one for computing a single Bellman update for a non-terminal state, and a main function that orchestrates the iterative evaluation. Return the final value function as a 4×4 nested list.",
+        "function_signature": "def policy_evaluation_4x4(policy: dict, gamma: float, reward: float, threshold: float) -> list:",
+        "starter_code": "def policy_evaluation_4x4(policy: dict, gamma: float, reward: float, threshold: float) -> list:\n    \"\"\"\n    Complete policy evaluation for 4x4 gridworld.\n    \n    Args:\n        policy: dict mapping (row, col) to action probability dict\n                e.g., {(0,1): {'up': 0.25, 'down': 0.25, 'left': 0.25, 'right': 0.25}}\n        gamma: discount factor (0 <= gamma < 1)\n        reward: constant step reward (typically negative)\n        threshold: convergence threshold for stopping\n    \n    Returns:\n        4x4 nested list of final state values\n    \n    Note: Terminal states are four corners: (0,0), (0,3), (3,0), (3,3)\n          Use helper functions for clarity\n    \"\"\"\n    # Your code here\n    # Suggested structure:\n    # - def is_terminal(state, size): ...\n    # - def get_next_state(state, action, size): ...\n    # - def compute_bellman_update(state, values, policy, gamma, reward, size): ...\n    # - main iteration loop\n    pass",
+        "test_cases": [
+          {
+            "input": "v = policy_evaluation_4x4({(i,j): {'up': 0.25, 'down': 0.25, 'left': 0.25, 'right': 0.25} for i in range(4) for j in range(4)}, 0.9, -1.0, 0.01); v[0][0]",
+            "expected": "0.0",
+            "explanation": "Corner (0,0) is terminal and must remain 0"
+          },
+          {
+            "input": "v = policy_evaluation_4x4({(i,j): {'up': 0.25, 'down': 0.25, 'left': 0.25, 'right': 0.25} for i in range(4) for j in range(4)}, 0.9, -1.0, 0.01); v[3][3]",
+            "expected": "0.0",
+            "explanation": "Corner (3,3) is terminal and must remain 0"
+          },
+          {
+            "input": "v = policy_evaluation_4x4({(i,j): {'up': 0.25, 'down': 0.25, 'left': 0.25, 'right': 0.25} for i in range(4) for j in range(4)}, 0.9, -1.0, 0.01); -6.0 < v[1][1] < -4.0",
+            "expected": "True",
+            "explanation": "State (1,1) near top-left corner should have negative value in range [-6, -4] due to step costs and proximity to terminal"
+          },
+          {
+            "input": "v = policy_evaluation_4x4({(i,j): {'up': 0.25, 'down': 0.25, 'left': 0.25, 'right': 0.25} for i in range(4) for j in range(4)}, 0.5, -1.0, 0.01); all(v[i][j] <= 0 for i in range(4) for j in range(4))",
+            "expected": "True",
+            "explanation": "With negative rewards and terminal states at 0, all state values should be non-positive"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not properly structuring code with helper functions, leading to complex nested loops that are hard to debug",
+        "Mixing up row/column indexing when accessing the 2D value array",
+        "Modifying the values array during iteration instead of creating a new array for updates",
+        "Forgetting to handle all four terminal states (checking only some corners)",
+        "Not implementing boundary checking in the transition function, leading to index errors",
+        "Hardcoding the grid size instead of parameterizing it for reusability"
+      ],
+      "hint": "Start by writing and testing each helper function independently. The is_terminal function should check if a state is one of the four corners. The get_next_state function should handle actions and boundaries (reuse logic from sub-quest 2). The compute_bellman_update function should loop over actions, get next states, and sum weighted values. Finally, the main loop should create new value arrays, compute delta, and check convergence.",
+      "references": [
+        "Software engineering best practices for numerical algorithms",
+        "Modular design in dynamic programming",
+        "Testing strategies for iterative algorithms",
+        "Sutton & Barto Section 4.1: Policy Evaluation"
+      ]
+    }
+  ]
+}

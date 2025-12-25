@@ -1,0 +1,35 @@
+{
+  "description": "SW1wbGVtZW50IHRoZSBOb2lzeSBUb3AtSyBnYXRpbmcgbWVjaGFuaXNtIHVzZWQgaW4gTWl4dHVyZS1vZi1FeHBlcnRzIChNb0UpIG1vZGVscy4gR2l2ZW4gYW4gaW5wdXQgbWF0cml4LCB3ZWlnaHQgbWF0cmljZXMsIHByZS1zYW1wbGVkIG5vaXNlLCBhbmQgYSBzcGFyc2l0eSBjb25zdHJhaW50IGssIGNvbXB1dGUgdGhlIGZpbmFsIGdhdGluZyBwcm9iYWJpbGl0aWVzIG1hdHJpeC4=",
+  "id": "124",
+  "test_cases": [
+    {
+      "test": "import numpy as np\nnp.random.seed(0)\nX = np.array([[1.0, 2.0]])\nW_g = np.array([[1.0, 0.0], [0.0, 1.0]])\nW_noise = np.zeros((2,2))\nN = np.zeros((1,2))\nprint(noisy_topk_gating(X, W_g, W_noise, N, k=1))",
+      "expected_output": "[[0. 1.]]"
+    },
+    {
+      "test": "import numpy as np\nX = np.array([[1.0, 2.0]])\nW_g = np.array([[1.0, 0.0], [0.0, 1.0]])\nW_noise = np.array([[0.5, 0.5], [0.5, 0.5]])\nN = np.array([[1.0, -1.0]])\nprint(np.round(noisy_topk_gating(X, W_g, W_noise, N, k=2), 4))",
+      "expected_output": "[[0.917, 0.083]]"
+    }
+  ],
+  "difficulty": "medium",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "X = [[1.0, 2.0]]\nW_g = [[1.0, 0.0], [0.0, 1.0]]\nW_noise = [[0.5, 0.5], [0.5, 0.5]]\nN = [[1.0, -1.0]]\nk = 2",
+    "output": "[[0.917, 0.0825]]",
+    "reasoning": "This example demonstrates that the gating function produces a sparse softmax output, favoring the higher gate after noise perturbation."
+  },
+  "category": "Deep Learning",
+  "starter_code": "import numpy as np\n\ndef noisy_topk_gating(\n    X: np.ndarray,\n    W_g: np.ndarray,\n    W_noise: np.ndarray,\n    N: np.ndarray,\n    k: int\n) -> np.ndarray:\n    \"\"\"\n    Args:\n        X: Input data, shape (batch_size, features)\n        W_g: Gating weight matrix, shape (features, num_experts)\n        W_noise: Noise weight matrix, shape (features, num_experts)\n        N: Noise samples, shape (batch_size, num_experts)\n        k: Number of experts to keep per example\n    Returns:\n        Gating probabilities, shape (batch_size, num_experts)\n    \"\"\"\n    # Your code here\n    pass",
+  "title": "Implement the Noisy Top-K Gating Function",
+  "learn_section": "IyMgTm9pc3kgVG9wLUsgR2F0aW5nCgpOb2lzeSBUb3AtSyBHYXRpbmcgaXMgYSBzcGFyc2Ugc2VsZWN0aW9uIG1lY2hhbmlzbSB1c2VkIGluIE1peHR1cmUtb2YtRXhwZXJ0cyAoTW9FKSBtb2RlbHMuIEl0IHJvdXRlcyBpbnB1dCB0b2tlbnMgdG8gYSBzdWJzZXQgb2YgYXZhaWxhYmxlIGV4cGVydHMsIGVuaGFuY2luZyBlZmZpY2llbmN5IGFuZCBtb2RlbCBjYXBhY2l0eS4KCiMjIyBPdmVydmlldwoKVGhlIGNvcmUgaWRlYSBpcyB0byBhZGQgbGVhcm5lZCBub2lzZSB0byB0aGUgZ2F0aW5nIGxvZ2l0cyBhbmQgdGhlbiBzZWxlY3Qgb25seSB0aGUgdG9wLWsgZXhwZXJ0cyBmb3IgZWFjaCBpbnB1dC4gVGhpcyBlbmNvdXJhZ2VzIGV4cGxvcmF0aW9uIGFuZCBoZWxwcyBiYWxhbmNlIGxvYWQgYWNyb3NzIGV4cGVydHMuCgojIyMgU3RlcC1ieS1TdGVwIEJyZWFrZG93bgoKMS4gKipDb21wdXRlIFJhdyBHYXRlIFNjb3JlcyoqICAKICAgRmlyc3QsIGNvbXB1dGUgdHdvIGxpbmVhciBwcm9qZWN0aW9ucyBvZiB0aGUgaW5wdXQ6CiAgICQkCiAgIEhfe1x0ZXh0e2Jhc2V9fSA9IFggV19nCiAgICQkCiAgICQkCiAgIEhfe1x0ZXh0e25vaXNlfX0gPSBYIFdfe1x0ZXh0e25vaXNlfX0KICAgJCQKCjIuICoqQXBwbHkgTm9pc2Ugd2l0aCBTb2Z0cGx1cyBTY2FsaW5nKiogIAogICBBZGQgcHJlLXNhbXBsZWQgR2F1c3NpYW4gbm9pc2UsIHNjYWxlZCBieSBhIHNvZnRwbHVzIHRyYW5zZm9ybWF0aW9uOgogICAkJAogICBIID0gSF97XHRleHR7YmFzZX19ICsgTiBcb2RvdCBcdGV4dHtTb2Z0cGx1c30oSF97XHRleHR7bm9pc2V9fSkKICAgJCQKCjMuICoqVG9wLUsgTWFza2luZyoqICAKICAgS2VlcCBvbmx5IHRoZSB0b3AtayBlbGVtZW50cyBpbiBlYWNoIHJvdyAoaS5lLiwgcGVyIGlucHV0KSwgc2V0dGluZyB0aGUgcmVzdCB0byAkLVxpbmZ0eSQ6CiAgICQkCiAgIEgnID0gXHRleHR7VG9wS30oSCwgaykKICAgJCQKCjQuICoqU29mdG1heCBPdmVyIFRvcC1LKiogIAogICBOb3JtYWxpemUgdGhlIHRvcC1rIHNjb3JlcyBpbnRvIGEgdmFsaWQgcHJvYmFiaWxpdHkgZGlzdHJpYnV0aW9uOgogICAkJAogICBHID0gXHRleHR7U29mdG1heH0oSCcpCiAgICQkCgojIyMgV29ya2VkIEV4YW1wbGUKCkxldDoKLSAkWCA9IFtbMS4wLCAyLjBdXSQKLSAkV19nID0gW1sxLjAsIDAuMF0sIFswLjAsIDEuMF1dJAotICRXX3tcdGV4dHtub2lzZX19ID0gW1swLjUsIDAuNV0sIFswLjUsIDAuNV1dJAotICROID0gW1sxLjAsIC0xLjBdXSQKLSAkayA9IDIkCgpTdGVwLWJ5LXN0ZXA6Ci0gJEhfe1x0ZXh0e2Jhc2V9fSA9IFsxLjAsIDIuMF0kCi0gJEhfe1x0ZXh0e25vaXNlfX0gPSBbMS41LCAxLjVdJAotICRcdGV4dHtTb2Z0cGx1c30oSF97XHRleHR7bm9pc2V9fSkgXGFwcHJveCBbMS44MDQsIDEuODA0XSQKLSAkSCA9IFsxLjAgKyAxLjgwNCwgMi4wIC0gMS44MDRdID0gWzIuODA0LCAwLjE5Nl0kCi0gU29mdG1heCBvdmVyIHRoZXNlIGdpdmVzOiAkWzAuOTE3LCAwLjA4MjVdJAoKIyMjIEJlbmVmaXRzCgotICoqQ29tcHV0YXRpb25hbCBFZmZpY2llbmN5Kio6IEFjdGl2YXRlcyBvbmx5IGsgZXhwZXJ0cyBwZXIgaW5wdXQuCi0gKipMb2FkIEJhbGFuY2luZyoqOiBJbmplY3RlZCBub2lzZSBlbmNvdXJhZ2VzIGRpdmVyc2l0eSBpbiBleHBlcnQgc2VsZWN0aW9uLgotICoqSW1wcm92ZWQgR2VuZXJhbGl6YXRpb24qKjogQWN0cyBhcyBhIHJlZ3VsYXJpemVyIHZpYSBub2lzZS1iYXNlZCBnYXRpbmcuCgpUaGlzIHRlY2huaXF1ZSBpcyB1c2VkIGluIGxhcmdlIHNwYXJzZSBtb2RlbHMgbGlrZSBHU2hhcmQgYW5kIFN3aXRjaCBUcmFuc2Zvcm1lcnMu",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/moe18",
+      "name": "Moe Chabot"
+    }
+  ],
+  "description_decoded": "Implement the Noisy Top-K gating mechanism used in Mixture-of-Experts (MoE) models. Given an input matrix, weight matrices, pre-sampled noise, and a sparsity constraint k, compute the final gating probabilities matrix.",
+  "learn_section_decoded": "## Noisy Top-K Gating\n\nNoisy Top-K Gating is a sparse selection mechanism used in Mixture-of-Experts (MoE) models. It routes input tokens to a subset of available experts, enhancing efficiency and model capacity.\n\n### Overview\n\nThe core idea is to add learned noise to the gating logits and then select only the top-k experts for each input. This encourages exploration and helps balance load across experts.\n\n### Step-by-Step Breakdown\n\n1. **Compute Raw Gate Scores**  \n   First, compute two linear projections of the input:\n   $$\n   H_{\\text{base}} = X W_g\n   $$\n   $$\n   H_{\\text{noise}} = X W_{\\text{noise}}\n   $$\n\n2. **Apply Noise with Softplus Scaling**  \n   Add pre-sampled Gaussian noise, scaled by a softplus transformation:\n   $$\n   H = H_{\\text{base}} + N \\odot \\text{Softplus}(H_{\\text{noise}})\n   $$\n\n3. **Top-K Masking**  \n   Keep only the top-k elements in each row (i.e., per input), setting the rest to $-\\infty$:\n   $$\n   H' = \\text{TopK}(H, k)\n   $$\n\n4. **Softmax Over Top-K**  \n   Normalize the top-k scores into a valid probability distribution:\n   $$\n   G = \\text{Softmax}(H')\n   $$\n\n### Worked Example\n\nLet:\n- $X = [[1.0, 2.0]]$\n- $W_g = [[1.0, 0.0], [0.0, 1.0]]$\n- $W_{\\text{noise}} = [[0.5, 0.5], [0.5, 0.5]]$\n- $N = [[1.0, -1.0]]$\n- $k = 2$\n\nStep-by-step:\n- $H_{\\text{base}} = [1.0, 2.0]$\n- $H_{\\text{noise}} = [1.5, 1.5]$\n- $\\text{Softplus}(H_{\\text{noise}}) \\approx [1.804, 1.804]$\n- $H = [1.0 + 1.804, 2.0 - 1.804] = [2.804, 0.196]$\n- Softmax over these gives: $[0.917, 0.0825]$\n\n### Benefits\n\n- **Computational Efficiency**: Activates only k experts per input.\n- **Load Balancing**: Injected noise encourages diversity in expert selection.\n- **Improved Generalization**: Acts as a regularizer via noise-based gating.\n\nThis technique is used in large sparse models like GShard and Switch Transformers."
+}

@@ -1,0 +1,518 @@
+{
+  "problem_id": 24,
+  "title": "Single Neuron",
+  "category": "Deep Learning",
+  "difficulty": "easy",
+  "description": "Write a Python function that simulates a single neuron with a sigmoid activation function for binary classification, handling multidimensional input features. The function should take a list of feature vectors (each vector representing multiple features for an example), associated true binary labels, and the neuron's weights (one for each feature) and bias as input. It should return the predicted probabilities after sigmoid activation and the mean squared error between the predicted probabilities and the true labels, both rounded to four decimal places.",
+  "example": {
+    "input": "features = [[0.5, 1.0], [-1.5, -2.0], [2.0, 1.5]], labels = [0, 1, 0], weights = [0.7, -0.4], bias = -0.1",
+    "output": "([0.4626, 0.4134, 0.6682], 0.3349)",
+    "reasoning": "For each input vector, the weighted sum is calculated by multiplying each feature by its corresponding weight, adding these up along with the bias, then applying the sigmoid function to produce a probability. The MSE is calculated as the average squared difference between each predicted probability and the corresponding true label."
+  },
+  "starter_code": "import math\n\ndef single_neuron_model(features: list[list[float]], labels: list[int], weights: list[float], bias: float) -> (list[float], float):\n\t# Your code here\n\treturn probabilities, mse",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Weighted Sum Computation and Linear Combinations",
+      "relation_to_problem": "This is the first step in neuron computation - calculating the pre-activation value z = Σ(weight_i × feature_i) + bias, which is the linear combination of inputs before applying the activation function.",
+      "prerequisites": [
+        "Basic linear algebra",
+        "Vector operations",
+        "Summation notation"
+      ],
+      "learning_objectives": [
+        "Understand the concept of weighted sums in neural computation",
+        "Implement dot product calculation for weight-feature multiplication",
+        "Learn how bias affects the linear transformation"
+      ],
+      "math_content": {
+        "definition": "A weighted sum is a linear combination of input features where each feature $x_i$ is multiplied by a corresponding weight $w_i$, and a bias term $b$ is added. For a feature vector $\\mathbf{x} = (x_1, x_2, \\ldots, x_d) \\in \\mathbb{R}^d$ and weight vector $\\mathbf{w} = (w_1, w_2, \\ldots, w_d) \\in \\mathbb{R}^d$, the weighted sum (pre-activation) is: $$z = \\mathbf{w}^T \\mathbf{x} + b = \\sum_{i=1}^{d} w_i x_i + b$$ where $b \\in \\mathbb{R}$ is the bias term.",
+        "notation": "$\\mathbf{x}$ = input feature vector, $\\mathbf{w}$ = weight vector, $b$ = bias, $z$ = pre-activation value, $d$ = number of features",
+        "theorem": "The weighted sum defines a hyperplane in the input space $\\mathbb{R}^d$. The equation $\\mathbf{w}^T \\mathbf{x} + b = 0$ represents a $(d-1)$-dimensional hyperplane that divides the space into two half-spaces.",
+        "proof_sketch": "The expression $\\mathbf{w}^T \\mathbf{x} + b$ is an affine function from $\\mathbb{R}^d$ to $\\mathbb{R}$. The weight vector $\\mathbf{w}$ is perpendicular (normal) to the hyperplane, and $b$ controls the distance from the origin. For any two points $\\mathbf{x}_1, \\mathbf{x}_2$ on the hyperplane, we have $\\mathbf{w}^T(\\mathbf{x}_1 - \\mathbf{x}_2) = 0$, confirming that $\\mathbf{w}$ is orthogonal to vectors lying in the hyperplane.",
+        "examples": [
+          "Example 1: Single feature - If $\\mathbf{x} = [2.0]$, $\\mathbf{w} = [0.5]$, $b = 0.3$, then $z = 0.5 \\times 2.0 + 0.3 = 1.3$",
+          "Example 2: Two features - If $\\mathbf{x} = [1.0, 2.0]$, $\\mathbf{w} = [0.3, 0.7]$, $b = -0.5$, then $z = 0.3 \\times 1.0 + 0.7 \\times 2.0 - 0.5 = 0.3 + 1.4 - 0.5 = 1.2$",
+          "Example 3: Three features - If $\\mathbf{x} = [0.5, 1.0, -1.5]$, $\\mathbf{w} = [0.7, -0.4, 0.2]$, $b = -0.1$, then $z = 0.7(0.5) - 0.4(1.0) + 0.2(-1.5) - 0.1 = 0.35 - 0.4 - 0.3 - 0.1 = -0.45$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Weighted Sum Formula",
+          "latex": "$z = \\sum_{i=1}^{d} w_i x_i + b$",
+          "description": "Use this to compute the pre-activation value for a single input vector"
+        },
+        {
+          "name": "Dot Product Representation",
+          "latex": "$z = \\mathbf{w}^T \\mathbf{x} + b = \\langle \\mathbf{w}, \\mathbf{x} \\rangle + b$",
+          "description": "Compact vector notation for the weighted sum"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the weighted sum (pre-activation value) for a single feature vector. This is the foundational computation that happens inside every neuron before applying the activation function.",
+        "function_signature": "def compute_weighted_sum(features: list[float], weights: list[float], bias: float) -> float:",
+        "starter_code": "def compute_weighted_sum(features: list[float], weights: list[float], bias: float) -> float:\n    # Compute z = sum(w_i * x_i) + b\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_weighted_sum([2.0], [0.5], 0.3)",
+            "expected": "1.3",
+            "explanation": "Single feature: 0.5 * 2.0 + 0.3 = 1.3"
+          },
+          {
+            "input": "compute_weighted_sum([1.0, 2.0], [0.3, 0.7], -0.5)",
+            "expected": "1.2",
+            "explanation": "Two features: 0.3 * 1.0 + 0.7 * 2.0 - 0.5 = 1.2"
+          },
+          {
+            "input": "compute_weighted_sum([0.5, 1.0, -1.5], [0.7, -0.4, 0.2], -0.1)",
+            "expected": "-0.45",
+            "explanation": "Three features: 0.7(0.5) + (-0.4)(1.0) + 0.2(-1.5) - 0.1 = -0.45"
+          },
+          {
+            "input": "compute_weighted_sum([0, 0], [1.0, 1.0], 2.0)",
+            "expected": "2.0",
+            "explanation": "Zero features result in just the bias term"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to add the bias term after computing the weighted sum",
+        "Assuming weights and features arrays have different lengths without validation",
+        "Using matrix multiplication libraries when a simple loop suffices",
+        "Not handling negative feature or weight values correctly"
+      ],
+      "hint": "Think of this as computing a dot product. Iterate through paired elements of weights and features, multiply them, sum everything up, then add the bias.",
+      "references": [
+        "Linear algebra - dot product",
+        "Affine transformations",
+        "Vector spaces"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "The Sigmoid Activation Function",
+      "relation_to_problem": "After computing the weighted sum z, neurons apply the sigmoid function σ(z) = 1/(1 + e^(-z)) to produce output probabilities between 0 and 1, which is essential for binary classification.",
+      "prerequisites": [
+        "Exponential functions",
+        "Function composition",
+        "Limits and asymptotic behavior"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical properties of the sigmoid function",
+        "Learn why sigmoid is suitable for binary classification",
+        "Implement numerically stable sigmoid computation",
+        "Recognize the sigmoid's role in mapping real values to probabilities"
+      ],
+      "math_content": {
+        "definition": "The sigmoid function (also called the logistic function) is defined as: $$\\sigma(z) = \\frac{1}{1 + e^{-z}}$$ where $z \\in \\mathbb{R}$ is the input and $\\sigma(z) \\in (0, 1)$ is the output. This function is a smooth, differentiable, monotonically increasing S-shaped curve that maps the entire real line to the open interval $(0, 1)$.",
+        "notation": "$\\sigma$ = sigmoid function, $z$ = pre-activation input, $e$ = Euler's number (≈ 2.71828), $\\sigma(z)$ = activation output (probability)",
+        "theorem": "The sigmoid function has several important properties: (1) Range: $\\lim_{z \\to -\\infty} \\sigma(z) = 0$ and $\\lim_{z \\to +\\infty} \\sigma(z) = 1$, so $\\sigma(z) \\in (0, 1)$ for all $z \\in \\mathbb{R}$. (2) Symmetry: $\\sigma(-z) = 1 - \\sigma(z)$. (3) Derivative: $\\frac{d\\sigma}{dz} = \\sigma(z)(1 - \\sigma(z))$. (4) Monotonicity: $\\sigma$ is strictly increasing.",
+        "proof_sketch": "For property (1), as $z \\to -\\infty$, $e^{-z} \\to +\\infty$, so $\\sigma(z) \\to 0$. As $z \\to +\\infty$, $e^{-z} \\to 0$, so $\\sigma(z) \\to 1$. For property (2), $\\sigma(-z) = 1/(1 + e^z) = e^{-z}/(e^{-z}(1 + e^z)) = e^{-z}/(1 + e^{-z}) = (1 + e^{-z} - 1)/(1 + e^{-z}) = 1 - 1/(1 + e^{-z}) = 1 - \\sigma(z)$. For property (3), using the quotient rule: $\\frac{d}{dz}\\left[\\frac{1}{1 + e^{-z}}\\right] = \\frac{e^{-z}}{(1 + e^{-z})^2} = \\frac{1}{1 + e^{-z}} \\cdot \\frac{e^{-z}}{1 + e^{-z}} = \\sigma(z)(1 - \\sigma(z))$.",
+        "examples": [
+          "Example 1: $\\sigma(0) = 1/(1 + e^0) = 1/(1 + 1) = 0.5$ - the sigmoid output at zero input is exactly 0.5",
+          "Example 2: $\\sigma(2) = 1/(1 + e^{-2}) = 1/(1 + 0.1353) \\approx 0.8808$ - positive inputs produce outputs above 0.5",
+          "Example 3: $\\sigma(-2) = 1/(1 + e^{2}) = 1/(1 + 7.3891) \\approx 0.1192$ - negative inputs produce outputs below 0.5, and note that $0.8808 + 0.1192 = 1$ (symmetry property)",
+          "Example 4: $\\sigma(5) \\approx 0.9933$ and $\\sigma(-5) \\approx 0.0067$ - the sigmoid saturates near 0 and 1 for large magnitude inputs"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sigmoid Function",
+          "latex": "$\\sigma(z) = \\frac{1}{1 + e^{-z}}$",
+          "description": "Use this to convert the pre-activation value z into a probability for binary classification"
+        },
+        {
+          "name": "Alternative Sigmoid Form",
+          "latex": "$\\sigma(z) = \\frac{e^z}{1 + e^z}$",
+          "description": "Equivalent form obtained by multiplying numerator and denominator by $e^z$, useful for numerical stability when z is large and positive"
+        },
+        {
+          "name": "Sigmoid Derivative",
+          "latex": "$\\sigma'(z) = \\sigma(z)(1 - \\sigma(z))$",
+          "description": "Used in backpropagation for training neural networks"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the sigmoid activation function that takes a real-valued input and returns a probability between 0 and 1. Round the output to 4 decimal places as required by the main problem.",
+        "function_signature": "def sigmoid(z: float) -> float:",
+        "starter_code": "import math\n\ndef sigmoid(z: float) -> float:\n    # Compute σ(z) = 1 / (1 + e^(-z))\n    # Round to 4 decimal places\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "sigmoid(0)",
+            "expected": "0.5",
+            "explanation": "At z=0, the sigmoid output is exactly 0.5, representing maximum uncertainty"
+          },
+          {
+            "input": "sigmoid(2.0)",
+            "expected": "0.8808",
+            "explanation": "Positive input produces probability above 0.5"
+          },
+          {
+            "input": "sigmoid(-2.0)",
+            "expected": "0.1192",
+            "explanation": "Negative input produces probability below 0.5, and sigmoid(-2) + sigmoid(2) = 1"
+          },
+          {
+            "input": "sigmoid(5.0)",
+            "expected": "0.9933",
+            "explanation": "Large positive input saturates near 1"
+          },
+          {
+            "input": "sigmoid(-5.0)",
+            "expected": "0.0067",
+            "explanation": "Large negative input saturates near 0"
+          },
+          {
+            "input": "sigmoid(0.69314718)",
+            "expected": "0.6667",
+            "explanation": "At z = ln(2), sigmoid gives 2/3"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to negate z in the exponent (writing e^z instead of e^(-z))",
+        "Not handling numerical overflow when z is very negative (e^(-z) becomes huge)",
+        "Forgetting to round to 4 decimal places as specified",
+        "Confusing sigmoid with other activation functions like tanh or softmax",
+        "Not importing the math module for the exponential function"
+      ],
+      "hint": "Use math.exp() for the exponential function. Remember the formula is 1 divided by (1 plus e to the negative z). Use Python's round() function to get 4 decimal places.",
+      "references": [
+        "Logistic function",
+        "Activation functions in neural networks",
+        "Exponential functions",
+        "Numerical stability in computing"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Neuron Forward Pass: Combining Linear Transformation and Activation",
+      "relation_to_problem": "This combines steps 1 and 2 to implement the complete forward pass of a single neuron: compute z from inputs, then apply sigmoid to get the probability output. This is the core computation in the main problem.",
+      "prerequisites": [
+        "Weighted sum computation",
+        "Sigmoid activation",
+        "Function composition"
+      ],
+      "learning_objectives": [
+        "Understand the two-stage computation model of artificial neurons",
+        "Implement complete neuron forward propagation",
+        "Apply function composition: σ(w^T x + b)",
+        "Process single examples through a neuron model"
+      ],
+      "math_content": {
+        "definition": "A single neuron performs a forward pass computation in two stages. Given an input vector $\\mathbf{x} \\in \\mathbb{R}^d$, weights $\\mathbf{w} \\in \\mathbb{R}^d$, and bias $b \\in \\mathbb{R}$: **Stage 1 (Pre-activation):** Compute the weighted sum $$z = \\mathbf{w}^T \\mathbf{x} + b = \\sum_{i=1}^{d} w_i x_i + b$$ **Stage 2 (Activation):** Apply the sigmoid function $$y = \\sigma(z) = \\frac{1}{1 + e^{-z}}$$ The output $y \\in (0, 1)$ represents the predicted probability that the input belongs to the positive class (label 1) in binary classification.",
+        "notation": "$\\mathbf{x}$ = input features, $\\mathbf{w}$ = neuron weights, $b$ = bias, $z$ = pre-activation, $y$ = neuron output (predicted probability), $\\sigma$ = sigmoid activation",
+        "theorem": "The neuron's decision boundary is defined by the hyperplane where $z = 0$, equivalently where $\\sigma(z) = 0.5$. Points satisfying $\\mathbf{w}^T \\mathbf{x} + b > 0$ are classified as positive (probability > 0.5), while points with $\\mathbf{w}^T \\mathbf{x} + b < 0$ are classified as negative (probability < 0.5). The neuron implements a linear classifier in the input space, but the sigmoid provides smooth probabilistic outputs rather than hard 0/1 decisions.",
+        "proof_sketch": "Since $\\sigma$ is strictly monotonically increasing, $\\sigma(z) > 0.5$ if and only if $z > 0$ (because $\\sigma(0) = 0.5$). Therefore, the set $\\{\\mathbf{x} : \\sigma(\\mathbf{w}^T \\mathbf{x} + b) > 0.5\\} = \\{\\mathbf{x} : \\mathbf{w}^T \\mathbf{x} + b > 0\\}$, which is precisely one of the two half-spaces defined by the hyperplane $\\mathbf{w}^T \\mathbf{x} + b = 0$. The sigmoid adds a probabilistic interpretation: points far from the boundary have probabilities near 0 or 1, while points near the boundary have probabilities near 0.5.",
+        "examples": [
+          "Example 1: With $\\mathbf{x} = [0.5, 1.0]$, $\\mathbf{w} = [0.7, -0.4]$, $b = -0.1$: First compute $z = 0.7(0.5) + (-0.4)(1.0) + (-0.1) = 0.35 - 0.4 - 0.1 = -0.15$. Then $y = \\sigma(-0.15) = 1/(1 + e^{0.15}) = 1/1.1618 \\approx 0.4626$. This input is slightly on the negative side of the decision boundary.",
+          "Example 2: With $\\mathbf{x} = [-1.5, -2.0]$, $\\mathbf{w} = [0.7, -0.4]$, $b = -0.1$: First $z = 0.7(-1.5) + (-0.4)(-2.0) + (-0.1) = -1.05 + 0.8 - 0.1 = -0.35$. Then $y = \\sigma(-0.35) \\approx 0.4134$. This gives a lower probability of belonging to the positive class.",
+          "Example 3: With $\\mathbf{x} = [2.0, 1.5]$, $\\mathbf{w} = [0.7, -0.4]$, $b = -0.1$: First $z = 0.7(2.0) + (-0.4)(1.5) + (-0.1) = 1.4 - 0.6 - 0.1 = 0.7$. Then $y = \\sigma(0.7) \\approx 0.6682$. This input is on the positive side, with probability above 0.5."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Neuron Output Function",
+          "latex": "$y = \\sigma(\\mathbf{w}^T \\mathbf{x} + b) = \\frac{1}{1 + e^{-(\\mathbf{w}^T \\mathbf{x} + b)}}$",
+          "description": "Complete forward pass computation for a single neuron - compose the weighted sum and sigmoid activation"
+        },
+        {
+          "name": "Decision Boundary",
+          "latex": "$\\mathbf{w}^T \\mathbf{x} + b = 0$",
+          "description": "The hyperplane separating regions where the neuron predicts class 0 vs class 1 (at probability threshold 0.5)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete neuron forward pass that takes a single feature vector, computes the weighted sum, applies sigmoid activation, and returns the probability. This builds directly toward the main problem's neuron model.",
+        "function_signature": "def neuron_forward(features: list[float], weights: list[float], bias: float) -> float:",
+        "starter_code": "import math\n\ndef neuron_forward(features: list[float], weights: list[float], bias: float) -> float:\n    # Step 1: Compute z = sum(w_i * x_i) + b\n    # Step 2: Compute y = sigmoid(z)\n    # Round to 4 decimal places\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "neuron_forward([0.5, 1.0], [0.7, -0.4], -0.1)",
+            "expected": "0.4626",
+            "explanation": "z = 0.7(0.5) - 0.4(1.0) - 0.1 = -0.15, then σ(-0.15) ≈ 0.4626"
+          },
+          {
+            "input": "neuron_forward([-1.5, -2.0], [0.7, -0.4], -0.1)",
+            "expected": "0.4134",
+            "explanation": "z = 0.7(-1.5) - 0.4(-2.0) - 0.1 = -0.35, then σ(-0.35) ≈ 0.4134"
+          },
+          {
+            "input": "neuron_forward([2.0, 1.5], [0.7, -0.4], -0.1)",
+            "expected": "0.6682",
+            "explanation": "z = 0.7(2.0) - 0.4(1.5) - 0.1 = 0.7, then σ(0.7) ≈ 0.6682"
+          },
+          {
+            "input": "neuron_forward([0, 0], [1.0, 1.0], 0)",
+            "expected": "0.5",
+            "explanation": "z = 0, so σ(0) = 0.5 exactly - maximum uncertainty"
+          },
+          {
+            "input": "neuron_forward([1.0], [2.0], -1.0)",
+            "expected": "0.7311",
+            "explanation": "z = 2.0(1.0) - 1.0 = 1.0, then σ(1.0) ≈ 0.7311"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing the weighted sum and sigmoid in the wrong order",
+        "Not properly composing the two functions (computing them separately without passing z to sigmoid)",
+        "Forgetting to round the final output to 4 decimal places",
+        "Recomputing sigmoid from scratch instead of reusing the function from step 2",
+        "Not validating that weights and features have the same length"
+      ],
+      "hint": "Break this into two clear steps: first compute the weighted sum z (reuse logic from step 1), then apply sigmoid to z (reuse from step 2). Think of it as function composition: sigmoid(weighted_sum(features, weights, bias)).",
+      "references": [
+        "Neural network forward propagation",
+        "Function composition",
+        "Binary classification"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Batch Processing: Multiple Forward Passes",
+      "relation_to_problem": "The main problem requires processing multiple feature vectors (a batch). This sub-quest teaches how to apply the neuron forward pass to each example in a dataset and collect the predictions.",
+      "prerequisites": [
+        "Neuron forward pass",
+        "List comprehensions",
+        "Iteration over collections"
+      ],
+      "learning_objectives": [
+        "Apply neuron computation to multiple examples independently",
+        "Understand batch processing in neural networks",
+        "Implement efficient iteration over datasets",
+        "Collect predictions for an entire batch"
+      ],
+      "math_content": {
+        "definition": "Batch processing applies the same neuron computation independently to each example in a dataset. Given a dataset of $n$ examples $\\{\\mathbf{x}^{(1)}, \\mathbf{x}^{(2)}, \\ldots, \\mathbf{x}^{(n)}\\}$ where each $\\mathbf{x}^{(j)} \\in \\mathbb{R}^d$, and fixed parameters $(\\mathbf{w}, b)$, the neuron produces $n$ outputs: $$y^{(j)} = \\sigma(\\mathbf{w}^T \\mathbf{x}^{(j)} + b) \\quad \\text{for } j = 1, 2, \\ldots, n$$ Each output $y^{(j)} \\in (0, 1)$ is computed independently using the same weights and bias. The result is a vector of predictions $\\mathbf{y} = [y^{(1)}, y^{(2)}, \\ldots, y^{(n)}]^T$.",
+        "notation": "$n$ = batch size (number of examples), $\\mathbf{x}^{(j)}$ = j-th input example, $y^{(j)}$ = predicted probability for j-th example, $\\mathbf{y}$ = vector of all predictions",
+        "theorem": "For a linear neuron model with fixed parameters, the predictions are independent: the output for example $j$ depends only on $\\mathbf{x}^{(j)}$ and the neuron parameters, not on other examples in the batch. Mathematically, $y^{(j)}$ is a function only of $\\mathbf{x}^{(j)}$: $y^{(j)} = f(\\mathbf{x}^{(j)}; \\mathbf{w}, b)$ where $f$ represents the complete neuron computation.",
+        "proof_sketch": "The neuron computation $y^{(j)} = \\sigma(\\mathbf{w}^T \\mathbf{x}^{(j)} + b)$ is a deterministic function that takes $\\mathbf{x}^{(j)}$ as input. There is no dependence on other examples $\\mathbf{x}^{(k)}$ for $k \\neq j$ in the formula. Each forward pass is a separate application of the same function to different inputs. This independence property means batch processing can be parallelized—each example can be processed simultaneously on different compute units.",
+        "examples": [
+          "Example 1: With batch $\\{[0.5, 1.0], [-1.5, -2.0], [2.0, 1.5]\\}$, $\\mathbf{w} = [0.7, -0.4]$, $b = -0.1$: Process each independently: $y^{(1)} = \\sigma(0.7(0.5) - 0.4(1.0) - 0.1) = \\sigma(-0.15) \\approx 0.4626$. $y^{(2)} = \\sigma(0.7(-1.5) - 0.4(-2.0) - 0.1) = \\sigma(-0.35) \\approx 0.4134$. $y^{(3)} = \\sigma(0.7(2.0) - 0.4(1.5) - 0.1) = \\sigma(0.7) \\approx 0.6682$. Result: $\\mathbf{y} = [0.4626, 0.4134, 0.6682]$.",
+          "Example 2: With batch $\\{[1.0], [2.0], [3.0]\\}$, $\\mathbf{w} = [0.5]$, $b = 0$: $y^{(1)} = \\sigma(0.5) \\approx 0.6225$. $y^{(2)} = \\sigma(1.0) \\approx 0.7311$. $y^{(3)} = \\sigma(1.5) \\approx 0.8176$. Result: $\\mathbf{y} = [0.6225, 0.7311, 0.8176]$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Batch Prediction",
+          "latex": "$\\mathbf{y} = [\\sigma(\\mathbf{w}^T \\mathbf{x}^{(1)} + b), \\sigma(\\mathbf{w}^T \\mathbf{x}^{(2)} + b), \\ldots, \\sigma(\\mathbf{w}^T \\mathbf{x}^{(n)} + b)]^T$",
+          "description": "Apply neuron forward pass to each example in the batch to get a vector of predictions"
+        },
+        {
+          "name": "Single Example Computation",
+          "latex": "$y^{(j)} = \\sigma(\\mathbf{w}^T \\mathbf{x}^{(j)} + b)$",
+          "description": "Each prediction is computed independently using the same formula from step 3"
+        }
+      ],
+      "exercise": {
+        "description": "Implement batch processing that takes a list of feature vectors and returns a list of predicted probabilities by applying the neuron forward pass to each example. This directly produces the first output of the main problem.",
+        "function_signature": "def batch_neuron_predict(features: list[list[float]], weights: list[float], bias: float) -> list[float]:",
+        "starter_code": "import math\n\ndef batch_neuron_predict(features: list[list[float]], weights: list[float], bias: float) -> list[float]:\n    # Apply neuron forward pass to each feature vector\n    # Return list of predictions, each rounded to 4 decimal places\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "batch_neuron_predict([[0.5, 1.0], [-1.5, -2.0], [2.0, 1.5]], [0.7, -0.4], -0.1)",
+            "expected": "[0.4626, 0.4134, 0.6682]",
+            "explanation": "Process each of the 3 examples through the neuron with given weights and bias"
+          },
+          {
+            "input": "batch_neuron_predict([[1.0], [2.0], [3.0]], [0.5], 0)",
+            "expected": "[0.6225, 0.7311, 0.8176]",
+            "explanation": "Single-feature examples with increasing values produce increasing probabilities"
+          },
+          {
+            "input": "batch_neuron_predict([[0, 0]], [1.0, 1.0], 0)",
+            "expected": "[0.5]",
+            "explanation": "Zero input with zero bias gives 0.5 probability"
+          },
+          {
+            "input": "batch_neuron_predict([[1.0, 0], [0, 1.0], [1.0, 1.0]], [1.0, -1.0], 0)",
+            "expected": "[0.7311, 0.2689, 0.5]",
+            "explanation": "First weight is positive, second is negative with equal magnitude - demonstrates decision boundary"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not iterating over all examples in the batch",
+        "Applying weights to the wrong features when examples have different structures",
+        "Forgetting to round each individual prediction to 4 decimal places",
+        "Modifying the neuron parameters between examples (they should stay fixed)",
+        "Returning a single value instead of a list of predictions",
+        "Not reusing the neuron forward pass function from step 3"
+      ],
+      "hint": "Use a loop or list comprehension to apply the neuron forward pass from step 3 to each feature vector in the batch. Each prediction is independent and uses the same weights and bias.",
+      "references": [
+        "Batch processing",
+        "Vectorization in machine learning",
+        "Independent predictions"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Mean Squared Error (MSE) for Regression and Probability Outputs",
+      "relation_to_problem": "After computing predictions, we need to measure how well they match the true labels. MSE quantifies the average squared difference between predicted probabilities and true binary labels, which is the second required output of the main problem.",
+      "prerequisites": [
+        "Basic statistics",
+        "Error metrics",
+        "Summation and averaging"
+      ],
+      "learning_objectives": [
+        "Understand MSE as a loss function for measuring prediction quality",
+        "Learn why squared differences penalize larger errors more heavily",
+        "Implement MSE calculation for binary classification with probability outputs",
+        "Interpret MSE values in the context of the problem"
+      ],
+      "math_content": {
+        "definition": "Mean Squared Error (MSE) measures the average squared difference between predicted values and true values. For $n$ predictions $\\hat{y}^{(1)}, \\hat{y}^{(2)}, \\ldots, \\hat{y}^{(n)}$ and true labels $y^{(1)}, y^{(2)}, \\ldots, y^{(n)}$, MSE is defined as: $$\\text{MSE} = \\frac{1}{n} \\sum_{j=1}^{n} (\\hat{y}^{(j)} - y^{(j)})^2$$ where each squared term $(\\hat{y}^{(j)} - y^{(j)})^2$ is the squared error for the $j$-th example. In binary classification with sigmoid outputs, $\\hat{y}^{(j)} \\in (0, 1)$ represents predicted probability and $y^{(j)} \\in \\{0, 1\\}$ is the true label.",
+        "notation": "$n$ = number of examples, $\\hat{y}^{(j)}$ = predicted probability for example $j$, $y^{(j)}$ = true label for example $j$, MSE = mean squared error",
+        "theorem": "MSE is always non-negative, $\\text{MSE} \\geq 0$, with equality if and only if $\\hat{y}^{(j)} = y^{(j)}$ for all $j$. MSE is a convex function of the predictions when the true labels are fixed. The squared term penalizes larger errors quadratically: an error of magnitude $2\\epsilon$ contributes $4\\epsilon^2$ to MSE, while two errors of magnitude $\\epsilon$ each contribute $2\\epsilon^2$ total.",
+        "proof_sketch": "Since each term $(\\hat{y}^{(j)} - y^{(j)})^2 \\geq 0$ (squares are non-negative) and $n > 0$, we have $\\text{MSE} \\geq 0$. MSE equals zero iff each term equals zero, which requires $\\hat{y}^{(j)} = y^{(j)}$ for all $j$. To show convexity: for fixed $y^{(j)}$, the function $f(\\hat{y}) = (\\hat{y} - y^{(j)})^2$ has second derivative $f''(\\hat{y}) = 2 > 0$, so each term is convex. A sum of convex functions is convex, hence MSE is convex in the predictions.",
+        "examples": [
+          "Example 1: Perfect predictions - If $\\mathbf{\\hat{y}} = [0.0, 1.0, 0.0]$ and $\\mathbf{y} = [0, 1, 0]$, then MSE $= [(0.0-0)^2 + (1.0-1)^2 + (0.0-0)^2]/3 = 0/3 = 0$. Perfect predictions yield zero error.",
+          "Example 2: From main problem - If $\\mathbf{\\hat{y}} = [0.4626, 0.4134, 0.6682]$ and $\\mathbf{y} = [0, 1, 0]$, then MSE $= [(0.4626-0)^2 + (0.4134-1)^2 + (0.6682-0)^2]/3 = [0.2140 + 0.3441 + 0.4465]/3 = 1.0046/3 \\approx 0.3349$.",
+          "Example 3: Constant predictions - If $\\mathbf{\\hat{y}} = [0.5, 0.5, 0.5]$ and $\\mathbf{y} = [0, 1, 0]$, then MSE $= [(0.5-0)^2 + (0.5-1)^2 + (0.5-0)^2]/3 = [0.25 + 0.25 + 0.25]/3 = 0.75/3 = 0.25$. Maximum uncertainty predictions on balanced data.",
+          "Example 4: Large single error - If $\\mathbf{\\hat{y}} = [0.9, 0.9]$ and $\\mathbf{y} = [0, 1]$, then MSE $= [(0.9-0)^2 + (0.9-1)^2]/2 = [0.81 + 0.01]/2 = 0.41$. The large error on the first example dominates."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Mean Squared Error",
+          "latex": "$\\text{MSE} = \\frac{1}{n} \\sum_{j=1}^{n} (\\hat{y}^{(j)} - y^{(j)})^2$",
+          "description": "Use this to compute the average squared error between predictions and true labels"
+        },
+        {
+          "name": "Individual Squared Error",
+          "latex": "$(\\hat{y}^{(j)} - y^{(j)})^2$",
+          "description": "The squared difference for a single example - compute this for each example then average"
+        }
+      ],
+      "exercise": {
+        "description": "Implement MSE calculation that takes predicted probabilities and true binary labels, computes the average squared error, and returns it rounded to 4 decimal places. This is the second output required by the main problem.",
+        "function_signature": "def compute_mse(predictions: list[float], labels: list[int]) -> float:",
+        "starter_code": "def compute_mse(predictions: list[float], labels: list[int]) -> float:\n    # Compute MSE = (1/n) * sum((predicted - true)^2)\n    # Round to 4 decimal places\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_mse([0.4626, 0.4134, 0.6682], [0, 1, 0])",
+            "expected": "0.3349",
+            "explanation": "From main problem example: average of squared errors [(0.4626)^2 + (0.4134-1)^2 + (0.6682)^2]/3"
+          },
+          {
+            "input": "compute_mse([0.0, 1.0, 0.0], [0, 1, 0])",
+            "expected": "0.0",
+            "explanation": "Perfect predictions have zero MSE"
+          },
+          {
+            "input": "compute_mse([0.5, 0.5], [0, 1])",
+            "expected": "0.25",
+            "explanation": "Maximum uncertainty predictions: [(0.5)^2 + (0.5-1)^2]/2 = [0.25 + 0.25]/2"
+          },
+          {
+            "input": "compute_mse([0.9, 0.1, 0.9, 0.1], [1, 0, 1, 0])",
+            "expected": "0.01",
+            "explanation": "Good predictions with small errors: [(0.1)^2 + (0.1)^2 + (0.1)^2 + (0.1)^2]/4 = 0.04/4"
+          },
+          {
+            "input": "compute_mse([0.7311], [1])",
+            "expected": "0.0722",
+            "explanation": "Single example: (0.7311 - 1)^2 = (-0.2689)^2 ≈ 0.0723"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to square the differences (computing mean absolute error instead)",
+        "Not dividing by the number of examples n (computing sum of squared errors instead)",
+        "Squaring after averaging instead of averaging after squaring",
+        "Not handling the case where predictions are probabilities and labels are binary integers",
+        "Forgetting to round to 4 decimal places",
+        "Confusing MSE with other loss functions like cross-entropy"
+      ],
+      "hint": "For each prediction-label pair, compute the difference, square it, then average all squared differences. The formula has three steps: subtract, square, average. Use the sum of squared differences divided by the count.",
+      "references": [
+        "Loss functions",
+        "MSE vs MAE",
+        "Regression metrics",
+        "Model evaluation"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Single Neuron Model: Integration and Binary Classification",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts to build the complete single neuron model that processes a batch of examples and returns both predictions and MSE—exactly what the main problem requires.",
+      "prerequisites": [
+        "Batch neuron prediction",
+        "MSE computation",
+        "All previous sub-quests"
+      ],
+      "learning_objectives": [
+        "Integrate weighted sum, sigmoid activation, batch processing, and error computation",
+        "Understand the complete pipeline of a trained neuron model",
+        "Implement the full forward pass with evaluation",
+        "Recognize how individual components combine to form a working model"
+      ],
+      "math_content": {
+        "definition": "A complete single neuron binary classification model takes a dataset of $n$ examples with features and labels, applies the neuron's learned parameters, and produces both predictions and an error metric. Given: dataset $\\mathcal{D} = \\{(\\mathbf{x}^{(j)}, y^{(j)})\\}_{j=1}^{n}$ where $\\mathbf{x}^{(j)} \\in \\mathbb{R}^d$ and $y^{(j)} \\in \\{0, 1\\}$, parameters $\\Theta = (\\mathbf{w}, b)$ where $\\mathbf{w} \\in \\mathbb{R}^d$ and $b \\in \\mathbb{R}$. The model computes: **Step 1:** For each example, compute $z^{(j)} = \\mathbf{w}^T \\mathbf{x}^{(j)} + b$. **Step 2:** Apply activation $\\hat{y}^{(j)} = \\sigma(z^{(j)}) = \\frac{1}{1 + e^{-z^{(j)}}}$. **Step 3:** Collect predictions $\\mathbf{\\hat{y}} = [\\hat{y}^{(1)}, \\ldots, \\hat{y}^{(n)}]^T$. **Step 4:** Compute error $\\text{MSE} = \\frac{1}{n} \\sum_{j=1}^{n} (\\hat{y}^{(j)} - y^{(j)})^2$. Output: $(\\mathbf{\\hat{y}}, \\text{MSE})$.",
+        "notation": "$\\mathcal{D}$ = dataset, $\\Theta$ = model parameters, $\\mathbf{\\hat{y}}$ = predicted probabilities, $z^{(j)}$ = pre-activation for example $j$, MSE = mean squared error",
+        "theorem": "The single neuron with sigmoid activation implements a probabilistic linear classifier. The decision boundary is a hyperplane in feature space, and the sigmoid provides calibrated probability estimates. For any dataset and parameter values, the MSE provides a continuous, differentiable loss function that measures model performance. When MSE is minimized through gradient descent (training), the neuron learns an optimal linear decision boundary for the given data.",
+        "proof_sketch": "The neuron divides the input space into two regions separated by the hyperplane $\\mathbf{w}^T \\mathbf{x} + b = 0$. Points on one side ($z > 0$) have $\\hat{y} > 0.5$, points on the other ($z < 0$) have $\\hat{y} < 0.5$. The sigmoid provides a smooth transition, with probabilities approaching 0 or 1 as distance from the boundary increases. MSE is differentiable with respect to parameters because it is a composition of differentiable functions: $\\text{MSE}(\\mathbf{w}, b) = \\frac{1}{n}\\sum (\\sigma(\\mathbf{w}^T \\mathbf{x}^{(j)} + b) - y^{(j)})^2$. The gradient $\\nabla_{\\mathbf{w}, b} \\text{MSE}$ can be computed via backpropagation, enabling parameter optimization.",
+        "examples": [
+          "Example 1 (main problem): Input features = [[0.5, 1.0], [-1.5, -2.0], [2.0, 1.5]], labels = [0, 1, 0], weights = [0.7, -0.4], bias = -0.1. Compute pre-activations: $z^{(1)} = -0.15$, $z^{(2)} = -0.35$, $z^{(3)} = 0.7$. Apply sigmoid: $\\hat{y}^{(1)} = 0.4626$, $\\hat{y}^{(2)} = 0.4134$, $\\hat{y}^{(3)} = 0.6682$. Compute MSE: $[(0.4626-0)^2 + (0.4134-1)^2 + (0.6682-0)^2]/3 = 0.3349$. Output: ([0.4626, 0.4134, 0.6682], 0.3349).",
+          "Example 2: Linearly separable data - features = [[1, 1], [-1, -1]], labels = [1, 0], weights = [1, 1], bias = 0. $z^{(1)} = 2$, $z^{(2)} = -2$. $\\hat{y}^{(1)} = \\sigma(2) \\approx 0.8808$, $\\hat{y}^{(2)} = \\sigma(-2) \\approx 0.1192$. MSE = $[(0.8808-1)^2 + (0.1192-0)^2]/2 \\approx 0.0213$. Good separation with low error."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Model Pipeline",
+          "latex": "$\\hat{y}^{(j)} = \\sigma(\\mathbf{w}^T \\mathbf{x}^{(j)} + b), \\quad \\text{MSE} = \\frac{1}{n}\\sum_{j=1}^{n}(\\hat{y}^{(j)} - y^{(j)})^2$",
+          "description": "Full model: compute predictions via neuron forward pass, then evaluate with MSE"
+        },
+        {
+          "name": "Neuron as Function",
+          "latex": "$f_{\\mathbf{w},b}(\\mathbf{x}) = \\sigma(\\mathbf{w}^T \\mathbf{x} + b)$",
+          "description": "The neuron defines a parametric function from input space to probability space"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete single neuron model by combining batch prediction and MSE computation. This integrates all previous sub-quests into the full solution framework without revealing the exact solution code.",
+        "function_signature": "def neuron_model_evaluate(features: list[list[float]], labels: list[int], weights: list[float], bias: float) -> tuple[list[float], float]:",
+        "starter_code": "import math\n\ndef neuron_model_evaluate(features: list[list[float]], labels: list[int], weights: list[float], bias: float) -> tuple[list[float], float]:\n    # Step 1: Generate predictions for all examples using batch processing\n    # Step 2: Compute MSE between predictions and true labels\n    # Return (predictions, mse) with proper rounding\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "neuron_model_evaluate([[0.5, 1.0], [-1.5, -2.0], [2.0, 1.5]], [0, 1, 0], [0.7, -0.4], -0.1)",
+            "expected": "([0.4626, 0.4134, 0.6682], 0.3349)",
+            "explanation": "Main problem example: process all 3 examples through neuron and compute MSE"
+          },
+          {
+            "input": "neuron_model_evaluate([[1, 1], [-1, -1]], [1, 0], [1, 1], 0)",
+            "expected": "([0.8808, 0.1192], 0.0213)",
+            "explanation": "Linearly separable data with good decision boundary gives low MSE"
+          },
+          {
+            "input": "neuron_model_evaluate([[0, 0]], [0], [1, 1], 0)",
+            "expected": "([0.5], 0.25)",
+            "explanation": "Zero input at decision boundary gives 0.5 probability, MSE = (0.5-0)^2 = 0.25"
+          },
+          {
+            "input": "neuron_model_evaluate([[1], [2], [3]], [0, 0, 1], [1], 0)",
+            "expected": "([0.7311, 0.8808, 0.9526], 0.4001)",
+            "explanation": "Monotonic increase in features with mixed labels shows how MSE captures fit quality"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not reusing functions from previous sub-quests (rewriting batch prediction or MSE from scratch)",
+        "Computing predictions and MSE in the wrong order or not independently",
+        "Returning predictions and MSE in the wrong format (not as a tuple)",
+        "Forgetting to round both outputs to 4 decimal places",
+        "Modifying the order of predictions or labels before computing MSE",
+        "Computing MSE on the wrong axis or with mismatched indices"
+      ],
+      "hint": "This sub-quest combines everything: use batch prediction from step 4 to get all probabilities, then use MSE computation from step 5 to evaluate them against labels. Return both results as a tuple. The main problem is just one step away.",
+      "references": [
+        "End-to-end model pipelines",
+        "Model evaluation",
+        "Binary classification metrics",
+        "Neural network inference"
+      ]
+    }
+  ]
+}

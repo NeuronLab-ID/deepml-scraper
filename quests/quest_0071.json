@@ -1,0 +1,418 @@
+{
+  "problem_id": 71,
+  "title": "Calculate Root Mean Square Error (RMSE)",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "\n## Task: Compute Root Mean Square Error (RMSE)\n\nIn this task, you are required to implement a function `rmse(y_true, y_pred)` that calculates the Root Mean Square Error (RMSE) between the actual values and the predicted values. RMSE is a commonly used metric for evaluating the accuracy of regression models, providing insight into the standard deviation of residuals.\n\n### Your Task:\nImplement the function `rmse(y_true, y_pred)` to:\n1. Calculate the RMSE between the arrays `y_true` and `y_pred`.\n2. Return the RMSE value rounded to three decimal places.\n3. Ensure the function handles edge cases such as:\n   - Mismatched array shapes.\n   - Empty arrays.\n   - Invalid input types.\n\nThe RMSE is defined as:\n\n$$\n\\text{RMSE} = \\sqrt{\\frac{1}{n} \\sum_{i=1}^{n} (y_{\\text{true}, i} - y_{\\text{pred}, i})^2}\n$$\n\nWhere:\n- $ n $ is the number of observations.\n- $ y_{\\text{true}, i} $ and $ y_{\\text{pred}, i} $ are the actual and predicted values for the $ i $-th observation.\n",
+  "example": {
+    "input": "y_true = np.array([3, -0.5, 2, 7])\ny_pred = np.array([2.5, 0.0, 2, 8])\nprint(rmse(y_true, y_pred))",
+    "output": "0.612",
+    "reasoning": "The RMSE is calculated as sqrt((0.5^2 + 0.5^2 + 0^2 + 1^2) / 4) = 0.612"
+  },
+  "starter_code": "\nimport numpy as np\n\ndef rmse(y_true, y_pred):\n\t# Write your code here\n\treturn round(rmse_res,3)\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Residuals and Error Computation",
+      "relation_to_problem": "Computing residuals (differences between actual and predicted values) is the foundational first step in calculating RMSE, as these differences form the basis of the squared error term.",
+      "prerequisites": [
+        "Basic arithmetic",
+        "Arrays/Lists in Python",
+        "Element-wise operations"
+      ],
+      "learning_objectives": [
+        "Define residuals formally in the context of prediction models",
+        "Compute element-wise differences between two arrays",
+        "Understand the interpretation of positive vs negative residuals",
+        "Handle array operations using NumPy"
+      ],
+      "math_content": {
+        "definition": "A **residual** (or prediction error) for the $i$-th observation is defined as the difference between the observed value and the predicted value: $$e_i = y_{\\text{true}, i} - y_{\\text{pred}, i}$$ where $e_i \\in \\mathbb{R}$ represents the error at observation $i$.",
+        "notation": "$y_{\\text{true}, i}$ = actual observed value at index $i$, $y_{\\text{pred}, i}$ = predicted value at index $i$, $e_i$ = residual (error) at index $i$, $n$ = total number of observations",
+        "theorem": "**Properties of Residuals**: (1) If $e_i > 0$, the model underestimated the true value. (2) If $e_i < 0$, the model overestimated the true value. (3) If $e_i = 0$, the prediction is exact. (4) For two arrays of length $n$, the residual vector is $\\mathbf{e} = \\mathbf{y}_{\\text{true}} - \\mathbf{y}_{\\text{pred}} \\in \\mathbb{R}^n$.",
+        "proof_sketch": "The residual measures deviation from truth. Since subtraction is commutative with sign change, $y_{\\text{true}} - y_{\\text{pred}} = -(y_{\\text{pred}} - y_{\\text{true}})$. The convention places actual value first to maintain the interpretation that positive errors indicate underestimation.",
+        "examples": [
+          "Example 1: If $y_{\\text{true}} = 7$ and $y_{\\text{pred}} = 5$, then $e = 7 - 5 = 2$ (model underestimated by 2 units)",
+          "Example 2: If $y_{\\text{true}} = [3, -0.5, 2, 7]$ and $y_{\\text{pred}} = [2.5, 0.0, 2, 8]$, then $\\mathbf{e} = [0.5, -0.5, 0, -1]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Single Residual",
+          "latex": "$e_i = y_{\\text{true}, i} - y_{\\text{pred}, i}$",
+          "description": "Use to compute the error for a single observation"
+        },
+        {
+          "name": "Residual Vector",
+          "latex": "$\\mathbf{e} = \\mathbf{y}_{\\text{true}} - \\mathbf{y}_{\\text{pred}}$",
+          "description": "Use for vectorized computation of all residuals simultaneously"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the residuals (differences) between actual and predicted values. This is the first building block for RMSE calculation.",
+        "function_signature": "def compute_residuals(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_residuals(y_true, y_pred):\n    # Compute element-wise differences: y_true - y_pred\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_residuals(np.array([5, 3, 8]), np.array([4, 3, 9]))",
+            "expected": "np.array([1, 0, -1])",
+            "explanation": "Residuals: (5-4)=1, (3-3)=0, (8-9)=-1. The model was exact for the second prediction."
+          },
+          {
+            "input": "compute_residuals(np.array([3, -0.5, 2, 7]), np.array([2.5, 0.0, 2, 8]))",
+            "expected": "np.array([0.5, -0.5, 0, -1])",
+            "explanation": "These are the residuals from the main problem example, showing mixed over/under estimations."
+          },
+          {
+            "input": "compute_residuals(np.array([10.0]), np.array([10.0]))",
+            "expected": "np.array([0.0])",
+            "explanation": "Perfect prediction yields zero residual."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing y_pred - y_true instead of y_true - y_pred, which inverts the sign convention",
+        "Forgetting to use NumPy arrays, making element-wise operations inefficient",
+        "Not handling the case where arrays have different lengths"
+      ],
+      "hint": "NumPy arrays support direct subtraction with the minus operator, which performs element-wise subtraction automatically.",
+      "references": [
+        "NumPy array operations",
+        "Statistical residuals",
+        "Prediction error analysis"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Squaring Operations and the Squared Error",
+      "relation_to_problem": "Squaring each residual is essential for RMSE computation. This transformation eliminates negative signs, penalizes larger errors more heavily, and forms the basis for the mean squared error calculation.",
+      "prerequisites": [
+        "Understanding residuals",
+        "Exponentiation",
+        "Element-wise array operations"
+      ],
+      "learning_objectives": [
+        "Understand why residuals are squared in error metrics",
+        "Apply element-wise squaring to arrays",
+        "Recognize how squaring amplifies large errors",
+        "Compute squared errors as preparation for MSE"
+      ],
+      "math_content": {
+        "definition": "The **squared error** for the $i$-th observation is defined as: $$SE_i = (y_{\\text{true}, i} - y_{\\text{pred}, i})^2 = e_i^2$$ where $SE_i \\geq 0$ for all $i$. The squared error is always non-negative regardless of whether the prediction was an overestimate or underestimate.",
+        "notation": "$SE_i$ = squared error at observation $i$, $e_i$ = residual at observation $i$, $(\\cdot)^2$ = squaring operation",
+        "theorem": "**Properties of Squared Errors**: (1) $SE_i \\geq 0$ for all $i$ (non-negativity). (2) $SE_i = 0$ if and only if $e_i = 0$ (perfect prediction). (3) Squaring is a convex operation: for errors $|e_1| < |e_2|$, we have $\\frac{SE_2}{SE_1} = \\left(\\frac{|e_2|}{|e_1|}\\right)^2$, meaning larger errors are penalized quadratically more than smaller ones. (4) $(-e_i)^2 = e_i^2$, so overestimation and underestimation by the same magnitude yield identical squared errors.",
+        "proof_sketch": "Non-negativity: Since $e_i \\in \\mathbb{R}$, we have $e_i^2 = e_i \\cdot e_i \\geq 0$ by properties of real numbers. Equality holds iff $e_i = 0$. For the quadratic penalty property, consider errors $e_1 = 1$ and $e_2 = 3$. Then $SE_1 = 1$, $SE_2 = 9$, and $\\frac{SE_2}{SE_1} = 9 = 3^2$, demonstrating that tripling the error increases squared error ninefold.",
+        "examples": [
+          "Example 1: Residual $e = 2$ gives $SE = 4$, while $e = -2$ also gives $SE = 4$ (symmetric treatment)",
+          "Example 2: Small error $e = 0.5$ gives $SE = 0.25$, while large error $e = 3$ gives $SE = 9$. The larger error contributes 36 times more to squared error despite being only 6 times larger.",
+          "Example 3: For residuals $\\mathbf{e} = [0.5, -0.5, 0, -1]$, squared errors are $[0.25, 0.25, 0, 1]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Single Squared Error",
+          "latex": "$SE_i = (y_{\\text{true}, i} - y_{\\text{pred}, i})^2$",
+          "description": "Compute squared error for a single prediction"
+        },
+        {
+          "name": "Squared Error Vector",
+          "latex": "$\\mathbf{SE} = (\\mathbf{y}_{\\text{true}} - \\mathbf{y}_{\\text{pred}})^2 = \\mathbf{e}^2$",
+          "description": "Element-wise squaring of the residual vector"
+        },
+        {
+          "name": "Sum of Squared Errors (SSE)",
+          "latex": "$\\text{SSE} = \\sum_{i=1}^{n} (y_{\\text{true}, i} - y_{\\text{pred}, i})^2$",
+          "description": "Total squared error across all observations (also called RSS)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the squared differences between actual and predicted values. This directly builds toward the numerator in the MSE/RMSE formula.",
+        "function_signature": "def compute_squared_errors(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_squared_errors(y_true, y_pred):\n    # Compute (y_true - y_pred)^2 element-wise\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_squared_errors(np.array([5, 3, 8]), np.array([4, 3, 9]))",
+            "expected": "np.array([1, 0, 1])",
+            "explanation": "Squared errors: (5-4)²=1, (3-3)²=0, (8-9)²=1. Note that errors of +1 and -1 both yield 1."
+          },
+          {
+            "input": "compute_squared_errors(np.array([3, -0.5, 2, 7]), np.array([2.5, 0.0, 2, 8]))",
+            "expected": "np.array([0.25, 0.25, 0, 1])",
+            "explanation": "Squared errors from main problem: 0.5²=0.25, (-0.5)²=0.25, 0²=0, (-1)²=1"
+          },
+          {
+            "input": "compute_squared_errors(np.array([1, 2]), np.array([3, 5]))",
+            "expected": "np.array([4, 9])",
+            "explanation": "Larger errors are amplified: error of -2 gives SE=4, error of -3 gives SE=9"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Taking absolute value before squaring (unnecessary, as squaring already eliminates sign)",
+        "Using ** operator incorrectly or forgetting NumPy's element-wise behavior",
+        "Summing the squared errors prematurely (that comes in the next step)",
+        "Not recognizing that np.square() or **2 both work for element-wise squaring"
+      ],
+      "hint": "You can square a NumPy array element-wise using either the ** operator or np.square() function. Remember to square the differences, not the individual values.",
+      "references": [
+        "L2 loss",
+        "Squared loss functions",
+        "Convex functions in optimization",
+        "Sum of squared residuals (RSS)"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Mean Calculation and the Arithmetic Average",
+      "relation_to_problem": "The 'M' in RMSE stands for 'Mean'—we must average the squared errors across all observations. Understanding the arithmetic mean is crucial for computing the mean squared error before taking the root.",
+      "prerequisites": [
+        "Summation notation",
+        "Division",
+        "Array aggregation"
+      ],
+      "learning_objectives": [
+        "Define the arithmetic mean formally",
+        "Compute the mean of an array of values",
+        "Understand why we divide by n (number of observations)",
+        "Recognize the mean as a measure of central tendency"
+      ],
+      "math_content": {
+        "definition": "The **arithmetic mean** (or average) of a set of $n$ real numbers $\\{x_1, x_2, \\ldots, x_n\\}$ is defined as: $$\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n} x_i = \\frac{x_1 + x_2 + \\cdots + x_n}{n}$$ where $n \\in \\mathbb{N}^+$ is the number of elements and $x_i \\in \\mathbb{R}$ for all $i$.",
+        "notation": "$\\bar{x}$ = sample mean, $\\sum_{i=1}^{n}$ = summation from $i=1$ to $n$, $n$ = sample size",
+        "theorem": "**Mean Squared Error (MSE) Definition**: The mean squared error is the arithmetic mean of the squared errors: $$\\text{MSE} = \\frac{1}{n}\\sum_{i=1}^{n}(y_{\\text{true}, i} - y_{\\text{pred}, i})^2$$ This represents the average squared deviation between predictions and actual values. MSE is always non-negative and equals zero if and only if all predictions are perfect.",
+        "proof_sketch": "MSE is well-defined because: (1) Each squared error $SE_i \\geq 0$, so their sum is non-negative. (2) Dividing by $n > 0$ preserves non-negativity. (3) MSE = 0 requires all $SE_i = 0$, which occurs iff $y_{\\text{true}, i} = y_{\\text{pred}, i}$ for all $i$. The mean normalizes the total error by sample size, making it comparable across datasets of different sizes.",
+        "examples": [
+          "Example 1: For squared errors $[1, 0, 1]$, MSE = $(1+0+1)/3 = 2/3 \\approx 0.667$",
+          "Example 2: For squared errors $[0.25, 0.25, 0, 1]$ (from main problem), MSE = $(0.25+0.25+0+1)/4 = 1.5/4 = 0.375$",
+          "Example 3: If all predictions are perfect, squared errors are $[0, 0, \\ldots, 0]$, giving MSE = 0"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Arithmetic Mean",
+          "latex": "$\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n} x_i$",
+          "description": "General formula for computing the average of any set of numbers"
+        },
+        {
+          "name": "Mean Squared Error (MSE)",
+          "latex": "$\\text{MSE} = \\frac{1}{n}\\sum_{i=1}^{n}(y_{\\text{true}, i} - y_{\\text{pred}, i})^2$",
+          "description": "Average of squared errors; the key intermediate step before computing RMSE"
+        },
+        {
+          "name": "MSE from Squared Error Array",
+          "latex": "$\\text{MSE} = \\frac{1}{n}\\sum_{i=1}^{n} SE_i$",
+          "description": "Compute MSE when you already have the squared errors"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the Mean Squared Error (MSE) given actual and predicted values. This is the crucial step before taking the square root to get RMSE.",
+        "function_signature": "def compute_mse(y_true: np.ndarray, y_pred: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_mse(y_true, y_pred):\n    # Compute mean of squared errors\n    # Step 1: Compute squared errors\n    # Step 2: Take the mean (average)\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_mse(np.array([5, 3, 8]), np.array([4, 3, 9]))",
+            "expected": "0.6666666666666666",
+            "explanation": "Squared errors [1, 0, 1], MSE = (1+0+1)/3 = 2/3 ≈ 0.667"
+          },
+          {
+            "input": "compute_mse(np.array([3, -0.5, 2, 7]), np.array([2.5, 0.0, 2, 8]))",
+            "expected": "0.375",
+            "explanation": "Squared errors [0.25, 0.25, 0, 1], MSE = 1.5/4 = 0.375. Note: RMSE of this will be sqrt(0.375) ≈ 0.612"
+          },
+          {
+            "input": "compute_mse(np.array([10, 10, 10]), np.array([10, 10, 10]))",
+            "expected": "0.0",
+            "explanation": "Perfect predictions yield all squared errors = 0, so MSE = 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to divide by n (computing sum of squared errors instead of mean)",
+        "Dividing by n-1 instead of n (that's for sample variance, not MSE)",
+        "Computing mean before squaring (must square first, then average)",
+        "Not using np.mean() which handles the summation and division automatically"
+      ],
+      "hint": "You can compute the mean using np.mean() or manually with np.sum() divided by the length. Make sure to square the differences before averaging.",
+      "references": [
+        "Arithmetic mean",
+        "Mean Squared Error (MSE)",
+        "Loss functions in machine learning",
+        "Bias-variance tradeoff"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Square Root Operation and RMSE Formula",
+      "relation_to_problem": "The 'R' in RMSE stands for 'Root'—taking the square root of MSE returns the error to the original units of measurement, making RMSE interpretable in the same units as the target variable.",
+      "prerequisites": [
+        "Understanding MSE",
+        "Square root function",
+        "Unit analysis"
+      ],
+      "learning_objectives": [
+        "Understand why the square root is taken in RMSE",
+        "Apply the square root operation correctly",
+        "Interpret RMSE in the context of the original data units",
+        "Recognize the complete RMSE formula composition"
+      ],
+      "math_content": {
+        "definition": "**Root Mean Squared Error (RMSE)** is defined as the square root of the mean squared error: $$\\text{RMSE} = \\sqrt{\\text{MSE}} = \\sqrt{\\frac{1}{n}\\sum_{i=1}^{n}(y_{\\text{true}, i} - y_{\\text{pred}, i})^2}$$ RMSE measures the standard deviation of residuals and is expressed in the same units as the response variable.",
+        "notation": "$\\sqrt{\\cdot}$ = square root operation (principal square root for $x \\geq 0$), RMSE $\\in [0, \\infty)$",
+        "theorem": "**Unit Interpretation Theorem**: If $y_{\\text{true}}$ and $y_{\\text{pred}}$ are measured in units $U$, then: (1) Residuals $e_i$ are in units $U$. (2) Squared errors $SE_i$ are in units $U^2$. (3) MSE is in units $U^2$. (4) RMSE is in units $U$ (original units restored). This makes RMSE directly interpretable: an RMSE of 1.5 meters means predictions deviate by approximately 1.5 meters on average.",
+        "proof_sketch": "Unit analysis: Let $[y] = U$ denote units. Then $[y_{\\text{true}} - y_{\\text{pred}}] = U$, $[(y_{\\text{true}} - y_{\\text{pred}})^2] = U^2$, $[\\text{MSE}] = U^2$ (mean preserves units), and $[\\sqrt{\\text{MSE}}] = \\sqrt{U^2} = U$. The square root operation reverses the squaring's effect on units, making RMSE interpretable in the original scale.",
+        "examples": [
+          "Example 1: If MSE = 0.375, then RMSE = √0.375 ≈ 0.612 (this is the main problem's answer)",
+          "Example 2: Predicting house prices in dollars—if MSE = 10000 dollars², then RMSE = √10000 = 100 dollars (meaningful interpretation)",
+          "Example 3: Temperature prediction—if MSE = 4°C², then RMSE = 2°C (error magnitude in degrees)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "RMSE from MSE",
+          "latex": "$\\text{RMSE} = \\sqrt{\\text{MSE}}$",
+          "description": "Take square root of mean squared error"
+        },
+        {
+          "name": "Complete RMSE Formula",
+          "latex": "$\\text{RMSE} = \\sqrt{\\frac{1}{n}\\sum_{i=1}^{n}(y_{\\text{true}, i} - y_{\\text{pred}, i})^2}$",
+          "description": "Full formula combining all steps: differences, squaring, averaging, and root"
+        },
+        {
+          "name": "RMSE Properties",
+          "latex": "$\\text{RMSE} \\geq 0$, with equality iff $y_{\\text{true}, i} = y_{\\text{pred}, i}$ for all $i$",
+          "description": "RMSE is non-negative and zero only for perfect predictions"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a basic RMSE function (without edge case handling) that takes MSE and returns RMSE. This isolates the square root operation's role in the final metric.",
+        "function_signature": "def mse_to_rmse(mse: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef mse_to_rmse(mse):\n    # Take the square root of MSE to get RMSE\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "mse_to_rmse(0.375)",
+            "expected": "0.6123724356957945",
+            "explanation": "√0.375 ≈ 0.612, matching the expected RMSE from the main problem"
+          },
+          {
+            "input": "mse_to_rmse(4.0)",
+            "expected": "2.0",
+            "explanation": "√4 = 2 exactly"
+          },
+          {
+            "input": "mse_to_rmse(0.0)",
+            "expected": "0.0",
+            "explanation": "Perfect predictions: √0 = 0"
+          },
+          {
+            "input": "mse_to_rmse(0.6666666666666666)",
+            "expected": "0.816496580927726",
+            "explanation": "√(2/3) ≈ 0.816"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to take the square root (reporting MSE instead of RMSE)",
+        "Taking square root before computing the mean (must be mean of squared errors, not mean of errors)",
+        "Using integer division which can cause precision loss",
+        "Not using np.sqrt() for consistency with NumPy arrays"
+      ],
+      "hint": "Use np.sqrt() to compute the square root. Remember: RMSE = √(MSE), and MSE must be computed first.",
+      "references": [
+        "Root mean square",
+        "Standard deviation of residuals",
+        "Error metrics comparison (RMSE vs MAE)",
+        "Model evaluation metrics"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Input Validation and Edge Cases in Error Metrics",
+      "relation_to_problem": "Real-world implementations must handle invalid inputs: mismatched array shapes, empty arrays, and invalid types. Robust error handling ensures the RMSE function works reliably across all scenarios.",
+      "prerequisites": [
+        "Exception handling in Python",
+        "Array shape validation",
+        "Type checking"
+      ],
+      "learning_objectives": [
+        "Identify potential edge cases in array-based computations",
+        "Implement input validation for numerical functions",
+        "Handle exceptions gracefully with informative error messages",
+        "Ensure numerical stability and correctness"
+      ],
+      "math_content": {
+        "definition": "**Well-defined RMSE**: RMSE is mathematically defined for two arrays $\\mathbf{y}_{\\text{true}}, \\mathbf{y}_{\\text{pred}} \\in \\mathbb{R}^n$ if and only if: (1) Both arrays have the same dimension $n$. (2) $n \\geq 1$ (non-empty). (3) All elements are finite real numbers (no NaN or infinity). When these conditions are not met, RMSE is undefined and the implementation should raise an appropriate error.",
+        "notation": "$\\mathbb{R}^n$ = $n$-dimensional real vector space, $|\\mathbf{y}|$ = length/dimension of vector $\\mathbf{y}$, NaN = Not a Number",
+        "theorem": "**Preconditions for RMSE Computation**: For RMSE to be computable: (1) **Shape Consistency**: $|\\mathbf{y}_{\\text{true}}| = |\\mathbf{y}_{\\text{pred}}| = n$. (2) **Non-emptiness**: $n \\geq 1$. (3) **Finiteness**: $\\forall i, y_{\\text{true}, i}, y_{\\text{pred}, i} \\in \\mathbb{R}$ (finite values). Violating any precondition makes RMSE undefined.",
+        "proof_sketch": "Shape mismatch: If $|\\mathbf{y}_{\\text{true}}| \\neq |\\mathbf{y}_{\\text{pred}}|$, element-wise operations $(y_{\\text{true}, i} - y_{\\text{pred}, i})$ are undefined for some $i$. Empty arrays: If $n = 0$, division by $n$ in $\\frac{1}{n}\\sum$ is undefined (division by zero). Non-finite values: If any $y_i = \\text{NaN}$ or $\\pm\\infty$, arithmetic operations propagate these, making RMSE meaningless.",
+        "examples": [
+          "Example 1: Arrays of different shapes—y_true of length 4 and y_pred of length 3 cannot be compared element-wise",
+          "Example 2: Empty arrays—y_true = [] and y_pred = [] have n=0, making division by zero occur in MSE calculation",
+          "Example 3: Valid input—y_true and y_pred both have 4 elements with finite values: RMSE is well-defined"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Shape Validation",
+          "latex": "$|\\mathbf{y}_{\\text{true}}| = |\\mathbf{y}_{\\text{pred}}|$",
+          "description": "Ensure both arrays have identical length before computing RMSE"
+        },
+        {
+          "name": "Non-emptiness Check",
+          "latex": "$n = |\\mathbf{y}_{\\text{true}}| \\geq 1$",
+          "description": "Verify at least one observation exists"
+        },
+        {
+          "name": "Type Validation",
+          "latex": "$\\mathbf{y}_{\\text{true}}, \\mathbf{y}_{\\text{pred}} \\in \\mathbb{R}^n$",
+          "description": "Confirm inputs are numeric arrays, not strings or other types"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete RMSE function with comprehensive input validation and edge case handling. This integrates all previous concepts with production-ready error handling, rounding the result to three decimal places as specified.",
+        "function_signature": "def rmse_with_validation(y_true: np.ndarray, y_pred: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef rmse_with_validation(y_true, y_pred):\n    # Validate inputs:\n    # 1. Check if inputs are numpy arrays (convert if needed)\n    # 2. Check if arrays have the same shape\n    # 3. Check if arrays are non-empty\n    # 4. Compute residuals: y_true - y_pred\n    # 5. Square the residuals\n    # 6. Compute mean of squared residuals (MSE)\n    # 7. Take square root to get RMSE\n    # 8. Round to 3 decimal places\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "rmse_with_validation(np.array([3, -0.5, 2, 7]), np.array([2.5, 0.0, 2, 8]))",
+            "expected": "0.612",
+            "explanation": "Main problem test case: √((0.5² + 0.5² + 0² + 1²)/4) = √0.375 ≈ 0.612"
+          },
+          {
+            "input": "rmse_with_validation(np.array([5, 3, 8]), np.array([4, 3, 9]))",
+            "expected": "0.816",
+            "explanation": "√((1 + 0 + 1)/3) = √(2/3) ≈ 0.816"
+          },
+          {
+            "input": "rmse_with_validation(np.array([10]), np.array([10]))",
+            "expected": "0.0",
+            "explanation": "Single perfect prediction: RMSE = 0.0"
+          },
+          {
+            "input": "rmse_with_validation(np.array([1, 2, 3]), np.array([1, 2]))",
+            "expected": "ValueError: Arrays must have the same shape",
+            "explanation": "Mismatched shapes should raise an error"
+          },
+          {
+            "input": "rmse_with_validation(np.array([]), np.array([]))",
+            "expected": "ValueError: Arrays cannot be empty",
+            "explanation": "Empty arrays should raise an error"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not converting lists to NumPy arrays when needed (accepting only arrays)",
+        "Checking shape after attempting computation (check should be first)",
+        "Not handling the case where inputs might not be arrays at all",
+        "Forgetting to round the final result to the required precision (3 decimal places)",
+        "Not providing informative error messages that help users understand what went wrong"
+      ],
+      "hint": "Use np.array() to ensure inputs are arrays, check .shape attribute for validation, and use try-except blocks for robust error handling. The round() function or np.round() can round to specified decimal places.",
+      "references": [
+        "Input validation best practices",
+        "NumPy array broadcasting",
+        "Exception handling in numerical computing",
+        "Defensive programming"
+      ]
+    }
+  ]
+}

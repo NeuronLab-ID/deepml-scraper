@@ -1,0 +1,399 @@
+{
+  "problem_id": 1,
+  "title": "Matrix-Vector Dot Product",
+  "category": "Linear Algebra",
+  "difficulty": "easy",
+  "description": "Write a Python function that computes the dot product of a matrix and a vector. The function should return a list representing the resulting vector if the operation is valid, or -1 if the matrix and vector dimensions are incompatible. A matrix (a list of lists) can be dotted with a vector (a list) only if the number of columns in the matrix equals the length of the vector. For example, an n x m matrix requires a vector of length m.",
+  "example": {
+    "input": "a = [[1, 2], [2, 4]], b = [1, 2]",
+    "output": "[5, 10]",
+    "reasoning": "Row 1: (1 * 1) + (2 * 2) = 1 + 4 = 5; Row 2: (2 * 1) + (4 * 2) = 2 + 8 = 10"
+  },
+  "starter_code": "def matrix_dot_vector(a: list[list[int|float]], b: list[int|float]) -> list[int|float]:\n\t# Return a list where each element is the dot product of a row of 'a' with 'b'.\n\t# If the number of columns in 'a' does not match the length of 'b', return -1.\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Vector-Vector Dot Product Fundamentals",
+      "relation_to_problem": "Understanding how to compute the dot product between two vectors is essential because each row of the matrix will be dotted with the input vector to produce one element of the result.",
+      "prerequisites": [
+        "Basic arithmetic operations",
+        "Understanding of lists/arrays in Python"
+      ],
+      "learning_objectives": [
+        "Formally define the dot product operation between two vectors",
+        "Understand the algebraic and geometric interpretations of the dot product",
+        "Implement a function to compute the dot product of two equal-length vectors"
+      ],
+      "math_content": {
+        "definition": "Let $\\vec{u} = (u_1, u_2, \\ldots, u_n)$ and $\\vec{v} = (v_1, v_2, \\ldots, v_n)$ be two vectors in $\\mathbb{R}^n$. The **dot product** (also called scalar product or inner product) is a binary operation that maps two vectors to a scalar value, formally defined as: $$\\vec{u} \\cdot \\vec{v} = \\sum_{i=1}^{n} u_i v_i = u_1v_1 + u_2v_2 + \\cdots + u_nv_n$$",
+        "notation": "$\\vec{u} \\cdot \\vec{v}$ denotes the dot product; $u_i$ is the $i$-th component of vector $\\vec{u}$; $n$ is the dimension of the vectors",
+        "theorem": "**Geometric Interpretation**: The dot product can also be expressed as $\\vec{u} \\cdot \\vec{v} = |\\vec{u}| |\\vec{v}| \\cos \\theta$, where $|\\vec{u}|$ and $|\\vec{v}|$ are the magnitudes of the vectors and $\\theta$ is the angle between them.",
+        "proof_sketch": "The algebraic definition follows from component-wise multiplication and summation. The geometric interpretation emerges from projecting one vector onto another: the dot product measures how much one vector extends in the direction of another. When vectors are perpendicular ($\\theta = 90°$), $\\cos 90° = 0$, so the dot product is zero.",
+        "examples": [
+          "For $\\vec{u} = (2, 3)$ and $\\vec{v} = (1, 4)$: $\\vec{u} \\cdot \\vec{v} = (2)(1) + (3)(4) = 2 + 12 = 14$",
+          "For $\\vec{u} = (1, 0, -1)$ and $\\vec{v} = (2, 5, 2)$: $\\vec{u} \\cdot \\vec{v} = (1)(2) + (0)(5) + (-1)(2) = 2 + 0 - 2 = 0$ (orthogonal vectors)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Dot Product",
+          "latex": "$\\vec{u} \\cdot \\vec{v} = \\sum_{i=1}^{n} u_i v_i$",
+          "description": "Use this to compute the scalar result of multiplying two equal-length vectors"
+        },
+        {
+          "name": "Commutativity",
+          "latex": "$\\vec{u} \\cdot \\vec{v} = \\vec{v} \\cdot \\vec{u}$",
+          "description": "The order of vectors doesn't affect the result"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the dot product of two vectors (represented as Python lists). The vectors are guaranteed to have the same length.",
+        "function_signature": "def vector_dot_product(u: list[int|float], v: list[int|float]) -> int|float:",
+        "starter_code": "def vector_dot_product(u: list[int|float], v: list[int|float]) -> int|float:\n    # Compute the sum of element-wise products\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "vector_dot_product([1, 2, 3], [4, 5, 6])",
+            "expected": "32",
+            "explanation": "$(1)(4) + (2)(5) + (3)(6) = 4 + 10 + 18 = 32$"
+          },
+          {
+            "input": "vector_dot_product([2, -1], [3, 4])",
+            "expected": "2",
+            "explanation": "$(2)(3) + (-1)(4) = 6 - 4 = 2$"
+          },
+          {
+            "input": "vector_dot_product([1, 0, 0], [0, 1, 0])",
+            "expected": "0",
+            "explanation": "$(1)(0) + (0)(1) + (0)(0) = 0$, these are orthogonal unit vectors"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to sum all the products (returning a list instead of a scalar)",
+        "Confusing dot product with element-wise multiplication",
+        "Not handling negative numbers correctly in the multiplication"
+      ],
+      "hint": "Use a loop or list comprehension to compute each $u_i \\times v_i$, then use the sum() function to add them all together.",
+      "references": [
+        "Linear algebra textbooks chapter on vector operations",
+        "Inner product spaces",
+        "Vector arithmetic"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Dimensional Compatibility in Vector Operations",
+      "relation_to_problem": "Before performing a matrix-vector multiplication, we must verify that the dimensions are compatible—specifically, that the number of matrix columns equals the vector length. This prevents undefined operations.",
+      "prerequisites": [
+        "Understanding of vector dimensions",
+        "Basic matrix structure"
+      ],
+      "learning_objectives": [
+        "Understand why dimensional compatibility is required for dot products",
+        "Learn to extract dimensions from matrices and vectors in code",
+        "Implement validation logic for dimensional compatibility"
+      ],
+      "math_content": {
+        "definition": "A matrix $A \\in \\mathbb{R}^{n \\times m}$ has $n$ rows and $m$ columns. A vector $\\vec{v} \\in \\mathbb{R}^k$ has length $k$. The dot product operation between a row of $A$ and $\\vec{v}$ is **defined** if and only if the row length equals the vector length, i.e., $m = k$.",
+        "notation": "$A \\in \\mathbb{R}^{n \\times m}$ means matrix $A$ has $n$ rows and $m$ columns; $\\vec{v} \\in \\mathbb{R}^k$ means vector $\\vec{v}$ has $k$ components",
+        "theorem": "**Compatibility Theorem**: The matrix-vector product $A\\vec{v}$ is defined if and only if the number of columns in $A$ equals the number of components in $\\vec{v}$. Formally: $A \\in \\mathbb{R}^{n \\times m}$ and $\\vec{v} \\in \\mathbb{R}^{m}$ produces $A\\vec{v} \\in \\mathbb{R}^{n}$.",
+        "proof_sketch": "Each element of the result vector is computed by taking the dot product of one row of $A$ (which has $m$ elements) with $\\vec{v}$ (which has $k$ elements). The dot product $\\sum_{i=1}^{m} a_i v_i$ is only defined when both sequences have the same length, requiring $m = k$. If $m \\neq k$, we cannot pair each matrix element with a vector element, making the operation undefined.",
+        "examples": [
+          "Matrix $A$ is $3 \\times 2$ and vector $\\vec{v}$ has length $2$: Compatible ($2 = 2$), result will have length $3$",
+          "Matrix $A$ is $2 \\times 4$ and vector $\\vec{v}$ has length $3$: Incompatible ($4 \\neq 3$), operation undefined",
+          "Matrix $A$ is $1 \\times 5$ and vector $\\vec{v}$ has length $5$: Compatible ($5 = 5$), result will have length $1$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Dimension Extraction",
+          "latex": "$A \\in \\mathbb{R}^{n \\times m} \\Rightarrow \\text{rows}(A) = n, \\text{cols}(A) = m$",
+          "description": "Extract the number of rows and columns from a matrix"
+        },
+        {
+          "name": "Compatibility Condition",
+          "latex": "$\\text{cols}(A) = \\text{length}(\\vec{v})$",
+          "description": "The condition that must be satisfied for matrix-vector multiplication"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that checks whether a matrix and vector have compatible dimensions for dot product computation. Return True if compatible (number of columns in matrix equals vector length), False otherwise. The matrix is represented as a list of lists, where each inner list is a row.",
+        "function_signature": "def check_compatibility(matrix: list[list[int|float]], vector: list[int|float]) -> bool:",
+        "starter_code": "def check_compatibility(matrix: list[list[int|float]], vector: list[int|float]) -> bool:\n    # Check if number of columns in matrix equals length of vector\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "check_compatibility([[1, 2, 3], [4, 5, 6]], [1, 2, 3])",
+            "expected": "True",
+            "explanation": "Matrix is $2 \\times 3$ (2 rows, 3 columns), vector has length 3. Since $3 = 3$, they are compatible"
+          },
+          {
+            "input": "check_compatibility([[1, 2], [3, 4], [5, 6]], [1, 2, 3])",
+            "expected": "False",
+            "explanation": "Matrix is $3 \\times 2$ (3 rows, 2 columns), vector has length 3. Since $2 \\neq 3$, they are incompatible"
+          },
+          {
+            "input": "check_compatibility([[1]], [5])",
+            "expected": "True",
+            "explanation": "Matrix is $1 \\times 1$, vector has length 1. Since $1 = 1$, they are compatible"
+          },
+          {
+            "input": "check_compatibility([[1, 2, 3, 4]], [1, 2])",
+            "expected": "False",
+            "explanation": "Matrix is $1 \\times 4$, vector has length 2. Since $4 \\neq 2$, they are incompatible"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing rows with columns (checking if number of rows equals vector length)",
+        "Not handling empty matrices or vectors correctly",
+        "Assuming all rows have the same length without verification",
+        "Checking equality of matrix rows with vector length instead of matrix columns"
+      ],
+      "hint": "The number of columns in a matrix equals the length of any single row (assuming a well-formed matrix). Access the first row to determine the number of columns.",
+      "references": [
+        "Matrix dimensions and notation",
+        "Linear transformation domain and codomain",
+        "Dimensional analysis in linear algebra"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Matrix Row Extraction and Representation",
+      "relation_to_problem": "To compute the matrix-vector product, we need to extract each row of the matrix individually and treat it as a vector. Understanding matrix structure and row access is crucial for the implementation.",
+      "prerequisites": [
+        "Matrix representation as nested lists",
+        "Indexing in Python",
+        "Vector-Vector Dot Product Fundamentals"
+      ],
+      "learning_objectives": [
+        "Understand the relationship between matrix rows and vectors",
+        "Learn to access and extract individual rows from a matrix",
+        "Recognize that each row-vector dot product produces one component of the result"
+      ],
+      "math_content": {
+        "definition": "A matrix $A \\in \\mathbb{R}^{n \\times m}$ can be decomposed into $n$ row vectors. The $i$-th row vector, denoted $\\vec{r}_i$ or $A_{i,:}$, is defined as: $$\\vec{r}_i = (a_{i1}, a_{i2}, \\ldots, a_{im}) \\in \\mathbb{R}^{m}$$ where $a_{ij}$ represents the element in row $i$, column $j$ of matrix $A$.",
+        "notation": "$A_{i,:}$ denotes the $i$-th row of matrix $A$ (all columns in row $i$); $a_{ij}$ is the element at position $(i,j)$",
+        "theorem": "**Row Vector Theorem**: For a matrix $A \\in \\mathbb{R}^{n \\times m}$ and vector $\\vec{v} \\in \\mathbb{R}^{m}$, the $i$-th component of the product $A\\vec{v}$ is given by the dot product of the $i$-th row of $A$ with $\\vec{v}$: $$(A\\vec{v})_i = A_{i,:} \\cdot \\vec{v} = \\sum_{j=1}^{m} a_{ij}v_j$$",
+        "proof_sketch": "By definition of matrix-vector multiplication, the $i$-th component of the result is computed by multiplying each element of row $i$ by the corresponding element of $\\vec{v}$ and summing. This is precisely the dot product operation: $A_{i,:} \\cdot \\vec{v} = \\sum_{j=1}^{m} a_{ij}v_j$. Since each row can be treated as an independent vector, we can apply the dot product formula from Step 1.",
+        "examples": [
+          "For matrix $A = \\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{pmatrix}$: Row 1 is $\\vec{r}_1 = (1, 2, 3)$, Row 2 is $\\vec{r}_2 = (4, 5, 6)$",
+          "For matrix $A = \\begin{pmatrix} 2 & -1 \\\\ 0 & 3 \\\\ 1 & 1 \\end{pmatrix}$: Row 1 is $(2, -1)$, Row 2 is $(0, 3)$, Row 3 is $(1, 1)$",
+          "Given $\\vec{v} = (1, 2)$ and row $(3, 4)$: The dot product $(3, 4) \\cdot (1, 2) = 3(1) + 4(2) = 11$ gives one component of the result"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Row Extraction",
+          "latex": "$\\vec{r}_i = A_{i,:} = (a_{i1}, a_{i2}, \\ldots, a_{im})$",
+          "description": "Extract the $i$-th row as a vector"
+        },
+        {
+          "name": "Component-wise Product Formula",
+          "latex": "$(A\\vec{v})_i = A_{i,:} \\cdot \\vec{v}$",
+          "description": "Each result component comes from one row-vector dot product"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes a matrix and a vector, and returns a list of dot products where each element is the dot product of the corresponding matrix row with the vector. You may assume the dimensions are compatible. This exercise combines row extraction with dot product computation.",
+        "function_signature": "def compute_row_dot_products(matrix: list[list[int|float]], vector: list[int|float]) -> list[int|float]:",
+        "starter_code": "def compute_row_dot_products(matrix: list[list[int|float]], vector: list[int|float]) -> list[int|float]:\n    # For each row in the matrix, compute its dot product with the vector\n    # Return a list of these dot products\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_row_dot_products([[1, 2], [3, 4]], [1, 0])",
+            "expected": "[1, 3]",
+            "explanation": "Row 1: $(1, 2) \\cdot (1, 0) = 1(1) + 2(0) = 1$; Row 2: $(3, 4) \\cdot (1, 0) = 3(1) + 4(0) = 3$"
+          },
+          {
+            "input": "compute_row_dot_products([[1, 2, 3]], [1, 1, 1])",
+            "expected": "[6]",
+            "explanation": "Single row: $(1, 2, 3) \\cdot (1, 1, 1) = 1 + 2 + 3 = 6$"
+          },
+          {
+            "input": "compute_row_dot_products([[2, 0], [0, 3], [-1, 2]], [4, 5])",
+            "expected": "[8, 15, 6]",
+            "explanation": "Row 1: $(2, 0) \\cdot (4, 5) = 8$; Row 2: $(0, 3) \\cdot (4, 5) = 15$; Row 3: $(-1, 2) \\cdot (4, 5) = -4 + 10 = 6$"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not iterating through all rows of the matrix",
+        "Computing the dot product incorrectly (element-wise instead of sum of products)",
+        "Returning a single value instead of a list of values",
+        "Confusing row indexing with column indexing"
+      ],
+      "hint": "Iterate through each row of the matrix. For each row, compute its dot product with the vector using the function from Step 1, then collect all results in a list.",
+      "references": [
+        "Matrix row operations",
+        "Row vectors vs column vectors",
+        "Matrix-vector multiplication mechanics"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Error Handling and Edge Cases in Linear Algebra Operations",
+      "relation_to_problem": "Real-world implementations must handle invalid inputs gracefully. For the matrix-vector product, we need to return -1 when dimensions are incompatible, and handle edge cases like empty matrices.",
+      "prerequisites": [
+        "Dimensional Compatibility in Vector Operations",
+        "Python conditional statements"
+      ],
+      "learning_objectives": [
+        "Identify edge cases in matrix-vector operations",
+        "Implement robust error checking before computation",
+        "Understand the mathematical meaning of undefined operations"
+      ],
+      "math_content": {
+        "definition": "An operation is **undefined** when the mathematical requirements for its execution are not met. For matrix-vector multiplication, the operation $A\\vec{v}$ is undefined when $\\text{cols}(A) \\neq \\text{length}(\\vec{v})$. In such cases, we cannot construct a valid result and must signal an error.",
+        "notation": "$\\emptyset$ represents an empty set; $A = []$ represents an empty matrix; $\\text{undefined}$ indicates an operation cannot be performed",
+        "theorem": "**Well-Definedness Requirement**: A mathematical operation must only be applied when all preconditions are satisfied. For $A\\vec{v}$ where $A \\in \\mathbb{R}^{n \\times m}$, the preconditions are: (1) $A$ is non-empty and well-formed (all rows have equal length $m$), (2) $\\vec{v} \\in \\mathbb{R}^{m}$, (3) $m > 0$. Violating any precondition makes the operation undefined.",
+        "proof_sketch": "If $\\text{cols}(A) \\neq \\text{length}(\\vec{v})$, then when computing $(A\\vec{v})_i = \\sum_{j=1}^{m} a_{ij}v_j$, we encounter a mismatch: we either have matrix elements without corresponding vector elements, or vector elements without corresponding matrix elements. This summation cannot be completed, making the result undefined. Similarly, an empty matrix has no rows, so we cannot produce any output components.",
+        "examples": [
+          "Empty matrix $A = []$ with any vector: undefined (no rows to process)",
+          "Matrix $A \\in \\mathbb{R}^{2 \\times 3}$ with vector $\\vec{v} \\in \\mathbb{R}^{2}$: undefined ($3 \\neq 2$)",
+          "Matrix $A \\in \\mathbb{R}^{3 \\times 2}$ with vector $\\vec{v} \\in \\mathbb{R}^{2}$: defined ($2 = 2$), proceed with computation"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Validity Check",
+          "latex": "$\\text{valid}(A, \\vec{v}) = \\begin{cases} \\text{true} & \\text{if } A \\neq \\emptyset \\text{ and } \\text{cols}(A) = \\text{length}(\\vec{v}) \\\\ \\text{false} & \\text{otherwise} \\end{cases}$",
+          "description": "Boolean function to determine if operation is valid"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes a matrix and vector, checks if they are compatible for dot product operation, and returns the appropriate result. If compatible, return a list of dot products (one per row). If incompatible or if the matrix is empty, return -1.",
+        "function_signature": "def safe_matrix_vector_product(matrix: list[list[int|float]], vector: list[int|float]) -> list[int|float] | int:",
+        "starter_code": "def safe_matrix_vector_product(matrix: list[list[int|float]], vector: list[int|float]) -> list[int|float] | int:\n    # First check if the operation is valid\n    # If invalid or empty matrix, return -1\n    # Otherwise, compute and return the dot products\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "safe_matrix_vector_product([[1, 2], [3, 4]], [5, 6])",
+            "expected": "[17, 39]",
+            "explanation": "Compatible: $2 = 2$. Row 1: $(1)(5) + (2)(6) = 17$; Row 2: $(3)(5) + (4)(6) = 39$"
+          },
+          {
+            "input": "safe_matrix_vector_product([[1, 2, 3], [4, 5, 6]], [1, 2])",
+            "expected": "-1",
+            "explanation": "Incompatible: matrix has 3 columns but vector has length 2 ($3 \\neq 2$)"
+          },
+          {
+            "input": "safe_matrix_vector_product([], [1, 2, 3])",
+            "expected": "-1",
+            "explanation": "Empty matrix: no rows to process, operation undefined"
+          },
+          {
+            "input": "safe_matrix_vector_product([[5]], [3])",
+            "expected": "[15]",
+            "explanation": "Compatible: $1 = 1$. Single element: $(5)(3) = 15$"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking for empty matrices before accessing elements",
+        "Checking dimensions after attempting computation (should check first)",
+        "Returning an empty list instead of -1 for invalid cases",
+        "Not considering that an empty vector might also be invalid"
+      ],
+      "hint": "Use an if-statement to check validity first. Check if the matrix is empty, then verify dimensional compatibility. Only proceed with computation if all checks pass.",
+      "references": [
+        "Exception handling in numerical computing",
+        "Defensive programming",
+        "Preconditions and postconditions"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Complete Matrix-Vector Multiplication Algorithm",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts into a complete, robust implementation of the matrix-vector dot product with proper validation, row iteration, and dot product computation.",
+      "prerequisites": [
+        "Vector-Vector Dot Product Fundamentals",
+        "Dimensional Compatibility",
+        "Matrix Row Extraction",
+        "Error Handling and Edge Cases"
+      ],
+      "learning_objectives": [
+        "Synthesize all previous concepts into a complete algorithm",
+        "Implement the full matrix-vector multiplication with error handling",
+        "Understand the computational complexity of the operation",
+        "Verify correctness through comprehensive testing"
+      ],
+      "math_content": {
+        "definition": "The **matrix-vector product** is a linear transformation that maps a vector from one space to another. Given $A \\in \\mathbb{R}^{n \\times m}$ and $\\vec{v} \\in \\mathbb{R}^{m}$, the product $\\vec{w} = A\\vec{v}$ where $\\vec{w} \\in \\mathbb{R}^{n}$ is defined component-wise as: $$w_i = \\sum_{j=1}^{m} a_{ij}v_j \\quad \\text{for } i = 1, 2, \\ldots, n$$",
+        "notation": "$A\\vec{v}$ denotes matrix-vector product; $w_i$ is the $i$-th component of result vector; summation over $j$ represents dot product with row $i$",
+        "theorem": "**Linearity Theorem**: Matrix-vector multiplication is a linear operation, satisfying: (1) $A(\\vec{u} + \\vec{v}) = A\\vec{u} + A\\vec{v}$ (additivity), and (2) $A(c\\vec{v}) = c(A\\vec{v})$ for any scalar $c$ (homogeneity). These properties make it a **linear transformation**.",
+        "proof_sketch": "For additivity: $(A(\\vec{u} + \\vec{v}))_i = \\sum_{j=1}^{m} a_{ij}(u_j + v_j) = \\sum_{j=1}^{m} a_{ij}u_j + \\sum_{j=1}^{m} a_{ij}v_j = (A\\vec{u})_i + (A\\vec{v})_i$. For homogeneity: $(A(c\\vec{v}))_i = \\sum_{j=1}^{m} a_{ij}(cv_j) = c\\sum_{j=1}^{m} a_{ij}v_j = c(A\\vec{v})_i$. Both properties hold for all components, establishing linearity.",
+        "examples": [
+          "Complete example: $A = \\begin{pmatrix} 1 & 2 \\\\ 2 & 4 \\end{pmatrix}$, $\\vec{v} = \\begin{pmatrix} 1 \\\\ 2 \\end{pmatrix}$. Component 1: $(1)(1) + (2)(2) = 5$; Component 2: $(2)(1) + (4)(2) = 10$. Result: $\\begin{pmatrix} 5 \\\\ 10 \\end{pmatrix}$",
+          "Identity transformation: $I\\vec{v} = \\vec{v}$ where $I$ is the identity matrix",
+          "Zero transformation: $O\\vec{v} = \\vec{0}$ where $O$ is the zero matrix"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Matrix-Vector Product",
+          "latex": "$(A\\vec{v})_i = \\sum_{j=1}^{m} a_{ij}v_j = A_{i,:} \\cdot \\vec{v}$",
+          "description": "Complete formula combining row extraction and dot product"
+        },
+        {
+          "name": "Computational Complexity",
+          "latex": "$O(nm)$",
+          "description": "Time complexity where $n$ is number of rows and $m$ is number of columns"
+        },
+        {
+          "name": "Output Dimension",
+          "latex": "$\\mathbb{R}^{n \\times m} \\times \\mathbb{R}^{m} \\rightarrow \\mathbb{R}^{n}$",
+          "description": "The result vector has the same length as the number of matrix rows"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete matrix-vector dot product function. The function should: (1) validate that dimensions are compatible, (2) return -1 if incompatible or if matrix is empty, (3) compute the dot product of each row with the vector, (4) return the resulting vector as a list. This synthesizes all concepts from previous sub-quests.",
+        "function_signature": "def matrix_dot_vector(a: list[list[int|float]], b: list[int|float]) -> list[int|float] | int:",
+        "starter_code": "def matrix_dot_vector(a: list[list[int|float]], b: list[int|float]) -> list[int|float] | int:\n    # Step 1: Check if matrix is empty\n    # Step 2: Check dimensional compatibility\n    # Step 3: For each row, compute dot product with vector\n    # Step 4: Return list of results\n    # Return -1 if invalid\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "matrix_dot_vector([[1, 2], [2, 4]], [1, 2])",
+            "expected": "[5, 10]",
+            "explanation": "Row 1: $(1)(1) + (2)(2) = 1 + 4 = 5$; Row 2: $(2)(1) + (4)(2) = 2 + 8 = 10$"
+          },
+          {
+            "input": "matrix_dot_vector([[1, 2, 3], [4, 5, 6], [7, 8, 9]], [1, 0, -1])",
+            "expected": "[-2, -2, -2]",
+            "explanation": "Row 1: $1 + 0 - 3 = -2$; Row 2: $4 + 0 - 6 = -2$; Row 3: $7 + 0 - 9 = -2$"
+          },
+          {
+            "input": "matrix_dot_vector([[1, 2], [3, 4]], [1, 2, 3])",
+            "expected": "-1",
+            "explanation": "Incompatible dimensions: matrix has 2 columns, vector has length 3"
+          },
+          {
+            "input": "matrix_dot_vector([], [1, 2])",
+            "expected": "-1",
+            "explanation": "Empty matrix: operation undefined"
+          },
+          {
+            "input": "matrix_dot_vector([[0, 0], [0, 0]], [5, 10])",
+            "expected": "[0, 0]",
+            "explanation": "Zero matrix: all dot products yield 0"
+          },
+          {
+            "input": "matrix_dot_vector([[1]], [1])",
+            "expected": "[1]",
+            "explanation": "Single element: $(1)(1) = 1$"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not validating inputs before computation",
+        "Mixing up rows and columns when checking compatibility",
+        "Returning individual dot products instead of collecting them in a list",
+        "Not handling negative numbers or zeros correctly",
+        "Forgetting to return -1 for invalid cases"
+      ],
+      "hint": "Structure your solution with clear steps: validation first, then iteration through rows, then computation for each row. Reuse the concepts from previous sub-quests.",
+      "references": [
+        "Linear transformations",
+        "Matrix multiplication algorithms",
+        "Computational linear algebra",
+        "NumPy implementation of matrix operations"
+      ]
+    }
+  ]
+}

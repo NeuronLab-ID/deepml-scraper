@@ -1,0 +1,464 @@
+{
+  "problem_id": 182,
+  "title": "Central Limit Theorem Simulation",
+  "category": "Probability",
+  "difficulty": "medium",
+  "description": "Write a Python function to demonstrate the Central Limit Theorem (CLT). Your function should draw many samples from a chosen distribution, compute their sample means, standardize them to Z-scores, and return the mean and standard deviation of these standardized values. The implementation should handle at least the following distributions: Uniform(0,1), Exponential(scale=1.0), and Bernoulli(p=0.3).",
+  "example": {
+    "input": "simulate_clt('exponential', n=30, runs=10000, seed=42)",
+    "output": "{'mean': -0.003, 'std': 1.002}",
+    "reasoning": "Drawing 10,000 samples of size 30 from an exponential distribution and standardizing the means produces a distribution very close to $N(0,1)$."
+  },
+  "starter_code": "import numpy as np\n\ndef simulate_clt(distribution: str, n: int, runs: int = 10000, seed: int = 42) -> dict:\n    \"\"\"\n    Simulate the Central Limit Theorem.\n\n    Args:\n        distribution (str): The distribution to sample from ('uniform', 'exponential', 'bernoulli').\n        n (int): Sample size.\n        runs (int): Number of repeated experiments.\n        seed (int): Random seed for reproducibility.\n\n    Returns:\n        dict: {'mean': float, 'std': float} of the standardized sample means.\n    \"\"\"\n    np.random.seed(seed)\n    # Your implementation here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Population Parameters and Sample Statistics",
+      "relation_to_problem": "Before simulating CLT, students must understand the distinction between population parameters (μ, σ²) and sample statistics (X̄, s²), which are fundamental to computing the standardized Z-scores required in the main problem.",
+      "prerequisites": [
+        "Basic probability theory",
+        "Random variables",
+        "Summation notation"
+      ],
+      "learning_objectives": [
+        "Formally define population mean and variance",
+        "Compute sample mean and understand its properties",
+        "Calculate population parameters for common distributions (Uniform, Exponential, Bernoulli)",
+        "Implement functions to generate samples and compute their means"
+      ],
+      "math_content": {
+        "definition": "**Population Mean**: For a random variable $X$ with probability density function $f(x)$ (continuous) or probability mass function $p(x)$ (discrete), the population mean is:\n$$\\mu = E[X] = \\begin{cases} \\int_{-\\infty}^{\\infty} x f(x) dx & \\text{(continuous)} \\\\ \\sum_{x} x p(x) & \\text{(discrete)} \\end{cases}$$\n\n**Population Variance**: The variance measures spread around the mean:\n$$\\sigma^2 = \\text{Var}(X) = E[(X - \\mu)^2] = E[X^2] - (E[X])^2$$\n\n**Sample Mean**: Given $n$ independent observations $X_1, X_2, \\ldots, X_n$ from a population:\n$$\\bar{X} = \\frac{1}{n} \\sum_{i=1}^{n} X_i$$\n\nThe sample mean $\\bar{X}$ is itself a random variable with properties:\n- $E[\\bar{X}] = \\mu$ (unbiased estimator)\n- $\\text{Var}(\\bar{X}) = \\frac{\\sigma^2}{n}$ (variance decreases with sample size)",
+        "notation": "$\\mu$ = population mean, $\\sigma^2$ = population variance, $\\bar{X}$ = sample mean, $n$ = sample size, $X_i$ = individual observations",
+        "theorem": "**Theorem (Properties of Sample Mean)**: If $X_1, \\ldots, X_n$ are i.i.d. (independent and identically distributed) random variables with $E[X_i] = \\mu$ and $\\text{Var}(X_i) = \\sigma^2$, then:\n1. $E[\\bar{X}] = \\mu$\n2. $\\text{Var}(\\bar{X}) = \\frac{\\sigma^2}{n}$\n3. $\\text{SD}(\\bar{X}) = \\frac{\\sigma}{\\sqrt{n}}$ (standard error)",
+        "proof_sketch": "**Proof of $E[\\bar{X}] = \\mu$:**\n$$E[\\bar{X}] = E\\left[\\frac{1}{n}\\sum_{i=1}^{n} X_i\\right] = \\frac{1}{n}\\sum_{i=1}^{n} E[X_i] = \\frac{1}{n} \\cdot n\\mu = \\mu$$\n\n**Proof of $\\text{Var}(\\bar{X}) = \\frac{\\sigma^2}{n}$:**\n$$\\text{Var}(\\bar{X}) = \\text{Var}\\left(\\frac{1}{n}\\sum_{i=1}^{n} X_i\\right) = \\frac{1}{n^2}\\sum_{i=1}^{n} \\text{Var}(X_i) = \\frac{1}{n^2} \\cdot n\\sigma^2 = \\frac{\\sigma^2}{n}$$\n(using independence to eliminate covariance terms)",
+        "examples": [
+          "**Uniform(0,1)**: $\\mu = \\frac{1}{2}$, $\\sigma^2 = \\frac{1}{12}$. If we draw 25 samples, the sample mean has $E[\\bar{X}] = 0.5$ and $\\text{SD}(\\bar{X}) = \\frac{1}{\\sqrt{12 \\cdot 25}} \\approx 0.058$",
+          "**Exponential(λ=1)**: $\\mu = 1$, $\\sigma^2 = 1$. For $n=30$, the sample mean satisfies $E[\\bar{X}] = 1$ and $\\text{SD}(\\bar{X}) = \\frac{1}{\\sqrt{30}} \\approx 0.183$",
+          "**Bernoulli(p=0.3)**: $\\mu = p = 0.3$, $\\sigma^2 = p(1-p) = 0.21$. For $n=100$, we get $E[\\bar{X}] = 0.3$ and $\\text{SD}(\\bar{X}) = \\sqrt{\\frac{0.21}{100}} \\approx 0.046$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sample Mean",
+          "latex": "$\\bar{X} = \\frac{1}{n} \\sum_{i=1}^{n} X_i$",
+          "description": "Average of n observations; the primary statistic in CLT"
+        },
+        {
+          "name": "Standard Error",
+          "latex": "$\\text{SE} = \\frac{\\sigma}{\\sqrt{n}}$",
+          "description": "Standard deviation of the sample mean; decreases as √n"
+        },
+        {
+          "name": "Uniform Distribution Parameters",
+          "latex": "$\\mu = \\frac{a+b}{2}, \\; \\sigma^2 = \\frac{(b-a)^2}{12}$",
+          "description": "For Uniform(a,b)"
+        },
+        {
+          "name": "Exponential Distribution Parameters",
+          "latex": "$\\mu = \\frac{1}{\\lambda}, \\; \\sigma^2 = \\frac{1}{\\lambda^2}$",
+          "description": "For Exponential(λ); often parameterized by scale = 1/λ"
+        },
+        {
+          "name": "Bernoulli Distribution Parameters",
+          "latex": "$\\mu = p, \\; \\sigma^2 = p(1-p)$",
+          "description": "For Bernoulli(p) with outcomes 0 or 1"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes the theoretical population mean and standard deviation for a given distribution, and another function that generates n samples and computes their sample mean. This builds the foundation for understanding how sample statistics relate to population parameters.",
+        "function_signature": "def get_distribution_parameters(distribution: str) -> tuple[float, float]:\ndef compute_sample_mean(distribution: str, n: int, seed: int = 42) -> float:",
+        "starter_code": "import numpy as np\n\ndef get_distribution_parameters(distribution: str) -> tuple[float, float]:\n    \"\"\"\n    Return the theoretical (mean, std_dev) for the given distribution.\n    \n    Args:\n        distribution: One of 'uniform', 'exponential', 'bernoulli'\n    \n    Returns:\n        tuple: (mean, standard_deviation)\n    \"\"\"\n    # Your code here\n    pass\n\ndef compute_sample_mean(distribution: str, n: int, seed: int = 42) -> float:\n    \"\"\"\n    Generate n samples from the distribution and return their mean.\n    \n    Args:\n        distribution: One of 'uniform', 'exponential', 'bernoulli'\n        n: Sample size\n        seed: Random seed\n    \n    Returns:\n        float: Sample mean\n    \"\"\"\n    np.random.seed(seed)\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "get_distribution_parameters('uniform')",
+            "expected": "(0.5, 0.2886751345948129)",
+            "explanation": "Uniform(0,1) has μ=0.5 and σ=√(1/12)≈0.289"
+          },
+          {
+            "input": "get_distribution_parameters('exponential')",
+            "expected": "(1.0, 1.0)",
+            "explanation": "Exponential(scale=1) has μ=1 and σ=1"
+          },
+          {
+            "input": "get_distribution_parameters('bernoulli')",
+            "expected": "(0.3, 0.458257569495584)",
+            "explanation": "Bernoulli(p=0.3) has μ=0.3 and σ=√(0.3×0.7)≈0.458"
+          },
+          {
+            "input": "compute_sample_mean('uniform', 100, seed=42)",
+            "expected": "approximately 0.5 (within ±0.1)",
+            "explanation": "With n=100 samples from Uniform(0,1), the sample mean should be near 0.5"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing population parameters (μ, σ) with sample statistics (X̄, s)",
+        "Using standard deviation σ instead of standard error σ/√n for the sample mean",
+        "Forgetting that Exponential distribution can be parameterized by rate (λ) or scale (1/λ)",
+        "Not setting random seed, leading to non-reproducible results",
+        "Using wrong parameter values: Bernoulli(p=0.3) not p=0.5"
+      ],
+      "hint": "For generating samples: use np.random.uniform(0, 1, n), np.random.exponential(scale=1.0, n), and np.random.binomial(1, 0.3, n) for the three distributions.",
+      "references": [
+        "Probability density functions and moment calculations",
+        "Law of Large Numbers",
+        "NumPy random number generation documentation"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Standardization and Z-Scores",
+      "relation_to_problem": "The main problem requires computing Z-scores by standardizing sample means. This sub-quest teaches the mathematical transformation that converts any random variable to a standard normal form, which is the essence of demonstrating CLT convergence.",
+      "prerequisites": [
+        "Population mean and variance",
+        "Sample mean calculation",
+        "Properties of linear transformations of random variables"
+      ],
+      "learning_objectives": [
+        "Understand the standardization transformation mathematically",
+        "Compute Z-scores for individual observations and sample means",
+        "Recognize why standardization produces mean 0 and variance 1",
+        "Implement standardization for arrays of values"
+      ],
+      "math_content": {
+        "definition": "**Standardization (Z-score transformation)**: Given a random variable $X$ with mean $\\mu$ and standard deviation $\\sigma > 0$, the standardized variable is:\n$$Z = \\frac{X - \\mu}{\\sigma}$$\n\nThis transformation creates a new random variable $Z$ with:\n- $E[Z] = 0$ (mean zero)\n- $\\text{Var}(Z) = 1$ (unit variance)\n- $\\text{SD}(Z) = 1$ (unit standard deviation)\n\n**Standardization of Sample Means**: When standardizing the sample mean $\\bar{X}$ (where $E[\\bar{X}] = \\mu$ and $\\text{SD}(\\bar{X}) = \\sigma/\\sqrt{n}$):\n$$Z = \\frac{\\bar{X} - \\mu}{\\sigma/\\sqrt{n}} = \\frac{\\sqrt{n}(\\bar{X} - \\mu)}{\\sigma}$$\n\nThis is the standardized statistic that CLT states converges to $N(0,1)$ as $n \\to \\infty$.",
+        "notation": "$Z$ = standardized variable (Z-score), $\\mu$ = original mean, $\\sigma$ = original standard deviation, $\\bar{X}$ = sample mean, $n$ = sample size",
+        "theorem": "**Theorem (Properties of Standardization)**: If $X$ is a random variable with $E[X] = \\mu$ and $\\text{Var}(X) = \\sigma^2 < \\infty$, then $Z = \\frac{X - \\mu}{\\sigma}$ satisfies:\n1. $E[Z] = 0$\n2. $\\text{Var}(Z) = 1$\n3. If $X \\sim N(\\mu, \\sigma^2)$, then $Z \\sim N(0, 1)$ (standard normal)\n\n**Corollary**: For sample means with $E[\\bar{X}] = \\mu$ and $\\text{Var}(\\bar{X}) = \\sigma^2/n$, the standardized form $Z = \\frac{\\bar{X} - \\mu}{\\sigma/\\sqrt{n}}$ has $E[Z] = 0$ and $\\text{Var}(Z) = 1$.",
+        "proof_sketch": "**Proof of $E[Z] = 0$:**\n$$E[Z] = E\\left[\\frac{X - \\mu}{\\sigma}\\right] = \\frac{1}{\\sigma}E[X - \\mu] = \\frac{1}{\\sigma}(E[X] - \\mu) = \\frac{\\mu - \\mu}{\\sigma} = 0$$\n\n**Proof of $\\text{Var}(Z) = 1$:**\n$$\\text{Var}(Z) = \\text{Var}\\left(\\frac{X - \\mu}{\\sigma}\\right) = \\frac{1}{\\sigma^2}\\text{Var}(X - \\mu) = \\frac{1}{\\sigma^2}\\text{Var}(X) = \\frac{\\sigma^2}{\\sigma^2} = 1$$\n(using the fact that subtracting a constant doesn't change variance, and $\\text{Var}(aX) = a^2\\text{Var}(X)$)",
+        "examples": [
+          "**Individual observation**: If $X \\sim \\text{Uniform}(0,1)$ with $\\mu=0.5$, $\\sigma=1/\\sqrt{12}$, and we observe $x=0.8$, then $z = \\frac{0.8 - 0.5}{1/\\sqrt{12}} = \\frac{0.3 \\sqrt{12}}{1} \\approx 1.039$",
+          "**Sample mean**: From Exponential(1) with $\\mu=1$, $\\sigma=1$, suppose we draw $n=25$ samples and get $\\bar{x}=1.15$. Then $z = \\frac{1.15 - 1}{1/\\sqrt{25}} = \\frac{0.15 \\cdot 5}{1} = 0.75$",
+          "**Array of sample means**: If we have 1000 sample means from Bernoulli(0.3) with $n=50$, we standardize each: $z_i = \\frac{\\bar{x}_i - 0.3}{\\sqrt{0.21/50}}$ for $i=1,\\ldots,1000$. The resulting array should have mean ≈0 and std ≈1"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Z-Score (General)",
+          "latex": "$Z = \\frac{X - \\mu}{\\sigma}$",
+          "description": "Standardizes any random variable to mean 0, variance 1"
+        },
+        {
+          "name": "Z-Score for Sample Mean",
+          "latex": "$Z = \\frac{\\bar{X} - \\mu}{\\sigma/\\sqrt{n}}$",
+          "description": "The specific form used in CLT; accounts for standard error"
+        },
+        {
+          "name": "Standard Error Formula",
+          "latex": "$\\text{SE}(\\bar{X}) = \\frac{\\sigma}{\\sqrt{n}}$",
+          "description": "The denominator when standardizing sample means"
+        },
+        {
+          "name": "Variance Scaling Rule",
+          "latex": "$\\text{Var}(aX) = a^2 \\text{Var}(X)$",
+          "description": "Used to prove standardization creates unit variance"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes an array of sample means and standardizes them using the theoretical population parameters. Given a distribution type and sample size n, your function should compute the appropriate μ and σ/√n, then transform the array of sample means to Z-scores. Verify that the resulting array has mean ≈0 and std ≈1.",
+        "function_signature": "def standardize_sample_means(sample_means: np.ndarray, distribution: str, n: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef standardize_sample_means(sample_means: np.ndarray, distribution: str, n: int) -> np.ndarray:\n    \"\"\"\n    Standardize an array of sample means to Z-scores.\n    \n    Args:\n        sample_means: Array of sample means (e.g., 1000 values)\n        distribution: One of 'uniform', 'exponential', 'bernoulli'\n        n: Sample size used to compute each sample mean\n    \n    Returns:\n        np.ndarray: Array of Z-scores with mean≈0, std≈1\n    \"\"\"\n    # Your code here\n    # 1. Get population parameters (μ, σ) for the distribution\n    # 2. Compute standard error: SE = σ/√n\n    # 3. Apply Z-score formula: Z = (X̄ - μ) / SE\n    pass",
+        "test_cases": [
+          {
+            "input": "standardize_sample_means(np.array([0.48, 0.52, 0.51, 0.49, 0.50]), 'uniform', 100)",
+            "expected": "Array with values near [-0.69, 0.69, 0.35, -0.35, 0.0] (Z-scores)",
+            "explanation": "With μ=0.5, σ=1/√12, n=100, SE=1/(√12·10)≈0.0289. So z=(0.48-0.5)/0.0289≈-0.69"
+          },
+          {
+            "input": "np.mean(standardize_sample_means(np.random.uniform(0.4, 0.6, 10000), 'uniform', 100))",
+            "expected": "approximately 0.0 (within ±0.05)",
+            "explanation": "Standardized values should have mean 0"
+          },
+          {
+            "input": "np.std(standardize_sample_means(np.random.exponential(1.0, 10000), 'exponential', 30), ddof=0)",
+            "expected": "approximately 1.0 (within ±0.05)",
+            "explanation": "Standardized values should have standard deviation 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using σ instead of σ/√n when standardizing sample means (forgetting the standard error)",
+        "Using sample standard deviation instead of population σ",
+        "Not accounting for the √n factor in the denominator",
+        "Confusing standardization of individual values vs. sample means",
+        "Using ddof=1 instead of ddof=0 when computing standard deviation of Z-scores"
+      ],
+      "hint": "The key insight is that sample means have reduced variability by a factor of 1/√n. So the standardization denominator must be σ/√n, not just σ.",
+      "references": [
+        "Linear transformations of random variables",
+        "Standard normal distribution",
+        "Properties of expectation and variance"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Repeated Sampling and the Sampling Distribution",
+      "relation_to_problem": "CLT describes the behavior of sample means across many repeated samples. This sub-quest teaches how to generate multiple independent samples, compute their means, and understand the resulting sampling distribution—the core simulation procedure needed for the main problem.",
+      "prerequisites": [
+        "Sample mean computation",
+        "Random number generation",
+        "Loop constructs and array operations",
+        "Understanding of independent samples"
+      ],
+      "learning_objectives": [
+        "Generate multiple independent samples from a distribution",
+        "Compute the mean of each sample to build a sampling distribution",
+        "Understand the difference between a population distribution and a sampling distribution",
+        "Implement efficient repeated sampling using loops or vectorization",
+        "Verify empirically that the sampling distribution has the correct mean and standard error"
+      ],
+      "math_content": {
+        "definition": "**Sampling Distribution**: The sampling distribution of a statistic is the probability distribution of that statistic obtained from all possible samples of a fixed size from a population.\n\nFor the sample mean $\\bar{X}$ from samples of size $n$:\n- Each sample yields one value of $\\bar{X}$\n- Repeating this process many times (e.g., $m$ runs) produces $\\{\\bar{X}_1, \\bar{X}_2, \\ldots, \\bar{X}_m\\}$\n- As $m \\to \\infty$, the empirical distribution of these values approaches the theoretical sampling distribution\n\n**Theoretical Properties**: If samples are drawn from a population with mean $\\mu$ and variance $\\sigma^2$:\n$$E[\\bar{X}] = \\mu \\quad \\text{and} \\quad \\text{Var}(\\bar{X}) = \\frac{\\sigma^2}{n}$$\n\n**Empirical Verification**: With $m$ runs producing sample means $\\{\\bar{x}_1, \\ldots, \\bar{x}_m\\}$:\n$$\\text{Empirical mean} = \\frac{1}{m}\\sum_{j=1}^{m} \\bar{x}_j \\approx \\mu$$\n$$\\text{Empirical variance} = \\frac{1}{m}\\sum_{j=1}^{m} (\\bar{x}_j - \\text{mean})^2 \\approx \\frac{\\sigma^2}{n}$$",
+        "notation": "$\\bar{X}_j$ = sample mean from the $j$-th run, $m$ = number of repeated samples (runs), $n$ = sample size per run, $\\{\\bar{x}_1, \\ldots, \\bar{x}_m\\}$ = observed sample means",
+        "theorem": "**Theorem (Sampling Distribution of $\\bar{X}$)**: Let $X_1, \\ldots, X_n$ be i.i.d. random variables from a distribution with mean $\\mu$ and variance $\\sigma^2$. Define $\\bar{X} = \\frac{1}{n}\\sum_{i=1}^{n} X_i$. Then:\n1. $E[\\bar{X}] = \\mu$ (the expected value of the sample mean equals the population mean)\n2. $\\text{Var}(\\bar{X}) = \\frac{\\sigma^2}{n}$ (the variance of the sample mean decreases with sample size)\n3. As $m$ (number of runs) increases, the empirical distribution of $\\{\\bar{X}_1, \\ldots, \\bar{X}_m\\}$ converges to the theoretical sampling distribution",
+        "proof_sketch": "**Independence of Runs**: Each run $j$ involves drawing a fresh independent sample of size $n$. Therefore, $\\bar{X}_1, \\bar{X}_2, \\ldots, \\bar{X}_m$ are independent and identically distributed random variables, each with mean $\\mu$ and variance $\\sigma^2/n$.\n\n**Law of Large Numbers Application**: By the Strong Law of Large Numbers:\n$$\\frac{1}{m}\\sum_{j=1}^{m} \\bar{X}_j \\xrightarrow{a.s.} E[\\bar{X}] = \\mu \\quad \\text{as } m \\to \\infty$$\n\nSimilarly, the sample variance of the $\\bar{X}_j$ values converges to $\\text{Var}(\\bar{X}) = \\sigma^2/n$.",
+        "examples": [
+          "**Uniform(0,1) with n=25, m=1000**: Draw 1000 samples of size 25. Compute mean of each sample. The 1000 sample means should have empirical mean ≈0.5 and empirical std ≈ 1/(√12·5) ≈ 0.058",
+          "**Exponential(1) with n=50, m=5000**: Draw 5000 samples of size 50. Each sample mean $\\bar{x}_j$ is computed from 50 exponential values. The 5000 means should have empirical mean ≈1.0 and empirical std ≈ 1/√50 ≈ 0.141",
+          "**Bernoulli(0.3) with n=100, m=10000**: Draw 10000 samples of size 100. Each sample mean represents the proportion of successes. The 10000 proportions should have mean ≈0.3 and std ≈ √(0.21/100) ≈ 0.046"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sample Mean (Single Run)",
+          "latex": "$\\bar{X} = \\frac{1}{n} \\sum_{i=1}^{n} X_i$",
+          "description": "Compute one sample mean from n observations"
+        },
+        {
+          "name": "Empirical Mean of Sample Means",
+          "latex": "$\\frac{1}{m}\\sum_{j=1}^{m} \\bar{X}_j \\approx \\mu$",
+          "description": "Average of m sample means approximates population mean"
+        },
+        {
+          "name": "Empirical Standard Deviation",
+          "latex": "$\\sqrt{\\frac{1}{m}\\sum_{j=1}^{m} (\\bar{X}_j - \\bar{\\bar{X}})^2} \\approx \\frac{\\sigma}{\\sqrt{n}}$",
+          "description": "Standard deviation of m sample means approximates standard error"
+        },
+        {
+          "name": "Standard Error",
+          "latex": "$\\text{SE}(\\bar{X}) = \\frac{\\sigma}{\\sqrt{n}}$",
+          "description": "Theoretical standard deviation of the sampling distribution"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that performs repeated sampling: draw m independent samples of size n from a given distribution, compute the mean of each sample, and return the array of sample means. Then write a verification function that checks whether the empirical mean and standard deviation of these sample means match the theoretical values (μ and σ/√n).",
+        "function_signature": "def generate_sample_means(distribution: str, n: int, runs: int, seed: int = 42) -> np.ndarray:\ndef verify_sampling_distribution(sample_means: np.ndarray, distribution: str, n: int, tolerance: float = 0.05) -> dict:",
+        "starter_code": "import numpy as np\n\ndef generate_sample_means(distribution: str, n: int, runs: int, seed: int = 42) -> np.ndarray:\n    \"\"\"\n    Generate 'runs' sample means, each from a sample of size n.\n    \n    Args:\n        distribution: One of 'uniform', 'exponential', 'bernoulli'\n        n: Sample size for each run\n        runs: Number of repeated samples (m)\n        seed: Random seed\n    \n    Returns:\n        np.ndarray: Array of length 'runs' containing sample means\n    \"\"\"\n    np.random.seed(seed)\n    # Your code here\n    # Loop 'runs' times:\n    #   - Draw n samples from the distribution\n    #   - Compute their mean\n    #   - Store the mean\n    pass\n\ndef verify_sampling_distribution(sample_means: np.ndarray, distribution: str, n: int, tolerance: float = 0.05) -> dict:\n    \"\"\"\n    Check if empirical properties match theoretical sampling distribution.\n    \n    Args:\n        sample_means: Array of sample means from repeated sampling\n        distribution: The source distribution\n        n: Sample size used\n        tolerance: Acceptable relative error\n    \n    Returns:\n        dict: {'mean_match': bool, 'std_match': bool, 'empirical_mean': float, 'empirical_std': float}\n    \"\"\"\n    # Your code here\n    # 1. Compute empirical mean and std of sample_means\n    # 2. Get theoretical μ and σ/√n\n    # 3. Check if empirical values are within tolerance\n    pass",
+        "test_cases": [
+          {
+            "input": "generate_sample_means('uniform', 50, 1000, seed=42).shape",
+            "expected": "(1000,)",
+            "explanation": "Should return 1000 sample means"
+          },
+          {
+            "input": "np.mean(generate_sample_means('exponential', 30, 10000, seed=42))",
+            "expected": "approximately 1.0 (within ±0.05)",
+            "explanation": "Empirical mean of sample means should be near population mean μ=1.0"
+          },
+          {
+            "input": "np.std(generate_sample_means('bernoulli', 100, 10000, seed=42), ddof=0)",
+            "expected": "approximately 0.046 (within ±0.005)",
+            "explanation": "Empirical std should be near σ/√n = √(0.21)/10 ≈ 0.046"
+          },
+          {
+            "input": "verify_sampling_distribution(generate_sample_means('uniform', 100, 5000, seed=42), 'uniform', 100)",
+            "expected": "{'mean_match': True, 'std_match': True, ...}",
+            "explanation": "With n=100 and 5000 runs, empirical statistics should match theory"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Reusing the same sample instead of drawing fresh independent samples each run",
+        "Confusing sample size n (observations per run) with number of runs m",
+        "Not resetting or properly managing random seed for reproducibility",
+        "Computing the wrong standard deviation (using std of original data instead of std of sample means)",
+        "Expecting exact matches instead of approximate convergence (need large m for precision)"
+      ],
+      "hint": "Use a loop from 0 to runs-1, and in each iteration: (1) generate n random values, (2) compute their mean with np.mean(), (3) store the result. For Bernoulli, remember to use np.random.binomial(1, 0.3, n) to get 0/1 values.",
+      "references": [
+        "Law of Large Numbers",
+        "Monte Carlo simulation methods",
+        "NumPy array operations and vectorization"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Central Limit Theorem: Statement and Convergence",
+      "relation_to_problem": "This sub-quest formally introduces the CLT and its convergence properties. Students learn the precise mathematical statement that standardized sample means converge to N(0,1) regardless of the original distribution—the theoretical foundation they must demonstrate computationally in the main problem.",
+      "prerequisites": [
+        "Sampling distributions",
+        "Standardization",
+        "Normal distribution properties",
+        "Convergence in distribution"
+      ],
+      "learning_objectives": [
+        "State the Central Limit Theorem formally with mathematical rigor",
+        "Understand the conditions required for CLT (i.i.d., finite variance)",
+        "Recognize that CLT applies regardless of the original distribution shape",
+        "Understand convergence in distribution and what 'as n→∞' means",
+        "Relate sample size n to the quality of normal approximation"
+      ],
+      "math_content": {
+        "definition": "**Central Limit Theorem (CLT)**: Let $X_1, X_2, \\ldots, X_n$ be independent and identically distributed (i.i.d.) random variables from a distribution with finite mean $\\mu$ and finite variance $\\sigma^2 > 0$. Define the sample mean:\n$$\\bar{X}_n = \\frac{1}{n}\\sum_{i=1}^{n} X_i$$\n\nThen the standardized sample mean:\n$$Z_n = \\frac{\\bar{X}_n - \\mu}{\\sigma/\\sqrt{n}} = \\frac{\\sqrt{n}(\\bar{X}_n - \\mu)}{\\sigma}$$\n\nconverges in distribution to a standard normal random variable as $n \\to \\infty$:\n$$Z_n \\xrightarrow{d} N(0,1)$$\n\nEquivalently: $\\bar{X}_n \\xrightarrow{d} N(\\mu, \\sigma^2/n)$ or more precisely, $\\sqrt{n}(\\bar{X}_n - \\mu) \\xrightarrow{d} N(0, \\sigma^2)$.\n\n**Convergence in Distribution**: We say $Z_n \\xrightarrow{d} Z$ if for every continuity point $x$ of the CDF of $Z$:\n$$\\lim_{n \\to \\infty} P(Z_n \\leq x) = P(Z \\leq x)$$\n\nFor CLT, this means: $\\lim_{n \\to \\infty} P(Z_n \\leq z) = \\Phi(z)$ where $\\Phi$ is the standard normal CDF.",
+        "notation": "$Z_n$ = standardized sample mean with sample size n, $\\xrightarrow{d}$ = convergence in distribution, $N(0,1)$ = standard normal distribution, $\\Phi(z)$ = standard normal CDF",
+        "theorem": "**Central Limit Theorem (Lindeberg-Lévy)**: If $X_1, \\ldots, X_n$ are i.i.d. with $E[X_i] = \\mu$ and $0 < \\text{Var}(X_i) = \\sigma^2 < \\infty$, then:\n$$\\frac{\\sqrt{n}(\\bar{X}_n - \\mu)}{\\sigma} \\xrightarrow{d} N(0,1) \\quad \\text{as } n \\to \\infty$$\n\n**Key Implications**:\n1. **Universality**: The limiting distribution is always $N(0,1)$ regardless of the original distribution (Uniform, Exponential, Bernoulli, etc.)\n2. **Rate of Convergence**: The approximation improves as $n$ increases. For \"nice\" distributions (symmetric, unimodal), even $n=30$ may suffice; for highly skewed distributions, larger $n$ may be needed\n3. **Practical Rule**: Often $n \\geq 30$ is cited as a rule of thumb for adequate normal approximation",
+        "proof_sketch": "**Proof Outline (using characteristic functions)**:\n\n1. Let $\\phi(t) = E[e^{itX}]$ be the characteristic function of $X - \\mu$ (centered random variable)\n2. By Taylor expansion: $\\phi(t) = 1 - \\frac{\\sigma^2 t^2}{2} + o(t^2)$ as $t \\to 0$\n3. The characteristic function of $Z_n = \\frac{\\sqrt{n}(\\bar{X}_n - \\mu)}{\\sigma}$ is:\n   $$\\phi_{Z_n}(t) = \\left[\\phi\\left(\\frac{t}{\\sigma\\sqrt{n}}\\right)\\right]^n$$\n4. Substituting the Taylor expansion:\n   $$\\phi_{Z_n}(t) = \\left[1 - \\frac{t^2}{2n} + o\\left(\\frac{1}{n}\\right)\\right]^n \\to e^{-t^2/2} \\quad \\text{as } n \\to \\infty$$\n5. Since $e^{-t^2/2}$ is the characteristic function of $N(0,1)$, by Lévy's continuity theorem: $Z_n \\xrightarrow{d} N(0,1)$\n\nThis proof requires complex analysis and measure theory, but demonstrates why CLT holds for any distribution with finite variance.",
+        "examples": [
+          "**Uniform(0,1)**: Highly non-normal (flat rectangle). But with $n=30$, $Z_n$ is approximately normal. With $n=100$, the approximation is excellent",
+          "**Exponential(1)**: Highly right-skewed (not symmetric). Yet $Z_n$ with $n=50$ shows clear convergence to normality. The skewness of sample means decreases as $n$ increases",
+          "**Bernoulli(0.3)**: Discrete with only two outcomes (0 and 1). Despite being discrete and asymmetric, $Z_n$ with $n=100$ produces a nearly continuous normal distribution"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "CLT Standardized Form",
+          "latex": "$Z_n = \\frac{\\bar{X}_n - \\mu}{\\sigma/\\sqrt{n}} \\xrightarrow{d} N(0,1)$",
+          "description": "The fundamental CLT statement for standardized sample means"
+        },
+        {
+          "name": "CLT Unstandardized Form",
+          "latex": "$\\bar{X}_n \\sim N\\left(\\mu, \\frac{\\sigma^2}{n}\\right)$ approximately for large n",
+          "description": "Sample means are approximately normal with these parameters"
+        },
+        {
+          "name": "Standard Normal PDF",
+          "latex": "$\\phi(z) = \\frac{1}{\\sqrt{2\\pi}} e^{-z^2/2}$",
+          "description": "The limiting distribution that CLT converges to"
+        },
+        {
+          "name": "Standard Normal CDF",
+          "latex": "$\\Phi(z) = \\int_{-\\infty}^{z} \\frac{1}{\\sqrt{2\\pi}} e^{-t^2/2} dt$",
+          "description": "Cumulative distribution function of N(0,1)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that demonstrates CLT convergence by generating sample means for different sample sizes (n=5, 10, 30, 100) and computing how close their standardized distributions are to N(0,1). Use a metric like the difference between empirical and theoretical quantiles or the Kolmogorov-Smirnov statistic to measure convergence quality.",
+        "function_signature": "def measure_clt_convergence(distribution: str, sample_sizes: list[int], runs: int = 5000, seed: int = 42) -> dict:",
+        "starter_code": "import numpy as np\nfrom scipy import stats\n\ndef measure_clt_convergence(distribution: str, sample_sizes: list[int], runs: int = 5000, seed: int = 42) -> dict:\n    \"\"\"\n    Measure how well standardized sample means approximate N(0,1) for various n.\n    \n    Args:\n        distribution: One of 'uniform', 'exponential', 'bernoulli'\n        sample_sizes: List of sample sizes to test (e.g., [5, 10, 30, 100])\n        runs: Number of sample means to generate for each n\n        seed: Random seed\n    \n    Returns:\n        dict: {n: {'mean': float, 'std': float, 'ks_statistic': float}} for each n\n              - mean: should approach 0\n              - std: should approach 1\n              - ks_statistic: Kolmogorov-Smirnov test vs N(0,1), lower is better\n    \"\"\"\n    np.random.seed(seed)\n    results = {}\n    \n    # Your code here\n    # For each sample size n:\n    #   1. Generate 'runs' sample means of size n\n    #   2. Standardize them using population parameters\n    #   3. Compute mean, std, and KS statistic vs N(0,1)\n    #   4. Store in results[n]\n    \n    pass",
+        "test_cases": [
+          {
+            "input": "measure_clt_convergence('exponential', [10, 30, 100], runs=5000, seed=42)",
+            "expected": "Results showing KS statistic decreases: e.g., {10: {'ks_statistic': ~0.05}, 30: {'ks_statistic': ~0.02}, 100: {'ks_statistic': ~0.01}}",
+            "explanation": "As n increases, the standardized distribution converges closer to N(0,1)"
+          },
+          {
+            "input": "measure_clt_convergence('uniform', [50], runs=10000, seed=42)[50]['mean']",
+            "expected": "approximately 0.0 (within ±0.02)",
+            "explanation": "With n=50 and 10000 runs, empirical mean of Z-scores should be near 0"
+          },
+          {
+            "input": "measure_clt_convergence('bernoulli', [100], runs=10000, seed=42)[100]['std']",
+            "expected": "approximately 1.0 (within ±0.02)",
+            "explanation": "Standardized values should have unit standard deviation"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Thinking CLT requires the original distribution to be normal (it doesn't—any distribution with finite variance works)",
+        "Confusing 'large n' with 'large number of runs': n is sample size per run, not total number of samples",
+        "Expecting perfect convergence for small n (e.g., n=5 may show visible deviation from normality)",
+        "Forgetting the independence assumption—CLT fails for dependent observations",
+        "Using biased estimators or wrong parameters when standardizing"
+      ],
+      "hint": "Use scipy.stats.kstest(z_scores, 'norm') to compute the Kolmogorov-Smirnov statistic, which measures the maximum difference between the empirical CDF and the theoretical N(0,1) CDF. Smaller values indicate better fit.",
+      "references": [
+        "Berry-Esseen theorem (gives convergence rate)",
+        "Characteristic functions and Fourier analysis",
+        "Quantile-Quantile (Q-Q) plots for visual assessment",
+        "Shapiro-Wilk and Anderson-Darling normality tests"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Comprehensive CLT Simulation with Multiple Distributions",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts to build a near-complete CLT simulation system. Students implement a function that handles multiple distributions, performs repeated sampling, standardizes results, and returns summary statistics—essentially solving most of the main problem while leaving final integration as the last step.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "String processing for distribution selection",
+        "Dictionary return values",
+        "Rounding and formatting numerical results"
+      ],
+      "learning_objectives": [
+        "Integrate distribution parameter lookup, repeated sampling, and standardization into one workflow",
+        "Handle multiple distribution types with conditional logic or lookup tables",
+        "Compute and return summary statistics (mean and std) of standardized values",
+        "Ensure reproducibility with proper random seed management",
+        "Format numerical output appropriately (rounding to 3 decimal places)"
+      ],
+      "math_content": {
+        "definition": "**Complete CLT Simulation Workflow**: The full process combines:\n\n1. **Distribution Selection**: Choose parameters $(\\mu, \\sigma)$ based on distribution type:\n   - Uniform(0,1): $\\mu = 0.5$, $\\sigma = 1/\\sqrt{12}$\n   - Exponential(scale=1): $\\mu = 1$, $\\sigma = 1$\n   - Bernoulli(p=0.3): $\\mu = 0.3$, $\\sigma = \\sqrt{0.21}$\n\n2. **Repeated Sampling**: Generate $m$ independent samples, each of size $n$:\n   $$\\text{For } j = 1, \\ldots, m: \\quad \\bar{X}_j = \\frac{1}{n}\\sum_{i=1}^{n} X_{ji}$$\n\n3. **Standardization**: Transform each sample mean to a Z-score:\n   $$Z_j = \\frac{\\bar{X}_j - \\mu}{\\sigma/\\sqrt{n}} \\quad \\text{for } j = 1, \\ldots, m$$\n\n4. **Statistical Summary**: Compute empirical statistics of the standardized values:\n   $$\\bar{Z} = \\frac{1}{m}\\sum_{j=1}^{m} Z_j \\approx 0$$\n   $$s_Z = \\sqrt{\\frac{1}{m}\\sum_{j=1}^{m} (Z_j - \\bar{Z})^2} \\approx 1$$\n\n**Expected Results**: If CLT holds (n is sufficiently large), we expect:\n- $\\bar{Z} \\approx 0$ (typically within ±0.01 for $m \\geq 10000$)\n- $s_Z \\approx 1$ (typically within ±0.02 for $m \\geq 10000$)",
+        "notation": "$m$ = number of runs (iterations), $n$ = sample size per run, $\\bar{X}_j$ = j-th sample mean, $Z_j$ = j-th standardized value, $\\bar{Z}$ = mean of Z-scores, $s_Z$ = standard deviation of Z-scores",
+        "theorem": "**Theorem (CLT Simulation Guarantee)**: Under the CLT assumptions (i.i.d. samples with finite $\\mu$ and $\\sigma^2$), as both $n \\to \\infty$ and $m \\to \\infty$:\n\n1. $Z_j \\xrightarrow{d} N(0,1)$ for each $j$ (by CLT)\n2. $\\bar{Z} = \\frac{1}{m}\\sum_{j=1}^{m} Z_j \\xrightarrow{p} E[Z] = 0$ (by Law of Large Numbers)\n3. $s_Z^2 = \\frac{1}{m}\\sum_{j=1}^{m} Z_j^2 - \\bar{Z}^2 \\xrightarrow{p} \\text{Var}(Z) = 1$ (by consistency of sample variance)\n\n**Practical Interpretation**: With $n \\geq 30$ and $m \\geq 10000$, we expect $(\\bar{Z}, s_Z)$ to be very close to $(0, 1)$, empirically demonstrating CLT.",
+        "proof_sketch": "**Justification of Expected Results**:\n\n1. **Mean of Z-scores**: Each $Z_j$ has $E[Z_j] = 0$ by standardization. By the Law of Large Numbers:\n   $$\\bar{Z} = \\frac{1}{m}\\sum_{j=1}^{m} Z_j \\xrightarrow{p} 0$$\n   \n2. **Std of Z-scores**: Each $Z_j$ has $\\text{Var}(Z_j) = 1$ by standardization. The sample variance:\n   $$s_Z^2 = \\frac{1}{m}\\sum_{j=1}^{m} (Z_j - \\bar{Z})^2$$\n   is a consistent estimator of $\\text{Var}(Z) = 1$, so $s_Z \\xrightarrow{p} 1$.\n\n3. **Convergence Rate**: By the Central Limit Theorem applied to the $Z_j$ values themselves:\n   $$\\sqrt{m}(\\bar{Z} - 0) \\sim N(0, 1) \\text{ approximately}$$\n   So the error in $\\bar{Z}$ is roughly $O(1/\\sqrt{m})$. For $m=10000$, the standard error is about $1/100 = 0.01$.",
+        "examples": [
+          "**Exponential(1), n=30, m=10000**: Generate 10000 sample means of size 30 from Exponential(1). Standardize using μ=1, σ=1, SE=1/√30. Compute mean and std of the 10000 Z-scores. Expected: mean≈0.0, std≈1.0",
+          "**Uniform(0,1), n=50, m=5000**: Generate 5000 sample means of size 50. Standardize using μ=0.5, σ=1/√12, SE=1/(√12·√50). Expected: mean≈0.0, std≈1.0",
+          "**Bernoulli(0.3), n=100, m=20000**: Generate 20000 sample means (proportions) of size 100. Standardize using μ=0.3, σ=√0.21, SE=√0.21/10. Expected: mean≈0.0, std≈1.0"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Standardization Pipeline",
+          "latex": "$Z_j = \\frac{\\bar{X}_j - \\mu}{\\sigma/\\sqrt{n}}$ for $j=1,\\ldots,m$",
+          "description": "Transform each sample mean to a Z-score"
+        },
+        {
+          "name": "Empirical Mean of Z-scores",
+          "latex": "$\\bar{Z} = \\frac{1}{m}\\sum_{j=1}^{m} Z_j \\approx 0$",
+          "description": "Should be near zero if CLT holds"
+        },
+        {
+          "name": "Empirical Std of Z-scores",
+          "latex": "$s_Z = \\sqrt{\\frac{1}{m}\\sum_{j=1}^{m} (Z_j - \\bar{Z})^2} \\approx 1$",
+          "description": "Should be near one if CLT holds (use ddof=0)"
+        },
+        {
+          "name": "Distribution Parameters Lookup",
+          "latex": "$\\begin{cases} \\text{Uniform}(0,1): & \\mu=0.5, \\sigma=1/\\sqrt{12} \\\\ \\text{Exponential}(1): & \\mu=1, \\sigma=1 \\\\ \\text{Bernoulli}(0.3): & \\mu=0.3, \\sigma=\\sqrt{0.21} \\end{cases}$",
+          "description": "Theoretical parameters for the three distributions"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a comprehensive CLT simulation function that accepts distribution type, sample size n, and number of runs, then returns the mean and standard deviation of the standardized sample means. This function integrates all previous concepts: parameter lookup, repeated sampling, standardization, and statistical summary. The output should match the format required in the main problem.",
+        "function_signature": "def demonstrate_clt(distribution: str, n: int, runs: int = 10000, seed: int = 42) -> dict:",
+        "starter_code": "import numpy as np\n\ndef demonstrate_clt(distribution: str, n: int, runs: int = 10000, seed: int = 42) -> dict:\n    \"\"\"\n    Demonstrate the Central Limit Theorem through simulation.\n    \n    Args:\n        distribution: One of 'uniform', 'exponential', 'bernoulli'\n        n: Sample size (number of observations per sample mean)\n        runs: Number of repeated experiments\n        seed: Random seed for reproducibility\n    \n    Returns:\n        dict: {'mean': float, 'std': float} rounded to 3 decimal places\n              These are the mean and std of the standardized sample means.\n    \"\"\"\n    np.random.seed(seed)\n    \n    # Your code here\n    # Step 1: Get population parameters (μ, σ) for the distribution\n    # Step 2: Initialize array to store sample means\n    # Step 3: Loop 'runs' times:\n    #         - Generate n samples from the distribution\n    #         - Compute and store the sample mean\n    # Step 4: Standardize all sample means: Z = (X̄ - μ)/(σ/√n)\n    # Step 5: Compute mean and std of the Z-scores\n    # Step 6: Return {'mean': round(mean, 3), 'std': round(std, 3)}\n    \n    pass",
+        "test_cases": [
+          {
+            "input": "demonstrate_clt('exponential', n=30, runs=10000, seed=42)",
+            "expected": "{'mean': approximately 0.0 (within ±0.02), 'std': approximately 1.0 (within ±0.03)}",
+            "explanation": "With n=30 and 10000 runs from Exponential(1), standardized means should be ~N(0,1)"
+          },
+          {
+            "input": "demonstrate_clt('uniform', n=50, runs=10000, seed=123)",
+            "expected": "{'mean': approximately 0.0, 'std': approximately 1.0}",
+            "explanation": "Uniform(0,1) with n=50 provides excellent normal approximation"
+          },
+          {
+            "input": "demonstrate_clt('bernoulli', n=100, runs=15000, seed=999)",
+            "expected": "{'mean': approximately 0.0, 'std': approximately 1.0}",
+            "explanation": "Bernoulli(0.3) with n=100 demonstrates CLT despite being discrete"
+          },
+          {
+            "input": "demonstrate_clt('exponential', n=5, runs=10000, seed=42)['std']",
+            "expected": "approximately 1.0 but may show some deviation (e.g., 0.95-1.05)",
+            "explanation": "With small n=5, convergence is not perfect but still reasonable for Exponential"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not using the correct standard error σ/√n when standardizing (forgetting √n)",
+        "Using wrong distribution parameters (e.g., wrong p for Bernoulli, wrong scale for Exponential)",
+        "Computing standard deviation with ddof=1 instead of ddof=0 for population std",
+        "Not handling string inputs properly (case sensitivity: 'Uniform' vs 'uniform')",
+        "Forgetting to round the output to 3 decimal places as specified",
+        "Not setting the random seed, making results non-reproducible"
+      ],
+      "hint": "Create a parameter dictionary: params = {'uniform': (0.5, 1/np.sqrt(12)), 'exponential': (1.0, 1.0), 'bernoulli': (0.3, np.sqrt(0.21))}. Then look up (μ, σ) with params[distribution]. For sampling, use np.random.uniform(), np.random.exponential(scale=1.0), and np.random.binomial(1, 0.3) respectively.",
+      "references": [
+        "Monte Carlo methods in statistics",
+        "Hypothesis testing using CLT",
+        "Confidence intervals based on normal approximation",
+        "Bootstrap methods as an alternative to CLT"
+      ]
+    }
+  ]
+}

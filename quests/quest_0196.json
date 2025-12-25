@@ -1,0 +1,519 @@
+{
+  "problem_id": 196,
+  "title": "Warmup + Cosine Decay Schedule",
+  "category": "Optimization",
+  "difficulty": "medium",
+  "description": "Implement a learning rate schedule that combines linear warmup and cosine decay. For the first W steps, the learning rate should increase linearly from 0 to a maximum learning rate (lr_max). After the warmup phase, the learning rate should decay following a cosine annealing schedule until it reaches a minimum learning rate (lr_min) at step T. Return a list of learning rates for each of the T total training steps.",
+  "example": {
+    "input": "T=10, W=3, lr_max=1.0, lr_min=0.0",
+    "output": "[0.0, 0.3333, 0.6667, 1.0, 0.9505, 0.8117, 0.6113, 0.3887, 0.1883, 0.0495]",
+    "reasoning": "During warmup (steps 0-2), learning rate increases linearly from 0 to 1.0. After warmup, it follows a cosine decay from 1.0 down to 0.0 over the remaining 7 steps."
+  },
+  "starter_code": "def warmup_cosine_schedule(T: int, W: int, lr_max: float, lr_min: float) -> list[float]:\n\t\"\"\"\n\tCompute learning rate schedule with linear warmup and cosine decay.\n\t\n\tArgs:\n\t\tT: Total number of training steps\n\t\tW: Number of warmup steps\n\t\tlr_max: Maximum learning rate (reached after warmup)\n\t\tlr_min: Minimum learning rate (reached at end of training)\n\t\n\tReturns:\n\t\tList of learning rates for each step\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Linear Interpolation and Piecewise Functions",
+      "relation_to_problem": "The warmup phase requires linear interpolation from 0 to lr_max over W steps, which is a fundamental application of linear functions and the basis for the first phase of our learning rate schedule.",
+      "prerequisites": [
+        "Basic algebra",
+        "Function composition",
+        "Coordinate geometry"
+      ],
+      "learning_objectives": [
+        "Understand and formally define linear interpolation between two points",
+        "Implement piecewise linear functions",
+        "Apply linear interpolation to generate sequences of values"
+      ],
+      "math_content": {
+        "definition": "**Linear Interpolation**: Given two points $(x_0, y_0)$ and $(x_1, y_1)$, linear interpolation is a method of constructing new data points within the range of a discrete set of known data points. The interpolated value at position $x$ where $x_0 \\leq x \\leq x_1$ is given by: $$y = y_0 + \\frac{x - x_0}{x_1 - x_0}(y_1 - y_0)$$ This can be rewritten in the normalized form: $$y = y_0 + t \\cdot (y_1 - y_0)$$ where $t = \\frac{x - x_0}{x_1 - x_0}$ is the interpolation parameter satisfying $t \\in [0, 1]$.",
+        "notation": "$t$ = interpolation parameter (progress ratio), $y_0$ = initial value, $y_1$ = final value, $x$ = current position, $[x_0, x_1]$ = interpolation interval",
+        "theorem": "**Theorem (Properties of Linear Interpolation)**: Linear interpolation $L(t) = y_0 + t(y_1 - y_0)$ satisfies: (1) $L(0) = y_0$ and $L(1) = y_1$ (endpoint preservation), (2) $L(t)$ is continuous on $[0,1]$, (3) $L(t)$ is monotonic when $y_0 \\neq y_1$, and (4) For any $t_1, t_2 \\in [0,1]$ with $t_1 < t_2$, the value $L(\\frac{t_1 + t_2}{2})$ is the midpoint of $L(t_1)$ and $L(t_2)$ (convexity preservation).",
+        "proof_sketch": "Properties (1) and (2) follow directly by substitution and the continuity of polynomial functions. For (3), note that $\\frac{dL}{dt} = y_1 - y_0$, which is constant and non-zero when $y_0 \\neq y_1$. For (4), substitute and verify: $L(\\frac{t_1+t_2}{2}) = y_0 + \\frac{t_1+t_2}{2}(y_1-y_0) = \\frac{1}{2}[y_0 + t_1(y_1-y_0)] + \\frac{1}{2}[y_0 + t_2(y_1-y_0)] = \\frac{L(t_1) + L(t_2)}{2}$.",
+        "examples": [
+          "**Example 1**: Interpolate between $y_0 = 0$ and $y_1 = 100$ at $t = 0.25$: $L(0.25) = 0 + 0.25(100 - 0) = 25$",
+          "**Example 2**: Generate 5 equally-spaced values from 0 to 1: Using $t \\in \\{0, 0.25, 0.5, 0.75, 1.0\\}$ gives $\\{0.0, 0.25, 0.5, 0.75, 1.0\\}$",
+          "**Example 3**: Warmup simulation: Starting from $y_0 = 0$ to $y_1 = 0.001$ over 4 steps. At step $i \\in \\{0,1,2,3\\}$, compute $t_i = \\frac{i}{3}$ giving values $\\{0, 0.000333, 0.000667, 0.001\\}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Standard Linear Interpolation",
+          "latex": "$L(t) = y_0 + t(y_1 - y_0)$ where $t \\in [0,1]$",
+          "description": "Use when you know the progress ratio $t$ directly"
+        },
+        {
+          "name": "Position-based Linear Interpolation",
+          "latex": "$L(x) = y_0 + \\frac{x - x_0}{x_1 - x_0}(y_1 - y_0)$",
+          "description": "Use when working with actual positions $x$ in interval $[x_0, x_1]$"
+        },
+        {
+          "name": "Discrete Step Interpolation",
+          "latex": "$L_i = y_0 + \\frac{i}{n}(y_1 - y_0)$ for $i = 0, 1, \\ldots, n$",
+          "description": "Use when generating $n+1$ equally-spaced interpolated values"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs linear interpolation to generate a sequence of values. Given start value, end value, and number of steps, return a list of linearly interpolated values. This simulates the warmup phase where learning rate grows from 0 to a maximum value.",
+        "function_signature": "def linear_warmup(start: float, end: float, num_steps: int) -> list[float]:",
+        "starter_code": "def linear_warmup(start: float, end: float, num_steps: int) -> list[float]:\n    \"\"\"\n    Generate linearly interpolated values from start to end.\n    \n    Args:\n        start: Initial value\n        end: Final value\n        num_steps: Total number of values to generate\n    \n    Returns:\n        List of interpolated values\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "linear_warmup(0.0, 1.0, 5)",
+            "expected": "[0.0, 0.25, 0.5, 0.75, 1.0]",
+            "explanation": "With 5 steps, progress ratios are 0/4, 1/4, 2/4, 3/4, 4/4, giving evenly spaced values from 0 to 1"
+          },
+          {
+            "input": "linear_warmup(0.0, 0.001, 4)",
+            "expected": "[0.0, 0.000333, 0.000667, 0.001]",
+            "explanation": "Interpolating to small learning rate values over 4 steps"
+          },
+          {
+            "input": "linear_warmup(0.5, 2.0, 6)",
+            "expected": "[0.5, 0.8, 1.1, 1.4, 1.7, 2.0]",
+            "explanation": "Starting from non-zero value, incrementing by (2.0-0.5)/5 = 0.3 at each step"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using num_steps-1 instead of num_steps in the denominator, causing the final value to exceed the target",
+        "Starting the loop from 1 instead of 0, missing the initial value at start",
+        "Integer division issues when computing the step size, leading to precision loss",
+        "Forgetting to handle the edge case when num_steps = 1 (should return just the start value)"
+      ],
+      "hint": "For n steps, you need n values indexed from 0 to n-1. The progress ratio at step i is i/(n-1) for n>1.",
+      "references": [
+        "Numerical analysis textbooks on interpolation methods",
+        "Linear algebra: parametric representation of lines",
+        "Computer graphics: lerp (linear interpolation) functions"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Trigonometric Functions and the Cosine Curve",
+      "relation_to_problem": "The decay phase uses cosine function to smoothly transition from maximum to minimum learning rate. Understanding the cosine function's properties and how to scale/shift it is essential for implementing the decay phase.",
+      "prerequisites": [
+        "Trigonometry",
+        "Radian measure",
+        "Function transformations"
+      ],
+      "learning_objectives": [
+        "Master the properties of the cosine function over [0, π]",
+        "Apply horizontal and vertical transformations to cosine",
+        "Understand how cosine provides smooth, gradual decay behavior"
+      ],
+      "math_content": {
+        "definition": "**The Cosine Function**: The cosine function $\\cos: \\mathbb{R} \\to [-1, 1]$ is a periodic function with period $2\\pi$ defined by the ratio of adjacent side to hypotenuse in a right triangle, or equivalently by the power series: $$\\cos(x) = \\sum_{n=0}^{\\infty} \\frac{(-1)^n x^{2n}}{(2n)!} = 1 - \\frac{x^2}{2!} + \\frac{x^4}{4!} - \\frac{x^6}{6!} + \\cdots$$ For learning rate schedules, we focus on the interval $[0, \\pi]$ where cosine monotonically decreases from 1 to -1.",
+        "notation": "$\\cos(x)$ = cosine of angle $x$ (in radians), $\\pi \\approx 3.14159$ = ratio of circle circumference to diameter, $[0, \\pi]$ = half-period interval of interest",
+        "theorem": "**Theorem (Cosine Decay Properties)**: On the interval $[0, \\pi]$: (1) $\\cos(0) = 1$ and $\\cos(\\pi) = -1$ (boundary values), (2) $\\cos(x)$ is strictly decreasing with $\\frac{d}{dx}\\cos(x) = -\\sin(x) < 0$ for $x \\in (0, \\pi)$, (3) $\\cos(x)$ is concave (second derivative $-\\cos(x)$ is negative on $(0, \\pi/2)$ and positive on $(\\pi/2, \\pi)$), giving an S-shaped decay curve, (4) The transformed function $f(x) = a + b\\cos(cx)$ has range $[a-|b|, a+|b|]$ and can be scaled to any desired output range.",
+        "proof_sketch": "Properties (1) are standard trigonometric values. For (2), $\\frac{d}{dx}\\cos(x) = -\\sin(x)$, and $\\sin(x) > 0$ for $x \\in (0, \\pi)$, thus derivative is negative (strictly decreasing). For (3), $\\frac{d^2}{dx^2}\\cos(x) = -\\cos(x)$, which changes sign at $x = \\pi/2$, indicating inflection point. For (4), since $\\cos(cx) \\in [-1, 1]$, we have $a - |b| \\leq a + b\\cos(cx) \\leq a + |b|$.",
+        "examples": [
+          "**Example 1**: Evaluate $\\cos(0) = 1$, $\\cos(\\pi/4) \\approx 0.707$, $\\cos(\\pi/2) = 0$, $\\cos(3\\pi/4) \\approx -0.707$, $\\cos(\\pi) = -1$",
+          "**Example 2**: Transform to range [0,1]: $f(x) = \\frac{1 + \\cos(x)}{2}$ gives $f(0) = 1$ and $f(\\pi) = 0$, a smooth decay from 1 to 0",
+          "**Example 3**: General transformation to range $[y_{min}, y_{max}]$: Use $f(x) = y_{min} + \\frac{y_{max} - y_{min}}{2}(1 + \\cos(x))$. For $y_{min}=0.1, y_{max}=1.0$: $f(\\pi/2) = 0.1 + \\frac{0.9}{2}(1 + 0) = 0.55$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cosine Decay (Normalized)",
+          "latex": "$f(t) = \\frac{1 + \\cos(\\pi t)}{2}$ where $t \\in [0,1]$",
+          "description": "Maps progress ratio $t \\in [0,1]$ to decay from 1 to 0 using cosine"
+        },
+        {
+          "name": "Scaled Cosine Decay",
+          "latex": "$f(t) = y_{min} + \\frac{y_{max} - y_{min}}{2}(1 + \\cos(\\pi t))$",
+          "description": "Decays from $y_{max}$ to $y_{min}$ as $t$ goes from 0 to 1"
+        },
+        {
+          "name": "Cosine Derivative",
+          "latex": "$\\frac{d}{dx}\\cos(x) = -\\sin(x)$",
+          "description": "Rate of change of cosine; negative on $(0, \\pi)$ confirming decay"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that applies cosine decay from a maximum value to a minimum value over a given number of steps. The function should use the transformed cosine formula to smoothly decay from max_val to min_val. This is the core building block for the learning rate decay phase.",
+        "function_signature": "def cosine_decay(max_val: float, min_val: float, num_steps: int) -> list[float]:",
+        "starter_code": "def cosine_decay(max_val: float, min_val: float, num_steps: int) -> list[float]:\n    \"\"\"\n    Generate values following cosine decay from max_val to min_val.\n    \n    Args:\n        max_val: Initial maximum value (at step 0)\n        min_val: Final minimum value (at last step)\n        num_steps: Total number of values to generate\n    \n    Returns:\n        List of values following cosine decay\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "cosine_decay(1.0, 0.0, 7)",
+            "expected": "[1.0, 0.9330, 0.7500, 0.5000, 0.2500, 0.0670, 0.0]",
+            "explanation": "Cosine decay from 1.0 to 0.0 over 7 steps. At step i, progress is i/6, and we apply the scaled cosine formula. Step 3 (middle) gives exactly 0.5."
+          },
+          {
+            "input": "cosine_decay(0.5, 0.1, 4)",
+            "expected": "[0.5, 0.4000, 0.2333, 0.1]",
+            "explanation": "Decay from 0.5 to 0.1 over 4 steps follows the cosine curve scaled to this range"
+          },
+          {
+            "input": "cosine_decay(2.0, 2.0, 5)",
+            "expected": "[2.0, 2.0, 2.0, 2.0, 2.0]",
+            "explanation": "When max_val equals min_val, all values should be constant (no decay)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to import math.pi and math.cos from the math module",
+        "Using degrees instead of radians in the cosine function",
+        "Incorrectly computing the progress ratio - should be i/(num_steps-1) for num_steps values indexed 0 to num_steps-1",
+        "Wrong formula transformation - forgetting that cos(0)=1 and cos(π)=-1, so need (1+cos(πt))/2 to map to [0,1]",
+        "Not handling the edge case where num_steps = 1 (should return just [max_val])"
+      ],
+      "hint": "The key is to map step index i to angle πt where t is the progress ratio, then transform (1+cos(πt))/2 to your desired range using linear scaling.",
+      "references": [
+        "Trigonometry: properties of cosine and sine functions",
+        "Function transformations: vertical and horizontal scaling",
+        "Optimization literature: cosine annealing schedules"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Piecewise Function Composition",
+      "relation_to_problem": "The complete learning rate schedule is a piecewise function with two distinct phases (warmup and decay). Understanding how to define, implement, and ensure continuity at boundaries is crucial for the final solution.",
+      "prerequisites": [
+        "Piecewise functions",
+        "Function continuity",
+        "Conditional logic"
+      ],
+      "learning_objectives": [
+        "Define and implement piecewise functions with multiple regions",
+        "Ensure continuity at phase boundaries",
+        "Understand domain partitioning for different function behaviors"
+      ],
+      "math_content": {
+        "definition": "**Piecewise Function**: A function $f: D \\to \\mathbb{R}$ is piecewise-defined if its domain $D$ is partitioned into disjoint subsets $D_1, D_2, \\ldots, D_k$ and $f$ is defined by different expressions on each subset: $$f(x) = \\begin{cases} f_1(x) & \\text{if } x \\in D_1 \\\\ f_2(x) & \\text{if } x \\in D_2 \\\\ \\vdots \\\\ f_k(x) & \\text{if } x \\in D_k \\end{cases}$$ For learning rate schedules, we typically have $D = [0, T]$ partitioned into warmup $[0, W)$ and decay $[W, T]$ regions.",
+        "notation": "$f_i(x)$ = function definition on subdomain $D_i$, $D = \\bigcup_{i=1}^k D_i$ = domain partition, $W$ = boundary point between phases",
+        "theorem": "**Theorem (Continuity of Piecewise Functions)**: Let $f$ be piecewise-defined with boundary point $c$ separating regions where $f(x) = f_1(x)$ for $x < c$ and $f(x) = f_2(x)$ for $x \\geq c$. Then $f$ is continuous at $c$ if and only if: $$\\lim_{x \\to c^-} f_1(x) = f_2(c)$$ In practice, for right-continuous schedules, this simplifies to: $f_1(c) = f_2(c)$ when both are defined at $c$. **Continuity is essential** because discontinuous jumps in learning rate can destabilize training.",
+        "proof_sketch": "By definition, $f$ is continuous at $c$ if $\\lim_{x \\to c} f(x) = f(c)$. Since $f$ is piecewise, the left limit $\\lim_{x \\to c^-} f(x) = \\lim_{x \\to c^-} f_1(x)$ and the right limit $\\lim_{x \\to c^+} f(x) = \\lim_{x \\to c^+} f_2(x) = f_2(c)$ (assuming $f_2$ is continuous). For continuity, these must be equal to $f(c)$. If we define $f(c) = f_2(c)$, then we need $\\lim_{x \\to c^-} f_1(x) = f_2(c)$.",
+        "examples": [
+          "**Example 1**: Two-phase schedule with warmup length $W=3$, total steps $T=6$. Phase 1: $f(t) = \\frac{t}{2}$ for $t \\in [0,3)$. Phase 2: $f(t) = \\frac{3}{2} - \\frac{t}{6}$ for $t \\in [3,6]$. Check continuity: $\\lim_{t \\to 3^-} \\frac{t}{2} = 1.5$ and $f(3) = \\frac{3}{2} - \\frac{3}{6} = 1.5$. Continuous! ✓",
+          "**Example 2**: Discontinuous example: Phase 1: $f(t) = t$ for $t < 2$. Phase 2: $f(t) = 3$ for $t \\geq 2$. At $t=2$: $\\lim_{t \\to 2^-} t = 2$ but $f(2) = 3$. Discontinuous! Jump of size 1.",
+          "**Example 3**: For warmup-cosine schedule: warmup ends at $t=W$ with value $\\eta_{max}$. Cosine decay must start at $\\eta_{max}$ at $t=W$. This is guaranteed if cosine formula evaluates to $\\eta_{max}$ when progress ratio is 0."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Two-Phase Piecewise Function",
+          "latex": "$f(t) = \\begin{cases} f_1(t) & \\text{if } t < W \\\\ f_2(t) & \\text{if } t \\geq W \\end{cases}$",
+          "description": "Standard form for warmup (phase 1) and decay (phase 2) schedule"
+        },
+        {
+          "name": "Continuity Condition",
+          "latex": "$\\lim_{t \\to W^-} f_1(t) = f_2(W)$",
+          "description": "Requirement for smooth transition at boundary point $W$"
+        },
+        {
+          "name": "Index-based Piecewise",
+          "latex": "$f(i) = \\begin{cases} g(i) & \\text{if } i < k \\\\ h(i) & \\text{if } i \\geq k \\end{cases}$ for $i \\in \\{0,1,\\ldots,n\\}$",
+          "description": "Discrete version using step indices instead of continuous variable"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a piecewise function that combines linear growth and exponential decay. For steps 0 to split_point-1, values grow linearly from start_val to peak_val. From split_point onwards, values decay exponentially toward end_val. Ensure the function is continuous at the split point.",
+        "function_signature": "def piecewise_schedule(total_steps: int, split_point: int, start_val: float, peak_val: float, end_val: float) -> list[float]:",
+        "starter_code": "def piecewise_schedule(total_steps: int, split_point: int, start_val: float, peak_val: float, end_val: float) -> list[float]:\n    \"\"\"\n    Generate a piecewise schedule with linear growth then exponential decay.\n    \n    Args:\n        total_steps: Total number of steps\n        split_point: Step index where phase changes (phase 1: [0, split_point), phase 2: [split_point, total_steps))\n        start_val: Starting value at step 0\n        peak_val: Peak value reached at split_point\n        end_val: Target value at final step\n    \n    Returns:\n        List of scheduled values\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "piecewise_schedule(10, 3, 0.0, 1.0, 0.1)",
+            "expected": "[0.0, 0.5, 1.0, 1.0, 0.7943, 0.6310, 0.5012, 0.3981, 0.3162, 0.2512]",
+            "explanation": "Linear growth from 0 to 1 over steps 0-2, then exponential decay from 1 toward 0.1 over remaining steps. Continuous at step 3."
+          },
+          {
+            "input": "piecewise_schedule(6, 2, 0.5, 2.0, 0.5)",
+            "expected": "[0.5, 1.25, 2.0, 2.0, 1.414, 1.0, 0.707, 0.5]",
+            "explanation": "Growth phase for 2 steps, then exponential decay back to starting value"
+          },
+          {
+            "input": "piecewise_schedule(5, 5, 0.0, 1.0, 0.5)",
+            "expected": "[0.0, 0.25, 0.5, 0.75, 1.0]",
+            "explanation": "Edge case: split point equals total steps, so only growth phase (no decay)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Off-by-one errors in determining which phase a given step belongs to",
+        "Failing to ensure continuity - the value at split_point should be peak_val in both phases",
+        "Not handling edge cases where split_point is 0 (no warmup) or equals total_steps (no decay)",
+        "Computing decay ratio incorrectly - should use remaining steps after split_point",
+        "Using the wrong base for exponential decay, leading to incorrect end value"
+      ],
+      "hint": "For the growth phase, use linear interpolation from start_val to peak_val. For decay, use exponential formula with base chosen so that the final step reaches end_val. Verify continuity by checking that both formulas give peak_val at split_point.",
+      "references": [
+        "Real analysis: continuity and limits of piecewise functions",
+        "Control theory: switching between different control modes",
+        "Optimization schedules: multi-phase learning rate strategies"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Parameter Scaling and Normalization",
+      "relation_to_problem": "To implement the cosine decay correctly, we must map the current step to the appropriate progress ratio within the decay phase. This requires understanding how to normalize indices to [0,1] range and scale outputs to arbitrary ranges.",
+      "prerequisites": [
+        "Linear transformations",
+        "Domain and range mappings",
+        "Normalization techniques"
+      ],
+      "learning_objectives": [
+        "Normalize discrete step indices to continuous [0,1] progress ratios",
+        "Scale function outputs from one range to another",
+        "Handle edge cases in range transformations"
+      ],
+      "math_content": {
+        "definition": "**Normalization**: Given a value $x$ in domain $[a, b]$, normalization maps it to a standardized range, typically $[0, 1]$: $$\\text{normalize}(x; a, b) = \\frac{x - a}{b - a}$$ **Scaling**: Given a normalized value $t \\in [0, 1]$, scaling maps it to target range $[c, d]$: $$\\text{scale}(t; c, d) = c + t(d - c)$$ **Composition**: To map from $[a,b]$ to $[c,d]$: $$\\text{map}(x; a, b, c, d) = c + \\frac{x - a}{b - a}(d - c)$$",
+        "notation": "$x$ = value to transform, $[a,b]$ = source domain, $[c,d]$ = target range, $t$ = normalized value in $[0,1]$",
+        "theorem": "**Theorem (Affine Transformation Properties)**: The mapping $f(x) = c + \\frac{x-a}{b-a}(d-c)$ is an affine transformation with the following properties: (1) $f(a) = c$ and $f(b) = d$ (endpoint mapping), (2) $f$ is bijective (one-to-one and onto) when $a \\neq b$, (3) $f$ preserves ratios: if $x = a + r(b-a)$ for $r \\in [0,1]$, then $f(x) = c + r(d-c)$, (4) $f$ is continuous and differentiable with constant derivative $\\frac{df}{dx} = \\frac{d-c}{b-a}$.",
+        "proof_sketch": "Property (1) follows by direct substitution. For (2), to show injectivity: assume $f(x_1) = f(x_2)$, then $c + \\frac{x_1-a}{b-a}(d-c) = c + \\frac{x_2-a}{b-a}(d-c)$, which implies $x_1 = x_2$ when $b \\neq a$. Surjectivity follows from solving $y = f(x)$ for $x$: $x = a + \\frac{y-c}{d-c}(b-a)$. Property (3): $f(a + r(b-a)) = c + \\frac{a+r(b-a)-a}{b-a}(d-c) = c + r(d-c)$. Property (4) follows from $f$ being a polynomial of degree 1.",
+        "examples": [
+          "**Example 1**: Normalize step 5 in range [3, 10] to [0,1]: $t = \\frac{5-3}{10-3} = \\frac{2}{7} \\approx 0.286$",
+          "**Example 2**: Scale normalized value $t=0.5$ to range [10, 100]: $y = 10 + 0.5(100-10) = 55$",
+          "**Example 3**: Map step index $i$ from discrete range $[W, T-1]$ to continuous [0,1]: For $T=10, W=3, i=6$: $t = \\frac{6-3}{(10-1)-3} = \\frac{3}{6} = 0.5$. This represents 50% progress through decay phase.",
+          "**Example 4**: Combined mapping for learning rate decay: Current step $i=7$, warmup ends at $W=2$, total steps $T=10$. Normalize: $t = \\frac{7-2}{10-2} = 0.625$. Then apply to cosine: $\\text{lr} = 0.01 + \\frac{0.1-0.01}{2}(1 + \\cos(\\pi \\cdot 0.625))$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Normalization Formula",
+          "latex": "$t = \\frac{x - x_{min}}{x_{max} - x_{min}}$",
+          "description": "Maps value $x$ from $[x_{min}, x_{max}]$ to $[0, 1]$"
+        },
+        {
+          "name": "Denormalization (Scaling) Formula",
+          "latex": "$y = y_{min} + t(y_{max} - y_{min})$",
+          "description": "Maps normalized value $t \\in [0,1]$ to target range $[y_{min}, y_{max}]$"
+        },
+        {
+          "name": "Progress Ratio in Decay Phase",
+          "latex": "$t = \\frac{i - W}{T - W}$ for step $i \\geq W$",
+          "description": "Normalizes step index to progress through decay phase, where $W$ is warmup length and $T$ is total steps"
+        },
+        {
+          "name": "Discrete Step Normalization",
+          "latex": "$t_i = \\frac{i}{n-1}$ for $i \\in \\{0, 1, \\ldots, n-1\\}$",
+          "description": "Maps $n$ discrete steps to [0,1] with first step at 0 and last at 1"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that normalizes step indices within a phase to progress ratios, then applies a transformed function. Given total steps, phase boundaries, and a transformation function, compute normalized progress for each step in the phase and apply the transformation.",
+        "function_signature": "def normalize_and_transform(step_index: int, phase_start: int, phase_end: int, transform_func: str) -> float:",
+        "starter_code": "def normalize_and_transform(step_index: int, phase_start: int, phase_end: int, transform_func: str) -> float:\n    \"\"\"\n    Normalize a step index within a phase and apply transformation.\n    \n    Args:\n        step_index: Current step index\n        phase_start: First step of the phase (inclusive)\n        phase_end: Last step of the phase (inclusive)\n        transform_func: Type of transformation ('linear', 'quadratic', or 'cosine')\n    \n    Returns:\n        Transformed value based on normalized progress\n    \"\"\"\n    # Your code here\n    # Linear: returns t\n    # Quadratic: returns t^2\n    # Cosine: returns (1 + cos(pi*t))/2\n    pass",
+        "test_cases": [
+          {
+            "input": "normalize_and_transform(5, 3, 9, 'linear')",
+            "expected": "0.3333",
+            "explanation": "Step 5 in phase [3,9]: progress = (5-3)/(9-3) = 2/6 = 0.333. Linear transform returns this directly."
+          },
+          {
+            "input": "normalize_and_transform(6, 2, 10, 'quadratic')",
+            "expected": "0.25",
+            "explanation": "Step 6 in phase [2,10]: progress = (6-2)/(10-2) = 4/8 = 0.5. Quadratic: 0.5^2 = 0.25"
+          },
+          {
+            "input": "normalize_and_transform(4, 0, 8, 'cosine')",
+            "expected": "0.5",
+            "explanation": "Step 4 in phase [0,8]: progress = 4/8 = 0.5. Cosine: (1+cos(π*0.5))/2 = (1+0)/2 = 0.5"
+          },
+          {
+            "input": "normalize_and_transform(3, 3, 3, 'linear')",
+            "expected": "1.0",
+            "explanation": "Edge case: single-step phase. Progress should be 1.0 (at end)."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using (phase_end - phase_start) instead of (phase_end - phase_start) when phase_end is inclusive",
+        "Not handling the edge case where phase_start equals phase_end (single step)",
+        "Forgetting that step indices are 0-based but phase lengths are counts",
+        "Applying the transformation before normalization instead of after",
+        "Rounding errors from integer division - always use float division"
+      ],
+      "hint": "First compute the progress ratio t = (step - phase_start) / (phase_end - phase_start). For the edge case where start equals end, set t = 1.0. Then apply the appropriate transformation to t.",
+      "references": [
+        "Data preprocessing: feature scaling and normalization",
+        "Computer graphics: viewport transformations",
+        "Signal processing: amplitude scaling"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Discrete Sequence Generation from Continuous Functions",
+      "relation_to_problem": "Learning rate schedules are implemented as discrete sequences (one value per training step), but are defined using continuous mathematical functions. This sub-quest teaches how to sample continuous functions at discrete points to generate sequences.",
+      "prerequisites": [
+        "Function evaluation",
+        "Sequence generation",
+        "Discrete mathematics"
+      ],
+      "learning_objectives": [
+        "Sample continuous functions at discrete points to generate sequences",
+        "Understand the relationship between continuous schedules and discrete implementations",
+        "Handle boundary conditions and edge cases in sequence generation"
+      ],
+      "math_content": {
+        "definition": "**Discrete Sampling**: Given a continuous function $f: [a,b] \\to \\mathbb{R}$ and $n$ sample points, discrete sampling generates a sequence $(f(x_0), f(x_1), \\ldots, f(x_{n-1}))$ where $x_i \\in [a,b]$ are sampling points. For uniform sampling with $n$ points: $$x_i = a + \\frac{i}{n-1}(b-a) \\quad \\text{for } i = 0, 1, \\ldots, n-1$$ This ensures $x_0 = a$ and $x_{n-1} = b$, covering the entire interval with equally-spaced points.",
+        "notation": "$f$ = continuous function, $n$ = number of samples, $x_i$ = $i$-th sampling point, $(f(x_0), \\ldots, f(x_{n-1}))$ = discrete sequence",
+        "theorem": "**Theorem (Sampling Preserves Function Properties)**: Let $f: [a,b] \\to \\mathbb{R}$ be a continuous function and $(y_0, \\ldots, y_{n-1})$ be the uniformly sampled sequence with $y_i = f(x_i)$ where $x_i = a + \\frac{i}{n-1}(b-a)$. Then: (1) **Endpoint preservation**: $y_0 = f(a)$ and $y_{n-1} = f(b)$, (2) **Monotonicity**: If $f$ is monotone increasing (decreasing), then $y_i \\leq y_{i+1}$ ($y_i \\geq y_{i+1}$) for all $i$, (3) **Boundedness**: $\\min_{i} y_i \\geq \\inf_{x \\in [a,b]} f(x)$ and $\\max_i y_i \\leq \\sup_{x \\in [a,b]} f(x)$, (4) **Approximation**: As $n \\to \\infty$, the piecewise linear interpolation through the sampled points converges uniformly to $f$ (if $f$ is continuous).",
+        "proof_sketch": "Property (1) follows directly from the sampling formula: $x_0 = a$ gives $y_0 = f(a)$, and $x_{n-1} = a + \\frac{n-1}{n-1}(b-a) = b$ gives $y_{n-1} = f(b)$. For (2), if $f$ is monotone increasing and $i < j$, then $x_i < x_j$ implies $f(x_i) \\leq f(x_j)$, so $y_i \\leq y_j$. Property (3) holds because the sampled values are specific function evaluations at points in the domain. Property (4) follows from the uniform continuity of $f$ on the compact interval $[a,b]$: for any $\\epsilon > 0$, there exists $\\delta > 0$ such that $|x-x'| < \\delta$ implies $|f(x) - f(x')| < \\epsilon$. Choose $n$ large enough that $\\frac{b-a}{n-1} < \\delta$.",
+        "examples": [
+          "**Example 1**: Sample $f(x) = x^2$ on $[0, 2]$ with $n=5$ points: $x_i = 0, 0.5, 1.0, 1.5, 2.0$, giving sequence $(0, 0.25, 1.0, 2.25, 4.0)$",
+          "**Example 2**: Sample cosine decay $f(t) = \\frac{1+\\cos(\\pi t)}{2}$ on $[0,1]$ with $n=4$ points: $t_i = 0, \\frac{1}{3}, \\frac{2}{3}, 1$, giving $(1.0, 0.75, 0.25, 0.0)$",
+          "**Example 3**: Generate learning rate schedule over $T=10$ steps with warmup $W=3$. Sample linear warmup $f_1(i) = \\frac{i}{W-1} \\eta_{max}$ for $i \\in \\{0,1,2\\}$, then sample cosine decay for $i \\in \\{3, 4, \\ldots, 9\\}$. Result is a piecewise sampled sequence.",
+          "**Example 4**: Edge case with $n=1$: Sampling any function at a single point $x_0 = a$ returns sequence $(f(a))$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Uniform Sampling Points",
+          "latex": "$x_i = a + \\frac{i}{n-1}(b-a)$ for $i = 0, 1, \\ldots, n-1$",
+          "description": "Generates $n$ equally-spaced points in $[a,b]$ including both endpoints"
+        },
+        {
+          "name": "Discrete Sequence from Continuous Function",
+          "latex": "$(y_0, y_1, \\ldots, y_{n-1})$ where $y_i = f(x_i)$",
+          "description": "Evaluates function at each sampling point to create sequence"
+        },
+        {
+          "name": "Step-based Sampling for Schedules",
+          "latex": "$\\alpha_i = f(i)$ for $i = 0, 1, \\ldots, T-1$",
+          "description": "Direct evaluation at integer step indices (when function domain matches step indices)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a general function that samples any mathematical function at discrete step indices. Given a specification of the function type and parameters, generate the complete discrete sequence. This exercise combines all previous concepts: you'll handle both polynomial and trigonometric functions, normalize indices, and generate the output sequence.",
+        "function_signature": "def sample_function(func_type: str, num_steps: int, params: dict) -> list[float]:",
+        "starter_code": "def sample_function(func_type: str, num_steps: int, params: dict) -> list[float]:\n    \"\"\"\n    Sample a continuous function at discrete step indices.\n    \n    Args:\n        func_type: Type of function ('linear', 'quadratic', 'cosine_decay')\n        num_steps: Number of discrete samples to generate\n        params: Dictionary of parameters specific to each function type\n                - linear: {'start': float, 'end': float}\n                - quadratic: {'coeff': float, 'start_x': float, 'end_x': float}\n                - cosine_decay: {'max_val': float, 'min_val': float}\n    \n    Returns:\n        List of sampled function values\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "sample_function('linear', 5, {'start': 0.0, 'end': 1.0})",
+            "expected": "[0.0, 0.25, 0.5, 0.75, 1.0]",
+            "explanation": "Linear function sampled at 5 points from 0 to 1"
+          },
+          {
+            "input": "sample_function('quadratic', 4, {'coeff': 2.0, 'start_x': 0.0, 'end_x': 3.0})",
+            "expected": "[0.0, 2.0, 8.0, 18.0]",
+            "explanation": "Quadratic f(x)=2x² sampled at x=0,1,2,3"
+          },
+          {
+            "input": "sample_function('cosine_decay', 5, {'max_val': 1.0, 'min_val': 0.0})",
+            "expected": "[1.0, 0.8536, 0.5, 0.1464, 0.0]",
+            "explanation": "Cosine decay from 1 to 0 sampled at 5 points"
+          },
+          {
+            "input": "sample_function('linear', 1, {'start': 5.0, 'end': 10.0})",
+            "expected": "[5.0]",
+            "explanation": "Edge case: single sample returns start value"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Off-by-one errors in computing the number of intervals vs number of points (n points create n-1 intervals)",
+        "Not handling the edge case when num_steps = 1 (should return just the starting value)",
+        "Incorrect normalization when sampling - forgetting to divide by (num_steps - 1) not num_steps",
+        "Evaluating the function at wrong points - must ensure endpoints are included",
+        "Type conversion errors when using integer division instead of float division"
+      ],
+      "hint": "For each step index i from 0 to num_steps-1, compute the normalized position t = i/(num_steps-1), map it to the function's input domain, evaluate the function, and append to result list.",
+      "references": [
+        "Numerical analysis: discretization of continuous functions",
+        "Signal processing: sampling theory and Nyquist theorem",
+        "Computational mathematics: discrete approximations"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Warmup-Cosine Schedule Integration",
+      "relation_to_problem": "This final sub-quest synthesizes all previous concepts to construct the complete two-phase learning rate schedule. You will combine linear warmup, cosine decay, piecewise function logic, normalization, and discrete sampling.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Integration of multiple mathematical concepts"
+      ],
+      "learning_objectives": [
+        "Integrate linear warmup and cosine decay into a unified schedule",
+        "Ensure mathematical correctness: continuity, boundary conditions, and proper scaling",
+        "Implement efficient discrete generation of the complete schedule",
+        "Validate implementation against theoretical properties"
+      ],
+      "math_content": {
+        "definition": "**Warmup + Cosine Decay Schedule**: A piecewise learning rate schedule $\\alpha: \\{0, 1, \\ldots, T-1\\} \\to \\mathbb{R}^+$ defined over $T$ training steps with warmup period $W$ as: $$\\alpha(t) = \\begin{cases} \\eta_{max} \\cdot \\frac{t}{W-1} & \\text{if } 0 \\leq t < W \\text{ (warmup phase)} \\\\ \\eta_{min} + \\frac{\\eta_{max} - \\eta_{min}}{2}\\left(1 + \\cos\\left(\\pi \\cdot \\frac{t - W}{T - W}\\right)\\right) & \\text{if } W \\leq t \\leq T-1 \\text{ (decay phase)} \\end{cases}$$ where $\\eta_{max} > 0$ is the maximum learning rate, $\\eta_{min} \\geq 0$ is the minimum learning rate, and $W < T$ is the warmup duration.",
+        "notation": "$\\alpha(t)$ = learning rate at step $t$, $T$ = total training steps, $W$ = warmup steps, $\\eta_{max}$ = maximum LR, $\\eta_{min}$ = minimum LR, $t \\in \\{0, 1, \\ldots, T-1\\}$ = discrete step index",
+        "theorem": "**Theorem (Properties of Warmup-Cosine Schedule)**: The schedule $\\alpha(t)$ satisfies: (1) **Range**: $\\alpha(t) \\in [0, \\eta_{max}]$ for all $t$, with minimum value $\\alpha(T-1) = \\eta_{min}$ achieved at the final step, (2) **Continuity**: $\\lim_{t \\to W^-} \\alpha(t) = \\alpha(W) = \\eta_{max}$, ensuring smooth transition at the phase boundary, (3) **Monotonicity**: $\\alpha(t)$ is strictly increasing on $[0, W)$ and strictly decreasing on $[W, T-1]$, achieving maximum at $t = W$, (4) **Endpoint conditions**: $\\alpha(0) = 0$ (or small value if $W=1$) and $\\alpha(T-1) = \\eta_{min}$, (5) **Smoothness**: Both phases have continuous derivatives (warmup has constant derivative, decay has smooth cosine-based derivative).",
+        "proof_sketch": "For (1): In warmup, $0 \\leq \\frac{t}{W-1} \\leq 1$ gives $0 \\leq \\alpha(t) \\leq \\eta_{max}$. In decay, since $\\cos(\\cdot) \\in [-1,1]$, we have $1 + \\cos(\\cdot) \\in [0, 2]$, giving $\\alpha(t) \\in [\\eta_{min}, \\eta_{max}]$. For (2): As $t \\to (W-1)^+$ in warmup phase, $\\alpha(t) \\to \\eta_{max} \\cdot \\frac{W-1}{W-1} = \\eta_{max}$. At $t=W$ in decay phase, progress ratio is $\\frac{W-W}{T-W} = 0$, so $\\cos(0) = 1$, giving $\\alpha(W) = \\eta_{min} + \\frac{\\eta_{max}-\\eta_{min}}{2}(1+1) = \\eta_{max}$. Thus continuous. For (3): Warmup derivative is $\\frac{d\\alpha}{dt} = \\frac{\\eta_{max}}{W-1} > 0$. Decay derivative is $\\frac{d\\alpha}{dt} = -\\frac{\\eta_{max} - \\eta_{min}}{2} \\cdot \\frac{\\pi}{T-W} \\sin\\left(\\pi \\cdot \\frac{t-W}{T-W}\\right) < 0$ for $t \\in (W, T)$ since $\\sin$ is positive on $(0, \\pi)$. Properties (4) and (5) follow by direct evaluation.",
+        "examples": [
+          "**Example 1**: $T=10, W=3, \\eta_{max}=1.0, \\eta_{min}=0.0$. Warmup steps $t=0,1,2$: $\\alpha(0)=0, \\alpha(1)=0.5, \\alpha(2)=1.0$. Decay steps $t=3,\\ldots,9$: progress ratios $0, \\frac{1}{7}, \\ldots, \\frac{6}{7}, 1$. Applying cosine formula: $\\alpha(3)=1.0, \\alpha(4)\\approx 0.975, \\ldots, \\alpha(9)=0.0$",
+          "**Example 2**: $T=8, W=2, \\eta_{max}=0.01, \\eta_{min}=0.001$. Warmup: $\\alpha(0)=0, \\alpha(1)=0.01$. Decay: For $t=2$ (progress 0): $\\alpha(2) = 0.001 + \\frac{0.009}{2}(1+1) = 0.01$ ✓ continuous. For $t=7$ (progress 1): $\\alpha(7) = 0.001 + \\frac{0.009}{2}(1-1) = 0.001$ ✓",
+          "**Example 3**: Edge case $W=1$: Only step 0 in warmup with $\\alpha(0) = 0$ (undefined division, typically set to 0). Remaining $T-1$ steps use cosine decay from $\\eta_{max}$ to $\\eta_{min}$.",
+          "**Example 4**: Verification of continuity: At boundary $t=W$, warmup gives $\\eta_{max} \\cdot \\frac{W}{W-1}$... wait, this doesn't equal $\\eta_{max}$ unless we're careful! Correct interpretation: warmup runs for steps $0, 1, \\ldots, W-1$ (total $W$ steps), with last warmup step at $t=W-1$ giving $\\alpha(W-1) = \\eta_{max} \\cdot \\frac{W-1}{W-1} = \\eta_{max}$. Decay starts at $t=W$ with progress 0, giving $\\alpha(W) = \\eta_{max}$. ✓ Continuous!"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Warmup Phase Formula",
+          "latex": "$\\alpha(t) = \\eta_{max} \\cdot \\frac{t}{W-1}$ for $t \\in [0, W)$",
+          "description": "Linear increase from 0 to $\\eta_{max}$ over first $W$ steps"
+        },
+        {
+          "name": "Cosine Decay Phase Formula",
+          "latex": "$\\alpha(t) = \\eta_{min} + \\frac{\\eta_{max} - \\eta_{min}}{2}\\left(1 + \\cos\\left(\\pi \\cdot \\frac{t-W}{T-W}\\right)\\right)$ for $t \\in [W, T)$",
+          "description": "Smooth cosine decay from $\\eta_{max}$ to $\\eta_{min}$ over remaining $T-W$ steps"
+        },
+        {
+          "name": "Progress Ratio in Decay",
+          "latex": "$p = \\frac{t - W}{T - W}$ where $p \\in [0, 1]$",
+          "description": "Normalizes step position within decay phase to [0,1] range"
+        },
+        {
+          "name": "Continuity Condition Verification",
+          "latex": "$\\lim_{t \\to W^-} \\alpha(t) = \\alpha(W) = \\eta_{max}$",
+          "description": "Both phases must evaluate to $\\eta_{max}$ at the boundary step $W$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete warmup + cosine decay learning rate schedule generator. This is a comprehensive exercise that tests your understanding of all previous concepts. Your function must correctly handle the two-phase structure, ensure continuity at the boundary, properly normalize indices, and generate accurate values throughout. Edge cases like W=0 (no warmup), W=T (no decay), and W=1 must be handled correctly.",
+        "function_signature": "def create_warmup_cosine_schedule(total_steps: int, warmup_steps: int, max_lr: float, min_lr: float) -> list[float]:",
+        "starter_code": "def create_warmup_cosine_schedule(total_steps: int, warmup_steps: int, max_lr: float, min_lr: float) -> list[float]:\n    \"\"\"\n    Generate a complete learning rate schedule with linear warmup and cosine decay.\n    \n    Args:\n        total_steps: Total number of training steps (T)\n        warmup_steps: Number of warmup steps (W)\n        max_lr: Maximum learning rate reached after warmup\n        min_lr: Minimum learning rate at end of training\n    \n    Returns:\n        List of learning rates for each step [alpha(0), alpha(1), ..., alpha(T-1)]\n    \n    Constraints:\n        - 0 <= warmup_steps <= total_steps\n        - min_lr <= max_lr\n        - total_steps >= 1\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "create_warmup_cosine_schedule(10, 3, 1.0, 0.0)",
+            "expected": "[0.0, 0.5, 1.0, 1.0, 0.9755, 0.9045, 0.7939, 0.6545, 0.5, 0.3455, 0.2061]",
+            "explanation": "Standard case: 3-step warmup (0→0.5→1.0), then 7-step cosine decay from 1.0 to 0.0. Boundary at t=3 is continuous."
+          },
+          {
+            "input": "create_warmup_cosine_schedule(5, 0, 1.0, 0.1)",
+            "expected": "[1.0, 0.7808, 0.55, 0.3192, 0.1]",
+            "explanation": "Edge case: No warmup (W=0). All steps use cosine decay from max_lr to min_lr."
+          },
+          {
+            "input": "create_warmup_cosine_schedule(5, 5, 1.0, 0.0)",
+            "expected": "[0.0, 0.25, 0.5, 0.75, 1.0]",
+            "explanation": "Edge case: No decay (W=T). All steps are warmup, linear increase to max_lr."
+          },
+          {
+            "input": "create_warmup_cosine_schedule(8, 2, 0.01, 0.001)",
+            "expected": "[0.0, 0.01, 0.01, 0.00867, 0.00676, 0.00489, 0.00324, 0.00133, 0.001]",
+            "explanation": "Small learning rates: 2-step warmup, then 6-step cosine decay from 0.01 to 0.001. Tests numerical precision."
+          },
+          {
+            "input": "create_warmup_cosine_schedule(1, 1, 1.0, 0.5)",
+            "expected": "[1.0]",
+            "explanation": "Edge case: Single step with W=T=1. Should return max_lr (or handle specially)."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Incorrect boundary handling: warmup should run for steps 0 to W-1, decay starts at step W",
+        "Off-by-one error in warmup: dividing by W instead of (W-1) causes warmup to reach max_lr only at step W, not W-1",
+        "Wrong progress ratio calculation: must use (t-W)/(T-W) not (t-W)/(T-W-1) for the decay phase",
+        "Discontinuity at boundary: failing to ensure both phases produce the same value at t=W",
+        "Not handling edge cases: W=0 (no warmup), W=T (no decay), W=1 (single warmup step), T=1 (single total step)",
+        "Floating point precision issues with very small learning rates",
+        "Using degrees instead of radians for cosine function",
+        "Incorrect import: forgetting to import math.pi and math.cos"
+      ],
+      "hint": "Structure your solution with clear phase separation: (1) Generate warmup values for steps 0 to W-1 using linear interpolation, (2) Generate decay values for steps W to T-1 using the cosine formula with proper normalization of progress ratio, (3) Concatenate the two lists. Test continuity by verifying warmup[-1] equals decay[0] when both phases exist.",
+      "references": [
+        "Deep learning optimization papers: 'Attention Is All You Need' (Vaswani et al., 2017) - Transformer training schedule",
+        "PyTorch documentation: torch.optim.lr_scheduler.CosineAnnealingWarmRestarts",
+        "Original cosine annealing paper: 'SGDR: Stochastic Gradient Descent with Warm Restarts' (Loshchilov & Hutter, 2017)",
+        "Learning rate schedules survey: 'Systematic evaluation of CNN advances on the ImageNet' (Mishkin et al., 2017)"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,489 @@
+{
+  "problem_id": 121,
+  "title": "Vector Element-wise Sum",
+  "category": "Linear Algebra",
+  "difficulty": "easy",
+  "description": "Write a Python function that computes the element-wise sum of two vectors. The function should return a new vector representing the resulting sum if the operation is valid, or -1 if the vectors have incompatible dimensions. Two vectors (lists) can be summed element-wise only if they are of the same length.",
+  "example": {
+    "input": "a = [1, 3], b = [4, 5]",
+    "output": "[5, 8]",
+    "reasoning": "Element-wise sum: [1+4, 3+5] = [5, 8]."
+  },
+  "starter_code": "def vector_sum(a: list[int|float], b: list[int|float]) -> list[int|float]:\n\t# Return the element-wise sum of vectors 'a' and 'b'.\n\t# If vectors have different lengths, return -1.\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Vector Representation and Indexing",
+      "relation_to_problem": "Understanding how vectors are represented as ordered sequences and accessed by index is fundamental to implementing element-wise operations, as we need to access corresponding elements from both vectors",
+      "prerequisites": [
+        "Basic Python lists",
+        "Zero-based indexing"
+      ],
+      "learning_objectives": [
+        "Define vectors formally as ordered n-tuples",
+        "Understand vector dimensionality and index notation",
+        "Access vector elements programmatically by index"
+      ],
+      "math_content": {
+        "definition": "A **vector** in $\\mathbb{R}^n$ is an ordered $n$-tuple of real numbers. Formally, $\\mathbf{v} \\in \\mathbb{R}^n$ can be written as $\\mathbf{v} = (v_1, v_2, \\ldots, v_n)$ where $v_i \\in \\mathbb{R}$ for $i = 1, 2, \\ldots, n$. The **dimension** of the vector is $n$, and each $v_i$ is called a **component** or **coordinate** of the vector.",
+        "notation": "$\\mathbf{v} = (v_1, v_2, \\ldots, v_n)$ where $v_i$ denotes the $i$-th component. In programming, we use zero-based indexing: $v[0], v[1], \\ldots, v[n-1]$",
+        "theorem": "**Theorem (Index Correspondence):** For a vector $\\mathbf{v} \\in \\mathbb{R}^n$, each index $i \\in \\{1, 2, \\ldots, n\\}$ uniquely identifies exactly one component $v_i$. The mapping $i \\mapsto v_i$ is well-defined and bijective.",
+        "proof_sketch": "By definition, an $n$-tuple is an ordered sequence with exactly $n$ positions. Each position $i$ corresponds to exactly one value $v_i$. The ordered nature ensures $v_i \\neq v_j$ positionally even if numerically equal.",
+        "examples": [
+          "Vector $\\mathbf{u} = (3, -1, 5)$ is in $\\mathbb{R}^3$ with $u_1 = 3$, $u_2 = -1$, $u_3 = 5$",
+          "In Python: `u = [3, -1, 5]`, access via `u[0] = 3`, `u[1] = -1`, `u[2] = 5`",
+          "Vector $\\mathbf{w} = (2.5, 0, -4.2, 1)$ is in $\\mathbb{R}^4$ with dimension 4"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Vector Dimension",
+          "latex": "$\\text{dim}(\\mathbf{v}) = n$ if $\\mathbf{v} \\in \\mathbb{R}^n$",
+          "description": "The dimension is the number of components in the vector"
+        },
+        {
+          "name": "Component Access",
+          "latex": "$\\mathbf{v}[i]$ or $v_i$ represents the $i$-th component",
+          "description": "Used to access individual elements for computation"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes a vector (list) and an index, and returns the element at that index. If the index is out of bounds, return None.",
+        "function_signature": "def get_element(vector: list[int|float], index: int) -> int|float|None:",
+        "starter_code": "def get_element(vector: list[int|float], index: int) -> int|float|None:\n    # Return the element at the given index\n    # Return None if index is out of bounds\n    pass",
+        "test_cases": [
+          {
+            "input": "get_element([1, 2, 3], 0)",
+            "expected": "1",
+            "explanation": "Index 0 accesses the first component"
+          },
+          {
+            "input": "get_element([5, -2, 8], 2)",
+            "expected": "8",
+            "explanation": "Index 2 accesses the third component"
+          },
+          {
+            "input": "get_element([1, 2], 5)",
+            "expected": "None",
+            "explanation": "Index 5 is out of bounds for a 2-dimensional vector"
+          },
+          {
+            "input": "get_element([7.5, 3.2, -1.1], 1)",
+            "expected": "3.2",
+            "explanation": "Works with floating-point components"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing 1-based mathematical notation with 0-based programming indexing",
+        "Attempting to access negative indices without understanding wraparound behavior",
+        "Not validating index bounds before access"
+      ],
+      "hint": "Consider using Python's built-in bounds checking or explicit validation before accessing list elements",
+      "references": [
+        "Vector spaces",
+        "Array data structures",
+        "Index bounds validation"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Vector Dimension Compatibility",
+      "relation_to_problem": "Before performing element-wise addition, we must verify that both vectors have the same dimension; this validation is essential for the main problem's requirement to return -1 for incompatible vectors",
+      "prerequisites": [
+        "Vector representation",
+        "Dimension of vectors"
+      ],
+      "learning_objectives": [
+        "Understand when two vectors can be added",
+        "Define dimension compatibility formally",
+        "Implement dimension checking algorithms"
+      ],
+      "math_content": {
+        "definition": "Two vectors $\\mathbf{u}, \\mathbf{v}$ are **dimension-compatible** (or conformable) for addition if and only if they belong to the same vector space $\\mathbb{R}^n$, that is, $\\text{dim}(\\mathbf{u}) = \\text{dim}(\\mathbf{v}) = n$. If $\\mathbf{u} \\in \\mathbb{R}^m$ and $\\mathbf{v} \\in \\mathbb{R}^n$ with $m \\neq n$, then $\\mathbf{u} + \\mathbf{v}$ is undefined.",
+        "notation": "$\\mathbf{u} \\sim \\mathbf{v}$ denotes that vectors $\\mathbf{u}$ and $\\mathbf{v}$ are dimension-compatible. Equivalently: $|\\mathbf{u}| = |\\mathbf{v}|$ where $|\\cdot|$ denotes vector length.",
+        "theorem": "**Theorem (Closure Under Addition):** Vector addition is defined on vector space $\\mathbb{R}^n$ such that for all $\\mathbf{u}, \\mathbf{v} \\in \\mathbb{R}^n$, we have $\\mathbf{u} + \\mathbf{v} \\in \\mathbb{R}^n$. This operation is closed within the vector space.",
+        "proof_sketch": "Let $\\mathbf{u} = (u_1, \\ldots, u_n)$ and $\\mathbf{v} = (v_1, \\ldots, v_n)$ where $u_i, v_i \\in \\mathbb{R}$. Define $\\mathbf{w} = \\mathbf{u} + \\mathbf{v} = (u_1 + v_1, \\ldots, u_n + v_n)$. Since $\\mathbb{R}$ is closed under addition, each $u_i + v_i \\in \\mathbb{R}$. Therefore $\\mathbf{w}$ is an $n$-tuple of real numbers, so $\\mathbf{w} \\in \\mathbb{R}^n$.",
+        "examples": [
+          "$\\mathbf{u} = (1, 2, 3) \\in \\mathbb{R}^3$ and $\\mathbf{v} = (4, 5, 6) \\in \\mathbb{R}^3$ are compatible: $\\text{dim}(\\mathbf{u}) = \\text{dim}(\\mathbf{v}) = 3$",
+          "$\\mathbf{a} = (1, 2) \\in \\mathbb{R}^2$ and $\\mathbf{b} = (3, 4, 5) \\in \\mathbb{R}^3$ are NOT compatible: $2 \\neq 3$",
+          "Zero vectors: $\\mathbf{0}_n \\in \\mathbb{R}^n$ is compatible only with vectors in $\\mathbb{R}^n$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Dimension Equality Condition",
+          "latex": "$\\mathbf{u}, \\mathbf{v}$ compatible $\\iff \\text{dim}(\\mathbf{u}) = \\text{dim}(\\mathbf{v})$",
+          "description": "Necessary and sufficient condition for vector addition"
+        },
+        {
+          "name": "Length Function",
+          "latex": "$|\\mathbf{v}| = n$ for $\\mathbf{v} \\in \\mathbb{R}^n$",
+          "description": "Returns the number of components in the vector"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that checks whether two vectors are dimension-compatible for addition. Return True if they have the same length, False otherwise.",
+        "function_signature": "def are_compatible(a: list[int|float], b: list[int|float]) -> bool:",
+        "starter_code": "def are_compatible(a: list[int|float], b: list[int|float]) -> bool:\n    # Return True if vectors a and b have the same dimension\n    # Return False otherwise\n    pass",
+        "test_cases": [
+          {
+            "input": "are_compatible([1, 2, 3], [4, 5, 6])",
+            "expected": "True",
+            "explanation": "Both vectors have dimension 3"
+          },
+          {
+            "input": "are_compatible([1, 2], [3, 4, 5])",
+            "expected": "False",
+            "explanation": "First vector has dimension 2, second has dimension 3"
+          },
+          {
+            "input": "are_compatible([], [])",
+            "expected": "True",
+            "explanation": "Both are zero-dimensional vectors (empty)"
+          },
+          {
+            "input": "are_compatible([7.5], [2.3])",
+            "expected": "True",
+            "explanation": "Both are 1-dimensional vectors"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Assuming vectors of different dimensions can be added by padding with zeros (this changes the vector space)",
+        "Not handling edge cases like empty vectors",
+        "Confusing vector length (dimension) with vector magnitude (norm)"
+      ],
+      "hint": "Use Python's len() function to determine the number of components in each vector",
+      "references": [
+        "Vector spaces",
+        "Dimension theory",
+        "Closure properties"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Field Addition and Commutativity",
+      "relation_to_problem": "Element-wise vector addition relies on the underlying field addition operation (adding real numbers); understanding field properties ensures correct implementation of component-wise addition",
+      "prerequisites": [
+        "Real number arithmetic",
+        "Basic algebra"
+      ],
+      "learning_objectives": [
+        "Understand field operations in ℝ",
+        "Apply commutativity and associativity of addition",
+        "Perform component-wise arithmetic operations"
+      ],
+      "math_content": {
+        "definition": "The set of real numbers $\\mathbb{R}$ forms a **field** under addition and multiplication. For addition, $\\mathbb{R}$ is closed and satisfies: (1) **Associativity**: $(a + b) + c = a + (b + c)$, (2) **Commutativity**: $a + b = b + a$, (3) **Identity**: $\\exists 0 \\in \\mathbb{R}$ such that $a + 0 = a$, (4) **Inverse**: $\\forall a \\in \\mathbb{R}, \\exists (-a)$ such that $a + (-a) = 0$.",
+        "notation": "$+: \\mathbb{R} \\times \\mathbb{R} \\to \\mathbb{R}$ denotes the binary addition operation. For vectors: $(\\mathbf{u} + \\mathbf{v})_i = u_i + v_i$ means component-wise application of field addition.",
+        "theorem": "**Theorem (Commutativity of Vector Addition):** For vectors $\\mathbf{u}, \\mathbf{v} \\in \\mathbb{R}^n$, we have $\\mathbf{u} + \\mathbf{v} = \\mathbf{v} + \\mathbf{u}$.",
+        "proof_sketch": "Let $\\mathbf{u} = (u_1, \\ldots, u_n)$ and $\\mathbf{v} = (v_1, \\ldots, v_n)$. Then $\\mathbf{u} + \\mathbf{v} = (u_1 + v_1, \\ldots, u_n + v_n)$ and $\\mathbf{v} + \\mathbf{u} = (v_1 + u_1, \\ldots, v_n + u_n)$. Since field addition is commutative, $u_i + v_i = v_i + u_i$ for each $i$. Therefore $(\\mathbf{u} + \\mathbf{v})_i = (\\mathbf{v} + \\mathbf{u})_i$ for all $i$, implying $\\mathbf{u} + \\mathbf{v} = \\mathbf{v} + \\mathbf{u}$.",
+        "examples": [
+          "Scalar: $3 + 5 = 8$ and $5 + 3 = 8$ demonstrates commutativity",
+          "Component-wise: If $u_1 = 2, v_1 = 7$, then $u_1 + v_1 = 2 + 7 = 9 = 7 + 2 = v_1 + u_1$",
+          "Vector: $(1, 2) + (3, 4) = (4, 6) = (3, 4) + (1, 2)$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Component Addition",
+          "latex": "$(\\mathbf{u} + \\mathbf{v})_i = u_i + v_i$",
+          "description": "Each component is added independently using field addition"
+        },
+        {
+          "name": "Commutativity",
+          "latex": "$\\mathbf{u} + \\mathbf{v} = \\mathbf{v} + \\mathbf{u}$",
+          "description": "Order of operands doesn't affect the result"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes two numbers and returns their sum. Then write a function that verifies commutativity by checking if a + b equals b + a.",
+        "function_signature": "def add_numbers(a: int|float, b: int|float) -> int|float:",
+        "starter_code": "def add_numbers(a: int|float, b: int|float) -> int|float:\n    # Return the sum of a and b\n    pass\n\ndef verify_commutativity(a: int|float, b: int|float) -> bool:\n    # Return True if a + b == b + a, False otherwise\n    pass",
+        "test_cases": [
+          {
+            "input": "add_numbers(3, 5)",
+            "expected": "8",
+            "explanation": "Basic addition of positive integers"
+          },
+          {
+            "input": "add_numbers(-2, 7)",
+            "expected": "5",
+            "explanation": "Addition with negative number"
+          },
+          {
+            "input": "verify_commutativity(4, 9)",
+            "expected": "True",
+            "explanation": "4 + 9 = 13 = 9 + 4, demonstrating commutativity"
+          },
+          {
+            "input": "verify_commutativity(2.5, 3.7)",
+            "expected": "True",
+            "explanation": "Commutativity holds for floating-point numbers"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Assuming non-commutative operations (like subtraction or division) follow commutativity",
+        "Not considering floating-point precision issues in equality comparisons",
+        "Confusing commutativity with associativity"
+      ],
+      "hint": "Field addition in ℝ is commutative by definition; this property extends naturally to component-wise vector addition",
+      "references": [
+        "Field theory",
+        "Abelian groups",
+        "Real number system"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Element-wise Vector Addition Definition",
+      "relation_to_problem": "This is the core mathematical operation required by the main problem - understanding how to add vectors component by component",
+      "prerequisites": [
+        "Vector representation",
+        "Dimension compatibility",
+        "Field addition"
+      ],
+      "learning_objectives": [
+        "Define element-wise vector addition formally",
+        "Compute vector sums by hand",
+        "Understand the algebraic structure of vector addition"
+      ],
+      "math_content": {
+        "definition": "Let $\\mathbf{u}, \\mathbf{v} \\in \\mathbb{R}^n$ where $\\mathbf{u} = (u_1, u_2, \\ldots, u_n)$ and $\\mathbf{v} = (v_1, v_2, \\ldots, v_n)$. The **element-wise sum** (or **vector addition**) is defined as: $$\\mathbf{u} + \\mathbf{v} = (u_1 + v_1, u_2 + v_2, \\ldots, u_n + v_n)$$ where each component is added using field addition in $\\mathbb{R}$.",
+        "notation": "$\\mathbf{w} = \\mathbf{u} + \\mathbf{v}$ where $w_i = u_i + v_i$ for $i = 1, 2, \\ldots, n$. In matrix notation: $\\begin{pmatrix} u_1 \\\\ u_2 \\\\ \\vdots \\\\ u_n \\end{pmatrix} + \\begin{pmatrix} v_1 \\\\ v_2 \\\\ \\vdots \\\\ v_n \\end{pmatrix} = \\begin{pmatrix} u_1 + v_1 \\\\ u_2 + v_2 \\\\ \\vdots \\\\ u_n + v_n \\end{pmatrix}$",
+        "theorem": "**Theorem (Vector Space Axioms):** The set $\\mathbb{R}^n$ equipped with element-wise addition forms an abelian group. It satisfies: (1) Closure: $\\mathbf{u} + \\mathbf{v} \\in \\mathbb{R}^n$, (2) Associativity: $(\\mathbf{u} + \\mathbf{v}) + \\mathbf{w} = \\mathbf{u} + (\\mathbf{v} + \\mathbf{w})$, (3) Identity: $\\mathbf{u} + \\mathbf{0} = \\mathbf{u}$ where $\\mathbf{0} = (0, \\ldots, 0)$, (4) Inverse: $\\mathbf{u} + (-\\mathbf{u}) = \\mathbf{0}$, (5) Commutativity: $\\mathbf{u} + \\mathbf{v} = \\mathbf{v} + \\mathbf{u}$.",
+        "proof_sketch": "Each property follows from the corresponding property of field addition in $\\mathbb{R}$. For example, associativity: $((\\mathbf{u} + \\mathbf{v}) + \\mathbf{w})_i = (u_i + v_i) + w_i = u_i + (v_i + w_i) = (\\mathbf{u} + (\\mathbf{v} + \\mathbf{w}))_i$ by associativity in $\\mathbb{R}$.",
+        "examples": [
+          "$\\mathbf{u} = (1, 3)$, $\\mathbf{v} = (4, 5)$: $\\mathbf{u} + \\mathbf{v} = (1+4, 3+5) = (5, 8)$",
+          "$\\mathbf{a} = (2, -1, 4)$, $\\mathbf{b} = (3, 5, -2)$: $\\mathbf{a} + \\mathbf{b} = (5, 4, 2)$",
+          "Identity: $(3, 7) + (0, 0) = (3, 7)$",
+          "Inverse: $(2, -5) + (-2, 5) = (0, 0)$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Element-wise Addition",
+          "latex": "$\\mathbf{u} + \\mathbf{v} = (u_1 + v_1, u_2 + v_2, \\ldots, u_n + v_n)$",
+          "description": "Fundamental definition of vector addition"
+        },
+        {
+          "name": "Component Formula",
+          "latex": "$(\\mathbf{u} + \\mathbf{v})_i = u_i + v_i$ for $i = 1, \\ldots, n$",
+          "description": "Addition performed independently on each component"
+        },
+        {
+          "name": "Zero Vector Identity",
+          "latex": "$\\mathbf{v} + \\mathbf{0} = \\mathbf{v}$ where $\\mathbf{0} = (0, 0, \\ldots, 0)$",
+          "description": "Adding the zero vector leaves the original unchanged"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that adds two vectors element-wise, assuming they have the same dimension. Do not check compatibility - focus only on the addition operation itself.",
+        "function_signature": "def add_vectors_unchecked(a: list[int|float], b: list[int|float]) -> list[int|float]:",
+        "starter_code": "def add_vectors_unchecked(a: list[int|float], b: list[int|float]) -> list[int|float]:\n    # Add vectors a and b element-wise\n    # Assume they have the same length\n    pass",
+        "test_cases": [
+          {
+            "input": "add_vectors_unchecked([1, 3], [4, 5])",
+            "expected": "[5, 8]",
+            "explanation": "Element-wise: [1+4, 3+5] = [5, 8]"
+          },
+          {
+            "input": "add_vectors_unchecked([2, -1, 4], [3, 5, -2])",
+            "expected": "[5, 4, 2]",
+            "explanation": "Three components: [2+3, -1+5, 4+(-2)] = [5, 4, 2]"
+          },
+          {
+            "input": "add_vectors_unchecked([0, 0], [7, 3])",
+            "expected": "[7, 3]",
+            "explanation": "Adding zero vector: identity property"
+          },
+          {
+            "input": "add_vectors_unchecked([1.5, 2.7, -3.2], [0.5, -1.7, 3.2])",
+            "expected": "[2.0, 1.0, 0.0]",
+            "explanation": "Works with floating-point numbers"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing dot product instead of element-wise sum (dot product produces a scalar)",
+        "Attempting to add vectors of different dimensions without checking",
+        "Confusing element-wise addition with matrix multiplication",
+        "Not preserving the vector type (returning scalar instead of vector)"
+      ],
+      "hint": "Use a loop or list comprehension to iterate through indices and add corresponding components",
+      "references": [
+        "Vector spaces",
+        "Abelian groups",
+        "Linear algebra operations"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Error Handling and Validation",
+      "relation_to_problem": "The main problem requires returning -1 when vectors are incompatible, necessitating proper error detection and conditional logic",
+      "prerequisites": [
+        "Dimension compatibility",
+        "Conditional statements"
+      ],
+      "learning_objectives": [
+        "Implement precondition checking for vector operations",
+        "Handle invalid inputs gracefully",
+        "Apply defensive programming principles"
+      ],
+      "math_content": {
+        "definition": "A **precondition** is a condition that must be true before a mathematical operation can be validly performed. For vector addition, the precondition is: $\\text{dim}(\\mathbf{u}) = \\text{dim}(\\mathbf{v})$. If this precondition fails, the operation is **undefined** in the mathematical sense.",
+        "notation": "We denote: $$\\mathbf{u} + \\mathbf{v} = \\begin{cases} (u_1 + v_1, \\ldots, u_n + v_n) & \\text{if } \\text{dim}(\\mathbf{u}) = \\text{dim}(\\mathbf{v}) = n \\\\ \\text{undefined} & \\text{otherwise} \\end{cases}$$",
+        "theorem": "**Theorem (Domain of Vector Addition):** The function $+: \\mathbb{R}^n \\times \\mathbb{R}^n \\to \\mathbb{R}^n$ is well-defined only when both operands are from the same vector space. The domain is restricted to pairs $(\\mathbf{u}, \\mathbf{v})$ where $\\mathbf{u}, \\mathbf{v} \\in \\mathbb{R}^n$ for a fixed $n$.",
+        "proof_sketch": "By definition, vector addition produces an $n$-tuple. If $\\mathbf{u} \\in \\mathbb{R}^m$ and $\\mathbf{v} \\in \\mathbb{R}^n$ with $m \\neq n$, then we cannot define component-wise addition as the index sets $\\{1, \\ldots, m\\}$ and $\\{1, \\ldots, n\\}$ are not equal. Thus the operation cannot be consistently defined for all indices.",
+        "examples": [
+          "Valid: $\\mathbf{u} = (1, 2, 3) \\in \\mathbb{R}^3$, $\\mathbf{v} = (4, 5, 6) \\in \\mathbb{R}^3$ → addition is defined",
+          "Invalid: $\\mathbf{u} = (1, 2) \\in \\mathbb{R}^2$, $\\mathbf{v} = (3, 4, 5) \\in \\mathbb{R}^3$ → addition is undefined",
+          "In programming: return error code (like -1) when precondition fails"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Precondition Check",
+          "latex": "$\\text{valid}(\\mathbf{u}, \\mathbf{v}) \\iff |\\mathbf{u}| = |\\mathbf{v}|$",
+          "description": "Boolean function checking if addition is defined"
+        },
+        {
+          "name": "Conditional Operation",
+          "latex": "$f(\\mathbf{u}, \\mathbf{v}) = \\begin{cases} \\mathbf{u} + \\mathbf{v} & \\text{if valid} \\\\ \\text{error} & \\text{otherwise} \\end{cases}$",
+          "description": "Safe operation with error handling"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that attempts to add two vectors. If they have the same dimension, return their sum. If they have different dimensions, return the string 'error'.",
+        "function_signature": "def safe_vector_add(a: list[int|float], b: list[int|float]) -> list[int|float]|str:",
+        "starter_code": "def safe_vector_add(a: list[int|float], b: list[int|float]) -> list[int|float]|str:\n    # Check if vectors are compatible\n    # If yes, return their element-wise sum\n    # If no, return 'error'\n    pass",
+        "test_cases": [
+          {
+            "input": "safe_vector_add([1, 2], [3, 4])",
+            "expected": "[4, 6]",
+            "explanation": "Compatible vectors: proceed with addition"
+          },
+          {
+            "input": "safe_vector_add([1, 2, 3], [4, 5])",
+            "expected": "'error'",
+            "explanation": "Incompatible dimensions (3 vs 2): return error"
+          },
+          {
+            "input": "safe_vector_add([], [])",
+            "expected": "[]",
+            "explanation": "Empty vectors are compatible and sum to empty vector"
+          },
+          {
+            "input": "safe_vector_add([5], [10, 20])",
+            "expected": "'error'",
+            "explanation": "Dimension mismatch: 1 vs 2"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Performing computation before checking preconditions (can cause index errors)",
+        "Not handling edge cases like empty vectors",
+        "Using exception handling when simple conditional logic suffices",
+        "Returning inconsistent types (mixing errors with valid results without clear distinction)"
+      ],
+      "hint": "Check the dimensions first using a conditional statement, then proceed with addition only if the check passes",
+      "references": [
+        "Defensive programming",
+        "Preconditions and postconditions",
+        "Error handling patterns"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Vector Addition Algorithm",
+      "relation_to_problem": "Synthesizes all previous concepts to implement the full solution: validation, element-wise addition, and proper error handling for the main problem",
+      "prerequisites": [
+        "Vector indexing",
+        "Dimension compatibility",
+        "Element-wise addition",
+        "Error handling"
+      ],
+      "learning_objectives": [
+        "Integrate dimension checking with vector addition",
+        "Implement the complete algorithm with all edge cases",
+        "Optimize for clarity and correctness"
+      ],
+      "math_content": {
+        "definition": "The **vector addition function** is a map $f: (\\mathbb{R}^*)^2 \\to \\mathbb{R}^* \\cup \\{\\text{error}\\}$ where $\\mathbb{R}^* = \\bigcup_{n=0}^{\\infty} \\mathbb{R}^n$ is the disjoint union of all finite-dimensional real vector spaces. It is defined as: $$f(\\mathbf{u}, \\mathbf{v}) = \\begin{cases} \\mathbf{u} + \\mathbf{v} & \\text{if } \\mathbf{u}, \\mathbf{v} \\in \\mathbb{R}^n \\text{ for some } n \\\\ \\text{error} & \\text{if } \\mathbf{u} \\in \\mathbb{R}^m, \\mathbf{v} \\in \\mathbb{R}^n, m \\neq n \\end{cases}$$",
+        "notation": "$f: \\text{vector} \\times \\text{vector} \\to \\text{vector} \\cup \\{\\text{error}\\}$ represents the safe addition function with validation",
+        "theorem": "**Theorem (Algorithmic Complexity):** Given two vectors $\\mathbf{u}, \\mathbf{v} \\in \\mathbb{R}^n$, the time complexity of computing $\\mathbf{u} + \\mathbf{v}$ is $\\Theta(n)$ and space complexity is $\\Theta(n)$ for the output vector.",
+        "proof_sketch": "The algorithm requires: (1) $O(1)$ time to check $|\\mathbf{u}| = |\\mathbf{v}|$, (2) $O(n)$ time to compute $n$ component additions, (3) $O(n)$ space to store the result. Total: $O(1) + O(n) = O(n)$. The operation is optimal as all $n$ components must be examined.",
+        "examples": [
+          "Complete workflow: Input $(1, 2, 3)$ and $(4, 5, 6)$ → Check dimensions (both 3) → Compute $(5, 7, 9)$",
+          "Error case: Input $(1, 2)$ and $(3, 4, 5)$ → Check dimensions (2 ≠ 3) → Return error",
+          "Identity: $(7, 3, -2)$ and $(0, 0, 0)$ → Valid → Result $(7, 3, -2)$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Algorithm",
+          "latex": "$f(\\mathbf{u}, \\mathbf{v}) = \\begin{cases} [u_1+v_1, \\ldots, u_n+v_n] & |\\mathbf{u}|=|\\mathbf{v}|=n \\\\ -1 & |\\mathbf{u}| \\neq |\\mathbf{v}| \\end{cases}$",
+          "description": "Full specification with dimension check and error code"
+        },
+        {
+          "name": "Time Complexity",
+          "latex": "$T(n) = \\Theta(n)$",
+          "description": "Linear in the dimension of the vectors"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete vector addition algorithm that checks dimension compatibility and returns -1 for incompatible vectors, or the element-wise sum for compatible vectors. This combines all previous sub-quest concepts.",
+        "function_signature": "def vector_add_complete(a: list[int|float], b: list[int|float]) -> list[int|float]|int:",
+        "starter_code": "def vector_add_complete(a: list[int|float], b: list[int|float]) -> list[int|float]|int:\n    # Step 1: Check if vectors have the same dimension\n    # Step 2: If not compatible, return -1\n    # Step 3: If compatible, compute element-wise sum\n    # Step 4: Return the result vector\n    pass",
+        "test_cases": [
+          {
+            "input": "vector_add_complete([1, 3], [4, 5])",
+            "expected": "[5, 8]",
+            "explanation": "Compatible 2D vectors: [1+4, 3+5] = [5, 8]"
+          },
+          {
+            "input": "vector_add_complete([2, -1, 4], [3, 5, -2])",
+            "expected": "[5, 4, 2]",
+            "explanation": "Compatible 3D vectors: element-wise addition"
+          },
+          {
+            "input": "vector_add_complete([1, 2], [3, 4, 5])",
+            "expected": "-1",
+            "explanation": "Incompatible dimensions (2 vs 3): return -1"
+          },
+          {
+            "input": "vector_add_complete([], [])",
+            "expected": "[]",
+            "explanation": "Empty vectors are compatible: sum is empty vector"
+          },
+          {
+            "input": "vector_add_complete([1.5, 2.5], [2.5, 3.5])",
+            "expected": "[4.0, 6.0]",
+            "explanation": "Works with floating-point numbers"
+          },
+          {
+            "input": "vector_add_complete([10], [5, 3])",
+            "expected": "-1",
+            "explanation": "Incompatible: 1-dimensional vs 2-dimensional"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check dimensions before attempting addition (causes IndexError)",
+        "Returning None instead of -1 for incompatible vectors",
+        "Creating result vector with wrong dimensions",
+        "Not handling floating-point numbers correctly",
+        "Inefficient algorithms that check dimensions multiple times"
+      ],
+      "hint": "Combine the validation logic from Step 5 with the addition algorithm from Step 4. Use early return for the error case to keep code clean.",
+      "references": [
+        "Algorithm design",
+        "Input validation",
+        "Linear algebra implementations",
+        "Computational complexity"
+      ]
+    }
+  ]
+}

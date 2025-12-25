@@ -1,0 +1,474 @@
+{
+  "problem_id": 19,
+  "title": "Principal Component Analysis (PCA) Implementation",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "Write a Python function that performs Principal Component Analysis (PCA) from scratch. The function should take a 2D NumPy array as input, where each row represents a data sample and each column represents a feature. The function should standardize the dataset, compute the covariance matrix, find the eigenvalues and eigenvectors, and return the principal components (the eigenvectors corresponding to the largest eigenvalues). The function should also take an integer k as input, representing the number of principal components to return.",
+  "example": {
+    "input": "data = np.array([[1, 2], [3, 4], [5, 6]]), k = 1",
+    "output": "[[0.7071], [0.7071]]",
+    "reasoning": "After standardizing the data and computing the covariance matrix, the eigenvalues and eigenvectors are calculated. The largest eigenvalue's corresponding eigenvector is returned as the principal component, rounded to four decimal places."
+  },
+  "starter_code": "import numpy as np \ndef pca(data: np.ndarray, k: int) -> np.ndarray:\n\t# Your code here\n\treturn np.round(principal_components, 4)",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Data Standardization and Z-Score Normalization",
+      "relation_to_problem": "PCA requires standardized data to ensure features with larger scales don't dominate the covariance matrix. This is the essential first step before computing PCA.",
+      "prerequisites": [
+        "Basic statistics (mean, standard deviation)",
+        "NumPy array operations",
+        "Broadcasting in NumPy"
+      ],
+      "learning_objectives": [
+        "Understand why standardization is necessary for PCA",
+        "Compute mean and standard deviation for each feature",
+        "Apply z-score normalization to transform data",
+        "Handle numerical stability issues in standardization"
+      ],
+      "math_content": {
+        "definition": "For a dataset $\\mathbf{X} \\in \\mathbb{R}^{n \\times p}$ with $n$ samples and $p$ features, standardization transforms each feature to have zero mean and unit variance. The standardized value $z_{ij}$ for element $x_{ij}$ is computed as: $$z_{ij} = \\frac{x_{ij} - \\mu_j}{\\sigma_j}$$ where $\\mu_j$ is the sample mean of feature $j$ and $\\sigma_j$ is the sample standard deviation of feature $j$.",
+        "notation": "$\\mathbf{X}$ = original data matrix ($n \\times p$), $\\mathbf{Z}$ = standardized data matrix, $\\mu_j$ = mean of feature $j$, $\\sigma_j$ = standard deviation of feature $j$, $n$ = number of samples, $p$ = number of features",
+        "theorem": "**Theorem (Properties of Standardized Data)**: If $\\mathbf{Z}$ is the standardized version of $\\mathbf{X}$, then for each feature column $j$: (1) $\\mathbb{E}[Z_j] = 0$ (zero mean), (2) $\\text{Var}(Z_j) = 1$ (unit variance), (3) Standardization preserves the relative distances and correlation structure of the data.",
+        "proof_sketch": "For property (1): $\\mathbb{E}[Z_j] = \\mathbb{E}\\left[\\frac{X_j - \\mu_j}{\\sigma_j}\\right] = \\frac{1}{\\sigma_j}(\\mathbb{E}[X_j] - \\mu_j) = \\frac{1}{\\sigma_j}(\\mu_j - \\mu_j) = 0$. For property (2): $\\text{Var}(Z_j) = \\text{Var}\\left(\\frac{X_j - \\mu_j}{\\sigma_j}\\right) = \\frac{1}{\\sigma_j^2}\\text{Var}(X_j - \\mu_j) = \\frac{\\sigma_j^2}{\\sigma_j^2} = 1$.",
+        "examples": [
+          "Example 1: For feature vector $[1, 3, 5]$, $\\mu = 3$, $\\sigma = \\sqrt{\\frac{(1-3)^2 + (3-3)^2 + (5-3)^2}{2}} = 2$. Standardized: $[\\frac{1-3}{2}, \\frac{3-3}{2}, \\frac{5-3}{2}] = [-1, 0, 1]$",
+          "Example 2: For the data matrix $\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\\\ 5 & 6 \\end{pmatrix}$, feature 1 has $\\mu_1 = 3$, $\\sigma_1 = 2$; feature 2 has $\\mu_2 = 4$, $\\sigma_2 = 2$. After standardization: $\\begin{pmatrix} -1 & -1 \\\\ 0 & 0 \\\\ 1 & 1 \\end{pmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sample Mean",
+          "latex": "$\\mu_j = \\frac{1}{n}\\sum_{i=1}^{n} x_{ij}$",
+          "description": "Compute the average value for feature $j$ across all samples"
+        },
+        {
+          "name": "Sample Standard Deviation",
+          "latex": "$\\sigma_j = \\sqrt{\\frac{1}{n-1}\\sum_{i=1}^{n} (x_{ij} - \\mu_j)^2}$",
+          "description": "Measure of spread using Bessel's correction (dividing by $n-1$)"
+        },
+        {
+          "name": "Z-Score Transformation",
+          "latex": "$z_{ij} = \\frac{x_{ij} - \\mu_j}{\\sigma_j}$",
+          "description": "Transform each element to have mean 0 and standard deviation 1"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that standardizes a 2D NumPy array. For each feature (column), compute the mean and standard deviation, then transform all values using the z-score formula. Use Bessel's correction (ddof=1) when computing standard deviation.",
+        "function_signature": "def standardize_data(data: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef standardize_data(data: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Standardize a 2D array so each column has mean 0 and std 1.\n    \n    Args:\n        data: Input array of shape (n_samples, n_features)\n    \n    Returns:\n        Standardized array of same shape\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "standardize_data(np.array([[1, 2], [3, 4], [5, 6]]))",
+            "expected": "np.array([[-1.22474487, -1.22474487], [0., 0.], [1.22474487, 1.22474487]])",
+            "explanation": "Each column [1,3,5] and [2,4,6] has mean 3 and 4 respectively, std=2 for both. After standardization, each column has mean 0 and std 1."
+          },
+          {
+            "input": "standardize_data(np.array([[10, 20, 30], [40, 50, 60]]))",
+            "expected": "np.array([[-1., -1., -1.], [1., 1., 1.]])",
+            "explanation": "With only 2 samples, standardization creates perfect symmetry around zero with values at -1 and 1."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using population std (ddof=0) instead of sample std (ddof=1) - Bessel's correction is crucial",
+        "Standardizing across rows instead of columns - each feature (column) should be standardized independently",
+        "Not handling edge cases where std=0 (constant features) which causes division by zero",
+        "Forgetting to broadcast operations correctly when subtracting mean from the entire array"
+      ],
+      "hint": "Use NumPy's axis parameter to compute statistics column-wise. np.mean(data, axis=0) gives mean for each column.",
+      "references": [
+        "Z-score normalization",
+        "Feature scaling in machine learning",
+        "NumPy broadcasting rules",
+        "Bessel's correction"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Covariance Matrix Computation",
+      "relation_to_problem": "The covariance matrix is the central object in PCA. It captures how features vary together, and its eigenvectors will become our principal components.",
+      "prerequisites": [
+        "Matrix multiplication",
+        "Transpose operations",
+        "Understanding of variance and covariance",
+        "Standardized data from Step 1"
+      ],
+      "learning_objectives": [
+        "Understand what covariance measures between two variables",
+        "Compute the sample covariance matrix from centered data",
+        "Recognize properties of covariance matrices (symmetric, positive semi-definite)",
+        "Interpret diagonal and off-diagonal elements of the covariance matrix"
+      ],
+      "math_content": {
+        "definition": "The **sample covariance matrix** $\\mathbf{\\Sigma} \\in \\mathbb{R}^{p \\times p}$ for centered data $\\mathbf{X}_c \\in \\mathbb{R}^{n \\times p}$ is defined as: $$\\mathbf{\\Sigma} = \\frac{1}{n-1}\\mathbf{X}_c^T\\mathbf{X}_c$$ where each element $\\Sigma_{ij}$ represents the covariance between features $i$ and $j$: $$\\Sigma_{ij} = \\frac{1}{n-1}\\sum_{k=1}^{n} (x_{ki} - \\mu_i)(x_{kj} - \\mu_j)$$ For standardized data, the covariance matrix becomes the **correlation matrix**.",
+        "notation": "$\\mathbf{\\Sigma}$ = covariance matrix ($p \\times p$), $\\mathbf{X}_c$ = centered data, $\\Sigma_{ii}$ = variance of feature $i$, $\\Sigma_{ij}$ = covariance between features $i$ and $j$, $n-1$ = Bessel's correction factor",
+        "theorem": "**Theorem (Properties of Covariance Matrix)**: For any data matrix $\\mathbf{X}$, its covariance matrix $\\mathbf{\\Sigma}$ has the following properties: (1) **Symmetry**: $\\mathbf{\\Sigma} = \\mathbf{\\Sigma}^T$ (i.e., $\\Sigma_{ij} = \\Sigma_{ji}$), (2) **Positive Semi-Definite**: For any vector $\\mathbf{v}$, $\\mathbf{v}^T\\mathbf{\\Sigma}\\mathbf{v} \\geq 0$, (3) **Diagonal Elements are Variances**: $\\Sigma_{ii} = \\text{Var}(X_i)$, (4) **Off-diagonal Elements are Covariances**: $\\Sigma_{ij} = \\text{Cov}(X_i, X_j)$ for $i \\neq j$.",
+        "proof_sketch": "For symmetry: $\\mathbf{\\Sigma}^T = (\\frac{1}{n-1}\\mathbf{X}_c^T\\mathbf{X}_c)^T = \\frac{1}{n-1}\\mathbf{X}_c^T(\\mathbf{X}_c^T)^T = \\frac{1}{n-1}\\mathbf{X}_c^T\\mathbf{X}_c = \\mathbf{\\Sigma}$. For positive semi-definiteness: $\\mathbf{v}^T\\mathbf{\\Sigma}\\mathbf{v} = \\frac{1}{n-1}\\mathbf{v}^T\\mathbf{X}_c^T\\mathbf{X}_c\\mathbf{v} = \\frac{1}{n-1}\\|\\mathbf{X}_c\\mathbf{v}\\|^2 \\geq 0$ since squared norms are non-negative.",
+        "examples": [
+          "Example 1: For standardized data $\\mathbf{Z} = \\begin{pmatrix} -1 & -1 \\\\ 0 & 0 \\\\ 1 & 1 \\end{pmatrix}$, $\\mathbf{\\Sigma} = \\frac{1}{2}\\begin{pmatrix} -1 & 0 & 1 \\\\ -1 & 0 & 1 \\end{pmatrix}\\begin{pmatrix} -1 & -1 \\\\ 0 & 0 \\\\ 1 & 1 \\end{pmatrix} = \\frac{1}{2}\\begin{pmatrix} 2 & 2 \\\\ 2 & 2 \\end{pmatrix} = \\begin{pmatrix} 1 & 1 \\\\ 1 & 1 \\end{pmatrix}$. Both features have variance 1 and perfect positive correlation.",
+          "Example 2: For uncorrelated features with equal variance, $\\mathbf{\\Sigma} = \\begin{pmatrix} 1 & 0 & 0 \\\\ 0 & 1 & 0 \\\\ 0 & 0 & 1 \\end{pmatrix}$ (identity matrix), indicating independent features."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Covariance Matrix via Matrix Multiplication",
+          "latex": "$\\mathbf{\\Sigma} = \\frac{1}{n-1}\\mathbf{X}_c^T\\mathbf{X}_c$",
+          "description": "Efficient computation using linear algebra, where $\\mathbf{X}_c$ is centered (or standardized) data"
+        },
+        {
+          "name": "Element-wise Covariance",
+          "latex": "$\\Sigma_{ij} = \\frac{1}{n-1}\\sum_{k=1}^{n} (x_{ki} - \\mu_i)(x_{kj} - \\mu_j)$",
+          "description": "Direct computation of covariance between features $i$ and $j$"
+        },
+        {
+          "name": "Variance (Diagonal Elements)",
+          "latex": "$\\Sigma_{ii} = \\frac{1}{n-1}\\sum_{k=1}^{n} (x_{ki} - \\mu_i)^2$",
+          "description": "Variance of feature $i$ appears on the diagonal"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the covariance matrix from standardized data. The input is already centered/standardized, so you need to compute the matrix product and scale by the appropriate factor. Remember to use Bessel's correction (divide by n-1, not n).",
+        "function_signature": "def compute_covariance_matrix(data: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_covariance_matrix(data: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute the covariance matrix for standardized/centered data.\n    \n    Args:\n        data: Centered/standardized array of shape (n_samples, n_features)\n    \n    Returns:\n        Covariance matrix of shape (n_features, n_features)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_covariance_matrix(np.array([[-1.22474487, -1.22474487], [0., 0.], [1.22474487, 1.22474487]]))",
+            "expected": "np.array([[1., 1.], [1., 1.]])",
+            "explanation": "For perfectly correlated standardized features, the covariance matrix shows correlation coefficient of 1.0 everywhere, with variances of 1 on the diagonal."
+          },
+          {
+            "input": "compute_covariance_matrix(np.array([[-1., 1.], [0., 0.], [1., -1.]]))",
+            "expected": "np.array([[1., -1.], [-1., 1.]])",
+            "explanation": "Features with perfect negative correlation yield covariance of -1 in off-diagonal positions."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Dividing by n instead of n-1 (forgetting Bessel's correction for sample covariance)",
+        "Computing data @ data.T instead of data.T @ data (wrong dimensions)",
+        "Not centering/standardizing data before computing covariance",
+        "Confusing covariance with correlation - they're the same only for standardized data",
+        "Assuming covariance matrix will be diagonal - it's only diagonal when features are uncorrelated"
+      ],
+      "hint": "For data matrix of shape (n, p), the covariance matrix should have shape (p, p). Use np.dot() or @ operator for matrix multiplication.",
+      "references": [
+        "Covariance matrix",
+        "Correlation vs covariance",
+        "Positive semi-definite matrices",
+        "Matrix transpose properties"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Eigenvalue Decomposition: Theory and Computation",
+      "relation_to_problem": "Finding eigenvalues and eigenvectors of the covariance matrix is the core of PCA. Eigenvectors become principal components, and eigenvalues indicate the variance explained by each component.",
+      "prerequisites": [
+        "Linear algebra fundamentals",
+        "Matrix operations",
+        "Covariance matrix from Step 2",
+        "Understanding of linear transformations"
+      ],
+      "learning_objectives": [
+        "Understand the geometric meaning of eigenvectors and eigenvalues",
+        "Learn why eigenvectors of covariance matrices are important for PCA",
+        "Compute eigendecomposition using NumPy",
+        "Sort eigenvalues and corresponding eigenvectors in descending order"
+      ],
+      "math_content": {
+        "definition": "For a square matrix $\\mathbf{A} \\in \\mathbb{R}^{p \\times p}$, a non-zero vector $\\mathbf{v} \\in \\mathbb{R}^p$ is an **eigenvector** with corresponding **eigenvalue** $\\lambda \\in \\mathbb{R}$ if: $$\\mathbf{A}\\mathbf{v} = \\lambda\\mathbf{v}$$ This means that $\\mathbf{A}$ transforms $\\mathbf{v}$ only by scaling it by factor $\\lambda$, without changing its direction. The set of all eigenvalues is called the **spectrum** of $\\mathbf{A}$.",
+        "notation": "$\\mathbf{A}$ = square matrix, $\\mathbf{v}$ = eigenvector, $\\lambda$ = eigenvalue, $\\mathbf{I}$ = identity matrix, $\\det(\\cdot)$ = determinant, $(\\mathbf{A} - \\lambda\\mathbf{I})$ = characteristic matrix",
+        "theorem": "**Theorem (Spectral Theorem for Symmetric Matrices)**: If $\\mathbf{A}$ is a real symmetric matrix (like a covariance matrix), then: (1) All eigenvalues are real: $\\lambda_i \\in \\mathbb{R}$, (2) Eigenvectors corresponding to distinct eigenvalues are orthogonal: $\\mathbf{v}_i^T\\mathbf{v}_j = 0$ for $\\lambda_i \\neq \\lambda_j$, (3) $\\mathbf{A}$ can be diagonalized as: $\\mathbf{A} = \\mathbf{Q}\\mathbf{\\Lambda}\\mathbf{Q}^T$ where $\\mathbf{Q}$ is orthogonal (columns are orthonormal eigenvectors) and $\\mathbf{\\Lambda} = \\text{diag}(\\lambda_1, \\ldots, \\lambda_p)$.",
+        "proof_sketch": "The characteristic equation is: $\\det(\\mathbf{A} - \\lambda\\mathbf{I}) = 0$. For symmetric $\\mathbf{A}$, this polynomial has $p$ real roots. For orthogonality: if $\\mathbf{A}\\mathbf{v}_i = \\lambda_i\\mathbf{v}_i$ and $\\mathbf{A}\\mathbf{v}_j = \\lambda_j\\mathbf{v}_j$ with $\\lambda_i \\neq \\lambda_j$, then $\\lambda_i\\mathbf{v}_i^T\\mathbf{v}_j = \\mathbf{v}_i^T\\mathbf{A}\\mathbf{v}_j = \\mathbf{v}_i^T\\mathbf{A}^T\\mathbf{v}_j = (\\mathbf{A}\\mathbf{v}_i)^T\\mathbf{v}_j = \\lambda_j\\mathbf{v}_i^T\\mathbf{v}_j$. Thus $(\\lambda_i - \\lambda_j)\\mathbf{v}_i^T\\mathbf{v}_j = 0$, implying $\\mathbf{v}_i^T\\mathbf{v}_j = 0$.",
+        "examples": [
+          "Example 1: For $\\mathbf{A} = \\begin{pmatrix} 3 & 1 \\\\ 1 & 3 \\end{pmatrix}$, characteristic equation: $\\det\\begin{pmatrix} 3-\\lambda & 1 \\\\ 1 & 3-\\lambda \\end{pmatrix} = (3-\\lambda)^2 - 1 = 0$ gives $\\lambda_1 = 4, \\lambda_2 = 2$. Eigenvectors: $\\mathbf{v}_1 = \\frac{1}{\\sqrt{2}}\\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}, \\mathbf{v}_2 = \\frac{1}{\\sqrt{2}}\\begin{pmatrix} 1 \\\\ -1 \\end{pmatrix}$ (orthogonal).",
+          "Example 2: Identity matrix $\\mathbf{I}$ has eigenvalue $\\lambda = 1$ with multiplicity $p$, and every non-zero vector is an eigenvector."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Eigenvalue Equation",
+          "latex": "$\\mathbf{A}\\mathbf{v} = \\lambda\\mathbf{v}$",
+          "description": "Fundamental relationship defining eigenvectors and eigenvalues"
+        },
+        {
+          "name": "Characteristic Equation",
+          "latex": "$\\det(\\mathbf{A} - \\lambda\\mathbf{I}) = 0$",
+          "description": "Polynomial equation whose roots are the eigenvalues"
+        },
+        {
+          "name": "Eigendecomposition",
+          "latex": "$\\mathbf{A} = \\mathbf{Q}\\mathbf{\\Lambda}\\mathbf{Q}^T$",
+          "description": "Decomposition of symmetric matrix into orthogonal eigenvectors and diagonal eigenvalue matrix"
+        },
+        {
+          "name": "Variance Along Principal Component",
+          "latex": "$\\text{Var}(\\mathbf{X}\\mathbf{v}_i) = \\lambda_i$",
+          "description": "In PCA, eigenvalue equals variance explained by corresponding eigenvector"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes eigenvalues and eigenvectors of a symmetric matrix and returns them sorted in descending order by eigenvalue magnitude. This sorting is crucial for PCA, as we want principal components ordered by explained variance.",
+        "function_signature": "def compute_eigendecomposition(cov_matrix: np.ndarray) -> tuple[np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef compute_eigendecomposition(cov_matrix: np.ndarray) -> tuple[np.ndarray, np.ndarray]:\n    \"\"\"\n    Compute eigenvalues and eigenvectors, sorted in descending order.\n    \n    Args:\n        cov_matrix: Symmetric covariance matrix of shape (p, p)\n    \n    Returns:\n        eigenvalues: Array of eigenvalues in descending order, shape (p,)\n        eigenvectors: Matrix where column i is eigenvector for eigenvalues[i], shape (p, p)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_eigendecomposition(np.array([[1., 1.], [1., 1.]]))",
+            "expected": "eigenvalues: [2., 0.], eigenvectors: [[0.7071, 0.7071], [0.7071, -0.7071]] (approximately)",
+            "explanation": "This covariance matrix has rank 1. Largest eigenvalue is 2 (sum of diagonal), corresponding to direction of maximum variance. Second eigenvalue is 0 (degenerate direction)."
+          },
+          {
+            "input": "compute_eigendecomposition(np.array([[2., 0.], [0., 1.]]))",
+            "expected": "eigenvalues: [2., 1.], eigenvectors: [[1., 0.], [0., 1.]]",
+            "explanation": "Diagonal matrix: eigenvalues are diagonal elements, eigenvectors are standard basis vectors."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not sorting eigenvalues in descending order - PCA requires largest first",
+        "Sorting eigenvalues but forgetting to reorder corresponding eigenvectors",
+        "Using np.linalg.eig() instead of np.linalg.eigh() for symmetric matrices (eigh is more stable)",
+        "Assuming eigenvalues are already sorted - NumPy doesn't guarantee ordering",
+        "Not handling numerical precision issues where small eigenvalues might be slightly negative"
+      ],
+      "hint": "Use np.linalg.eigh() for symmetric matrices. It returns eigenvalues and eigenvectors, but they need to be sorted. Use np.argsort()[::-1] to get descending order indices.",
+      "references": [
+        "Eigenvalue decomposition",
+        "Spectral theorem",
+        "Symmetric matrices",
+        "NumPy linear algebra functions"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Principal Component Selection and Variance Explained",
+      "relation_to_problem": "This step teaches how to select the top k eigenvectors as principal components and understand how much variance they capture. This is the decision-making step in PCA.",
+      "prerequisites": [
+        "Eigendecomposition from Step 3",
+        "Understanding of variance",
+        "Cumulative sums",
+        "Percentage calculations"
+      ],
+      "learning_objectives": [
+        "Understand the relationship between eigenvalues and explained variance",
+        "Select the top k eigenvectors based on eigenvalue magnitude",
+        "Calculate the proportion of total variance explained by k components",
+        "Make informed decisions about dimensionality reduction trade-offs"
+      ],
+      "math_content": {
+        "definition": "The **principal components** are the eigenvectors of the covariance matrix $\\mathbf{\\Sigma}$, ordered by decreasing eigenvalues. The $j$-th principal component $\\mathbf{w}_j$ satisfies: $$\\mathbf{\\Sigma}\\mathbf{w}_j = \\lambda_j\\mathbf{w}_j$$ where $\\lambda_1 \\geq \\lambda_2 \\geq \\cdots \\geq \\lambda_p \\geq 0$. The **proportion of variance explained** by the first $k$ components is: $$\\rho_k = \\frac{\\sum_{j=1}^{k}\\lambda_j}{\\sum_{j=1}^{p}\\lambda_j}$$ This quantifies the information retained after dimensionality reduction.",
+        "notation": "$\\mathbf{w}_j$ = $j$-th principal component (eigenvector), $\\lambda_j$ = $j$-th eigenvalue (variance along $\\mathbf{w}_j$), $\\rho_k$ = cumulative variance explained by first $k$ components, $k$ = number of components to retain, $p$ = total number of features",
+        "theorem": "**Theorem (Total Variance Decomposition)**: The total variance in the data equals the sum of all eigenvalues: $$\\text{Total Variance} = \\text{tr}(\\mathbf{\\Sigma}) = \\sum_{j=1}^{p}\\lambda_j$$ where $\\text{tr}(\\cdot)$ denotes the trace (sum of diagonal elements). Furthermore, each eigenvalue $\\lambda_j$ represents the variance of the data when projected onto the $j$-th principal component: $$\\lambda_j = \\text{Var}(\\mathbf{X}\\mathbf{w}_j) = \\mathbf{w}_j^T\\mathbf{\\Sigma}\\mathbf{w}_j$$",
+        "proof_sketch": "For total variance: $\\text{tr}(\\mathbf{\\Sigma}) = \\text{tr}(\\mathbf{Q}\\mathbf{\\Lambda}\\mathbf{Q}^T) = \\text{tr}(\\mathbf{Q}^T\\mathbf{Q}\\mathbf{\\Lambda}) = \\text{tr}(\\mathbf{\\Lambda}) = \\sum_{j=1}^{p}\\lambda_j$ using cyclic property of trace and $\\mathbf{Q}^T\\mathbf{Q} = \\mathbf{I}$. For variance along principal component: $\\text{Var}(\\mathbf{X}\\mathbf{w}_j) = \\mathbf{w}_j^T\\text{Cov}(\\mathbf{X})\\mathbf{w}_j = \\mathbf{w}_j^T\\mathbf{\\Sigma}\\mathbf{w}_j = \\mathbf{w}_j^T(\\lambda_j\\mathbf{w}_j) = \\lambda_j\\mathbf{w}_j^T\\mathbf{w}_j = \\lambda_j$ since eigenvectors are normalized.",
+        "examples": [
+          "Example 1: Given eigenvalues $[4, 2, 1]$, total variance = $4+2+1 = 7$. First PC explains $4/7 \\approx 57.1\\%$, first two PCs explain $(4+2)/7 \\approx 85.7\\%$, all three explain $100\\%$.",
+          "Example 2: For eigenvalues $[10, 5, 3, 1, 0.5, 0.3, 0.2]$ (total=20), selecting $k=3$ retains $(10+5+3)/20 = 18/20 = 90\\%$ of variance while reducing from 7 to 3 dimensions."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Individual Variance Explained",
+          "latex": "$\\text{VE}_j = \\frac{\\lambda_j}{\\sum_{i=1}^{p}\\lambda_i}$",
+          "description": "Proportion of total variance explained by the $j$-th principal component"
+        },
+        {
+          "name": "Cumulative Variance Explained",
+          "latex": "$\\text{CVE}_k = \\frac{\\sum_{j=1}^{k}\\lambda_j}{\\sum_{j=1}^{p}\\lambda_j}$",
+          "description": "Proportion of total variance explained by first $k$ components"
+        },
+        {
+          "name": "Component Selection Criterion",
+          "latex": "$k^* = \\min\\{k : \\text{CVE}_k \\geq \\tau\\}$",
+          "description": "Choose smallest $k$ that retains at least threshold $\\tau$ (e.g., 95%) of variance"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes eigenvalues and eigenvectors, selects the top k components, and returns both the selected eigenvectors and the proportion of variance they explain. This helps understand the information loss from dimensionality reduction.",
+        "function_signature": "def select_principal_components(eigenvalues: np.ndarray, eigenvectors: np.ndarray, k: int) -> tuple[np.ndarray, float]:",
+        "starter_code": "import numpy as np\n\ndef select_principal_components(eigenvalues: np.ndarray, eigenvectors: np.ndarray, k: int) -> tuple[np.ndarray, float]:\n    \"\"\"\n    Select top k principal components and compute variance explained.\n    \n    Args:\n        eigenvalues: Array of eigenvalues in descending order, shape (p,)\n        eigenvectors: Matrix of eigenvectors (columns), shape (p, p)\n        k: Number of components to select\n    \n    Returns:\n        selected_components: Matrix of k eigenvectors, shape (p, k)\n        variance_explained: Proportion of total variance explained (0 to 1)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "select_principal_components(np.array([4., 2., 1.]), np.eye(3), 2)",
+            "expected": "(np.array([[1., 0.], [0., 1.], [0., 0.]]), 0.857142...)",
+            "explanation": "Select first 2 columns (identity matrix), variance explained = (4+2)/(4+2+1) = 6/7 ≈ 0.857"
+          },
+          {
+            "input": "select_principal_components(np.array([10., 1., 0.1]), np.eye(3), 1)",
+            "expected": "(np.array([[1.], [0.], [0.]]), 0.900900...)",
+            "explanation": "First component alone explains 10/11.1 ≈ 90% of variance, showing strong dimensionality reduction"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Selecting rows instead of columns from eigenvector matrix - each column is one eigenvector",
+        "Not checking if k exceeds the number of available components",
+        "Forgetting that eigenvalues must be in descending order before selection",
+        "Computing variance explained using only the k eigenvalues without considering total variance",
+        "Assuming 95% variance threshold is always sufficient - depends on application"
+      ],
+      "hint": "To select first k columns from a matrix, use eigenvectors[:, :k]. Sum of first k eigenvalues divided by sum of all eigenvalues gives variance explained.",
+      "references": [
+        "Scree plot",
+        "Elbow method for PCA",
+        "Kaiser criterion",
+        "Cumulative explained variance"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Data Projection and Transformation",
+      "relation_to_problem": "Once principal components are selected, we project the original data onto these new axes. This transforms high-dimensional data into the reduced PCA space.",
+      "prerequisites": [
+        "Matrix multiplication",
+        "Principal components from Step 4",
+        "Standardized data from Step 1",
+        "Geometric understanding of projections"
+      ],
+      "learning_objectives": [
+        "Understand projection as a linear transformation",
+        "Compute the projection of data onto principal component axes",
+        "Interpret the transformed coordinates in PCA space",
+        "Recognize that projection minimizes reconstruction error"
+      ],
+      "math_content": {
+        "definition": "**Data projection** onto the first $k$ principal components transforms the centered data $\\mathbf{X}_c \\in \\mathbb{R}^{n \\times p}$ into a lower-dimensional representation $\\mathbf{Y} \\in \\mathbb{R}^{n \\times k}$: $$\\mathbf{Y} = \\mathbf{X}_c\\mathbf{W}_k$$ where $\\mathbf{W}_k = [\\mathbf{w}_1, \\mathbf{w}_2, \\ldots, \\mathbf{w}_k] \\in \\mathbb{R}^{p \\times k}$ is the matrix of the first $k$ principal components. Each row $\\mathbf{y}_i$ of $\\mathbf{Y}$ represents the coordinates of sample $i$ in the new PCA basis.",
+        "notation": "$\\mathbf{Y}$ = transformed/projected data ($n \\times k$), $\\mathbf{X}_c$ = centered original data ($n \\times p$), $\\mathbf{W}_k$ = principal component matrix ($p \\times k$), $\\mathbf{y}_i$ = PCA coordinates for sample $i$, $y_{ij}$ = coordinate of sample $i$ along $j$-th principal component",
+        "theorem": "**Theorem (Optimal Low-Rank Approximation)**: The projection onto the first $k$ principal components gives the best rank-$k$ approximation to the data in the least-squares sense. Specifically, if $\\mathbf{\\hat{X}}_c = \\mathbf{Y}\\mathbf{W}_k^T = \\mathbf{X}_c\\mathbf{W}_k\\mathbf{W}_k^T$ is the reconstruction, then: $$\\mathbf{W}_k = \\arg\\min_{\\mathbf{W}: \\mathbf{W}^T\\mathbf{W}=\\mathbf{I}} \\|\\mathbf{X}_c - \\mathbf{X}_c\\mathbf{W}\\mathbf{W}^T\\|_F^2$$ where $\\|\\cdot\\|_F$ is the Frobenius norm. The minimum reconstruction error is: $$\\|\\mathbf{X}_c - \\mathbf{\\hat{X}}_c\\|_F^2 = (n-1)\\sum_{j=k+1}^{p}\\lambda_j$$",
+        "proof_sketch": "The reconstruction error can be written as: $\\|\\mathbf{X}_c - \\mathbf{X}_c\\mathbf{W}\\mathbf{W}^T\\|_F^2 = \\|\\mathbf{X}_c(\\mathbf{I} - \\mathbf{W}\\mathbf{W}^T)\\|_F^2 = \\text{tr}[(\\mathbf{I} - \\mathbf{W}\\mathbf{W}^T)^T\\mathbf{X}_c^T\\mathbf{X}_c(\\mathbf{I} - \\mathbf{W}\\mathbf{W}^T)] = (n-1)\\text{tr}[(\\mathbf{I} - \\mathbf{W}\\mathbf{W}^T)\\mathbf{\\Sigma}]$. Using the spectral decomposition $\\mathbf{\\Sigma} = \\mathbf{Q}\\mathbf{\\Lambda}\\mathbf{Q}^T$, this is minimized when $\\mathbf{W}$ consists of the eigenvectors corresponding to the $k$ largest eigenvalues, yielding error $(n-1)\\sum_{j=k+1}^{p}\\lambda_j$.",
+        "examples": [
+          "Example 1: If $\\mathbf{X}_c = \\begin{pmatrix} -1 & -1 \\\\ 0 & 0 \\\\ 1 & 1 \\end{pmatrix}$ and $\\mathbf{w}_1 = \\frac{1}{\\sqrt{2}}\\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}$, then $\\mathbf{Y} = \\mathbf{X}_c\\mathbf{w}_1 = \\begin{pmatrix} -\\sqrt{2} \\\\ 0 \\\\ \\sqrt{2} \\end{pmatrix}$ (projection onto first PC).",
+          "Example 2: For 3D data projected onto 2 PCs, each row of $\\mathbf{Y}$ is a 2D point representing the original 3D sample in the optimal 2D subspace."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Projection Formula",
+          "latex": "$\\mathbf{Y} = \\mathbf{X}_c\\mathbf{W}_k$",
+          "description": "Transform data from original $p$-dimensional space to $k$-dimensional PCA space"
+        },
+        {
+          "name": "Individual Sample Projection",
+          "latex": "$\\mathbf{y}_i = \\mathbf{W}_k^T\\mathbf{x}_{c,i}$",
+          "description": "Project single centered sample $\\mathbf{x}_{c,i}$ onto principal components"
+        },
+        {
+          "name": "Reconstruction Formula",
+          "latex": "$\\mathbf{\\hat{X}}_c = \\mathbf{Y}\\mathbf{W}_k^T = \\mathbf{X}_c\\mathbf{W}_k\\mathbf{W}_k^T$",
+          "description": "Approximate original data by projecting back from PCA space"
+        },
+        {
+          "name": "Reconstruction Error",
+          "latex": "$E = \\|\\mathbf{X}_c - \\mathbf{\\hat{X}}_c\\|_F^2 = (n-1)\\sum_{j=k+1}^{p}\\lambda_j$",
+          "description": "Quantifies information loss from dimensionality reduction"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that projects standardized data onto principal components and optionally reconstructs the data back to the original space. This demonstrates both dimensionality reduction and the quality of approximation.",
+        "function_signature": "def project_data(data: np.ndarray, components: np.ndarray, reconstruct: bool = False) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef project_data(data: np.ndarray, components: np.ndarray, reconstruct: bool = False) -> np.ndarray:\n    \"\"\"\n    Project data onto principal components and optionally reconstruct.\n    \n    Args:\n        data: Centered/standardized data, shape (n_samples, n_features)\n        components: Principal component matrix, shape (n_features, k)\n        reconstruct: If True, project back to original space\n    \n    Returns:\n        If reconstruct=False: Projected data, shape (n_samples, k)\n        If reconstruct=True: Reconstructed data, shape (n_samples, n_features)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "project_data(np.array([[-1., -1.], [0., 0.], [1., 1.]]), np.array([[0.7071], [0.7071]]), reconstruct=False)",
+            "expected": "np.array([[-1.4142], [0.], [1.4142]]) approximately",
+            "explanation": "Projects 2D perfectly correlated data onto 1D principal axis, resulting in scaled coordinates along that direction."
+          },
+          {
+            "input": "project_data(np.array([[-1., -1.], [0., 0.], [1., 1.]]), np.array([[0.7071], [0.7071]]), reconstruct=True)",
+            "expected": "np.array([[-1., -1.], [0., 0.], [1., 1.]]) approximately",
+            "explanation": "Since data lies perfectly on the principal component, reconstruction is exact (no information loss)."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing data @ components with components @ data - order matters for matrix multiplication",
+        "Forgetting to use centered/standardized data for projection",
+        "In reconstruction, using components instead of components.T for back-projection",
+        "Not understanding that reconstruction increases dimensionality back to original space",
+        "Assuming projection preserves distances exactly - only preserves them in the k-dimensional subspace"
+      ],
+      "hint": "For projection: Y = data @ components. For reconstruction: X_reconstructed = Y @ components.T. Check matrix dimensions to ensure compatibility.",
+      "references": [
+        "Orthogonal projection",
+        "Linear transformations",
+        "Frobenius norm",
+        "Low-rank matrix approximation"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete PCA Pipeline Integration",
+      "relation_to_problem": "This final sub-quest integrates all previous steps into a complete PCA implementation, mimicking the main problem but with detailed step-by-step guidance.",
+      "prerequisites": [
+        "All previous steps (1-5)",
+        "Understanding of function composition",
+        "NumPy array manipulation",
+        "Debugging and testing skills"
+      ],
+      "learning_objectives": [
+        "Integrate standardization, covariance computation, eigendecomposition, and projection",
+        "Handle edge cases (k > p, zero variance features, numerical issues)",
+        "Understand the complete information flow in PCA",
+        "Return properly formatted principal components matching expected output"
+      ],
+      "math_content": {
+        "definition": "**Complete PCA Algorithm**: Given data matrix $\\mathbf{X} \\in \\mathbb{R}^{n \\times p}$ and target dimensionality $k$, PCA returns the top $k$ principal components $\\mathbf{W}_k \\in \\mathbb{R}^{p \\times k}$. The algorithm consists of: (1) **Standardization**: $\\mathbf{Z} = (\\mathbf{X} - \\boldsymbol{\\mu})/\\boldsymbol{\\sigma}$, (2) **Covariance**: $\\mathbf{\\Sigma} = \\frac{1}{n-1}\\mathbf{Z}^T\\mathbf{Z}$, (3) **Eigendecomposition**: $\\mathbf{\\Sigma} = \\mathbf{Q}\\mathbf{\\Lambda}\\mathbf{Q}^T$ with $\\lambda_1 \\geq \\cdots \\geq \\lambda_p$, (4) **Selection**: $\\mathbf{W}_k = [\\mathbf{q}_1, \\ldots, \\mathbf{q}_k]$, the first $k$ columns of $\\mathbf{Q}$.",
+        "notation": "$\\mathbf{X}$ = raw input data, $\\mathbf{Z}$ = standardized data, $\\mathbf{\\Sigma}$ = covariance matrix, $\\mathbf{Q}$ = eigenvector matrix, $\\mathbf{\\Lambda}$ = diagonal eigenvalue matrix, $\\mathbf{W}_k$ = selected principal components, $k$ = target dimensionality",
+        "theorem": "**Theorem (PCA Optimality)**: The PCA solution simultaneously: (1) **Maximizes Variance**: The first $k$ PCs maximize $\\sum_{j=1}^{k}\\text{Var}(\\mathbf{Z}\\mathbf{w}_j)$ subject to orthonormality constraints, (2) **Minimizes Reconstruction Error**: The reconstruction $\\mathbf{\\hat{Z}} = \\mathbf{Z}\\mathbf{W}_k\\mathbf{W}_k^T$ minimizes $\\|\\mathbf{Z} - \\mathbf{\\hat{Z}}\\|_F^2$ among all rank-$k$ approximations, (3) **Decorrelates Features**: The projected features $\\mathbf{Y} = \\mathbf{Z}\\mathbf{W}_k$ have diagonal covariance matrix $\\text{diag}(\\lambda_1, \\ldots, \\lambda_k)$.",
+        "proof_sketch": "These properties follow from combining the theorems from previous steps. Variance maximization follows from the eigenvalue problem solution. Reconstruction error minimization follows from the Eckart-Young theorem on optimal low-rank approximation. Decorrelation follows from: $\\text{Cov}(\\mathbf{Y}) = \\frac{1}{n-1}\\mathbf{W}_k^T\\mathbf{Z}^T\\mathbf{Z}\\mathbf{W}_k = \\mathbf{W}_k^T\\mathbf{\\Sigma}\\mathbf{W}_k = \\mathbf{W}_k^T\\mathbf{Q}\\mathbf{\\Lambda}\\mathbf{Q}^T\\mathbf{W}_k = \\text{diag}(\\lambda_1, \\ldots, \\lambda_k)$ since $\\mathbf{W}_k$ consists of orthonormal eigenvectors.",
+        "examples": [
+          "Example 1 (from problem): For $\\mathbf{X} = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\\\ 5 & 6 \\end{pmatrix}$ with $k=1$, after standardization both features become $[-1.22, 0, 1.22]$. Covariance matrix is $\\begin{pmatrix} 1 & 1 \\\\ 1 & 1 \\end{pmatrix}$. Eigenvalues: $[2, 0]$, eigenvectors: $\\mathbf{w}_1 \\approx [0.7071, 0.7071]^T$. Output: $[[0.7071], [0.7071]]$.",
+          "Example 2: For data with 3 features where one is redundant, the smallest eigenvalue will be near zero, indicating that dimension can be removed with minimal information loss."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete PCA Formula",
+          "latex": "$\\mathbf{W}_k = \\text{eigenvectors}_{1:k}\\left(\\frac{1}{n-1}\\left(\\frac{\\mathbf{X} - \\boldsymbol{\\mu}}{\\boldsymbol{\\sigma}}\\right)^T\\left(\\frac{\\mathbf{X} - \\boldsymbol{\\mu}}{\\boldsymbol{\\sigma}}\\right)\\right)$",
+          "description": "End-to-end formula showing all steps composed together"
+        },
+        {
+          "name": "PCA Transformation",
+          "latex": "$\\mathbf{Y} = \\left(\\frac{\\mathbf{X} - \\boldsymbol{\\mu}}{\\boldsymbol{\\sigma}}\\right)\\mathbf{W}_k$",
+          "description": "Apply PCA to transform new data using computed components"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified but complete PCA function that takes raw data and k, performs all necessary steps (standardization, covariance, eigendecomposition, selection), and returns the top k principal components as a matrix. This is very similar to the main problem but broken down with clear steps.",
+        "function_signature": "def pca_components(data: np.ndarray, k: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef pca_components(data: np.ndarray, k: int) -> np.ndarray:\n    \"\"\"\n    Compute the top k principal components from raw data.\n    \n    Args:\n        data: Raw input data, shape (n_samples, n_features)\n        k: Number of principal components to return\n    \n    Returns:\n        Principal components matrix, shape (n_features, k)\n    \"\"\"\n    # Step 1: Standardize the data\n    # Hint: Use mean and std along axis=0, with ddof=1\n    \n    # Step 2: Compute covariance matrix\n    # Hint: (1/(n-1)) * data_std.T @ data_std\n    \n    # Step 3: Eigendecomposition and sorting\n    # Hint: Use np.linalg.eigh() and sort descending\n    \n    # Step 4: Select top k eigenvectors\n    # Hint: Take first k columns\n    \n    # Step 5: Round and return\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "pca_components(np.array([[1, 2], [3, 4], [5, 6]]), k=1)",
+            "expected": "np.array([[0.7071], [0.7071]])",
+            "explanation": "This is the exact example from the main problem. Both features are perfectly correlated, so the first PC points in the [0.7071, 0.7071] direction (45-degree angle), explaining 100% of the variance."
+          },
+          {
+            "input": "pca_components(np.array([[1, 2], [3, 4], [5, 6]]), k=2)",
+            "expected": "np.array([[0.7071, -0.7071], [0.7071, 0.7071]])",
+            "explanation": "Requesting both components returns the full orthonormal basis. Second component is orthogonal to first and has zero eigenvalue."
+          },
+          {
+            "input": "pca_components(np.array([[1, 0], [0, 1], [1, 1], [0, 0]]), k=1)",
+            "expected": "First PC along direction of maximum variance (approximately [0.7071, 0.7071] or similar)",
+            "explanation": "For uncorrelated features with equal variance, the principal component depends on data distribution, but algorithm should work correctly."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Returning eigenvectors as rows instead of columns - should be (n_features, k) shape",
+        "Not rounding to 4 decimal places as specified in the main problem",
+        "Using population std (ddof=0) instead of sample std (ddof=1) in any step",
+        "Not validating that k <= number of features",
+        "Returning eigenvalues along with eigenvectors - problem only asks for eigenvectors",
+        "Computing covariance with np.cov() which transposes the interpretation - use manual computation"
+      ],
+      "hint": "Follow the exact sequence: standardize → covariance → eigendecomposition → sort descending → select k → round. Test each step independently to debug issues.",
+      "references": [
+        "Complete PCA algorithm",
+        "Scikit-learn PCA documentation",
+        "PCA implementation best practices",
+        "Numerical stability in PCA"
+      ]
+    }
+  ]
+}

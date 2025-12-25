@@ -1,0 +1,36 @@
+{
+  "description": "SW1wbGVtZW50IHRoZSAqKlNBUlNBKiogYWxnb3JpdGhtIHRvIGVzdGltYXRlIFEtdmFsdWVzIGZvciBhIGdpdmVuIHNldCBvZiBkZXRlcm1pbmlzdGljIHRyYW5zaXRpb25zIHVzaW5nIGdyZWVkeSBhY3Rpb24gc2VsZWN0aW9uLgoKLSBBbGwgUS12YWx1ZXMgYXJlIGluaXRpYWxpemVkIHRvIHplcm8uCi0gRWFjaCBlcGlzb2RlIHN0YXJ0cyBmcm9tIGEgZ2l2ZW4gaW5pdGlhbCBzdGF0ZS4KLSBUaGUgZXBpc29kZSBlbmRzIHdoZW4gaXQgcmVhY2hlcyB0aGUgJHRlcm1pbmFsJCBzdGF0ZSBvciB3aGVuIHRoZSBudW1iZXIgb2Ygc3RlcHMgZXhjZWVkcyAkbWF4c3RlcHMkLgotIENoYW5nZXMgbWFkZSB0byBRLXZhbHVlcyBhcmUgcGVyc2lzdGVudCBhY3Jvc3MgZXBpc29kZXMu",
+  "id": "175",
+  "test_cases": [
+    {
+      "test": "transitions = {\n    ('A', 'go'): (1.0, 'B'),\n    ('B', 'go'): (2.0, 'C'),\n    ('C', 'go'): (3.0, 'terminal')\n}\ninitial_states = ['A']\nalpha = 0.5\ngamma = 0.9\nmax_steps = 5\nQ = sarsa_update(transitions, initial_states, alpha, gamma, max_steps)\nfor k in sorted(Q):\n    print(f\"Q{str(k):15} = {Q[k]:.4f}\")",
+      "expected_output": "Q('A', 'go')     = 0.5000\nQ('B', 'go')     = 1.0000\nQ('C', 'go')     = 1.5000"
+    },
+    {
+      "test": "transitions = {\n    ('S1', 'left'): (2.0, 'S2'),\n    ('S1', 'right'): (1.0, 'S3'),\n    ('S2', 'left'): (0.5, 'terminal'),\n    ('S3', 'right'): (0.5, 'terminal')\n}\ninitial_states = ['S1', 'S2', 'S3']\nalpha = 0.1\ngamma = 0.8\nmax_steps = 10\nQ = sarsa_update(transitions, initial_states, alpha, gamma, max_steps)\nfor k in sorted(Q):\n    print(f\"Q{str(k):15} = {Q[k]:.4f}\")",
+      "expected_output": "Q('S1', 'left')  = 0.2000\nQ('S1', 'right') = 0.0000\nQ('S2', 'left')  = 0.0950\nQ('S3', 'right') = 0.0500"
+    }
+  ],
+  "difficulty": "medium",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "transitions = {\n    ('A', 'left'): (5.0, 'B'),\n    ('A', 'right'): (1.0, 'C'),\n    ('B', 'left'): (2.0, 'A'),\n    ('B', 'right'): (0.0, 'C'),\n    ('C', 'down'): (1.0, 'terminal')\n}\n\ninitial_states = ['A', 'B']\nalpha = 0.1\ngamma = 0.9\nmax_steps = 10\n\nQ = sarsa_update(transitions, initial_states, alpha, gamma, max_steps)\n\nfor k in sorted(transitions):\n    print(f\"Q{str(k):15} = {Q[k]:.4f}\")",
+    "output": "Q('A', 'left')   = 4.2181\nQ('A', 'right')  = 0.0000\nQ('B', 'left')   = 2.7901\nQ('B', 'right')  = 0.0000",
+    "reasoning": "The SARSA update rule is:\nQ(s,a) <- Q(s,a) + alpha * [reward + gamma * Q(s',a') - Q(s,a)]\n\nStarting from initial Q-values of 0, each episode updates Q-values based on the transitions.\n- Q('A', 'left') increases because it leads to B, and B can eventually return to A or C with additional rewards.\n- Q('A', 'right') and Q('B', 'right') remain 0.0 because the next state C leads directly to terminal with small reward.\n- Q('B', 'left') increases due to cyclic transitions giving non-zero rewards."
+  },
+  "category": "Reinforcement Learning",
+  "starter_code": "def sarsa_update(transitions, initial_states, alpha, gamma, max_steps):\n    \"\"\"\n    Perform SARSA updates on the given environment transitions.\n    Args:\n        transitions (dict): mapping (state, action) -> (reward, next_state)\n        initial_states (list): list of starting states to simulate episodes from\n        alpha (float): learning rate\n        gamma (float): discount factor\n        max_steps (int): maximum steps allowed per episode\n    Returns:\n        dict: final Q-table as a dictionary {(state, action): value}\n    \"\"\"\n    # Your code here\n    pass",
+  "title": "Implement the SARSA Algorithm on policy",
+  "createdAt": "August 15, 2025 at 5:36:32 PM UTUTC-4",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/836hardik-agrawal",
+      "name": "Hardik Agrawal"
+    }
+  ],
+  "learn_section": "IyBTQVJTQTogT24tUG9saWN5IFREIENvbnRyb2wKCioqR29hbCoqOiBFc3RpbWF0ZSB0aGUgYWN0aW9uLXZhbHVlIGZ1bmN0aW9uICRRXlxwaSBcYXBwcm94IHFeKiQgdXNpbmcgdGhlIFNBUlNBIGFsZ29yaXRobSAob24tcG9saWN5IFRlbXBvcmFsLURpZmZlcmVuY2UgY29udHJvbCkuCgojIyBQYXJhbWV0ZXJzCi0gU3RlcCBzaXplICRcYWxwaGEgXGluICgwLCAxXSQKLSBEaXNjb3VudCBmYWN0b3IgJFxnYW1tYSBcaW4gWzAsIDFdJAoKIyMgSW5pdGlhbGl6YXRpb24KLSBJbml0aWFsaXplICRRKHMsIGEpJCBhcmJpdHJhcmlseSBmb3IgYWxsICRzIFxpbiBcbWF0aGNhbHtTfV4rJCwgJGEgXGluIFxtYXRoY2Fse0F9KHMpJCAgCi0gU2V0ICRRKFx0ZXh0e3Rlcm1pbmFsfSwgXGNkb3QpID0gMCQKCiMjIEFsZ29yaXRobQoKKipMb29wIGZvciBlYWNoIGVwaXNvZGU6KioKMS4gSW5pdGlhbGl6ZSBzdGF0ZSAkUyQKMi4gQ2hvb3NlIGFjdGlvbiAkQSQgZnJvbSAkUyQgdXNpbmcgYSBwb2xpY3kgZGVyaXZlZCBmcm9tICRRJCAoZS5nLiwgZ3JlZWR5KQoKICAgICoqTG9vcCBmb3IgZWFjaCBzdGVwIG9mIHRoZSBlcGlzb2RlOioqCiAgICAxLiBUYWtlIGFjdGlvbiAkQSQsIG9ic2VydmUgcmV3YXJkICRSJCBhbmQgbmV4dCBzdGF0ZSAkUyckCiAgICAyLiBDaG9vc2UgbmV4dCBhY3Rpb24gJEEnJCBmcm9tICRTJyQgdXNpbmcgYSBwb2xpY3kgZGVyaXZlZCBmcm9tICRRJCAoZS5nLiwgZ3JlZWR5KQogICAgMy4gVXBkYXRlIHRoZSBhY3Rpb24tdmFsdWU6CiAgICAgICAkCiAgICAgICBRKFMsIEEpIFxsZWZ0YXJyb3cgUShTLCBBKSArIFxhbHBoYSBcbGVmdFsgUiArIFxnYW1tYSBRKFMnLCBBJykgLSBRKFMsIEEpIFxyaWdodF0KICAgICAgICQKICAgIDQuIFNldCAkUyBcbGVmdGFycm93IFMnJCwgJEEgXGxlZnRhcnJvdyBBJyQKICAgIDUuIFJlcGVhdCB1bnRpbCAkUyQgaXMgdGVybWluYWwKClRoaXMgYWxnb3JpdGhtIGNvbnRpbnVvdXNseSBpbXByb3ZlcyB0aGUgcG9saWN5IGFzIGl0IGV4cGxvcmVzIGFuZCBsZWFybnMgZnJvbSBpbnRlcmFjdGlvbiwgbWFraW5nIGl0IHN1aXRhYmxlIGZvciBvbmxpbmUgcmVpbmZvcmNlbWVudCBsZWFybmluZyBzY2VuYXJpb3Mu",
+  "description_decoded": "Implement the **SARSA** algorithm to estimate Q-values for a given set of deterministic transitions using greedy action selection.\n\n- All Q-values are initialized to zero.\n- Each episode starts from a given initial state.\n- The episode ends when it reaches the $terminal$ state or when the number of steps exceeds $maxsteps$.\n- Changes made to Q-values are persistent across episodes.",
+  "learn_section_decoded": "# SARSA: On-Policy TD Control\n\n**Goal**: Estimate the action-value function $Q^\\pi \\approx q^*$ using the SARSA algorithm (on-policy Temporal-Difference control).\n\n## Parameters\n- Step size $\\alpha \\in (0, 1]$\n- Discount factor $\\gamma \\in [0, 1]$\n\n## Initialization\n- Initialize $Q(s, a)$ arbitrarily for all $s \\in \\mathcal{S}^+$, $a \\in \\mathcal{A}(s)$  \n- Set $Q(\\text{terminal}, \\cdot) = 0$\n\n## Algorithm\n\n**Loop for each episode:**\n1. Initialize state $S$\n2. Choose action $A$ from $S$ using a policy derived from $Q$ (e.g., greedy)\n\n    **Loop for each step of the episode:**\n    1. Take action $A$, observe reward $R$ and next state $S'$\n    2. Choose next action $A'$ from $S'$ using a policy derived from $Q$ (e.g., greedy)\n    3. Update the action-value:\n       $\n       Q(S, A) \\leftarrow Q(S, A) + \\alpha \\left[ R + \\gamma Q(S', A') - Q(S, A) \\right]\n       $\n    4. Set $S \\leftarrow S'$, $A \\leftarrow A'$\n    5. Repeat until $S$ is terminal\n\nThis algorithm continuously improves the policy as it explores and learns from interaction, making it suitable for online reinforcement learning scenarios."
+}

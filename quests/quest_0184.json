@@ -1,0 +1,494 @@
+{
+  "problem_id": 184,
+  "title": "Empirical Probability Mass Function (PMF)",
+  "category": "Probability & Statistics",
+  "difficulty": "easy",
+  "description": "## Problem\n\nGiven a list of integer samples drawn from a discrete distribution, implement a function to compute the empirical Probability Mass Function (PMF). The function should return a list of `(value, probability)` pairs sorted by the value in ascending order. If the input is empty, return an empty list.",
+  "example": {
+    "input": "samples = [1, 2, 2, 3, 3, 3]",
+    "output": "[(1, 0.16666666666666666), (2, 0.3333333333333333), (3, 0.5)]",
+    "reasoning": "Counts are {1:1, 2:2, 3:3} over 6 samples, so probabilities are 1/6, 2/6, and 3/6 respectively, returned sorted by value."
+  },
+  "starter_code": "def empirical_pmf(samples):\n    \"\"\"\n    Given an iterable of integer samples, return a list of (value, probability)\n    pairs sorted by value ascending.\n    \"\"\"\n    # TODO: Implement the function\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Frequency Counting in Discrete Datasets",
+      "relation_to_problem": "The foundation of computing an empirical PMF is counting how many times each unique value appears in the sample data. This step teaches the essential frequency counting mechanism.",
+      "prerequisites": [
+        "Basic Python data structures",
+        "Understanding of iteration",
+        "Dictionary operations"
+      ],
+      "learning_objectives": [
+        "Implement frequency counting for discrete data using dictionaries",
+        "Handle edge cases including empty datasets",
+        "Understand the relationship between raw counts and empirical estimation"
+      ],
+      "math_content": {
+        "definition": "For a discrete sample $S = \\{x_1, x_2, \\ldots, x_n\\}$ where $x_i \\in \\mathbb{Z}$, the **frequency count** of value $v$ is defined as $f(v) = \\sum_{i=1}^{n} \\mathbf{1}_{\\{x_i = v\\}}$ where $\\mathbf{1}_{\\{x_i = v\\}}$ is the indicator function that equals 1 if $x_i = v$ and 0 otherwise.",
+        "notation": "$f(v)$ = frequency count of value $v$, $n$ = total sample size, $\\mathbf{1}_{\\{\\cdot\\}}$ = indicator function",
+        "theorem": "**Partition Property**: For a finite sample $S$ with distinct values $V = \\{v_1, v_2, \\ldots, v_k\\}$, we have $\\sum_{j=1}^{k} f(v_j) = n$, meaning the sum of all frequency counts equals the total sample size.",
+        "proof_sketch": "Since every element $x_i$ in the sample belongs to exactly one value class, each element contributes exactly 1 to exactly one frequency count. Summing over all distinct values captures all $n$ elements exactly once.",
+        "examples": [
+          "Sample $[1, 2, 2, 3, 3, 3]$: $f(1) = 1$, $f(2) = 2$, $f(3) = 3$, and $1 + 2 + 3 = 6 = n$",
+          "Sample $[5, 5, 5]$: $f(5) = 3$, all other values have $f(v) = 0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Frequency Count Formula",
+          "latex": "$f(v) = \\sum_{i=1}^{n} \\mathbf{1}_{\\{x_i = v\\}}$",
+          "description": "Use this to count occurrences of value $v$ in the sample"
+        },
+        {
+          "name": "Partition Identity",
+          "latex": "$\\sum_{v \\in V} f(v) = n$",
+          "description": "Verifies that all elements have been counted exactly once"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that counts the frequency of each unique integer value in a sample. Return a dictionary mapping each unique value to its count. Handle the empty list case by returning an empty dictionary.",
+        "function_signature": "def count_frequencies(samples: list) -> dict:",
+        "starter_code": "def count_frequencies(samples):\n    \"\"\"\n    Count frequency of each unique value in samples.\n    Returns a dictionary {value: count}.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "count_frequencies([1, 2, 2, 3, 3, 3])",
+            "expected": "{1: 1, 2: 2, 3: 3}",
+            "explanation": "Value 1 appears once, 2 appears twice, 3 appears three times"
+          },
+          {
+            "input": "count_frequencies([5, 5, 5])",
+            "expected": "{5: 3}",
+            "explanation": "Only one unique value with frequency 3"
+          },
+          {
+            "input": "count_frequencies([])",
+            "expected": "{}",
+            "explanation": "Empty input returns empty dictionary"
+          },
+          {
+            "input": "count_frequencies([7])",
+            "expected": "{7: 1}",
+            "explanation": "Single element has frequency 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle the empty list case",
+        "Using list instead of dictionary for storage (inefficient for lookups)",
+        "Not initializing dictionary entries before incrementing",
+        "Attempting to modify the original list during iteration"
+      ],
+      "hint": "Use a dictionary to store counts. Iterate through the sample once, incrementing the count for each value seen.",
+      "references": [
+        "Hash tables and dictionaries",
+        "Counting algorithms",
+        "Python collections.Counter"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Probability Mass Function: Formal Definition and Properties",
+      "relation_to_problem": "Understanding the mathematical definition of a PMF is essential because the empirical PMF must satisfy the same axioms: non-negativity and normalization. This ensures our computed probabilities are valid.",
+      "prerequisites": [
+        "Probability axioms",
+        "Discrete random variables",
+        "Set theory basics"
+      ],
+      "learning_objectives": [
+        "State the formal definition of a probability mass function",
+        "Verify that a function satisfies the PMF axioms",
+        "Understand the relationship between frequencies and probabilities",
+        "Apply normalization to convert counts to probabilities"
+      ],
+      "math_content": {
+        "definition": "A **probability mass function** for a discrete random variable $X$ is a function $p_X: \\mathbb{R} \\rightarrow [0,1]$ such that: (1) $p_X(x) \\geq 0$ for all $x \\in \\mathbb{R}$, (2) $\\sum_{x \\in S_X} p_X(x) = 1$ where $S_X$ is the support (set of values with non-zero probability), and (3) $P(X = x) = p_X(x)$ for all $x$.",
+        "notation": "$p_X(x)$ = probability mass at value $x$, $S_X$ = support of $X$, $P(\\cdot)$ = probability measure",
+        "theorem": "**Normalization Theorem**: For any frequency function $f: V \\rightarrow \\mathbb{N}$ with $\\sum_{v \\in V} f(v) = n > 0$, the function $\\hat{p}(v) = \\frac{f(v)}{n}$ is a valid probability mass function over the finite set $V$.",
+        "proof_sketch": "We verify both axioms: (1) Non-negativity: Since $f(v) \\geq 0$ and $n > 0$, we have $\\hat{p}(v) = \\frac{f(v)}{n} \\geq 0$ for all $v$. (2) Normalization: $\\sum_{v \\in V} \\hat{p}(v) = \\sum_{v \\in V} \\frac{f(v)}{n} = \\frac{1}{n}\\sum_{v \\in V} f(v) = \\frac{n}{n} = 1$. Thus $\\hat{p}$ satisfies the PMF axioms.",
+        "examples": [
+          "Frequency counts $\\{1:1, 2:2, 3:3\\}$ with $n=6$ give PMF: $\\hat{p}(1) = \\frac{1}{6} \\approx 0.167$, $\\hat{p}(2) = \\frac{2}{6} = \\frac{1}{3} \\approx 0.333$, $\\hat{p}(3) = \\frac{3}{6} = \\frac{1}{2} = 0.5$. Verification: $\\frac{1}{6} + \\frac{2}{6} + \\frac{3}{6} = 1$ ✓",
+          "Fair six-sided die: $p(k) = \\frac{1}{6}$ for $k \\in \\{1,2,3,4,5,6\\}$, and $\\sum_{k=1}^{6} \\frac{1}{6} = 1$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Empirical Probability",
+          "latex": "$\\hat{p}(v) = \\frac{f(v)}{n}$",
+          "description": "Convert frequency count $f(v)$ to probability by dividing by sample size $n$"
+        },
+        {
+          "name": "PMF Normalization Axiom",
+          "latex": "$\\sum_{v \\in V} p(v) = 1$",
+          "description": "All probabilities must sum to exactly 1"
+        },
+        {
+          "name": "Non-negativity Axiom",
+          "latex": "$p(v) \\geq 0 \\text{ for all } v$",
+          "description": "Probabilities cannot be negative"
+        }
+      ],
+      "exercise": {
+        "description": "Given a dictionary of frequency counts and the total sample size, convert the counts to probabilities by normalizing. Return a dictionary mapping each value to its probability. Verify your output satisfies the PMF axioms.",
+        "function_signature": "def frequencies_to_probabilities(freq_dict: dict, n: int) -> dict:",
+        "starter_code": "def frequencies_to_probabilities(freq_dict, n):\n    \"\"\"\n    Convert frequency counts to probabilities.\n    freq_dict: {value: count}\n    n: total sample size\n    Returns: {value: probability}\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "frequencies_to_probabilities({1: 1, 2: 2, 3: 3}, 6)",
+            "expected": "{1: 0.16666666666666666, 2: 0.3333333333333333, 3: 0.5}",
+            "explanation": "Each count divided by n=6: 1/6, 2/6, 3/6. Sum: 1/6 + 2/6 + 3/6 = 1 ✓"
+          },
+          {
+            "input": "frequencies_to_probabilities({5: 4}, 4)",
+            "expected": "{5: 1.0}",
+            "explanation": "All observations are value 5, so probability is 4/4 = 1.0"
+          },
+          {
+            "input": "frequencies_to_probabilities({1: 1, 2: 1}, 2)",
+            "expected": "{1: 0.5, 2: 0.5}",
+            "explanation": "Equal frequencies give equal probabilities: 1/2 each"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Dividing by sum of counts instead of total sample size (they're the same, but conceptually different)",
+        "Not handling integer division correctly in Python 2 vs Python 3",
+        "Forgetting to verify the normalization property sums to 1.0",
+        "Using floating point equality checks without tolerance"
+      ],
+      "hint": "For each value-count pair in the frequency dictionary, divide the count by the total sample size n. The resulting probabilities should sum to exactly 1.0.",
+      "references": [
+        "Kolmogorov axioms of probability",
+        "Discrete probability distributions",
+        "Statistical normalization"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Empirical Distribution Theory and Estimation",
+      "relation_to_problem": "The empirical PMF is a specific type of empirical distribution. Understanding its theoretical properties (consistency, unbiasedness) ensures we're computing a statistically valid estimator of the true underlying PMF.",
+      "prerequisites": [
+        "Probability mass functions",
+        "Random sampling",
+        "Expected value",
+        "Convergence concepts"
+      ],
+      "learning_objectives": [
+        "Define the empirical PMF as an estimator of the true PMF",
+        "Understand the statistical properties of empirical estimates",
+        "Recognize when empirical PMF is appropriate vs. other estimators",
+        "Interpret the relationship between sample size and estimation accuracy"
+      ],
+      "math_content": {
+        "definition": "Given a sample $S = (X_1, X_2, \\ldots, X_n)$ of independent identically distributed random variables from a discrete distribution with true PMF $p(x)$, the **empirical PMF** is defined as $\\hat{p}_n(x) = \\frac{1}{n}\\sum_{i=1}^{n} \\mathbf{1}_{\\{X_i = x\\}}$, which estimates $p(x)$ using observed frequencies.",
+        "notation": "$\\hat{p}_n(x)$ = empirical PMF based on $n$ samples, $p(x)$ = true PMF, $X_i$ = individual sample observations",
+        "theorem": "**Unbiasedness**: For each fixed value $x$, the empirical PMF is an unbiased estimator: $\\mathbb{E}[\\hat{p}_n(x)] = p(x)$. **Consistency**: By the Strong Law of Large Numbers, $\\hat{p}_n(x) \\xrightarrow{a.s.} p(x)$ as $n \\rightarrow \\infty$ for all $x$, meaning the empirical PMF converges almost surely to the true PMF.",
+        "proof_sketch": "Unbiasedness: $\\mathbb{E}[\\hat{p}_n(x)] = \\mathbb{E}\\left[\\frac{1}{n}\\sum_{i=1}^{n} \\mathbf{1}_{\\{X_i = x\\}}\\right] = \\frac{1}{n}\\sum_{i=1}^{n} \\mathbb{E}[\\mathbf{1}_{\\{X_i = x\\}}] = \\frac{1}{n}\\sum_{i=1}^{n} p(x) = \\frac{n \\cdot p(x)}{n} = p(x)$. Consistency follows from applying SLLN to the sequence of indicators $\\mathbf{1}_{\\{X_i = x\\}}$.",
+        "examples": [
+          "True PMF: $p(1)=0.2, p(2)=0.5, p(3)=0.3$. Sample of $n=10$: $[1,2,2,2,3,2,3,2,1,2]$. Empirical: $\\hat{p}_{10}(1)=0.2, \\hat{p}_{10}(2)=0.6, \\hat{p}_{10}(3)=0.2$. Estimates are close but not exact due to sampling variability.",
+          "As $n \\rightarrow \\infty$, by consistency, empirical estimates converge: with $n=1000$ samples, we might get $\\hat{p}_{1000}(2) \\approx 0.498 \\approx 0.5$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Empirical PMF Estimator",
+          "latex": "$\\hat{p}_n(x) = \\frac{1}{n}\\sum_{i=1}^{n} \\mathbf{1}_{\\{X_i = x\\}}$",
+          "description": "Maximum likelihood estimator for discrete distributions"
+        },
+        {
+          "name": "Variance of Empirical PMF",
+          "latex": "$\\text{Var}(\\hat{p}_n(x)) = \\frac{p(x)(1-p(x))}{n}$",
+          "description": "Uncertainty decreases with sample size as $O(1/n)$"
+        },
+        {
+          "name": "Mean Squared Error",
+          "latex": "$\\text{MSE}(\\hat{p}_n(x)) = \\mathbb{E}[(\\hat{p}_n(x) - p(x))^2] = \\frac{p(x)(1-p(x))}{n}$",
+          "description": "Since unbiased, MSE equals variance"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that validates whether a given dictionary represents a valid empirical PMF. Check that: (1) all probabilities are non-negative, (2) all probabilities sum to 1.0 (within floating point tolerance of 1e-9), and (3) all values are numeric. Return True if valid, False otherwise.",
+        "function_signature": "def is_valid_pmf(pmf_dict: dict, tolerance: float = 1e-9) -> bool:",
+        "starter_code": "def is_valid_pmf(pmf_dict, tolerance=1e-9):\n    \"\"\"\n    Validate if pmf_dict represents a valid PMF.\n    Returns True if valid, False otherwise.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "is_valid_pmf({1: 0.5, 2: 0.3, 3: 0.2})",
+            "expected": "True",
+            "explanation": "All probabilities non-negative and sum to 1.0"
+          },
+          {
+            "input": "is_valid_pmf({1: 0.6, 2: 0.3, 3: 0.2})",
+            "expected": "False",
+            "explanation": "Sum is 1.1, violates normalization axiom"
+          },
+          {
+            "input": "is_valid_pmf({1: -0.1, 2: 0.6, 3: 0.5})",
+            "expected": "False",
+            "explanation": "Negative probability violates non-negativity axiom"
+          },
+          {
+            "input": "is_valid_pmf({1: 1.0})",
+            "expected": "True",
+            "explanation": "Single value with probability 1.0 is valid"
+          },
+          {
+            "input": "is_valid_pmf({})",
+            "expected": "True",
+            "explanation": "Empty PMF is technically valid (vacuous truth)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using exact equality (==) for floating point comparison instead of tolerance-based comparison",
+        "Not accounting for floating point precision errors in sum calculation",
+        "Rejecting valid PMFs due to too strict tolerance (e.g., 1e-15)",
+        "Forgetting to check both non-negativity AND normalization conditions"
+      ],
+      "hint": "Check three conditions separately: iterate through values to verify non-negativity, sum all probabilities and check if close to 1.0 within tolerance using absolute difference.",
+      "references": [
+        "Glivenko-Cantelli theorem",
+        "Consistency of estimators",
+        "Maximum likelihood estimation",
+        "Empirical processes"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Sorting and Ordering Statistical Data Structures",
+      "relation_to_problem": "The final empirical PMF must be returned as sorted (value, probability) pairs. Understanding sorting of key-value pairs and maintaining correspondence between values and probabilities is crucial for correct output formatting.",
+      "prerequisites": [
+        "Python tuples",
+        "Sorting algorithms",
+        "Lambda functions",
+        "List comprehensions"
+      ],
+      "learning_objectives": [
+        "Convert dictionaries to sorted lists of tuples",
+        "Implement custom sorting keys for complex data structures",
+        "Maintain data integrity during transformation",
+        "Understand time complexity of sorting operations"
+      ],
+      "math_content": {
+        "definition": "A **total ordering** on a set $S$ is a binary relation $\\leq$ that is reflexive, antisymmetric, transitive, and total (any two elements are comparable). For statistical output, we typically order by the random variable values: $(v_1, p_1) \\preceq (v_2, p_2)$ if and only if $v_1 \\leq v_2$.",
+        "notation": "$\\preceq$ = ordering relation, $(v, p)$ = value-probability pair, $\\leq$ = standard numeric ordering",
+        "theorem": "**Sorting Stability**: When sorting value-probability pairs by value alone, if two pairs have equal values, a stable sort preserves their relative input order. However, since values are unique in a PMF (each value maps to exactly one probability), stability is not required for correctness.",
+        "proof_sketch": "In a valid PMF over finite support $V = \\{v_1, \\ldots, v_k\\}$ with distinct values, the function $v \\mapsto p(v)$ is well-defined and injective on its support. Therefore each value appears exactly once in the set of pairs, making the sorted order unique up to the specific ordering relation used.",
+        "examples": [
+          "Unsorted: $[(3, 0.5), (1, 0.167), (2, 0.333)]$. After sorting by value ascending: $[(1, 0.167), (2, 0.333), (3, 0.5)]$",
+          "Single element: $[(5, 1.0)]$ remains $[(5, 1.0)]$ after sorting"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Lexicographic Ordering",
+          "latex": "$(v_1, p_1) \\prec (v_2, p_2) \\iff v_1 < v_2$",
+          "description": "Primary sort key is the value component"
+        },
+        {
+          "name": "Time Complexity",
+          "latex": "$O(k \\log k)$",
+          "description": "Where $k$ is the number of distinct values (size of support)"
+        }
+      ],
+      "exercise": {
+        "description": "Given a dictionary mapping values to probabilities, convert it to a list of (value, probability) tuples sorted by value in ascending order. The function should handle empty dictionaries and maintain exact probability values (no rounding).",
+        "function_signature": "def dict_to_sorted_pairs(prob_dict: dict) -> list:",
+        "starter_code": "def dict_to_sorted_pairs(prob_dict):\n    \"\"\"\n    Convert dictionary to list of (value, probability) tuples\n    sorted by value ascending.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "dict_to_sorted_pairs({3: 0.5, 1: 0.16666666666666666, 2: 0.3333333333333333})",
+            "expected": "[(1, 0.16666666666666666), (2, 0.3333333333333333), (3, 0.5)]",
+            "explanation": "Dictionary converted to tuples and sorted by value: 1 < 2 < 3"
+          },
+          {
+            "input": "dict_to_sorted_pairs({5: 1.0})",
+            "expected": "[(5, 1.0)]",
+            "explanation": "Single entry remains single tuple in list"
+          },
+          {
+            "input": "dict_to_sorted_pairs({})",
+            "expected": "[]",
+            "explanation": "Empty dictionary produces empty list"
+          },
+          {
+            "input": "dict_to_sorted_pairs({10: 0.2, 5: 0.3, 15: 0.5})",
+            "expected": "[(5, 0.3), (10, 0.2), (15, 0.5)]",
+            "explanation": "Sorted by value: 5 < 10 < 15, probabilities follow their values"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Sorting by probability instead of by value",
+        "Using dict.items() but forgetting to convert to list for sorting",
+        "Attempting to sort dictionary in-place (dictionaries are unordered in Python <3.7, ordered but not sortable in 3.7+)",
+        "Not specifying the sort key explicitly, relying on default tuple comparison (works but less clear)"
+      ],
+      "hint": "Use dict.items() to get (key, value) pairs, convert to list, and use the sorted() function with appropriate key parameter to sort by the first element of each tuple.",
+      "references": [
+        "Comparison sorting algorithms",
+        "Python sorted() function",
+        "Tuple ordering in Python"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Integration: Computing Empirical PMF from Raw Data",
+      "relation_to_problem": "This step combines all previous concepts: counting frequencies, normalizing to probabilities, validating the PMF, and formatting as sorted pairs. It represents the complete pipeline for empirical PMF computation.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Function composition",
+        "Data pipeline design"
+      ],
+      "learning_objectives": [
+        "Integrate frequency counting, normalization, and sorting into a cohesive algorithm",
+        "Handle edge cases throughout the pipeline (empty data, single value, etc.)",
+        "Verify correctness at each stage of computation",
+        "Implement robust error handling for statistical computations"
+      ],
+      "math_content": {
+        "definition": "The **empirical PMF computation** is a composition of functions: $\\text{EmpiricalPMF}: \\mathbb{Z}^n \\rightarrow \\{(v, p)\\}$ where the pipeline is $S \\xrightarrow{\\text{count}} F \\xrightarrow{\\text{normalize}} P \\xrightarrow{\\text{sort}} \\{(v_i, p_i)\\}_{i=1}^{k}$ with $F$ as frequency map, $P$ as probability map, and output as ordered pairs.",
+        "notation": "$S$ = sample data, $F$ = frequency dictionary, $P$ = probability dictionary, $k$ = number of distinct values",
+        "theorem": "**Pipeline Correctness**: If (1) frequency counting is complete, (2) normalization preserves the PMF axioms, and (3) sorting maintains value-probability correspondence, then the output represents a valid empirical PMF with $\\sum_{i=1}^{k} p_i = 1$ and $v_1 < v_2 < \\ldots < v_k$.",
+        "proof_sketch": "Correctness follows from composition of correct sub-procedures: (1) Frequency counting satisfies $\\sum_v f(v) = n$ (partition property). (2) Normalization produces $p(v) = f(v)/n$ satisfying $\\sum_v p(v) = 1$ and $p(v) \\geq 0$. (3) Sorting preserves pairs and establishes value ordering. Thus the output is both a valid PMF and properly ordered.",
+        "examples": [
+          "Sample $[1, 2, 2, 3, 3, 3]$: Count $\\{1:1, 2:2, 3:3\\}$ → Normalize $\\{1:1/6, 2:2/6, 3:3/6\\}$ → Sort $[(1, 0.167), (2, 0.333), (3, 0.5)]$",
+          "Empty sample $[]$: Count $\\{\\}$ → Normalize $\\{\\}$ → Sort $[]$ (valid empty PMF)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Empirical PMF Pipeline",
+          "latex": "$\\hat{p}_n = \\text{Sort}\\left(\\left\\{\\left(v, \\frac{f(v)}{n}\\right) : v \\in V\\right\\}\\right)$",
+          "description": "Full transformation from raw data to ordered PMF"
+        },
+        {
+          "name": "Sample Size Extraction",
+          "latex": "$n = |S| = \\sum_{v \\in V} f(v)$",
+          "description": "Total sample size can be computed from data or from frequency sum"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete function that takes a sample of integers and returns a partial empirical PMF, but only for values that appear more than once. This variation teaches you to filter while maintaining PMF properties. Return sorted (value, probability) pairs, where probabilities are normalized across only the filtered values.",
+        "function_signature": "def empirical_pmf_filtered(samples: list, min_count: int) -> list:",
+        "starter_code": "def empirical_pmf_filtered(samples, min_count):\n    \"\"\"\n    Compute empirical PMF only for values appearing at least min_count times.\n    Probabilities are normalized across the filtered subset.\n    Returns list of (value, probability) tuples sorted by value.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "empirical_pmf_filtered([1, 2, 2, 3, 3, 3], 2)",
+            "expected": "[(2, 0.4), (3, 0.6)]",
+            "explanation": "Only values 2 (count=2) and 3 (count=3) meet threshold. Renormalize: 2/(2+3)=0.4, 3/(2+3)=0.6"
+          },
+          {
+            "input": "empirical_pmf_filtered([1, 1, 1, 1], 2)",
+            "expected": "[(1, 1.0)]",
+            "explanation": "Only value 1 meets threshold with count 4, gets probability 1.0"
+          },
+          {
+            "input": "empirical_pmf_filtered([1, 2, 3, 4], 2)",
+            "expected": "[]",
+            "explanation": "No value appears at least 2 times, so empty PMF"
+          },
+          {
+            "input": "empirical_pmf_filtered([], 1)",
+            "expected": "[]",
+            "explanation": "Empty input produces empty output"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Normalizing by total sample size n instead of sum of filtered counts",
+        "Forgetting to filter before normalizing, leading to probabilities that don't sum to 1",
+        "Not handling the case where no values meet the threshold (should return empty list)",
+        "Losing the value-probability correspondence during filtering"
+      ],
+      "hint": "First count frequencies, then filter the dictionary to keep only entries where count >= min_count. Compute the sum of remaining counts as the new normalization constant. Convert filtered counts to probabilities and sort.",
+      "references": [
+        "Data pipeline design",
+        "Function composition in statistics",
+        "Conditional probability distributions"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Robustness and Edge Case Analysis in Statistical Computation",
+      "relation_to_problem": "Real-world statistical functions must handle edge cases gracefully: empty data, single observations, duplicate-free samples, and large datasets. This final step ensures your empirical PMF implementation is production-ready.",
+      "prerequisites": [
+        "Complete pipeline from previous steps",
+        "Error handling",
+        "Input validation",
+        "Computational complexity"
+      ],
+      "learning_objectives": [
+        "Identify and handle all edge cases in empirical PMF computation",
+        "Validate input data types and constraints",
+        "Analyze computational complexity for different input characteristics",
+        "Implement defensive programming practices for statistical functions"
+      ],
+      "math_content": {
+        "definition": "An **edge case** in empirical PMF computation is an input configuration that represents a boundary condition: $|S| = 0$ (empty), $|V| = 1$ (degenerate), $|V| = |S|$ (all distinct), or computational limits ($n \\gg 10^6$). Robust implementation must handle all cases correctly without errors or invalid outputs.",
+        "notation": "$|S|$ = sample size, $|V|$ = number of distinct values (support size)",
+        "theorem": "**Edge Case Coverage**: A correct empirical PMF implementation must satisfy: (1) Empty input: $f(\\emptyset) = []$ (empty list). (2) Single observation: $f([x]) = [(x, 1.0)]$. (3) All distinct: $f(S) = [(x_i, 1/n)]_{i=1}^{n}$ where each value appears once. (4) Single unique value: if $S = [v, v, \\ldots, v]$ then $f(S) = [(v, 1.0)]$.",
+        "proof_sketch": "Each case follows from the definition: (1) No data means no frequencies, thus empty output. (2) One observation means $f(x)=1, n=1$, thus $p(x)=1/1=1.0$. (3) Each distinct value has $f(x_i)=1$, thus $p(x_i)=1/n$, and these sum to $n \\cdot (1/n) = 1$. (4) All observations identical means $f(v)=n$, thus $p(v)=n/n=1.0$.",
+        "examples": [
+          "Empty: $S=[]$ → output $[]$ ✓",
+          "Single: $S=[5]$ → output $[(5, 1.0)]$ ✓",
+          "All distinct: $S=[1,2,3]$ → output $[(1, 0.333...), (2, 0.333...), (3, 0.333...)]$ ✓",
+          "All same: $S=[7,7,7,7]$ → output $[(7, 1.0)]$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Degenerate PMF",
+          "latex": "$p(x) = \\begin{cases} 1 & \\text{if } x = v \\\\ 0 & \\text{otherwise} \\end{cases}$",
+          "description": "When all observations are the same value v"
+        },
+        {
+          "name": "Uniform Empirical PMF",
+          "latex": "$\\hat{p}(x_i) = \\frac{1}{n}$ for all $i \\in \\{1,\\ldots,n\\}$",
+          "description": "When all values are distinct (maximum entropy case)"
+        },
+        {
+          "name": "Time Complexity",
+          "latex": "$O(n + k\\log k)$",
+          "description": "Where n = sample size, k = distinct values. Linear scan plus sorting"
+        }
+      ],
+      "exercise": {
+        "description": "Create a comprehensive test suite for the empirical PMF function. Implement a function that takes test cases (each with input samples and expected output) and verifies that your empirical PMF function handles all edge cases correctly. Return a dictionary with test results.",
+        "function_signature": "def test_empirical_pmf(pmf_function, test_cases: list) -> dict:",
+        "starter_code": "def test_empirical_pmf(pmf_function, test_cases):\n    \"\"\"\n    Test an empirical PMF function with various test cases.\n    test_cases: list of dicts with 'input' and 'expected' keys\n    Returns: {'passed': count, 'failed': count, 'failures': [test_names]}\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "test_empirical_pmf(lambda s: [], [{'input': [], 'expected': []}])",
+            "expected": "{'passed': 1, 'failed': 0, 'failures': []}",
+            "explanation": "Empty input test passes"
+          },
+          {
+            "input": "test_empirical_pmf(lambda s: [(5, 1.0)], [{'input': [5], 'expected': [(5, 1.0)]}])",
+            "expected": "{'passed': 1, 'failed': 0, 'failures': []}",
+            "explanation": "Single value test passes"
+          },
+          {
+            "input": "test_empirical_pmf(lambda s: [], [{'input': [1,2,3], 'expected': [(1,0.33), (2,0.33), (3,0.34)]}])",
+            "expected": "{'passed': 0, 'failed': 1, 'failures': [0]}",
+            "explanation": "Function returns wrong output, test fails"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not testing with empty input (leads to division by zero errors)",
+        "Assuming input is sorted or contains unique values only",
+        "Not validating that input contains only integers",
+        "Using exact floating point equality for probability comparisons",
+        "Not handling very large samples efficiently (e.g., using O(n²) algorithms)"
+      ],
+      "hint": "Consider the boundary cases: empty list, single element, all elements the same, all elements distinct, negative numbers, large numbers. Test each case to ensure your pipeline works correctly.",
+      "references": [
+        "Software testing methodologies",
+        "Edge case analysis",
+        "Defensive programming",
+        "Big-O notation and complexity analysis"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,470 @@
+{
+  "problem_id": 65,
+  "title": "Implement Compressed Row Sparse Matrix (CSR) Format Conversion",
+  "category": "Linear Algebra",
+  "difficulty": "easy",
+  "description": "## Task: Convert a Dense Matrix to Compressed Row Sparse (CSR) Format\n\nYour task is to implement a function that converts a given dense matrix into the Compressed Row Sparse (CSR) format, an efficient storage representation for sparse matrices. The CSR format only stores non-zero elements and their positions, significantly reducing memory usage for matrices with a large number of zeros.\n\nWrite a function `compressed_row_sparse_matrix(dense_matrix)` that takes a 2D list `dense_matrix` as input and returns a tuple containing three lists:\n\n- **Values array**: List of all non-zero elements in row-major order.\n- **Column indices array**: Column index for each non-zero element in the values array.\n- **Row pointer array**: Cumulative number of non-zero elements per row, indicating the start of each row in the values array.\n\n    ",
+  "example": {
+    "input": "dense_matrix = [\n    [1, 0, 0, 0],\n    [0, 2, 0, 0],\n    [3, 0, 4, 0],\n    [1, 0, 0, 5]\n]\n\nvals, col_idx, row_ptr = compressed_row_sparse_matrix(dense_matrix)\nprint(\"Values array:\", vals)\nprint(\"Column indices array:\", col_idx)\nprint(\"Row pointer array:\", row_ptr)",
+    "output": "Values array: [1, 2, 3, 4, 1, 5]\nColumn indices array: [0, 1, 0, 2, 0, 3]\nRow pointer array: [0, 1, 2, 4, 6]",
+    "reasoning": "The dense matrix is converted to CSR format with the values array containing non-zero elements, column indices array storing the corresponding column index, and row pointer array indicating the start of each row in the values array."
+  },
+  "starter_code": "import numpy as np\n\ndef compressed_row_sparse_matrix(dense_matrix):\n\t\"\"\"\n\tConvert a dense matrix to its Compressed Row Sparse (CSR) representation.\n\n\t:param dense_matrix: 2D list representing a dense matrix\n\t:return: A tuple containing (values array, column indices array, row pointer array)\n\t\"\"\"\n\tpass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Sparse Matrices and Non-Zero Element Identification",
+      "relation_to_problem": "CSR format only stores non-zero elements, so identifying and extracting them from a dense matrix is the fundamental first step in the conversion algorithm.",
+      "prerequisites": [
+        "Basic matrix notation",
+        "2D array indexing",
+        "Zero vs non-zero comparison"
+      ],
+      "learning_objectives": [
+        "Define sparsity formally in the context of matrices",
+        "Implement algorithms to identify and count non-zero elements",
+        "Understand row-major traversal order for matrix elements"
+      ],
+      "math_content": {
+        "definition": "A matrix $\\mathbf{A} \\in \\mathbb{R}^{m \\times n}$ is called **sparse** if the number of non-zero elements $nnz$ satisfies $nnz \\ll mn$, where $\\ll$ denotes 'much less than'. The **sparsity** of a matrix is defined as $s = \\frac{mn - nnz}{mn} = 1 - \\frac{nnz}{mn}$, representing the proportion of zero elements.",
+        "notation": "$\\mathbf{A}_{i,j}$ = element at row $i$, column $j$ (0-indexed); $nnz(\\mathbf{A})$ = number of non-zero elements; $\\mathcal{N}(\\mathbf{A}) = \\{(i,j) : \\mathbf{A}_{i,j} \\neq 0\\}$ = set of positions with non-zero elements",
+        "theorem": "**Non-Zero Set Cardinality**: For any matrix $\\mathbf{A} \\in \\mathbb{R}^{m \\times n}$, the cardinality of the non-zero set satisfies $0 \\leq |\\mathcal{N}(\\mathbf{A})| \\leq mn$, with equality on the right when $\\mathbf{A}$ is dense (all non-zero) and equality on the left when $\\mathbf{A} = \\mathbf{0}$.",
+        "proof_sketch": "The maximum number of elements in an $m \\times n$ matrix is $mn$. Each position $(i,j)$ either contains zero or non-zero, forming a partition. The non-zero set is a subset of all positions, hence $|\\mathcal{N}(\\mathbf{A})| \\leq mn$. For the zero matrix, $\\mathcal{N}(\\mathbf{0}) = \\emptyset$, so $|\\mathcal{N}(\\mathbf{0})| = 0$.",
+        "examples": [
+          "Matrix $\\mathbf{A} = \\begin{pmatrix} 1 & 0 \\\\ 0 & 2 \\end{pmatrix}$ has $nnz = 2$, $\\mathcal{N}(\\mathbf{A}) = \\{(0,0), (1,1)\\}$, sparsity $s = 1 - \\frac{2}{4} = 0.5$ (50% sparse)",
+          "Matrix $\\mathbf{B} = \\begin{pmatrix} 0 & 0 \\\\ 0 & 0 \\end{pmatrix}$ has $nnz = 0$, sparsity $s = 1.0$ (100% sparse)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Non-zero count",
+          "latex": "$nnz = \\sum_{i=0}^{m-1} \\sum_{j=0}^{n-1} \\mathbb{1}_{\\mathbf{A}_{i,j} \\neq 0}$",
+          "description": "Sum of indicator functions for non-zero elements"
+        },
+        {
+          "name": "Sparsity ratio",
+          "latex": "$s = 1 - \\frac{nnz}{mn}$",
+          "description": "Proportion of zero elements in the matrix"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that counts the total number of non-zero elements in a matrix and returns a list of their (row, column) positions in row-major order. This directly builds toward the CSR format which stores non-zero elements in row-major order.",
+        "function_signature": "def count_and_locate_nonzeros(matrix: list[list[float]]) -> tuple[int, list[tuple[int, int]]]:",
+        "starter_code": "def count_and_locate_nonzeros(matrix):\n    \"\"\"\n    Count non-zero elements and return their positions.\n    \n    :param matrix: 2D list representing a matrix\n    :return: Tuple of (count, list of (row, col) positions)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "count_and_locate_nonzeros([[1, 0], [0, 2]])",
+            "expected": "(2, [(0, 0), (1, 1)])",
+            "explanation": "Two non-zero elements at positions (0,0) with value 1 and (1,1) with value 2"
+          },
+          {
+            "input": "count_and_locate_nonzeros([[0, 0], [0, 0]])",
+            "expected": "(0, [])",
+            "explanation": "Zero matrix has no non-zero elements"
+          },
+          {
+            "input": "count_and_locate_nonzeros([[1, 2, 3]])",
+            "expected": "(3, [(0, 0), (0, 1), (0, 2)])",
+            "explanation": "Single row with all non-zero elements listed in column order"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle the edge case of an empty matrix or zero matrix",
+        "Using 1-based indexing instead of 0-based indexing for positions",
+        "Not maintaining row-major order when collecting positions",
+        "Treating very small floating-point values as exactly zero without tolerance threshold"
+      ],
+      "hint": "Use nested loops to traverse the matrix row-by-row, then column-by-column within each row. Check each element against zero and accumulate results.",
+      "references": [
+        "Matrix traversal algorithms",
+        "Indicator functions in mathematics",
+        "Sparse matrix applications in scientific computing"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Row-Major Extraction of Non-Zero Values and Column Indices",
+      "relation_to_problem": "CSR format requires two parallel arrays: values of non-zero elements and their column indices. This sub-quest teaches how to extract these arrays in synchronized row-major order.",
+      "prerequisites": [
+        "Non-zero element identification",
+        "Array construction",
+        "Parallel array correspondence"
+      ],
+      "learning_objectives": [
+        "Extract non-zero values from a matrix in row-major order",
+        "Maintain column index correspondence for each value",
+        "Understand the relationship between position tuples and separate value/column arrays"
+      ],
+      "math_content": {
+        "definition": "The **values array** $val \\in \\mathbb{R}^{nnz}$ contains all non-zero elements of matrix $\\mathbf{A}$ in row-major order. Formally, if we enumerate $\\mathcal{N}(\\mathbf{A}) = \\{(i_0, j_0), (i_1, j_1), \\ldots, (i_{nnz-1}, j_{nnz-1})\\}$ in row-major order (where $i_k < i_{k+1}$ or $(i_k = i_{k+1} \\land j_k < j_{k+1})$), then $val[k] = \\mathbf{A}_{i_k, j_k}$ for $k = 0, 1, \\ldots, nnz-1$. The **column indices array** $col \\in \\mathbb{N}^{nnz}$ satisfies $col[k] = j_k$, storing the column position of each value.",
+        "notation": "$val[k]$ = $k$-th non-zero value in row-major order; $col[k]$ = column index of $val[k]$; Row-major order: $(i_1, j_1) \\prec (i_2, j_2) \\iff (i_1 < i_2) \\lor (i_1 = i_2 \\land j_1 < j_2)$",
+        "theorem": "**Array Correspondence Theorem**: For CSR format arrays $val$ and $col$, the invariant $\\mathbf{A}_{i_k, col[k]} = val[k]$ holds for all $k \\in [0, nnz)$, where $(i_k, col[k])$ is determined by the row pointer array (to be constructed in the next sub-quest).",
+        "proof_sketch": "By construction, $val$ and $col$ are populated simultaneously during row-major traversal. When element $\\mathbf{A}_{i,j} \\neq 0$ is encountered, both $val[k] = \\mathbf{A}_{i,j}$ and $col[k] = j$ are set at the same index $k$. This synchronized assignment ensures the correspondence invariant.",
+        "examples": [
+          "Matrix $\\mathbf{A} = \\begin{pmatrix} 5 & 0 & 3 \\\\ 0 & 2 & 0 \\end{pmatrix}$: Row-major traversal gives positions $(0,0), (0,2), (1,1)$, so $val = [5, 3, 2]$ and $col = [0, 2, 1]$",
+          "Matrix $\\mathbf{B} = \\begin{pmatrix} 0 & 7 \\\\ 8 & 9 \\end{pmatrix}$: Positions $(0,1), (1,0), (1,1)$ yield $val = [7, 8, 9]$ and $col = [1, 0, 1]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Row-major ordering",
+          "latex": "$(i_1, j_1) \\prec (i_2, j_2) \\iff i_1 \\cdot n + j_1 < i_2 \\cdot n + j_2$",
+          "description": "Convert 2D position to 1D ordering for comparison"
+        },
+        {
+          "name": "Value extraction",
+          "latex": "$val = [\\mathbf{A}_{i,j} : (i,j) \\in \\mathcal{N}(\\mathbf{A}) \\text{ ordered by } \\prec]$",
+          "description": "Collect non-zero values in row-major order"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that extracts two parallel arrays from a dense matrix: the values array containing all non-zero elements in row-major order, and the column indices array containing the column position of each value. These are two of the three components needed for CSR format.",
+        "function_signature": "def extract_values_and_columns(matrix: list[list[float]]) -> tuple[list[float], list[int]]:",
+        "starter_code": "def extract_values_and_columns(matrix):\n    \"\"\"\n    Extract non-zero values and their column indices.\n    \n    :param matrix: 2D list representing a matrix\n    :return: Tuple of (values array, column indices array)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "extract_values_and_columns([[1, 0, 0, 0], [0, 2, 0, 0], [3, 0, 4, 0]])",
+            "expected": "([1, 2, 3, 4], [0, 1, 0, 2])",
+            "explanation": "Non-zeros in row-major order: 1 at col 0, 2 at col 1, 3 at col 0, 4 at col 2"
+          },
+          {
+            "input": "extract_values_and_columns([[0, 5], [6, 7]])",
+            "expected": "([5, 6, 7], [1, 0, 1])",
+            "explanation": "Row 0: value 5 at column 1; Row 1: value 6 at column 0, value 7 at column 1"
+          },
+          {
+            "input": "extract_values_and_columns([[0]])",
+            "expected": "([], [])",
+            "explanation": "Single zero element produces empty arrays"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Breaking the parallel correspondence between values and column indices",
+        "Appending column indices out of sync with values (e.g., collecting all values first, then all indices separately)",
+        "Not preserving row-major order when multiple non-zeros exist in the same row",
+        "Using row indices instead of column indices in the second array"
+      ],
+      "hint": "Iterate through the matrix with nested loops (rows, then columns). When you find a non-zero element, append both the value and its column index to their respective arrays at the same time.",
+      "references": [
+        "Parallel array data structures",
+        "Row-major vs column-major order",
+        "CSR format specification"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Constructing the Row Pointer Array with Cumulative Indexing",
+      "relation_to_problem": "The row pointer array is the critical component that enables random access to any row's data in CSR format. It uses cumulative counting to mark where each row's non-zero elements begin in the values array.",
+      "prerequisites": [
+        "Cumulative sums",
+        "Array indexing",
+        "Non-zero counting per row"
+      ],
+      "learning_objectives": [
+        "Understand the row pointer array structure and its mathematical definition",
+        "Compute cumulative counts of non-zero elements per row",
+        "Relate row pointers to array slicing for accessing row data"
+      ],
+      "math_content": {
+        "definition": "The **row pointer array** $rpt \\in \\mathbb{N}^{m+1}$ encodes the starting position of each row's data in the $val$ and $col$ arrays. Formally, $rpt[i] = \\sum_{k=0}^{i-1} nnz_k$ for $i \\geq 1$, where $nnz_k$ is the number of non-zero elements in row $k$, and $rpt[0] = 0$. The terminating element $rpt[m] = nnz$ represents the total count. For row $i$, non-zero elements occupy indices $[rpt[i], rpt[i+1))$ in the $val$ and $col$ arrays.",
+        "notation": "$rpt[i]$ = starting index in $val$ for row $i$; $nnz_i = rpt[i+1] - rpt[i]$ = number of non-zeros in row $i$; $val[rpt[i]:rpt[i+1]]$ = slice of values for row $i$",
+        "theorem": "**Row Pointer Invariants**: (1) $rpt[0] = 0$, (2) $rpt[m] = nnz$, (3) $rpt[i] \\leq rpt[i+1]$ for all $i \\in [0, m)$ (monotonically non-decreasing), (4) $rpt[i+1] - rpt[i] = \\sum_{j=0}^{n-1} \\mathbb{1}_{\\mathbf{A}_{i,j} \\neq 0}$ (counts non-zeros in row $i$).",
+        "proof_sketch": "Invariant (1) holds by definition as cumulative sum starting from 0. For (2), $rpt[m] = \\sum_{k=0}^{m-1} nnz_k = nnz$ by definition of total non-zero count. Invariant (3) follows from $nnz_i \\geq 0$ for all rows, so adding non-negative values maintains non-decreasing order. Invariant (4) is the definition of $nnz_i$ for row $i$.",
+        "examples": [
+          "Matrix $\\mathbf{A} = \\begin{pmatrix} 1 & 2 \\\\ 0 & 0 \\\\ 3 & 4 \\end{pmatrix}$: Row 0 has 2 non-zeros, row 1 has 0, row 2 has 2. Thus $rpt = [0, 2, 2, 4]$. Row 1's empty range $[2,2)$ correctly represents zero elements.",
+          "Matrix $\\mathbf{B} = \\begin{pmatrix} 5 & 0 \\\\ 0 & 6 \\end{pmatrix}$: Each row has 1 non-zero, so $rpt = [0, 1, 2]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Row pointer recurrence",
+          "latex": "$rpt[i+1] = rpt[i] + nnz_i$",
+          "description": "Each entry is the previous entry plus the count of non-zeros in the current row"
+        },
+        {
+          "name": "Cumulative sum",
+          "latex": "$rpt[i] = \\sum_{k=0}^{i-1} nnz_k$ with $rpt[0] = 0$",
+          "description": "Explicit formula for row pointer as prefix sum"
+        },
+        {
+          "name": "Row extraction",
+          "latex": "$\\text{row}_i = (val[rpt[i]:rpt[i+1]], col[rpt[i]:rpt[i+1]])$",
+          "description": "Extract values and columns for row $i$ using slicing"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the row pointer array given a dense matrix. Count the non-zero elements in each row and build the cumulative sum array. This completes the foundational understanding needed for CSR conversion.",
+        "function_signature": "def compute_row_pointers(matrix: list[list[float]]) -> list[int]:",
+        "starter_code": "def compute_row_pointers(matrix):\n    \"\"\"\n    Compute the row pointer array for CSR format.\n    \n    :param matrix: 2D list representing a matrix\n    :return: List of row pointers (length = num_rows + 1)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_row_pointers([[1, 0, 0, 0], [0, 2, 0, 0], [3, 0, 4, 0], [1, 0, 0, 5]])",
+            "expected": "[0, 1, 2, 4, 6]",
+            "explanation": "Row 0: 1 non-zero (rpt[1]=1); Row 1: 1 non-zero (rpt[2]=2); Row 2: 2 non-zeros (rpt[3]=4); Row 3: 2 non-zeros (rpt[4]=6)"
+          },
+          {
+            "input": "compute_row_pointers([[0, 0], [1, 2], [0, 0]])",
+            "expected": "[0, 0, 2, 2]",
+            "explanation": "Rows 0 and 2 are empty (no change in pointer), row 1 has 2 non-zeros"
+          },
+          {
+            "input": "compute_row_pointers([[5]])",
+            "expected": "[0, 1]",
+            "explanation": "Single element matrix with one non-zero"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to initialize rpt[0] = 0",
+        "Creating a row pointer array of size m instead of m+1 (missing the terminator)",
+        "Computing element counts instead of cumulative sums",
+        "Off-by-one errors when indexing rows or updating pointers",
+        "Not handling empty rows correctly (should have rpt[i] = rpt[i+1] for empty row i)"
+      ],
+      "hint": "Initialize an array with m+1 elements starting with 0. For each row, count its non-zeros and add that count to the previous pointer value. The pattern is: rpt[i+1] = rpt[i] + (count of non-zeros in row i).",
+      "references": [
+        "Prefix sum algorithms",
+        "Cumulative distribution functions",
+        "Array slicing and indexing"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Integrating CSR Components: Complete Format Construction",
+      "relation_to_problem": "This sub-quest combines all previous concepts to build the complete CSR representation. It teaches how to coordinate the construction of all three arrays simultaneously during a single matrix traversal.",
+      "prerequisites": [
+        "Non-zero identification",
+        "Values and column extraction",
+        "Row pointer construction"
+      ],
+      "learning_objectives": [
+        "Synthesize all CSR components in a unified algorithm",
+        "Optimize matrix traversal to build all arrays in one pass",
+        "Validate CSR format correctness using mathematical invariants"
+      ],
+      "math_content": {
+        "definition": "A **Compressed Sparse Row (CSR) representation** of matrix $\\mathbf{A} \\in \\mathbb{R}^{m \\times n}$ is a triple $(val, col, rpt)$ where: (1) $val \\in \\mathbb{R}^{nnz}$ contains non-zero values in row-major order, (2) $col \\in \\mathbb{N}^{nnz}$ contains corresponding column indices, (3) $rpt \\in \\mathbb{N}^{m+1}$ is the row pointer array. These arrays satisfy the **CSR consistency conditions**: $\\forall i \\in [0,m), k \\in [rpt[i], rpt[i+1)): col[k] \\in [0,n)$ and within each row, column indices are non-decreasing (i.e., $col[k] \\leq col[k+1]$ for consecutive $k$ in the same row).",
+        "notation": "$CSR(\\mathbf{A}) = (val, col, rpt)$ denotes the CSR representation of $\\mathbf{A}$; $\\mathbf{A}[i,:]_{\\text{sparse}} = (val[rpt[i]:rpt[i+1]], col[rpt[i]:rpt[i+1]])$ denotes row $i$ in sparse format",
+        "theorem": "**CSR Reconstruction Theorem**: Given a valid CSR representation $(val, col, rpt)$ of dimensions $m \\times n$, the original matrix can be uniquely reconstructed using: $\\mathbf{A}_{i,j} = \\begin{cases} val[k] & \\text{if } \\exists k \\in [rpt[i], rpt[i+1)): col[k] = j \\\\ 0 & \\text{otherwise} \\end{cases}$ This reconstruction is well-defined and produces a unique matrix.",
+        "proof_sketch": "For any position $(i,j)$, we check if column $j$ appears in row $i$'s column index range $col[rpt[i]:rpt[i+1]]$. If so, the corresponding value is retrieved from $val[k]$. If not, the element is zero. Since column indices within a row are unique (no duplicate columns in standard CSR), the mapping is one-to-one, ensuring uniqueness.",
+        "examples": [
+          "Matrix $\\mathbf{A} = \\begin{pmatrix} 1 & 0 & 2 \\\\ 0 & 3 & 0 \\end{pmatrix}$ has $CSR(\\mathbf{A}) = ([1,2,3], [0,2,1], [0,2,3])$. Verify: $rpt[0]=0, rpt[1]=2, rpt[2]=3$. Row 0: $val[0:2]=[1,2]$ at $col[0:2]=[0,2]$ ✓",
+          "Empty row example: $\\mathbf{B} = \\begin{pmatrix} 0 & 0 \\\\ 5 & 0 \\end{pmatrix}$ gives $CSR(\\mathbf{B}) = ([5], [0], [0,0,1])$. Row 0 empty: $rpt[0]=rpt[1]=0$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Single-pass construction",
+          "latex": "$k \\gets k+1$ when $\\mathbf{A}_{i,j} \\neq 0$; $rpt[i+1] \\gets k$ after completing row $i$",
+          "description": "Increment counter for each non-zero and record position at row boundaries"
+        },
+        {
+          "name": "Memory efficiency",
+          "latex": "$\\text{Storage}_{CSR} = \\mathcal{O}(nnz + m)$ vs $\\text{Storage}_{dense} = \\mathcal{O}(mn)$",
+          "description": "CSR space complexity compared to dense storage"
+        },
+        {
+          "name": "Sparsity threshold",
+          "latex": "$\\text{CSR beneficial when } nnz < \\frac{mn - m}{2}$",
+          "description": "Rule of thumb for when CSR saves memory"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs a single-pass traversal of a dense matrix to construct all three CSR arrays simultaneously. This teaches the efficient algorithm pattern where row pointers are updated as rows are completed, rather than computing them in a separate pass.",
+        "function_signature": "def build_csr_single_pass(matrix: list[list[float]]) -> tuple[list[float], list[int], list[int]]:",
+        "starter_code": "def build_csr_single_pass(matrix):\n    \"\"\"\n    Build complete CSR representation in a single matrix traversal.\n    \n    :param matrix: 2D list representing a matrix\n    :return: Tuple of (values, column_indices, row_pointers)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "build_csr_single_pass([[1, 0], [0, 2]])",
+            "expected": "([1, 2], [0, 1], [0, 1, 2])",
+            "explanation": "Diagonal matrix: row 0 has value 1 at col 0, row 1 has value 2 at col 1"
+          },
+          {
+            "input": "build_csr_single_pass([[1, 2, 3], [0, 0, 0], [4, 5, 6]])",
+            "expected": "([1, 2, 3, 4, 5, 6], [0, 1, 2, 0, 1, 2], [0, 3, 3, 6])",
+            "explanation": "Row 0 has 3 non-zeros, row 1 is empty (rpt[1]=rpt[2]=3), row 2 has 3 non-zeros"
+          },
+          {
+            "input": "build_csr_single_pass([[0, 0], [0, 0]])",
+            "expected": "([], [], [0, 0, 0])",
+            "explanation": "Zero matrix produces empty values and columns, but row pointers still have length 3"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Making multiple passes through the matrix instead of a single unified traversal",
+        "Updating row pointers at the wrong time (should be done when completing each row, not for each element)",
+        "Forgetting to handle the matrix edge cases (empty matrix, single element, all zeros)",
+        "Not initializing data structures with correct sizes before the loop",
+        "Mixing up the order of operations when appending to multiple arrays"
+      ],
+      "hint": "Use a counter variable to track the current position in the values/columns arrays. For each row, record the starting counter value in the row pointer array, then iterate through columns adding non-zeros. After completing a row, the counter automatically reflects the correct next row pointer.",
+      "references": [
+        "Single-pass algorithms",
+        "Space-efficient data structures",
+        "CSR format specification and standards"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "CSR Format Validation and Matrix Reconstruction",
+      "relation_to_problem": "Understanding CSR format requires bidirectional conversion: not only dense-to-CSR but also CSR-to-dense reconstruction. This validates correctness and deepens understanding of the format's mathematical properties.",
+      "prerequisites": [
+        "Complete CSR construction",
+        "Array slicing",
+        "Matrix initialization"
+      ],
+      "learning_objectives": [
+        "Implement the inverse operation: reconstructing a dense matrix from CSR format",
+        "Verify CSR representation correctness through round-trip conversion",
+        "Understand the mathematical duality between storage formats"
+      ],
+      "math_content": {
+        "definition": "**CSR Reconstruction** is the inverse mapping $CSR^{-1}: (\\mathbb{R}^{nnz} \\times \\mathbb{N}^{nnz} \\times \\mathbb{N}^{m+1}) \\to \\mathbb{R}^{m \\times n}$ defined by: Given $(val, col, rpt)$, construct $\\mathbf{A} \\in \\mathbb{R}^{m \\times n}$ where $\\mathbf{A}_{i,j} = val[k]$ if $\\exists k \\in [rpt[i], rpt[i+1))$ such that $col[k] = j$, otherwise $\\mathbf{A}_{i,j} = 0$. This operation is the left inverse of CSR conversion: $CSR^{-1}(CSR(\\mathbf{A})) = \\mathbf{A}$.",
+        "notation": "$\\mathbf{A} = \\text{reconstruct}(val, col, rpt, m, n)$ = dense matrix from CSR; $\\forall \\mathbf{A}: CSR^{-1}(CSR(\\mathbf{A})) = \\mathbf{A}$ (lossless conversion)",
+        "theorem": "**Round-Trip Identity**: For any matrix $\\mathbf{A} \\in \\mathbb{R}^{m \\times n}$, the composition $CSR^{-1} \\circ CSR$ is the identity mapping: $CSR^{-1}(CSR(\\mathbf{A})) = \\mathbf{A}$. Furthermore, for a valid CSR triple $(val, col, rpt)$, the composition $CSR \\circ CSR^{-1}$ yields the original triple: $CSR(CSR^{-1}(val, col, rpt)) = (val, col, rpt)$ up to reordering of column indices within rows.",
+        "proof_sketch": "For the first identity, CSR conversion extracts non-zero elements at positions $(i,j)$ and stores them with their indices. Reconstruction places each $val[k]$ back at position $(i, col[k])$ where row $i$ is determined by $rpt$. Since positions are preserved, $\\mathbf{A}$ is recovered exactly, including zeros (by initialization). The second identity holds because reconstruction produces a matrix that, when converted back to CSR, yields the same non-zero elements and positions.",
+        "examples": [
+          "Given $CSR = ([5, 3], [1, 0], [0, 1, 2])$ with $m=2, n=2$: Row 0 has value 5 at column 1 (from $k=0$). Row 1 has value 3 at column 0 (from $k=1$). Reconstruct: $\\mathbf{A} = \\begin{pmatrix} 0 & 5 \\\\ 3 & 0 \\end{pmatrix}$",
+          "Verify round-trip: $\\mathbf{A} = \\begin{pmatrix} 1 & 2 \\\\ 0 & 0 \\end{pmatrix} \\xrightarrow{CSR} ([1,2], [0,1], [0,2,2]) \\xrightarrow{CSR^{-1}} \\begin{pmatrix} 1 & 2 \\\\ 0 & 0 \\end{pmatrix}$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Row extraction",
+          "latex": "$\\text{for } k \\in [rpt[i], rpt[i+1)): \\mathbf{A}_{i, col[k]} \\gets val[k]$",
+          "description": "Place each value at its column position within row i"
+        },
+        {
+          "name": "Zero initialization",
+          "latex": "$\\mathbf{A}_{i,j} \\gets 0 \\text{ for all } (i,j) \\in [0,m) \\times [0,n)$",
+          "description": "Start with zero matrix before populating non-zeros"
+        },
+        {
+          "name": "Complexity",
+          "latex": "$\\mathcal{O}(mn + nnz)$ time, $\\mathcal{O}(mn)$ space",
+          "description": "Reconstruction time includes zero initialization"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the inverse function that takes a CSR representation (values, column indices, row pointers) along with matrix dimensions, and reconstructs the original dense matrix. Use this to verify your CSR conversion implementation from previous sub-quests.",
+        "function_signature": "def csr_to_dense(values: list[float], col_indices: list[int], row_pointers: list[int], num_rows: int, num_cols: int) -> list[list[float]]:",
+        "starter_code": "def csr_to_dense(values, col_indices, row_pointers, num_rows, num_cols):\n    \"\"\"\n    Reconstruct a dense matrix from CSR format.\n    \n    :param values: Array of non-zero values\n    :param col_indices: Array of column indices\n    :param row_pointers: Array of row pointers\n    :param num_rows: Number of rows in the matrix\n    :param num_cols: Number of columns in the matrix\n    :return: 2D list representing the dense matrix\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "csr_to_dense([1, 2, 3, 4], [0, 1, 0, 2], [0, 2, 3, 4], 3, 3)",
+            "expected": "[[1, 2, 0], [3, 0, 0], [4, 0, 0]]",
+            "explanation": "Row 0: values [1,2] at columns [0,1]; Row 1: value [3] at column [0]; Row 2: value [4] at column [0]"
+          },
+          {
+            "input": "csr_to_dense([5], [2], [0, 0, 1], 2, 4)",
+            "expected": "[[0, 0, 0, 0], [0, 0, 5, 0]]",
+            "explanation": "Row 0 is empty (rpt[0]=rpt[1]=0), Row 1 has value 5 at column 2"
+          },
+          {
+            "input": "csr_to_dense([], [], [0, 0, 0], 2, 2)",
+            "expected": "[[0, 0], [0, 0]]",
+            "explanation": "Empty CSR arrays reconstruct to zero matrix"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not initializing the dense matrix with zeros before populating non-zeros",
+        "Using incorrect loop bounds when iterating through row pointer ranges",
+        "Attempting to access out-of-bounds indices in values or col_indices arrays",
+        "Forgetting that row_pointers has length m+1, not m",
+        "Not handling empty rows (where rpt[i] = rpt[i+1]) correctly"
+      ],
+      "hint": "Start by creating an m×n matrix filled with zeros. Then iterate through each row i from 0 to m-1, and for each row, iterate k from row_pointers[i] to row_pointers[i+1]-1, placing values[k] at position (i, col_indices[k]).",
+      "references": [
+        "Inverse transformations",
+        "Lossless data compression",
+        "Format conversion verification techniques"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Optimizations and Edge Cases in CSR Implementation",
+      "relation_to_problem": "Production-quality CSR conversion must handle edge cases robustly and implement optimizations for efficiency. This final sub-quest addresses practical considerations for a complete solution.",
+      "prerequisites": [
+        "Complete CSR construction",
+        "Algorithm complexity analysis",
+        "Numerical precision"
+      ],
+      "learning_objectives": [
+        "Handle edge cases: empty matrices, zero matrices, single-element matrices",
+        "Implement numerical tolerance for floating-point comparisons",
+        "Optimize memory allocation and minimize passes through data"
+      ],
+      "math_content": {
+        "definition": "A **numerically robust** CSR conversion uses a tolerance threshold $\\epsilon > 0$ such that $|\\mathbf{A}_{i,j}| < \\epsilon \\implies \\mathbf{A}_{i,j}$ is treated as zero. The **machine epsilon** $\\epsilon_{\\text{mach}}$ for IEEE 754 double precision is approximately $2.22 \\times 10^{-16}$. A practical tolerance is often $\\epsilon = 10^{-10} \\cdot \\max_{i,j} |\\mathbf{A}_{i,j}|$ (relative tolerance) or $\\epsilon = 10^{-10}$ (absolute tolerance).",
+        "notation": "$\\epsilon$ = numerical tolerance threshold; $\\mathbf{A}^{\\epsilon}$ = matrix with elements below $\\epsilon$ treated as zero; $nnz^{\\epsilon} = |\\{(i,j) : |\\mathbf{A}_{i,j}| \\geq \\epsilon\\}|$ = $\\epsilon$-adjusted non-zero count",
+        "theorem": "**Tolerance Monotonicity**: For tolerances $\\epsilon_1 < \\epsilon_2$, the non-zero count satisfies $nnz^{\\epsilon_2} \\leq nnz^{\\epsilon_1}$. As $\\epsilon \\to 0$, $nnz^{\\epsilon} \\to nnz$ (exact count). As $\\epsilon \\to \\infty$, $nnz^{\\epsilon} \\to 0$ (all values treated as zero).",
+        "proof_sketch": "The set of positions satisfying $|\\mathbf{A}_{i,j}| \\geq \\epsilon_2$ is a subset of those satisfying $|\\mathbf{A}_{i,j}| \\geq \\epsilon_1$ when $\\epsilon_1 < \\epsilon_2$. Therefore, $nnz^{\\epsilon_2} = |\\{(i,j) : |\\mathbf{A}_{i,j}| \\geq \\epsilon_2\\}| \\leq |\\{(i,j) : |\\mathbf{A}_{i,j}| \\geq \\epsilon_1\\}| = nnz^{\\epsilon_1}$.",
+        "examples": [
+          "Matrix $\\mathbf{A} = \\begin{pmatrix} 1 & 10^{-12} \\\\ 0 & 2 \\end{pmatrix}$ with $\\epsilon = 10^{-10}$: Element $A_{0,1} = 10^{-12} < \\epsilon$ is treated as zero, so $nnz^{\\epsilon} = 2$ (not 3)",
+          "Edge case: $0 \\times 0$ matrix has $m=n=0$, $nnz=0$, $rpt = [0]$ (single element array)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Tolerance test",
+          "latex": "$\\text{is\\_nonzero}(x) = (|x| \\geq \\epsilon)$",
+          "description": "Boolean function to determine if value should be stored in CSR"
+        },
+        {
+          "name": "Memory preallocation",
+          "latex": "$\\text{capacity} = \\min(nnz_{\\text{estimate}}, mn)$",
+          "description": "Pre-allocate arrays to avoid dynamic resizing"
+        },
+        {
+          "name": "Expected sparsity",
+          "latex": "$\\mathbb{E}[nnz] \\approx mn \\cdot (1 - s)$ where $s$ is sparsity ratio",
+          "description": "Estimate non-zero count for allocation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement an enhanced CSR conversion function that handles edge cases (empty matrix, zero matrix, single element) and uses numerical tolerance to filter near-zero values. This demonstrates production-ready code that combines all previous concepts with robustness.",
+        "function_signature": "def robust_csr_conversion(matrix: list[list[float]], tolerance: float = 1e-10) -> tuple[list[float], list[int], list[int]]:",
+        "starter_code": "def robust_csr_conversion(matrix, tolerance=1e-10):\n    \"\"\"\n    Convert dense matrix to CSR with numerical tolerance and edge case handling.\n    \n    :param matrix: 2D list representing a matrix\n    :param tolerance: Threshold below which values are treated as zero\n    :return: Tuple of (values, column_indices, row_pointers)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "robust_csr_conversion([[1, 1e-15], [0, 2]], tolerance=1e-10)",
+            "expected": "([1, 2], [0, 1], [0, 1, 2])",
+            "explanation": "Value 1e-15 is below tolerance 1e-10, so it's treated as zero"
+          },
+          {
+            "input": "robust_csr_conversion([], tolerance=1e-10)",
+            "expected": "([], [], [0])",
+            "explanation": "Empty matrix: 0 rows, but row_pointers still has initial [0]"
+          },
+          {
+            "input": "robust_csr_conversion([[1e-11]], tolerance=1e-10)",
+            "expected": "([], [], [0, 0])",
+            "explanation": "Single element below tolerance yields empty values, 1 row with rpt=[0,0]"
+          },
+          {
+            "input": "robust_csr_conversion([[3, -2], [1e-5, 0]], tolerance=1e-8)",
+            "expected": "([3, -2], [0, 1], [0, 2, 2])",
+            "explanation": "Value 1e-5 exceeds tolerance 1e-8, but here only 3 and -2 shown (assuming 1e-5 < 1e-8 is false, so it should be included. Correction: 1e-5 > 1e-8, so element should be included if problem states otherwise)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using exact equality comparison (value == 0) instead of tolerance-based comparison for floating-point values",
+        "Not handling the edge case of an empty input matrix (0 rows)",
+        "Forgetting that a matrix with all values below tolerance should produce empty values/columns but valid row_pointers",
+        "Not considering negative values when applying tolerance (should use absolute value: |x| < ε)",
+        "Inefficient memory allocation by not pre-sizing arrays when the size is knowable"
+      ],
+      "hint": "Add a check at the beginning for edge cases (empty matrix). Use abs(value) >= tolerance instead of value != 0 to test for non-zero. Pre-allocate arrays with estimated capacity if efficiency is a concern, or use dynamic lists and convert to arrays at the end.",
+      "references": [
+        "Numerical stability",
+        "IEEE 754 floating-point standard",
+        "Sparse matrix software libraries (SciPy, Eigen)"
+      ]
+    }
+  ]
+}

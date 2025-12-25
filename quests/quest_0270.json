@@ -1,0 +1,466 @@
+{
+  "problem_id": 270,
+  "title": "ML Pipeline DAG Scheduler with Critical Path Analysis",
+  "category": "MLOps",
+  "difficulty": "hard",
+  "description": "In production MLOps systems, ML pipelines consist of multiple interdependent tasks (data loading, feature engineering, training, evaluation, etc.) organized as a Directed Acyclic Graph (DAG). Understanding task dependencies, execution order, and the critical path is essential for pipeline optimization and resource allocation.\n\nGiven a list of pipeline tasks where each task has an ID, duration, and list of dependencies (task IDs that must complete before this task can start), implement a function `analyze_ml_pipeline(tasks)` that performs complete pipeline analysis.\n\nThe function should compute:\n\n1. **Execution Order**: A valid topological ordering of tasks (use alphabetical ordering when multiple tasks are available)\n\n2. **Earliest Start/Finish Times**: For each task, the earliest possible start and finish times assuming tasks start as soon as dependencies complete\n\n3. **Latest Start/Finish Times**: For each task, the latest times the task can start/finish without delaying the overall pipeline\n\n4. **Slack Time**: For each task, the amount of time the task can be delayed without affecting the makespan\n\n5. **Critical Path**: The sequence of tasks with zero slack that determines the minimum pipeline duration\n\n6. **Makespan**: The total time required to complete all tasks\n\nIf the input is empty, return a result with empty collections and makespan of 0. Assume the input DAG has no cycles.",
+  "example": {
+    "input": "tasks = [{'id': 'start', 'duration': 2, 'dependencies': []}, {'id': 'left', 'duration': 5, 'dependencies': ['start']}, {'id': 'right', 'duration': 10, 'dependencies': ['start']}, {'id': 'end', 'duration': 3, 'dependencies': ['left', 'right']}]",
+    "output": "{'execution_order': ['start', 'left', 'right', 'end'], 'earliest_start': {'start': 0, 'left': 2, 'right': 2, 'end': 12}, 'earliest_finish': {'start': 2, 'left': 7, 'right': 12, 'end': 15}, 'latest_start': {'start': 0, 'left': 7, 'right': 2, 'end': 12}, 'latest_finish': {'start': 2, 'left': 12, 'right': 12, 'end': 15}, 'slack': {'start': 0, 'left': 5, 'right': 0, 'end': 0}, 'critical_path': ['start', 'right', 'end'], 'makespan': 15}",
+    "reasoning": "The pipeline forms a diamond: start splits into left (5min) and right (10min) branches, both merging at end. Forward pass: start finishes at t=2, left at t=7, right at t=12, end waits for both so starts at t=12 and finishes at t=15. Backward pass from makespan=15: end must finish by 15 (LS=12), right must finish by 12 (LS=2), left can finish as late as 12 (LS=7, slack=5). Critical path follows zero-slack tasks: start->right->end."
+  },
+  "starter_code": "def analyze_ml_pipeline(tasks: list) -> dict:\n    \"\"\"\n    Analyze an ML pipeline DAG for scheduling and critical path.\n    \n    Args:\n        tasks: list of task dicts with:\n            - 'id': task identifier (str)\n            - 'duration': task duration in minutes (int)\n            - 'dependencies': list of task IDs this task depends on\n    \n    Returns:\n        dict with:\n            - 'execution_order': topologically sorted list of task IDs\n            - 'earliest_start': dict mapping task ID to earliest start time\n            - 'earliest_finish': dict mapping task ID to earliest finish time\n            - 'latest_start': dict mapping task ID to latest start time\n            - 'latest_finish': dict mapping task ID to latest finish time\n            - 'slack': dict mapping task ID to slack time\n            - 'critical_path': list of task IDs on critical path (in execution order)\n            - 'makespan': total time to complete pipeline\n    \"\"\"\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Directed Acyclic Graphs and In-Degree Calculation",
+      "relation_to_problem": "Understanding DAG structure and in-degree is the foundation for topological sorting, which determines valid execution order of pipeline tasks",
+      "prerequisites": [
+        "Basic graph theory",
+        "Python dictionaries and lists",
+        "Set operations"
+      ],
+      "learning_objectives": [
+        "Define directed acyclic graphs formally and understand their properties",
+        "Compute in-degree for each vertex in a directed graph",
+        "Build adjacency list representation from dependency specifications",
+        "Identify source nodes (in-degree 0) that can execute immediately"
+      ],
+      "math_content": {
+        "definition": "A **Directed Acyclic Graph (DAG)** is a directed graph $G = (V, E)$ where $V$ is a set of vertices and $E \\subseteq V \\times V$ is a set of directed edges, such that there exists no directed cycle. Formally, there is no sequence of vertices $v_1, v_2, \\ldots, v_k$ where $(v_i, v_{i+1}) \\in E$ for all $i \\in [1, k-1]$ and $(v_k, v_1) \\in E$.",
+        "notation": "$G = (V, E)$ represents a graph with vertex set $V$ and edge set $E$. For a directed edge $(u, v) \\in E$, we say $u$ is a **predecessor** of $v$ and $v$ is a **successor** of $u$. The **in-degree** of vertex $v$ is $\\text{deg}^{-}(v) = |\\{u \\in V : (u, v) \\in E\\}|$.",
+        "theorem": "**Theorem (DAG Property)**: A directed graph $G = (V, E)$ is acyclic if and only if it admits a topological ordering. **Proof sketch**: ($\\Rightarrow$) If $G$ is acyclic, we can repeatedly remove vertices with in-degree 0 (such vertices must exist in any acyclic graph) to construct a topological order. ($\\Leftarrow$) If a topological order exists, any edge $(u, v)$ satisfies $u < v$ in the ordering, so following edges forward never returns to a previous vertex, preventing cycles.",
+        "proof_sketch": "To show every DAG has a vertex with in-degree 0: Assume for contradiction all vertices have in-degree ≥ 1. Start at any vertex $v_0$. Since $\\text{deg}^{-}(v_0) \\geq 1$, there exists $v_1$ with edge $(v_1, v_0)$. Continue building sequence $\\ldots v_2 \\to v_1 \\to v_0$. Since $|V|$ is finite, we must revisit some vertex, creating a cycle—contradiction.",
+        "examples": [
+          "**Example 1**: Graph with edges $\\{(A, B), (A, C), (B, D), (C, D)\\}$ has in-degrees: $A: 0, B: 1, C: 1, D: 2$. Vertex $A$ is the only source.",
+          "**Example 2**: For ML pipeline tasks $\\{(\\text{load}, \\text{preprocess}), (\\text{preprocess}, \\text{train}), (\\text{preprocess}, \\text{validate})\\}$, in-degrees are: load: 0, preprocess: 1, train: 1, validate: 1."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "In-Degree Formula",
+          "latex": "$\\text{deg}^{-}(v) = |\\{u \\in V : (u, v) \\in E\\}|$",
+          "description": "Count the number of incoming edges to vertex $v$. Used to identify which tasks are ready to execute (in-degree 0 means all dependencies satisfied)."
+        },
+        {
+          "name": "Source Node Condition",
+          "latex": "$S = \\{v \\in V : \\text{deg}^{-}(v) = 0\\}$",
+          "description": "The set of source nodes with no dependencies. These tasks can start immediately in the pipeline."
+        }
+      ],
+      "exercise": {
+        "description": "Given a list of tasks with dependencies, build the graph structure and compute the in-degree for each task. Return a dictionary mapping each task ID to its in-degree and identify all source tasks (tasks with no dependencies).",
+        "function_signature": "def compute_in_degrees(tasks: list) -> dict:",
+        "starter_code": "def compute_in_degrees(tasks: list) -> dict:\n    \"\"\"\n    Compute in-degree for each task in the pipeline.\n    \n    Args:\n        tasks: list of dicts with 'id', 'duration', 'dependencies'\n    \n    Returns:\n        dict with:\n            - 'in_degrees': dict mapping task_id to in-degree count\n            - 'sources': list of task IDs with in-degree 0\n            - 'graph': dict mapping task_id to list of dependent task IDs\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_in_degrees([{'id': 'A', 'duration': 1, 'dependencies': []}, {'id': 'B', 'duration': 2, 'dependencies': ['A']}, {'id': 'C', 'duration': 3, 'dependencies': ['A', 'B']}])",
+            "expected": "{'in_degrees': {'A': 0, 'B': 1, 'C': 2}, 'sources': ['A'], 'graph': {'A': ['B', 'C'], 'B': ['C'], 'C': []}}",
+            "explanation": "Task A has no dependencies (in-degree 0), B depends on A (in-degree 1), C depends on both A and B (in-degree 2). The graph adjacency list shows A points to B and C, B points to C."
+          },
+          {
+            "input": "compute_in_degrees([{'id': 'load', 'duration': 5, 'dependencies': []}, {'id': 'process', 'duration': 10, 'dependencies': ['load']}])",
+            "expected": "{'in_degrees': {'load': 0, 'process': 1}, 'sources': ['load'], 'graph': {'load': ['process'], 'process': []}}",
+            "explanation": "Simple two-task pipeline where 'load' is the source and 'process' depends on it."
+          },
+          {
+            "input": "compute_in_degrees([])",
+            "expected": "{'in_degrees': {}, 'sources': [], 'graph': {}}",
+            "explanation": "Empty pipeline returns empty structures."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing in-degree with out-degree (in-degree counts incoming edges, out-degree counts outgoing)",
+        "Forgetting to initialize in-degree to 0 for source nodes with no dependencies",
+        "Not building the adjacency list (graph structure) needed for later traversal",
+        "Assuming there's only one source node—there can be multiple independent starting tasks"
+      ],
+      "hint": "Iterate through all tasks twice: first to initialize the in-degree counter for each task to 0, then to increment counters based on dependencies.",
+      "references": [
+        "Graph Theory: In-degree and Out-degree",
+        "Adjacency List Representation",
+        "DAG properties and applications"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Kahn's Algorithm for Topological Sorting",
+      "relation_to_problem": "Topological sorting produces a valid execution order for pipeline tasks, ensuring all dependencies are satisfied before a task executes",
+      "prerequisites": [
+        "DAG definition and in-degree calculation",
+        "Queue data structure",
+        "Graph traversal basics"
+      ],
+      "learning_objectives": [
+        "Understand topological ordering and its uniqueness properties",
+        "Implement Kahn's algorithm for topological sorting",
+        "Handle tie-breaking when multiple tasks are ready simultaneously",
+        "Verify correctness of topological sort"
+      ],
+      "math_content": {
+        "definition": "A **topological ordering** of a directed graph $G = (V, E)$ is a linear ordering $\\prec$ of vertices such that for every directed edge $(u, v) \\in E$, vertex $u$ comes before $v$ in the ordering (i.e., $u \\prec v$). Formally, it is a bijection $f: V \\to \\{1, 2, \\ldots, |V|\\}$ such that $(u, v) \\in E \\Rightarrow f(u) < f(v)$.",
+        "notation": "Let $\\text{topo}(G)$ denote a topological ordering of $G$. We write $u \\prec v$ to mean $u$ appears before $v$ in the ordering. The notation $\\text{deg}^{-}(v)$ represents the current in-degree during algorithm execution.",
+        "theorem": "**Kahn's Algorithm Correctness**: Kahn's algorithm produces a valid topological ordering for any DAG $G = (V, E)$ in $O(V + E)$ time. **Proof**: (1) **Invariant**: At each step, all vertices in the output list have all their predecessors already processed. (2) **Termination**: Since we only add vertices when in-degree becomes 0, we never add a vertex before its dependencies. (3) **Completeness**: In a DAG, there always exists a vertex with in-degree 0 among unprocessed vertices (otherwise there would be a cycle).",
+        "proof_sketch": "**Correctness**: When we add vertex $v$ to the result, $\\text{deg}^{-}(v) = 0$ means all edges $(u, v)$ have had $u$ already processed. Thus $u \\prec v$ for all predecessors $u$. **Complexity**: Each vertex is enqueued once ($O(V)$), and each edge is examined once when decrementing in-degrees ($O(E)$), giving $O(V + E)$ total time.",
+        "examples": [
+          "**Example 1**: DAG with edges $\\{(1, 2), (1, 3), (2, 4), (3, 4)\\}$. Initial in-degrees: $[1:0, 2:1, 3:1, 4:2]$. Process: Start with 1 (in-degree 0), output [1], decrement neighbors: $[2:0, 3:0, 4:2]$. Choose 2 (alphabetically first), output [1,2], decrement: $[3:0, 4:1]$. Choose 3, output [1,2,3], decrement: $[4:0]$. Choose 4, output [1,2,3,4]. Valid topological order: [1,2,3,4].",
+          "**Example 2**: ML pipeline with 'load' → 'featurize' → 'train' and 'load' → 'validate'. After processing 'load', both 'featurize' and 'validate' have in-degree 0. Alphabetical tie-breaking gives: ['load', 'featurize', 'validate', 'train'] (assuming 'train' depends only on 'featurize')."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "In-Degree Update Rule",
+          "latex": "$\\text{deg}^{-}(v) \\gets \\text{deg}^{-}(v) - 1 \\text{ when predecessor } u \\text{ is processed}$",
+          "description": "After processing a vertex $u$, decrement the in-degree of all its successors. When in-degree reaches 0, the vertex is ready to process."
+        },
+        {
+          "name": "Algorithm Invariant",
+          "latex": "$\\forall v \\in \\text{output}, \\forall (u, v) \\in E: u \\in \\text{output} \\land u \\prec v$",
+          "description": "At any point, all vertices in the output list have all their predecessors already in the output, maintaining topological order."
+        }
+      ],
+      "exercise": {
+        "description": "Implement Kahn's algorithm to produce a topological ordering of tasks. When multiple tasks have in-degree 0 simultaneously, use alphabetical ordering to break ties (this ensures deterministic output). Return the execution order as a list of task IDs.",
+        "function_signature": "def topological_sort(tasks: list) -> list:",
+        "starter_code": "def topological_sort(tasks: list) -> list:\n    \"\"\"\n    Compute topological ordering of tasks using Kahn's algorithm.\n    \n    Args:\n        tasks: list of dicts with 'id', 'duration', 'dependencies'\n    \n    Returns:\n        list of task IDs in topological (execution) order\n        (use alphabetical ordering when multiple tasks are ready)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "topological_sort([{'id': 'A', 'duration': 1, 'dependencies': []}, {'id': 'B', 'duration': 2, 'dependencies': ['A']}, {'id': 'C', 'duration': 3, 'dependencies': ['A']}])",
+            "expected": "['A', 'B', 'C']",
+            "explanation": "A has no dependencies so executes first. After A completes, both B and C have in-degree 0. Alphabetically B comes before C, so order is A, B, C."
+          },
+          {
+            "input": "topological_sort([{'id': 'start', 'duration': 1, 'dependencies': []}, {'id': 'left', 'duration': 2, 'dependencies': ['start']}, {'id': 'right', 'duration': 3, 'dependencies': ['start']}, {'id': 'end', 'duration': 4, 'dependencies': ['left', 'right']}])",
+            "expected": "['start', 'left', 'right', 'end']",
+            "explanation": "Diamond pattern: start is source, then left and right are both ready (alphabetically left < right), finally end when both complete."
+          },
+          {
+            "input": "topological_sort([])",
+            "expected": "[]",
+            "explanation": "Empty input produces empty output."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using a regular list instead of a queue/priority queue for tie-breaking, leading to non-deterministic results",
+        "Forgetting to decrement in-degrees of successor nodes after processing a vertex",
+        "Not handling the case where multiple nodes have in-degree 0 simultaneously",
+        "Modifying the original in-degree dictionary instead of working with a copy"
+      ],
+      "hint": "Use a min-heap or sorted list to maintain tasks with in-degree 0, ensuring alphabetical tie-breaking. Remember to build the adjacency list to know which tasks depend on each task.",
+      "references": [
+        "Kahn's Algorithm",
+        "Topological Sorting Applications",
+        "Priority Queue for Tie-Breaking"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Forward Pass: Computing Earliest Start and Finish Times",
+      "relation_to_problem": "The forward pass determines the earliest possible execution schedule, identifying when each task can start given its dependencies—critical for computing the makespan",
+      "prerequisites": [
+        "Topological sorting",
+        "Dynamic programming principles",
+        "Maximum over sets"
+      ],
+      "learning_objectives": [
+        "Define earliest start time (ES) and earliest finish time (EF) formally",
+        "Implement forward pass algorithm using dynamic programming on DAG",
+        "Understand how task dependencies constrain earliest start times",
+        "Compute makespan as the maximum earliest finish time"
+      ],
+      "math_content": {
+        "definition": "For a task $i$ in a DAG with duration $d_i$, the **earliest start time** $ES_i$ is the earliest time task $i$ can begin execution given that all predecessor tasks must complete first. The **earliest finish time** is $EF_i = ES_i + d_i$. Formally, $ES_i = \\max_{j \\in \\text{pred}(i)} EF_j$ where $\\text{pred}(i) = \\{j : (j, i) \\in E\\}$. For source nodes with no predecessors, $ES_i = 0$.",
+        "notation": "$ES_i$ = earliest start time for task $i$, $EF_i$ = earliest finish time for task $i$, $d_i$ = duration of task $i$, $\\text{pred}(i)$ = set of immediate predecessors of task $i$. The **makespan** $M = \\max_{i \\in V} EF_i$ is the total pipeline completion time.",
+        "theorem": "**Optimal Substructure Property**: The earliest start time satisfies the recurrence $ES_i = \\max_{j \\in \\text{pred}(i)} (ES_j + d_j)$ with base case $ES_i = 0$ for source nodes. This exhibits optimal substructure: the optimal solution for task $i$ depends on optimal solutions for its predecessors. **Proof**: Task $i$ cannot start until all predecessors complete. The predecessor that finishes latest determines when $i$ can start. By induction on topological order, this recurrence correctly computes all earliest times.",
+        "proof_sketch": "**Base case**: Source nodes have no predecessors, so $ES_i = 0$ (can start immediately). **Inductive step**: Assume $ES_j$ and $EF_j$ are correct for all predecessors $j$ of task $i$. Task $i$ cannot start until all predecessors finish. The latest-finishing predecessor determines $ES_i$. Thus $ES_i = \\max_{j \\in \\text{pred}(i)} EF_j = \\max_{j \\in \\text{pred}(i)} (ES_j + d_j)$ is correct. Processing tasks in topological order ensures all predecessors are computed before $i$.",
+        "examples": [
+          "**Example 1**: Tasks A (duration 2, no deps), B (duration 5, depends on A), C (duration 3, depends on A). Forward pass: $ES_A = 0, EF_A = 2$. Then $ES_B = \\max(EF_A) = 2, EF_B = 7$. And $ES_C = \\max(EF_A) = 2, EF_C = 5$. Makespan = $\\max(7, 5) = 7$.",
+          "**Example 2**: Diamond DAG: Start (2) → Left (5) → End (3) and Start (2) → Right (10) → End (3). $ES_{\\text{start}} = 0, EF_{\\text{start}} = 2$. $ES_{\\text{left}} = 2, EF_{\\text{left}} = 7$. $ES_{\\text{right}} = 2, EF_{\\text{right}} = 12$. $ES_{\\text{end}} = \\max(7, 12) = 12, EF_{\\text{end}} = 15$. Makespan = 15."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Earliest Start Time",
+          "latex": "$ES_i = \\begin{cases} 0 & \\text{if } \\text{pred}(i) = \\emptyset \\\\ \\max_{j \\in \\text{pred}(i)} EF_j & \\text{otherwise} \\end{cases}$",
+          "description": "Source nodes start at time 0. Other nodes start when all predecessors finish (i.e., when the latest predecessor finishes)."
+        },
+        {
+          "name": "Earliest Finish Time",
+          "latex": "$EF_i = ES_i + d_i$",
+          "description": "A task finishes at its start time plus its duration."
+        },
+        {
+          "name": "Makespan",
+          "latex": "$M = \\max_{i \\in V} EF_i$",
+          "description": "The total pipeline duration is determined by the task that finishes last."
+        }
+      ],
+      "exercise": {
+        "description": "Implement the forward pass algorithm to compute earliest start and finish times for all tasks. Process tasks in topological order to ensure all dependencies are computed before each task. Return dictionaries mapping task IDs to their ES and EF values, plus the makespan.",
+        "function_signature": "def compute_earliest_times(tasks: list) -> dict:",
+        "starter_code": "def compute_earliest_times(tasks: list) -> dict:\n    \"\"\"\n    Compute earliest start and finish times via forward pass.\n    \n    Args:\n        tasks: list of dicts with 'id', 'duration', 'dependencies'\n    \n    Returns:\n        dict with:\n            - 'earliest_start': dict mapping task_id to ES time\n            - 'earliest_finish': dict mapping task_id to EF time\n            - 'makespan': total pipeline duration (max EF)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_earliest_times([{'id': 'A', 'duration': 5, 'dependencies': []}, {'id': 'B', 'duration': 3, 'dependencies': ['A']}, {'id': 'C', 'duration': 4, 'dependencies': ['A']}])",
+            "expected": "{'earliest_start': {'A': 0, 'B': 5, 'C': 5}, 'earliest_finish': {'A': 5, 'B': 8, 'C': 9}, 'makespan': 9}",
+            "explanation": "A starts at 0, finishes at 5. B and C both start at 5 (after A). B finishes at 8, C at 9. Makespan is 9."
+          },
+          {
+            "input": "compute_earliest_times([{'id': 'X', 'duration': 10, 'dependencies': []}, {'id': 'Y', 'duration': 5, 'dependencies': []}, {'id': 'Z', 'duration': 3, 'dependencies': ['X', 'Y']}])",
+            "expected": "{'earliest_start': {'X': 0, 'Y': 0, 'Z': 10}, 'earliest_finish': {'X': 10, 'Y': 5, 'Z': 13}, 'makespan': 13}",
+            "explanation": "X and Y are both sources, start at 0. Z must wait for both; X finishes later at 10, so Z starts at 10 and finishes at 13."
+          },
+          {
+            "input": "compute_earliest_times([])",
+            "expected": "{'earliest_start': {}, 'earliest_finish': {}, 'makespan': 0}",
+            "explanation": "Empty pipeline has makespan 0."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Processing tasks in arbitrary order instead of topological order, leading to incorrect ES values when predecessors haven't been computed yet",
+        "Using sum instead of max when computing ES from multiple predecessors",
+        "Forgetting to handle source nodes as special case (ES = 0)",
+        "Computing makespan as sum of all durations instead of max of finish times"
+      ],
+      "hint": "First compute topological order, then iterate through tasks in that order. For each task, ES is the maximum EF of all its dependencies (or 0 if no dependencies).",
+      "references": [
+        "Dynamic Programming on DAGs",
+        "Critical Path Method Forward Pass",
+        "Project Scheduling PERT/CPM"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Backward Pass: Computing Latest Start and Finish Times",
+      "relation_to_problem": "The backward pass determines the latest times each task can execute without delaying the overall pipeline, enabling slack calculation and critical path identification",
+      "prerequisites": [
+        "Forward pass and makespan computation",
+        "Reverse topological order",
+        "Minimum over sets"
+      ],
+      "learning_objectives": [
+        "Define latest start time (LS) and latest finish time (LF) formally",
+        "Implement backward pass algorithm in reverse topological order",
+        "Understand how successor dependencies constrain latest times",
+        "Connect backward pass to scheduling flexibility analysis"
+      ],
+      "math_content": {
+        "definition": "For a task $i$ with duration $d_i$, the **latest finish time** $LF_i$ is the latest time task $i$ can complete without delaying the overall pipeline makespan $M$. The **latest start time** is $LS_i = LF_i - d_i$. Formally, $LF_i = \\min_{j \\in \\text{succ}(i)} LS_j$ where $\\text{succ}(i) = \\{j : (i, j) \\in E\\}$ are the immediate successors. For sink nodes with no successors, $LF_i = EF_i$ (they must finish exactly at their earliest finish time to meet the makespan).",
+        "notation": "$LS_i$ = latest start time for task $i$, $LF_i$ = latest finish time for task $i$, $d_i$ = duration of task $i$, $\\text{succ}(i)$ = set of immediate successors of task $i$. We process tasks in **reverse topological order** to ensure successors are computed before predecessors.",
+        "theorem": "**Backward Pass Correctness**: The recurrence $LF_i = \\min_{j \\in \\text{succ}(i)} LS_j$ with base case $LF_i = EF_i$ for sink nodes correctly computes latest times such that delaying any task beyond its latest time increases the makespan. **Proof**: Sink nodes must finish by their EF to meet the makespan (any delay propagates to makespan). For other nodes, task $i$ must finish before the earliest-starting successor begins. The successor with minimum LS determines the constraint on $LF_i$. Processing in reverse topological order ensures all successors are computed before each node.",
+        "proof_sketch": "**Initialization**: For each task $i$ with no successors, set $LF_i = EF_i$ (must finish exactly when forward pass indicates). For tasks with maximum $EF_i = M$, these determine the makespan. **Recurrence**: For task $i$ with successors, if $i$ finishes later than $\\min_{j \\in \\text{succ}(i)} LS_j$, then some successor $j$ cannot start at its latest start time $LS_j$, propagating delay. Thus $LF_i = \\min_{j \\in \\text{succ}(i)} LS_j$ is the tightest constraint. **Order**: Reverse topological order ensures when computing $LF_i$, all $LS_j$ for successors $j$ are already computed.",
+        "examples": [
+          "**Example 1**: Tasks A → B → C with durations 2, 5, 3. Forward pass gives: $EF_A = 2, EF_B = 7, EF_C = 10$. Backward pass from makespan 10: $LF_C = 10, LS_C = 7$. $LF_B = \\min(LS_C) = 7, LS_B = 2$. $LF_A = \\min(LS_B) = 2, LS_A = 0$. All tasks have zero slack (critical path).",
+          "**Example 2**: Diamond DAG from step 3. Makespan = 15. Backward: $LF_{\\text{end}} = 15, LS_{\\text{end}} = 12$. $LF_{\\text{right}} = 12, LS_{\\text{right}} = 2$. $LF_{\\text{left}} = 12, LS_{\\text{left}} = 7$. $LF_{\\text{start}} = \\min(2, 2) = 2, LS_{\\text{start}} = 0$. Left has slack = 7-2 = 5, others have slack 0."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Latest Finish Time",
+          "latex": "$LF_i = \\begin{cases} EF_i & \\text{if } \\text{succ}(i) = \\emptyset \\\\ \\min_{j \\in \\text{succ}(i)} LS_j & \\text{otherwise} \\end{cases}$",
+          "description": "Sink nodes must finish at their earliest finish time. Other nodes must finish before their earliest-starting successor begins."
+        },
+        {
+          "name": "Latest Start Time",
+          "latex": "$LS_i = LF_i - d_i$",
+          "description": "Latest start is latest finish minus the task duration."
+        },
+        {
+          "name": "Processing Order",
+          "latex": "$\\text{Process tasks in reverse topological order: } i \\prec j \\Rightarrow j \\text{ processed before } i$",
+          "description": "Ensures all successors are computed before processing each task."
+        }
+      ],
+      "exercise": {
+        "description": "Implement the backward pass algorithm to compute latest start and finish times. Initialize sink nodes (tasks with no successors) using their earliest finish times, then process remaining tasks in reverse topological order. For tasks with multiple successors, take the minimum of successor latest start times.",
+        "function_signature": "def compute_latest_times(tasks: list, earliest_finish: dict, makespan: int) -> dict:",
+        "starter_code": "def compute_latest_times(tasks: list, earliest_finish: dict, makespan: int) -> dict:\n    \"\"\"\n    Compute latest start and finish times via backward pass.\n    \n    Args:\n        tasks: list of dicts with 'id', 'duration', 'dependencies'\n        earliest_finish: dict from forward pass with EF values\n        makespan: total pipeline duration\n    \n    Returns:\n        dict with:\n            - 'latest_start': dict mapping task_id to LS time\n            - 'latest_finish': dict mapping task_id to LF time\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_latest_times([{'id': 'A', 'duration': 2, 'dependencies': []}, {'id': 'B', 'duration': 5, 'dependencies': ['A']}, {'id': 'C', 'duration': 3, 'dependencies': ['B']}], {'A': 2, 'B': 7, 'C': 10}, 10)",
+            "expected": "{'latest_start': {'A': 0, 'B': 2, 'C': 7}, 'latest_finish': {'A': 2, 'B': 7, 'C': 10}}",
+            "explanation": "Linear chain: C must finish at 10, so LS_C = 7. B must finish before C starts: LF_B = 7, LS_B = 2. A must finish before B starts: LF_A = 2, LS_A = 0. All have zero slack."
+          },
+          {
+            "input": "compute_latest_times([{'id': 'X', 'duration': 5, 'dependencies': []}, {'id': 'Y', 'duration': 10, 'dependencies': []}, {'id': 'Z', 'duration': 3, 'dependencies': ['X', 'Y']}], {'X': 5, 'Y': 10, 'Z': 13}, 13)",
+            "expected": "{'latest_start': {'X': 5, 'Y': 0, 'Z': 10}, 'latest_finish': {'X': 10, 'Y': 10, 'Z': 13}}",
+            "explanation": "Z finishes at makespan, so LF_Z = 13, LS_Z = 10. Both X and Y must finish by 10. Y: LF = 10, LS = 0 (no slack). X: LF = 10, LS = 5 (slack = 5)."
+          },
+          {
+            "input": "compute_latest_times([], {}, 0)",
+            "expected": "{'latest_start': {}, 'latest_finish': {}}",
+            "explanation": "Empty pipeline returns empty dictionaries."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Processing tasks in forward topological order instead of reverse, causing successors to not be computed yet",
+        "Using max instead of min when multiple successors exist (should use min to get tightest constraint)",
+        "Initializing all sink nodes to makespan instead of their individual earliest finish times",
+        "Not building reverse adjacency list to efficiently find successors of each task"
+      ],
+      "hint": "Build a reverse adjacency list (task → list of successors) during preprocessing. Reverse the topological order and iterate through tasks, computing LF as minimum of successor LS values.",
+      "references": [
+        "Critical Path Method Backward Pass",
+        "Project Scheduling Algorithms",
+        "PERT Chart Analysis"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Slack Time Calculation and Critical Path Identification",
+      "relation_to_problem": "Slack time quantifies scheduling flexibility, and zero-slack tasks form the critical path that determines pipeline optimization priorities",
+      "prerequisites": [
+        "Forward pass (ES, EF)",
+        "Backward pass (LS, LF)",
+        "Graph path traversal"
+      ],
+      "learning_objectives": [
+        "Define slack (float) formally and compute it from earliest/latest times",
+        "Identify critical tasks (zero slack) in the pipeline",
+        "Extract the critical path as a sequence of zero-slack tasks",
+        "Understand the practical implications of slack for resource allocation"
+      ],
+      "math_content": {
+        "definition": "The **slack time** (or **total float**) of task $i$ is the amount of time the task can be delayed without increasing the project makespan. It is defined as $\\text{Slack}_i = LS_i - ES_i = LF_i - EF_i$. A task is **critical** if $\\text{Slack}_i = 0$. The **critical path** is a maximal path in the DAG consisting entirely of critical tasks, from a source node to a sink node.",
+        "notation": "$\\text{Slack}_i$ = slack time for task $i$. A task with $\\text{Slack}_i = 0$ is on the critical path. Let $CP = \\{i \\in V : \\text{Slack}_i = 0\\}$ be the set of critical tasks. The critical path is a path $\\pi = (v_1, v_2, \\ldots, v_k)$ where $v_j \\in CP$ for all $j$ and $(v_j, v_{j+1}) \\in E$.",
+        "theorem": "**Critical Path Theorem**: (1) Every DAG with at least one task has at least one critical path from a source to a sink. (2) The length of any critical path equals the makespan $M$. (3) Delaying any critical task by $\\delta > 0$ increases the makespan by $\\delta$. **Proof**: (1) Let $v$ be a task with $EF_v = M$. Then $\\text{Slack}_v = 0$ since $LF_v = EF_v = M$ (sink property). Tracing backward through edges $(u, v)$ where $EF_u = ES_v$ and $\\text{Slack}_u = 0$ constructs a critical path. (2) Sum of durations along critical path equals makespan by definition. (3) Zero slack means no scheduling flexibility; any delay directly impacts makespan.",
+        "proof_sketch": "**Slack equivalence**: $\\text{Slack}_i = LS_i - ES_i = (LF_i - d_i) - ES_i$ and $\\text{Slack}_i = LF_i - EF_i = LF_i - (ES_i + d_i)$. Both give the same value, confirming consistency. **Critical path existence**: Start with any task $t$ where $EF_t = M$. This task has $\\text{Slack}_t = 0$. For each predecessor $p$ of $t$ where $EF_p = ES_t$ (meaning $p$ directly determines when $t$ starts), if $\\text{Slack}_p = 0$, include $p$ in the critical path and recurse. Continue until reaching a source node. **Uniqueness**: Critical paths need not be unique; multiple paths can have all zero-slack tasks.",
+        "examples": [
+          "**Example 1**: Linear chain A(2) → B(5) → C(3). All tasks have slack 0: $ES_A=0, LS_A=0, ES_B=2, LS_B=2, ES_C=7, LS_C=7$. Critical path: [A, B, C]. Total duration = 2+5+3 = 10 = makespan.",
+          "**Example 2**: Diamond: Start(2) → Left(5) & Right(10) → End(3). Slack: Start=0, Left=5, Right=0, End=0. Critical path: [Start, Right, End] with total 2+10+3 = 15 = makespan. Left has slack 5, so it can be delayed up to 5 time units without affecting the makespan."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Slack Time",
+          "latex": "$\\text{Slack}_i = LS_i - ES_i = LF_i - EF_i$",
+          "description": "The maximum time task $i$ can be delayed without affecting the makespan. Both formulas are equivalent."
+        },
+        {
+          "name": "Critical Task Condition",
+          "latex": "$i \\text{ is critical} \\iff \\text{Slack}_i = 0$",
+          "description": "A task is on the critical path if and only if it has zero slack."
+        },
+        {
+          "name": "Critical Path Length",
+          "latex": "$\\sum_{i \\in CP} d_i = M$",
+          "description": "The sum of durations along any critical path equals the makespan."
+        }
+      ],
+      "exercise": {
+        "description": "Given the earliest and latest times computed from forward and backward passes, calculate slack for each task and extract the critical path. The critical path should be a sequence of zero-slack tasks in execution order (topological order). If multiple critical paths exist, return any valid one.",
+        "function_signature": "def compute_slack_and_critical_path(tasks: list, earliest_start: dict, latest_start: dict) -> dict:",
+        "starter_code": "def compute_slack_and_critical_path(tasks: list, earliest_start: dict, latest_start: dict) -> dict:\n    \"\"\"\n    Compute slack times and identify the critical path.\n    \n    Args:\n        tasks: list of dicts with 'id', 'duration', 'dependencies'\n        earliest_start: dict from forward pass\n        latest_start: dict from backward pass\n    \n    Returns:\n        dict with:\n            - 'slack': dict mapping task_id to slack time\n            - 'critical_path': list of task IDs forming critical path\n                             (in execution/topological order)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_slack_and_critical_path([{'id': 'A', 'duration': 2, 'dependencies': []}, {'id': 'B', 'duration': 5, 'dependencies': ['A']}, {'id': 'C', 'duration': 3, 'dependencies': ['B']}], {'A': 0, 'B': 2, 'C': 7}, {'A': 0, 'B': 2, 'C': 7})",
+            "expected": "{'slack': {'A': 0, 'B': 0, 'C': 0}, 'critical_path': ['A', 'B', 'C']}",
+            "explanation": "Linear pipeline where all tasks have slack 0. The entire path is critical."
+          },
+          {
+            "input": "compute_slack_and_critical_path([{'id': 'start', 'duration': 2, 'dependencies': []}, {'id': 'left', 'duration': 5, 'dependencies': ['start']}, {'id': 'right', 'duration': 10, 'dependencies': ['start']}, {'id': 'end', 'duration': 3, 'dependencies': ['left', 'right']}], {'start': 0, 'left': 2, 'right': 2, 'end': 12}, {'start': 0, 'left': 7, 'right': 2, 'end': 12})",
+            "expected": "{'slack': {'start': 0, 'left': 5, 'right': 0, 'end': 0}, 'critical_path': ['start', 'right', 'end']}",
+            "explanation": "Diamond with two parallel branches. Right branch (10 min) is longer than left (5 min). Critical path follows: start → right → end. Left has 5 minutes of slack."
+          },
+          {
+            "input": "compute_slack_and_critical_path([], {}, {})",
+            "expected": "{'slack': {}, 'critical_path': []}",
+            "explanation": "Empty pipeline has no critical path."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing slack as ES - LS instead of LS - ES (wrong sign)",
+        "Including tasks with non-zero slack in the critical path",
+        "Not ensuring critical path tasks are connected by edges (just listing all zero-slack tasks)",
+        "Returning critical path in arbitrary order instead of topological/execution order"
+      ],
+      "hint": "First compute slack for all tasks using LS - ES. Then perform a graph traversal starting from zero-slack source nodes, following edges to zero-slack successors, until reaching sink nodes.",
+      "references": [
+        "Critical Path Method (CPM)",
+        "Float/Slack in Project Management",
+        "PERT Critical Path Analysis"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete ML Pipeline Analysis Integration",
+      "relation_to_problem": "Integrate all previous components—topological sort, forward pass, backward pass, slack calculation, and critical path extraction—into a complete pipeline analyzer",
+      "prerequisites": [
+        "All previous sub-quests: DAG structure, topological sorting, forward pass, backward pass, slack and critical path"
+      ],
+      "learning_objectives": [
+        "Synthesize all CPM algorithm components into a unified solution",
+        "Handle edge cases: empty pipelines, single tasks, multiple source/sink nodes",
+        "Validate DAG properties and detect cycles if present",
+        "Return complete analysis in the required output format"
+      ],
+      "math_content": {
+        "definition": "A **complete pipeline analysis** for a DAG $G = (V, E)$ with task durations $\\{d_i\\}_{i \\in V}$ consists of: (1) A topological ordering $\\sigma: V \\to \\mathbb{N}$, (2) Earliest times $(ES_i, EF_i)$ for all $i \\in V$, (3) Latest times $(LS_i, LF_i)$ for all $i \\in V$, (4) Slack $\\text{Slack}_i = LS_i - ES_i$ for all $i \\in V$, (5) Critical path $CP = (v_1, \\ldots, v_k)$ where each $v_j$ has zero slack and $(v_j, v_{j+1}) \\in E$, (6) Makespan $M = \\max_{i \\in V} EF_i$.",
+        "notation": "Let $\\mathcal{A}(G) = (\\sigma, ES, EF, LS, LF, \\text{Slack}, CP, M)$ denote the complete analysis. The algorithm runs in $O(V + E)$ time: topological sort $O(V + E)$, forward pass $O(V + E)$, backward pass $O(V + E)$, slack and critical path $O(V + E)$.",
+        "theorem": "**Complete Analysis Theorem**: For any DAG $G$, the complete analysis $\\mathcal{A}(G)$ can be computed in $O(V + E)$ time and satisfies: (1) All earliest times are minimal (no task can start earlier without violating dependencies), (2) All latest times are maximal (no task can finish later without increasing makespan), (3) The critical path length equals the makespan, (4) Delaying any critical task increases makespan. **Proof**: Follows from correctness of individual components (topological sort, forward/backward passes) and the definitions of slack and critical path.",
+        "proof_sketch": "**Correctness**: Topological sort ensures dependencies are respected in execution order. Forward pass computes minimal start times by induction. Backward pass computes maximal finish times by reverse induction. Slack quantifies scheduling flexibility. Critical path consists of zero-slack tasks forming the longest path. **Complexity**: Each phase (topological sort, forward, backward, slack, critical path) processes each vertex and edge at most once, giving $O(V + E)$ per phase, thus $O(V + E)$ total. **Optimality**: ES values are minimal because forward pass always starts tasks as early as possible. LS values are maximal because backward pass tolerates maximum delay without affecting makespan.",
+        "examples": [
+          "**Example 1**: Single task pipeline: $G = (\\{A\\}, \\emptyset)$ with $d_A = 5$. Analysis: $\\sigma = [A], ES_A = 0, EF_A = 5, LS_A = 0, LF_A = 5, \\text{Slack}_A = 0, CP = [A], M = 5$. Trivial critical path.",
+          "**Example 2**: Complex DAG with 5 tasks forming two parallel branches and a merge. Applying full algorithm: topological order determines execution sequence, forward pass computes earliest times, backward pass from makespan computes latest times, slack identifies which branch has flexibility, critical path follows the longer branch. Output includes all seven components in structured format."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Algorithm Pipeline",
+          "latex": "$\\mathcal{A}(G) = (\\text{TopoSort}(G), \\text{Forward}(G), \\text{Backward}(G), \\text{Slack}(G), \\text{CritPath}(G))$",
+          "description": "The full analysis consists of five sequential phases, each building on the previous results."
+        },
+        {
+          "name": "Complexity Bound",
+          "latex": "$T(V, E) = O(V + E)$",
+          "description": "Total time complexity is linear in the number of tasks and dependencies."
+        },
+        {
+          "name": "Empty Pipeline Base Case",
+          "latex": "$G = (\\emptyset, \\emptyset) \\Rightarrow M = 0, CP = []$",
+          "description": "Special case: empty pipeline has makespan 0 and empty critical path."
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete pipeline analysis function that integrates all components from previous sub-quests. The function should: (1) Handle the empty pipeline case, (2) Build graph structure and compute in-degrees, (3) Perform topological sort with alphabetical tie-breaking, (4) Execute forward pass for earliest times, (5) Execute backward pass for latest times, (6) Calculate slack for all tasks, (7) Extract critical path, (8) Return all results in the specified dictionary format.",
+        "function_signature": "def analyze_ml_pipeline(tasks: list) -> dict:",
+        "starter_code": "def analyze_ml_pipeline(tasks: list) -> dict:\n    \"\"\"\n    Perform complete analysis of an ML pipeline DAG.\n    \n    Args:\n        tasks: list of dicts with 'id', 'duration', 'dependencies'\n    \n    Returns:\n        dict with keys:\n            - 'execution_order': list of task IDs in topological order\n            - 'earliest_start': dict {task_id: ES_time}\n            - 'earliest_finish': dict {task_id: EF_time}\n            - 'latest_start': dict {task_id: LS_time}\n            - 'latest_finish': dict {task_id: LF_time}\n            - 'slack': dict {task_id: slack_time}\n            - 'critical_path': list of task IDs on critical path\n            - 'makespan': total pipeline duration\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "analyze_ml_pipeline([{'id': 'start', 'duration': 2, 'dependencies': []}, {'id': 'left', 'duration': 5, 'dependencies': ['start']}, {'id': 'right', 'duration': 10, 'dependencies': ['start']}, {'id': 'end', 'duration': 3, 'dependencies': ['left', 'right']}])",
+            "expected": "{'execution_order': ['start', 'left', 'right', 'end'], 'earliest_start': {'start': 0, 'left': 2, 'right': 2, 'end': 12}, 'earliest_finish': {'start': 2, 'left': 7, 'right': 12, 'end': 15}, 'latest_start': {'start': 0, 'left': 7, 'right': 2, 'end': 12}, 'latest_finish': {'start': 2, 'left': 12, 'right': 12, 'end': 15}, 'slack': {'start': 0, 'left': 5, 'right': 0, 'end': 0}, 'critical_path': ['start', 'right', 'end'], 'makespan': 15}",
+            "explanation": "Diamond pipeline: start splits into parallel branches, right branch (10) is longer than left (5). Critical path goes through longer branch. Left has 5 units of slack."
+          },
+          {
+            "input": "analyze_ml_pipeline([{'id': 'load', 'duration': 10, 'dependencies': []}, {'id': 'transform', 'duration': 5, 'dependencies': ['load']}, {'id': 'train', 'duration': 20, 'dependencies': ['transform']}, {'id': 'evaluate', 'duration': 3, 'dependencies': ['train']}])",
+            "expected": "{'execution_order': ['load', 'transform', 'train', 'evaluate'], 'earliest_start': {'load': 0, 'transform': 10, 'train': 15, 'evaluate': 35}, 'earliest_finish': {'load': 10, 'transform': 15, 'train': 35, 'evaluate': 38}, 'latest_start': {'load': 0, 'transform': 10, 'train': 15, 'evaluate': 35}, 'latest_finish': {'load': 10, 'transform': 15, 'train': 35, 'evaluate': 38}, 'slack': {'load': 0, 'transform': 0, 'train': 0, 'evaluate': 0}, 'critical_path': ['load', 'transform', 'train', 'evaluate'], 'makespan': 38}",
+            "explanation": "Linear ML pipeline: all tasks are on critical path with zero slack. Total duration is sum of all task durations: 10+5+20+3 = 38."
+          },
+          {
+            "input": "analyze_ml_pipeline([])",
+            "expected": "{'execution_order': [], 'earliest_start': {}, 'earliest_finish': {}, 'latest_start': {}, 'latest_finish': {}, 'slack': {}, 'critical_path': [], 'makespan': 0}",
+            "explanation": "Empty pipeline returns all empty structures with makespan 0."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the empty pipeline case, causing errors when accessing non-existent elements",
+        "Forgetting alphabetical tie-breaking in topological sort, leading to non-deterministic output",
+        "Computing backward pass before ensuring all EF values are set from forward pass",
+        "Not validating that critical path tasks are actually connected by edges in the graph",
+        "Returning results in wrong format (e.g., lists instead of dicts where specified)"
+      ],
+      "hint": "Structure your solution in clear phases: (1) validate input, (2) topological sort, (3) forward pass, (4) backward pass, (5) slack computation, (6) critical path extraction. Reuse helper functions from previous sub-quests.",
+      "references": [
+        "Complete CPM Implementation",
+        "Project Network Analysis",
+        "MLOps Pipeline Optimization"
+      ]
+    }
+  ]
+}

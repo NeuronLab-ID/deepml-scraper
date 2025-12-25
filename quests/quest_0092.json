@@ -1,0 +1,442 @@
+{
+  "problem_id": 92,
+  "title": "Linear Regression - Power Grid Optimization",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "It is the year 2157. Mars has its first thriving colony, and energy consumption is steadily on the rise. As the lead data scientist, you have daily power usage measurements (10 days) affected by both a growing linear trend and a daily fluctuation. The fluctuation follows the formula fᵢ = 10 x sin(2π x i / 10), where i is the day number (1 through 10). Your challenge is to remove this known fluctuation from each data point, fit a linear regression model to the detrended data, predict day 15's base consumption, add back the fluctuation for day 15, and finally include a 5% safety margin. The final answer must be an integer, ensuring you meet the colony's future needs.",
+  "example": {
+    "input": "Daily consumption data for 10 days: [150, 165, 185, 195, 210, 225, 240, 260, 275, 290]",
+    "output": "404",
+    "reasoning": "For each of the 10 days, we subtract the daily fluctuation given by 10xsin(2πxi/10). We then perform linear regression on the resulting values, predict day 15’s base usage, and add back the day 15 fluctuation. Finally, we apply a 5% margin. Running the provided solution code yields 404 for this dataset."
+  },
+  "starter_code": "import math\n\nPI = 3.14159\n\ndef power_grid_forecast(consumption_data):\n\t# 1) Subtract the daily fluctuation (10 * sin(2π * i / 10)) from each data point.\n\t# 2) Perform linear regression on the detrended data.\n\t# 3) Predict day 15's base consumption.\n\t# 4) Add the day 15 fluctuation back.\n\t# 5) Round, then add a 5% safety margin (rounded up).\n\t# 6) Return the final integer.\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Trigonometric Periodicity and Signal Detrending",
+      "relation_to_problem": "Understanding periodic fluctuations is essential for removing the known sinusoidal component $f_i = 10 \\times \\sin(2\\pi i / 10)$ from the power consumption data before fitting the linear regression model.",
+      "prerequisites": [
+        "Basic trigonometry",
+        "Function composition",
+        "Radian measure"
+      ],
+      "learning_objectives": [
+        "Understand periodic functions and their properties",
+        "Calculate sinusoidal fluctuations for discrete time points",
+        "Apply signal detrending by removing known periodic components"
+      ],
+      "math_content": {
+        "definition": "A **periodic function** $f: \\mathbb{R} \\to \\mathbb{R}$ satisfies $f(x + T) = f(x)$ for all $x \\in \\mathbb{R}$ and some minimal positive constant $T$ called the **period**. The sine function has period $2\\pi$, meaning $\\sin(x + 2\\pi) = \\sin(x)$ for all $x$.",
+        "notation": "$f_i$ = fluctuation at time $i$, $i$ = discrete time index (day number), $T$ = period of oscillation, $A$ = amplitude of oscillation",
+        "theorem": "**Discrete Periodic Sampling Theorem**: For a continuous periodic function $f(t)$ with period $T$, sampling at discrete points $t_i = i \\cdot \\Delta t$ where $i \\in \\{1, 2, ..., n\\}$ yields values $f_i = f(i \\cdot \\Delta t)$. When $n$ samples cover exactly one period ($n \\cdot \\Delta t = T$), the argument becomes $f_i = f(2\\pi i / n)$ after normalization.",
+        "proof_sketch": "In this problem, we have 10 days comprising one full cycle. The normalized angular frequency is $\\omega = 2\\pi / 10$, giving $f_i = A \\sin(\\omega i) = 10 \\sin(2\\pi i / 10)$. As $i$ ranges from 1 to 10, the argument $2\\pi i / 10$ ranges from $\\pi/5$ to $2\\pi$, completing one full oscillation.",
+        "examples": [
+          "For $i=1$: $f_1 = 10 \\sin(2\\pi \\cdot 1 / 10) = 10 \\sin(\\pi/5) \\approx 5.878$",
+          "For $i=5$: $f_5 = 10 \\sin(2\\pi \\cdot 5 / 10) = 10 \\sin(\\pi) = 0$",
+          "For $i=10$: $f_{10} = 10 \\sin(2\\pi) = 0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Periodic Fluctuation Formula",
+          "latex": "$f_i = A \\sin\\left(\\frac{2\\pi i}{T}\\right)$",
+          "description": "Calculates the fluctuation at discrete time point $i$ with amplitude $A$ and period $T$"
+        },
+        {
+          "name": "Detrending Operation",
+          "latex": "$y_i^{\\text{detrended}} = y_i^{\\text{observed}} - f_i$",
+          "description": "Removes the known periodic component from observed data to isolate the underlying trend"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the periodic fluctuation for any day number using the formula $f_i = 10 \\times \\sin(2\\pi i / 10)$. This is the first step in detrending the power consumption data.",
+        "function_signature": "def calculate_fluctuation(day: int) -> float:",
+        "starter_code": "import math\n\nPI = 3.14159\n\ndef calculate_fluctuation(day: int) -> float:\n    # Calculate the fluctuation for a given day using f_i = 10 * sin(2π * i / 10)\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_fluctuation(1)",
+            "expected": "5.878 (approximately)",
+            "explanation": "Day 1: $10 \\sin(2\\pi/10) = 10 \\sin(\\pi/5) \\approx 5.878$"
+          },
+          {
+            "input": "calculate_fluctuation(5)",
+            "expected": "0.0",
+            "explanation": "Day 5: $10 \\sin(\\pi) = 0$ (at the midpoint of the cycle)"
+          },
+          {
+            "input": "calculate_fluctuation(10)",
+            "expected": "0.0 (approximately)",
+            "explanation": "Day 10: $10 \\sin(2\\pi) \\approx 0$ (completes one full cycle)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using degrees instead of radians in the sine function",
+        "Forgetting to normalize the day number by dividing by the period (10)",
+        "Using an imprecise value of π leading to accumulating errors"
+      ],
+      "hint": "Remember that the math.sin() function expects its argument in radians. The formula $2\\pi i / 10$ naturally produces radian values.",
+      "references": [
+        "Trigonometric functions and periodicity",
+        "Signal processing: trend removal and detrending",
+        "Time series decomposition"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Data Detrending and Array Transformation",
+      "relation_to_problem": "After computing fluctuations, we must subtract them from each observed consumption value to obtain the detrended data that reveals the underlying linear trend for regression analysis.",
+      "prerequisites": [
+        "Array manipulation",
+        "Element-wise operations",
+        "Trigonometric Periodicity (Step 1)"
+      ],
+      "learning_objectives": [
+        "Apply fluctuation removal across an entire dataset",
+        "Transform observed time series data to isolate trend components",
+        "Prepare data for linear regression by removing known periodic effects"
+      ],
+      "math_content": {
+        "definition": "**Signal Detrending** is the process of removing a known or estimated trend component from a time series to reveal other patterns. Formally, given observed data $\\{y_i\\}_{i=1}^n$ and a fluctuation model $\\{f_i\\}_{i=1}^n$, the detrended series is $\\{y_i^* = y_i - f_i\\}_{i=1}^n$.",
+        "notation": "$y_i$ = observed value at time $i$, $f_i$ = known fluctuation at time $i$, $y_i^* $ = detrended value at time $i$, $n$ = number of observations",
+        "theorem": "**Additive Decomposition Theorem**: A time series $y_i$ can be decomposed as $y_i = T_i + S_i + \\epsilon_i$ where $T_i$ is the trend component, $S_i$ is the seasonal/periodic component, and $\\epsilon_i$ is random noise. If $S_i$ is known exactly (as $f_i$ in our problem), then $y_i^* = y_i - S_i = T_i + \\epsilon_i$ isolates the trend.",
+        "proof_sketch": "In this problem, $S_i = f_i = 10 \\sin(2\\pi i / 10)$ is the known seasonal component. The observed consumption $y_i$ includes both linear growth ($T_i = mi + b$) and this fluctuation. By computing $y_i^* = y_i - f_i$, we remove the oscillation, leaving $y_i^* \\approx mi + b$, which is suitable for linear regression.",
+        "examples": [
+          "If $y_3 = 185$ and $f_3 = 10\\sin(3\\pi/5) \\approx 9.511$, then $y_3^* = 185 - 9.511 = 175.489$",
+          "If $y_5 = 210$ and $f_5 = 0$, then $y_5^* = 210 - 0 = 210$ (no adjustment at the cycle midpoint)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Element-wise Detrending",
+          "latex": "$y_i^* = y_i - 10\\sin\\left(\\frac{2\\pi i}{10}\\right), \\quad i = 1, 2, \\ldots, n$",
+          "description": "Apply fluctuation removal to each data point independently"
+        },
+        {
+          "name": "Vector Form",
+          "latex": "$\\mathbf{y}^* = \\mathbf{y} - \\mathbf{f}$",
+          "description": "Detrending operation expressed as vector subtraction"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes an array of consumption data and returns the detrended values by subtracting the fluctuation $f_i = 10 \\times \\sin(2\\pi i / 10)$ from each element. The day index starts at 1.",
+        "function_signature": "def detrend_data(consumption_data: list) -> list:",
+        "starter_code": "import math\n\nPI = 3.14159\n\ndef detrend_data(consumption_data: list) -> list:\n    # Remove the known fluctuation from each data point\n    # Day index i goes from 1 to len(consumption_data)\n    # Return list of detrended values\n    pass",
+        "test_cases": [
+          {
+            "input": "detrend_data([150, 165, 185])",
+            "expected": "[144.122, 155.388, 175.489]",
+            "explanation": "Subtracts $f_1 \\approx 5.878$, $f_2 \\approx 9.511$, $f_3 \\approx 9.511$ from respective values"
+          },
+          {
+            "input": "detrend_data([210, 225])",
+            "expected": "[210.0, 235.878]",
+            "explanation": "Day 5 has $f_5 = 0$, day 6 has $f_6 \\approx -10.878$ (negative fluctuation subtracts to add back)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using 0-indexed days instead of 1-indexed (i starts at 1, not 0)",
+        "Not storing detrended values in the same order as input",
+        "Rounding prematurely before all calculations are complete"
+      ],
+      "hint": "Iterate through the consumption data with enumeration. Remember that if enumerate starts at 0, you need to add 1 to get the correct day number for the fluctuation formula.",
+      "references": [
+        "Time series decomposition methods",
+        "Seasonal adjustment techniques",
+        "Array transformation operations"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Least Squares Linear Regression Theory",
+      "relation_to_problem": "Once data is detrended, we must fit a linear model $y = mx + b$ to predict future consumption. The least squares method provides optimal estimates for slope $m$ and intercept $b$.",
+      "prerequisites": [
+        "Basic calculus",
+        "Summation notation",
+        "Data Detrending (Step 2)"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical foundation of least squares estimation",
+        "Derive and apply formulas for slope and intercept",
+        "Minimize prediction error using the normal equations"
+      ],
+      "math_content": {
+        "definition": "**Simple Linear Regression** models the relationship between an independent variable $x$ and dependent variable $y$ as $y = mx + b + \\epsilon$, where $m$ is the slope, $b$ is the intercept, and $\\epsilon$ is random error. The **least squares estimators** $\\hat{m}$ and $\\hat{b}$ minimize the sum of squared residuals $S = \\sum_{i=1}^n (y_i - (mx_i + b))^2$.",
+        "notation": "$n$ = number of data points, $(x_i, y_i)$ = observed data pairs, $\\hat{y}_i = mx_i + b$ = predicted values, $m$ = slope, $b$ = y-intercept",
+        "theorem": "**Normal Equations for Simple Linear Regression**: The least squares estimates are given by:\n$$m = \\frac{n\\sum x_i y_i - (\\sum x_i)(\\sum y_i)}{n\\sum x_i^2 - (\\sum x_i)^2}, \\quad b = \\frac{\\sum y_i - m\\sum x_i}{n}$$\nThese formulas minimize the mean squared error between observed and predicted values.",
+        "proof_sketch": "To minimize $S = \\sum_{i=1}^n (y_i - mx_i - b)^2$, we take partial derivatives: $\\frac{\\partial S}{\\partial m} = -2\\sum x_i(y_i - mx_i - b) = 0$ and $\\frac{\\partial S}{\\partial b} = -2\\sum(y_i - mx_i - b) = 0$. Solving this system yields the normal equations. The second derivative test confirms these are minima.",
+        "examples": [
+          "For points $(1, 5), (2, 7), (3, 9)$: $\\sum x_i = 6$, $\\sum y_i = 21$, $\\sum x_i y_i = 46$, $\\sum x_i^2 = 14$. Then $m = (3 \\cdot 46 - 6 \\cdot 21)/(3 \\cdot 14 - 36) = 12/6 = 2$ and $b = (21 - 2 \\cdot 6)/3 = 3$. The line is $y = 2x + 3$.",
+          "Prediction for $x=4$: $\\hat{y} = 2(4) + 3 = 11$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Slope Formula",
+          "latex": "$m = \\frac{n\\sum_{i=1}^n x_i y_i - \\left(\\sum_{i=1}^n x_i\\right)\\left(\\sum_{i=1}^n y_i\\right)}{n\\sum_{i=1}^n x_i^2 - \\left(\\sum_{i=1}^n x_i\\right)^2}$",
+          "description": "Optimal slope that minimizes squared prediction errors"
+        },
+        {
+          "name": "Intercept Formula",
+          "latex": "$b = \\frac{\\sum_{i=1}^n y_i - m\\sum_{i=1}^n x_i}{n}$",
+          "description": "Optimal y-intercept, computed after finding slope $m$"
+        },
+        {
+          "name": "Prediction Formula",
+          "latex": "$\\hat{y}_{new} = m \\cdot x_{new} + b$",
+          "description": "Predicts the value for any new input $x_{new}$ using the fitted line"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs simple linear regression on a dataset where $x$ values are day numbers (1, 2, 3, ..., n) and $y$ values are the detrended consumption data. Return the slope $m$ and intercept $b$.",
+        "function_signature": "def linear_regression(y_values: list) -> tuple:",
+        "starter_code": "def linear_regression(y_values: list) -> tuple:\n    # Assume x values are day numbers: 1, 2, 3, ..., len(y_values)\n    # Calculate slope m and intercept b using least squares formulas\n    # Return (m, b) as a tuple\n    pass",
+        "test_cases": [
+          {
+            "input": "linear_regression([3, 5, 7, 9, 11])",
+            "expected": "(2.0, 1.0)",
+            "explanation": "Perfect linear data with slope 2 and intercept 1: $y = 2x + 1$"
+          },
+          {
+            "input": "linear_regression([10, 20, 30])",
+            "expected": "(10.0, 0.0)",
+            "explanation": "Data follows $y = 10x$: slope is 10, intercept is 0"
+          },
+          {
+            "input": "linear_regression([5, 5, 5, 5])",
+            "expected": "(0.0, 5.0)",
+            "explanation": "Constant data: no slope (0), intercept equals the constant value"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing which variable is $x$ and which is $y$ in the formulas",
+        "Calculating $b$ before $m$ (intercept formula requires the slope)",
+        "Integer division errors causing incorrect floating-point results",
+        "Not handling the case where all $x$ values are identical (zero denominator)"
+      ],
+      "hint": "Build up the sums incrementally: $\\sum x_i$, $\\sum y_i$, $\\sum x_i y_i$, and $\\sum x_i^2$. Use these in the formulas for $m$ and $b$.",
+      "references": [
+        "Ordinary least squares estimation",
+        "Linear algebra: solving normal equations",
+        "Statistical regression analysis"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Linear Model Prediction and Extrapolation",
+      "relation_to_problem": "After fitting the regression model to historical data (days 1-10), we must extrapolate to predict day 15's base consumption before adding back the fluctuation.",
+      "prerequisites": [
+        "Linear Regression (Step 3)",
+        "Function evaluation"
+      ],
+      "learning_objectives": [
+        "Apply a fitted linear model to make predictions for new data points",
+        "Understand extrapolation beyond the training data range",
+        "Evaluate prediction confidence and limitations"
+      ],
+      "math_content": {
+        "definition": "**Prediction** (or **forecasting**) is the process of using a fitted model to estimate the response variable for new values of the independent variable. Given a linear model $\\hat{y} = mx + b$ fitted to data $(x_1, y_1), \\ldots, (x_n, y_n)$, prediction for a new point $x_{new}$ is $\\hat{y}_{new} = m \\cdot x_{new} + b$. **Extrapolation** occurs when $x_{new}$ lies outside the range $[\\min(x_i), \\max(x_i)]$ of the training data.",
+        "notation": "$\\hat{y}_{new}$ = predicted value at $x_{new}$, $m$ = fitted slope, $b$ = fitted intercept, $x_{new}$ = new input value for prediction",
+        "theorem": "**Linear Model Evaluation**: For a simple linear regression model $\\hat{y} = mx + b$, the prediction at any point $x_{new}$ is obtained by direct substitution. The prediction is unbiased if the true relationship is linear: $\\mathbb{E}[\\hat{y}_{new}] = mx_{new} + b$ equals the true expected value.",
+        "proof_sketch": "The least squares estimators $\\hat{m}$ and $\\hat{b}$ are unbiased under standard regression assumptions. By linearity of expectation, $\\mathbb{E}[\\hat{y}_{new}] = \\mathbb{E}[\\hat{m}]x_{new} + \\mathbb{E}[\\hat{b}] = mx_{new} + b$. However, extrapolation (predicting beyond the data range) carries higher uncertainty since the linear assumption may not hold far from observed values.",
+        "examples": [
+          "If $m = 2$ and $b = 3$ (fitted from days 1-10), then day 15 prediction is $\\hat{y}_{15} = 2 \\times 15 + 3 = 33$",
+          "Extrapolating from days 1-10 to day 15 assumes the linear trend continues unchanged"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Prediction Formula",
+          "latex": "$\\hat{y}_{new} = m \\cdot x_{new} + b$",
+          "description": "Evaluate the fitted linear function at a new input point"
+        },
+        {
+          "name": "Extrapolation Range",
+          "latex": "$x_{new} > \\max(x_i) \\text{ or } x_{new} < \\min(x_i)$",
+          "description": "Condition for extrapolation beyond the training data domain"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes regression parameters (slope $m$ and intercept $b$) and a target day number, then returns the predicted base consumption for that day.",
+        "function_signature": "def predict_consumption(m: float, b: float, day: int) -> float:",
+        "starter_code": "def predict_consumption(m: float, b: float, day: int) -> float:\n    # Use the linear model y = m*x + b to predict consumption for the given day\n    # Return the predicted value\n    pass",
+        "test_cases": [
+          {
+            "input": "predict_consumption(2.0, 1.0, 15)",
+            "expected": "31.0",
+            "explanation": "Using $y = 2x + 1$, prediction for day 15 is $2(15) + 1 = 31$"
+          },
+          {
+            "input": "predict_consumption(10.5, 150.0, 20)",
+            "expected": "360.0",
+            "explanation": "Using $y = 10.5x + 150$, prediction for day 20 is $10.5(20) + 150 = 360$"
+          },
+          {
+            "input": "predict_consumption(0.0, 100.0, 50)",
+            "expected": "100.0",
+            "explanation": "Zero slope means constant prediction of 100 regardless of day"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing the prediction day with the training data range",
+        "Forgetting that this is only the base prediction (fluctuation not yet added back)",
+        "Assuming extrapolation is always reliable (model may break down far from data)"
+      ],
+      "hint": "This is a straightforward function evaluation: plug the day number into the linear equation.",
+      "references": [
+        "Time series forecasting",
+        "Extrapolation risks in statistical modeling",
+        "Linear model assumptions"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Signal Reconstruction and Margin Calculation",
+      "relation_to_problem": "After predicting day 15's base consumption, we must add back the fluctuation for day 15, round the result, and apply a 5% safety margin to get the final power requirement.",
+      "prerequisites": [
+        "Prediction (Step 4)",
+        "Trigonometric Periodicity (Step 1)",
+        "Rounding operations"
+      ],
+      "learning_objectives": [
+        "Reconstruct the full signal by adding back removed components",
+        "Apply rounding and ceiling operations correctly",
+        "Calculate safety margins for capacity planning"
+      ],
+      "math_content": {
+        "definition": "**Signal Reconstruction** reverses the detrending process by adding back the removed component. Given a base prediction $\\hat{y}_{base}$ and known fluctuation $f$, the reconstructed signal is $\\hat{y}_{full} = \\hat{y}_{base} + f$. A **safety margin** is an additional capacity buffer, often expressed as a percentage increase: $y_{final} = y_{full} \\times (1 + \\alpha)$ where $\\alpha$ is the margin rate.",
+        "notation": "$\\hat{y}_{base}$ = base prediction from linear model, $f_{new}$ = fluctuation at the prediction time, $\\hat{y}_{full}$ = reconstructed prediction, $\\alpha$ = safety margin rate (0.05 for 5%), $y_{final}$ = final capacity requirement",
+        "theorem": "**Additive Reconstruction**: If a signal $y$ was decomposed as $y = y_{base} + f$ and we modeled $y_{base}$, then the predicted full signal is $\\hat{y}_{full} = \\hat{y}_{base} + f$. The safety margin application $y_{final} = \\lceil (1 + \\alpha) \\cdot \\text{round}(\\hat{y}_{full}) \\rceil$ ensures the capacity exceeds the expected demand with high probability.",
+        "proof_sketch": "The original data was $y_i = (m \\cdot i + b) + f_i$. After detrending, we fit $m$ and $b$. For day 15, $\\hat{y}_{base,15} = 15m + b$ is our trend estimate. Adding $f_{15} = 10\\sin(2\\pi \\cdot 15/10)$ reconstructs the full prediction. Rounding to integer reflects discrete capacity units. The 5% margin provides a buffer against uncertainty: $y_{final} = \\lceil 1.05 \\cdot \\text{round}(\\hat{y}_{full,15}) \\rceil$.",
+        "examples": [
+          "If $\\hat{y}_{base,15} = 330.5$ and $f_{15} = 10\\sin(3\\pi) = 0$, then $\\hat{y}_{full,15} = 330.5$. After rounding: 331. With 5% margin: $\\lceil 1.05 \\times 331 \\rceil = \\lceil 347.55 \\rceil = 348$.",
+          "If $\\hat{y}_{base,15} = 380.2$ and $f_{15} = -5.878$, then $\\hat{y}_{full,15} = 374.322$. After rounding: 374. With 5% margin: $\\lceil 1.05 \\times 374 \\rceil = \\lceil 392.7 \\rceil = 393$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Signal Reconstruction",
+          "latex": "$\\hat{y}_{full} = \\hat{y}_{base} + f_{new}$",
+          "description": "Add back the fluctuation component to the base prediction"
+        },
+        {
+          "name": "Safety Margin Application",
+          "latex": "$y_{final} = \\lceil (1 + \\alpha) \\cdot \\text{round}(\\hat{y}_{full}) \\rceil$",
+          "description": "Round to integer, apply percentage margin, and round up to ensure adequate capacity"
+        },
+        {
+          "name": "Day 15 Fluctuation",
+          "latex": "$f_{15} = 10\\sin\\left(\\frac{2\\pi \\cdot 15}{10}\\right) = 10\\sin(3\\pi) = 0$",
+          "description": "For this specific problem, day 15's fluctuation is zero since $\\sin(3\\pi) = 0$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a base prediction, calculates the day 15 fluctuation, reconstructs the full prediction, applies rounding, adds a 5% safety margin (rounding up), and returns the final integer capacity requirement.",
+        "function_signature": "def apply_safety_margin(base_prediction: float, target_day: int, margin_rate: float) -> int:",
+        "starter_code": "import math\n\nPI = 3.14159\n\ndef apply_safety_margin(base_prediction: float, target_day: int, margin_rate: float) -> int:\n    # 1) Calculate fluctuation for target_day: f = 10 * sin(2π * target_day / 10)\n    # 2) Reconstruct: full_prediction = base_prediction + f\n    # 3) Round to nearest integer\n    # 4) Apply margin: final = ceiling((1 + margin_rate) * rounded_value)\n    # Return final integer\n    pass",
+        "test_cases": [
+          {
+            "input": "apply_safety_margin(330.5, 15, 0.05)",
+            "expected": "348",
+            "explanation": "$f_{15} = 0$, full = 330.5, rounded = 331, with margin: $\\lceil 347.55 \\rceil = 348$"
+          },
+          {
+            "input": "apply_safety_margin(380.0, 15, 0.05)",
+            "expected": "399",
+            "explanation": "$f_{15} = 0$, full = 380.0, rounded = 380, with margin: $\\lceil 399.0 \\rceil = 399$"
+          },
+          {
+            "input": "apply_safety_margin(200.0, 3, 0.05)",
+            "expected": "221",
+            "explanation": "$f_3 \\approx 9.511$, full ≈ 209.511, rounded = 210, with margin: $\\lceil 220.5 \\rceil = 221$"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Applying the margin before rounding the prediction (incorrect order)",
+        "Using floor instead of ceiling for the final rounding (underestimates capacity)",
+        "Forgetting that for day 15, $\\sin(3\\pi) = 0$ exactly",
+        "Not converting the final result to an integer type"
+      ],
+      "hint": "Follow the exact sequence: add fluctuation → round to integer → multiply by (1 + margin) → ceiling. The math.ceil() function rounds up.",
+      "references": [
+        "Capacity planning and safety margins",
+        "Rounding operations in numerical computation",
+        "Time series forecasting with uncertainty"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "End-to-End Power Grid Forecasting Pipeline",
+      "relation_to_problem": "This final sub-quest integrates all previous steps into a complete forecasting pipeline: detrend data, fit regression, predict future base consumption, reconstruct signal, and apply safety margin.",
+      "prerequisites": [
+        "Steps 1-5: All previous concepts"
+      ],
+      "learning_objectives": [
+        "Integrate multiple mathematical operations into a coherent workflow",
+        "Apply the complete forecasting methodology to solve the power grid problem",
+        "Validate results through comprehensive test cases"
+      ],
+      "math_content": {
+        "definition": "A **forecasting pipeline** is a structured sequence of data transformations and model operations that converts raw input data into actionable predictions. For time series with known periodic components and linear trends, the pipeline consists of: (1) **Detrending** to remove periodicity, (2) **Model Fitting** via least squares regression, (3) **Extrapolation** to predict future base values, (4) **Reconstruction** by adding back periodic effects, and (5) **Margin Application** for robustness.",
+        "notation": "$\\{y_i\\}_{i=1}^n$ = observed consumption data, $\\{f_i\\}$ = known fluctuations, $\\{y_i^*\\}$ = detrended data, $(m, b)$ = regression parameters, $\\hat{y}_{new}$ = prediction, $y_{final}$ = capacity requirement",
+        "theorem": "**Complete Forecasting Algorithm**: Given consumption data for days 1 through $n$, the optimal day $k$ forecast (where $k > n$) under additive decomposition with known periodicity is:\n$$y_{final}(k) = \\left\\lceil (1+\\alpha) \\cdot \\text{round}\\left(\\hat{m}k + \\hat{b} + 10\\sin\\left(\\frac{2\\pi k}{10}\\right)\\right) \\right\\rceil$$\nwhere $\\hat{m}$ and $\\hat{b}$ are least squares estimates from detrended data $y_i^* = y_i - 10\\sin(2\\pi i/10)$, and $\\alpha$ is the safety margin.",
+        "proof_sketch": "The observed data follows $y_i = (mi + b) + 10\\sin(2\\pi i/10) + \\epsilon_i$. Detrending gives $y_i^* = mi + b + \\epsilon_i$. Least squares on $(i, y_i^*)$ yields unbiased estimates $\\hat{m}, \\hat{b}$. For day $k$, base prediction is $\\hat{m}k + \\hat{b}$. Adding the day $k$ fluctuation reconstructs the full signal. Rounding converts to discrete units, and the margin $\\alpha$ provides a confidence buffer.",
+        "examples": [
+          "Example walkthrough with data [150, 165, 185, 195, 210, 225, 240, 260, 275, 290]:",
+          "Step 1: Detrend each value by subtracting $f_i$",
+          "Step 2: Fit $y^* = mx + b$ to $(1, y_1^*), \\ldots, (10, y_{10}^*)$",
+          "Step 3: Predict base for day 15: $\\hat{y}_{base} = 15m + b$",
+          "Step 4: Add $f_{15} = 0$ to get full prediction",
+          "Step 5: Round and apply 5% margin → final answer: 404"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Pipeline Formula",
+          "latex": "$y_{final}(k) = \\left\\lceil 1.05 \\cdot \\text{round}\\left((\\hat{m}k + \\hat{b}) + 10\\sin\\left(\\frac{2\\pi k}{10}\\right)\\right) \\right\\rceil$",
+          "description": "Combines all steps: regression on detrended data, prediction, reconstruction, and margin"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete function that takes consumption data for 10 days, performs all necessary steps (detrending, regression, prediction for day 15, reconstruction, margin), and returns the final integer capacity requirement. This should integrate all previous sub-quest concepts without using external libraries beyond math.",
+        "function_signature": "def forecast_power_requirement(consumption_data: list) -> int:",
+        "starter_code": "import math\n\nPI = 3.14159\n\ndef forecast_power_requirement(consumption_data: list) -> int:\n    # Implement the complete pipeline:\n    # 1) Detrend the data (remove fluctuations for days 1-10)\n    # 2) Fit linear regression to detrended data\n    # 3) Predict day 15's base consumption\n    # 4) Add back day 15's fluctuation\n    # 5) Round and apply 5% safety margin (ceiling)\n    # Return the final integer\n    pass",
+        "test_cases": [
+          {
+            "input": "forecast_power_requirement([150, 165, 185, 195, 210, 225, 240, 260, 275, 290])",
+            "expected": "404",
+            "explanation": "Complete pipeline on the provided example data yields 404 as the final capacity"
+          },
+          {
+            "input": "forecast_power_requirement([100, 110, 120, 130, 140, 150, 160, 170, 180, 190])",
+            "expected": "277",
+            "explanation": "Linear data with constant slope; after detrending, regression, and margin application"
+          },
+          {
+            "input": "forecast_power_requirement([200, 200, 200, 200, 200, 200, 200, 200, 200, 200])",
+            "expected": "210",
+            "explanation": "Constant consumption; after removing fluctuations, flat trend predicts same value"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Performing operations in the wrong order (e.g., adding margin before reconstruction)",
+        "Using 0-indexed days for fluctuation calculations instead of 1-indexed",
+        "Incorrectly implementing any of the five pipeline stages",
+        "Not handling floating-point precision carefully throughout the calculations",
+        "Forgetting to use ceiling for the final rounding after applying the margin"
+      ],
+      "hint": "Break down the problem into the five distinct stages. Test each stage independently using the concepts from previous sub-quests before combining them.",
+      "references": [
+        "Time series forecasting methodologies",
+        "Production pipeline design",
+        "Energy demand forecasting in power systems",
+        "Robust capacity planning under uncertainty"
+      ]
+    }
+  ]
+}

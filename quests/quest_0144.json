@@ -1,0 +1,444 @@
+{
+  "problem_id": 144,
+  "title": "Apriori Frequent Itemset Mining",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "Implement the Apriori algorithm to discover all frequent itemsets in a set of transactions, given a minimum support threshold. Your function should return all frequent itemsets (of any size) whose support is at least the given minimum. Return the frequent itemsets as a dictionary mapping frozenset of items to their support (fractional). Only use built-in Python and standard libraries (collections, itertools).",
+  "example": {
+    "input": "transactions = [\n    {'bread', 'milk'},\n    {'bread', 'diaper', 'beer', 'eggs'},\n    {'milk', 'diaper', 'beer', 'cola'},\n    {'bread', 'milk', 'diaper', 'beer'},\n    {'bread', 'milk', 'diaper', 'cola'}\n]\nresult = apriori(transactions, min_support=0.6)\nfor k in sorted(result, key=lambda x: (len(x), sorted(x))):\n    print(sorted(list(k)), round(result[k], 2))",
+    "output": "['bread'] 0.8\n['diaper'] 0.8\n['milk'] 0.8\n['bread', 'diaper'] 0.6\n['bread', 'milk'] 0.6\n['milk', 'diaper'] 0.6",
+    "reasoning": "Bread, Milk, and Diaper each appear in 4 out of 5 transactions (support=0.8), and the 2-itemsets {'bread','milk'}, {'bread','diaper'}, and {'milk','diaper'} each appear in 3 out of 5 (support=0.6). Only these satisfy the min_support threshold."
+  },
+  "starter_code": "import itertools\nfrom collections import defaultdict\n\ndef apriori(transactions, min_support=0.5, max_length=None):\n    \"\"\"\n    Returns: dict mapping frozenset(itemset) -> support (float)\n    \"\"\"\n    # TODO: Implement the Apriori algorithm\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Set Theory and Support Calculation",
+      "relation_to_problem": "Support calculation is the fundamental operation in Apriori - we must count how many transactions contain each itemset and compute fractional support values",
+      "prerequisites": [
+        "Basic Python",
+        "Set operations",
+        "Fractions and ratios"
+      ],
+      "learning_objectives": [
+        "Define itemsets as mathematical sets and understand containment",
+        "Calculate support as a frequency metric",
+        "Implement efficient itemset membership testing"
+      ],
+      "math_content": {
+        "definition": "Let $\\mathcal{D} = \\{T_1, T_2, \\ldots, T_n\\}$ be a database of $n$ transactions, where each transaction $T_i \\subseteq \\mathcal{I}$ is a subset of the universe of items $\\mathcal{I}$. An **itemset** $X \\subseteq \\mathcal{I}$ is any subset of items. The **support** of itemset $X$ is defined as: $$\\text{supp}(X) = \\frac{|\\{T_i \\in \\mathcal{D} : X \\subseteq T_i\\}|}{|\\mathcal{D}|}$$ This represents the fraction of transactions that contain all items in $X$.",
+        "notation": "$\\mathcal{D}$ = transaction database, $T_i$ = individual transaction, $X$ = itemset, $\\text{supp}(X)$ = support of itemset $X$, $X \\subseteq T_i$ = itemset $X$ is contained in transaction $T_i$",
+        "theorem": "**Support Monotonicity Property**: For any itemsets $X, Y \\subseteq \\mathcal{I}$, if $X \\subseteq Y$, then $\\text{supp}(Y) \\leq \\text{supp}(X)$.",
+        "proof_sketch": "If $X \\subseteq Y$, then any transaction containing $Y$ must also contain $X$ (since $Y$ includes all elements of $X$). Therefore, $\\{T : Y \\subseteq T\\} \\subseteq \\{T : X \\subseteq T\\}$, which implies $|\\{T : Y \\subseteq T\\}| \\leq |\\{T : X \\subseteq T\\}|$. Dividing by $|\\mathcal{D}|$ gives the result.",
+        "examples": [
+          "Consider $\\mathcal{D} = \\{\\{a,b\\}, \\{b,c\\}, \\{a,b,c\\}\\}$ with $n=3$ transactions. For itemset $X = \\{b\\}$: it appears in all 3 transactions, so $\\text{supp}(\\{b\\}) = 3/3 = 1.0$",
+          "For itemset $Y = \\{a,b\\}$: it appears in transactions 1 and 3, so $\\text{supp}(\\{a,b\\}) = 2/3 \\approx 0.667$. Note $\\text{supp}(\\{a,b\\}) < \\text{supp}(\\{b\\})$ as expected from monotonicity."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Support Formula",
+          "latex": "$\\text{supp}(X) = \\frac{|\\{T_i \\in \\mathcal{D} : X \\subseteq T_i\\}|}{n}$",
+          "description": "Use this to calculate the fraction of transactions containing itemset X"
+        },
+        {
+          "name": "Containment Test",
+          "latex": "$X \\subseteq T_i \\iff \\forall x \\in X, x \\in T_i$",
+          "description": "An itemset is contained in a transaction if every item in the itemset is in the transaction"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the support of a single itemset across a collection of transactions. This is the core counting operation needed for Apriori.",
+        "function_signature": "def calculate_support(transactions: list, itemset: frozenset) -> float:",
+        "starter_code": "def calculate_support(transactions: list, itemset: frozenset) -> float:\n    \"\"\"\n    Calculate the support of an itemset in a transaction database.\n    \n    Args:\n        transactions: List of sets, each representing a transaction\n        itemset: A frozenset of items\n    \n    Returns:\n        Support value as a float between 0 and 1\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_support([{'a', 'b'}, {'b', 'c'}, {'a', 'b', 'c'}], frozenset({'b'}))",
+            "expected": "1.0",
+            "explanation": "Item 'b' appears in all 3 transactions, so support = 3/3 = 1.0"
+          },
+          {
+            "input": "calculate_support([{'a', 'b'}, {'b', 'c'}, {'a', 'b', 'c'}], frozenset({'a', 'b'}))",
+            "expected": "0.6667 (approximately)",
+            "explanation": "Itemset {'a','b'} appears in 2 out of 3 transactions (transactions 1 and 3), so support = 2/3"
+          },
+          {
+            "input": "calculate_support([{'a', 'b'}, {'b', 'c'}, {'a', 'b', 'c'}], frozenset({'a', 'c'}))",
+            "expected": "0.3333 (approximately)",
+            "explanation": "Itemset {'a','c'} only appears in transaction 3, so support = 1/3"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check that ALL items in the itemset are present (using OR instead of AND logic)",
+        "Not handling empty itemsets correctly (empty set has support 1.0)",
+        "Integer division instead of float division",
+        "Confusing itemset containment with set equality"
+      ],
+      "hint": "Use Python's set operations - the issubset() method or the <= operator checks if one set is contained in another",
+      "references": [
+        "Set theory and subset relations",
+        "Frequency counting in databases",
+        "Python frozenset operations"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Frequent Itemsets and the Downward Closure Property",
+      "relation_to_problem": "Understanding which itemsets are 'frequent' and the anti-monotonicity property is essential - it allows Apriori to prune the search space and avoid checking supersets of infrequent itemsets",
+      "prerequisites": [
+        "Support calculation",
+        "Set containment",
+        "Threshold comparison"
+      ],
+      "learning_objectives": [
+        "Define frequent itemsets formally using support thresholds",
+        "Understand and prove the Apriori principle (downward closure)",
+        "Implement frequency filtering for a collection of itemsets"
+      ],
+      "math_content": {
+        "definition": "Given a minimum support threshold $\\sigma \\in [0,1]$, an itemset $X$ is called **frequent** (or **large**) if $\\text{supp}(X) \\geq \\sigma$. The set of all frequent $k$-itemsets (itemsets of size $k$) is denoted $\\mathcal{F}_k = \\{X \\subseteq \\mathcal{I} : |X| = k \\land \\text{supp}(X) \\geq \\sigma\\}$.",
+        "notation": "$\\sigma$ = minimum support threshold, $\\mathcal{F}_k$ = set of all frequent $k$-itemsets, $|X|$ = cardinality (size) of itemset $X$",
+        "theorem": "**Apriori Principle (Downward Closure Property)**: If an itemset $X$ is infrequent (i.e., $\\text{supp}(X) < \\sigma$), then all supersets of $X$ are also infrequent. Formally: $$\\text{supp}(X) < \\sigma \\implies \\forall Y \\supseteq X: \\text{supp}(Y) < \\sigma$$ Equivalently, by contrapositive: if $Y$ is frequent, then all subsets of $Y$ must be frequent.",
+        "proof_sketch": "From the Support Monotonicity Property (Step 1), we know that if $X \\subseteq Y$, then $\\text{supp}(Y) \\leq \\text{supp}(X)$. If $\\text{supp}(X) < \\sigma$, then $\\text{supp}(Y) \\leq \\text{supp}(X) < \\sigma$, so $Y$ is also infrequent. This property is fundamental to Apriori's efficiency: we can prune entire branches of the search tree.",
+        "examples": [
+          "With $\\sigma = 0.5$ and $\\mathcal{D} = \\{\\{a,b\\}, \\{b,c\\}, \\{c,d\\}\\}$: itemset $\\{a\\}$ has $\\text{supp}(\\{a\\}) = 1/3 < 0.5$, so it's infrequent. By the Apriori principle, we don't need to check $\\{a,b\\}$, $\\{a,c\\}$, $\\{a,d\\}$, or any larger sets containing $a$ - they're all guaranteed to be infrequent.",
+          "Itemset $\\{b\\}$ has $\\text{supp}(\\{b\\}) = 2/3 \\geq 0.5$, so it's frequent. However, this doesn't guarantee that $\\{b,c\\}$ or $\\{b,d\\}$ are frequent - we must still check them."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Frequency Criterion",
+          "latex": "$X \\in \\mathcal{F}_k \\iff |X| = k \\land \\text{supp}(X) \\geq \\sigma$",
+          "description": "Use this to determine if an itemset qualifies as frequent"
+        },
+        {
+          "name": "Pruning Rule",
+          "latex": "$\\text{supp}(X) < \\sigma \\implies \\forall Y \\supseteq X: Y \\notin \\mathcal{F}$",
+          "description": "If X is infrequent, skip all supersets of X in the search"
+        }
+      ],
+      "exercise": {
+        "description": "Given a dictionary mapping itemsets to their supports, filter and return only the frequent itemsets that meet the minimum support threshold. This filtering step is applied after each counting phase in Apriori.",
+        "function_signature": "def filter_frequent(itemset_supports: dict, min_support: float) -> dict:",
+        "starter_code": "def filter_frequent(itemset_supports: dict, min_support: float) -> dict:\n    \"\"\"\n    Filter itemsets by minimum support threshold.\n    \n    Args:\n        itemset_supports: Dict mapping frozenset -> support (float)\n        min_support: Minimum support threshold (float between 0 and 1)\n    \n    Returns:\n        Dict containing only itemsets with support >= min_support\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "filter_frequent({frozenset({'a'}): 0.8, frozenset({'b'}): 0.6, frozenset({'c'}): 0.4}, 0.5)",
+            "expected": "{frozenset({'a'}): 0.8, frozenset({'b'}): 0.6}",
+            "explanation": "Items 'a' and 'b' meet the 0.5 threshold, but 'c' with support 0.4 is infrequent and is filtered out"
+          },
+          {
+            "input": "filter_frequent({frozenset({'a','b'}): 0.7, frozenset({'a','c'}): 0.45, frozenset({'b','c'}): 0.6}, 0.6)",
+            "expected": "{frozenset({'a','b'}): 0.7, frozenset({'b','c'}): 0.6}",
+            "explanation": "Only itemsets with support >= 0.6 are retained; {'a','c'} is removed"
+          },
+          {
+            "input": "filter_frequent({frozenset({'x'}): 0.3, frozenset({'y'}): 0.2}, 0.5)",
+            "expected": "{}",
+            "explanation": "No itemsets meet the threshold, so an empty dictionary is returned"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using strict inequality (>) instead of >= for the threshold comparison",
+        "Modifying the input dictionary instead of creating a new one",
+        "Incorrect handling of edge cases (empty input, threshold of 0.0 or 1.0)",
+        "Not understanding that this is a simple filter - no pruning logic needed yet"
+      ],
+      "hint": "Use dictionary comprehension to filter key-value pairs based on the support value",
+      "references": [
+        "Downward closure property in lattice theory",
+        "Anti-monotonicity in frequent pattern mining",
+        "Dictionary filtering in Python"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Candidate Generation via Set Union",
+      "relation_to_problem": "Apriori generates candidate (k+1)-itemsets by combining frequent k-itemsets. Understanding the join step mathematically ensures we generate all potential frequent itemsets without duplicates",
+      "prerequisites": [
+        "Frequent itemset definition",
+        "Set unions",
+        "Combinatorial enumeration"
+      ],
+      "learning_objectives": [
+        "Understand the self-join operation for generating candidates",
+        "Prove that the join step generates all necessary candidates",
+        "Implement efficient candidate generation from k-itemsets"
+      ],
+      "math_content": {
+        "definition": "Given the set of frequent $k$-itemsets $\\mathcal{F}_k$, we generate **candidate $(k+1)$-itemsets** $\\mathcal{C}_{k+1}$ using the **join step**: $$\\mathcal{C}_{k+1} = \\{X \\cup Y : X, Y \\in \\mathcal{F}_k \\land |X \\cup Y| = k+1\\}$$ This operation combines pairs of $k$-itemsets that differ by exactly one item to form $(k+1)$-itemsets.",
+        "notation": "$\\mathcal{C}_{k+1}$ = candidate set of $(k+1)$-itemsets, $X \\cup Y$ = set union of itemsets $X$ and $Y$, $|X \\cup Y|$ = size of the union",
+        "theorem": "**Candidate Completeness**: Every frequent $(k+1)$-itemset $Z \\in \\mathcal{F}_{k+1}$ can be generated by the join step from $\\mathcal{F}_k$. That is, there exist $X, Y \\in \\mathcal{F}_k$ such that $Z = X \\cup Y$.",
+        "proof_sketch": "Let $Z \\in \\mathcal{F}_{k+1}$ be a frequent $(k+1)$-itemset. By the Apriori principle, all $k$-subsets of $Z$ must be frequent. Choose any two distinct items $a, b \\in Z$ and let $X = Z \\setminus \\{a\\}$ and $Y = Z \\setminus \\{b\\}$. Then $X, Y \\in \\mathcal{F}_k$ (both have size $k$ and are subsets of frequent $Z$), and $X \\cup Y = Z$. Thus, the join step will generate $Z$.",
+        "examples": [
+          "If $\\mathcal{F}_2 = \\{\\{a,b\\}, \\{a,c\\}, \\{b,c\\}\\}$, the join step produces: $\\{a,b\\} \\cup \\{a,c\\} = \\{a,b,c\\}$, $\\{a,b\\} \\cup \\{b,c\\} = \\{a,b,c\\}$, $\\{a,c\\} \\cup \\{b,c\\} = \\{a,b,c\\}$. After removing duplicates: $\\mathcal{C}_3 = \\{\\{a,b,c\\}\\}$",
+          "If $\\mathcal{F}_1 = \\{\\{a\\}, \\{b\\}, \\{c\\}, \\{d\\}\\}$, the join step generates all possible 2-itemsets: $\\mathcal{C}_2 = \\{\\{a,b\\}, \\{a,c\\}, \\{a,d\\}, \\{b,c\\}, \\{b,d\\}, \\{c,d\\}\\}$ (there are $\\binom{4}{2} = 6$ candidates)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Join Condition",
+          "latex": "$X, Y \\in \\mathcal{F}_k \\land |X \\cup Y| = k+1$",
+          "description": "Only combine k-itemsets whose union has exactly k+1 items (they share k-1 items)"
+        },
+        {
+          "name": "Candidate Size Bound",
+          "latex": "$|\\mathcal{C}_{k+1}| \\leq \\binom{|\\mathcal{F}_k|}{2}$",
+          "description": "At most, we consider all pairs of frequent k-itemsets (actual size is usually much smaller)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement candidate generation: given a set of frequent k-itemsets, generate all possible (k+1)-itemsets by taking unions of pairs. Remove duplicates and return candidates as frozensets.",
+        "function_signature": "def generate_candidates(frequent_k_itemsets: set) -> set:",
+        "starter_code": "def generate_candidates(frequent_k_itemsets: set) -> set:\n    \"\"\"\n    Generate candidate (k+1)-itemsets from frequent k-itemsets.\n    \n    Args:\n        frequent_k_itemsets: Set of frozensets, all of the same size k\n    \n    Returns:\n        Set of frozensets representing candidate (k+1)-itemsets\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "generate_candidates({frozenset({'a'}), frozenset({'b'}), frozenset({'c'})})",
+            "expected": "{frozenset({'a','b'}), frozenset({'a','c'}), frozenset({'b','c'})}",
+            "explanation": "Combining all pairs of 1-itemsets produces all possible 2-itemsets"
+          },
+          {
+            "input": "generate_candidates({frozenset({'a','b'}), frozenset({'a','c'}), frozenset({'b','c'})})",
+            "expected": "{frozenset({'a','b','c'})}",
+            "explanation": "All three pairs union to the same 3-itemset {a,b,c}, duplicates are removed"
+          },
+          {
+            "input": "generate_candidates({frozenset({'a','b'}), frozenset({'c','d'})})",
+            "expected": "{frozenset({'a','b','c','d'})}",
+            "explanation": "These 2-itemsets share no items, so their union has 4 items (a valid 4-itemset candidate)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not removing duplicate candidates after unions",
+        "Using lists instead of frozensets (frozensets are hashable and can be stored in sets)",
+        "Incorrectly filtering by size - accepting unions that are too large or too small",
+        "Inefficient O(n³) approaches when O(n²) is sufficient"
+      ],
+      "hint": "Use itertools.combinations to iterate over all pairs of frequent k-itemsets, then compute their union and add to a set to handle duplicates automatically",
+      "references": [
+        "Set union properties",
+        "Combinatorial generation",
+        "Python itertools.combinations"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Candidate Pruning via Subset Checking",
+      "relation_to_problem": "The Apriori algorithm prunes candidates before counting their support - if any (k-1)-subset of a candidate k-itemset is infrequent, we can skip counting it. This dramatically reduces computation",
+      "prerequisites": [
+        "Apriori principle",
+        "Subset enumeration",
+        "Candidate generation"
+      ],
+      "learning_objectives": [
+        "Apply the Apriori principle to prune candidates before support counting",
+        "Generate all k-1 subsets of a k-itemset efficiently",
+        "Implement the pruning step of the Apriori algorithm"
+      ],
+      "math_content": {
+        "definition": "The **pruning step** removes candidate itemsets $C \\in \\mathcal{C}_k$ if any $(k-1)$-subset of $C$ is not in $\\mathcal{F}_{k-1}$. Formally, the pruned candidate set is: $$\\mathcal{C}'_k = \\{C \\in \\mathcal{C}_k : \\forall S \\subset C, |S| = k-1 \\implies S \\in \\mathcal{F}_{k-1}\\}$$",
+        "notation": "$\\mathcal{C}'_k$ = pruned candidate set, $S \\subset C$ = $S$ is a proper subset of $C$, $\\forall$ = for all",
+        "theorem": "**Correctness of Pruning**: No frequent itemset is removed by the pruning step. That is, $\\mathcal{F}_k \\subseteq \\mathcal{C}'_k$.",
+        "proof_sketch": "Suppose $C \\in \\mathcal{F}_k$ is a frequent $k$-itemset. By the contrapositive of the Apriori principle, all subsets of $C$ must be frequent. In particular, all $(k-1)$-subsets of $C$ are in $\\mathcal{F}_{k-1}$. Therefore, $C$ satisfies the pruning condition and remains in $\\mathcal{C}'_k$. The pruning only removes candidates that are guaranteed to be infrequent.",
+        "examples": [
+          "Suppose $\\mathcal{F}_2 = \\{\\{a,b\\}, \\{a,c\\}, \\{b,d\\}\\}$ and candidate $C = \\{a,b,d\\}$. The 2-subsets of $C$ are $\\{a,b\\}, \\{a,d\\}, \\{b,d\\}$. Since $\\{a,d\\} \\notin \\mathcal{F}_2$, we prune $C$ - it cannot be frequent.",
+          "For candidate $C' = \\{a,b,c\\}$ with the same $\\mathcal{F}_2$, all 2-subsets $\\{a,b\\}, \\{a,c\\}, \\{b,c\\}$ must be checked. Since $\\{b,c\\} \\notin \\mathcal{F}_2$, we prune $C'$ as well."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Subset Generation",
+          "latex": "$\\{S \\subset C : |S| = k-1\\} = \\{C \\setminus \\{x\\} : x \\in C\\}$",
+          "description": "To get all (k-1)-subsets of a k-itemset C, remove each element one at a time"
+        },
+        {
+          "name": "Pruning Criterion",
+          "latex": "$C \\in \\mathcal{C}'_k \\iff \\forall x \\in C: (C \\setminus \\{x\\}) \\in \\mathcal{F}_{k-1}$",
+          "description": "Keep candidate C only if all its (k-1)-subsets are frequent"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the pruning step: given a set of candidate k-itemsets and the set of frequent (k-1)-itemsets, remove any candidate whose (k-1)-subsets are not all frequent.",
+        "function_signature": "def prune_candidates(candidates: set, frequent_prev: set) -> set:",
+        "starter_code": "def prune_candidates(candidates: set, frequent_prev: set) -> set:\n    \"\"\"\n    Prune candidates using the Apriori principle.\n    \n    Args:\n        candidates: Set of frozensets representing candidate k-itemsets\n        frequent_prev: Set of frozensets representing frequent (k-1)-itemsets\n    \n    Returns:\n        Set of frozensets with infrequent candidates removed\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "prune_candidates({frozenset({'a','b','c'})}, {frozenset({'a','b'}), frozenset({'a','c'}), frozenset({'b','c'})})",
+            "expected": "{frozenset({'a','b','c'})}",
+            "explanation": "All 2-subsets of {a,b,c} are frequent, so the candidate is retained"
+          },
+          {
+            "input": "prune_candidates({frozenset({'a','b','d'})}, {frozenset({'a','b'}), frozenset({'a','c'}), frozenset({'b','d'})})",
+            "expected": "set()",
+            "explanation": "Subset {a,d} is not in frequent_prev, so {a,b,d} is pruned (empty set returned)"
+          },
+          {
+            "input": "prune_candidates({frozenset({'a','b','c'}), frozenset({'a','b','d'}), frozenset({'a','c','d'})}, {frozenset({'a','b'}), frozenset({'a','c'}), frozenset({'a','d'})})",
+            "expected": "{frozenset({'a','b','c'}), frozenset({'a','b','d'}), frozenset({'a','c','d'})}",
+            "explanation": "All candidates have all their 2-subsets present (note {b,c}, {b,d}, {c,d} are not required since those pairs don't appear in all three candidates)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Checking if the entire candidate is in frequent_prev instead of checking subsets",
+        "Not generating all (k-1)-subsets correctly - missing some subsets",
+        "Using inefficient nested loops instead of set membership testing",
+        "Incorrectly handling edge cases (size-1 candidates have no subsets to check)"
+      ],
+      "hint": "For each candidate C, generate all (k-1)-subsets by removing one item at a time. Use set membership (in operator) to check if each subset is frequent. Use all() with a generator expression for efficiency.",
+      "references": [
+        "Subset generation algorithms",
+        "Apriori principle applications",
+        "Set difference operations"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Iterative Level-wise Search",
+      "relation_to_problem": "The complete Apriori algorithm iteratively finds frequent 1-itemsets, then 2-itemsets, then 3-itemsets, etc., stopping when no new frequent itemsets are found. This level-wise approach is the core structure of the algorithm",
+      "prerequisites": [
+        "Support calculation",
+        "Candidate generation",
+        "Candidate pruning",
+        "Frequent filtering"
+      ],
+      "learning_objectives": [
+        "Understand the iterative, level-wise structure of Apriori",
+        "Implement termination conditions for the main loop",
+        "Combine all previous operations into a complete mining algorithm"
+      ],
+      "math_content": {
+        "definition": "The **Apriori algorithm** performs a **level-wise search** through the itemset lattice. At level $k$, it: (1) generates candidates $\\mathcal{C}_k$ from $\\mathcal{F}_{k-1}$, (2) prunes candidates, (3) scans the database to compute support for remaining candidates, (4) filters to obtain $\\mathcal{F}_k$. The algorithm terminates when $\\mathcal{F}_k = \\emptyset$ or a maximum size is reached.",
+        "notation": "$k$ = current itemset size (level), $\\mathcal{L}$ = itemset lattice, $\\emptyset$ = empty set",
+        "theorem": "**Apriori Termination**: The Apriori algorithm terminates after at most $|\\mathcal{I}|$ iterations, where $|\\mathcal{I}|$ is the number of distinct items. Furthermore, if $\\mathcal{F}_k = \\emptyset$ for some $k < |\\mathcal{I}|$, then $\\mathcal{F}_j = \\emptyset$ for all $j > k$.",
+        "proof_sketch": "At each iteration $k$, we find itemsets of size $k$. Since itemsets cannot exceed size $|\\mathcal{I}|$, we have at most $|\\mathcal{I}|$ iterations. If $\\mathcal{F}_k = \\emptyset$, there are no frequent $k$-itemsets. By the Apriori principle, any $(k+1)$-itemset contains at least one infrequent $k$-subset, so no $(k+1)$-itemset can be frequent. Thus $\\mathcal{F}_{k+1} = \\emptyset$, and by induction, all larger levels are empty.",
+        "examples": [
+          "**Iteration structure**: Start with $k=1$. Find all frequent 1-itemsets $\\mathcal{F}_1$. If $\\mathcal{F}_1 \\neq \\emptyset$, set $k=2$, generate $\\mathcal{C}_2$ from $\\mathcal{F}_1$, find $\\mathcal{F}_2$. Continue until $\\mathcal{F}_k = \\emptyset$.",
+          "**Termination example**: With transactions $\\{\\{a\\}, \\{b\\}, \\{c\\}\\}$ and $\\sigma = 0.5$, we get $\\mathcal{F}_1 = \\emptyset$ (each item has support $1/3 < 0.5$). The algorithm terminates immediately - no need to check 2-itemsets or larger."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Main Loop Condition",
+          "latex": "$\\mathcal{F}_k \\neq \\emptyset \\land (k < \\text{max\\_length} \\text{ or max\\_length is None})$",
+          "description": "Continue iterating while frequent itemsets exist at the current level and size limit not reached"
+        },
+        {
+          "name": "Database Scan Complexity",
+          "latex": "$O(|\\mathcal{C}_k| \\cdot |\\mathcal{D}| \\cdot k)$",
+          "description": "At level k, checking each candidate against each transaction costs O(k) per check"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified multi-level mining function that finds all frequent k-itemsets for k=1 and k=2 only (not full Apriori yet). Start by finding frequent 1-itemsets, then generate and find frequent 2-itemsets. Return combined results.",
+        "function_signature": "def mine_frequent_pairs(transactions: list, min_support: float) -> dict:",
+        "starter_code": "def mine_frequent_pairs(transactions: list, min_support: float) -> dict:\n    \"\"\"\n    Find frequent 1-itemsets and 2-itemsets using level-wise approach.\n    \n    Args:\n        transactions: List of sets representing transactions\n        min_support: Minimum support threshold\n    \n    Returns:\n        Dict mapping frozenset -> support for all frequent 1- and 2-itemsets\n    \"\"\"\n    # Your code here\n    # Step 1: Find all unique items and compute their supports\n    # Step 2: Filter to get frequent 1-itemsets\n    # Step 3: Generate candidate 2-itemsets from frequent 1-itemsets\n    # Step 4: Compute supports for candidate 2-itemsets\n    # Step 5: Filter to get frequent 2-itemsets\n    # Step 6: Combine and return all frequent itemsets\n    pass",
+        "test_cases": [
+          {
+            "input": "mine_frequent_pairs([{'a','b'}, {'b','c'}, {'a','b','c'}], 0.6)",
+            "expected": "{frozenset({'a'}): 0.667, frozenset({'b'}): 1.0, frozenset({'c'}): 0.667, frozenset({'a','b'}): 0.667, frozenset({'b','c'}): 0.667}",
+            "explanation": "Items a, b, c all appear in 2+ transactions (support >= 0.6). Pairs {a,b} and {b,c} appear in 2 transactions each."
+          },
+          {
+            "input": "mine_frequent_pairs([{'x','y'}, {'y','z'}, {'x','z'}], 0.5)",
+            "expected": "{frozenset({'x'}): 0.667, frozenset({'y'}): 0.667, frozenset({'z'}): 0.667, frozenset({'x','y'}): 0.333, frozenset({'y','z'}): 0.333, frozenset({'x','z'}): 0.333}",
+            "explanation": "All single items are frequent (appear in 2/3 transactions), but NO pairs are frequent (each appears in only 1/3, below 0.5 threshold) - only 1-itemsets returned"
+          },
+          {
+            "input": "mine_frequent_pairs([{'a'}], 1.0)",
+            "expected": "{frozenset({'a'}): 1.0}",
+            "explanation": "Only item 'a' exists with support 1.0; no 2-itemsets possible"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not properly extracting all unique items from transactions in the first pass",
+        "Forgetting to filter out infrequent 1-itemsets before generating 2-itemset candidates",
+        "Recomputing supports inefficiently instead of doing one database pass per level",
+        "Not handling the case where no frequent 1-itemsets exist (should return empty result)"
+      ],
+      "hint": "Use nested dictionary comprehensions or loops. First pass: iterate through all transactions to build a set of unique items, compute their supports, filter. Second pass: generate all 2-item combinations from frequent 1-itemsets, compute supports, filter.",
+      "references": [
+        "Breadth-first search in lattices",
+        "Level-wise algorithms",
+        "Database scanning strategies"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Apriori Implementation with Arbitrary Itemset Sizes",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts into the complete Apriori algorithm that mines frequent itemsets of any size, handling all edge cases and optimizations",
+      "prerequisites": [
+        "All previous sub-quests",
+        "While loops and termination",
+        "Dictionary operations"
+      ],
+      "learning_objectives": [
+        "Implement the complete Apriori algorithm for itemsets of any size",
+        "Handle optional max_length parameter to limit search depth",
+        "Optimize with early termination when no candidates remain"
+      ],
+      "math_content": {
+        "definition": "The **complete Apriori algorithm** returns the set of all frequent itemsets: $$\\mathcal{F} = \\bigcup_{k=1}^{|\\mathcal{I}|} \\mathcal{F}_k = \\{X \\subseteq \\mathcal{I} : \\text{supp}(X) \\geq \\sigma\\}$$ represented as a dictionary mapping each frequent itemset to its support value.",
+        "notation": "$\\mathcal{F}$ = complete set of all frequent itemsets (across all sizes), $\\bigcup$ = set union over all levels",
+        "theorem": "**Apriori Completeness**: The Apriori algorithm finds all and only the frequent itemsets. That is, an itemset $X$ is in the output if and only if $\\text{supp}(X) \\geq \\sigma$.",
+        "proof_sketch": "**Soundness** (all output itemsets are frequent): Every itemset added to $\\mathcal{F}$ has its support explicitly computed and checked against $\\sigma$. **Completeness** (all frequent itemsets are found): We prove by induction on $k$ that all frequent $k$-itemsets are found. Base case ($k=1$): we scan all items and check all 1-itemsets. Inductive step: assume all frequent $(k-1)$-itemsets are in $\\mathcal{F}_{k-1}$. By the Candidate Completeness theorem (Step 3), every frequent $k$-itemset is generated as a candidate. We compute its support and add it to $\\mathcal{F}_k$. Thus all frequent itemsets are discovered.",
+        "examples": [
+          "**Complete execution trace**: Given $\\mathcal{D} = \\{\\{a,b,c\\}, \\{a,b\\}, \\{a,c\\}, \\{b,c\\}\\}$ with $\\sigma=0.5$: $\\mathcal{F}_1 = \\{a:0.75, b:0.75, c:0.75\\}$; $\\mathcal{F}_2 = \\{\\{a,b\\}:0.5, \\{a,c\\}:0.5, \\{b,c\\}:0.5\\}$; $\\mathcal{C}_3 = \\{\\{a,b,c\\}\\}$ but $\\text{supp}(\\{a,b,c\\}) = 0.25 < 0.5$, so $\\mathcal{F}_3 = \\emptyset$. Algorithm terminates. Output: all itemsets from $\\mathcal{F}_1$ and $\\mathcal{F}_2$.",
+          "**Max length example**: Same data with max_length=2 stops after finding $\\mathcal{F}_2$, not checking 3-itemsets even though frequent 2-itemsets exist."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Total Frequent Itemsets",
+          "latex": "$|\\mathcal{F}| = \\sum_{k=1}^{\\max k} |\\mathcal{F}_k|$",
+          "description": "The total number of frequent itemsets is the sum across all levels"
+        },
+        {
+          "name": "Worst-case Complexity",
+          "latex": "$O(2^{|\\mathcal{I}|} \\cdot |\\mathcal{D}| \\cdot |\\mathcal{I}|)$",
+          "description": "In the worst case (all itemsets frequent), we check exponentially many candidates"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete Apriori algorithm that finds all frequent itemsets of any size. Use all the building blocks from previous sub-quests: support calculation, filtering, candidate generation, and pruning. Handle the optional max_length parameter.",
+        "function_signature": "def apriori_full(transactions: list, min_support: float, max_length: int = None) -> dict:",
+        "starter_code": "def apriori_full(transactions: list, min_support: float, max_length: int = None) -> dict:\n    \"\"\"\n    Complete Apriori algorithm for frequent itemset mining.\n    \n    Args:\n        transactions: List of sets representing transactions\n        min_support: Minimum support threshold (0 to 1)\n        max_length: Optional maximum itemset size to consider\n    \n    Returns:\n        Dict mapping frozenset -> support for all frequent itemsets\n    \"\"\"\n    # Your code here\n    # Initialize result dictionary to accumulate all frequent itemsets\n    # Find frequent 1-itemsets\n    # While frequent k-itemsets exist and size limit not reached:\n    #   - Generate candidates from frequent k-itemsets\n    #   - Prune candidates (for k >= 2)\n    #   - Count support for candidates\n    #   - Filter to get frequent (k+1)-itemsets\n    #   - Add to result\n    #   - Increment k\n    # Return accumulated results\n    pass",
+        "test_cases": [
+          {
+            "input": "apriori_full([{'bread','milk'}, {'bread','diaper','beer','eggs'}, {'milk','diaper','beer','cola'}, {'bread','milk','diaper','beer'}, {'bread','milk','diaper','cola'}], 0.6)",
+            "expected": "{frozenset({'bread'}): 0.8, frozenset({'milk'}): 0.8, frozenset({'diaper'}): 0.8, frozenset({'bread','milk'}): 0.6, frozenset({'bread','diaper'}): 0.6, frozenset({'milk','diaper'}): 0.6}",
+            "explanation": "Matches the original problem example: 3 frequent 1-itemsets and 3 frequent 2-itemsets"
+          },
+          {
+            "input": "apriori_full([{'a','b','c'}, {'a','b','c'}, {'a','b','c'}], 0.9)",
+            "expected": "{frozenset({'a'}): 1.0, frozenset({'b'}): 1.0, frozenset({'c'}): 1.0, frozenset({'a','b'}): 1.0, frozenset({'a','c'}): 1.0, frozenset({'b','c'}): 1.0, frozenset({'a','b','c'}): 1.0}",
+            "explanation": "All items appear in all transactions, so all possible itemsets up to size 3 are frequent with support 1.0"
+          },
+          {
+            "input": "apriori_full([{'x','y','z'}, {'x','y'}, {'y','z'}], 0.6, max_length=1)",
+            "expected": "{frozenset({'x'}): 0.667, frozenset({'y'}): 1.0, frozenset({'z'}): 0.667}",
+            "explanation": "max_length=1 limits search to 1-itemsets only; y is in all transactions, x and z in 2 of 3"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not accumulating results from all levels - only returning the last level",
+        "Incorrect loop termination - not checking both emptiness and max_length conditions",
+        "Not handling empty transaction list or min_support edge cases (0.0, 1.0)",
+        "Inefficient repeated scanning - should scan database once per level",
+        "Forgetting to apply pruning step for k >= 3"
+      ],
+      "hint": "Structure your code with a while loop that continues as long as the current frequent set is non-empty and max_length allows. In each iteration: generate candidates from the previous frequent set, optionally prune (if k > 2), scan transactions to count supports, filter by min_support, and add to results. Use helper functions from previous exercises.",
+      "references": [
+        "Original Apriori paper by Agrawal & Srikant (1994)",
+        "Frequent pattern mining algorithms",
+        "Association rule learning",
+        "Market basket analysis applications"
+      ]
+    }
+  ]
+}

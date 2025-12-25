@@ -1,0 +1,506 @@
+{
+  "problem_id": 221,
+  "title": "Newton's Method for Optimization",
+  "category": "Calculus",
+  "difficulty": "medium",
+  "description": "Implement Newton's method for finding the minimum of a function. Given functions that compute the gradient and Hessian at any point, iteratively update the position using the Newton step until convergence. Newton's method uses second-order information (curvature) to converge faster than gradient descent, often finding the minimum of quadratic functions in a single step.",
+  "example": {
+    "input": "f(x,y) = (x-1)^2 + (y-2)^2, gradient_func, hessian_func, x0 = [0.0, 0.0]",
+    "output": "[1.0, 2.0]",
+    "reasoning": "At x0=[0,0]: grad=[-2,-4], Hessian=[[2,0],[0,2]]. Newton step: delta = -H^{-1}*grad = -[[0.5,0],[0,0.5]]*[-2,-4] = [1,2]. New point: [0,0]+[1,2]=[1,2]. Since this is a quadratic function, Newton's method converges in exactly one step to the minimum at (1,2)."
+  },
+  "starter_code": "from typing import Callable\n\ndef newtons_method_optimization(\n\tgradient_func: Callable[[list[float]], list[float]],\n\thessian_func: Callable[[list[float]], list[list[float]]],\n\tx0: list[float],\n\ttol: float = 1e-6,\n\tmax_iter: int = 100\n) -> list[float]:\n\t\"\"\"\n\tFind the minimum of a function using Newton's method.\n\t\n\tArgs:\n\t\tgradient_func: Function that returns gradient vector at a point\n\t\thessian_func: Function that returns Hessian matrix at a point\n\t\tx0: Initial guess (list of coordinates)\n\t\ttol: Convergence tolerance for gradient norm\n\t\tmax_iter: Maximum number of iterations\n\t\t\n\tReturns:\n\t\tThe point that minimizes the function\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Matrix-Vector Operations and the Gradient Vector",
+      "relation_to_problem": "Newton's method requires computing and manipulating gradient vectors. Understanding gradient computation is the foundation for the iterative update rule x_{k+1} = x_k - H^{-1}∇f(x_k).",
+      "prerequisites": [
+        "Multivariable calculus",
+        "Partial derivatives",
+        "Vector operations"
+      ],
+      "learning_objectives": [
+        "Define the gradient vector formally using partial derivatives",
+        "Compute gradients of multivariable functions programmatically",
+        "Understand the gradient as the direction of steepest ascent",
+        "Implement vector operations (dot product, norm) for convergence checking"
+      ],
+      "math_content": {
+        "definition": "Let f: ℝⁿ → ℝ be a differentiable function. The **gradient** of f at point x = (x₁, x₂, ..., xₙ) is the vector of partial derivatives: ∇f(x) = [∂f/∂x₁, ∂f/∂x₂, ..., ∂f/∂xₙ]ᵀ. The gradient points in the direction of maximum rate of increase of f.",
+        "notation": "$\\nabla f(\\mathbf{x})$ = gradient vector at point $\\mathbf{x}$, $\\|\\nabla f(\\mathbf{x})\\|$ = Euclidean norm of gradient (convergence criterion)",
+        "theorem": "**First-Order Necessary Condition for Optimality**: If x* is a local minimum of f and f is differentiable at x*, then ∇f(x*) = 0. This is the fundamental equation Newton's method attempts to solve.",
+        "proof_sketch": "If ∇f(x*) ≠ 0, then the directional derivative in direction -∇f(x*) would be -‖∇f(x*)‖² < 0, meaning we could decrease f by moving in that direction, contradicting that x* is a local minimum.",
+        "examples": [
+          "For f(x,y) = x² + y², ∇f = [2x, 2y]ᵀ. At (1,1): ∇f(1,1) = [2, 2]ᵀ. At minimum (0,0): ∇f(0,0) = [0, 0]ᵀ.",
+          "For f(x,y) = (x-1)² + (y-2)², ∇f = [2(x-1), 2(y-2)]ᵀ. The gradient is zero at the minimum (1,2)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gradient Vector",
+          "latex": "$\\nabla f(\\mathbf{x}) = \\begin{bmatrix} \\frac{\\partial f}{\\partial x_1} \\\\ \\frac{\\partial f}{\\partial x_2} \\\\ \\vdots \\\\ \\frac{\\partial f}{\\partial x_n} \\end{bmatrix}$",
+          "description": "Used to determine the direction and steepness of function increase"
+        },
+        {
+          "name": "Euclidean Norm",
+          "latex": "$\\|\\mathbf{v}\\| = \\sqrt{\\sum_{i=1}^{n} v_i^2}$",
+          "description": "Used as convergence criterion: stop when ‖∇f(x)‖ < tol"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to compute the Euclidean norm of a gradient vector. This is used as the convergence criterion in Newton's method (we stop when ‖∇f(x)‖ < tolerance).",
+        "function_signature": "def gradient_norm(gradient: list[float]) -> float:",
+        "starter_code": "def gradient_norm(gradient: list[float]) -> float:\n    \"\"\"\n    Compute the Euclidean norm (L2 norm) of a gradient vector.\n    \n    Args:\n        gradient: A list representing the gradient vector\n        \n    Returns:\n        The Euclidean norm of the gradient\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "gradient_norm([3.0, 4.0])",
+            "expected": "5.0",
+            "explanation": "‖[3,4]‖ = √(3² + 4²) = √25 = 5. This is a simple Pythagorean triple."
+          },
+          {
+            "input": "gradient_norm([1.0, 0.0, 0.0])",
+            "expected": "1.0",
+            "explanation": "‖[1,0,0]‖ = √(1² + 0² + 0²) = 1. Unit vector along x-axis."
+          },
+          {
+            "input": "gradient_norm([0.0, 0.0])",
+            "expected": "0.0",
+            "explanation": "‖[0,0]‖ = 0. Zero gradient indicates we're at a critical point (potential minimum)."
+          },
+          {
+            "input": "gradient_norm([1.0, 1.0, 1.0, 1.0])",
+            "expected": "2.0",
+            "explanation": "‖[1,1,1,1]‖ = √(1² + 1² + 1² + 1²) = √4 = 2."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to take the square root after summing squares",
+        "Using absolute values instead of squares (Manhattan distance instead of Euclidean)",
+        "Not handling the zero-gradient case (which is actually the goal state)"
+      ],
+      "hint": "The Euclidean norm is the square root of the sum of squared components. Use the mathematical formula ‖v‖ = √(Σvᵢ²).",
+      "references": [
+        "Vector norms",
+        "Convergence criteria in iterative methods",
+        "First-order optimality conditions"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "The Hessian Matrix and Second-Order Information",
+      "relation_to_problem": "The Hessian matrix H captures the curvature of the function. Newton's method uses H⁻¹ to scale the gradient, enabling quadratic convergence and making the algorithm scale-invariant.",
+      "prerequisites": [
+        "Partial derivatives",
+        "Matrix notation",
+        "Gradient computation"
+      ],
+      "learning_objectives": [
+        "Define the Hessian matrix formally as the matrix of second partial derivatives",
+        "Understand how the Hessian captures curvature information",
+        "Recognize positive definite Hessians at local minima",
+        "Extract diagonal elements of the Hessian for simple analysis"
+      ],
+      "math_content": {
+        "definition": "Let f: ℝⁿ → ℝ be twice differentiable. The **Hessian matrix** of f at point x is the n×n matrix of second partial derivatives: H(x)ᵢⱼ = ∂²f/∂xᵢ∂xⱼ. The Hessian is symmetric when f is C² (continuous second derivatives) by Schwarz's theorem.",
+        "notation": "$H(\\mathbf{x}) = \\nabla^2 f(\\mathbf{x}) = \\begin{bmatrix} \\frac{\\partial^2 f}{\\partial x_1^2} & \\frac{\\partial^2 f}{\\partial x_1 \\partial x_2} & \\cdots \\\\ \\frac{\\partial^2 f}{\\partial x_2 \\partial x_1} & \\frac{\\partial^2 f}{\\partial x_2^2} & \\cdots \\\\ \\vdots & \\vdots & \\ddots \\end{bmatrix}$",
+        "theorem": "**Second-Order Sufficient Condition for Local Minimum**: If ∇f(x*) = 0 and H(x*) is positive definite (all eigenvalues > 0), then x* is a strict local minimum. This justifies why Newton's method works: near a minimum, H is positive definite, making the Newton step well-defined and convergent.",
+        "proof_sketch": "By Taylor's theorem, f(x* + δ) ≈ f(x*) + ∇f(x*)ᵀδ + ½δᵀH(x*)δ. If ∇f(x*) = 0 and H(x*) ≻ 0, then f(x* + δ) ≈ f(x*) + ½δᵀH(x*)δ > f(x*) for all δ ≠ 0 (since the quadratic form is positive), proving x* is a strict local minimum.",
+        "examples": [
+          "For f(x,y) = x² + y², H = [[2, 0], [0, 2]] = 2I (constant, positive definite). Every point has positive curvature in all directions.",
+          "For f(x,y) = (x-1)² + (y-2)², H = [[2, 0], [0, 2]] (same as above). At minimum (1,2), H is positive definite, confirming it's a local minimum."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Hessian Matrix (2D)",
+          "latex": "$H(x,y) = \\begin{bmatrix} \\frac{\\partial^2 f}{\\partial x^2} & \\frac{\\partial^2 f}{\\partial x \\partial y} \\\\ \\frac{\\partial^2 f}{\\partial y \\partial x} & \\frac{\\partial^2 f}{\\partial y^2} \\end{bmatrix}$",
+          "description": "Captures curvature: diagonal elements = curvature along axes, off-diagonal = coupling between variables"
+        },
+        {
+          "name": "Positive Definiteness",
+          "latex": "$\\mathbf{v}^T H \\mathbf{v} > 0$ for all $\\mathbf{v} \\neq \\mathbf{0}$",
+          "description": "Ensures the Hessian represents a bowl-shaped surface, making Newton's method converge to a minimum"
+        }
+      ],
+      "exercise": {
+        "description": "Given a Hessian matrix, determine if it is diagonal (no coupling between variables). Diagonal Hessians simplify Newton's method since no cross-derivatives exist. This is a building block for understanding when inversion is trivial.",
+        "function_signature": "def is_diagonal_hessian(hessian: list[list[float]], tol: float = 1e-10) -> bool:",
+        "starter_code": "def is_diagonal_hessian(hessian: list[list[float]], tol: float = 1e-10) -> bool:\n    \"\"\"\n    Check if a Hessian matrix is diagonal (all off-diagonal elements are zero).\n    \n    Args:\n        hessian: A square matrix representing the Hessian\n        tol: Tolerance for considering a value as zero\n        \n    Returns:\n        True if the matrix is diagonal, False otherwise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "is_diagonal_hessian([[2.0, 0.0], [0.0, 2.0]])",
+            "expected": "True",
+            "explanation": "This is the Hessian of f(x,y) = x² + y², which is perfectly diagonal (no interaction between x and y)."
+          },
+          {
+            "input": "is_diagonal_hessian([[2.0, 1.0], [1.0, 2.0]])",
+            "expected": "False",
+            "explanation": "Off-diagonal elements are 1.0, indicating coupling between variables (mixed partial derivatives)."
+          },
+          {
+            "input": "is_diagonal_hessian([[5.0, 0.0, 0.0], [0.0, 3.0, 0.0], [0.0, 0.0, 1.0]])",
+            "expected": "True",
+            "explanation": "A 3×3 diagonal Hessian. Each variable has independent curvature."
+          },
+          {
+            "input": "is_diagonal_hessian([[1.0, 1e-11], [1e-11, 1.0]])",
+            "expected": "True",
+            "explanation": "Off-diagonal elements are within tolerance (1e-11 < 1e-10), so treated as zero (numerical precision)."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking that the matrix is square before analyzing",
+        "Forgetting to check symmetry (Hessian should be symmetric for C² functions)",
+        "Using exact zero comparison instead of tolerance (numerical precision issues)",
+        "Only checking upper triangular or lower triangular elements"
+      ],
+      "hint": "A diagonal matrix has all zeros in off-diagonal positions. Iterate through all i ≠ j positions and check if |Hᵢⱼ| < tolerance.",
+      "references": [
+        "Hessian matrix",
+        "Positive definite matrices",
+        "Second-order optimality conditions",
+        "Mixed partial derivatives"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Matrix Inversion and Solving Linear Systems",
+      "relation_to_problem": "Newton's method requires computing H⁻¹∇f, which means solving the linear system Hδ = -∇f for the Newton step δ. Matrix inversion (or system solving) is computationally the most expensive part of Newton's method.",
+      "prerequisites": [
+        "Linear algebra",
+        "Matrix operations",
+        "Gaussian elimination"
+      ],
+      "learning_objectives": [
+        "Understand that solving Ax = b is equivalent to computing x = A⁻¹b",
+        "Implement matrix inversion for small matrices using cofactor method",
+        "Recognize computational complexity: O(n³) for general inversion",
+        "Handle the special case of diagonal matrices (O(n) inversion)"
+      ],
+      "math_content": {
+        "definition": "The **inverse** of an n×n matrix A, denoted A⁻¹, is the unique matrix satisfying AA⁻¹ = A⁻¹A = I (identity matrix). Not all matrices are invertible; A⁻¹ exists if and only if det(A) ≠ 0. In Newton's method, we need H⁻¹∇f, which is equivalent to solving Hδ = -∇f.",
+        "notation": "$A^{-1}$ = inverse of matrix A, $\\det(A)$ = determinant of A, $I$ = identity matrix",
+        "theorem": "**Inverse via Cofactor Method (2×2)**: For a 2×2 matrix A = [[a,b],[c,d]], if det(A) = ad - bc ≠ 0, then A⁻¹ = (1/det(A))[[d,-b],[-c,a]]. This formula enables direct computation without Gaussian elimination for small matrices.",
+        "proof_sketch": "Verify by multiplication: [[a,b],[c,d]] · [[d,-b],[-c,a]]/(ad-bc) = [[ad-bc, 0],[0, ad-bc]]/(ad-bc) = [[1,0],[0,1]] = I. The formula swaps diagonal elements, negates off-diagonal elements, and scales by 1/det(A).",
+        "examples": [
+          "For A = [[2,0],[0,2]], det(A) = 4, A⁻¹ = (1/4)[[2,0],[0,2]] = [[0.5,0],[0,0.5]]. Diagonal matrices invert by inverting each diagonal element.",
+          "For A = [[1,2],[3,4]], det(A) = -2, A⁻¹ = (-1/2)[[4,-2],[-3,1]] = [[-2,1],[1.5,-0.5]]."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "2×2 Matrix Inverse",
+          "latex": "$\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}^{-1} = \\frac{1}{ad-bc} \\begin{bmatrix} d & -b \\\\ -c & a \\end{bmatrix}$",
+          "description": "Direct formula for Newton's method in 2D optimization problems"
+        },
+        {
+          "name": "Diagonal Matrix Inverse",
+          "latex": "$\\text{diag}(d_1, d_2, ..., d_n)^{-1} = \\text{diag}(1/d_1, 1/d_2, ..., 1/d_n)$",
+          "description": "Efficient O(n) inversion when Hessian is diagonal (uncoupled variables)"
+        },
+        {
+          "name": "Newton Step via System Solve",
+          "latex": "$H(\\mathbf{x}_k) \\delta = -\\nabla f(\\mathbf{x}_k) \\implies \\delta = -H(\\mathbf{x}_k)^{-1} \\nabla f(\\mathbf{x}_k)$",
+          "description": "The Newton step δ can be computed by solving the linear system instead of explicit inversion"
+        }
+      ],
+      "exercise": {
+        "description": "Implement matrix-vector multiplication, which is needed to apply H⁻¹ to the gradient vector after computing the inverse. This operation gives us the Newton step direction.",
+        "function_signature": "def matrix_vector_multiply(matrix: list[list[float]], vector: list[float]) -> list[float]:",
+        "starter_code": "def matrix_vector_multiply(matrix: list[list[float]], vector: list[float]) -> list[float]:\n    \"\"\"\n    Multiply a matrix by a vector: result = A * v.\n    \n    Args:\n        matrix: An m×n matrix (list of lists)\n        vector: A length-n vector (list)\n        \n    Returns:\n        The resulting length-m vector\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "matrix_vector_multiply([[2.0, 0.0], [0.0, 2.0]], [1.0, 1.0])",
+            "expected": "[2.0, 2.0]",
+            "explanation": "[[2,0],[0,2]] · [1,1] = [2·1 + 0·1, 0·1 + 2·1] = [2, 2]. Diagonal matrix scales each component."
+          },
+          {
+            "input": "matrix_vector_multiply([[0.5, 0.0], [0.0, 0.5]], [-2.0, -4.0])",
+            "expected": "[-1.0, -2.0]",
+            "explanation": "This computes H⁻¹ · ∇f for the example problem where H⁻¹ = [[0.5,0],[0,0.5]] and ∇f = [-2,-4]."
+          },
+          {
+            "input": "matrix_vector_multiply([[1.0, 2.0], [3.0, 4.0]], [1.0, 0.0])",
+            "expected": "[1.0, 3.0]",
+            "explanation": "[[1,2],[3,4]] · [1,0] = [1·1 + 2·0, 3·1 + 4·0] = [1, 3]. Selects first column of matrix."
+          },
+          {
+            "input": "matrix_vector_multiply([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]], [2.0, 3.0, 4.0])",
+            "expected": "[2.0, 3.0, 4.0]",
+            "explanation": "Identity matrix multiplication returns the original vector: I · v = v."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row-major vs column-major order when indexing",
+        "Not checking dimensional compatibility (matrix columns must equal vector length)",
+        "Attempting to invert singular matrices (det = 0) without checking",
+        "Using explicit inversion when solving Ax = b is more efficient and numerically stable"
+      ],
+      "hint": "The i-th component of the result is the dot product of the i-th row of the matrix with the vector. Use nested loops or list comprehension.",
+      "references": [
+        "Matrix multiplication",
+        "Linear systems",
+        "Gaussian elimination",
+        "Numerical stability of matrix inversion"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "The Newton Step and Update Rule",
+      "relation_to_problem": "The core of Newton's method is the update rule xₖ₊₁ = xₖ - H⁻¹∇f(xₖ). This step combines all previous concepts: gradient computation, Hessian evaluation, matrix inversion, and vector operations.",
+      "prerequisites": [
+        "Gradient computation",
+        "Hessian matrix",
+        "Matrix inversion",
+        "Vector arithmetic"
+      ],
+      "learning_objectives": [
+        "Derive the Newton update rule from second-order Taylor approximation",
+        "Understand why the step is -H⁻¹∇f (direction of steepest descent in H-metric)",
+        "Implement a single Newton step combining all operations",
+        "Recognize that the negative sign gives descent direction"
+      ],
+      "math_content": {
+        "definition": "The **Newton step** at point xₖ is the vector δₖ = -H(xₖ)⁻¹∇f(xₖ). The **Newton update** is xₖ₊₁ = xₖ + δₖ = xₖ - H(xₖ)⁻¹∇f(xₖ). This update minimizes the second-order Taylor approximation of f around xₖ.",
+        "notation": "$\\delta_k$ = Newton step vector, $\\mathbf{x}_{k+1}$ = next iterate, $H^{-1}$ = inverse Hessian",
+        "theorem": "**Quadratic Convergence of Newton's Method**: Suppose f is twice continuously differentiable, H(x*) is positive definite at a local minimum x*, and the initial point x₀ is sufficiently close to x*. Then Newton's method converges quadratically: ‖xₖ₊₁ - x*‖ ≤ C‖xₖ - x*‖² for some constant C > 0. This means the error squares at each iteration once close enough.",
+        "proof_sketch": "By Taylor expansion, 0 = ∇f(x*) = ∇f(xₖ) + H(xₖ)(x* - xₖ) + O(‖x* - xₖ‖²). Rearranging: x* - xₖ = -H(xₖ)⁻¹∇f(xₖ) + O(‖x* - xₖ‖²). But xₖ₊₁ - xₖ = -H(xₖ)⁻¹∇f(xₖ), so x* - xₖ₊₁ = O(‖x* - xₖ‖²), proving quadratic convergence.",
+        "examples": [
+          "For f(x) = (x-3)², starting at x₀ = 10: ∇f = 2(10-3) = 14, H = 2, δ = -14/2 = -7, x₁ = 10 - 7 = 3 (converged in one step).",
+          "For f(x,y) = (x-1)² + (y-2)², starting at (0,0): ∇f = [-2,-4], H = [[2,0],[0,2]], H⁻¹ = [[0.5,0],[0,0.5]], δ = -H⁻¹∇f = [1,2], x₁ = [0,0] + [1,2] = [1,2] (converged in one step because f is quadratic)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Newton Step",
+          "latex": "$\\delta_k = -H(\\mathbf{x}_k)^{-1} \\nabla f(\\mathbf{x}_k)$",
+          "description": "The direction and magnitude to move from current point xₖ"
+        },
+        {
+          "name": "Newton Update",
+          "latex": "$\\mathbf{x}_{k+1} = \\mathbf{x}_k + \\delta_k = \\mathbf{x}_k - H(\\mathbf{x}_k)^{-1} \\nabla f(\\mathbf{x}_k)$",
+          "description": "The core iterative formula of Newton's method for optimization"
+        },
+        {
+          "name": "Second-Order Taylor Approximation",
+          "latex": "$f(\\mathbf{x}) \\approx f(\\mathbf{x}_k) + \\nabla f(\\mathbf{x}_k)^T (\\mathbf{x} - \\mathbf{x}_k) + \\frac{1}{2}(\\mathbf{x} - \\mathbf{x}_k)^T H(\\mathbf{x}_k) (\\mathbf{x} - \\mathbf{x}_k)$",
+          "description": "The quadratic model that Newton's method minimizes at each iteration"
+        }
+      ],
+      "exercise": {
+        "description": "Implement vector subtraction and addition, which are needed for the Newton update xₖ₊₁ = xₖ + δₖ. This combines the current position with the Newton step to get the next iterate.",
+        "function_signature": "def vector_subtract(v1: list[float], v2: list[float]) -> list[float]:",
+        "starter_code": "def vector_subtract(v1: list[float], v2: list[float]) -> list[float]:\n    \"\"\"\n    Subtract two vectors element-wise: result = v1 - v2.\n    \n    Args:\n        v1: First vector\n        v2: Second vector (must have same length as v1)\n        \n    Returns:\n        The difference vector\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "vector_subtract([5.0, 7.0], [2.0, 3.0])",
+            "expected": "[3.0, 4.0]",
+            "explanation": "[5,7] - [2,3] = [5-2, 7-3] = [3, 4]. Basic element-wise subtraction."
+          },
+          {
+            "input": "vector_subtract([0.0, 0.0], [1.0, 2.0])",
+            "expected": "[-1.0, -2.0]",
+            "explanation": "This represents computing the Newton step when starting at origin: x - δ where x = [0,0]."
+          },
+          {
+            "input": "vector_subtract([1.0, 2.0], [1.0, 2.0])",
+            "expected": "[0.0, 0.0]",
+            "explanation": "Subtracting a vector from itself gives the zero vector (no movement needed)."
+          },
+          {
+            "input": "vector_subtract([10.0, 20.0, 30.0], [1.0, 2.0, 3.0])",
+            "expected": "[9.0, 18.0, 27.0]",
+            "explanation": "Works for any dimension n. Element-wise: [10-1, 20-2, 30-3] = [9, 18, 27]."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting the negative sign in δ = -H⁻¹∇f (this makes it a descent direction)",
+        "Computing H⁻¹ before checking if H is positive definite (could be at saddle point)",
+        "Using wrong order in subtraction: computing xₖ - δₖ requires careful tracking of signs",
+        "Not handling the case when gradient is already near zero (already at minimum)"
+      ],
+      "hint": "Vector subtraction is element-wise: (v₁ - v₂)ᵢ = v₁[i] - v₂[i]. Use a loop or list comprehension to compute each component.",
+      "references": [
+        "Iterative optimization methods",
+        "Second-order optimization",
+        "Quadratic convergence",
+        "Taylor series approximation"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Convergence Criteria and Iterative Stopping Conditions",
+      "relation_to_problem": "Newton's method must know when to stop iterating. The standard criterion is ‖∇f(xₖ)‖ < tol (gradient norm below tolerance), indicating we're near a critical point. A maximum iteration limit prevents infinite loops.",
+      "prerequisites": [
+        "Gradient norm",
+        "Iterative algorithms",
+        "Floating-point arithmetic"
+      ],
+      "learning_objectives": [
+        "Understand why ‖∇f(x)‖ < tol is the appropriate stopping criterion",
+        "Implement iteration counting to prevent infinite loops",
+        "Recognize when convergence fails (oscillation, divergence)",
+        "Combine multiple stopping conditions (tolerance AND max iterations)"
+      ],
+      "math_content": {
+        "definition": "A **convergence criterion** is a condition that determines when an iterative algorithm has sufficiently approximated the solution. For Newton's method seeking a minimum, we use ‖∇f(xₖ)‖ < tol, since the first-order necessary condition for a minimum is ∇f(x*) = 0. A small gradient norm indicates proximity to a critical point.",
+        "notation": "$\\text{tol}$ = tolerance threshold (e.g., 10⁻⁶), $k$ = iteration counter, $k_{\\max}$ = maximum iterations",
+        "theorem": "**Stopping Criterion Justification**: If Newton's method converges to a point x* with ‖∇f(x*)‖ = 0 and H(x*) ≻ 0 (positive definite), then x* is a local minimum by second-order sufficient conditions. Therefore, stopping when ‖∇f(xₖ)‖ < tol ensures we're within tolerance of satisfying the optimality condition.",
+        "proof_sketch": "Newton's method is designed to solve ∇f(x) = 0. If the method converges (‖xₖ₊₁ - xₖ‖ → 0), then at the limit point x*, we have ∇f(x*) = 0 by continuity. If additionally H(x*) ≻ 0, the second-order sufficient condition guarantees x* is a strict local minimum.",
+        "examples": [
+          "For tol = 10⁻⁶, if ‖∇f(x₅)‖ = 3.2 × 10⁻⁷, we stop at iteration 5 since 3.2 × 10⁻⁷ < 10⁻⁶.",
+          "If max_iter = 100 and we reach iteration 100 with ‖∇f(x₁₀₀)‖ = 0.5, we stop due to iteration limit (convergence failed)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gradient Norm Stopping Criterion",
+          "latex": "$\\|\\nabla f(\\mathbf{x}_k)\\| < \\text{tol}$",
+          "description": "Primary stopping condition: gradient is sufficiently close to zero"
+        },
+        {
+          "name": "Iteration Limit",
+          "latex": "$k \\geq k_{\\max}$",
+          "description": "Safety condition: stop if maximum iterations reached to prevent infinite loops"
+        },
+        {
+          "name": "Combined Stopping Condition",
+          "latex": "$\\text{STOP if } \\|\\nabla f(\\mathbf{x}_k)\\| < \\text{tol} \\text{ OR } k \\geq k_{\\max}$",
+          "description": "Complete stopping logic for Newton's method"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that checks if Newton's method should stop, given the current gradient norm, iteration count, tolerance, and maximum iterations. This is the control logic for the main Newton loop.",
+        "function_signature": "def should_stop(grad_norm: float, iteration: int, tol: float, max_iter: int) -> bool:",
+        "starter_code": "def should_stop(grad_norm: float, iteration: int, tol: float, max_iter: int) -> bool:\n    \"\"\"\n    Determine if Newton's method should stop iterating.\n    \n    Args:\n        grad_norm: The Euclidean norm of the current gradient\n        iteration: The current iteration number\n        tol: Convergence tolerance for gradient norm\n        max_iter: Maximum allowed iterations\n        \n    Returns:\n        True if should stop (converged or max iterations), False otherwise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "should_stop(1e-7, 5, 1e-6, 100)",
+            "expected": "True",
+            "explanation": "grad_norm = 10⁻⁷ < tol = 10⁻⁶, so convergence criterion is satisfied. Stop even though iteration < max_iter."
+          },
+          {
+            "input": "should_stop(0.5, 100, 1e-6, 100)",
+            "expected": "True",
+            "explanation": "iteration = 100 = max_iter, so we've reached the iteration limit. Stop even though grad_norm > tol (convergence failed)."
+          },
+          {
+            "input": "should_stop(0.01, 10, 1e-6, 100)",
+            "expected": "False",
+            "explanation": "grad_norm = 0.01 > tol = 10⁻⁶ and iteration = 10 < max_iter = 100. Continue iterating."
+          },
+          {
+            "input": "should_stop(0.0, 1, 1e-6, 100)",
+            "expected": "True",
+            "explanation": "grad_norm = 0 < tol, so we're exactly at a critical point. Stop immediately (found exact solution)."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using AND instead of OR in stopping condition (would require both conditions simultaneously)",
+        "Comparing iteration count with > instead of >= (would do one extra iteration)",
+        "Not handling the case when gradient is exactly zero (edge case but theoretically possible)",
+        "Setting tolerance too tight for floating-point precision (e.g., tol = 10⁻¹⁶ may never be reached)"
+      ],
+      "hint": "The function should return True if EITHER condition is met: gradient is small enough (converged) OR iteration limit reached (forced stop). Use logical OR (or operator).",
+      "references": [
+        "Stopping criteria for iterative methods",
+        "Numerical convergence",
+        "Floating-point arithmetic",
+        "Robust algorithm design"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Newton's Method Algorithm Integration",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts into the complete Newton's method loop: initialize at x₀, iterate (compute gradient, compute Hessian, solve for Newton step, update position), and check convergence. This is the full algorithm structure needed for the main problem.",
+      "prerequisites": [
+        "Gradient computation",
+        "Hessian evaluation",
+        "Matrix inversion",
+        "Newton update",
+        "Convergence criteria"
+      ],
+      "learning_objectives": [
+        "Combine all components into a complete iterative optimization algorithm",
+        "Understand the overall flow: initialization → iteration loop → convergence check",
+        "Implement proper iteration tracking and state management",
+        "Handle edge cases: already at minimum (x₀ is optimal), convergence failure"
+      ],
+      "math_content": {
+        "definition": "**Newton's Method Algorithm**: Given an initial point x₀, tolerance tol, and maximum iterations max_iter: (1) Set k = 0. (2) Compute gₖ = ∇f(xₖ). (3) If ‖gₖ‖ < tol or k ≥ max_iter, stop and return xₖ. (4) Compute Hₖ = H(xₖ). (5) Solve Hₖδₖ = -gₖ for Newton step δₖ. (6) Update xₖ₊₁ = xₖ + δₖ. (7) Increment k ← k + 1. (8) Go to step 2.",
+        "notation": "$k$ = iteration index, $\\mathbf{g}_k = \\nabla f(\\mathbf{x}_k)$ = gradient at iteration k, $\\mathbf{H}_k = H(\\mathbf{x}_k)$ = Hessian at iteration k",
+        "theorem": "**Global Convergence vs Local Convergence**: Newton's method has guaranteed local quadratic convergence near a minimum where H ≻ 0, but may diverge if started far from the solution or at a point where H is not positive definite (saddle point or maximum). Damped Newton or trust-region modifications improve global convergence.",
+        "proof_sketch": "Local quadratic convergence was proven in sub-quest 4. For global convergence, note that if H(xₖ) is not positive definite, the Newton step may not be a descent direction (δₖᵀ∇f(xₖ) > 0), causing the algorithm to move uphill. Modifications like eigenvalue clipping (Hₖ + λI for λ > 0) ensure positive definiteness.",
+        "examples": [
+          "For f(x,y) = (x-1)² + (y-2)² starting at x₀ = [0,0]: Iteration 0: g = [-2,-4], H = [[2,0],[0,2]], δ = [1,2], x₁ = [1,2]. Iteration 1: g = [0,0], ‖g‖ = 0 < tol, stop. Result: [1,2] (converged in 1 iteration).",
+          "For f(x) = x⁴ starting at x₀ = 1: Iteration 0: g = 4, H = 12, δ = -1/3, x₁ = 2/3. Continue iterations until ‖g‖ < tol (converges to 0 but takes multiple steps because f is not quadratic)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Newton Iteration",
+          "latex": "$\\mathbf{x}_{k+1} = \\mathbf{x}_k - H(\\mathbf{x}_k)^{-1} \\nabla f(\\mathbf{x}_k)$",
+          "description": "The core update repeated until convergence"
+        },
+        {
+          "name": "Iteration Loop Structure",
+          "latex": "$\\text{while } \\|\\nabla f(\\mathbf{x}_k)\\| \\geq \\text{tol} \\text{ and } k < k_{\\max}: \\text{ [compute update]}$",
+          "description": "Standard while-loop structure for Newton's method"
+        },
+        {
+          "name": "Convergence Rate",
+          "latex": "$\\|\\mathbf{x}_{k+1} - \\mathbf{x}^*\\| \\leq C \\|\\mathbf{x}_k - \\mathbf{x}^*\\|^2$",
+          "description": "Quadratic convergence: error squares each iteration (once close enough)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified 1D Newton's method that takes scalar gradient and Hessian values directly (not functions). This demonstrates the core loop structure without the complexity of multidimensional operations. Given initial x, iterate using Newton updates until convergence.",
+        "function_signature": "def newton_1d_simple(x0: float, grad_values: list[float], hess_values: list[float], tol: float = 1e-6) -> tuple[float, int]:",
+        "starter_code": "def newton_1d_simple(x0: float, grad_values: list[float], hess_values: list[float], tol: float = 1e-6) -> tuple[float, int]:\n    \"\"\"\n    Simplified 1D Newton's method with pre-computed gradient and Hessian values.\n    \n    Args:\n        x0: Initial point\n        grad_values: List of gradient values at each iteration [g0, g1, ...]\n        hess_values: List of Hessian values at each iteration [H0, H1, ...]\n        tol: Convergence tolerance for gradient magnitude\n        \n    Returns:\n        Tuple of (final_x, num_iterations)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "newton_1d_simple(0.0, [-2.0, 0.0], [2.0, 2.0], tol=1e-6)",
+            "expected": "(1.0, 1)",
+            "explanation": "Starting at x=0 with grad=-2, Hess=2: δ = -(-2)/2 = 1, x₁ = 0+1 = 1. At x=1, grad=0 < tol, stop after 1 iteration."
+          },
+          {
+            "input": "newton_1d_simple(10.0, [14.0, 0.0], [2.0, 2.0], tol=1e-6)",
+            "expected": "(3.0, 1)",
+            "explanation": "For f(x)=(x-3)²: at x=10, grad=14, Hess=2: δ = -14/2 = -7, x₁ = 10-7 = 3. Converges in 1 step (quadratic function)."
+          },
+          {
+            "input": "newton_1d_simple(5.0, [0.0], [2.0], tol=1e-6)",
+            "expected": "(5.0, 0)",
+            "explanation": "Starting with grad=0 (already at minimum). Stop immediately with 0 iterations (convergence criterion already satisfied)."
+          },
+          {
+            "input": "newton_1d_simple(0.0, [1.0, 0.5, 0.1, 1e-7], [1.0, 1.0, 1.0, 1.0], tol=1e-6)",
+            "expected": "(3.9, 3)",
+            "explanation": "Multiple iterations: x₁=0-1=-1, x₂=-1-0.5=-1.5, x₃=-1.5-0.1=-1.6, x₄=-1.6-1e-7≈-1.6 (approx). After 3 iterations, |grad|=1e-7 < 1e-6."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Checking convergence after update instead of before (wastes one iteration)",
+        "Not initializing iteration counter before loop",
+        "Forgetting to handle the case when x₀ is already optimal (grad ≈ 0 initially)",
+        "Not returning the iteration count (useful for analyzing convergence speed)",
+        "Attempting to use Newton step when Hessian is zero or negative (non-convex regions)"
+      ],
+      "hint": "Use a while loop that continues while |grad| >= tol. In each iteration: compute Newton step δ = -grad/Hess, update x = x + δ, move to next gradient/Hessian values, increment iteration counter. Check convergence before computing the step.",
+      "references": [
+        "Iterative optimization algorithms",
+        "Newton-Raphson method",
+        "Numerical analysis",
+        "Algorithm design patterns",
+        "Convergence analysis"
+      ]
+    }
+  ]
+}

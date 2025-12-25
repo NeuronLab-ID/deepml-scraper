@@ -1,0 +1,538 @@
+{
+  "problem_id": 237,
+  "title": "Convert RGB Image to Grayscale",
+  "category": "Computer Vision",
+  "difficulty": "easy",
+  "description": "## Task: RGB to Grayscale Conversion\n\nIn this task, you will implement a function `rgb_to_grayscale(image)` that converts an RGB image to a grayscale image using the luminosity method.\n\nThe input image is represented as a 3D array of shape (H, W, 3), where H is height, W is width, and 3 represents the RGB color channels. Each pixel value should be in the range [0, 255].\n\n### **Your Task**:\nImplement the function `rgb_to_grayscale(image)` to:\n1. Convert the RGB image to grayscale using the standard luminosity coefficients for human perception of color brightness.\n2. Return the grayscale image as a 2D list with pixel values rounded to integers.\n3. Handle edge cases:\n   - If the input is not a valid 3D array with 3 color channels.\n   - If the image has empty dimensions.\n   - If any pixel values are outside the valid range (0-255).\n\nFor any of these edge cases, the function should return `-1`.",
+  "example": {
+    "input": "image = [[[255, 0, 0], [0, 255, 0]], [[0, 0, 255], [255, 255, 255]]]\nprint(rgb_to_grayscale(image))",
+    "output": "[[76, 150], [29, 255]]",
+    "reasoning": "Using the luminosity formula: Gray = 0.299*R + 0.587*G + 0.114*B\n- Pure Red (255, 0, 0): 0.299 * 255 = 76.245 -> 76\n- Pure Green (0, 255, 0): 0.587 * 255 = 149.685 -> 150\n- Pure Blue (0, 0, 255): 0.114 * 255 = 29.07 -> 29\n- White (255, 255, 255): 0.299*255 + 0.587*255 + 0.114*255 = 255"
+  },
+  "starter_code": "import numpy as np\n\ndef rgb_to_grayscale(image):\n    \"\"\"\n    Convert an RGB image to grayscale using luminosity method.\n    \n    Args:\n        image: RGB image as list or numpy array of shape (H, W, 3)\n               with values in range [0, 255]\n    \n    Returns:\n        Grayscale image as 2D list with integer values,\n        or -1 if input is invalid\n    \"\"\"\n    # Write your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Linear Combinations and Weighted Sums in Image Processing",
+      "relation_to_problem": "The core of RGB-to-grayscale conversion is computing a weighted linear combination of three color channels. This sub-quest establishes the mathematical foundation for understanding why we use weighted sums rather than simple averages.",
+      "prerequisites": [
+        "Basic linear algebra",
+        "Vector operations",
+        "Array indexing"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition of linear combinations",
+        "Compute weighted sums of vector components",
+        "Implement linear combinations for multi-dimensional arrays",
+        "Recognize when coefficients must satisfy normalization constraints"
+      ],
+      "math_content": {
+        "definition": "A **linear combination** of vectors $\\mathbf{v}_1, \\mathbf{v}_2, \\ldots, \\mathbf{v}_n$ is an expression of the form $c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2 + \\cdots + c_n\\mathbf{v}_n$ where $c_1, c_2, \\ldots, c_n$ are scalar coefficients. For a single pixel represented as a vector $\\mathbf{p} = (R, G, B)$, a weighted sum is: $L = w_R \\cdot R + w_G \\cdot G + w_B \\cdot B$ where $w_R, w_G, w_B \\in \\mathbb{R}$ are weights.",
+        "notation": "$\\mathbf{w} = (w_R, w_G, w_B)$ = weight vector; $\\mathbf{p} = (R, G, B)$ = pixel color vector; $L = \\mathbf{w} \\cdot \\mathbf{p}$ = dot product producing scalar luminance",
+        "theorem": "**Convex Combination Theorem**: If weights satisfy $w_R + w_G + w_B = 1$ and $w_i \\geq 0$ for all $i$, then for inputs in range $[a, b]$, the output $L$ is guaranteed to lie in $[a, b]$. Formally: if $R, G, B \\in [a, b]$ and $\\sum w_i = 1$ with $w_i \\geq 0$, then $a \\leq L \\leq b$.",
+        "proof_sketch": "Proof: Since each $R, G, B \\geq a$, we have $L = w_R R + w_G G + w_B B \\geq w_R a + w_G a + w_B a = a(w_R + w_G + w_B) = a$. Similarly, $L \\leq b(w_R + w_G + w_B) = b$. This preservation property is critical for maintaining valid pixel intensities.",
+        "examples": [
+          "Example 1: Simple average - Equal weights $(1/3, 1/3, 1/3)$ applied to pixel $(90, 120, 150)$ yields $L = \\frac{1}{3}(90) + \\frac{1}{3}(120) + \\frac{1}{3}(150) = 120$",
+          "Example 2: Perceptual weights - Using $(0.299, 0.587, 0.114)$ on pixel $(100, 150, 200)$ gives $L = 0.299(100) + 0.587(150) + 0.114(200) = 29.9 + 88.05 + 22.8 = 140.75$",
+          "Example 3: Verify convexity - For any pixel $(R, G, B) \\in [0, 255]$ with normalized weights, $L \\in [0, 255]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "General Weighted Sum",
+          "latex": "$L = \\sum_{i=1}^{n} w_i x_i$",
+          "description": "Foundation for combining multiple channels into a single value"
+        },
+        {
+          "name": "Three-Channel Weighted Sum",
+          "latex": "$L = w_R R + w_G G + w_B B$",
+          "description": "Specific form for RGB channels used in grayscale conversion"
+        },
+        {
+          "name": "Normalization Constraint",
+          "latex": "$\\sum_{i=1}^{n} w_i = 1$",
+          "description": "Ensures output remains in same range as inputs"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes a weighted sum of three values. The weights should be passed as a tuple or list. This builds the fundamental operation needed for pixel-level grayscale conversion.",
+        "function_signature": "def weighted_sum(values: tuple, weights: tuple) -> float:",
+        "starter_code": "def weighted_sum(values: tuple, weights: tuple) -> float:\n    \"\"\"\n    Compute weighted sum of three values.\n    \n    Args:\n        values: tuple of 3 numeric values (e.g., RGB channels)\n        weights: tuple of 3 weights that sum to 1\n    \n    Returns:\n        Weighted sum as float\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "weighted_sum((100, 150, 200), (0.299, 0.587, 0.114))",
+            "expected": "140.75",
+            "explanation": "Standard luminosity weights applied: 0.299*100 + 0.587*150 + 0.114*200 = 140.75"
+          },
+          {
+            "input": "weighted_sum((255, 0, 0), (0.299, 0.587, 0.114))",
+            "expected": "76.245",
+            "explanation": "Pure red pixel: only the red channel contributes 0.299*255"
+          },
+          {
+            "input": "weighted_sum((50, 50, 50), (0.299, 0.587, 0.114))",
+            "expected": "50.0",
+            "explanation": "Gray pixel: weights sum to 1, so result equals the common value"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that weights must sum to 1 for proper normalization",
+        "Using integer division which causes precision loss",
+        "Not handling the case where inputs might be in different ranges",
+        "Applying weights in wrong order (e.g., blue weight to red channel)"
+      ],
+      "hint": "Think of this as a dot product between two vectors. Use floating-point arithmetic to preserve precision.",
+      "references": [
+        "Linear algebra: dot products and inner products",
+        "Convex combinations and barycentric coordinates",
+        "ITU-R BT.601 and BT.709 standards for color coefficients"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Human Visual Perception and Perceptual Color Weights",
+      "relation_to_problem": "Understanding why RGB channels need different weights (not 1/3 each) is crucial for implementing the luminosity method correctly. The BT.601 coefficients (0.299, 0.587, 0.114) are derived from human cone cell sensitivity.",
+      "prerequisites": [
+        "Linear combinations",
+        "Weighted sums",
+        "Basic photometry"
+      ],
+      "learning_objectives": [
+        "Understand the biological basis for perceptual color weights",
+        "Distinguish between simple averaging and perceptually-weighted conversion",
+        "Apply ITU-R BT.601 standard coefficients correctly",
+        "Recognize the difference between physical light intensity and perceived brightness"
+      ],
+      "math_content": {
+        "definition": "**Luminance** $Y$ is a photometric measure of the intensity of light per unit area, weighted according to the spectral sensitivity of the human eye. For RGB color spaces, luminance is approximated as: $Y = \\Phi_R R + \\Phi_G G + \\Phi_B B$ where $\\Phi_R, \\Phi_G, \\Phi_B$ are luminosity coefficients satisfying $\\Phi_R + \\Phi_G + \\Phi_B = 1$.",
+        "notation": "$Y$ or $L$ = luminance (perceived brightness); $R, G, B \\in [0, 1]$ or $[0, 255]$ = color channel values; $\\Phi = (\\Phi_R, \\Phi_G, \\Phi_B)$ = perceptual weight vector",
+        "theorem": "**Luminosity Function Approximation**: The CIE 1931 photopic luminosity function $V(\\lambda)$ describes human eye sensitivity across wavelengths. For standard RGB primaries, integration yields: $\\Phi_R \\approx 0.299$, $\\Phi_G \\approx 0.587$, $\\Phi_B \\approx 0.114$ (BT.601) or $\\Phi_R \\approx 0.2126$, $\\Phi_G \\approx 0.7152$, $\\Phi_B \\approx 0.0722$ (BT.709 for HDTV).",
+        "proof_sketch": "Derivation: Human retina contains L, M, S cone cells with peak sensitivities at ~564nm (red), ~534nm (green), ~420nm (blue). Population ratios are approximately 40:20:1 (L:M:S). Combined with spectral overlap and neural processing in retinal ganglion cells, this produces the luminance channel that emphasizes green. The BT.601 weights result from empirical measurements of brightness matching experiments with standard phosphors.",
+        "examples": [
+          "Example 1: Pure colors - Red (255,0,0)→76.245, Green (0,255,0)→149.685, Blue (0,0,255)→29.07. Notice green produces brightest grayscale.",
+          "Example 2: Yellow (255,255,0) = 0.299(255) + 0.587(255) + 0.114(0) = 225.93. Yellow appears very bright because both R and G contribute.",
+          "Example 3: Cyan (0,255,255) = 0.299(0) + 0.587(255) + 0.114(255) = 178.635. Still bright but less than yellow due to blue's low weight.",
+          "Example 4: Comparison - Simple average of (255,0,0) gives 85, but perceptual gives 76. Green (0,255,0) gives 85 vs 150. This shows averaging fails to match perception."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "ITU-R BT.601 Luminance",
+          "latex": "$Y_{601} = 0.299R + 0.587G + 0.114B$",
+          "description": "Standard definition television; most commonly used for grayscale conversion"
+        },
+        {
+          "name": "ITU-R BT.709 Luminance",
+          "latex": "$Y_{709} = 0.2126R + 0.7152G + 0.0722B$",
+          "description": "HDTV standard; more accurate for modern displays"
+        },
+        {
+          "name": "Simple Average (Incorrect)",
+          "latex": "$Y_{avg} = \\frac{R + G + B}{3}$",
+          "description": "Naive approach that ignores human perception; produces poor visual results"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that compares simple averaging versus perceptual weighting for a single RGB pixel. Return both results to illustrate the difference. This demonstrates why correct weights matter.",
+        "function_signature": "def compare_conversions(r: int, g: int, b: int) -> dict:",
+        "starter_code": "def compare_conversions(r: int, g: int, b: int) -> dict:\n    \"\"\"\n    Compare simple average vs perceptual luminosity for one pixel.\n    \n    Args:\n        r, g, b: RGB values in range [0, 255]\n    \n    Returns:\n        Dictionary with keys 'average' and 'luminosity',\n        values rounded to 2 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compare_conversions(255, 0, 0)",
+            "expected": "{'average': 85.0, 'luminosity': 76.25}",
+            "explanation": "Pure red: average=(255+0+0)/3=85, luminosity=0.299*255=76.245≈76.25"
+          },
+          {
+            "input": "compare_conversions(0, 255, 0)",
+            "expected": "{'average': 85.0, 'luminosity': 149.69}",
+            "explanation": "Pure green: much brighter perceptually than red despite same average"
+          },
+          {
+            "input": "compare_conversions(128, 128, 128)",
+            "expected": "{'average': 128.0, 'luminosity': 128.0}",
+            "explanation": "Gray pixels: both methods agree since all channels equal"
+          },
+          {
+            "input": "compare_conversions(100, 150, 200)",
+            "expected": "{'average': 150.0, 'luminosity': 140.75}",
+            "explanation": "Mixed color: shows difference between simple and perceptual weighting"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using equal weights (1/3) instead of perceptual weights - produces incorrect brightness",
+        "Confusing BT.601 and BT.709 coefficients - both valid but for different standards",
+        "Forgetting that coefficients assume normalized [0,1] or integer [0,255] consistently",
+        "Thinking of luminance as physical light intensity rather than perceived brightness"
+      ],
+      "hint": "The green coefficient is nearly double the red coefficient. This isn't arbitrary - it reflects biology. Test on pure color pixels to see the dramatic difference.",
+      "references": [
+        "CIE 1931 color space and luminosity function",
+        "Cone cell spectral sensitivity curves",
+        "ITU-R Recommendations BT.601 and BT.709",
+        "Photometry vs radiometry in color science"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Numerical Precision and Rounding in Fixed-Point Conversion",
+      "relation_to_problem": "Grayscale conversion produces floating-point results that must be converted to integers [0,255]. Understanding proper rounding (not truncation) and managing numerical precision is essential for correct output.",
+      "prerequisites": [
+        "Floating-point arithmetic",
+        "Type conversion",
+        "Rounding modes"
+      ],
+      "learning_objectives": [
+        "Distinguish between truncation, floor, ceiling, and round-half-up",
+        "Implement proper rounding for floating-point to integer conversion",
+        "Understand accumulated rounding errors in image processing",
+        "Apply Python's round() function correctly for pixel values"
+      ],
+      "math_content": {
+        "definition": "**Rounding** is a mapping $f: \\mathbb{R} \\to \\mathbb{Z}$ that approximates real numbers with integers. The standard **round-half-up** function is defined as: $\\text{round}(x) = \\lfloor x + 0.5 \\rfloor$ where $\\lfloor \\cdot \\rfloor$ is the floor function. Python's built-in round() uses **round-half-to-even** (banker's rounding): $\\text{round}(x) = \\begin{cases} \\lfloor x \\rfloor & \\text{if } x - \\lfloor x \\rfloor < 0.5 \\\\ \\lceil x \\rceil & \\text{if } x - \\lfloor x \\rfloor > 0.5 \\\\ 2\\lfloor x/2 \\rfloor & \\text{if } x - \\lfloor x \\rfloor = 0.5 \\end{cases}$",
+        "notation": "$\\lfloor x \\rfloor$ = floor (largest integer $\\leq x$); $\\lceil x \\rceil$ = ceiling (smallest integer $\\geq x$); $\\text{round}(x)$ = nearest integer with tie-breaking rule",
+        "theorem": "**Rounding Error Bound**: For round-half-up, the absolute error is bounded: $|\\text{round}(x) - x| \\leq 0.5$ for all $x \\in \\mathbb{R}$. For a sequence of $n$ independent rounding operations, expected accumulated error scales as $O(\\sqrt{n})$ under random rounding, but can be $O(n)$ with systematic bias (e.g., always truncating).",
+        "proof_sketch": "Proof of error bound: Let $r = \\text{round}(x)$ be the rounded value. By definition, $r$ is the nearest integer to $x$. The distance from $x$ to its nearest integer cannot exceed half the spacing between consecutive integers, which is 1. Therefore $|r - x| \\leq 1/2$. Equality holds when $x$ is exactly halfway between integers (e.g., 76.5).",
+        "examples": [
+          "Example 1: $76.245 \\to \\text{round}(76.245) = 76$ since $0.245 < 0.5$",
+          "Example 2: $149.685 \\to \\text{round}(149.685) = 150$ since $0.685 > 0.5$",
+          "Example 3: $29.07 \\to \\text{round}(29.07) = 29$ since $0.07 < 0.5$",
+          "Example 4: Halfway case: $76.5 \\to 76$ (Python's banker's rounding to even) vs $77$ (round-half-up)",
+          "Example 5: Truncation comparison: $\\text{int}(76.9) = 76$ (wrong) vs $\\text{round}(76.9) = 77$ (correct)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Round-Half-Up",
+          "latex": "$\\text{round}(x) = \\lfloor x + 0.5 \\rfloor$",
+          "description": "Traditional rounding: 0.5 and above rounds up"
+        },
+        {
+          "name": "Round-Half-To-Even (Banker's)",
+          "latex": "$\\text{round}_{even}(x) = \\begin{cases} \\text{even nearest} & \\text{if } \\{x\\} = 0.5 \\\\ \\text{nearest} & \\text{otherwise} \\end{cases}$",
+          "description": "Python's default: reduces systematic bias in .5 cases"
+        },
+        {
+          "name": "Truncation (Incorrect)",
+          "latex": "$\\text{trunc}(x) = \\text{sgn}(x) \\lfloor |x| \\rfloor$",
+          "description": "Rounds toward zero; introduces systematic negative bias"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a list of floating-point luminance values and converts them to properly rounded integers in [0,255]. Ensure values are clamped to valid range after rounding. This is the final step in grayscale conversion.",
+        "function_signature": "def round_and_clamp(values: list) -> list:",
+        "starter_code": "def round_and_clamp(values: list) -> list:\n    \"\"\"\n    Round floating-point values to integers and clamp to [0, 255].\n    \n    Args:\n        values: list of float luminance values\n    \n    Returns:\n        list of integers in range [0, 255]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "round_and_clamp([76.245, 149.685, 29.07, 255.0])",
+            "expected": "[76, 150, 29, 255]",
+            "explanation": "Standard rounding: 76.245→76, 149.685→150, 29.07→29, 255.0→255"
+          },
+          {
+            "input": "round_and_clamp([0.0, 127.5, 255.0])",
+            "expected": "[0, 128, 255]",
+            "explanation": "Edge cases: minimum (0), halfway (127.5), maximum (255)"
+          },
+          {
+            "input": "round_and_clamp([-5.0, 260.3])",
+            "expected": "[0, 255]",
+            "explanation": "Clamping: negative values to 0, values >255 to 255"
+          },
+          {
+            "input": "round_and_clamp([100.4, 100.5, 100.6])",
+            "expected": "[100, 100, 101]",
+            "explanation": "Demonstrates banker's rounding: 100.5→100 (even), 100.6→101"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using int() which truncates instead of rounding (e.g., int(76.9)=76 wrong)",
+        "Forgetting to clamp values outside [0,255] range",
+        "Not handling negative values from numerical errors",
+        "Rounding before multiplying by weights instead of after",
+        "Assuming Python's round() uses round-half-up (it uses banker's rounding)"
+      ],
+      "hint": "Python's round() function handles most cases correctly. Focus on clamping out-of-range values. Use max(0, min(255, value)) pattern.",
+      "references": [
+        "IEEE 754 floating-point arithmetic standard",
+        "Numerical analysis: rounding error propagation",
+        "Python documentation: round() vs math.floor()",
+        "Quantization in digital signal processing"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Multidimensional Array Processing and Broadcasting",
+      "relation_to_problem": "Images are 3D arrays (height × width × 3 channels). To convert an entire image, we must apply the weighted sum operation to every pixel while handling array shapes correctly. Understanding vectorization and broadcasting is key to efficient implementation.",
+      "prerequisites": [
+        "NumPy arrays",
+        "Array indexing",
+        "Matrix operations",
+        "Shape manipulation"
+      ],
+      "learning_objectives": [
+        "Understand multidimensional array representations of images",
+        "Apply element-wise operations across array dimensions",
+        "Use array slicing to access color channels",
+        "Implement vectorized operations for efficiency"
+      ],
+      "math_content": {
+        "definition": "An **RGB image** is represented as a 3D tensor $I \\in \\mathbb{R}^{H \\times W \\times 3}$ where $H$ is height, $W$ is width, and the third dimension indexes color channels: $I[i,j,0]$ = red, $I[i,j,1]$ = green, $I[i,j,2]$ = blue for pixel at position $(i,j)$. A **grayscale image** is a 2D matrix $G \\in \\mathbb{R}^{H \\times W}$ where $G[i,j]$ represents luminance. The conversion is: $G[i,j] = w_R \\cdot I[i,j,0] + w_G \\cdot I[i,j,1] + w_B \\cdot I[i,j,2]$ for all $i \\in [0, H), j \\in [0, W)$.",
+        "notation": "$I \\in \\mathbb{R}^{H \\times W \\times 3}$ = RGB image tensor; $G \\in \\mathbb{R}^{H \\times W}$ = grayscale output; $I[:,:,k]$ = $k$-th channel (slice notation); $\\mathbf{w} = [w_R, w_G, w_B]^T$ = weight vector",
+        "theorem": "**Vectorized Dot Product**: For an image tensor $I$ and weight vector $\\mathbf{w}$, the grayscale conversion can be expressed as matrix multiplication: $G = I \\cdot \\mathbf{w}$ where the dot product is computed along the channel axis. In NumPy: G = np.dot(I, w) or G = (I * w).sum(axis=2). This reduces $O(HWC)$ element-wise operations to a single vectorized operation with equivalent complexity but much faster execution.",
+        "proof_sketch": "Broadcasting proof: When multiplying $I$ (shape $H \\times W \\times 3$) by $\\mathbf{w}$ (shape $3$), NumPy broadcasts $\\mathbf{w}$ to shape $H \\times W \\times 3$, performs element-wise multiplication yielding shape $H \\times W \\times 3$, then sums along axis 2 to produce $H \\times W$. This is mathematically equivalent to: $G[i,j] = \\sum_{k=0}^{2} I[i,j,k] \\cdot w[k]$ for each pixel $(i,j)$.",
+        "examples": [
+          "Example 1: Shape transformation - Input $I$ shape $(480, 640, 3)$ → Output $G$ shape $(480, 640)$ after applying weights",
+          "Example 2: Channel access - $I[:,:,0]$ extracts red channel as $480 \\times 640$ matrix",
+          "Example 3: Single pixel - $I[0,0,:]$ gives $[R, G, B]$ vector for top-left pixel",
+          "Example 4: Vectorized - $G = 0.299 \\cdot I[:,:,0] + 0.587 \\cdot I[:,:,1] + 0.114 \\cdot I[:,:,2]$ computes all pixels simultaneously",
+          "Example 5: Nested list - For nested list representation [[R,G,B], [R,G,B]], convert to array first, process, then convert back"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Per-Pixel Conversion",
+          "latex": "$G[i,j] = \\sum_{k=0}^{2} w_k \\cdot I[i,j,k]$",
+          "description": "Explicit formula showing conversion for each pixel location"
+        },
+        {
+          "name": "Vectorized Conversion",
+          "latex": "$G = I \\cdot \\mathbf{w}$",
+          "description": "Matrix multiplication form for efficient computation"
+        },
+        {
+          "name": "Channel-wise Decomposition",
+          "latex": "$G = w_R \\cdot I[:,:,0] + w_G \\cdot I[:,:,1] + w_B \\cdot I[:,:,2]$",
+          "description": "NumPy slicing notation for weighted channel sum"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that converts a small 2D list of RGB pixels to grayscale using proper array operations. Input is a 2D list where each element is an [R,G,B] list. Output is a 2D list of grayscale integers. This combines weighted sums with array processing.",
+        "function_signature": "def convert_pixel_array(pixels: list) -> list:",
+        "starter_code": "def convert_pixel_array(pixels: list) -> list:\n    \"\"\"\n    Convert 2D array of RGB pixels to grayscale.\n    \n    Args:\n        pixels: 2D list where each element is [R, G, B]\n                Example: [[[R,G,B], [R,G,B]], [[R,G,B], [R,G,B]]]\n    \n    Returns:\n        2D list of grayscale integer values\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "convert_pixel_array([[[255, 0, 0], [0, 255, 0]], [[0, 0, 255], [255, 255, 255]]])",
+            "expected": "[[76, 150], [29, 255]]",
+            "explanation": "2×2 image with pure colors: red→76, green→150, blue→29, white→255"
+          },
+          {
+            "input": "convert_pixel_array([[[100, 100, 100]]])",
+            "expected": "[[100]]",
+            "explanation": "1×1 gray pixel: all channels equal so result equals input"
+          },
+          {
+            "input": "convert_pixel_array([[[100, 150, 200], [50, 75, 100], [200, 100, 50]]])",
+            "expected": "[[141, 71, 115]]",
+            "explanation": "1×3 image with mixed colors: demonstrates formula on different pixels"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing image dimensions: mixing up (H, W, 3) vs (3, H, W) channel ordering",
+        "Not preserving nested list structure when converting to/from arrays",
+        "Applying weights to wrong axis in multidimensional arrays",
+        "Forgetting that nested lists need iteration while arrays support vectorization",
+        "Processing one pixel at a time instead of using vectorized operations"
+      ],
+      "hint": "Use nested loops for the list structure: outer loop for rows, inner for columns, then apply weighted sum to each [R,G,B] triplet. Remember to round each result.",
+      "references": [
+        "NumPy array indexing and slicing",
+        "Broadcasting rules in NumPy",
+        "Image representation in computer vision",
+        "Vectorization for performance optimization"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Input Validation and Edge Case Handling",
+      "relation_to_problem": "The problem requires returning -1 for invalid inputs: wrong shape, empty dimensions, or out-of-range pixel values. Robust input validation ensures the function handles all edge cases correctly before attempting conversion.",
+      "prerequisites": [
+        "Array shape inspection",
+        "Type checking",
+        "Conditional logic"
+      ],
+      "learning_objectives": [
+        "Identify and validate required array structure",
+        "Check dimensional constraints systematically",
+        "Verify value ranges for all elements",
+        "Implement early-exit error handling"
+      ],
+      "math_content": {
+        "definition": "**Input Validation** is the process of verifying preconditions before computation. For RGB-to-grayscale conversion, valid input must satisfy: (1) $I$ is a 3D structure with shape $(H, W, 3)$ where $H, W \\geq 1$, (2) All pixel values $I[i,j,k] \\in [0, 255] \\cap \\mathbb{Z}$, (3) The structure is rectangular (all rows have same length). If any condition fails, the function is **undefined** and should return an error indicator.",
+        "notation": "$\\text{shape}(I) = (H, W, C)$ = dimensions of tensor $I$; $\\text{valid}(I) = \\bigwedge_{i,j,k} (0 \\leq I[i,j,k] \\leq 255)$ = validation predicate; $\\bot$ = undefined/error state",
+        "theorem": "**Validation Order Optimization**: Checking conditions in order of computational cost minimizes work for invalid inputs: (1) Check type and structure (O(1)), (2) Check dimensions (O(1)), (3) Check value ranges (O(HWC)). Early exit on first failure prevents unnecessary computation. If $P_i$ is probability of failure at stage $i$ with cost $C_i$, expected cost is $\\sum_{i=1}^{n} C_i \\prod_{j=1}^{i-1}(1-P_j)$, minimized when stages ordered by increasing $C_i/(1-P_i)$.",
+        "proof_sketch": "Proof: Type/structure check requires only accessing shape attribute (constant time). Dimension check compares three integers (constant time). Range validation requires examining all $H \\times W \\times 3$ values (linear in image size). Since constant-time checks are cheaper, perform them first to potentially avoid expensive element-wise validation.",
+        "examples": [
+          "Example 1: Invalid shape - Input $[[1,2,3,4], [5,6,7,8]]$ has 4 channels not 3 → return -1",
+          "Example 2: Empty dimension - Input $[]$ has $H=0$ → return -1",
+          "Example 3: Out of range - Input $[[[256, 0, 0]]]$ has value >255 → return -1",
+          "Example 4: Irregular structure - Input $[[[1,2,3]], [[4,5]]]$ has mismatched widths → return -1",
+          "Example 5: Valid edge case - Input $[[[0,0,0]]]$ is 1×1 black pixel → valid, convert normally"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Shape Validation",
+          "latex": "$\\text{shape}(I) = (H, W, 3) \\land H \\geq 1 \\land W \\geq 1$",
+          "description": "Must be 3D with exactly 3 channels and positive dimensions"
+        },
+        {
+          "name": "Range Validation",
+          "latex": "$\\forall i,j,k: 0 \\leq I[i,j,k] \\leq 255$",
+          "description": "All pixel values must be in valid byte range"
+        },
+        {
+          "name": "Rectangularity Check",
+          "latex": "$\\forall i \\in [0,H): |\\text{row}_i| = W \\land \\forall j \\in [0,W): |\\text{pixel}_{i,j}| = 3$",
+          "description": "All rows same width, all pixels have 3 channels"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a validation function that checks if an input is a valid RGB image array. Return a dictionary with 'valid' (bool) and 'error' (string describing issue or None). This validates structure before attempting conversion.",
+        "function_signature": "def validate_rgb_image(image) -> dict:",
+        "starter_code": "def validate_rgb_image(image) -> dict:\n    \"\"\"\n    Validate if input is a proper RGB image array.\n    \n    Args:\n        image: Input to validate (could be any type)\n    \n    Returns:\n        Dictionary: {'valid': bool, 'error': str or None}\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "validate_rgb_image([[[255, 0, 0], [0, 255, 0]], [[0, 0, 255], [255, 255, 255]]])",
+            "expected": "{'valid': True, 'error': None}",
+            "explanation": "Valid 2×2 RGB image with correct structure and values"
+          },
+          {
+            "input": "validate_rgb_image([])",
+            "expected": "{'valid': False, 'error': 'Empty image'}",
+            "explanation": "Empty list has no dimensions"
+          },
+          {
+            "input": "validate_rgb_image([[[256, 0, 0]]])",
+            "expected": "{'valid': False, 'error': 'Pixel value out of range'}",
+            "explanation": "Value 256 exceeds maximum of 255"
+          },
+          {
+            "input": "validate_rgb_image([[[100, 200]]])",
+            "expected": "{'valid': False, 'error': 'Pixel must have 3 channels'}",
+            "explanation": "Pixel has only 2 values instead of 3"
+          },
+          {
+            "input": "validate_rgb_image([[[50, 100, 150]], [[200, 220]]])",
+            "expected": "{'valid': False, 'error': 'Irregular row width'}",
+            "explanation": "First row has 1 pixel, second row has 1 pixel but malformed"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Only checking first pixel instead of all pixels for value range",
+        "Not handling nested list structure with irregular dimensions",
+        "Forgetting to check for empty sublists at any level",
+        "Checking value ranges before verifying structure (may cause index errors)",
+        "Not considering that input might not even be a list"
+      ],
+      "hint": "Use nested try-except for structure errors. Check shape dimensions first, then iterate through all pixels to verify ranges. Use early return pattern for efficiency.",
+      "references": [
+        "Defensive programming principles",
+        "Python type checking and duck typing",
+        "Exception handling best practices",
+        "Contract-based programming"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete RGB-to-Grayscale Pipeline Integration",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts: validate input, apply perceptual weights using array operations, round results, and return proper format. You'll build the complete conversion pipeline.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Function composition",
+        "Error handling"
+      ],
+      "learning_objectives": [
+        "Compose multiple operations into a coherent pipeline",
+        "Apply all learned techniques in correct sequence",
+        "Handle edge cases gracefully throughout the pipeline",
+        "Produce correctly formatted output from nested list input"
+      ],
+      "math_content": {
+        "definition": "A **color space transformation** is a function $T: \\mathcal{C}_1 \\to \\mathcal{C}_2$ mapping between color spaces. RGB-to-grayscale is a transformation $T_{RGB \\to Gray}: \\mathbb{R}^{H \\times W \\times 3} \\to \\mathbb{R}^{H \\times W}$ defined by: $T(I)[i,j] = \\text{round}\\left(\\sum_{k=0}^{2} w_k \\cdot I[i,j,k]\\right)$ where $\\mathbf{w} = (0.299, 0.587, 0.114)$ subject to validation constraint $\\text{valid}(I)$ returning $\\bot$ if validation fails.",
+        "notation": "$T: \\mathcal{C}_1 \\to \\mathcal{C}_2$ = color transformation function; $\\mathcal{C}_1 = \\mathbb{R}^{H \\times W \\times 3}$ = RGB color space; $\\mathcal{C}_2 = \\mathbb{R}^{H \\times W}$ = grayscale intensity space; $\\bot$ = error/undefined",
+        "theorem": "**Transformation Composability**: Color transformations can be decomposed into component functions: $T = f_4 \\circ f_3 \\circ f_2 \\circ f_1$ where $f_1$ = validate, $f_2$ = normalize (if needed), $f_3$ = weighted sum, $f_4$ = round and clamp. This decomposition satisfies: (1) Each $f_i$ is independently testable, (2) Order matters: $f_i \\circ f_j \\neq f_j \\circ f_i$ in general, (3) Early failure in pipeline propagates: $f_i$ returns $\\bot$ implies $T$ returns $\\bot$.",
+        "proof_sketch": "Pipeline correctness: Let $I_{valid}$ be the set of valid inputs. For $I \\notin I_{valid}$, $f_1(I) = \\bot$ and pipeline returns -1 immediately. For $I \\in I_{valid}$, $f_1(I) = I$ passes to $f_2$. Since values already in [0,255], $f_2$ is identity. $f_3$ applies $I \\mapsto I \\cdot \\mathbf{w}$ producing floating-point matrix. $f_4$ applies rounding: $M \\mapsto \\text{round}(M)$ and clamping to ensure $G \\in [0,255]^{H \\times W}$. Composition preserves mathematical properties: linearity in $f_3$, range preservation in $f_4$.",
+        "examples": [
+          "Example 1: Full pipeline on valid input $[[[255,0,0]]]$: validate→pass, weighted sum→76.245, round→76, output $[[76]]$",
+          "Example 2: Pipeline with invalid input $[[1,2]]$: validate→fail at dimension check, return -1, never execute weighted sum",
+          "Example 3: Multi-pixel $[[[100,150,200],[50,50,50]]]$: validate→pass, weighted sum→[140.75, 50.0], round→[141,50], output $[[141,50]]$",
+          "Example 4: Edge case black $[[[0,0,0]]]$: all stages pass, output $[[0]]$",
+          "Example 5: Edge case white $[[[255,255,255]]]$: weighted sum gives 255.0, output $[[255]]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Pipeline",
+          "latex": "$T(I) = \\begin{cases} \\text{round}(I \\cdot \\mathbf{w}) & \\text{if } \\text{valid}(I) \\\\ \\bot & \\text{otherwise} \\end{cases}$",
+          "description": "Full transformation with validation guard"
+        },
+        {
+          "name": "Element-wise Application",
+          "latex": "$G[i,j] = \\max(0, \\min(255, \\text{round}(0.299 I[i,j,0] + 0.587 I[i,j,1] + 0.114 I[i,j,2])))$",
+          "description": "Per-pixel formula with clamping for safety"
+        },
+        {
+          "name": "Matrix Form",
+          "latex": "$G = \\text{clamp}_{[0,255]}(\\text{round}(I \\mathbf{w}))$",
+          "description": "Vectorized form showing operation order"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified but complete RGB-to-grayscale conversion for a small test image. Must validate input structure, apply BT.601 weights, round correctly, and return as 2D list or -1 for invalid input. This demonstrates the full pipeline without revealing the final solution's implementation details.",
+        "function_signature": "def mini_rgb_to_grayscale(image: list) -> any:",
+        "starter_code": "def mini_rgb_to_grayscale(image: list) -> any:\n    \"\"\"\n    Convert small RGB image to grayscale (simplified version).\n    \n    Args:\n        image: 2D list of RGB pixels, e.g., [[[R,G,B], [R,G,B]], ...]\n    \n    Returns:\n        2D list of grayscale integers, or -1 if invalid\n    \"\"\"\n    # Your code here\n    # Hint: Use functions from previous exercises\n    pass",
+        "test_cases": [
+          {
+            "input": "mini_rgb_to_grayscale([[[255, 0, 0], [0, 255, 0]], [[0, 0, 255], [255, 255, 255]]])",
+            "expected": "[[76, 150], [29, 255]]",
+            "explanation": "Standard 2×2 test case from problem description"
+          },
+          {
+            "input": "mini_rgb_to_grayscale([[[128, 128, 128]]])",
+            "expected": "[[128]]",
+            "explanation": "1×1 gray pixel: validates single-pixel handling"
+          },
+          {
+            "input": "mini_rgb_to_grayscale([])",
+            "expected": "-1",
+            "explanation": "Empty image: validation should fail"
+          },
+          {
+            "input": "mini_rgb_to_grayscale([[[100, 150, 200, 50]]])",
+            "expected": "-1",
+            "explanation": "4 channels instead of 3: validation should fail"
+          },
+          {
+            "input": "mini_rgb_to_grayscale([[[100, 150, 300]]])",
+            "expected": "-1",
+            "explanation": "Value 300 out of range: validation should fail"
+          },
+          {
+            "input": "mini_rgb_to_grayscale([[[0, 0, 0]], [[255, 255, 255]]])",
+            "expected": "[[0], [255]]",
+            "explanation": "Black and white pixels: tests extreme values"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to validate before processing (causes crashes on bad input)",
+        "Validating after partial processing (inefficient and may error)",
+        "Not returning -1 for ALL invalid cases specified in requirements",
+        "Converting to NumPy array when problem expects nested list output",
+        "Mixing up row-major vs column-major indexing in nested loops",
+        "Not handling the conversion back from array to nested list properly"
+      ],
+      "hint": "Structure your solution: (1) validate input structure and values, return -1 if invalid; (2) iterate through rows and pixels; (3) for each pixel, apply weighted_sum from step 1; (4) round each result; (5) build output list structure matching input shape. Test each component separately first.",
+      "references": [
+        "Software engineering: function decomposition and modularity",
+        "Image processing pipelines and dataflow",
+        "Functional programming: composition and pipelining",
+        "Clean Code principles for readable implementations"
+      ]
+    }
+  ]
+}

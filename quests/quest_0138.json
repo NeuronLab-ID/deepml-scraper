@@ -1,0 +1,470 @@
+{
+  "problem_id": 138,
+  "title": "Find the Best Gini-Based Split for a Binary Decision Tree",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "Implement a function that scans every feature and threshold in a small data set, then returns the split that minimises the weighted Gini impurity. Your implementation should support binary class labels (0 or 1) and handle ties gracefully.  \n\nYou will write **one** function:\n\n```python\nfind_best_split(X: np.ndarray, y: np.ndarray) -> tuple[int, float]\n```\n\n* **`X`** is an $n\\times d$ NumPy array of numeric features.\n* **`y`** is a length-$n$ NumPy array of 0/1 labels.\n* The function returns `(best_feature_index, best_threshold)` for the split with the **lowest** weighted Gini impurity.\n* If several splits share the same impurity, return the first that you encounter while scanning features and thresholds.",
+  "example": {
+    "input": "import numpy as np\nX = np.array([[2.5],[3.5],[1.0],[4.0]])\ny = np.array([0,1,0,1])\nprint(find_best_split(X, y))",
+    "output": "(0, 2.5)",
+    "reasoning": "Splitting on feature 0 at threshold 2.5 yields two perfectly pure leaves, producing the minimum possible weighted Gini impurity."
+  },
+  "starter_code": "import numpy as np\nfrom typing import Tuple\n\ndef find_best_split(X: np.ndarray, y: np.ndarray) -> Tuple[int, float]:\n    \"\"\"Return the (feature_index, threshold) that minimises weighted Gini impurity.\"\"\"\n    # ✏️ TODO: implement\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Class Proportions and Probability Distributions",
+      "relation_to_problem": "Computing Gini impurity requires calculating the proportion of each class in a dataset, which is the foundation for measuring node purity in decision trees.",
+      "prerequisites": [
+        "Basic Python",
+        "NumPy arrays",
+        "Elementary probability"
+      ],
+      "learning_objectives": [
+        "Calculate class proportions from binary label arrays",
+        "Understand how class distribution relates to node purity",
+        "Handle edge cases like empty datasets or single-class nodes"
+      ],
+      "math_content": {
+        "definition": "Given a dataset with $n$ samples and binary labels $y \\in \\{0, 1\\}^n$, the **class proportion** (or empirical probability) for class $c$ is defined as: $$p_c = \\frac{1}{n}\\sum_{i=1}^{n} \\mathbb{1}_{y_i = c}$$ where $\\mathbb{1}_{y_i = c}$ is the indicator function that equals 1 if $y_i = c$ and 0 otherwise.",
+        "notation": "$p_0$ = proportion of class 0, $p_1$ = proportion of class 1, $n$ = total number of samples, $\\mathbb{1}$ = indicator function",
+        "theorem": "**Normalization Property**: For binary classification, the class proportions satisfy $p_0 + p_1 = 1$. This follows directly from the definition since every sample belongs to exactly one class.",
+        "proof_sketch": "Let $n_0$ be the count of class 0 and $n_1$ be the count of class 1. Then $n_0 + n_1 = n$ (total samples). Dividing both sides by $n$ gives: $\\frac{n_0}{n} + \\frac{n_1}{n} = 1$, which is $p_0 + p_1 = 1$.",
+        "examples": [
+          "Example 1: $y = [0, 0, 1, 1, 1]$, then $n=5$, $n_0=2$, $n_1=3$, so $p_0=2/5=0.4$, $p_1=3/5=0.6$. Verify: $0.4+0.6=1$ ✓",
+          "Example 2: $y = [1, 1, 1, 1]$ (pure node), then $p_0=0$, $p_1=1$. This represents maximum purity for class 1.",
+          "Example 3: $y = [0, 1, 0, 1, 0, 1]$ (balanced), then $p_0=0.5$, $p_1=0.5$. This represents maximum impurity."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Class Proportion",
+          "latex": "$p_c = \\frac{\\text{count}(y = c)}{n}$",
+          "description": "Use this to compute the fraction of samples belonging to class $c$"
+        },
+        {
+          "name": "Complementary Probability",
+          "latex": "$p_1 = 1 - p_0$",
+          "description": "For binary classification, knowing one proportion gives you the other"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes class proportions for binary labels. This is the first building block needed to calculate Gini impurity.",
+        "function_signature": "def compute_class_proportions(y: np.ndarray) -> tuple[float, float]:",
+        "starter_code": "import numpy as np\nfrom typing import Tuple\n\ndef compute_class_proportions(y: np.ndarray) -> Tuple[float, float]:\n    \"\"\"\n    Compute the proportions of class 0 and class 1 in binary labels.\n    \n    Args:\n        y: 1D array of binary labels (0 or 1)\n    \n    Returns:\n        (p0, p1): proportions of class 0 and class 1\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_class_proportions(np.array([0, 0, 1, 1, 1]))",
+            "expected": "(0.4, 0.6)",
+            "explanation": "Out of 5 samples, 2 are class 0 (40%) and 3 are class 1 (60%)"
+          },
+          {
+            "input": "compute_class_proportions(np.array([1, 1, 1, 1]))",
+            "expected": "(0.0, 1.0)",
+            "explanation": "Pure node with all samples belonging to class 1"
+          },
+          {
+            "input": "compute_class_proportions(np.array([0, 1, 0, 1]))",
+            "expected": "(0.5, 0.5)",
+            "explanation": "Perfectly balanced dataset with equal class distribution"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle empty arrays (should return (0.0, 0.0) or raise an error)",
+        "Using integer division instead of float division, leading to incorrect proportions",
+        "Not validating that input contains only 0s and 1s",
+        "Assuming p1 = 1 - p0 without verifying the data is binary"
+      ],
+      "hint": "Use NumPy's sum() or count_nonzero() functions to count occurrences efficiently. Remember that for binary labels, sum(y) gives you the count of 1s.",
+      "references": [
+        "NumPy boolean indexing and counting",
+        "Empirical probability estimation",
+        "Indicator functions in statistics"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Computing Gini Impurity for Binary Classification",
+      "relation_to_problem": "Gini impurity is the core metric used to evaluate node purity in decision trees. Understanding how to compute it is essential for comparing different splits.",
+      "prerequisites": [
+        "Class proportions from Step 1",
+        "Basic algebra",
+        "Understanding of squared terms"
+      ],
+      "learning_objectives": [
+        "Understand Gini impurity as a measure of misclassification probability",
+        "Compute Gini impurity from class proportions",
+        "Recognize pure nodes (impurity = 0) and maximally impure nodes (impurity = 0.5)",
+        "Interpret Gini values in context of decision tree splitting"
+      ],
+      "math_content": {
+        "definition": "**Gini Impurity** for a binary classification node with class proportions $p_0$ and $p_1$ is defined as: $$G = 1 - (p_0^2 + p_1^2) = 1 - p_0^2 - p_1^2$$ Alternatively, using $p_1 = 1 - p_0$: $$G = 1 - p_0^2 - (1-p_0)^2 = 2p_0(1-p_0)$$ The Gini impurity represents the probability of misclassifying a randomly chosen element if it were randomly labeled according to the class distribution.",
+        "notation": "$G$ = Gini impurity, $p_0$ = proportion of class 0, $p_1$ = proportion of class 1",
+        "theorem": "**Range Theorem**: For binary classification, Gini impurity satisfies $0 \\leq G \\leq 0.5$. The minimum $G=0$ occurs when $p_0 \\in \\{0,1\\}$ (pure node), and the maximum $G=0.5$ occurs when $p_0=p_1=0.5$ (maximally impure node).",
+        "proof_sketch": "To find the maximum, we treat $G$ as a function of $p_0$: $G(p_0) = 2p_0(1-p_0) = 2p_0 - 2p_0^2$. Taking the derivative: $\\frac{dG}{dp_0} = 2 - 4p_0$. Setting to zero: $2-4p_0=0 \\Rightarrow p_0=0.5$. The second derivative is $\\frac{d^2G}{dp_0^2}=-4<0$, confirming a maximum. Evaluating: $G(0.5)=2(0.5)(0.5)=0.5$. At boundaries: $G(0)=0$ and $G(1)=0$.",
+        "examples": [
+          "Example 1: Pure node with $y=[1,1,1,1]$ has $p_0=0$, $p_1=1$. Then $G = 1 - (0^2 + 1^2) = 1 - 1 = 0$. Perfect purity.",
+          "Example 2: Balanced node with $y=[0,0,1,1]$ has $p_0=0.5$, $p_1=0.5$. Then $G = 1 - (0.5^2 + 0.5^2) = 1 - 0.5 = 0.5$. Maximum impurity.",
+          "Example 3: Imbalanced node with $y=[0,0,0,1]$ has $p_0=0.75$, $p_1=0.25$. Then $G = 1 - (0.75^2 + 0.25^2) = 1 - (0.5625 + 0.0625) = 0.375$.",
+          "Example 4: Using alternative formula for Example 3: $G = 2(0.75)(0.25) = 0.375$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gini Impurity (Standard Form)",
+          "latex": "$G = 1 - \\sum_{i=0}^{1} p_i^2 = 1 - p_0^2 - p_1^2$",
+          "description": "Primary formula for computing Gini impurity from class proportions"
+        },
+        {
+          "name": "Gini Impurity (Simplified Binary Form)",
+          "latex": "$G = 2p_0p_1 = 2p_0(1-p_0)$",
+          "description": "Equivalent form that's computationally simpler for binary classification"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes Gini impurity for a binary label array. This combines your proportion calculation with the Gini formula.",
+        "function_signature": "def gini_impurity(y: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef gini_impurity(y: np.ndarray) -> float:\n    \"\"\"\n    Compute the Gini impurity for a binary classification node.\n    \n    Args:\n        y: 1D array of binary labels (0 or 1)\n    \n    Returns:\n        Gini impurity value (between 0 and 0.5)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "gini_impurity(np.array([1, 1, 1, 1]))",
+            "expected": "0.0",
+            "explanation": "Pure node with all class 1 labels has zero impurity"
+          },
+          {
+            "input": "gini_impurity(np.array([0, 0, 0, 0]))",
+            "expected": "0.0",
+            "explanation": "Pure node with all class 0 labels has zero impurity"
+          },
+          {
+            "input": "gini_impurity(np.array([0, 1, 0, 1]))",
+            "expected": "0.5",
+            "explanation": "Perfectly balanced dataset has maximum impurity of 0.5"
+          },
+          {
+            "input": "gini_impurity(np.array([0, 0, 0, 1]))",
+            "expected": "0.375",
+            "explanation": "With p0=0.75 and p1=0.25: G = 1 - (0.75² + 0.25²) = 0.375"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing 1 - p0² - p1² with integer arithmetic instead of floats",
+        "Confusing Gini impurity (max 0.5 for binary) with the multiclass range (max approaching 1)",
+        "Forgetting to square the proportions before subtracting from 1",
+        "Thinking higher Gini means better purity (it's the opposite: lower Gini = purer node)",
+        "Not handling edge case where y is empty (should return 0.0)"
+      ],
+      "hint": "First compute class proportions using your previous function or inline calculation, then apply the Gini formula. Verify your answer makes intuitive sense: pure nodes should give 0, balanced nodes should give 0.5.",
+      "references": [
+        "CART algorithm (Breiman et al., 1984)",
+        "Information theory and entropy measures",
+        "Statistical measures of heterogeneity"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Partitioning Data by Threshold and Computing Weighted Impurity",
+      "relation_to_problem": "To evaluate a candidate split, we must partition the data into left and right children based on a threshold, then compute the weighted average of their impurities.",
+      "prerequisites": [
+        "Gini impurity computation from Step 2",
+        "Boolean indexing in NumPy",
+        "Weighted averages"
+      ],
+      "learning_objectives": [
+        "Partition data into left and right subsets based on a feature threshold",
+        "Compute weighted Gini impurity for a split",
+        "Understand why weighted impurity measures split quality",
+        "Handle edge cases like splits that send all data to one side"
+      ],
+      "math_content": {
+        "definition": "Given a dataset with features $X \\in \\mathbb{R}^{n \\times d}$ and labels $y \\in \\{0,1\\}^n$, a **split** on feature $j$ at threshold $t$ partitions the data into: $$\\text{Left: } L = \\{i : X_{i,j} \\leq t\\}$$ $$\\text{Right: } R = \\{i : X_{i,j} > t\\}$$ The **weighted Gini impurity** of this split is: $$G_{\\text{weighted}} = \\frac{|L|}{n} G(y_L) + \\frac{|R|}{n} G(y_R)$$ where $y_L$ and $y_R$ are the label subsets for left and right children, and $|L|$, $|R|$ are their sizes.",
+        "notation": "$L$ = left child indices, $R$ = right child indices, $n$ = total samples, $G(y_L)$ = Gini impurity of left child, $G(y_R)$ = Gini impurity of right child",
+        "theorem": "**Bounds on Weighted Impurity**: The weighted impurity satisfies $0 \\leq G_{\\text{weighted}} \\leq G_{\\text{parent}}$ where $G_{\\text{parent}}$ is the parent node's impurity. Equality holds when the split produces no separation (both children have the same class distribution as parent).",
+        "proof_sketch": "Since $0 \\leq G(y_L), G(y_R) \\leq 0.5$ for binary classification, and the weights $\\frac{|L|}{n}$ and $\\frac{|R|}{n}$ are non-negative and sum to 1, we have $G_{\\text{weighted}} \\geq 0$. The upper bound follows from the convexity of the Gini function: a weighted average of child impurities can be at most the parent impurity when the split provides no information gain.",
+        "examples": [
+          "Example 1: Consider $y=[0,0,1,1]$ with feature $x=[1,2,3,4]$. Split at $t=2.5$ gives Left: $y_L=[0,0]$ (indices 0,1), Right: $y_R=[1,1]$ (indices 2,3). Then $G(y_L)=0$, $G(y_R)=0$, so $G_{\\text{weighted}} = \\frac{2}{4}(0) + \\frac{2}{4}(0) = 0$. Perfect split!",
+          "Example 2: Same data, split at $t=1.5$ gives Left: $y_L=[0]$, Right: $y_R=[0,1,1]$. Then $G(y_L)=0$, $G(y_R)=1-(\\frac{1}{3})^2-(\\frac{2}{3})^2=\\frac{4}{9}\\approx 0.444$. So $G_{\\text{weighted}} = \\frac{1}{4}(0) + \\frac{3}{4}(0.444) = 0.333$.",
+          "Example 3: Split at $t=0.5$ sends all to right: $|L|=0$, $|R|=4$. Then $G_{\\text{weighted}} = \\frac{0}{4}(\\cdot) + \\frac{4}{4}(0.5) = 0.5$. No improvement over parent."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Weighted Gini Impurity",
+          "latex": "$G_{\\text{split}} = \\frac{n_L}{n} G_L + \\frac{n_R}{n} G_R$",
+          "description": "Use this to evaluate the quality of a split by computing the size-weighted average of child impurities"
+        },
+        {
+          "name": "Impurity Reduction (Gini Gain)",
+          "latex": "$\\Delta G = G_{\\text{parent}} - G_{\\text{split}}$",
+          "description": "Positive values indicate the split reduces impurity (good). Larger reduction = better split"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the weighted Gini impurity for splitting a single feature at a given threshold. This is a critical component for evaluating split quality.",
+        "function_signature": "def weighted_gini_split(X_feature: np.ndarray, y: np.ndarray, threshold: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef weighted_gini_split(X_feature: np.ndarray, y: np.ndarray, threshold: float) -> float:\n    \"\"\"\n    Compute weighted Gini impurity for splitting a feature at a threshold.\n    \n    Args:\n        X_feature: 1D array of feature values for all samples\n        y: 1D array of binary labels (0 or 1)\n        threshold: split threshold value\n    \n    Returns:\n        Weighted Gini impurity after the split\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "weighted_gini_split(np.array([1, 2, 3, 4]), np.array([0, 0, 1, 1]), 2.5)",
+            "expected": "0.0",
+            "explanation": "Split at 2.5 creates two pure children: left=[0,0], right=[1,1], so weighted impurity is 0"
+          },
+          {
+            "input": "weighted_gini_split(np.array([1, 2, 3, 4]), np.array([0, 0, 1, 1]), 1.5)",
+            "expected": "0.333333",
+            "explanation": "Split at 1.5: left=[0] (pure, G=0), right=[0,1,1] (G=4/9). Weighted: (1/4)*0 + (3/4)*(4/9) = 1/3"
+          },
+          {
+            "input": "weighted_gini_split(np.array([1, 2, 3, 4]), np.array([0, 1, 0, 1]), 2.5)",
+            "expected": "0.5",
+            "explanation": "Split at 2.5: both children are [0,1] (each has G=0.5). Weighted: (1/2)*0.5 + (1/2)*0.5 = 0.5"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using < instead of <= for the left split condition (convention matters for consistency)",
+        "Forgetting to weight by child sizes (n_left/n and n_right/n)",
+        "Not handling edge case where split sends all samples to one side (should check if left or right is empty)",
+        "Computing weights as n_left/n_right instead of as fractions of total n",
+        "Assuming both children always exist (a poor threshold might create an empty child)"
+      ],
+      "hint": "Use boolean indexing: `left_mask = X_feature <= threshold` to get left indices. Then compute `y_left = y[left_mask]` and `y_right = y[~left_mask]`. Calculate Gini for each child, weight by their sizes, and sum.",
+      "references": [
+        "NumPy boolean indexing",
+        "Decision tree splitting mechanics",
+        "Weighted averages in statistics"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Identifying Candidate Split Points for Continuous Features",
+      "relation_to_problem": "For continuous features, we cannot test every possible threshold. We must identify meaningful candidate split points based on the data values.",
+      "prerequisites": [
+        "Understanding of sorted arrays",
+        "Threshold-based partitioning from Step 3",
+        "NumPy array operations"
+      ],
+      "learning_objectives": [
+        "Understand why we only need to test thresholds between consecutive distinct feature values",
+        "Extract candidate split points efficiently from continuous data",
+        "Recognize that optimal splits occur at midpoints between data values",
+        "Avoid redundant threshold testing"
+      ],
+      "math_content": {
+        "definition": "For a continuous feature $x^{(j)} = [x_1^{(j)}, x_2^{(j)}, \\ldots, x_n^{(j)}]$, a **candidate split point** is a threshold value $t$ that produces a different partition than all other thresholds. Formally, two thresholds $t_1$ and $t_2$ are equivalent if $\\{i : x_i^{(j)} \\leq t_1\\} = \\{i : x_i^{(j)} \\leq t_2\\}$. The set of **unique candidate splits** can be chosen as: $$T = \\left\\{ \\frac{x_i^{(j)} + x_{i+1}^{(j)}}{2} : i=1,\\ldots,n-1 \\right\\}$$ where $x_1^{(j)} \\leq x_2^{(j)} \\leq \\cdots \\leq x_n^{(j)}$ are the sorted unique feature values.",
+        "notation": "$x^{(j)}$ = feature column $j$, $T$ = set of candidate thresholds, $n$ = number of samples",
+        "theorem": "**Optimal Split Theorem**: Among all possible threshold values $t \\in \\mathbb{R}$ for feature $j$, there exists an optimal split at some threshold $t^* \\in T$ where $T$ is the set of midpoints between consecutive sorted feature values. Thus, we need only test $O(n)$ thresholds per feature, not infinitely many.",
+        "proof_sketch": "Consider any threshold $t$ that lies strictly between two consecutive data points $x_i^{(j)}$ and $x_{i+1}^{(j)}$. Any such $t$ produces the same partition: left = $\\{k : x_k^{(j)} \\leq x_i^{(j)}\\}$ and right = $\\{k : x_k^{(j)} > x_i^{(j)}\\}$. Therefore, all thresholds in the interval $(x_i^{(j)}, x_{i+1}^{(j)})$ are equivalent, and we only need to test one representative from each interval, conventionally the midpoint.",
+        "examples": [
+          "Example 1: Feature values $x=[1.0, 2.0, 5.0, 9.0]$. Candidate thresholds are: $t_1=\\frac{1+2}{2}=1.5$, $t_2=\\frac{2+5}{2}=3.5$, $t_3=\\frac{5+9}{2}=7.0$. Only 3 thresholds need testing instead of infinitely many.",
+          "Example 2: Feature with duplicates $x=[1.0, 1.0, 3.0, 5.0]$. After removing duplicates: $x_{\\text{unique}}=[1.0, 3.0, 5.0]$. Candidates: $t_1=2.0$, $t_2=4.0$. Only 2 thresholds.",
+          "Example 3: Single unique value $x=[2.0, 2.0, 2.0]$ gives no candidate splits (cannot partition into meaningful subsets)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Midpoint Threshold",
+          "latex": "$t_i = \\frac{x_i + x_{i+1}}{2}$",
+          "description": "Compute candidate threshold as midpoint between consecutive sorted unique values"
+        },
+        {
+          "name": "Number of Candidates",
+          "latex": "$|T| = n_{\\text{unique}} - 1$",
+          "description": "For $n_{\\text{unique}}$ distinct feature values, there are at most $n_{\\text{unique}}-1$ candidate splits"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that extracts all candidate split thresholds from a continuous feature array. This reduces the search space from infinite to O(n) thresholds.",
+        "function_signature": "def get_candidate_thresholds(X_feature: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef get_candidate_thresholds(X_feature: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Extract candidate split thresholds from a feature array.\n    \n    Args:\n        X_feature: 1D array of feature values\n    \n    Returns:\n        Array of candidate threshold values (midpoints between consecutive unique values)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "get_candidate_thresholds(np.array([1.0, 2.0, 5.0, 9.0]))",
+            "expected": "np.array([1.5, 3.5, 7.0])",
+            "explanation": "Midpoints between consecutive values: (1+2)/2=1.5, (2+5)/2=3.5, (5+9)/2=7.0"
+          },
+          {
+            "input": "get_candidate_thresholds(np.array([3.0, 1.0, 2.0, 1.0]))",
+            "expected": "np.array([1.5, 2.5])",
+            "explanation": "After sorting and removing duplicates [1.0, 2.0, 3.0], midpoints are 1.5 and 2.5"
+          },
+          {
+            "input": "get_candidate_thresholds(np.array([5.0, 5.0, 5.0]))",
+            "expected": "np.array([])",
+            "explanation": "All values identical, no meaningful split points"
+          },
+          {
+            "input": "get_candidate_thresholds(np.array([1.0, 3.0]))",
+            "expected": "np.array([2.0])",
+            "explanation": "Only one midpoint between two values"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not removing duplicate values before computing midpoints (leads to redundant thresholds)",
+        "Forgetting to sort the feature values first",
+        "Computing midpoints between all consecutive values without deduplication",
+        "Not handling edge case of single unique value (should return empty array)",
+        "Using min/max of feature range instead of actual data values"
+      ],
+      "hint": "Use np.unique() to get sorted unique values, then compute midpoints between consecutive pairs. You can use array slicing: `(unique_vals[:-1] + unique_vals[1:]) / 2` to vectorize the midpoint calculation.",
+      "references": [
+        "CART splitting algorithm",
+        "Computational complexity of decision tree training",
+        "Efficient threshold selection strategies"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Exhaustive Search for Optimal Feature-Threshold Pair",
+      "relation_to_problem": "The final step combines all previous concepts: iterate through all features and candidate thresholds, computing weighted impurity for each, and select the split that minimizes impurity.",
+      "prerequisites": [
+        "Weighted impurity computation from Step 3",
+        "Candidate threshold extraction from Step 4",
+        "Understanding of greedy optimization"
+      ],
+      "learning_objectives": [
+        "Implement nested iteration over features and thresholds",
+        "Track the best split found so far during search",
+        "Handle ties by selecting the first encountered split",
+        "Understand the computational complexity of exhaustive split search",
+        "Recognize when no valid splits exist"
+      ],
+      "math_content": {
+        "definition": "The **best split** for a dataset $(X, y)$ with $X \\in \\mathbb{R}^{n \\times d}$ is the feature-threshold pair $(j^*, t^*)$ that minimizes weighted Gini impurity: $$(j^*, t^*) = \\arg\\min_{j \\in \\{1,\\ldots,d\\}, t \\in T_j} G_{\\text{weighted}}(X^{(j)}, y, t)$$ where $T_j$ is the set of candidate thresholds for feature $j$. This is a **greedy optimization** approach: we select the locally optimal split without considering future splits.",
+        "notation": "$j^*$ = best feature index, $t^*$ = best threshold, $G_{\\text{weighted}}$ = weighted Gini impurity function, $d$ = number of features",
+        "theorem": "**Exhaustive Search Complexity**: For a dataset with $n$ samples and $d$ features, the time complexity of finding the best split is $O(d \\cdot n \\log n)$. The $n \\log n$ factor comes from sorting each feature, and the $d$ factor comes from iterating over all features. For each of the $O(n)$ candidate thresholds per feature, computing weighted Gini takes $O(n)$ time, but this can be optimized to $O(1)$ per threshold using cumulative statistics.",
+        "proof_sketch": "For each feature $j \\in \\{1,\\ldots,d\\}$: (1) Sort the feature values: $O(n \\log n)$. (2) Extract $O(n)$ candidate thresholds: $O(n)$. (3) For each threshold, compute weighted impurity by scanning the data: $O(n)$. Thus per feature: $O(n \\log n + n \\cdot n) = O(n^2)$. Across $d$ features: $O(d \\cdot n^2)$. With optimization using cumulative sums (not required here), this reduces to $O(d \\cdot n \\log n)$.",
+        "examples": [
+          "Example 1: Dataset $X=\\begin{bmatrix}2.5\\\\3.5\\\\1.0\\\\4.0\\end{bmatrix}$, $y=[0,1,0,1]$. Feature 0 candidates: $\\{1.75, 2.0, 3.75\\}$ (after sorting $[1.0,2.5,3.5,4.0]$). Test each: $G(1.75)=0.375$, $G(3.0)=0.0$, $G(3.75)=0.375$. Best: $(j=0, t=3.0)$ with $G=0.0$.",
+          "Example 2: For multi-feature data, iterate feature 0 to find best split, then feature 1, etc. Keep track of global minimum. If feature 0's best is $(0, 2.5, G=0.1)$ and feature 1's best is $(1, 5.0, G=0.15)$, select feature 0's split.",
+          "Example 3: Tie-breaking: If splits $(0, 2.5)$ and $(0, 3.5)$ both achieve $G=0.1$, select $(0, 2.5)$ as it was encountered first."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Optimization Objective",
+          "latex": "$\\min_{j, t} G_{\\text{weighted}}(j, t)$",
+          "description": "Find the feature $j$ and threshold $t$ that minimize weighted Gini impurity"
+        },
+        {
+          "name": "Impurity Reduction",
+          "latex": "$\\Delta G = G_{\\text{parent}} - G_{\\text{split}}$",
+          "description": "Equivalently, maximize the impurity reduction (Gini gain)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that searches through all features and thresholds to find the split with minimum weighted Gini impurity. This is a simplified version of the main problem that works on a single feature.",
+        "function_signature": "def find_best_split_single_feature(X_feature: np.ndarray, y: np.ndarray) -> tuple[float, float]:",
+        "starter_code": "import numpy as np\nfrom typing import Tuple\n\ndef find_best_split_single_feature(X_feature: np.ndarray, y: np.ndarray) -> Tuple[float, float]:\n    \"\"\"\n    Find the best threshold for splitting a single feature.\n    \n    Args:\n        X_feature: 1D array of feature values\n        y: 1D array of binary labels (0 or 1)\n    \n    Returns:\n        (best_threshold, best_impurity): threshold with minimum weighted Gini impurity\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "find_best_split_single_feature(np.array([2.5, 3.5, 1.0, 4.0]), np.array([0, 1, 0, 1]))",
+            "expected": "(2.5, 0.0) or (3.0, 0.0)",
+            "explanation": "Multiple thresholds may achieve perfect split with impurity 0.0"
+          },
+          {
+            "input": "find_best_split_single_feature(np.array([1, 2, 3, 4]), np.array([0, 0, 0, 1]))",
+            "expected": "(3.5, 0.0)",
+            "explanation": "Split at 3.5 gives left=[0,0,0] (pure) and right=[1] (pure), achieving minimum impurity"
+          },
+          {
+            "input": "find_best_split_single_feature(np.array([1, 1, 1]), np.array([0, 1, 0]))",
+            "expected": "None or raise error",
+            "explanation": "All feature values identical, no valid split exists"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not initializing best_impurity to a large value (e.g., float('inf')), causing incorrect comparisons",
+        "Breaking ties incorrectly (should return first encountered, not last)",
+        "Forgetting to handle case where no candidate thresholds exist",
+        "Using > instead of >= when comparing impurities, which affects tie-breaking",
+        "Not tracking both threshold and impurity, making it impossible to return both values"
+      ],
+      "hint": "Structure your code with nested loops: outer loop over features (just one for this exercise), inner loop over candidate thresholds. Keep variables for best_threshold and best_impurity, updating them when you find a better split.",
+      "references": [
+        "Greedy algorithms in machine learning",
+        "CART algorithm implementation",
+        "Decision tree splitting strategies"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Multi-Feature Optimization with Proper Tie-Breaking",
+      "relation_to_problem": "Extend single-feature optimization to handle multiple features, implementing proper index-based tie-breaking to ensure deterministic results.",
+      "prerequisites": [
+        "Single-feature optimization from Step 5",
+        "Understanding of nested loops and state tracking",
+        "Tuple comparisons in Python"
+      ],
+      "learning_objectives": [
+        "Extend exhaustive search to multiple features",
+        "Implement deterministic tie-breaking (first feature, then first threshold)",
+        "Return feature index and threshold as required by the problem",
+        "Validate correctness on multi-feature datasets",
+        "Understand the full decision tree splitting algorithm"
+      ],
+      "math_content": {
+        "definition": "For a multi-feature dataset $X \\in \\mathbb{R}^{n \\times d}$ with $d > 1$ features, the **best split** is found by: $$(j^*, t^*) = \\arg\\min_{j=0,\\ldots,d-1} \\min_{t \\in T_j} G_{\\text{weighted}}(X^{(j)}, y, t)$$ with **lexicographic tie-breaking**: if multiple $(j, t)$ pairs achieve the same minimum impurity, select the one with smallest $j$, and for equal $j$, select smallest $t$.",
+        "notation": "$j$ = feature index (0 to $d-1$), $t$ = threshold value, $T_j$ = candidate thresholds for feature $j$",
+        "theorem": "**Deterministic Splitting**: Given a fixed dataset $(X, y)$ and a consistent candidate threshold generation method, the best split $(j^*, t^*)$ with lexicographic tie-breaking is unique and deterministic. This ensures that decision tree construction is reproducible.",
+        "proof_sketch": "Lexicographic ordering is a total order on pairs $(j, t)$: for any two pairs $(j_1, t_1)$ and $(j_2, t_2)$, either $(j_1, t_1) < (j_2, t_2)$, $(j_1, t_1) = (j_2, t_2)$, or $(j_1, t_1) > (j_2, t_2)$. Among all pairs achieving minimum impurity $G_{\\min}$, there exists a unique lexicographically smallest pair. Iterating through features in order $j=0,1,\\ldots,d-1$ and thresholds in sorted order ensures we encounter this pair first.",
+        "examples": [
+          "Example 1: Two features $X=\\begin{bmatrix}1&5\\\\2&3\\\\3&1\\\\4&2\\end{bmatrix}$, $y=[0,0,1,1]$. Feature 0 best: $(0, 2.5, G=0.0)$. Feature 1 best: $(1, 2.5, G=0.0)$. Tie on impurity. Select $(0, 2.5)$ because $j=0 < j=1$.",
+          "Example 2: Single feature $X=\\begin{bmatrix}1\\\\2\\\\3\\\\4\\end{bmatrix}$, $y=[0,1,1,1]$. Candidates $\\{1.5, 2.5, 3.5\\}$ give impurities $\\{0.375, 0.25, 0.375\\}$. Best: $(0, 2.5)$.",
+          "Example 3: Feature 0 has thresholds $\\{1.5, 2.5\\}$ both with $G=0.1$. Select $t=1.5$ as it's encountered first."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Lexicographic Ordering",
+          "latex": "$(j_1, t_1) < (j_2, t_2) \\iff j_1 < j_2 \\text{ or } (j_1 = j_2 \\land t_1 < t_2)$",
+          "description": "Tie-breaking rule: prefer smaller feature index, then smaller threshold"
+        },
+        {
+          "name": "Global Minimum",
+          "latex": "$G^* = \\min_{j,t} G_{\\text{weighted}}(j, t)$",
+          "description": "The minimum weighted impurity across all features and thresholds"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete best split function that handles multiple features with proper tie-breaking. This brings together all previous sub-quests into the solution framework.",
+        "function_signature": "def find_best_split_multifeature(X: np.ndarray, y: np.ndarray) -> tuple[int, float]:",
+        "starter_code": "import numpy as np\nfrom typing import Tuple\n\ndef find_best_split_multifeature(X: np.ndarray, y: np.ndarray) -> Tuple[int, float]:\n    \"\"\"\n    Find the best feature and threshold for splitting.\n    \n    Args:\n        X: 2D array of shape (n_samples, n_features)\n        y: 1D array of binary labels (0 or 1)\n    \n    Returns:\n        (best_feature_index, best_threshold): feature and threshold with minimum weighted Gini\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "find_best_split_multifeature(np.array([[2.5], [3.5], [1.0], [4.0]]), np.array([0, 1, 0, 1]))",
+            "expected": "(0, 2.5) or (0, 3.0)",
+            "explanation": "Single feature case from the main problem example"
+          },
+          {
+            "input": "find_best_split_multifeature(np.array([[1, 5], [2, 3], [3, 1], [4, 2]]), np.array([0, 0, 1, 1]))",
+            "expected": "(0, 2.5)",
+            "explanation": "Both features can achieve perfect split, but feature 0 comes first"
+          },
+          {
+            "input": "find_best_split_multifeature(np.array([[1, 10], [2, 20], [3, 30]]), np.array([0, 1, 1]))",
+            "expected": "(0, 1.5)",
+            "explanation": "Feature 0 at threshold 1.5 creates left=[0] (pure) and right=[1,1] (pure)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not iterating features in order (0, 1, 2, ...), which breaks tie-breaking correctness",
+        "Not iterating thresholds in sorted order, which breaks threshold tie-breaking",
+        "Updating best split when impurity is equal (should only update when strictly less than)",
+        "Returning threshold instead of (feature_index, threshold) tuple",
+        "Not handling edge case where dataset has only one feature"
+      ],
+      "hint": "Use a double nested loop: outer loop `for j in range(d):` iterates features, inner loop iterates candidate thresholds for feature j. Initialize best_impurity = float('inf'), and update best_feature, best_threshold only when current impurity < best_impurity.",
+      "references": [
+        "CART algorithm (Breiman, 1984)",
+        "Scikit-learn DecisionTreeClassifier implementation",
+        "Greedy splitting in decision trees"
+      ]
+    }
+  ]
+}

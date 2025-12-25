@@ -1,0 +1,501 @@
+{
+  "problem_id": 10,
+  "title": "Calculate Covariance Matrix",
+  "category": "Statistics",
+  "difficulty": "easy",
+  "description": "Write a Python function to calculate the covariance matrix for a given set of vectors. The function should take a list of lists, where each inner list represents a feature with its observations, and return a covariance matrix as a list of lists. Additionally, provide test cases to verify the correctness of your implementation.",
+  "example": {
+    "input": "[[1, 2, 3], [4, 5, 6]]",
+    "output": "[[1.0, 1.0], [1.0, 1.0]]",
+    "reasoning": "The covariance between the two features is calculated based on their deviations from the mean. For the given vectors, both covariances are 1.0, resulting in a symmetric covariance matrix."
+  },
+  "starter_code": "def calculate_covariance_matrix(vectors: list[list[float]]) -> list[list[float]]:\n\t# Your code here\n\treturn []",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Computing the Mean of a Dataset",
+      "relation_to_problem": "The mean is the foundation for calculating covariance, as covariance measures how variables deviate from their respective means. Without accurate mean calculation, the entire covariance computation fails.",
+      "prerequisites": [
+        "Basic arithmetic operations",
+        "Summation notation",
+        "Python list operations"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of the arithmetic mean",
+        "Implement mean calculation for a single vector",
+        "Apply summation notation to practical computation",
+        "Handle edge cases like empty datasets"
+      ],
+      "math_content": {
+        "definition": "The arithmetic mean (or average) of a set of $n$ numerical values $x_1, x_2, \\ldots, x_n$ is formally defined as: $$\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n} x_i$$ where $\\bar{x}$ denotes the mean, $n$ is the number of observations, and $\\sum$ represents the summation operator.",
+        "notation": "$\\bar{x}$ = sample mean (read as 'x-bar'); $n$ = number of observations; $x_i$ = the $i$-th observation in the dataset",
+        "theorem": "The mean is the center of mass of a distribution and minimizes the sum of squared deviations: $\\bar{x} = \\arg\\min_{c} \\sum_{i=1}^{n}(x_i - c)^2$",
+        "proof_sketch": "To minimize $f(c) = \\sum_{i=1}^{n}(x_i - c)^2$, take the derivative with respect to $c$: $$\\frac{df}{dc} = -2\\sum_{i=1}^{n}(x_i - c) = 0$$ Solving: $\\sum_{i=1}^{n}x_i - nc = 0 \\Rightarrow c = \\frac{1}{n}\\sum_{i=1}^{n}x_i = \\bar{x}$",
+        "examples": [
+          "For dataset $[1, 2, 3]$: $\\bar{x} = \\frac{1+2+3}{3} = \\frac{6}{3} = 2.0$",
+          "For dataset $[4, 5, 6]$: $\\bar{x} = \\frac{4+5+6}{3} = \\frac{15}{3} = 5.0$",
+          "For dataset $[80, 63, 100]$: $\\bar{x} = \\frac{80+63+100}{3} = \\frac{243}{3} = 81.0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Arithmetic Mean",
+          "latex": "$\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n} x_i$",
+          "description": "Use this to calculate the center point of a dataset, required before computing deviations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the arithmetic mean of a single vector (list of numbers). This is the first step in computing covariance, as you'll need to find the mean of each feature before calculating how they vary together.",
+        "function_signature": "def calculate_mean(vector: list[float]) -> float:",
+        "starter_code": "def calculate_mean(vector: list[float]) -> float:\n    # Calculate the arithmetic mean of the vector\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_mean([1, 2, 3])",
+            "expected": "2.0",
+            "explanation": "Sum is 6, divided by 3 observations equals 2.0"
+          },
+          {
+            "input": "calculate_mean([4, 5, 6])",
+            "expected": "5.0",
+            "explanation": "Sum is 15, divided by 3 observations equals 5.0"
+          },
+          {
+            "input": "calculate_mean([10.0, 20.0, 30.0, 40.0])",
+            "expected": "25.0",
+            "explanation": "Sum is 100, divided by 4 observations equals 25.0"
+          },
+          {
+            "input": "calculate_mean([-1, 0, 1])",
+            "expected": "0.0",
+            "explanation": "Negative and positive values cancel out, mean is zero"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to divide by the number of elements (just summing)",
+        "Integer division causing precision loss (use floating-point division)",
+        "Not handling empty lists (should raise an error or return None)",
+        "Confusing population mean with sample mean (same formula, but distinction matters later)"
+      ],
+      "hint": "Use Python's built-in sum() function and len() function to compute the formula directly. Remember to convert to float for precision.",
+      "references": [
+        "Descriptive statistics",
+        "Measures of central tendency",
+        "Expected value in probability theory"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Computing Deviations from the Mean",
+      "relation_to_problem": "Covariance measures how two variables deviate from their means together. Computing deviations (mean-centered values) is the critical intermediate step before calculating the covariance product sum.",
+      "prerequisites": [
+        "Arithmetic mean calculation",
+        "Vector operations",
+        "Subtraction operations on sequences"
+      ],
+      "learning_objectives": [
+        "Understand deviation as distance from the mean",
+        "Implement mean-centering (creating deviation scores)",
+        "Recognize the zero-sum property of deviations",
+        "Apply deviations to understanding variance"
+      ],
+      "math_content": {
+        "definition": "The deviation (or deviation score) of an observation $x_i$ from the mean $\\bar{x}$ is defined as: $$d_i = x_i - \\bar{x}$$ The set of all deviations forms a mean-centered dataset: $\\mathbf{d} = [d_1, d_2, \\ldots, d_n]$ where each element represents how far the observation is from the mean.",
+        "notation": "$d_i$ = deviation of the $i$-th observation; $x_i$ = original observation; $\\bar{x}$ = mean of all observations",
+        "theorem": "The sum of deviations from the mean is always zero: $$\\sum_{i=1}^{n}(x_i - \\bar{x}) = 0$$ This is known as the zero-sum property of deviations.",
+        "proof_sketch": "Expand the summation: $$\\sum_{i=1}^{n}(x_i - \\bar{x}) = \\sum_{i=1}^{n}x_i - \\sum_{i=1}^{n}\\bar{x} = \\sum_{i=1}^{n}x_i - n\\bar{x}$$ Substitute the definition of mean $\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n}x_i$: $$= \\sum_{i=1}^{n}x_i - n\\cdot\\frac{1}{n}\\sum_{i=1}^{n}x_i = \\sum_{i=1}^{n}x_i - \\sum_{i=1}^{n}x_i = 0$$",
+        "examples": [
+          "Dataset $[1, 2, 3]$ with mean $2.0$: deviations are $[1-2, 2-2, 3-2] = [-1.0, 0.0, 1.0]$, sum = $0.0$",
+          "Dataset $[4, 5, 6]$ with mean $5.0$: deviations are $[4-5, 5-5, 6-5] = [-1.0, 0.0, 1.0]$, sum = $0.0$",
+          "Dataset $[80, 63, 100]$ with mean $81.0$: deviations are $[-1.0, -18.0, 19.0]$, sum = $0.0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Deviation Score",
+          "latex": "$d_i = x_i - \\bar{x}$",
+          "description": "Calculate how far each observation is from the mean; positive means above mean, negative means below mean"
+        },
+        {
+          "name": "Zero-Sum Property",
+          "latex": "$\\sum_{i=1}^{n}d_i = 0$",
+          "description": "Verification check: deviations should sum to zero (or very close due to floating-point errors)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the deviation vector for a given dataset. This transformation creates a mean-centered dataset, which is essential for calculating covariance and variance.",
+        "function_signature": "def calculate_deviations(vector: list[float]) -> list[float]:",
+        "starter_code": "def calculate_deviations(vector: list[float]) -> list[float]:\n    # Compute deviations from the mean\n    # Step 1: Calculate the mean\n    # Step 2: Subtract mean from each element\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_deviations([1, 2, 3])",
+            "expected": "[-1.0, 0.0, 1.0]",
+            "explanation": "Mean is 2.0; deviations are each value minus 2.0"
+          },
+          {
+            "input": "calculate_deviations([4, 5, 6])",
+            "expected": "[-1.0, 0.0, 1.0]",
+            "explanation": "Mean is 5.0; deviations are each value minus 5.0"
+          },
+          {
+            "input": "calculate_deviations([10, 10, 10])",
+            "expected": "[0.0, 0.0, 0.0]",
+            "explanation": "All values equal the mean (10.0), so all deviations are zero"
+          },
+          {
+            "input": "calculate_deviations([0, 5, 10])",
+            "expected": "[-5.0, 0.0, 5.0]",
+            "explanation": "Mean is 5.0; deviations show symmetric spread around mean"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing deviations before calculating the mean (order matters)",
+        "Not preserving the original vector length (output should be same length as input)",
+        "Rounding errors causing the sum to be slightly non-zero (acceptable due to floating-point arithmetic)",
+        "Confusing absolute deviation with signed deviation (don't take absolute value)"
+      ],
+      "hint": "First calculate the mean using your previous function, then use a list comprehension to subtract the mean from each element. Verify your result by checking that the sum of deviations is close to zero.",
+      "references": [
+        "Mean-centering",
+        "Standardization in statistics",
+        "Z-scores",
+        "Data preprocessing"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Computing Sample Variance",
+      "relation_to_problem": "Variance is the diagonal element of the covariance matrix. Understanding variance (covariance of a variable with itself) is essential before computing covariance between different variables.",
+      "prerequisites": [
+        "Mean calculation",
+        "Deviation computation",
+        "Squared differences",
+        "Bessel's correction"
+      ],
+      "learning_objectives": [
+        "Understand variance as the average squared deviation",
+        "Distinguish between population and sample variance",
+        "Apply Bessel's correction (n-1 denominator)",
+        "Recognize variance as measuring spread"
+      ],
+      "math_content": {
+        "definition": "The sample variance of a dataset $x_1, x_2, \\ldots, x_n$ is formally defined as: $$s^2 = \\frac{1}{n-1}\\sum_{i=1}^{n}(x_i - \\bar{x})^2$$ This measures the average squared deviation from the mean, quantifying the spread or dispersion of the data. The variance is always non-negative: $s^2 \\geq 0$.",
+        "notation": "$s^2$ = sample variance; $\\bar{x}$ = sample mean; $n$ = sample size; $(x_i - \\bar{x})^2$ = squared deviation",
+        "theorem": "Bessel's Correction Theorem: The sample variance with denominator $(n-1)$ is an unbiased estimator of the population variance $\\sigma^2$, meaning $E[s^2] = \\sigma^2$. Using $n$ instead of $(n-1)$ produces a biased estimator that systematically underestimates population variance.",
+        "proof_sketch": "The bias arises because we use the sample mean $\\bar{x}$ instead of the true population mean $\\mu$. Since $\\bar{x}$ minimizes the sum of squared deviations within the sample, using it causes systematic underestimation. Dividing by $(n-1)$ instead of $n$ corrects this bias. The full proof requires showing $E\\left[\\sum(x_i - \\bar{x})^2\\right] = (n-1)\\sigma^2$.",
+        "examples": [
+          "Dataset $[1, 2, 3]$ with mean $2.0$: $s^2 = \\frac{(-1)^2 + 0^2 + 1^2}{3-1} = \\frac{2}{2} = 1.0$",
+          "Dataset $[4, 5, 6]$ with mean $5.0$: $s^2 = \\frac{(-1)^2 + 0^2 + 1^2}{3-1} = \\frac{2}{2} = 1.0$",
+          "Dataset $[80, 63, 100]$ with mean $81.0$: $s^2 = \\frac{(-1)^2 + (-18)^2 + 19^2}{3-1} = \\frac{1 + 324 + 361}{2} = \\frac{686}{2} = 343.0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sample Variance",
+          "latex": "$s^2 = \\frac{1}{n-1}\\sum_{i=1}^{n}(x_i - \\bar{x})^2$",
+          "description": "Use n-1 (Bessel's correction) for sample data to get unbiased estimate; this appears on the diagonal of the covariance matrix"
+        },
+        {
+          "name": "Alternative Computation",
+          "latex": "$s^2 = \\frac{1}{n-1}\\left(\\sum_{i=1}^{n}x_i^2 - n\\bar{x}^2\\right)$",
+          "description": "Computational formula that can be more efficient but less numerically stable"
+        },
+        {
+          "name": "Standard Deviation",
+          "latex": "$s = \\sqrt{s^2}$",
+          "description": "Square root of variance, measured in original units"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the sample variance of a vector. This calculates the diagonal elements of the covariance matrix (variance of each variable with itself) and is structurally identical to covariance computation.",
+        "function_signature": "def calculate_variance(vector: list[float]) -> float:",
+        "starter_code": "def calculate_variance(vector: list[float]) -> float:\n    # Compute the sample variance\n    # Step 1: Calculate the mean\n    # Step 2: Calculate squared deviations\n    # Step 3: Sum squared deviations\n    # Step 4: Divide by (n-1) for sample variance\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_variance([1, 2, 3])",
+            "expected": "1.0",
+            "explanation": "Deviations [-1, 0, 1], squared [1, 0, 1], sum 2, divided by (3-1) = 1.0"
+          },
+          {
+            "input": "calculate_variance([4, 5, 6])",
+            "expected": "1.0",
+            "explanation": "Same spread as [1,2,3], just shifted; variance is shift-invariant"
+          },
+          {
+            "input": "calculate_variance([2, 4, 6, 8])",
+            "expected": "6.666666666666667",
+            "explanation": "Mean is 5.0; squared deviations sum to 20; divided by 3 gives ~6.67"
+          },
+          {
+            "input": "calculate_variance([10, 10, 10])",
+            "expected": "0.0",
+            "explanation": "No variation (all values identical) means variance is zero"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using n instead of (n-1) in the denominator (produces biased estimate)",
+        "Forgetting to square the deviations (taking absolute values instead)",
+        "Computing the mean incorrectly, which propagates through the calculation",
+        "Not handling the edge case where n=1 (variance undefined, causes division by zero)"
+      ],
+      "hint": "Reuse your deviation calculation function, then square each deviation, sum them, and divide by (n-1). The pattern is: mean → deviations → square → sum → divide.",
+      "references": [
+        "Measures of dispersion",
+        "Bessel's correction",
+        "Unbiased estimation",
+        "Variance properties"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Computing Covariance Between Two Variables",
+      "relation_to_problem": "Covariance is the fundamental building block of the covariance matrix. Each off-diagonal element is the covariance between two features, while diagonal elements are variances (covariance with self).",
+      "prerequisites": [
+        "Mean calculation",
+        "Deviation computation",
+        "Sample variance",
+        "Product of deviations"
+      ],
+      "learning_objectives": [
+        "Understand covariance as measuring joint variability",
+        "Implement the covariance formula for two vectors",
+        "Interpret positive, negative, and zero covariance",
+        "Recognize the relationship between covariance and correlation"
+      ],
+      "math_content": {
+        "definition": "The sample covariance between two random variables $X$ and $Y$ with observations $(x_1, y_1), (x_2, y_2), \\ldots, (x_n, y_n)$ is formally defined as: $$\\text{cov}(X, Y) = \\frac{1}{n-1}\\sum_{i=1}^{n}(x_i - \\bar{x})(y_i - \\bar{y})$$ where $\\bar{x}$ and $\\bar{y}$ are the means of $X$ and $Y$ respectively. This measures how much the two variables change together.",
+        "notation": "$\\text{cov}(X, Y)$ or $s_{XY}$ = sample covariance; $x_i, y_i$ = paired observations; $\\bar{x}, \\bar{y}$ = sample means",
+        "theorem": "Covariance Symmetry: $\\text{cov}(X, Y) = \\text{cov}(Y, X)$. Covariance with Self: $\\text{cov}(X, X) = \\text{Var}(X) = s^2$. Range: Covariance can be any real number: $\\text{cov}(X, Y) \\in (-\\infty, +\\infty)$. Cauchy-Schwarz Inequality: $|\\text{cov}(X, Y)| \\leq \\sqrt{\\text{Var}(X) \\cdot \\text{Var}(Y)}$",
+        "proof_sketch": "Symmetry follows from commutativity of multiplication: $(x_i - \\bar{x})(y_i - \\bar{y}) = (y_i - \\bar{y})(x_i - \\bar{x})$. Self-covariance: $\\text{cov}(X, X) = \\frac{1}{n-1}\\sum(x_i - \\bar{x})(x_i - \\bar{x}) = \\frac{1}{n-1}\\sum(x_i - \\bar{x})^2 = \\text{Var}(X)$.",
+        "examples": [
+          "Vectors $X=[1,2,3]$, $Y=[4,5,6]$: means are $2.0, 5.0$; deviations $[-1,0,1]$, $[-1,0,1]$; products $[1,0,1]$; sum $2$; covariance $2/(3-1) = 1.0$",
+          "Vectors $X=[1,2,3]$, $Y=[6,5,4]$: means are $2.0, 5.0$; deviations $[-1,0,1]$, $[1,0,-1]$; products $[-1,0,-1]$; sum $-2$; covariance $-2/(3-1) = -1.0$ (negative: inverse relationship)",
+          "Vectors $X=[1,2,3]$, $Y=[5,5,5]$: $Y$ has no variation; all products are zero; covariance is $0.0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sample Covariance",
+          "latex": "$\\text{cov}(X, Y) = \\frac{1}{n-1}\\sum_{i=1}^{n}(x_i - \\bar{x})(y_i - \\bar{y})$",
+          "description": "Compute this for every pair of features to build the covariance matrix; use (n-1) for unbiased estimation"
+        },
+        {
+          "name": "Correlation Coefficient",
+          "latex": "$r_{XY} = \\frac{\\text{cov}(X,Y)}{s_X \\cdot s_Y}$",
+          "description": "Normalized covariance bounded in [-1, 1]; shows strength of linear relationship"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the sample covariance between two vectors of equal length. This is the core computation for off-diagonal elements of the covariance matrix, measuring how two features vary together.",
+        "function_signature": "def calculate_covariance(x: list[float], y: list[float]) -> float:",
+        "starter_code": "def calculate_covariance(x: list[float], y: list[float]) -> float:\n    # Compute the sample covariance between two vectors\n    # Step 1: Verify vectors have same length\n    # Step 2: Calculate means of both vectors\n    # Step 3: Calculate deviations for both vectors\n    # Step 4: Multiply corresponding deviations\n    # Step 5: Sum the products and divide by (n-1)\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_covariance([1, 2, 3], [4, 5, 6])",
+            "expected": "1.0",
+            "explanation": "Both vectors increase together uniformly; positive covariance of 1.0"
+          },
+          {
+            "input": "calculate_covariance([1, 2, 3], [6, 5, 4])",
+            "expected": "-1.0",
+            "explanation": "Vectors move in opposite directions; negative covariance of -1.0"
+          },
+          {
+            "input": "calculate_covariance([1, 2, 3], [5, 5, 5])",
+            "expected": "0.0",
+            "explanation": "Second vector has no variation; covariance is zero"
+          },
+          {
+            "input": "calculate_covariance([2, 4, 6], [1, 3, 5])",
+            "expected": "4.0",
+            "explanation": "Both vectors increase with high covariance due to larger spread"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using different means for X and Y deviations (each uses its own mean)",
+        "Forgetting to use (n-1) denominator (consistency with variance computation)",
+        "Not validating that vectors have equal length (undefined otherwise)",
+        "Confusing covariance with correlation (covariance is not normalized)",
+        "Computing variance when asked for covariance (variance is special case: cov(X,X))"
+      ],
+      "hint": "Think of this as a generalization of variance: instead of squaring deviations from one variable, you multiply deviations from two variables. The structure is identical to variance but with two deviation vectors.",
+      "references": [
+        "Joint probability distributions",
+        "Pearson correlation",
+        "Linear dependence",
+        "Multivariate statistics"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Constructing a Symmetric Matrix Structure",
+      "relation_to_problem": "The covariance matrix is a symmetric square matrix where element (i,j) equals element (j,i). Understanding matrix symmetry and construction is essential before computing all pairwise covariances.",
+      "prerequisites": [
+        "Matrix representation",
+        "Nested lists in Python",
+        "Symmetry concept",
+        "Matrix dimensions"
+      ],
+      "learning_objectives": [
+        "Understand the structure of symmetric matrices",
+        "Implement matrix construction using nested lists",
+        "Apply the symmetry property to optimize computation",
+        "Recognize diagonal versus off-diagonal elements"
+      ],
+      "math_content": {
+        "definition": "A square matrix $\\mathbf{A}$ of size $n \\times n$ is symmetric if and only if $\\mathbf{A} = \\mathbf{A}^T$, equivalently: $$A_{ij} = A_{ji} \\quad \\forall i,j \\in \\{1, 2, \\ldots, n\\}$$ The covariance matrix is always symmetric because $\\text{cov}(X_i, X_j) = \\text{cov}(X_j, X_i)$ for all variables $X_i, X_j$.",
+        "notation": "$\\mathbf{A}^T$ = transpose of matrix $\\mathbf{A}$; $A_{ij}$ = element in row $i$, column $j$; $n \\times n$ = dimensions (n rows, n columns)",
+        "theorem": "Properties of Symmetric Matrices: (1) All eigenvalues are real numbers, (2) Eigenvectors corresponding to distinct eigenvalues are orthogonal, (3) Can be diagonalized by an orthogonal matrix, (4) Only $\\frac{n(n+1)}{2}$ unique elements need to be computed (not $n^2$).",
+        "proof_sketch": "For symmetry of covariance: $\\text{cov}(X_i, X_j) = \\frac{1}{n-1}\\sum_{k=1}^{n}(x_{ki} - \\bar{x}_i)(x_{kj} - \\bar{x}_j)$. By commutativity of multiplication: $(x_{ki} - \\bar{x}_i)(x_{kj} - \\bar{x}_j) = (x_{kj} - \\bar{x}_j)(x_{ki} - \\bar{x}_i)$, therefore $\\text{cov}(X_i, X_j) = \\text{cov}(X_j, X_i)$.",
+        "examples": [
+          "A $2 \\times 2$ symmetric matrix: $\\begin{bmatrix} a & b \\\\ b & c \\end{bmatrix}$ has 3 unique values (a, b, c)",
+          "A $3 \\times 3$ symmetric matrix: $\\begin{bmatrix} a & b & c \\\\ b & d & e \\\\ c & e & f \\end{bmatrix}$ has 6 unique values",
+          "Covariance matrix for 2 features: $\\begin{bmatrix} \\text{Var}(X_1) & \\text{Cov}(X_1,X_2) \\\\ \\text{Cov}(X_2,X_1) & \\text{Var}(X_2) \\end{bmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Symmetry Condition",
+          "latex": "$A_{ij} = A_{ji}$",
+          "description": "Each off-diagonal element has a mirror element across the diagonal"
+        },
+        {
+          "name": "Unique Elements Count",
+          "latex": "$\\frac{n(n+1)}{2}$",
+          "description": "Number of unique values in an n×n symmetric matrix; exploit this for computational efficiency"
+        },
+        {
+          "name": "Diagonal Elements",
+          "latex": "$A_{ii}$ where $i=j$",
+          "description": "In covariance matrices, diagonal elements are variances: $\\Sigma_{ii} = \\text{Var}(X_i)$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that creates a symmetric n×n matrix given a list of values for the upper triangle (including diagonal). This builds the matrix structure needed for the covariance matrix, exploiting symmetry to avoid redundant computation.",
+        "function_signature": "def create_symmetric_matrix(n: int, upper_triangle_values: list[float]) -> list[list[float]]:",
+        "starter_code": "def create_symmetric_matrix(n: int, upper_triangle_values: list[float]) -> list[list[float]]:\n    # Create an n×n symmetric matrix from upper triangle values\n    # Input: n (matrix size), upper_triangle_values (list with n(n+1)/2 elements)\n    # Output: n×n symmetric matrix as list of lists\n    # Order of values: row 1 (all n elements), row 2 (last n-1), row 3 (last n-2), etc.\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "create_symmetric_matrix(2, [1.0, 0.5, 2.0])",
+            "expected": "[[1.0, 0.5], [0.5, 2.0]]",
+            "explanation": "2×2 matrix: diagonal [1.0, 2.0], off-diagonal 0.5 appears at (0,1) and (1,0)"
+          },
+          {
+            "input": "create_symmetric_matrix(3, [1.0, 0.5, 0.3, 2.0, 0.4, 3.0])",
+            "expected": "[[1.0, 0.5, 0.3], [0.5, 2.0, 0.4], [0.3, 0.4, 3.0]]",
+            "explanation": "3×3 matrix: diagonals are 1.0, 2.0, 3.0; off-diagonals are mirrored across diagonal"
+          },
+          {
+            "input": "create_symmetric_matrix(2, [1.0, 1.0, 1.0])",
+            "expected": "[[1.0, 1.0], [1.0, 1.0]]",
+            "explanation": "All elements equal 1.0; still maintains symmetric structure"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not mirroring off-diagonal elements (creating asymmetric matrix)",
+        "Wrong indexing when filling matrix from upper triangle values",
+        "Confusing row-major vs column-major ordering",
+        "Not validating that upper_triangle_values has exactly n(n+1)/2 elements",
+        "Forgetting that diagonal elements are at positions (i,i)"
+      ],
+      "hint": "Initialize an n×n matrix filled with zeros. Use nested loops: for each row i from 0 to n-1, fill columns j from i to n-1 using the input values, then mirror each value to position (j,i). Track your position in the input list as you go.",
+      "references": [
+        "Matrix algebra",
+        "Symmetric matrices",
+        "Upper triangular matrices",
+        "Matrix storage optimization"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Building the Complete Covariance Matrix",
+      "relation_to_problem": "This integrates all previous concepts to construct the full covariance matrix. Given multiple feature vectors, compute all pairwise covariances and organize them into the final symmetric matrix structure.",
+      "prerequisites": [
+        "Mean calculation",
+        "Covariance computation",
+        "Symmetric matrix construction",
+        "Nested iteration"
+      ],
+      "learning_objectives": [
+        "Combine all previous skills to build the covariance matrix",
+        "Understand matrix element interpretation (variance vs covariance)",
+        "Implement efficient computation using symmetry",
+        "Validate matrix properties (symmetry, positive semi-definiteness)"
+      ],
+      "math_content": {
+        "definition": "For a dataset with $p$ features (variables) $X_1, X_2, \\ldots, X_p$ and $n$ observations, the sample covariance matrix $\\mathbf{\\Sigma}$ is a $p \\times p$ symmetric matrix where: $$\\Sigma_{ij} = \\begin{cases} \\text{Var}(X_i) = \\frac{1}{n-1}\\sum_{k=1}^{n}(x_{ki} - \\bar{x}_i)^2 & \\text{if } i = j \\\\ \\text{Cov}(X_i, X_j) = \\frac{1}{n-1}\\sum_{k=1}^{n}(x_{ki} - \\bar{x}_i)(x_{kj} - \\bar{x}_j) & \\text{if } i \\neq j \\end{cases}$$",
+        "notation": "$\\mathbf{\\Sigma}$ or $\\mathbf{S}$ = covariance matrix; $\\Sigma_{ij}$ = element at row $i$, column $j$; $p$ = number of features; $n$ = number of observations",
+        "theorem": "The covariance matrix is: (1) Symmetric: $\\mathbf{\\Sigma}^T = \\mathbf{\\Sigma}$, (2) Positive semi-definite: $\\mathbf{v}^T \\mathbf{\\Sigma} \\mathbf{v} \\geq 0$ for all vectors $\\mathbf{v}$, (3) Has non-negative diagonal elements (variances): $\\Sigma_{ii} \\geq 0$, (4) Satisfies Cauchy-Schwarz: $\\Sigma_{ij}^2 \\leq \\Sigma_{ii} \\cdot \\Sigma_{jj}$.",
+        "proof_sketch": "Symmetry proven in previous step. For positive semi-definiteness, consider a linear combination $Y = \\sum_{i=1}^{p} v_i X_i$. Then $\\mathbf{v}^T \\mathbf{\\Sigma} \\mathbf{v} = \\text{Var}(Y) \\geq 0$ since variance is always non-negative. The Cauchy-Schwarz inequality for covariance follows from the fact that $|\\text{Cov}(X_i, X_j)| \\leq \\sqrt{\\text{Var}(X_i) \\cdot \\text{Var}(X_j)}$.",
+        "examples": [
+          "For features $[[1,2,3], [4,5,6]]$: compute means $[2.0, 5.0]$, variance of each $[1.0, 1.0]$, covariance between them $1.0$, resulting in $\\begin{bmatrix} 1.0 & 1.0 \\\\ 1.0 & 1.0 \\end{bmatrix}$",
+          "For features $[[1,2,3], [3,2,1]]$: variances are $[1.0, 1.0]$, covariance is $-1.0$ (inverse relationship), resulting in $\\begin{bmatrix} 1.0 & -1.0 \\\\ -1.0 & 1.0 \\end{bmatrix}$",
+          "Identity-like structure: uncorrelated features with equal variance produce diagonal-dominant matrices"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Covariance Matrix Element",
+          "latex": "$\\Sigma_{ij} = \\frac{1}{n-1}\\sum_{k=1}^{n}(x_{ki} - \\bar{x}_i)(x_{kj} - \\bar{x}_j)$",
+          "description": "General formula for any element; reduces to variance when i=j"
+        },
+        {
+          "name": "Matrix Form",
+          "latex": "$\\mathbf{\\Sigma} = \\frac{1}{n-1}(\\mathbf{X} - \\bar{\\mathbf{X}})^T(\\mathbf{X} - \\bar{\\mathbf{X}})$",
+          "description": "Compact matrix notation where $\\mathbf{X}$ is mean-centered data matrix"
+        },
+        {
+          "name": "Computational Complexity",
+          "latex": "$O(np^2)$",
+          "description": "Time complexity: n observations, p features, computing p(p+1)/2 unique covariances each requiring O(n) operations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that constructs the complete covariance matrix for a dataset with multiple features. Each feature is represented as a row (list of observations). This synthesizes all previous sub-quests: compute means, calculate pairwise covariances (including variances on diagonal), and organize into symmetric matrix structure. This is one step before the final solution.",
+        "function_signature": "def build_covariance_matrix_from_pairs(features: list[list[float]]) -> list[list[float]]:",
+        "starter_code": "def build_covariance_matrix_from_pairs(features: list[list[float]]) -> list[list[float]]:\n    # Build the covariance matrix by computing all pairwise covariances\n    # Input: list of features, each feature is a list of observations\n    # Output: p×p covariance matrix where p is the number of features\n    # Step 1: Determine matrix dimensions (p = number of features)\n    # Step 2: Initialize empty p×p matrix\n    # Step 3: For each pair (i,j), compute covariance between feature i and feature j\n    # Step 4: Use symmetry: only compute upper triangle, mirror to lower triangle\n    # Step 5: Diagonal elements are variances (covariance with self)\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "build_covariance_matrix_from_pairs([[1, 2, 3], [4, 5, 6]])",
+            "expected": "[[1.0, 1.0], [1.0, 1.0]]",
+            "explanation": "Two features with observations; both have variance 1.0 and covariance 1.0"
+          },
+          {
+            "input": "build_covariance_matrix_from_pairs([[1, 2, 3]])",
+            "expected": "[[1.0]]",
+            "explanation": "Single feature produces 1×1 matrix containing just its variance"
+          },
+          {
+            "input": "build_covariance_matrix_from_pairs([[1, 2, 3], [4, 5, 6], [7, 8, 9]])",
+            "expected": "[[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]",
+            "explanation": "Three perfectly correlated features (linear relationship) produce all-ones covariance matrix"
+          },
+          {
+            "input": "build_covariance_matrix_from_pairs([[2, 4, 6], [1, 3, 5]])",
+            "expected": "[[4.0, 4.0], [4.0, 4.0]]",
+            "explanation": "Features with larger spread have higher variance and covariance values"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing each covariance twice (inefficient; exploit symmetry to compute only upper triangle)",
+        "Confusing which dimension is features vs observations (rows should be features, columns observations)",
+        "Forgetting that diagonal elements use variance formula (covariance of feature with itself)",
+        "Not using (n-1) consistently in all variance and covariance calculations",
+        "Wrong matrix dimensions (should be p×p where p is number of features, not n×n)"
+      ],
+      "hint": "Use nested loops: outer loop for feature i (0 to p-1), inner loop for feature j (i to p-1) to compute only the upper triangle. For diagonal (i==j), use variance; for off-diagonal (i≠j), use covariance. Mirror each computed value to position (j,i). This gives you the complete symmetric covariance matrix.",
+      "references": [
+        "Multivariate statistics",
+        "Principal Component Analysis (PCA)",
+        "Mahalanobis distance",
+        "Portfolio theory",
+        "Machine learning feature correlation"
+      ]
+    }
+  ]
+}

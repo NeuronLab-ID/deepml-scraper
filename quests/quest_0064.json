@@ -1,0 +1,489 @@
+{
+  "problem_id": 64,
+  "title": "Implement Gini Impurity Calculation for a Set of Classes",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "## Task: Implement Gini Impurity Calculation\n\nYour task is to implement a function that calculates the Gini Impurity for a set of classes. Gini impurity is commonly used in decision tree algorithms to measure the impurity or disorder within a node.\n",
+  "example": {
+    "input": "y = [0, 1, 1, 1, 0]\nprint(gini_impurity(y))",
+    "output": "0.48",
+    "reasoning": "The Gini Impurity is calculated as 1 - (p_0^2 + p_1^2), where p_0 and p_1 are the probabilities of each class. In this case, p_0 = 2/5 and p_1 = 3/5, resulting in a Gini Impurity of 0.48."
+  },
+  "starter_code": "\nimport numpy as np\n\ndef gini_impurity(y):\n\t\"\"\"\n\tCalculate Gini Impurity for a list of class labels.\n\n\t:param y: List of class labels\n\t:return: Gini Impurity rounded to three decimal places\n\t\"\"\"\n\tpass\n\treturn round(val,3)",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Class Frequency Counting and Probability Distributions",
+      "relation_to_problem": "Computing Gini Impurity requires knowing the probability of each class, which is derived from counting class occurrences and dividing by the total number of samples. This is the fundamental first step in the Gini formula.",
+      "prerequisites": [
+        "Basic Python lists",
+        "Dictionary operations",
+        "Division and fractions"
+      ],
+      "learning_objectives": [
+        "Count occurrences of unique elements in a dataset",
+        "Convert counts to probability distributions",
+        "Understand the relationship between frequency and probability"
+      ],
+      "math_content": {
+        "definition": "Given a dataset $S$ with $n$ samples, where each sample belongs to one of $C$ classes, the **probability** of class $i$ is defined as: $p_i = \\frac{n_i}{n}$, where $n_i$ is the number of samples belonging to class $i$. The collection of all probabilities $\\{p_1, p_2, \\ldots, p_C\\}$ forms a **discrete probability distribution** over the classes.",
+        "notation": "$S$ = dataset, $n$ = total number of samples, $C$ = number of distinct classes, $n_i$ = count of samples in class $i$, $p_i$ = probability of class $i$",
+        "theorem": "**Probability Axioms for Class Distributions**: For any dataset with class probabilities $\\{p_1, p_2, \\ldots, p_C\\}$: (1) $0 \\leq p_i \\leq 1$ for all $i$, and (2) $\\sum_{i=1}^{C} p_i = 1$.",
+        "proof_sketch": "Since $p_i = \\frac{n_i}{n}$ and $0 \\leq n_i \\leq n$, we have $0 \\leq p_i \\leq 1$. For the sum: $\\sum_{i=1}^{C} p_i = \\sum_{i=1}^{C} \\frac{n_i}{n} = \\frac{1}{n} \\sum_{i=1}^{C} n_i = \\frac{n}{n} = 1$, since all samples must belong to exactly one class.",
+        "examples": [
+          "For $y = [0, 1, 1, 0, 2]$: $n = 5$, $n_0 = 2$, $n_1 = 2$, $n_2 = 1$. Thus $p_0 = 2/5 = 0.4$, $p_1 = 2/5 = 0.4$, $p_2 = 1/5 = 0.2$. Verification: $0.4 + 0.4 + 0.2 = 1.0$ ✓",
+          "For $y = [1, 1, 1]$: $n = 3$, $n_1 = 3$. Thus $p_1 = 3/3 = 1.0$. This represents a **pure** node with only one class."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Class Probability",
+          "latex": "$p_i = \\frac{n_i}{n} = \\frac{\\text{count of class } i}{\\text{total count}}$",
+          "description": "Use this to convert raw class counts to probabilities for each class in the dataset"
+        },
+        {
+          "name": "Normalization Check",
+          "latex": "$\\sum_{i=1}^{C} p_i = 1$",
+          "description": "Verify your probability calculation is correct by checking all probabilities sum to 1"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a list of class labels and returns a dictionary mapping each unique class to its probability. This is the prerequisite computation for Gini Impurity.",
+        "function_signature": "def class_probabilities(y: list) -> dict:",
+        "starter_code": "def class_probabilities(y):\n    \"\"\"\n    Calculate the probability distribution of classes in the dataset.\n    \n    :param y: List of class labels (can be any hashable type)\n    :return: Dictionary mapping each class to its probability\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "class_probabilities([0, 1, 1, 1, 0])",
+            "expected": "{0: 0.4, 1: 0.6}",
+            "explanation": "Class 0 appears 2/5 times (0.4), class 1 appears 3/5 times (0.6)"
+          },
+          {
+            "input": "class_probabilities([2, 2, 2, 2])",
+            "expected": "{2: 1.0}",
+            "explanation": "Pure node: only one class present, so its probability is 1.0"
+          },
+          {
+            "input": "class_probabilities(['A', 'B', 'A', 'C', 'B', 'A'])",
+            "expected": "{'A': 0.5, 'B': 0.333, 'C': 0.167}",
+            "explanation": "Works with string labels: A appears 3/6, B appears 2/6, C appears 1/6"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using integer division instead of float division, resulting in probabilities of 0",
+        "Forgetting to handle empty lists (edge case)",
+        "Not using the total count of all samples as the denominator",
+        "Assuming classes are always integers starting from 0"
+      ],
+      "hint": "Use a dictionary or Counter to count occurrences, then divide each count by the total length of the input list.",
+      "references": [
+        "Discrete probability distributions",
+        "Frequency tables in statistics",
+        "Python collections.Counter"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Squared Probability Terms and Summation",
+      "relation_to_problem": "The Gini Impurity formula contains the term $\\sum_{i=1}^{C} p_i^2$, which represents the sum of squared probabilities. Understanding this component is essential before computing the full Gini formula.",
+      "prerequisites": [
+        "Class probability calculations",
+        "Exponentiation (squaring)",
+        "Summation notation"
+      ],
+      "learning_objectives": [
+        "Compute squared values of probabilities",
+        "Sum multiple squared probability terms",
+        "Interpret the meaning of $\\sum p_i^2$ in the context of class distribution"
+      ],
+      "math_content": {
+        "definition": "For a probability distribution $\\{p_1, p_2, \\ldots, p_C\\}$ over $C$ classes, the **sum of squared probabilities** is defined as: $Q = \\sum_{i=1}^{C} p_i^2 = p_1^2 + p_2^2 + \\cdots + p_C^2$. This quantity measures the concentration of the distribution.",
+        "notation": "$Q = \\sum_{i=1}^{C} p_i^2$ where $p_i$ is the probability of class $i$ and $C$ is the number of classes",
+        "theorem": "**Bounds on Sum of Squared Probabilities**: For any probability distribution over $C$ classes, $\\frac{1}{C} \\leq Q \\leq 1$. The minimum $Q = \\frac{1}{C}$ occurs when all classes are equally likely ($p_i = \\frac{1}{C}$ for all $i$), and the maximum $Q = 1$ occurs when one class has probability 1 and all others have probability 0.",
+        "proof_sketch": "**Maximum**: If $p_k = 1$ for some class $k$ and $p_i = 0$ for $i \\neq k$, then $Q = 1^2 + 0 + \\cdots + 0 = 1$. **Minimum**: By the Cauchy-Schwarz inequality applied to probability vectors, $Q$ is minimized when the distribution is uniform. For uniform distribution, $p_i = 1/C$ for all $i$, giving $Q = C \\cdot (1/C)^2 = C/C^2 = 1/C$.",
+        "examples": [
+          "Binary uniform: $p_1 = 0.5$, $p_2 = 0.5$. Then $Q = 0.5^2 + 0.5^2 = 0.25 + 0.25 = 0.5 = 1/2$. This matches the minimum for $C=2$.",
+          "Binary skewed: $p_1 = 0.8$, $p_2 = 0.2$. Then $Q = 0.8^2 + 0.2^2 = 0.64 + 0.04 = 0.68$. Higher than uniform, indicating more concentration.",
+          "Pure node: $p_1 = 1.0$. Then $Q = 1.0^2 = 1.0$. Maximum value, indicating complete concentration."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sum of Squared Probabilities",
+          "latex": "$Q = \\sum_{i=1}^{C} p_i^2$",
+          "description": "This is the key component that will be subtracted from 1 to get Gini Impurity"
+        },
+        {
+          "name": "Uniform Distribution Case",
+          "latex": "$Q_{\\text{uniform}} = C \\cdot \\left(\\frac{1}{C}\\right)^2 = \\frac{1}{C}$",
+          "description": "When all classes are equally likely, Q reaches its minimum value"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the sum of squared probabilities given a probability distribution dictionary. This is the $\\sum p_i^2$ term needed for Gini Impurity.",
+        "function_signature": "def sum_of_squared_probabilities(prob_dist: dict) -> float:",
+        "starter_code": "def sum_of_squared_probabilities(prob_dist):\n    \"\"\"\n    Calculate the sum of squared probabilities from a probability distribution.\n    \n    :param prob_dist: Dictionary mapping classes to their probabilities\n    :return: Sum of squared probabilities (rounded to 5 decimal places)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "sum_of_squared_probabilities({0: 0.5, 1: 0.5})",
+            "expected": "0.5",
+            "explanation": "0.5² + 0.5² = 0.25 + 0.25 = 0.5, the minimum for binary classification"
+          },
+          {
+            "input": "sum_of_squared_probabilities({0: 0.4, 1: 0.6})",
+            "expected": "0.52",
+            "explanation": "0.4² + 0.6² = 0.16 + 0.36 = 0.52, higher than uniform distribution"
+          },
+          {
+            "input": "sum_of_squared_probabilities({1: 1.0})",
+            "expected": "1.0",
+            "explanation": "Pure node: 1.0² = 1.0, the maximum possible value"
+          },
+          {
+            "input": "sum_of_squared_probabilities({0: 0.2, 1: 0.3, 2: 0.5})",
+            "expected": "0.38",
+            "explanation": "0.2² + 0.3² + 0.5² = 0.04 + 0.09 + 0.25 = 0.38"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Summing the probabilities instead of the squared probabilities",
+        "Forgetting to square each probability before summing",
+        "Not handling floating-point precision properly",
+        "Confusing this with variance calculation (which uses $(p_i - \\mu)^2$)"
+      ],
+      "hint": "Iterate through all probability values in the dictionary, square each one, and accumulate the sum.",
+      "references": [
+        "Concentration measures",
+        "L² norms of probability vectors",
+        "Herfindahl-Hirschman Index (similar concept in economics)"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Computing Gini Impurity from Probability Distribution",
+      "relation_to_problem": "This step combines the previous concepts to implement the core Gini Impurity formula: $\\text{Gini} = 1 - \\sum_{i=1}^{C} p_i^2$. Given a probability distribution, compute the final impurity measure.",
+      "prerequisites": [
+        "Probability distributions",
+        "Sum of squared probabilities",
+        "Subtraction and complement operations"
+      ],
+      "learning_objectives": [
+        "Apply the Gini Impurity formula to a probability distribution",
+        "Understand the complement relationship between $\\sum p_i^2$ and Gini",
+        "Interpret Gini values in terms of node purity"
+      ],
+      "math_content": {
+        "definition": "The **Gini Impurity** (or Gini Index) for a node with class probability distribution $\\{p_1, p_2, \\ldots, p_C\\}$ is defined as: $\\text{Gini}(S) = 1 - \\sum_{i=1}^{C} p_i^2$. It measures the probability that a randomly chosen element would be incorrectly classified if it were randomly labeled according to the distribution of labels in the node.",
+        "notation": "$\\text{Gini}(S)$ = Gini Impurity of node $S$, $p_i$ = probability of class $i$, $C$ = number of classes",
+        "theorem": "**Gini Impurity Bounds**: For any node with $C$ classes, $0 \\leq \\text{Gini}(S) \\leq \\frac{C-1}{C}$. The minimum $\\text{Gini}(S) = 0$ occurs when the node is pure (all samples belong to one class), and the maximum $\\text{Gini}(S) = \\frac{C-1}{C}$ occurs when all classes are equally represented.",
+        "proof_sketch": "From the previous theorem, we know $\\frac{1}{C} \\leq \\sum p_i^2 \\leq 1$. Applying the transformation $\\text{Gini} = 1 - \\sum p_i^2$: **Minimum**: When $\\sum p_i^2 = 1$ (pure node), $\\text{Gini} = 1 - 1 = 0$. **Maximum**: When $\\sum p_i^2 = 1/C$ (uniform distribution), $\\text{Gini} = 1 - 1/C = \\frac{C-1}{C}$. For binary classification ($C=2$), the maximum is $\\frac{1}{2} = 0.5$.",
+        "examples": [
+          "Pure node with $p_1 = 1.0$: $\\text{Gini} = 1 - 1.0^2 = 1 - 1 = 0$. Perfect purity, no impurity.",
+          "Balanced binary node with $p_0 = 0.5$, $p_1 = 0.5$: $\\text{Gini} = 1 - (0.5^2 + 0.5^2) = 1 - 0.5 = 0.5$. Maximum impurity for binary case.",
+          "Imbalanced binary node with $p_0 = 0.2$, $p_1 = 0.8$: $\\text{Gini} = 1 - (0.2^2 + 0.8^2) = 1 - (0.04 + 0.64) = 1 - 0.68 = 0.32$. Lower impurity due to class imbalance.",
+          "Three-class uniform with $p_1 = p_2 = p_3 = 1/3$: $\\text{Gini} = 1 - 3 \\cdot (1/3)^2 = 1 - 1/3 = 2/3 \\approx 0.667$. Maximum for 3-class case."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gini Impurity Formula",
+          "latex": "$\\text{Gini}(S) = 1 - \\sum_{i=1}^{C} p_i^2$",
+          "description": "The main formula: 1 minus the sum of squared probabilities"
+        },
+        {
+          "name": "Alternative Form",
+          "latex": "$\\text{Gini}(S) = \\sum_{i=1}^{C} p_i(1 - p_i)$",
+          "description": "Equivalent formulation showing the misclassification interpretation more directly"
+        },
+        {
+          "name": "Maximum Impurity",
+          "latex": "$\\text{Gini}_{\\text{max}} = 1 - \\frac{1}{C} = \\frac{C-1}{C}$",
+          "description": "The maximum Gini value for C classes (occurs with uniform distribution)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates Gini Impurity given a probability distribution dictionary. This directly applies the formula $1 - \\sum p_i^2$.",
+        "function_signature": "def gini_from_probabilities(prob_dist: dict) -> float:",
+        "starter_code": "def gini_from_probabilities(prob_dist):\n    \"\"\"\n    Calculate Gini Impurity from a probability distribution.\n    \n    :param prob_dist: Dictionary mapping classes to their probabilities\n    :return: Gini Impurity value (rounded to 3 decimal places)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "gini_from_probabilities({0: 0.4, 1: 0.6})",
+            "expected": "0.48",
+            "explanation": "Gini = 1 - (0.4² + 0.6²) = 1 - (0.16 + 0.36) = 1 - 0.52 = 0.48"
+          },
+          {
+            "input": "gini_from_probabilities({0: 0.5, 1: 0.5})",
+            "expected": "0.5",
+            "explanation": "Maximum impurity for binary case: 1 - (0.25 + 0.25) = 0.5"
+          },
+          {
+            "input": "gini_from_probabilities({1: 1.0})",
+            "expected": "0.0",
+            "explanation": "Pure node: Gini = 1 - 1.0² = 0, no impurity"
+          },
+          {
+            "input": "gini_from_probabilities({0: 0.33333, 1: 0.33333, 2: 0.33334})",
+            "expected": "0.667",
+            "explanation": "Three-class uniform: Gini ≈ 1 - 3(1/3)² = 2/3 ≈ 0.667"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to subtract the sum from 1 (returning $\\sum p_i^2$ instead of $1 - \\sum p_i^2$)",
+        "Not squaring the probabilities before summing",
+        "Incorrect rounding or precision handling",
+        "Confusing Gini Impurity with Gini coefficient from economics (different concept)"
+      ],
+      "hint": "Reuse your sum_of_squared_probabilities logic, then subtract the result from 1.",
+      "references": [
+        "CART algorithm",
+        "Decision tree splitting criteria",
+        "Information theory measures"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Direct Computation: From Class Labels to Gini Impurity",
+      "relation_to_problem": "This step integrates all previous concepts into a single pipeline: given raw class labels, compute probabilities, then compute Gini Impurity. This matches the exact input format of the main problem.",
+      "prerequisites": [
+        "Class probability calculation",
+        "Gini formula application",
+        "Function composition"
+      ],
+      "learning_objectives": [
+        "Combine multiple computational steps into a single function",
+        "Handle raw class label arrays as input",
+        "Produce final Gini Impurity values with proper rounding"
+      ],
+      "math_content": {
+        "definition": "The **direct Gini Impurity computation** is a composite function $\\mathcal{G}: \\mathbb{L}^n \\to [0, 1]$ that maps a sequence of $n$ class labels to a Gini Impurity value: $\\mathcal{G}(y) = 1 - \\sum_{i=1}^{C} \\left(\\frac{n_i}{n}\\right)^2$, where $y = [y_1, y_2, \\ldots, y_n]$ is the input sequence, $n_i$ is the count of class $i$, and $n$ is the total number of labels.",
+        "notation": "$y$ = array of class labels, $n = |y|$ = length of array, $n_i$ = count of label $i$ in $y$, $\\mathcal{G}(y)$ = Gini Impurity",
+        "theorem": "**Computational Pipeline Equivalence**: For any label array $y$, the following are equivalent: (1) $\\mathcal{G}(y) = 1 - \\sum_{i} (n_i/n)^2$, (2) First compute $P = \\{p_i = n_i/n\\}$, then compute $\\mathcal{G} = 1 - \\sum_i p_i^2$, (3) $\\mathcal{G}(y) = \\sum_i (n_i/n)(1 - n_i/n)$. All three formulations yield identical results.",
+        "proof_sketch": "**Equivalence of (1) and (2)**: Direct substitution of $p_i = n_i/n$ into formulation (2) yields (1). **Equivalence of (2) and (3)**: Expanding $\\sum_i p_i(1-p_i) = \\sum_i p_i - \\sum_i p_i^2 = 1 - \\sum_i p_i^2$ (using $\\sum_i p_i = 1$). The choice of formulation affects numerical stability and computational efficiency but not the mathematical result.",
+        "examples": [
+          "Input $y = [0, 1, 1, 1, 0]$: $n=5$, $n_0=2$, $n_1=3$. $\\mathcal{G}(y) = 1 - ((2/5)^2 + (3/5)^2) = 1 - (0.16 + 0.36) = 0.48$.",
+          "Input $y = [5, 5, 5]$: $n=3$, $n_5=3$. $\\mathcal{G}(y) = 1 - (3/3)^2 = 1 - 1 = 0$. Pure node.",
+          "Input $y = ['cat', 'dog', 'cat', 'bird']$: $n=4$, $n_{\\text{cat}}=2$, $n_{\\text{dog}}=1$, $n_{\\text{bird}}=1$. $\\mathcal{G}(y) = 1 - ((2/4)^2 + (1/4)^2 + (1/4)^2) = 1 - (0.25 + 0.0625 + 0.0625) = 0.625$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Direct Gini Formula",
+          "latex": "$\\text{Gini}(y) = 1 - \\sum_{i=1}^{C} \\left(\\frac{n_i}{n}\\right)^2$",
+          "description": "Compute Gini directly from label counts without intermediate probability dictionary"
+        },
+        {
+          "name": "Numerical Stability Form",
+          "latex": "$\\text{Gini}(y) = \\frac{1}{n^2}\\left(n^2 - \\sum_{i=1}^{C} n_i^2\\right)$",
+          "description": "Alternative that avoids repeated division, useful for integer arithmetic"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete pipeline: given an array of class labels, compute and return the Gini Impurity. This combines all previous sub-quests into a single function.",
+        "function_signature": "def compute_gini_impurity(y: list) -> float:",
+        "starter_code": "def compute_gini_impurity(y):\n    \"\"\"\n    Calculate Gini Impurity directly from a list of class labels.\n    \n    :param y: List of class labels (any hashable type)\n    :return: Gini Impurity rounded to 3 decimal places\n    \"\"\"\n    # Your code here\n    # Hint: You can reuse functions from previous exercises\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_gini_impurity([0, 1, 1, 1, 0])",
+            "expected": "0.48",
+            "explanation": "The example from the main problem: 2 zeros, 3 ones, Gini = 1 - (0.4² + 0.6²) = 0.48"
+          },
+          {
+            "input": "compute_gini_impurity([1, 1, 1, 1])",
+            "expected": "0.0",
+            "explanation": "Pure node with only class 1: Gini = 1 - 1² = 0"
+          },
+          {
+            "input": "compute_gini_impurity([0, 1, 0, 1, 0, 1])",
+            "expected": "0.5",
+            "explanation": "Perfect balance: 3 zeros, 3 ones, Gini = 1 - (0.5² + 0.5²) = 0.5"
+          },
+          {
+            "input": "compute_gini_impurity([2, 0, 1, 2, 0, 2])",
+            "expected": "0.667",
+            "explanation": "Three classes: 2 zeros, 1 one, 3 twos. Gini = 1 - ((2/6)² + (1/6)² + (3/6)²) ≈ 0.667"
+          },
+          {
+            "input": "compute_gini_impurity(['apple', 'orange', 'apple'])",
+            "expected": "0.444",
+            "explanation": "Works with strings: 2 apples, 1 orange. Gini = 1 - ((2/3)² + (1/3)²) ≈ 0.444"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling edge cases like empty lists or single-element lists",
+        "Incorrect rounding (should round to exactly 3 decimal places)",
+        "Creating inefficient nested loops instead of using a single count pass",
+        "Not testing with non-integer or non-numeric class labels",
+        "Forgetting to handle the case where all elements are the same class"
+      ],
+      "hint": "Build on your previous functions: (1) count class frequencies, (2) convert to probabilities, (3) sum the squares, (4) subtract from 1. Or combine steps for efficiency.",
+      "references": [
+        "Scikit-learn DecisionTreeClassifier criterion='gini'",
+        "CART algorithm implementation",
+        "NumPy unique with return_counts"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Optimization and Edge Cases in Gini Computation",
+      "relation_to_problem": "Real-world implementations must handle edge cases (empty datasets, single-class nodes) and use efficient algorithms. This step ensures robustness and teaches vectorized computation techniques.",
+      "prerequisites": [
+        "Basic Gini computation",
+        "NumPy array operations",
+        "Error handling"
+      ],
+      "learning_objectives": [
+        "Identify and handle edge cases in Gini calculation",
+        "Implement efficient vectorized computation using NumPy",
+        "Understand when Gini Impurity is undefined or trivial"
+      ],
+      "math_content": {
+        "definition": "**Edge cases in Gini Impurity**: (1) **Empty set**: $\\text{Gini}(\\emptyset)$ is undefined since $n=0$ makes $p_i = n_i/0$ undefined. By convention, return 0 or raise an error. (2) **Single element**: For $|y|=1$, we have a pure node, so $\\text{Gini}=0$. (3) **All same class**: When $n_i = n$ for some class $i$, $\\text{Gini} = 1 - 1^2 = 0$ (pure node).",
+        "notation": "$\\emptyset$ = empty set, $|y|$ = cardinality (size) of dataset $y$",
+        "theorem": "**Gini Under Set Operations**: (1) **Permutation invariance**: $\\text{Gini}(y) = \\text{Gini}(\\pi(y))$ for any permutation $\\pi$. The order of labels doesn't affect impurity. (2) **Subset property**: For disjoint subsets $S_1, S_2$ of a node, the weighted Gini $\\frac{|S_1|}{|S|} \\text{Gini}(S_1) + \\frac{|S_2|}{|S|} \\text{Gini}(S_2)$ forms the basis for split evaluation.",
+        "proof_sketch": "**Permutation invariance**: Gini depends only on class counts $n_i$, which are invariant under permutation of the input sequence. Formally, if $\\pi$ is a permutation, then the multiset of labels is unchanged, so $\\{n_i\\}$ remains constant, thus $\\text{Gini}(y) = \\text{Gini}(\\pi(y))$.",
+        "examples": [
+          "Empty array $y = []$: Cannot compute probabilities. Convention: return $0.0$ or handle as special case.",
+          "Single element $y = [5]$: $n=1$, $n_5=1$, $p_5=1$. $\\text{Gini} = 1 - 1^2 = 0$. Pure by definition.",
+          "Permutation test: $y_1 = [0,1,0,1]$ and $y_2 = [1,0,1,0]$ have identical Gini values (both 0.5) despite different orderings."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Vectorized Gini (NumPy)",
+          "latex": "$\\text{Gini}(y) = 1 - \\sum_{i} \\left(\\frac{\\text{counts}_i}{n}\\right)^2$",
+          "description": "Use np.unique(y, return_counts=True) to get counts, then vectorize the computation"
+        },
+        {
+          "name": "Edge Case Convention",
+          "latex": "$\\text{Gini}(y) = \\begin{cases} 0 & \\text{if } |y| \\leq 1 \\\\ 1 - \\sum_i p_i^2 & \\text{otherwise} \\end{cases}$",
+          "description": "Standard convention for handling trivial cases"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a robust, optimized version of Gini Impurity calculation that handles edge cases and uses NumPy for efficiency. This is production-ready code.",
+        "function_signature": "def gini_impurity_robust(y: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef gini_impurity_robust(y):\n    \"\"\"\n    Calculate Gini Impurity with edge case handling and NumPy optimization.\n    \n    :param y: NumPy array or list of class labels\n    :return: Gini Impurity rounded to 3 decimal places\n    \"\"\"\n    # Handle edge cases\n    # Use NumPy for efficient computation\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "gini_impurity_robust(np.array([]))",
+            "expected": "0.0",
+            "explanation": "Edge case: empty array returns 0.0 by convention"
+          },
+          {
+            "input": "gini_impurity_robust(np.array([7]))",
+            "expected": "0.0",
+            "explanation": "Edge case: single element is pure, Gini = 0"
+          },
+          {
+            "input": "gini_impurity_robust(np.array([0, 1, 1, 1, 0]))",
+            "expected": "0.48",
+            "explanation": "Standard case: same as main problem example"
+          },
+          {
+            "input": "gini_impurity_robust([3, 3, 3, 3, 3])",
+            "expected": "0.0",
+            "explanation": "All same class: pure node, Gini = 0 (handles list input too)"
+          },
+          {
+            "input": "gini_impurity_robust(np.array([5, 2, 8, 2, 5, 8, 2]))",
+            "expected": "0.663",
+            "explanation": "Multiple classes with varying counts: tests general case with NumPy"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking for empty array before accessing elements (causes index errors)",
+        "Using Python loops instead of NumPy vectorization (much slower)",
+        "Not converting input to NumPy array when needed",
+        "Incorrect handling of the n=1 case (should return 0, not undefined)",
+        "Forgetting that np.unique returns sorted unique values and their counts"
+      ],
+      "hint": "Use np.unique(y, return_counts=True) to get class counts efficiently, then compute probabilities as counts/n and apply the Gini formula. Handle len(y)==0 separately.",
+      "references": [
+        "NumPy unique function",
+        "Vectorization in NumPy",
+        "Scikit-learn source code for Gini implementation"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Gini Gain and Split Evaluation (Application Context)",
+      "relation_to_problem": "Understanding how Gini Impurity is used in decision trees provides context for why we calculate it. This final step shows how individual node Gini values combine to evaluate split quality.",
+      "prerequisites": [
+        "Gini Impurity calculation",
+        "Weighted averages",
+        "Tree splitting concepts"
+      ],
+      "learning_objectives": [
+        "Understand how Gini Impurity drives decision tree splits",
+        "Calculate Gini Gain for evaluating splits",
+        "Apply the complete Gini framework in a tree context"
+      ],
+      "math_content": {
+        "definition": "**Gini Gain** measures the reduction in impurity achieved by splitting a parent node $S$ into child nodes $S_L$ (left) and $S_R$ (right): $\\text{Gain}(S, \\text{split}) = \\text{Gini}(S) - \\left(\\frac{|S_L|}{|S|} \\text{Gini}(S_L) + \\frac{|S_R|}{|S|} \\text{Gini}(S_R)\\right)$. The CART algorithm selects the split that maximizes this gain.",
+        "notation": "$S$ = parent node dataset, $S_L, S_R$ = left and right child datasets after split, $|S|$ = number of samples in $S$",
+        "theorem": "**Non-Negativity of Weighted Child Impurity**: For any split of a parent node $S$ into children $S_L$ and $S_R$, the weighted child impurity $\\frac{|S_L|}{|S|} \\text{Gini}(S_L) + \\frac{|S_R|}{|S|} \\text{Gini}(S_R)$ is always in the range $[0, \\text{Gini}(S)]$. Thus, Gini Gain is always non-negative, with $\\text{Gain} = 0$ when the split provides no improvement.",
+        "proof_sketch": "The weighted child impurity is a convex combination of non-negative values (Gini impurities), so it's non-negative. To show it's at most $\\text{Gini}(S)$, note that the Gini formula is concave with respect to the distribution over classes. By Jensen's inequality, splitting cannot increase the weighted impurity beyond the parent's impurity. Equality occurs when the split perfectly separates classes or doesn't change the distribution.",
+        "examples": [
+          "Parent $S = [0,0,1,1,1,1]$: $\\text{Gini}(S) = 1 - ((2/6)^2 + (4/6)^2) = 1 - (1/9 + 4/9) = 4/9 \\approx 0.444$. Split into $S_L=[0,0]$ (pure), $S_R=[1,1,1,1]$ (pure): weighted impurity $= (2/6)\\cdot 0 + (4/6)\\cdot 0 = 0$. Gain $= 0.444 - 0 = 0.444$ (perfect split).",
+          "Parent $S = [0,1,0,1]$: $\\text{Gini}(S) = 0.5$. Split into $S_L=[0,1]$, $S_R=[0,1]$: each child has Gini $=0.5$. Weighted impurity $= 0.5 \\cdot 0.5 + 0.5 \\cdot 0.5 = 0.5$. Gain $= 0.5 - 0.5 = 0$ (no improvement)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gini Gain",
+          "latex": "$\\text{Gain} = \\text{Gini}(S) - \\sum_{j \\in \\{L,R\\}} \\frac{|S_j|}{|S|} \\text{Gini}(S_j)$",
+          "description": "Reduction in impurity from parent to weighted children; higher is better"
+        },
+        {
+          "name": "Weighted Child Impurity",
+          "latex": "$\\text{Weighted-Gini} = \\frac{n_L}{n} \\text{Gini}(S_L) + \\frac{n_R}{n} \\text{Gini}(S_R)$",
+          "description": "The impurity after the split, weighted by child sizes"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates Gini Gain for a binary split. Given a parent dataset and a split point, compute the parent Gini, child Ginis, and return the gain.",
+        "function_signature": "def calculate_gini_gain(parent: list, left_child: list, right_child: list) -> float:",
+        "starter_code": "def calculate_gini_gain(parent, left_child, right_child):\n    \"\"\"\n    Calculate the Gini Gain from splitting parent into left and right children.\n    \n    :param parent: List of class labels in parent node\n    :param left_child: List of class labels in left child after split\n    :param right_child: List of class labels in right child after split\n    :return: Gini Gain rounded to 3 decimal places\n    \"\"\"\n    # Your code here\n    # Hint: Reuse your Gini computation function from previous exercises\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_gini_gain([0,0,1,1,1,1], [0,0], [1,1,1,1])",
+            "expected": "0.444",
+            "explanation": "Perfect split: parent Gini=0.444, both children pure (Gini=0), gain=0.444"
+          },
+          {
+            "input": "calculate_gini_gain([0,1,0,1], [0,1], [0,1])",
+            "expected": "0.0",
+            "explanation": "No improvement: parent and children all have Gini=0.5, gain=0"
+          },
+          {
+            "input": "calculate_gini_gain([0,0,0,1,1,1], [0,0,0], [1,1,1])",
+            "expected": "0.5",
+            "explanation": "Perfect split: parent Gini=0.5, children pure, gain=0.5"
+          },
+          {
+            "input": "calculate_gini_gain([0,0,1,1,2,2], [0,0,1], [1,2,2])",
+            "expected": "0.111",
+            "explanation": "Partial improvement: parent Gini=0.667, weighted child Gini≈0.556, gain≈0.111"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to weight child Gini values by the proportion of samples in each child",
+        "Assuming left_child and right_child sizes sum to parent size (should verify)",
+        "Computing gain as the difference of child Ginis rather than parent minus weighted children",
+        "Not handling cases where one child is empty (degenerate split)",
+        "Confusing Gini Gain with Information Gain (which uses entropy)"
+      ],
+      "hint": "Compute three Gini values (parent, left child, right child), then apply the weighted subtraction formula. Use len() to get the sizes for weighting.",
+      "references": [
+        "CART algorithm",
+        "Decision tree splitting criteria",
+        "Scikit-learn DecisionTreeClassifier.tree_ attributes"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,402 @@
+{
+  "problem_id": 129,
+  "title": "Calculate Unigram Probability from Corpus",
+  "category": "NLP",
+  "difficulty": "easy",
+  "description": "Implement a function that calculates the unigram probability of a given word in a corpus of sentences. Include start `<s>` and end `</s>` tokens in the calculation. The probability should be rounded to 4 decimal places.",
+  "example": {
+    "input": "corpus = \"<s> Jack I like </s> <s> Jack I do like </s>\", word = \"Jack\"",
+    "output": "0.1818",
+    "reasoning": "The corpus has 11 total tokens. 'Jack' appears twice. So, probability = 2 / 11"
+  },
+  "starter_code": "def unigram_probability(corpus: str, word: str) -> float:\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "String Tokenization and Frequency Counting",
+      "relation_to_problem": "The unigram probability calculation requires counting how many times each word (token) appears in the corpus. This sub-quest teaches how to extract and count tokens, which provides the numerator in the probability formula.",
+      "prerequisites": [
+        "Basic Python strings",
+        "Dictionaries/hash maps"
+      ],
+      "learning_objectives": [
+        "Understand tokenization as the process of splitting text into discrete units",
+        "Implement frequency counting using hash maps for O(n) time complexity",
+        "Handle special tokens like <s> and </s> correctly"
+      ],
+      "math_content": {
+        "definition": "**Tokenization** is a function $\\tau: \\Sigma^* \\to (\\Sigma^*)^*$ that maps a string over alphabet $\\Sigma$ to a sequence of tokens (substrings). For whitespace tokenization, $\\tau(s)$ splits string $s$ on whitespace characters. **Frequency counting** creates a mapping $f: V \\to \\mathbb{N}$ where $V$ is the vocabulary (set of unique tokens) and $f(w)$ returns the count of token $w$ in the sequence.",
+        "notation": "$\\Sigma$ = alphabet (set of characters), $\\Sigma^*$ = set of all possible strings over $\\Sigma$, $(\\Sigma^*)^*$ = sequences of strings, $V$ = vocabulary (set of unique tokens), $f(w)$ = frequency of token $w$",
+        "theorem": "For a sequence of tokens $T = [t_1, t_2, ..., t_n]$, the frequency function can be computed in $O(n)$ time and $O(|V|)$ space using a hash map, where $|V|$ is the number of unique tokens.",
+        "proof_sketch": "Each token $t_i$ is processed exactly once in a single pass through the sequence. Hash map insertion and lookup are $O(1)$ on average. Total operations: $n$ lookups and updates, giving $O(n)$ time. Space is bounded by the number of unique tokens stored in the hash map, which is at most $|V| \\leq n$.",
+        "examples": [
+          "For text \"cat dog cat\": $\\tau($\"cat dog cat\"$) = [$\"cat\", \"dog\", \"cat\"$]$, then $f($\"cat\"$) = 2$, $f($\"dog\"$) = 1$",
+          "For \"<s> Jack I </s>\": tokens are [\"<s>\", \"Jack\", \"I\", \"</s>\"], where special tokens <s> and </s> are treated as regular tokens in the count"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Frequency Count",
+          "latex": "$f(w) = |\\{i : t_i = w, 1 \\leq i \\leq n\\}|$",
+          "description": "Count of positions where token w appears in sequence T of length n"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that tokenizes a corpus (splits on whitespace) and returns a dictionary mapping each token to its frequency count. This is the foundation for calculating probabilities.",
+        "function_signature": "def token_frequency(corpus: str) -> dict[str, int]:",
+        "starter_code": "def token_frequency(corpus: str) -> dict[str, int]:\n    # Your code here\n    # Split the corpus on whitespace and count each token\n    pass",
+        "test_cases": [
+          {
+            "input": "token_frequency(\"cat dog cat\")",
+            "expected": "{'cat': 2, 'dog': 1}",
+            "explanation": "The word 'cat' appears twice and 'dog' appears once in the corpus"
+          },
+          {
+            "input": "token_frequency(\"<s> Jack I </s> <s> Jack </s>\")",
+            "expected": "{'<s>': 2, 'Jack': 2, 'I': 1, '</s>': 2}",
+            "explanation": "Special tokens <s> and </s> are counted as regular tokens. Jack appears twice."
+          },
+          {
+            "input": "token_frequency(\"hello\")",
+            "expected": "{'hello': 1}",
+            "explanation": "Single token corpus has frequency 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle multiple consecutive spaces (use split() without arguments)",
+        "Not treating special tokens <s> and </s> as regular tokens",
+        "Using inefficient counting methods like nested loops instead of hash maps"
+      ],
+      "hint": "Python's split() method without arguments automatically handles multiple spaces and returns a list of tokens. Use a dictionary to count efficiently.",
+      "references": [
+        "Hash tables and dictionaries",
+        "String manipulation in Python",
+        "Tokenization in NLP"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Corpus Size and Total Token Count",
+      "relation_to_problem": "The unigram probability formula requires dividing by the total number of tokens in the corpus. This sub-quest teaches how to calculate the denominator $N = \\sum_{w' \\in V} \\text{Count}(w')$.",
+      "prerequisites": [
+        "Token frequency counting",
+        "Sum aggregation"
+      ],
+      "learning_objectives": [
+        "Calculate the total number of tokens (corpus size) from frequency counts",
+        "Understand the relationship between vocabulary size and corpus size",
+        "Verify that sum of all frequencies equals total token count"
+      ],
+      "math_content": {
+        "definition": "The **corpus size** (or total token count) is defined as $N = |T|$ where $T = [t_1, t_2, ..., t_n]$ is the sequence of all tokens in the corpus. Equivalently, $N = \\sum_{w \\in V} f(w)$ where $V$ is the vocabulary and $f(w)$ is the frequency of token $w$.",
+        "notation": "$N$ = corpus size (total number of tokens), $|T|$ = length of token sequence, $V$ = vocabulary (set of unique tokens), $|V|$ = vocabulary size (number of unique tokens)",
+        "theorem": "For any corpus with token sequence $T$ and frequency function $f$, we have $\\sum_{w \\in V} f(w) = |T| = N$. Furthermore, $|V| \\leq N$ with equality only when all tokens are unique.",
+        "proof_sketch": "By definition, $f(w) = |\\{i : t_i = w\\}|$ counts occurrences of $w$. The sum $\\sum_{w \\in V} f(w)$ partitions all positions $\\{1, ..., N\\}$ since each position contributes to exactly one token's count. Therefore, $\\sum_{w \\in V} f(w) = N$. Since each token contributes at least once to some $f(w)$, and $V$ contains only tokens with $f(w) \\geq 1$, we have $|V| \\leq N$.",
+        "examples": [
+          "For corpus \"cat dog cat\": $T = [$\"cat\", \"dog\", \"cat\"$]$, so $N = 3$. Vocabulary $V = \\{$\"cat\", \"dog\"$\\}$, $|V| = 2$. Check: $f($\"cat\"$) + f($\"dog\"$) = 2 + 1 = 3 = N$.",
+          "For \"<s> Jack I </s>\": $N = 4$ tokens total, $|V| = 4$ unique tokens (each appears once)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Corpus Size from Frequencies",
+          "latex": "$N = \\sum_{w \\in V} f(w)$",
+          "description": "Sum all token frequencies to get total corpus size"
+        },
+        {
+          "name": "Vocabulary Size Bound",
+          "latex": "$1 \\leq |V| \\leq N$",
+          "description": "Vocabulary size is between 1 and corpus size"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a frequency dictionary (from sub-quest 1) and returns the total number of tokens in the corpus. This value will be the denominator in the probability calculation.",
+        "function_signature": "def corpus_size(frequency_dict: dict[str, int]) -> int:",
+        "starter_code": "def corpus_size(frequency_dict: dict[str, int]) -> int:\n    # Your code here\n    # Sum all frequency values\n    pass",
+        "test_cases": [
+          {
+            "input": "corpus_size({'cat': 2, 'dog': 1})",
+            "expected": "3",
+            "explanation": "Total tokens = 2 + 1 = 3"
+          },
+          {
+            "input": "corpus_size({'<s>': 2, 'Jack': 2, 'I': 1, '</s>': 2})",
+            "expected": "7",
+            "explanation": "Total tokens = 2 + 2 + 1 + 2 = 7"
+          },
+          {
+            "input": "corpus_size({'hello': 5})",
+            "expected": "5",
+            "explanation": "Single token type appearing 5 times gives corpus size 5"
+          },
+          {
+            "input": "corpus_size({})",
+            "expected": "0",
+            "explanation": "Empty corpus has size 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing vocabulary size |V| with corpus size N",
+        "Using len(frequency_dict) which gives vocabulary size, not corpus size",
+        "Not handling empty corpus edge case"
+      ],
+      "hint": "You need to sum the values in the dictionary, not count the keys. Python's sum() function with dict.values() is efficient.",
+      "references": [
+        "Dictionary aggregation",
+        "Sum of values",
+        "Corpus statistics in NLP"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Probability Theory: Maximum Likelihood Estimation for Unigrams",
+      "relation_to_problem": "This sub-quest introduces the formal probability theory underlying the unigram model. Understanding the MLE principle explains why we divide count by total to get probability.",
+      "prerequisites": [
+        "Probability axioms",
+        "Frequency counting",
+        "Division operation"
+      ],
+      "learning_objectives": [
+        "Understand probability as a measure satisfying axioms: 0 ≤ P(w) ≤ 1 and sum of all probabilities = 1",
+        "Learn Maximum Likelihood Estimation (MLE) for categorical distributions",
+        "Apply MLE to derive the unigram probability formula"
+      ],
+      "math_content": {
+        "definition": "A **probability distribution** over a finite vocabulary $V$ is a function $P: V \\to [0,1]$ satisfying: (1) $P(w) \\geq 0$ for all $w \\in V$, and (2) $\\sum_{w \\in V} P(w) = 1$. The **unigram language model** assumes tokens are generated i.i.d. from this distribution. **Maximum Likelihood Estimation (MLE)** finds the probability distribution that maximizes the likelihood of observed data.",
+        "notation": "$P(w)$ = probability of token $w$, $\\mathcal{L}(P | T)$ = likelihood of distribution $P$ given observed tokens $T$, $\\hat{P}_{MLE}(w)$ = MLE estimate of probability",
+        "theorem": "Given observed token sequence $T = [t_1, ..., t_n]$, the MLE for the unigram probability is $\\hat{P}_{MLE}(w) = \\frac{f(w)}{N}$ where $f(w)$ is the frequency of $w$ in $T$ and $N = |T|$. This estimate satisfies the probability axioms.",
+        "proof_sketch": "The likelihood is $\\mathcal{L}(P | T) = \\prod_{i=1}^{n} P(t_i) = \\prod_{w \\in V} P(w)^{f(w)}$. Taking log: $\\log \\mathcal{L} = \\sum_{w} f(w) \\log P(w)$. To maximize subject to $\\sum_{w} P(w) = 1$, use Lagrange multipliers: $\\mathcal{F} = \\sum_{w} f(w) \\log P(w) - \\lambda(\\sum_{w} P(w) - 1)$. Taking $\\frac{\\partial \\mathcal{F}}{\\partial P(w)} = 0$ gives $\\frac{f(w)}{P(w)} - \\lambda = 0$, so $P(w) = \\frac{f(w)}{\\lambda}$. Using constraint $\\sum_w P(w) = 1$: $\\sum_w \\frac{f(w)}{\\lambda} = 1 \\Rightarrow \\lambda = N$. Thus $\\hat{P}_{MLE}(w) = \\frac{f(w)}{N}$.",
+        "examples": [
+          "For T = [\"cat\", \"dog\", \"cat\"]: $f($\"cat\"$) = 2$, $f($\"dog\"$) = 1$, $N = 3$. MLE gives $\\hat{P}($\"cat\"$) = 2/3 \\approx 0.6667$, $\\hat{P}($\"dog\"$) = 1/3 \\approx 0.3333$. Verify: $2/3 + 1/3 = 1$ ✓",
+          "For single observation T = [\"hello\"]: $\\hat{P}($\"hello\"$) = 1/1 = 1.0$. All probability mass on observed word."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Unigram MLE Probability",
+          "latex": "$\\hat{P}_{MLE}(w) = \\frac{f(w)}{N}$",
+          "description": "Maximum likelihood estimate: frequency divided by corpus size"
+        },
+        {
+          "name": "Probability Normalization",
+          "latex": "$\\sum_{w \\in V} \\hat{P}_{MLE}(w) = \\sum_{w \\in V} \\frac{f(w)}{N} = \\frac{1}{N} \\sum_{w \\in V} f(w) = \\frac{N}{N} = 1$",
+          "description": "MLE probabilities sum to 1, satisfying probability axioms"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the raw (unrounded) unigram probability of a word given its frequency and the total corpus size. This applies the MLE formula directly.",
+        "function_signature": "def calculate_probability(word_frequency: int, corpus_size: int) -> float:",
+        "starter_code": "def calculate_probability(word_frequency: int, corpus_size: int) -> float:\n    # Your code here\n    # Apply the MLE formula: P(w) = count(w) / N\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_probability(2, 11)",
+            "expected": "0.18181818181818182",
+            "explanation": "P(word) = 2/11 ≈ 0.1818... (this matches the example in the main problem)"
+          },
+          {
+            "input": "calculate_probability(1, 3)",
+            "expected": "0.3333333333333333",
+            "explanation": "P(word) = 1/3 ≈ 0.3333..."
+          },
+          {
+            "input": "calculate_probability(0, 10)",
+            "expected": "0.0",
+            "explanation": "Word not in corpus has probability 0 (zero-probability problem, mentioned but not addressed)"
+          },
+          {
+            "input": "calculate_probability(5, 5)",
+            "expected": "1.0",
+            "explanation": "If a word appears in all positions, P(word) = 5/5 = 1.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing frequency with probability (they have different ranges and meanings)",
+        "Not handling division by zero when corpus_size is 0",
+        "Rounding too early in the calculation pipeline",
+        "Forgetting that probabilities must be in [0, 1] range"
+      ],
+      "hint": "This is a simple division, but think about what it means: the probability is the proportion of the corpus occupied by the word.",
+      "references": [
+        "Maximum Likelihood Estimation",
+        "Categorical distribution",
+        "Probability axioms"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Numerical Precision: Rounding and Floating-Point Arithmetic",
+      "relation_to_problem": "The final answer must be rounded to 4 decimal places. This sub-quest teaches proper rounding techniques and floating-point considerations for probability calculations.",
+      "prerequisites": [
+        "Floating-point arithmetic",
+        "Decimal representation"
+      ],
+      "learning_objectives": [
+        "Understand IEEE 754 floating-point representation and precision limits",
+        "Apply proper rounding to a specified number of decimal places",
+        "Recognize when to round (at output) vs. when to keep full precision (during computation)"
+      ],
+      "math_content": {
+        "definition": "**Rounding** to $d$ decimal places is a function $R_d: \\mathbb{R} \\to D_d$ where $D_d$ is the set of decimal numbers with at most $d$ digits after the decimal point. For a real number $x$, $R_d(x)$ returns the element of $D_d$ closest to $x$. Ties are typically broken using \"round half to even\" (banker's rounding) or \"round half up\".",
+        "notation": "$R_d(x)$ = x rounded to d decimal places, $\\epsilon_{machine}$ = machine epsilon (smallest representable difference)",
+        "theorem": "For unigram probabilities $P(w) = f(w)/N$ where $f(w), N \\in \\mathbb{Z}^+$, the exact value is a rational number $\\frac{a}{b}$ in lowest terms. When represented in base-10 with rounding to $d$ decimal places, the rounding error is bounded: $|P(w) - R_d(P(w))| \\leq \\frac{1}{2} \\times 10^{-d}$.",
+        "proof_sketch": "Let $x = P(w)$ be the exact probability. By definition of rounding, $R_d(x)$ is the closest value in $D_d$ to $x$. The spacing between consecutive elements in $D_d$ is $10^{-d}$. The maximum distance from $x$ to the nearest point in $D_d$ is half this spacing: $\\frac{10^{-d}}{2}$. This occurs when $x$ is exactly midway between two representable values.",
+        "examples": [
+          "For $P = 2/11 = 0.181818...$, rounding to 4 decimal places: intermediate digits are ...1818..., so 5th digit is 8 ≥ 5, round up: $R_4(2/11) = 0.1818$. Error: $|0.181818... - 0.1818| < 0.00005$.",
+          "For $P = 1/3 = 0.333333...$, rounding to 4 places: 5th digit is 3 < 5, round down: $R_4(1/3) = 0.3333$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Rounding Error Bound",
+          "latex": "$|x - R_d(x)| \\leq \\frac{1}{2} \\times 10^{-d}$",
+          "description": "Maximum error when rounding to d decimal places"
+        },
+        {
+          "name": "Python round() Function",
+          "latex": "$\\texttt{round}(x, d) = R_d(x)$",
+          "description": "Python's built-in round function implements rounding to d decimal places"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a probability value (as a float) and returns it rounded to exactly 4 decimal places. This is the final formatting step for the unigram probability output.",
+        "function_signature": "def round_probability(probability: float) -> float:",
+        "starter_code": "def round_probability(probability: float) -> float:\n    # Your code here\n    # Round to exactly 4 decimal places\n    pass",
+        "test_cases": [
+          {
+            "input": "round_probability(0.18181818181818182)",
+            "expected": "0.1818",
+            "explanation": "2/11 rounded to 4 decimal places is 0.1818"
+          },
+          {
+            "input": "round_probability(0.3333333333333333)",
+            "expected": "0.3333",
+            "explanation": "1/3 rounded to 4 decimal places is 0.3333"
+          },
+          {
+            "input": "round_probability(0.123456789)",
+            "expected": "0.1235",
+            "explanation": "5th decimal is 5, round up: 0.1235"
+          },
+          {
+            "input": "round_probability(0.99999)",
+            "expected": "1.0",
+            "explanation": "Very close to 1.0, rounds to 1.0000 = 1.0"
+          },
+          {
+            "input": "round_probability(0.0)",
+            "expected": "0.0",
+            "explanation": "Zero probability remains 0.0000 = 0.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using string formatting instead of proper rounding (may not handle ties correctly)",
+        "Rounding intermediate values during computation (compounds rounding errors)",
+        "Confusing truncation with rounding",
+        "Not understanding that Python's round() uses banker's rounding for exact ties"
+      ],
+      "hint": "Python's round() function takes two arguments: the number to round and the number of decimal places.",
+      "references": [
+        "IEEE 754 floating-point standard",
+        "Numerical analysis",
+        "Python round() documentation"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Integration: Complete Unigram Probability Pipeline",
+      "relation_to_problem": "This final sub-quest combines all previous concepts into a complete pipeline: tokenize → count frequency → calculate total → compute probability → round. This is the architecture of the main problem solution.",
+      "prerequisites": [
+        "Token frequency counting (step 1)",
+        "Corpus size calculation (step 2)",
+        "MLE probability formula (step 3)",
+        "Rounding (step 4)"
+      ],
+      "learning_objectives": [
+        "Combine multiple processing steps into a coherent pipeline",
+        "Handle edge cases: empty corpus, word not in corpus",
+        "Validate that the pipeline produces correct results matching manual calculations"
+      ],
+      "math_content": {
+        "definition": "The **unigram probability pipeline** is a composition of functions: $\\pi = R_4 \\circ P_{MLE} \\circ (f, N) \\circ \\tau$ where $\\tau$ tokenizes the corpus, $(f, N)$ computes frequency and corpus size, $P_{MLE}$ applies the MLE formula, and $R_4$ rounds to 4 decimal places. Formally: $\\pi(\\text{corpus}, w) = R_4\\left(\\frac{f(w)}{N}\\right)$ where $f$ and $N$ are derived from $\\tau(\\text{corpus})$.",
+        "notation": "$\\pi(s, w)$ = unigram probability pipeline, $\\tau(s)$ = tokenization, $f(w)$ = frequency, $N$ = corpus size, $P_{MLE}(w)$ = MLE probability, $R_4(x)$ = rounding to 4 decimals",
+        "theorem": "The unigram probability pipeline $\\pi$ is well-defined for any non-empty corpus and any word $w$. If $w \\in V$ (vocabulary), then $0 < \\pi(s, w) \\leq 1$. If $w \\notin V$, then $\\pi(s, w) = 0$. For any corpus, $\\sum_{w \\in V} \\pi(s, w) \\approx 1$ (within rounding error).",
+        "proof_sketch": "For $w \\in V$: $f(w) \\geq 1$ and $N \\geq 1$, so $P_{MLE}(w) = f(w)/N \\in (0, 1]$. Rounding preserves the range: $R_4(P_{MLE}(w)) \\in [0, 1]$. For $w \\notin V$: $f(w) = 0$, so $P_{MLE}(w) = 0$ and $R_4(0) = 0$. The sum $\\sum_{w \\in V} P_{MLE}(w) = 1$ exactly, but rounding introduces small errors bounded by $|V| \\times 0.00005$, so the rounded sum $\\approx 1$.",
+        "examples": [
+          "For corpus \"<s> Jack I like </s> <s> Jack I do like </s>\" and word \"Jack\": (1) $\\tau$ → [\"<s>\", \"Jack\", \"I\", \"like\", \"</s>\", \"<s>\", \"Jack\", \"I\", \"do\", \"like\", \"</s>\"], (2) $f($\"Jack\"$) = 2$, $N = 11$, (3) $P_{MLE}($\"Jack\"$) = 2/11 = 0.181818...$, (4) $R_4(0.181818...) = 0.1818$. Final answer: 0.1818.",
+          "For corpus \"cat dog\" and word \"bird\": (1) $\\tau$ → [\"cat\", \"dog\"], (2) $f($\"bird\"$) = 0$ (not in vocabulary), $N = 2$, (3) $P_{MLE}($\"bird\"$) = 0/2 = 0$, (4) $R_4(0) = 0.0$. Final answer: 0.0."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Pipeline Formula",
+          "latex": "$\\pi(\\text{corpus}, w) = R_4\\left(\\frac{\\text{Count}(w)}{\\sum_{w' \\in V} \\text{Count}(w')}\\right)$",
+          "description": "End-to-end formula combining all steps from corpus to rounded probability"
+        },
+        {
+          "name": "Edge Case: Unknown Word",
+          "latex": "$\\pi(\\text{corpus}, w) = 0 \\text{ if } w \\notin V$",
+          "description": "Words not in the corpus have probability 0 under MLE (zero-probability problem)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete function that takes a corpus string and a word, then returns the unigram probability rounded to 4 decimal places. This function should call helper functions from previous sub-quests (or reimplement their logic) to: (1) tokenize and count, (2) get total tokens, (3) calculate probability, (4) round the result. Do NOT implement the full solution to the main problem yet—focus on the pipeline architecture.",
+        "function_signature": "def unigram_prob_pipeline(corpus: str, word: str) -> float:",
+        "starter_code": "def unigram_prob_pipeline(corpus: str, word: str) -> float:\n    # Your code here\n    # Step 1: Tokenize corpus and count frequencies\n    # Step 2: Calculate total number of tokens\n    # Step 3: Get frequency of the target word\n    # Step 4: Calculate probability = frequency / total\n    # Step 5: Round to 4 decimal places\n    pass",
+        "test_cases": [
+          {
+            "input": "unigram_prob_pipeline(\"<s> Jack I like </s> <s> Jack I do like </s>\", \"Jack\")",
+            "expected": "0.1818",
+            "explanation": "This is the example from the main problem. Jack appears 2 times out of 11 total tokens. 2/11 = 0.181818... → 0.1818"
+          },
+          {
+            "input": "unigram_prob_pipeline(\"<s> Jack I like </s> <s> Jack I do like </s>\", \"I\")",
+            "expected": "0.1818",
+            "explanation": "I also appears 2 times out of 11 tokens. Same probability as Jack."
+          },
+          {
+            "input": "unigram_prob_pipeline(\"<s> Jack I like </s> <s> Jack I do like </s>\", \"<s>\")",
+            "expected": "0.1818",
+            "explanation": "Start token <s> appears 2 times out of 11 tokens. Treated as regular token."
+          },
+          {
+            "input": "unigram_prob_pipeline(\"<s> Jack I like </s> <s> Jack I do like </s>\", \"like\")",
+            "expected": "0.1818",
+            "explanation": "like appears 2 times out of 11 tokens"
+          },
+          {
+            "input": "unigram_prob_pipeline(\"<s> Jack I like </s> <s> Jack I do like </s>\", \"do\")",
+            "expected": "0.0909",
+            "explanation": "do appears 1 time out of 11 tokens. 1/11 = 0.090909... → 0.0909"
+          },
+          {
+            "input": "unigram_prob_pipeline(\"cat dog cat\", \"cat\")",
+            "expected": "0.6667",
+            "explanation": "cat appears 2 times out of 3 tokens. 2/3 = 0.666666... → 0.6667"
+          },
+          {
+            "input": "unigram_prob_pipeline(\"hello world\", \"goodbye\")",
+            "expected": "0.0",
+            "explanation": "Word not in corpus has probability 0 (zero-probability problem)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not treating special tokens <s> and </s> as regular tokens in the count",
+        "Rounding intermediate values instead of only the final result",
+        "Off-by-one errors in counting (forgetting to count certain tokens)",
+        "Not handling the case where word is not in corpus (should return 0.0)",
+        "Incorrect tokenization (e.g., not splitting on all whitespace)"
+      ],
+      "hint": "Break the problem into clear stages: (1) tokenization, (2) counting, (3) division, (4) rounding. Each stage should be correct independently before combining them.",
+      "references": [
+        "Pipeline architecture",
+        "Function composition",
+        "End-to-end NLP processing"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "description": "SW1wbGVtZW50IHRoZSBrbm93bGVkZ2UgZGlzdGlsbGF0aW9uIGxvc3MgdXNlZCB0byB0cmFuc2ZlciBjYXBhYmlsaXRpZXMgZnJvbSBhIGxhcmdlIHRlYWNoZXIgbW9kZWwgdG8gYSBzbWFsbGVyIHN0dWRlbnQgbW9kZWwuIERpc3RpbGxhdGlvbiB0cmFpbnMgdGhlIHN0dWRlbnQgdG8gbWF0Y2ggdGhlIHRlYWNoZXIncyBzb2Z0IHByb2JhYmlsaXR5IGRpc3RyaWJ1dGlvbiByYXRoZXIgdGhhbiBoYXJkIGxhYmVscywgZW5hYmxpbmcgc21hbGxlciBtb2RlbHMgdG8gYWNoaWV2ZSBwZXJmb3JtYW5jZSBjbG9zZXIgdG8gdGhlaXIgbGFyZ2VyIGNvdW50ZXJwYXJ0cy4gQ29tcHV0ZSB0aGUgS0wgZGl2ZXJnZW5jZSBiZXR3ZWVuIHRlbXBlcmF0dXJlLXNvZnRlbmVkIHRlYWNoZXIgYW5kIHN0dWRlbnQgZGlzdHJpYnV0aW9ucy4=",
+  "id": "227",
+  "test_cases": [
+    {
+      "test": "import numpy as np\nstudent = np.array([1.0, 2.0, 3.0])\nteacher = np.array([1.0, 2.0, 3.0])\nresult = distillation_loss(student, teacher, temperature=1.0)\nprint(round(result, 4))",
+      "expected_output": "0.0"
+    },
+    {
+      "test": "import numpy as np\nstudent = np.array([1.0, 2.0, 0.5])\nteacher = np.array([0.5, 2.5, 1.0])\nresult = distillation_loss(student, teacher, temperature=1.0)\nprint(round(result, 4))",
+      "expected_output": "0.0584"
+    }
+  ],
+  "difficulty": "medium",
+  "pytorch_difficulty": "medium",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "student_logits = np.array([1.0, 2.0]), teacher_logits = np.array([1.5, 2.5]), temperature = 1.0",
+    "output": "0.0147",
+    "reasoning": "Both distributions are similar (teacher slightly more confident in class 2), so the KL divergence is small. The T^2 scaling ensures gradients remain useful even with high temperatures."
+  },
+  "category": "Deep Learning",
+  "pytorch_starter_code": "aW1wb3J0IHRvcmNoCmltcG9ydCB0b3JjaC5ubi5mdW5jdGlvbmFsIGFzIEYKCmRlZiBkaXN0aWxsYXRpb25fbG9zcygKCXN0dWRlbnRfbG9naXRzOiB0b3JjaC5UZW5zb3IsCgl0ZWFjaGVyX2xvZ2l0czogdG9yY2guVGVuc29yLAoJdGVtcGVyYXR1cmU6IGZsb2F0ID0gMS4wCikgLT4gdG9yY2guVGVuc29yOgoJIiIiCglDb21wdXRlIGtub3dsZWRnZSBkaXN0aWxsYXRpb24gbG9zcyB1c2luZyBQeVRvcmNoLgoJCglBcmdzOgoJCXN0dWRlbnRfbG9naXRzOiBMb2dpdHMgZnJvbSBzdHVkZW50IG1vZGVsCgkJdGVhY2hlcl9sb2dpdHM6IExvZ2l0cyBmcm9tIHRlYWNoZXIgbW9kZWwKCQl0ZW1wZXJhdHVyZTogU29mdG1heCB0ZW1wZXJhdHVyZQoJCQoJUmV0dXJuczoKCQlEaXN0aWxsYXRpb24gbG9zcwoJIiIiCgkjIFlvdXIgY29kZSBoZXJlCglwYXNz",
+  "title": "Knowledge Distillation Loss",
+  "createdAt": "December 9, 2025 at 5:21:16 PM UTC-0500",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/Open-Deep-ML",
+      "name": "Deep-ML"
+    }
+  ],
+  "pytorch_test_cases": [
+    {
+      "test": "import torch\nstudent = torch.tensor([1.0, 2.0, 3.0])\nteacher = torch.tensor([1.0, 2.0, 3.0])\nresult = distillation_loss(student, teacher, temperature=1.0)\nprint(round(result.item(), 4))",
+      "expected_output": "0.0"
+    },
+    {
+      "test": "import torch\nstudent = torch.tensor([1.0, 2.0, 0.5])\nteacher = torch.tensor([0.5, 2.5, 1.0])\nresult = distillation_loss(student, teacher, temperature=1.0)\nprint(round(result.item(), 4))",
+      "expected_output": "0.0584"
+    },
+    {
+      "test": "import torch\nstudent = torch.tensor([1.0, 2.0, 0.5])\nteacher = torch.tensor([0.5, 2.5, 1.0])\nresult = distillation_loss(student, teacher, temperature=2.0)\nprint(round(result.item(), 4))",
+      "expected_output": "0.0879"
+    },
+    {
+      "test": "import torch\nstudent = torch.tensor([2.0, -2.0])\nteacher = torch.tensor([1.5, -1.5])\nresult = distillation_loss(student, teacher, temperature=1.0)\nprint(round(result.item(), 4))",
+      "expected_output": "0.017"
+    }
+  ],
+  "learn_section": "IyMgS25vd2xlZGdlIERpc3RpbGxhdGlvbgoKIyMjIFdoYXQgaXMgS25vd2xlZGdlIERpc3RpbGxhdGlvbj8KCktub3dsZWRnZSBkaXN0aWxsYXRpb24gdHJhbnNmZXJzIGtub3dsZWRnZSBmcm9tIGEgbGFyZ2UgInRlYWNoZXIiIG1vZGVsIHRvIGEgc21hbGxlciAic3R1ZGVudCIgbW9kZWwuIEluc3RlYWQgb2YgdHJhaW5pbmcgdGhlIHN0dWRlbnQgb24gaGFyZCBsYWJlbHMgKDAgb3IgMSksIGl0IGxlYXJucyBmcm9tIHRoZSB0ZWFjaGVyJ3Mgc29mdCBwcm9iYWJpbGl0eSBkaXN0cmlidXRpb24sIHdoaWNoIGNvbnRhaW5zIHJpY2hlciBpbmZvcm1hdGlvbiBhYm91dCByZWxhdGlvbnNoaXBzIGJldHdlZW4gY2xhc3Nlcy4KCiMjIyBUaGUgRGlzdGlsbGF0aW9uIExvc3MKClRoZSBsb3NzIGNvbWJpbmVzIHNvZnQgdGFyZ2V0cyBmcm9tIHRoZSB0ZWFjaGVyIHdpdGggdGVtcGVyYXR1cmUgc2NhbGluZzoKCiQkTF97ZGlzdGlsbH0gPSBUXjIgXGNkb3QgRF97S0x9XGxlZnQoXHNpZ21hXGxlZnQoXGZyYWN7el90fXtUfVxyaWdodCkgXHwgXHNpZ21hXGxlZnQoXGZyYWN7el9zfXtUfVxyaWdodClccmlnaHQpJCQKCndoZXJlOgotICR6X3QkID0gdGVhY2hlciBsb2dpdHMKLSAkel9zJCA9IHN0dWRlbnQgbG9naXRzICAKLSAkVCQgPSB0ZW1wZXJhdHVyZQotICRcc2lnbWEkID0gc29mdG1heCBmdW5jdGlvbgoKIyMjIFdoeSBUZW1wZXJhdHVyZT8KCkhpZ2hlciB0ZW1wZXJhdHVyZSAic29mdGVucyIgdGhlIHByb2JhYmlsaXR5IGRpc3RyaWJ1dGlvbjoKLSAkVCA9IDEkOiBTdGFuZGFyZCBzb2Z0bWF4Ci0gJFQgPiAxJDogRmxhdHRlciBkaXN0cmlidXRpb24sIHJldmVhbHMgbW9yZSBhYm91dCByZWxhdGl2ZSBjb25maWRlbmNlcwotICRUIFx0byBcaW5mdHkkOiBVbmlmb3JtIGRpc3RyaWJ1dGlvbgoKU29mdCB0YXJnZXRzIHByb3ZpZGUgbW9yZSBncmFkaWVudCBzaWduYWwgdGhhbiBoYXJkIGxhYmVscywgZXNwZWNpYWxseSBmb3IgY2xhc3NlcyB0aGUgdGVhY2hlciBpcyB1bmNlcnRhaW4gYWJvdXQuCgojIyMgV2h5ICRUXjIkIFNjYWxpbmc/CgpXaGVuIHRlbXBlcmF0dXJlIGluY3JlYXNlcywgZ3JhZGllbnRzIGRlY3JlYXNlIGJ5IGZhY3RvciBvZiAkMS9UXjIkLiBNdWx0aXBseWluZyB0aGUgbG9zcyBieSAkVF4yJCBjb21wZW5zYXRlcywga2VlcGluZyBncmFkaWVudCBtYWduaXR1ZGVzIHN0YWJsZSBhY3Jvc3MgZGlmZmVyZW50IHRlbXBlcmF0dXJlcy4KCiMjIyBQcmFjdGljYWwgVGlwcwoKMS4gKipUZW1wZXJhdHVyZSoqOiBUeXBpY2FsbHkgMi0yMC4gSGlnaGVyIGZvciBtb3JlIGtub3dsZWRnZSB0cmFuc2ZlciwgbG93ZXIgZm9yIGhhcmRlciB0YXJnZXRzLgoKMi4gKipDb21iaW5lZCBMb3NzKio6IE9mdGVuIGNvbWJpbmUgZGlzdGlsbGF0aW9uIGxvc3Mgd2l0aCBzdGFuZGFyZCBjcm9zcy1lbnRyb3B5IG9uIHRydWUgbGFiZWxzOgogICAkJEwgPSBcYWxwaGEgTF97ZGlzdGlsbH0gKyAoMS1cYWxwaGEpIExfe0NFfSQkCgozLiAqKkRhdGEgUXVhbGl0eSoqOiBUaGUgcXVhbGl0eSBvZiB0ZWFjaGVyIG91dHB1dHMgbWF0dGVycyBtb3JlIHRoYW4gcXVhbnRpdHkuCgojIyMgV2h5IERpc3RpbGxhdGlvbiBXb3JrcwoKU21hbGwgbW9kZWxzIGxhY2sgdGhlIGNhcGFjaXR5IHRvIGRpc2NvdmVyIHNvcGhpc3RpY2F0ZWQgcGF0dGVybnMgdGhyb3VnaCB0cmFpbmluZyBhbG9uZS4gRGlzdGlsbGF0aW9uIGdpdmVzIHRoZW0gYSAic2hvcnRjdXQiIHRvIGxlYXJuIHBhdHRlcm5zIGRpc2NvdmVyZWQgYnkgbGFyZ2VyIG1vZGVscy4gVGhlIHNvZnQgcHJvYmFiaWxpdGllcyBlbmNvZGUgbm90IGp1c3QgdGhlIGNvcnJlY3QgYW5zd2VyLCBidXQgYWxzbyB3aGljaCBpbmNvcnJlY3QgYW5zd2VycyBhcmUgIm1vcmUgd3JvbmciIHRoYW4gb3RoZXJzLg==",
+  "starter_code": "import numpy as np\n\ndef distillation_loss(\n\tstudent_logits: np.ndarray,\n\tteacher_logits: np.ndarray,\n\ttemperature: float = 1.0\n) -> float:\n\t\"\"\"\n\tCompute knowledge distillation loss.\n\t\n\tL = T^2 * KL(softmax(teacher/T) || softmax(student/T))\n\t\n\tArgs:\n\t\tstudent_logits: Logits from student model\n\t\tteacher_logits: Logits from teacher model\n\t\ttemperature: Softmax temperature\n\t\t\n\tReturns:\n\t\tDistillation loss value\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "description_decoded": "Implement the knowledge distillation loss used to transfer capabilities from a large teacher model to a smaller student model. Distillation trains the student to match the teacher's soft probability distribution rather than hard labels, enabling smaller models to achieve performance closer to their larger counterparts. Compute the KL divergence between temperature-softened teacher and student distributions.",
+  "learn_section_decoded": "## Knowledge Distillation\n\n### What is Knowledge Distillation?\n\nKnowledge distillation transfers knowledge from a large \"teacher\" model to a smaller \"student\" model. Instead of training the student on hard labels (0 or 1), it learns from the teacher's soft probability distribution, which contains richer information about relationships between classes.\n\n### The Distillation Loss\n\nThe loss combines soft targets from the teacher with temperature scaling:\n\n$$L_{distill} = T^2 \\cdot D_{KL}\\left(\\sigma\\left(\\frac{z_t}{T}\\right) \\| \\sigma\\left(\\frac{z_s}{T}\\right)\\right)$$\n\nwhere:\n- $z_t$ = teacher logits\n- $z_s$ = student logits  \n- $T$ = temperature\n- $\\sigma$ = softmax function\n\n### Why Temperature?\n\nHigher temperature \"softens\" the probability distribution:\n- $T = 1$: Standard softmax\n- $T > 1$: Flatter distribution, reveals more about relative confidences\n- $T \\to \\infty$: Uniform distribution\n\nSoft targets provide more gradient signal than hard labels, especially for classes the teacher is uncertain about.\n\n### Why $T^2$ Scaling?\n\nWhen temperature increases, gradients decrease by factor of $1/T^2$. Multiplying the loss by $T^2$ compensates, keeping gradient magnitudes stable across different temperatures.\n\n### Practical Tips\n\n1. **Temperature**: Typically 2-20. Higher for more knowledge transfer, lower for harder targets.\n\n2. **Combined Loss**: Often combine distillation loss with standard cross-entropy on true labels:\n   $$L = \\alpha L_{distill} + (1-\\alpha) L_{CE}$$\n\n3. **Data Quality**: The quality of teacher outputs matters more than quantity.\n\n### Why Distillation Works\n\nSmall models lack the capacity to discover sophisticated patterns through training alone. Distillation gives them a \"shortcut\" to learn patterns discovered by larger models. The soft probabilities encode not just the correct answer, but also which incorrect answers are \"more wrong\" than others."
+}

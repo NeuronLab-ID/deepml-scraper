@@ -1,0 +1,417 @@
+{
+  "problem_id": 118,
+  "title": "Compute the Cross Product of Two 3D Vectors",
+  "category": "Linear Algebra",
+  "difficulty": "easy",
+  "description": "Implement a function to compute the cross product of two 3-dimensional vectors. The cross product of two vectors results in a third vector that is perpendicular to both and follows the right-hand rule. This concept is fundamental in physics, engineering, and 3D graphics.",
+  "example": {
+    "input": "cross_product([1, 0, 0], [0, 1, 0])",
+    "output": "[0, 0, 1]",
+    "reasoning": "The cross product of two orthogonal unit vectors [1, 0, 0] and [0, 1, 0] is [0, 0, 1], pointing in the positive z-direction as per the right-hand rule."
+  },
+  "starter_code": "import numpy as np\n\ndef cross_product(a, b):\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "2×2 Determinants and Their Computational Foundation",
+      "relation_to_problem": "Computing the cross product requires calculating three 2×2 determinants from the components of the input vectors. This sub-quest teaches the fundamental operation that forms each component of the final result.",
+      "prerequisites": [
+        "Basic arithmetic operations",
+        "Matrix notation",
+        "Ordered pairs"
+      ],
+      "learning_objectives": [
+        "Define and compute 2×2 determinants using the algebraic formula",
+        "Understand the geometric interpretation of determinants as signed area",
+        "Apply determinant computation to extract vector components"
+      ],
+      "math_content": {
+        "definition": "A **determinant** of a 2×2 matrix $\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}$ is a scalar value that encodes information about the linear transformation represented by the matrix. Formally, for a 2×2 matrix $M = \\begin{bmatrix} m_{11} & m_{12} \\\\ m_{21} & m_{22} \\end{bmatrix}$, the determinant is defined as: $$\\det(M) = \\begin{vmatrix} m_{11} & m_{12} \\\\ m_{21} & m_{22} \\end{vmatrix} = m_{11}m_{22} - m_{12}m_{21}$$",
+        "notation": "$\\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix}$ denotes the determinant of the matrix with entries $a, b, c, d$. The vertical bars distinguish determinant notation from matrix bracket notation.",
+        "theorem": "**Geometric Interpretation Theorem**: The absolute value of $\\det(M)$ equals the area of the parallelogram formed by the column vectors of $M$. The sign indicates orientation: positive for counter-clockwise, negative for clockwise.",
+        "proof_sketch": "Consider column vectors $\\vec{v}_1 = (a, c)$ and $\\vec{v}_2 = (b, d)$. The parallelogram area is computed using the base-height formula: Area = $|\\vec{v}_1| \\cdot |\\vec{v}_2| \\cdot \\sin\\theta$. Through trigonometric identities and the relationship $\\sin\\theta = \\sqrt{1 - \\cos^2\\theta}$, this reduces to $|ad - bc|$.",
+        "examples": [
+          "Example 1: $\\begin{vmatrix} 3 & 1 \\\\ 2 & 4 \\end{vmatrix} = (3)(4) - (1)(2) = 12 - 2 = 10$",
+          "Example 2: $\\begin{vmatrix} -1 & 5 \\\\ 2 & 3 \\end{vmatrix} = (-1)(3) - (5)(2) = -3 - 10 = -13$",
+          "Example 3 (Zero Determinant): $\\begin{vmatrix} 2 & 4 \\\\ 1 & 2 \\end{vmatrix} = (2)(2) - (4)(1) = 0$ indicates linearly dependent rows"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "2×2 Determinant Formula",
+          "latex": "$\\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix} = ad - bc$",
+          "description": "Use this formula whenever you need to compute a 2×2 determinant by multiplying diagonal elements and subtracting the anti-diagonal product"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the determinant of a 2×2 matrix given as four scalar values. This operation is the building block for each component calculation in the cross product formula.",
+        "function_signature": "def determinant_2x2(a: float, b: float, c: float, d: float) -> float:",
+        "starter_code": "def determinant_2x2(a: float, b: float, c: float, d: float) -> float:\n    \"\"\"\n    Compute the determinant of a 2x2 matrix:\n    | a  b |\n    | c  d |\n    \n    Args:\n        a, b, c, d: Matrix elements\n    \n    Returns:\n        The determinant value (ad - bc)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "determinant_2x2(3, 1, 2, 4)",
+            "expected": "10",
+            "explanation": "Using the formula: (3)(4) - (1)(2) = 12 - 2 = 10"
+          },
+          {
+            "input": "determinant_2x2(-1, 5, 2, 3)",
+            "expected": "-13",
+            "explanation": "Using the formula: (-1)(3) - (5)(2) = -3 - 10 = -13"
+          },
+          {
+            "input": "determinant_2x2(2, 4, 1, 2)",
+            "expected": "0",
+            "explanation": "Zero determinant indicates linearly dependent rows: (2)(2) - (4)(1) = 0"
+          },
+          {
+            "input": "determinant_2x2(1, 0, 0, 1)",
+            "expected": "1",
+            "explanation": "Identity matrix has determinant 1: (1)(1) - (0)(0) = 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing the subtraction order: writing $bc - ad$ instead of $ad - bc$",
+        "Forgetting to handle negative numbers correctly in multiplication",
+        "Mixing up which elements are on the main diagonal versus anti-diagonal"
+      ],
+      "hint": "The main diagonal runs from top-left to bottom-right (elements a and d). Multiply these first, then subtract the product of the anti-diagonal elements.",
+      "references": [
+        "Linear Algebra and Its Applications by Gilbert Strang, Chapter 5",
+        "Determinant properties and cofactor expansion",
+        "Geometric interpretation of determinants"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "3D Vector Representation and Component Access",
+      "relation_to_problem": "The cross product operates on 3D vectors by combining their components in specific patterns. This sub-quest teaches how to properly represent vectors and access their individual components, which is essential for applying the cross product formula.",
+      "prerequisites": [
+        "Arrays/Lists in Python",
+        "Indexing notation",
+        "Tuple unpacking"
+      ],
+      "learning_objectives": [
+        "Represent 3D vectors using Python data structures (lists, tuples, or arrays)",
+        "Extract individual components using zero-based indexing",
+        "Validate vector dimensionality for 3D operations",
+        "Understand component notation: $\\vec{v} = (v_1, v_2, v_3)$ corresponds to x, y, z axes"
+      ],
+      "math_content": {
+        "definition": "A **3-dimensional vector** is an ordered triple of real numbers representing a directed line segment in Euclidean 3-space $\\mathbb{R}^3$. Formally, $\\vec{v} \\in \\mathbb{R}^3$ can be written as $\\vec{v} = (v_1, v_2, v_3)$ or in column form $\\vec{v} = \\begin{bmatrix} v_1 \\\\ v_2 \\\\ v_3 \\end{bmatrix}$, where $v_1, v_2, v_3 \\in \\mathbb{R}$ are called the **components** of the vector along the standard basis vectors $\\vec{i}, \\vec{j}, \\vec{k}$.",
+        "notation": "$\\vec{v} = (v_1, v_2, v_3) = v_1\\vec{i} + v_2\\vec{j} + v_3\\vec{k}$, where $\\vec{i} = (1, 0, 0)$, $\\vec{j} = (0, 1, 0)$, $\\vec{k} = (0, 0, 1)$ are the standard orthonormal basis vectors. Components are also denoted as $v_x = v_1$, $v_y = v_2$, $v_z = v_3$.",
+        "theorem": "**Component Uniqueness Theorem**: Every vector in $\\mathbb{R}^3$ has a unique representation as a linear combination of the standard basis vectors. That is, for any $\\vec{v} \\in \\mathbb{R}^3$, there exist unique scalars $v_1, v_2, v_3$ such that $\\vec{v} = v_1\\vec{i} + v_2\\vec{j} + v_3\\vec{k}$.",
+        "proof_sketch": "The standard basis $\\{\\vec{i}, \\vec{j}, \\vec{k}\\}$ is linearly independent (their only linear combination equaling zero is the trivial one) and spans $\\mathbb{R}^3$ (any vector can be expressed using them). These properties define a basis, guaranteeing unique representation.",
+        "examples": [
+          "Example 1: $\\vec{a} = (2, -3, 5)$ has components $a_1 = 2$, $a_2 = -3$, $a_3 = 5$",
+          "Example 2: The position vector from origin to point $P(1, 4, 7)$ is $\\vec{OP} = (1, 4, 7) = 1\\vec{i} + 4\\vec{j} + 7\\vec{k}$",
+          "Example 3: Zero vector $\\vec{0} = (0, 0, 0)$ has all components equal to zero"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Component Extraction",
+          "latex": "If $\\vec{v} = (v_1, v_2, v_3)$, then $v_i$ denotes the $i$-th component for $i \\in \\{1, 2, 3\\}$",
+          "description": "Use indexing to access individual components for computation"
+        },
+        {
+          "name": "Vector Equality",
+          "latex": "$\\vec{a} = \\vec{b} \\iff a_1 = b_1 \\land a_2 = b_2 \\land a_3 = b_3$",
+          "description": "Two vectors are equal if and only if all corresponding components are equal"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that extracts and returns all three components of a 3D vector, validating that the input is indeed a 3-dimensional vector. This ensures proper input handling before applying the cross product formula.",
+        "function_signature": "def extract_components(v: list) -> tuple:",
+        "starter_code": "def extract_components(v: list) -> tuple:\n    \"\"\"\n    Extract the three components from a 3D vector.\n    \n    Args:\n        v: A list or array representing a 3D vector [v1, v2, v3]\n    \n    Returns:\n        A tuple (v1, v2, v3) containing the three components\n    \n    Raises:\n        ValueError: If the input is not a 3-dimensional vector\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "extract_components([1, 2, 3])",
+            "expected": "(1, 2, 3)",
+            "explanation": "Successfully extracts the three components from a valid 3D vector"
+          },
+          {
+            "input": "extract_components([0, -5, 7.5])",
+            "expected": "(0, -5, 7.5)",
+            "explanation": "Handles negative numbers and floating-point values correctly"
+          },
+          {
+            "input": "extract_components([1, 2])",
+            "expected": "ValueError",
+            "explanation": "Should raise an error for 2D vectors (insufficient dimensions)"
+          },
+          {
+            "input": "extract_components([1, 2, 3, 4])",
+            "expected": "ValueError",
+            "explanation": "Should raise an error for 4D vectors (too many dimensions)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that Python uses 0-based indexing: v[0] is the first component, not v[1]",
+        "Not validating input dimensions before processing",
+        "Assuming vectors are always lists when they might be tuples or numpy arrays",
+        "Confusing mathematical notation (1-indexed) with programming notation (0-indexed)"
+      ],
+      "hint": "Check the length of the input vector first. Use len() to verify it equals 3, then access elements using indices 0, 1, and 2.",
+      "references": [
+        "Vector spaces and basis vectors",
+        "Coordinate systems in 3D space",
+        "Python sequence types and indexing"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "The 3×3 Determinant and Cofactor Expansion",
+      "relation_to_problem": "The cross product formula is derived from expanding a 3×3 determinant along the first row. Understanding this expansion reveals why the cross product formula has its specific structure and sign pattern.",
+      "prerequisites": [
+        "2×2 determinants",
+        "Matrix notation",
+        "Signed cofactors"
+      ],
+      "learning_objectives": [
+        "Compute 3×3 determinants using cofactor expansion along the first row",
+        "Understand the alternating sign pattern (+, -, +) in the expansion",
+        "Connect 3×3 determinant structure to the cross product formula",
+        "Recognize how the determinant form encodes perpendicularity"
+      ],
+      "math_content": {
+        "definition": "The **determinant** of a 3×3 matrix $M = \\begin{bmatrix} m_{11} & m_{12} & m_{13} \\\\ m_{21} & m_{22} & m_{23} \\\\ m_{31} & m_{32} & m_{33} \\end{bmatrix}$ is a scalar computed via **cofactor expansion along the first row**: $$\\det(M) = m_{11}\\begin{vmatrix} m_{22} & m_{23} \\\\ m_{32} & m_{33} \\end{vmatrix} - m_{12}\\begin{vmatrix} m_{21} & m_{23} \\\\ m_{31} & m_{33} \\end{vmatrix} + m_{13}\\begin{vmatrix} m_{21} & m_{22} \\\\ m_{31} & m_{32} \\end{vmatrix}$$",
+        "notation": "$C_{ij}$ denotes the **cofactor** of element $m_{ij}$, defined as $C_{ij} = (-1)^{i+j}M_{ij}$ where $M_{ij}$ is the **minor** (determinant of the 2×2 submatrix obtained by deleting row $i$ and column $j$).",
+        "theorem": "**Laplace Expansion Theorem**: The determinant of an $n \\times n$ matrix can be computed by expanding along any row or column using cofactors: $$\\det(M) = \\sum_{j=1}^{n} m_{ij}C_{ij}$$ for any fixed row $i$, or $$\\det(M) = \\sum_{i=1}^{n} m_{ij}C_{ij}$$ for any fixed column $j$.",
+        "proof_sketch": "The theorem follows from the multilinearity and alternating properties of the determinant function. Expansion along the first row is the recursive definition, and invariance under row/column choice follows from determinant properties under row operations.",
+        "examples": [
+          "Example 1: $\\begin{vmatrix} 1 & 2 & 3 \\\\ 0 & 1 & 4 \\\\ 5 & 6 & 0 \\end{vmatrix} = 1\\begin{vmatrix} 1 & 4 \\\\ 6 & 0 \\end{vmatrix} - 2\\begin{vmatrix} 0 & 4 \\\\ 5 & 0 \\end{vmatrix} + 3\\begin{vmatrix} 0 & 1 \\\\ 5 & 6 \\end{vmatrix} = 1(0-24) - 2(0-20) + 3(0-5) = -24 + 40 - 15 = 1$",
+          "Example 2 (Cross Product Form): $\\begin{vmatrix} \\vec{i} & \\vec{j} & \\vec{k} \\\\ a_1 & a_2 & a_3 \\\\ b_1 & b_2 & b_3 \\end{vmatrix} = \\vec{i}(a_2b_3 - a_3b_2) - \\vec{j}(a_1b_3 - a_3b_1) + \\vec{k}(a_1b_2 - a_2b_1)$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "3×3 Determinant (First Row Expansion)",
+          "latex": "$\\begin{vmatrix} a & b & c \\\\ d & e & f \\\\ g & h & i \\end{vmatrix} = a\\begin{vmatrix} e & f \\\\ h & i \\end{vmatrix} - b\\begin{vmatrix} d & f \\\\ g & i \\end{vmatrix} + c\\begin{vmatrix} d & e \\\\ g & h \\end{vmatrix}$",
+          "description": "Expand along the first row, using alternating signs (+, -, +) and computing 2×2 determinants"
+        },
+        {
+          "name": "Simplified Form",
+          "latex": "$\\det(M) = a(ei - fh) - b(di - fg) + c(dh - eg)$",
+          "description": "Fully expanded algebraic form after computing all 2×2 minors"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the determinant of a 3×3 matrix using cofactor expansion along the first row. This mirrors the exact structure used in the cross product formula, where basis vectors replace the first row entries.",
+        "function_signature": "def determinant_3x3(row1: list, row2: list, row3: list) -> float:",
+        "starter_code": "def determinant_3x3(row1: list, row2: list, row3: list) -> float:\n    \"\"\"\n    Compute the determinant of a 3x3 matrix using cofactor expansion.\n    \n    Args:\n        row1: First row [a, b, c]\n        row2: Second row [d, e, f]\n        row3: Third row [g, h, i]\n    \n    Returns:\n        The determinant value\n    \n    Hint: Use the determinant_2x2 function from the previous exercise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "determinant_3x3([1, 2, 3], [0, 1, 4], [5, 6, 0])",
+            "expected": "1",
+            "explanation": "Expanding: 1(1·0 - 4·6) - 2(0·0 - 4·5) + 3(0·6 - 1·5) = 1(-24) - 2(-20) + 3(-5) = -24 + 40 - 15 = 1"
+          },
+          {
+            "input": "determinant_3x3([1, 0, 0], [0, 1, 0], [0, 0, 1])",
+            "expected": "1",
+            "explanation": "Identity matrix has determinant 1: 1(1·1 - 0·0) - 0 + 0 = 1"
+          },
+          {
+            "input": "determinant_3x3([2, 3, 1], [1, 4, 2], [3, 7, 3])",
+            "expected": "0",
+            "explanation": "Zero determinant indicates linearly dependent rows (row 3 = row 1 + row 2)"
+          },
+          {
+            "input": "determinant_3x3([1, 2, 3], [4, 5, 6], [7, 8, 9])",
+            "expected": "0",
+            "explanation": "Collinear rows give zero determinant: each row differs by a constant multiple"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting the alternating sign pattern: must use +, -, + for the three terms",
+        "Computing the wrong 2×2 minors: ensure you're deleting the correct row and column",
+        "Incorrect indexing when extracting submatrix elements from the rows",
+        "Not reusing the 2×2 determinant function, leading to code duplication and errors"
+      ],
+      "hint": "For each element in the first row, compute the 2×2 determinant of the submatrix that remains after removing that element's row and column. Remember to alternate signs starting with +.",
+      "references": [
+        "Cofactor expansion and Laplace's formula",
+        "Determinant properties and geometric interpretation",
+        "Connection between determinants and linear independence"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Perpendicularity and the Dot Product Test",
+      "relation_to_problem": "The defining property of the cross product is that it produces a vector perpendicular to both input vectors. This sub-quest teaches how to verify perpendicularity using the dot product, which is essential for validating cross product results.",
+      "prerequisites": [
+        "Vector components",
+        "Dot product formula",
+        "Vector orthogonality"
+      ],
+      "learning_objectives": [
+        "Define and compute the dot product of two 3D vectors",
+        "Understand the relationship between dot product and angle between vectors",
+        "Apply the perpendicularity test: $\\vec{a} \\perp \\vec{b} \\iff \\vec{a} \\cdot \\vec{b} = 0$",
+        "Use dot product verification to validate cross product computations"
+      ],
+      "math_content": {
+        "definition": "The **dot product** (also called **scalar product** or **inner product**) of two vectors $\\vec{a} = (a_1, a_2, a_3)$ and $\\vec{b} = (b_1, b_2, b_3)$ is a scalar defined as: $$\\vec{a} \\cdot \\vec{b} = a_1b_1 + a_2b_2 + a_3b_3$$ Geometrically, $\\vec{a} \\cdot \\vec{b} = |\\vec{a}||\\vec{b}|\\cos\\theta$ where $\\theta$ is the angle between the vectors and $|\\vec{v}| = \\sqrt{v_1^2 + v_2^2 + v_3^2}$ is the magnitude.",
+        "notation": "$\\vec{a} \\cdot \\vec{b}$ or $\\langle \\vec{a}, \\vec{b} \\rangle$ denotes the dot product. The result is always a scalar, not a vector.",
+        "theorem": "**Perpendicularity Theorem**: Two non-zero vectors $\\vec{a}$ and $\\vec{b}$ are perpendicular (orthogonal) if and only if their dot product equals zero: $$\\vec{a} \\perp \\vec{b} \\iff \\vec{a} \\cdot \\vec{b} = 0$$ This follows from $\\vec{a} \\cdot \\vec{b} = |\\vec{a}||\\vec{b}|\\cos\\theta = 0$ which occurs when $\\cos\\theta = 0$, i.e., $\\theta = 90°$ or $\\theta = 270°$.",
+        "proof_sketch": "From the geometric definition $\\vec{a} \\cdot \\vec{b} = |\\vec{a}||\\vec{b}|\\cos\\theta$, we have $\\vec{a} \\cdot \\vec{b} = 0$ when either vector is zero or $\\cos\\theta = 0$. For non-zero vectors, $\\cos\\theta = 0$ occurs precisely when $\\theta = \\frac{\\pi}{2} + n\\pi$ for integer $n$, which corresponds to perpendicular orientation.",
+        "examples": [
+          "Example 1: $\\vec{a} = (1, 0, 0)$ and $\\vec{b} = (0, 1, 0)$ are perpendicular because $\\vec{a} \\cdot \\vec{b} = (1)(0) + (0)(1) + (0)(0) = 0$",
+          "Example 2: $\\vec{a} = (1, 2, 3)$ and $\\vec{b} = (-3, 6, -3)$ satisfy $\\vec{a} \\cdot \\vec{b} = (1)(-3) + (2)(6) + (3)(-3) = -3 + 12 - 9 = 0$, hence they are perpendicular",
+          "Example 3: Standard basis vectors are mutually perpendicular: $\\vec{i} \\cdot \\vec{j} = \\vec{j} \\cdot \\vec{k} = \\vec{k} \\cdot \\vec{i} = 0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Dot Product (Component Form)",
+          "latex": "$\\vec{a} \\cdot \\vec{b} = a_1b_1 + a_2b_2 + a_3b_3$",
+          "description": "Sum of products of corresponding components"
+        },
+        {
+          "name": "Dot Product (Geometric Form)",
+          "latex": "$\\vec{a} \\cdot \\vec{b} = |\\vec{a}||\\vec{b}|\\cos\\theta$",
+          "description": "Product of magnitudes times cosine of angle between vectors"
+        },
+        {
+          "name": "Perpendicularity Condition",
+          "latex": "$\\vec{a} \\perp \\vec{b} \\iff \\vec{a} \\cdot \\vec{b} = 0$",
+          "description": "Zero dot product is both necessary and sufficient for perpendicularity"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that checks whether two 3D vectors are perpendicular by computing their dot product and testing if it equals zero (within floating-point tolerance). This verification will be used to confirm that cross product results are correct.",
+        "function_signature": "def are_perpendicular(a: list, b: list, tolerance: float = 1e-9) -> bool:",
+        "starter_code": "def are_perpendicular(a: list, b: list, tolerance: float = 1e-9) -> bool:\n    \"\"\"\n    Check if two 3D vectors are perpendicular.\n    \n    Args:\n        a: First vector [a1, a2, a3]\n        b: Second vector [b1, b2, b3]\n        tolerance: Numerical tolerance for floating-point comparison\n    \n    Returns:\n        True if vectors are perpendicular (dot product ≈ 0), False otherwise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "are_perpendicular([1, 0, 0], [0, 1, 0])",
+            "expected": "True",
+            "explanation": "Standard basis vectors are perpendicular: dot product = 0"
+          },
+          {
+            "input": "are_perpendicular([1, 2, 3], [-3, 6, -3])",
+            "expected": "True",
+            "explanation": "Dot product: 1(-3) + 2(6) + 3(-3) = -3 + 12 - 9 = 0"
+          },
+          {
+            "input": "are_perpendicular([1, 1, 0], [1, 0, 0])",
+            "expected": "False",
+            "explanation": "Dot product: 1(1) + 1(0) + 0(0) = 1 ≠ 0, not perpendicular"
+          },
+          {
+            "input": "are_perpendicular([3, 4, 0], [-4, 3, 0])",
+            "expected": "True",
+            "explanation": "Dot product: 3(-4) + 4(3) + 0(0) = -12 + 12 = 0"
+          },
+          {
+            "input": "are_perpendicular([1, 0, 0], [0, 0, 1])",
+            "expected": "True",
+            "explanation": "Vectors along x-axis and z-axis are perpendicular"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using exact equality (==) instead of approximate equality for floating-point comparisons",
+        "Computing the magnitude instead of the dot product",
+        "Forgetting to sum all three component products",
+        "Confusing dot product (scalar result) with cross product (vector result)"
+      ],
+      "hint": "Multiply corresponding components and sum them. Use abs(dot_product) < tolerance to handle floating-point precision issues.",
+      "references": [
+        "Inner product spaces and orthogonality",
+        "Geometric interpretation of dot product",
+        "Floating-point arithmetic and numerical tolerance"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "The Right-Hand Rule and Cross Product Sign Convention",
+      "relation_to_problem": "The cross product must follow the right-hand rule to determine the correct direction of the result vector. This sub-quest teaches the alternating sign pattern in the cross product formula and how it encodes the right-hand rule convention.",
+      "prerequisites": [
+        "3×3 determinants",
+        "Vector perpendicularity",
+        "3D coordinate systems"
+      ],
+      "learning_objectives": [
+        "Understand the right-hand rule for determining cross product direction",
+        "Recognize the sign pattern (+, -, +) in the cross product component formula",
+        "Apply the complete cross product formula: $\\vec{a} \\times \\vec{b} = (a_2b_3 - a_3b_2, a_3b_1 - a_1b_3, a_1b_2 - a_2b_1)$",
+        "Verify that the result satisfies both perpendicularity and right-hand rule"
+      ],
+      "math_content": {
+        "definition": "The **cross product** $\\vec{a} \\times \\vec{b}$ of two vectors $\\vec{a} = (a_1, a_2, a_3)$ and $\\vec{b} = (b_1, b_2, b_3)$ in $\\mathbb{R}^3$ is the unique vector $\\vec{c} = (c_1, c_2, c_3)$ such that: (1) $\\vec{c} \\perp \\vec{a}$ and $\\vec{c} \\perp \\vec{b}$, (2) $|\\vec{c}| = |\\vec{a}||\\vec{b}|\\sin\\theta$ where $\\theta$ is the angle between $\\vec{a}$ and $\\vec{b}$, (3) The triple $(\\vec{a}, \\vec{b}, \\vec{c})$ forms a right-handed system. The components are: $$\\vec{a} \\times \\vec{b} = (a_2b_3 - a_3b_2, a_3b_1 - a_1b_3, a_1b_2 - a_2b_1)$$",
+        "notation": "$\\vec{a} \\times \\vec{b}$ denotes the cross product. Alternative notation: $[\\vec{a}, \\vec{b}]$ or $\\vec{a} \\wedge \\vec{b}$ (in exterior algebra). The cross product is also written as $\\begin{vmatrix} \\vec{i} & \\vec{j} & \\vec{k} \\\\ a_1 & a_2 & a_3 \\\\ b_1 & b_2 & b_3 \\end{vmatrix}$ using determinant notation.",
+        "theorem": "**Right-Hand Rule Theorem**: The direction of $\\vec{a} \\times \\vec{b}$ is determined by the right-hand rule: when the fingers of the right hand curl from $\\vec{a}$ toward $\\vec{b}$ through the smaller angle, the thumb points in the direction of $\\vec{a} \\times \\vec{b}$. This orientation is encoded in the formula through the specific order of component subtractions.",
+        "proof_sketch": "The formula $\\vec{a} \\times \\vec{b} = \\begin{vmatrix} \\vec{i} & \\vec{j} & \\vec{k} \\\\ a_1 & a_2 & a_3 \\\\ b_1 & b_2 & b_3 \\end{vmatrix}$ arises from cofactor expansion. The alternating signs (+$\\vec{i}$, -$\\vec{j}$, +$\\vec{k}$) ensure that $\\vec{i} \\times \\vec{j} = \\vec{k}$, $\\vec{j} \\times \\vec{k} = \\vec{i}$, $\\vec{k} \\times \\vec{i} = \\vec{j}$, establishing right-handedness. The anticommutativity $\\vec{a} \\times \\vec{b} = -\\vec{b} \\times \\vec{a}$ follows from swapping determinant rows.",
+        "examples": [
+          "Example 1: $\\vec{i} \\times \\vec{j} = (1, 0, 0) \\times (0, 1, 0) = (0 \\cdot 0 - 0 \\cdot 1, 0 \\cdot 0 - 1 \\cdot 0, 1 \\cdot 1 - 0 \\cdot 0) = (0, 0, 1) = \\vec{k}$",
+          "Example 2: $\\vec{a} = (1, 2, 3)$ and $\\vec{b} = (4, 5, 6)$ give $\\vec{a} \\times \\vec{b} = (2 \\cdot 6 - 3 \\cdot 5, 3 \\cdot 4 - 1 \\cdot 6, 1 \\cdot 5 - 2 \\cdot 4) = (12 - 15, 12 - 6, 5 - 8) = (-3, 6, -3)$",
+          "Example 3 (Parallel Vectors): $\\vec{a} = (1, 2, 3)$ and $\\vec{b} = (2, 4, 6)$ give $\\vec{a} \\times \\vec{b} = (8 - 12, 6 - 6, 4 - 4) = (-4, 0, 0)$... wait, let me recalculate: $(2 \\cdot 6 - 3 \\cdot 4, 3 \\cdot 2 - 1 \\cdot 6, 1 \\cdot 4 - 2 \\cdot 2) = (12 - 12, 6 - 6, 4 - 4) = (0, 0, 0)$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cross Product Component Formula",
+          "latex": "$\\vec{a} \\times \\vec{b} = (a_2b_3 - a_3b_2, a_3b_1 - a_1b_3, a_1b_2 - a_2b_1)$",
+          "description": "The complete formula for computing each component of the cross product"
+        },
+        {
+          "name": "Determinant Form",
+          "latex": "$\\vec{a} \\times \\vec{b} = \\begin{vmatrix} \\vec{i} & \\vec{j} & \\vec{k} \\\\ a_1 & a_2 & a_3 \\\\ b_1 & b_2 & b_3 \\end{vmatrix} = \\vec{i}\\begin{vmatrix} a_2 & a_3 \\\\ b_2 & b_3 \\end{vmatrix} - \\vec{j}\\begin{vmatrix} a_1 & a_3 \\\\ b_1 & b_3 \\end{vmatrix} + \\vec{k}\\begin{vmatrix} a_1 & a_2 \\\\ b_1 & b_2 \\end{vmatrix}$",
+          "description": "Determinant representation showing connection to cofactor expansion"
+        },
+        {
+          "name": "Magnitude Formula",
+          "latex": "$|\\vec{a} \\times \\vec{b}| = |\\vec{a}||\\vec{b}|\\sin\\theta$",
+          "description": "The magnitude equals the area of the parallelogram spanned by the vectors"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the individual components of the cross product result vector by applying the formula with correct signs. This synthesizes all previous sub-quests: extracting components, computing 2×2 determinants with proper signs, and producing a vector perpendicular to both inputs.",
+        "function_signature": "def compute_cross_product_components(a: list, b: list) -> tuple:",
+        "starter_code": "def compute_cross_product_components(a: list, b: list) -> tuple:\n    \"\"\"\n    Compute the three components of the cross product a × b.\n    \n    Args:\n        a: First 3D vector [a1, a2, a3]\n        b: Second 3D vector [b1, b2, b3]\n    \n    Returns:\n        A tuple (c1, c2, c3) representing the cross product components\n    \n    Hint: Use the formulas:\n        c1 = a2*b3 - a3*b2\n        c2 = a3*b1 - a1*b3 (note the order!)\n        c3 = a1*b2 - a2*b1\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_cross_product_components([1, 0, 0], [0, 1, 0])",
+            "expected": "(0, 0, 1)",
+            "explanation": "i × j = k: Components are (0·0 - 0·1, 0·0 - 1·0, 1·1 - 0·0) = (0, 0, 1)"
+          },
+          {
+            "input": "compute_cross_product_components([1, 2, 3], [4, 5, 6])",
+            "expected": "(-3, 6, -3)",
+            "explanation": "c1 = 2·6 - 3·5 = -3, c2 = 3·4 - 1·6 = 6, c3 = 1·5 - 2·4 = -3"
+          },
+          {
+            "input": "compute_cross_product_components([2, 3, 4], [5, 6, 7])",
+            "expected": "(-3, 6, -3)",
+            "explanation": "c1 = 3·7 - 4·6 = -3, c2 = 4·5 - 2·7 = 6, c3 = 2·6 - 3·5 = -3"
+          },
+          {
+            "input": "compute_cross_product_components([1, 0, 0], [1, 0, 0])",
+            "expected": "(0, 0, 0)",
+            "explanation": "Cross product of a vector with itself is zero vector (parallel vectors)"
+          },
+          {
+            "input": "compute_cross_product_components([3, -3, 1], [4, 9, 2])",
+            "expected": "(-15, -2, 39)",
+            "explanation": "c1 = -3·2 - 1·9 = -15, c2 = 1·4 - 3·2 = -2, c3 = 3·9 - (-3)·4 = 39"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting the negative sign in the second component (j-component): it's a3*b1 - a1*b3, not a1*b3 - a3*b1",
+        "Using the wrong indices: mixing up which components to multiply",
+        "Returning a scalar instead of a tuple/list with three components",
+        "Not handling the case of parallel vectors (which produces zero vector)"
+      ],
+      "hint": "For the second component (j-component), notice the index pattern differs: it uses indices 1 and 3 (skipping 2), and the subtraction order is swapped compared to the other components to maintain the alternating sign pattern.",
+      "references": [
+        "Right-hand rule in physics and engineering",
+        "Anticommutativity of cross product",
+        "Applications: torque, angular momentum, surface normals in graphics"
+      ]
+    }
+  ]
+}

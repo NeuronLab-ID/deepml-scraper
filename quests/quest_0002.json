@@ -1,0 +1,407 @@
+{
+  "problem_id": 2,
+  "title": "Transpose of a Matrix",
+  "category": "Linear Algebra",
+  "difficulty": "easy",
+  "description": "Write a Python function that computes the transpose of a given 2D matrix. The transpose of a matrix is formed by turning its rows into columns and columns into rows. For an m×n matrix, the transpose will be an n×m matrix.",
+  "example": {
+    "input": "a = [[1, 2, 3], [4, 5, 6]]",
+    "output": "[[1, 4], [2, 5], [3, 6]]",
+    "reasoning": "The input is a 2×3 matrix. The transpose swaps rows and columns: the first row [1, 2, 3] becomes the first column, and the second row [4, 5, 6] becomes the second column, resulting in a 3×2 matrix."
+  },
+  "starter_code": "def transpose_matrix(a: list[list[int|float]]) -> list[list[int|float]]:\n    \"\"\"\n    Transpose a 2D matrix by swapping rows and columns.\n    \n    Args:\n        a: A 2D matrix of shape (m, n)\n    \n    Returns:\n        The transposed matrix of shape (n, m)\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Matrix Structure and Index Notation",
+      "relation_to_problem": "Before transposing a matrix, you must understand how matrices are structured as 2D arrays and how to access individual elements using row-column indexing, which is fundamental to swapping rows and columns.",
+      "prerequisites": [
+        "Basic Python lists",
+        "Nested data structures",
+        "For loops"
+      ],
+      "learning_objectives": [
+        "Understand matrix representation as nested lists in Python",
+        "Master index notation $a_{ij}$ for accessing matrix elements",
+        "Determine matrix dimensions from a 2D structure",
+        "Navigate through matrix elements systematically"
+      ],
+      "math_content": {
+        "definition": "A **matrix** is a rectangular array of numbers arranged in rows and columns. A matrix $A$ with $m$ rows and $n$ columns is said to have **order** or **dimension** $m \\times n$. Each element in the matrix is uniquely identified by its position using a two-index system: $a_{ij}$ denotes the element in the $i$-th row and $j$-th column, where $1 \\leq i \\leq m$ and $1 \\leq j \\leq n$.",
+        "notation": "$A = [a_{ij}]_{m \\times n}$ represents a matrix with elements $a_{ij}$ where $i$ is the row index and $j$ is the column index. In Python, this translates to `A[i-1][j-1]` due to zero-based indexing.",
+        "theorem": "**Dimension Theorem**: For any matrix $A$ represented as a list of lists in Python, if $A$ has $m$ rows and each row has $n$ elements, then $\\text{dim}(A) = m \\times n$, where $m = \\text{len}(A)$ and $n = \\text{len}(A[0])$ for non-empty matrices.",
+        "proof_sketch": "By definition, a matrix is a collection of row vectors stacked vertically. Each row vector contains $n$ elements (columns), and there are $m$ such rows. Thus, the total structure forms an $m \\times n$ rectangular grid.",
+        "examples": [
+          "For $A = \\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{pmatrix}$, we have $a_{11} = 1$, $a_{12} = 2$, $a_{21} = 4$, and $\\text{dim}(A) = 2 \\times 3$",
+          "In Python: `A = [[1, 2, 3], [4, 5, 6]]` means `A[0][0] = 1` (first row, first column), `A[1][2] = 6` (second row, third column)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Matrix Dimensions",
+          "latex": "$m = \\text{number of rows}, \\quad n = \\text{number of columns}$",
+          "description": "Used to determine the shape of a matrix before any transformation"
+        },
+        {
+          "name": "Element Access",
+          "latex": "$a_{ij}$ in mathematics $\\leftrightarrow$ `A[i-1][j-1]` in Python",
+          "description": "Conversion between mathematical notation (1-indexed) and Python implementation (0-indexed)"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes a 2D matrix and returns a tuple containing its dimensions (number of rows, number of columns) and extracts a specific element at position (i, j) using mathematical 1-based indexing.",
+        "function_signature": "def get_matrix_info(matrix: list[list[int|float]], i: int, j: int) -> tuple[int, int, int|float]:",
+        "starter_code": "def get_matrix_info(matrix: list[list[int|float]], i: int, j: int) -> tuple[int, int, int|float]:\n    \"\"\"\n    Get matrix dimensions and extract element at position (i, j).\n    \n    Args:\n        matrix: 2D matrix\n        i: row position (1-indexed)\n        j: column position (1-indexed)\n    \n    Returns:\n        Tuple of (num_rows, num_cols, element_at_ij)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "get_matrix_info([[1, 2, 3], [4, 5, 6]], 1, 2)",
+            "expected": "(2, 3, 2)",
+            "explanation": "Matrix has 2 rows and 3 columns. Element at position (1,2) is 2 (first row, second column)"
+          },
+          {
+            "input": "get_matrix_info([[7, 8], [9, 10], [11, 12]], 3, 1)",
+            "expected": "(3, 2, 11)",
+            "explanation": "Matrix has 3 rows and 2 columns. Element at position (3,1) is 11 (third row, first column)"
+          },
+          {
+            "input": "get_matrix_info([[5]], 1, 1)",
+            "expected": "(1, 1, 5)",
+            "explanation": "A 1×1 matrix contains only one element at position (1,1)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row and column indices (using $a_{ji}$ instead of $a_{ij}$)",
+        "Forgetting that Python uses 0-based indexing while mathematical notation uses 1-based indexing",
+        "Assuming all rows have the same length without validation (jagged arrays)",
+        "Off-by-one errors when converting between mathematical and programming notation"
+      ],
+      "hint": "Remember that len(matrix) gives you the number of rows, and len(matrix[0]) gives you the number of columns. For element access, subtract 1 from mathematical indices to get Python indices.",
+      "references": [
+        "Matrix representation in computer memory",
+        "Index notation in linear algebra",
+        "Row-major vs column-major order"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Extracting and Constructing Rows and Columns",
+      "relation_to_problem": "Transposing a matrix requires converting rows into columns and columns into rows. Mastering how to extract a specific column or row from a matrix is the foundational operation for building the transposed matrix.",
+      "prerequisites": [
+        "Matrix indexing",
+        "List comprehensions",
+        "Nested loops"
+      ],
+      "learning_objectives": [
+        "Extract any row from a matrix efficiently",
+        "Extract any column from a matrix by iterating through rows",
+        "Understand the asymmetry between row and column access in nested lists",
+        "Build new lists from extracted matrix components"
+      ],
+      "math_content": {
+        "definition": "For a matrix $A = [a_{ij}]_{m \\times n}$, the **$i$-th row** is the horizontal vector $R_i = [a_{i1}, a_{i2}, \\ldots, a_{in}]$, and the **$j$-th column** is the vertical vector $C_j = [a_{1j}, a_{2j}, \\ldots, a_{mj}]^T$. In the context of the transpose operation, each row of $A$ becomes a column of $A^T$, and each column of $A$ becomes a row of $A^T$.",
+        "notation": "$R_i(A)$ denotes the $i$-th row of matrix $A$, and $C_j(A)$ denotes the $j$-th column. In Python: row $i$ is `A[i-1]` (direct access), while column $j$ requires extraction: `[A[k][j-1] for k in range(len(A))]`.",
+        "theorem": "**Row-Column Duality in Transpose**: For any matrix $A$ of dimension $m \\times n$, the $i$-th row of $A$ equals the $i$-th column of $A^T$, and the $j$-th column of $A$ equals the $j$-th row of $A^T$. Formally: $R_i(A) = C_i(A^T)$ and $C_j(A) = R_j(A^T)$.",
+        "proof_sketch": "By definition of transpose, $(A^T)_{ji} = A_{ij}$. For the $i$-th row of $A$: $R_i(A) = [a_{i1}, a_{i2}, \\ldots, a_{in}]$. For the $i$-th column of $A^T$: $C_i(A^T) = [(A^T)_{1i}, (A^T)_{2i}, \\ldots, (A^T)_{ni}] = [a_{i1}, a_{i2}, \\ldots, a_{in}]$. Therefore, $R_i(A) = C_i(A^T)$.",
+        "examples": [
+          "Given $A = \\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{pmatrix}$: Row 1 is $[1, 2, 3]$, Row 2 is $[4, 5, 6]$",
+          "Column 1 is $\\begin{pmatrix} 1 \\\\ 4 \\end{pmatrix}$ or $[1, 4]$, Column 2 is $[2, 5]$, Column 3 is $[3, 6]$",
+          "In Python: `A[0]` gives `[1, 2, 3]`, but getting column 2 requires `[A[0][1], A[1][1]]` which gives `[2, 5]`"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Row Extraction",
+          "latex": "$R_i(A) = [a_{i1}, a_{i2}, \\ldots, a_{in}]$",
+          "description": "Direct access in Python: `A[i-1]`"
+        },
+        {
+          "name": "Column Extraction",
+          "latex": "$C_j(A) = [a_{1j}, a_{2j}, \\ldots, a_{mj}]$",
+          "description": "Requires iteration in Python: `[row[j-1] for row in A]`"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that extracts a specific column from a matrix. Given a 2D matrix and a column index j (1-indexed), return the j-th column as a list. This operation is essential because it's what you need to do repeatedly when transposing.",
+        "function_signature": "def extract_column(matrix: list[list[int|float]], j: int) -> list[int|float]:",
+        "starter_code": "def extract_column(matrix: list[list[int|float]], j: int) -> list[int|float]:\n    \"\"\"\n    Extract the j-th column from a matrix.\n    \n    Args:\n        matrix: 2D matrix of shape (m, n)\n        j: column index (1-indexed)\n    \n    Returns:\n        List containing the j-th column elements\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "extract_column([[1, 2, 3], [4, 5, 6]], 1)",
+            "expected": "[1, 4]",
+            "explanation": "First column contains elements from position (1,1) and (2,1): [1, 4]"
+          },
+          {
+            "input": "extract_column([[1, 2, 3], [4, 5, 6]], 3)",
+            "expected": "[3, 6]",
+            "explanation": "Third column contains elements from position (1,3) and (2,3): [3, 6]"
+          },
+          {
+            "input": "extract_column([[7, 8], [9, 10], [11, 12]], 2)",
+            "expected": "[8, 10, 12]",
+            "explanation": "Second column of a 3×2 matrix contains elements [8, 10, 12]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Trying to access a column with `A[j]` (this gives you a row, not a column)",
+        "Forgetting to convert from 1-indexed (mathematical) to 0-indexed (Python) when accessing column elements",
+        "Not iterating through all rows when extracting a column",
+        "Confusing column extraction with row extraction syntax"
+      ],
+      "hint": "To get column j, you need to visit every row and collect the element at position j from each row. Use a list comprehension or loop through all rows.",
+      "references": [
+        "List comprehensions in Python",
+        "Vector extraction from matrices",
+        "Row-major storage format"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Formal Definition of Matrix Transpose",
+      "relation_to_problem": "Understanding the mathematical definition of transpose operation provides the theoretical foundation for implementing the algorithm. It precisely defines the relationship between elements in the original and transposed matrices.",
+      "prerequisites": [
+        "Matrix indexing",
+        "Index notation",
+        "Row and column extraction"
+      ],
+      "learning_objectives": [
+        "Understand the formal mathematical definition of matrix transpose",
+        "Apply the index transformation rule $(A^T)_{ij} = A_{ji}$",
+        "Recognize how dimensions change under transposition",
+        "Verify transpose properties with concrete examples"
+      ],
+      "math_content": {
+        "definition": "Let $A = [a_{ij}]$ be an $m \\times n$ matrix. The **transpose** of $A$, denoted $A^T$, is the $n \\times m$ matrix defined by $(A^T)_{ij} = a_{ji}$ for all $1 \\leq i \\leq n$ and $1 \\leq j \\leq m$. Equivalently, the transpose is obtained by interchanging the rows and columns of $A$: the $i$-th row of $A$ becomes the $i$-th column of $A^T$, and the $j$-th column of $A$ becomes the $j$-th row of $A^T$.",
+        "notation": "$A^T$ or $A'$ denotes the transpose. Element notation: $(A^T)_{ij} = A_{ji}$. Dimension notation: if $A \\in \\mathbb{R}^{m \\times n}$, then $A^T \\in \\mathbb{R}^{n \\times m}$.",
+        "theorem": "**Fundamental Properties of Transpose**: For matrices $A$ and $B$ of appropriate dimensions and scalar $c$: (1) $(A^T)^T = A$ (involution), (2) $(A + B)^T = A^T + B^T$ (additivity), (3) $(cA)^T = cA^T$ (scalar compatibility), (4) $(AB)^T = B^T A^T$ (reversal property), (5) $\\det(A) = \\det(A^T)$ for square matrices.",
+        "proof_sketch": "**Proof of $(A^T)^T = A$**: Let $B = A^T$. Then $b_{ij} = a_{ji}$ by definition. Taking the transpose of $B$: $(B^T)_{ij} = b_{ji} = a_{ij}$. Thus $(A^T)^T = A$. **Proof of $(AB)^T = B^T A^T$**: Let $C = AB$. Then $c_{ij} = \\sum_{k=1}^{p} a_{ik}b_{kj}$. For the transpose: $(C^T)_{ij} = c_{ji} = \\sum_{k=1}^{p} a_{jk}b_{ki} = \\sum_{k=1}^{p} (A^T)_{kj}(B^T)_{ik} = \\sum_{k=1}^{p} (B^T)_{ik}(A^T)_{kj} = (B^T A^T)_{ij}$.",
+        "examples": [
+          "Let $A = \\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{pmatrix}_{2\\times 3}$. Then $A^T = \\begin{pmatrix} 1 & 4 \\\\ 2 & 5 \\\\ 3 & 6 \\end{pmatrix}_{3\\times 2}$. Verify: $(A^T)_{12} = 4 = A_{21}$ ✓",
+          "For symmetric matrix $S = \\begin{pmatrix} 1 & 2 \\\\ 2 & 3 \\end{pmatrix}$, we have $S^T = S$ (the defining property of symmetric matrices)",
+          "Column vector $v = \\begin{pmatrix} 1 \\\\ 2 \\\\ 3 \\end{pmatrix}_{3\\times 1}$ transposes to row vector $v^T = \\begin{pmatrix} 1 & 2 & 3 \\end{pmatrix}_{1\\times 3}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Transpose Definition",
+          "latex": "$(A^T)_{ij} = A_{ji}$",
+          "description": "The fundamental index transformation rule: row and column indices are swapped"
+        },
+        {
+          "name": "Dimension Transformation",
+          "latex": "$A \\in \\mathbb{R}^{m \\times n} \\Rightarrow A^T \\in \\mathbb{R}^{n \\times m}$",
+          "description": "Transposition swaps the dimensions of the matrix"
+        },
+        {
+          "name": "Double Transpose Property",
+          "latex": "$(A^T)^T = A$",
+          "description": "Transposing twice returns the original matrix (involution property)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that verifies whether a given matrix is symmetric. A matrix is symmetric if and only if $A = A^T$, which means $a_{ij} = a_{ji}$ for all valid indices. This requires understanding the transpose relationship without actually computing the full transpose.",
+        "function_signature": "def is_symmetric(matrix: list[list[int|float]]) -> bool:",
+        "starter_code": "def is_symmetric(matrix: list[list[int|float]]) -> bool:\n    \"\"\"\n    Check if a matrix is symmetric (A = A^T).\n    \n    Args:\n        matrix: 2D square matrix\n    \n    Returns:\n        True if symmetric, False otherwise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "is_symmetric([[1, 2], [2, 3]])",
+            "expected": "True",
+            "explanation": "Element (1,2) = 2 equals element (2,1) = 2, so the matrix equals its transpose"
+          },
+          {
+            "input": "is_symmetric([[1, 2, 3], [4, 5, 6]])",
+            "expected": "False",
+            "explanation": "Non-square matrices cannot be symmetric (different dimensions than transpose)"
+          },
+          {
+            "input": "is_symmetric([[1, 2], [3, 4]])",
+            "expected": "False",
+            "explanation": "Element (1,2) = 2 but element (2,1) = 3, so A ≠ A^T"
+          },
+          {
+            "input": "is_symmetric([[5]])",
+            "expected": "True",
+            "explanation": "A 1×1 matrix is always symmetric"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that only square matrices can be symmetric (m must equal n)",
+        "Only checking upper triangular elements without checking lower triangular",
+        "Computing the full transpose when you only need to check element pairs",
+        "Off-by-one errors in index comparisons"
+      ],
+      "hint": "A matrix is symmetric if a[i][j] == a[j][i] for all i, j. First check if the matrix is square, then compare elements above and below the diagonal.",
+      "references": [
+        "Symmetric matrices",
+        "Matrix properties",
+        "Diagonal and off-diagonal elements"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Dimension Analysis and Memory Allocation for Transpose",
+      "relation_to_problem": "Before computing the transpose, you must determine the dimensions of the result matrix. An m×n matrix transposes to an n×m matrix. Understanding this dimension swap is critical for correctly allocating the result structure.",
+      "prerequisites": [
+        "Matrix dimensions",
+        "Transpose definition",
+        "List initialization in Python"
+      ],
+      "learning_objectives": [
+        "Calculate output dimensions from input dimensions for transpose",
+        "Pre-allocate result matrices with correct dimensions",
+        "Understand why dimension transformation is necessary",
+        "Initialize nested lists with proper structure"
+      ],
+      "math_content": {
+        "definition": "Given a matrix $A \\in \\mathbb{R}^{m \\times n}$ (having $m$ rows and $n$ columns), its transpose $A^T \\in \\mathbb{R}^{n \\times m}$ has $n$ rows and $m$ columns. The **dimension transformation** under transpose is the mapping $(m, n) \\mapsto (n, m)$. This is a bijective operation since applying it twice returns the original dimensions: $(n, m) \\mapsto (m, n)$.",
+        "notation": "If $\\text{shape}(A) = (m, n)$, then $\\text{shape}(A^T) = (n, m)$. The number of rows in $A^T$ equals the number of columns in $A$, and vice versa.",
+        "theorem": "**Dimension Conservation**: The total number of elements is preserved under transposition. If $A$ has $mn$ elements, then $A^T$ also has $mn$ elements, since $\\text{shape}(A) = (m,n)$ and $\\text{shape}(A^T) = (n,m)$ both yield $m \\cdot n$ total elements. This follows from the bijective nature of the row-column interchange.",
+        "proof_sketch": "Let $A$ be $m \\times n$. The total elements in $A$ is $|A| = m \\cdot n$. By definition, $A^T$ is $n \\times m$, so $|A^T| = n \\cdot m = m \\cdot n = |A|$. Since transposition creates a one-to-one correspondence between elements ($(A^T)_{ij} = A_{ji}$), no elements are created or destroyed, only repositioned.",
+        "examples": [
+          "Matrix $A$ with shape $(2, 3)$ transposes to $A^T$ with shape $(3, 2)$. Both contain $2 \\times 3 = 6$ elements.",
+          "Column vector shape $(n, 1)$ transposes to row vector shape $(1, n)$.",
+          "Square matrix shape $(n, n)$ transposes to shape $(n, n)$ (dimensions unchanged, but elements may move unless symmetric)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Transpose Dimension Formula",
+          "latex": "$\\text{if } A \\text{ is } m \\times n, \\text{ then } A^T \\text{ is } n \\times m$",
+          "description": "The dimensions are swapped during transposition"
+        },
+        {
+          "name": "Element Count Invariant",
+          "latex": "$|A| = m \\cdot n = n \\cdot m = |A^T|$",
+          "description": "Total number of elements remains constant under transpose"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that creates an empty result matrix with the correct dimensions for storing a transpose. Given an m×n input matrix, create and return an n×m matrix initialized with zeros. This demonstrates proper memory allocation before filling in the transposed values.",
+        "function_signature": "def create_transpose_structure(matrix: list[list[int|float]]) -> list[list[int|float]]:",
+        "starter_code": "def create_transpose_structure(matrix: list[list[int|float]]) -> list[list[int|float]]:\n    \"\"\"\n    Create an empty matrix with dimensions for the transpose of input matrix.\n    \n    Args:\n        matrix: Input matrix of shape (m, n)\n    \n    Returns:\n        Zero-initialized matrix of shape (n, m)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "create_transpose_structure([[1, 2, 3], [4, 5, 6]])",
+            "expected": "[[0, 0], [0, 0], [0, 0]]",
+            "explanation": "Input is 2×3, so output structure is 3×2 (3 rows, 2 columns of zeros)"
+          },
+          {
+            "input": "create_transpose_structure([[1, 2], [3, 4], [5, 6]])",
+            "expected": "[[0, 0, 0], [0, 0, 0]]",
+            "explanation": "Input is 3×2, so output structure is 2×3 (2 rows, 3 columns of zeros)"
+          },
+          {
+            "input": "create_transpose_structure([[5]])",
+            "expected": "[[0]]",
+            "explanation": "Input is 1×1, so output structure is also 1×1"
+          },
+          {
+            "input": "create_transpose_structure([[1, 2, 3, 4]])",
+            "expected": "[[0], [0], [0], [0]]",
+            "explanation": "Input is 1×4 (row vector), so output structure is 4×1 (column vector)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Creating a matrix with the same dimensions as input instead of swapped dimensions",
+        "Confusing which dimension (m or n) should become the number of rows vs columns",
+        "Not initializing all elements (leaving some undefined)",
+        "Creating jagged arrays (rows with different lengths)"
+      ],
+      "hint": "If the input has m rows and n columns, the output should have n rows and m columns. Use nested list comprehension or loops to create the structure: [[0 for _ in range(m)] for _ in range(n)].",
+      "references": [
+        "Matrix memory allocation",
+        "Nested list initialization",
+        "Dimension analysis"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Complete Transpose Algorithm with Index Mapping",
+      "relation_to_problem": "This is the culmination of all previous concepts: using the transpose definition $(A^T)_{ij} = A_{ji}$, proper dimension allocation, and systematic element copying to implement the full transpose operation efficiently.",
+      "prerequisites": [
+        "Matrix indexing",
+        "Column extraction",
+        "Transpose definition",
+        "Dimension transformation"
+      ],
+      "learning_objectives": [
+        "Implement the complete transpose algorithm using index transformation",
+        "Apply the formula $(A^T)_{ij} = A_{ji}$ systematically",
+        "Choose between different algorithmic approaches (nested loops vs Pythonic methods)",
+        "Verify correctness with edge cases and validate properties"
+      ],
+      "math_content": {
+        "definition": "The **transpose algorithm** is a computational procedure that implements the mathematical definition of transpose by systematically copying each element $a_{ij}$ from the input matrix $A$ to position $(j, i)$ in the output matrix $A^T$. Given input matrix $A$ of dimension $m \\times n$, the algorithm produces output $A^T$ of dimension $n \\times m$ such that $(A^T)_{ij} = A_{ji}$ for all valid indices.",
+        "notation": "Input: $A = [a_{ij}]_{m \\times n}$ where $i \\in \\{1, \\ldots, m\\}$ and $j \\in \\{1, \\ldots, n\\}$. Output: $A^T = [a'_{ij}]_{n \\times m}$ where $a'_{ij} = a_{ji}$.",
+        "theorem": "**Algorithmic Correctness of Transpose**: Given matrix $A$ and algorithm that produces matrix $B$ by the rule $b_{ij} = a_{ji}$ for all $i, j$, then $B = A^T$ and satisfies all transpose properties: (1) $(B^T) = A$, (2) $\\text{shape}(B) = (n, m)$ when $\\text{shape}(A) = (m, n)$, (3) $R_i(A) = C_i(B)$ for all $i$.",
+        "proof_sketch": "The algorithm explicitly constructs $B$ such that $b_{ij} = a_{ji}$, which is the defining property of transpose. Property (1): $(B^T)_{ij} = B_{ji} = a_{ij}$, so $B^T = A$. Property (2): $B$ has $n$ rows (one for each column of $A$) and $m$ columns (one for each row of $A$). Property (3): The $i$-th row of $A$ is $[a_{i1}, a_{i2}, \\ldots, a_{in}]$; the $i$-th column of $B$ is $[b_{1i}, b_{2i}, \\ldots, b_{ni}] = [a_{i1}, a_{i2}, \\ldots, a_{in}]$, confirming $R_i(A) = C_i(B)$.",
+        "examples": [
+          "**Example 1**: $A = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}$. Algorithm: Create $2 \\times 2$ result. Set result[0][0] = A[0][0] = 1, result[0][1] = A[1][0] = 3, result[1][0] = A[0][1] = 2, result[1][1] = A[1][1] = 4. Output: $\\begin{pmatrix} 1 & 3 \\\\ 2 & 4 \\end{pmatrix}$.",
+          "**Example 2**: $A = \\begin{pmatrix} 1 & 2 & 3 \\end{pmatrix}$ (row vector). Algorithm creates $3 \\times 1$ result: $\\begin{pmatrix} 1 \\\\ 2 \\\\ 3 \\end{pmatrix}$ (column vector).",
+          "**Example 3**: Empty matrix handling: $A$ with shape $(0, n)$ transposes to shape $(n, 0)$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Index Transformation Rule",
+          "latex": "$(A^T)_{ij} = A_{ji}$ or equivalently: `result[j][i] = matrix[i][j]`",
+          "description": "Core formula for element placement during transpose"
+        },
+        {
+          "name": "Nested Loop Structure",
+          "latex": "$\\text{for } i = 0 \\text{ to } m-1: \\text{ for } j = 0 \\text{ to } n-1: \\text{ result}[j][i] \\gets A[i][j]$",
+          "description": "Imperative algorithm using nested iteration"
+        },
+        {
+          "name": "Pythonic zip Approach",
+          "latex": "$A^T = [\\text{list}(\\text{col}) \\text{ for col in zip}(*A)]$",
+          "description": "Functional approach using Python's zip unpacking"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the transpose of a matrix using nested loops and explicit index manipulation. For each element matrix[i][j] in the input, place it at position result[j][i] in the output. This implements the fundamental definition $(A^T)_{ij} = A_{ji}$ directly and demonstrates understanding of the index transformation.",
+        "function_signature": "def transpose_with_loops(matrix: list[list[int|float]]) -> list[list[int|float]]:",
+        "starter_code": "def transpose_with_loops(matrix: list[list[int|float]]) -> list[list[int|float]]:\n    \"\"\"\n    Compute matrix transpose using nested loops.\n    \n    Args:\n        matrix: Input matrix of shape (m, n)\n    \n    Returns:\n        Transposed matrix of shape (n, m)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "transpose_with_loops([[1, 2], [3, 4], [5, 6]])",
+            "expected": "[[1, 3, 5], [2, 4, 6]]",
+            "explanation": "Input is 3×2, output is 2×3. First row [1,2] becomes first column [1,3,5] is incorrect - actually first column [1,3,5] of input becomes first row [1,3,5] of output"
+          },
+          {
+            "input": "transpose_with_loops([[1]])",
+            "expected": "[[1]]",
+            "explanation": "Single element matrix is unchanged by transpose"
+          },
+          {
+            "input": "transpose_with_loops([[1, 2, 3]])",
+            "expected": "[[1], [2], [3]]",
+            "explanation": "Row vector (1×3) becomes column vector (3×1)"
+          },
+          {
+            "input": "transpose_with_loops([[1, 2, 3], [4, 5, 6]])",
+            "expected": "[[1, 4], [2, 5], [3, 6]]",
+            "explanation": "Standard 2×3 matrix transposes to 3×2. First column [1,4] of input becomes first row [1,4] of output"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Swapping the wrong indices: using result[i][j] = matrix[j][i] instead of result[j][i] = matrix[i][j]",
+        "Creating result matrix with wrong dimensions (using m×n instead of n×m)",
+        "Iterating with wrong loop bounds (confusing m and n)",
+        "Not handling edge cases like single-row or single-column matrices",
+        "Attempting to transpose in-place (which only works correctly for square matrices with extra care)"
+      ],
+      "hint": "First determine m (number of rows) and n (number of columns) of input. Create result with n rows and m columns. Use nested loops: outer loop over rows (0 to m-1), inner loop over columns (0 to n-1). For each matrix[i][j], place it at result[j][i].",
+      "references": [
+        "Matrix transpose algorithms",
+        "Computational complexity O(mn)",
+        "In-place vs out-of-place transpose",
+        "Python zip function for transpose"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "description": "SW1wbGVtZW50IHRoZSBHcm91cCBSZWxhdGl2ZSBBZHZhbnRhZ2UgY2FsY3VsYXRpb24gdXNlZCBpbiBHUlBPIChHcm91cCBSZWxhdGl2ZSBQb2xpY3kgT3B0aW1pemF0aW9uKSBmcm9tIHRoZSBEZWVwU2VlayBSMSBwYXBlci4gSW4gR1JQTywgZm9yIGVhY2ggcHJvbXB0LCB0aGUgbW9kZWwgZ2VuZXJhdGVzIGEgZ3JvdXAgb2YgRyBvdXRwdXRzLiBFYWNoIG91dHB1dCByZWNlaXZlcyBhIHJld2FyZCwgYW5kIHRoZSBhZHZhbnRhZ2UgZm9yIGVhY2ggb3V0cHV0IGlzIGNvbXB1dGVkIGJ5IG5vcm1hbGl6aW5nIHJld2FyZHMgd2l0aGluIHRoZSBncm91cC4gVGhpcyBub3JtYWxpemF0aW9uIGVuc3VyZXMgdGhhdCB0aGUgcG9saWN5IHVwZGF0ZSBpcyByZWxhdGl2ZSB0byBvdGhlciBvdXRwdXRzIGZvciB0aGUgc2FtZSBwcm9tcHQsIHdoaWNoIGlzIGtleSB0byBHUlBPJ3MgZWZmZWN0aXZlbmVzcy4=",
+  "id": "224",
+  "test_cases": [
+    {
+      "test": "rewards = [1.0, 2.0, 3.0, 4.0, 5.0]\nresult = compute_group_relative_advantage(rewards)\nprint([round(v, 4) for v in result])",
+      "expected_output": "[-1.4142, -0.7071, 0.0, 0.7071, 1.4142]"
+    },
+    {
+      "test": "rewards = [1.0, 1.0, 1.0, 1.0]\nresult = compute_group_relative_advantage(rewards)\nprint([round(v, 4) for v in result])",
+      "expected_output": "[0.0, 0.0, 0.0, 0.0]"
+    }
+  ],
+  "difficulty": "easy",
+  "pytorch_difficulty": "easy",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "rewards = [0.0, 1.0, 0.0, 1.0]",
+    "output": "[-1.0, 1.0, -1.0, 1.0]",
+    "reasoning": "Mean = 0.5, Std = 0.5. Each reward is normalized: (0-0.5)/0.5 = -1.0 for incorrect outputs, (1-0.5)/0.5 = 1.0 for correct outputs. This gives positive advantage to correct responses and negative to incorrect ones."
+  },
+  "category": "Reinforcement Learning",
+  "pytorch_starter_code": "aW1wb3J0IHRvcmNoCgpkZWYgY29tcHV0ZV9ncm91cF9yZWxhdGl2ZV9hZHZhbnRhZ2UocmV3YXJkczogdG9yY2guVGVuc29yKSAtPiB0b3JjaC5UZW5zb3I6CgkiIiIKCUNvbXB1dGUgdGhlIEdyb3VwIFJlbGF0aXZlIEFkdmFudGFnZSBmb3IgR1JQTyB1c2luZyBQeVRvcmNoLgoJCglBcmdzOgoJCXJld2FyZHM6IDFEIHRlbnNvciBvZiByZXdhcmRzIGZvciBhIGdyb3VwIG9mIG91dHB1dHMKCQkKCVJldHVybnM6CgkJMUQgdGVuc29yIG9mIG5vcm1hbGl6ZWQgYWR2YW50YWdlcwoJIiIiCgkjIFlvdXIgY29kZSBoZXJlCglwYXNz",
+  "title": "Group Relative Advantage for GRPO",
+  "starter_code": "import numpy as np\n\ndef compute_group_relative_advantage(rewards: list[float]) -> list[float]:\n\t\"\"\"\n\tCompute the Group Relative Advantage for GRPO.\n\t\n\tFor each reward r_i in a group, compute:\n\tA_i = (r_i - mean(rewards)) / std(rewards)\n\t\n\tIf all rewards are identical (std=0), return zeros.\n\t\n\tArgs:\n\t\trewards: List of rewards for a group of outputs from the same prompt\n\t\t\n\tReturns:\n\t\tList of normalized advantages\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/Open-Deep-ML",
+      "name": "Deep-ML"
+    }
+  ],
+  "pytorch_test_cases": [
+    {
+      "test": "import torch\nrewards = torch.tensor([1.0, 2.0, 3.0, 4.0, 5.0])\nresult = compute_group_relative_advantage(rewards)\nprint([round(v.item(), 4) for v in result])",
+      "expected_output": "[-1.4142, -0.7071, 0.0, 0.7071, 1.4142]"
+    },
+    {
+      "test": "import torch\nrewards = torch.tensor([1.0, 1.0, 1.0, 1.0])\nresult = compute_group_relative_advantage(rewards)\nprint([round(v.item(), 4) for v in result])",
+      "expected_output": "[0.0, 0.0, 0.0, 0.0]"
+    },
+    {
+      "test": "import torch\nrewards = torch.tensor([0.0, 1.0])\nresult = compute_group_relative_advantage(rewards)\nprint([round(v.item(), 4) for v in result])",
+      "expected_output": "[-1.0, 1.0]"
+    },
+    {
+      "test": "import torch\nrewards = torch.tensor([0.0, 0.0, 1.0, 1.0, 0.5])\nresult = compute_group_relative_advantage(rewards)\nprint([round(v.item(), 4) for v in result])",
+      "expected_output": "[-1.118, -1.118, 1.118, 1.118, 0.0]"
+    }
+  ],
+  "createdAt": "December 9, 2025 at 4:33:58 PM UTC-0500",
+  "learn_section": "IyMgR3JvdXAgUmVsYXRpdmUgQWR2YW50YWdlIGluIEdSUE8KCiMjIyBCYWNrZ3JvdW5kCgpHUlBPIChHcm91cCBSZWxhdGl2ZSBQb2xpY3kgT3B0aW1pemF0aW9uKSBpcyB0aGUgcmVpbmZvcmNlbWVudCBsZWFybmluZyBhbGdvcml0aG0gdXNlZCB0byB0cmFpbiBEZWVwU2Vlay1SMS4gQSBrZXkgaW5ub3ZhdGlvbiBvZiBHUlBPIGlzIGhvdyBpdCBjb21wdXRlcyBhZHZhbnRhZ2VzOiBpbnN0ZWFkIG9mIHVzaW5nIGEgbGVhcm5lZCBjcml0aWMgbmV0d29yayAobGlrZSBpbiBQUE8pLCBHUlBPIGVzdGltYXRlcyBhZHZhbnRhZ2VzIGRpcmVjdGx5IGZyb20gYSBncm91cCBvZiBzYW1wbGVkIG91dHB1dHMuCgojIyMgVGhlIEFsZ29yaXRobQoKRm9yIGVhY2ggcHJvbXB0ICRxJCwgR1JQTyBzYW1wbGVzIGEgZ3JvdXAgb2YgJEckIG91dHB1dHMgJFx7b18xLCBvXzIsIFxsZG90cywgb19HXH0kIGZyb20gdGhlIGN1cnJlbnQgcG9saWN5LiBFYWNoIG91dHB1dCByZWNlaXZlcyBhIHJld2FyZCAkcl9pJCAoZS5nLiwgMSBmb3IgY29ycmVjdCwgMCBmb3IgaW5jb3JyZWN0KS4KClRoZSBhZHZhbnRhZ2UgZm9yIGVhY2ggb3V0cHV0IGlzIGNvbXB1dGVkIGFzOgoKJCRBX2kgPSBcZnJhY3tyX2kgLSBcdGV4dHttZWFufShce3JfMSwgcl8yLCBcbGRvdHMsIHJfR1x9KX17XHRleHR7c3RkfShce3JfMSwgcl8yLCBcbGRvdHMsIHJfR1x9KX0kJAoKIyMjIFdoeSBHcm91cCBSZWxhdGl2ZT8KClRoaXMgbm9ybWFsaXphdGlvbiBoYXMgc2V2ZXJhbCBiZW5lZml0czoKCjEuICoqTm8gQ3JpdGljIE5ldHdvcmsqKjogVHJhZGl0aW9uYWwgYWN0b3ItY3JpdGljIG1ldGhvZHMgcmVxdWlyZSB0cmFpbmluZyBhIHZhbHVlIGZ1bmN0aW9uICRWKHMpJCB0byBlc3RpbWF0ZSBiYXNlbGluZXMuIEdSUE8gZWxpbWluYXRlcyB0aGlzIGJ5IHVzaW5nIHRoZSBncm91cCBtZWFuIGFzIHRoZSBiYXNlbGluZSwgc2F2aW5nIGNvbXB1dGUgYW5kIG1lbW9yeS4KCjIuICoqUmVsYXRpdmUgQ29tcGFyaXNvbioqOiBUaGUgYWR2YW50YWdlIG1lYXN1cmVzIGhvdyBtdWNoIGJldHRlciBvciB3b3JzZSBhbiBvdXRwdXQgaXMgY29tcGFyZWQgdG8gb3RoZXIgb3V0cHV0cyBmb3IgdGhlIHNhbWUgcHJvbXB0LiBUaGlzIGlzIG1vcmUgbWVhbmluZ2Z1bCB0aGFuIGFic29sdXRlIHJld2FyZHMuCgozLiAqKlNjYWxlIEludmFyaWFuY2UqKjogRGl2aWRpbmcgYnkgc3RhbmRhcmQgZGV2aWF0aW9uIG5vcm1hbGl6ZXMgdGhlIGdyYWRpZW50IHVwZGF0ZXMsIHByZXZlbnRpbmcgaXNzdWVzIHdoZW4gcmV3YXJkIG1hZ25pdHVkZXMgdmFyeSBhY3Jvc3MgZGlmZmVyZW50IHByb21wdHMuCgojIyMgRXhhbXBsZQoKU3VwcG9zZSB3ZSBzYW1wbGUgNCBvdXRwdXRzIGZvciBhIG1hdGggcHJvYmxlbToKLSBPdXRwdXQgMTogV3JvbmcgYW5zd2VyIC0+IHJld2FyZCA9IDAKLSBPdXRwdXQgMjogQ29ycmVjdCBhbnN3ZXIgLT4gcmV3YXJkID0gMQotIE91dHB1dCAzOiBXcm9uZyBhbnN3ZXIgLT4gcmV3YXJkID0gMAotIE91dHB1dCA0OiBDb3JyZWN0IGFuc3dlciAtPiByZXdhcmQgPSAxCgpDb21wdXRlIHN0YXRpc3RpY3M6Ci0gTWVhbiA9ICgwICsgMSArIDAgKyAxKSAvIDQgPSAwLjUKLSBTdGQgPSAwLjUKCkFkdmFudGFnZXM6Ci0gJEFfMSA9ICgwIC0gMC41KSAvIDAuNSA9IC0xJCAocGVuYWxpemUgd3JvbmcgYW5zd2VyKQotICRBXzIgPSAoMSAtIDAuNSkgLyAwLjUgPSArMSQgKHJld2FyZCBjb3JyZWN0IGFuc3dlcikKLSAkQV8zID0gLTEkCi0gJEFfNCA9ICsxJAoKIyMjIEVkZ2UgQ2FzZTogQWxsIFNhbWUgUmV3YXJkcwoKSWYgYWxsIG91dHB1dHMgcmVjZWl2ZSB0aGUgc2FtZSByZXdhcmQgKGUuZy4sIGFsbCBjb3JyZWN0IG9yIGFsbCB3cm9uZyksIHRoZSBzdGFuZGFyZCBkZXZpYXRpb24gaXMgMC4gSW4gdGhpcyBjYXNlLCBhbGwgYWR2YW50YWdlcyBzaG91bGQgYmUgMCBzaW5jZSB0aGVyZSdzIG5vIHJlbGF0aXZlIGRpZmZlcmVuY2UgdG8gbGVhcm4gZnJvbS4KCiMjIyBDb25uZWN0aW9uIHRvIERlZXBTZWVrLVIxCgpJbiBEZWVwU2Vlay1SMS1aZXJvIHRyYWluaW5nOgotIEcgaXMgdHlwaWNhbGx5IDE2LTY0IG91dHB1dHMgcGVyIHByb21wdAotIFJld2FyZHMgYXJlIHJ1bGUtYmFzZWQ6IDEgZm9yIGNvcnJlY3QgZmluYWwgYW5zd2VyLCAwIGZvciBpbmNvcnJlY3QKLSBUaGlzIHNpbXBsZSBzZXR1cCBhbGxvd2VkIHRoZSBtb2RlbCB0byBkZXZlbG9wIHNvcGhpc3RpY2F0ZWQgcmVhc29uaW5nIGJlaGF2aW9ycyBwdXJlbHkgdGhyb3VnaCBSTA==",
+  "description_decoded": "Implement the Group Relative Advantage calculation used in GRPO (Group Relative Policy Optimization) from the DeepSeek R1 paper. In GRPO, for each prompt, the model generates a group of G outputs. Each output receives a reward, and the advantage for each output is computed by normalizing rewards within the group. This normalization ensures that the policy update is relative to other outputs for the same prompt, which is key to GRPO's effectiveness.",
+  "learn_section_decoded": "## Group Relative Advantage in GRPO\n\n### Background\n\nGRPO (Group Relative Policy Optimization) is the reinforcement learning algorithm used to train DeepSeek-R1. A key innovation of GRPO is how it computes advantages: instead of using a learned critic network (like in PPO), GRPO estimates advantages directly from a group of sampled outputs.\n\n### The Algorithm\n\nFor each prompt $q$, GRPO samples a group of $G$ outputs $\\{o_1, o_2, \\ldots, o_G\\}$ from the current policy. Each output receives a reward $r_i$ (e.g., 1 for correct, 0 for incorrect).\n\nThe advantage for each output is computed as:\n\n$$A_i = \\frac{r_i - \\text{mean}(\\{r_1, r_2, \\ldots, r_G\\})}{\\text{std}(\\{r_1, r_2, \\ldots, r_G\\})}$$\n\n### Why Group Relative?\n\nThis normalization has several benefits:\n\n1. **No Critic Network**: Traditional actor-critic methods require training a value function $V(s)$ to estimate baselines. GRPO eliminates this by using the group mean as the baseline, saving compute and memory.\n\n2. **Relative Comparison**: The advantage measures how much better or worse an output is compared to other outputs for the same prompt. This is more meaningful than absolute rewards.\n\n3. **Scale Invariance**: Dividing by standard deviation normalizes the gradient updates, preventing issues when reward magnitudes vary across different prompts.\n\n### Example\n\nSuppose we sample 4 outputs for a math problem:\n- Output 1: Wrong answer -> reward = 0\n- Output 2: Correct answer -> reward = 1\n- Output 3: Wrong answer -> reward = 0\n- Output 4: Correct answer -> reward = 1\n\nCompute statistics:\n- Mean = (0 + 1 + 0 + 1) / 4 = 0.5\n- Std = 0.5\n\nAdvantages:\n- $A_1 = (0 - 0.5) / 0.5 = -1$ (penalize wrong answer)\n- $A_2 = (1 - 0.5) / 0.5 = +1$ (reward correct answer)\n- $A_3 = -1$\n- $A_4 = +1$\n\n### Edge Case: All Same Rewards\n\nIf all outputs receive the same reward (e.g., all correct or all wrong), the standard deviation is 0. In this case, all advantages should be 0 since there's no relative difference to learn from.\n\n### Connection to DeepSeek-R1\n\nIn DeepSeek-R1-Zero training:\n- G is typically 16-64 outputs per prompt\n- Rewards are rule-based: 1 for correct final answer, 0 for incorrect\n- This simple setup allowed the model to develop sophisticated reasoning behaviors purely through RL"
+}

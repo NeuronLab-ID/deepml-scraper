@@ -1,0 +1,522 @@
+{
+  "problem_id": 197,
+  "title": "Gradient Clipping by Global Norm",
+  "category": "Optimization",
+  "difficulty": "medium",
+  "description": "Implement gradient clipping by global norm. Given a list of gradient arrays (representing gradients for different parameters) and a maximum norm threshold, compute the global L2 norm across all gradients. If this global norm exceeds the threshold, scale down all gradients proportionally so that the global norm equals the threshold. Return the clipped gradients maintaining the original structure.",
+  "example": {
+    "input": "gradients=[[3.0, 4.0], [0.0, 0.0]], max_norm=1.0",
+    "output": "[[0.6, 0.8], [0.0, 0.0]]",
+    "reasoning": "The global norm is $\\sqrt{3^2 + 4^2 + 0^2 + 0^2} = \\sqrt{25} = 5.0$. Since $5.0 > 1.0$, we need to clip. The scaling factor is $\\frac{1.0}{5.0} = 0.2$. Each gradient is multiplied by 0.2: $[3.0 \\times 0.2, 4.0 \\times 0.2] = [0.6, 0.8]$ and $[0.0 \\times 0.2, 0.0 \\times 0.2] = [0.0, 0.0]$."
+  },
+  "starter_code": "def clip_gradients_by_global_norm(gradients: list[list[float]], max_norm: float) -> list[list[float]]:\n\t\"\"\"\n\tClip gradients by global norm.\n\t\n\tArgs:\n\t\tgradients: List of gradient arrays\n\t\tmax_norm: Maximum allowed global norm\n\t\n\tReturns:\n\t\tList of clipped gradient arrays\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Computing the Euclidean (L2) Norm of a Vector",
+      "relation_to_problem": "The global norm in gradient clipping is the L2 norm across all gradient values. Understanding how to compute the L2 norm of a single vector is the foundational step before computing the global norm across multiple gradient arrays.",
+      "prerequisites": [
+        "Basic algebra",
+        "Summation notation",
+        "Square roots"
+      ],
+      "learning_objectives": [
+        "Define the Euclidean (L2) norm formally using mathematical notation",
+        "Compute the L2 norm of a vector by hand and programmatically",
+        "Understand the geometric interpretation of the L2 norm as distance"
+      ],
+      "math_content": {
+        "definition": "The Euclidean norm (also called L2 norm or 2-norm) of a vector $\\mathbf{v} \\in \\mathbb{R}^n$ is defined as: $$\\|\\mathbf{v}\\|_2 = \\sqrt{\\sum_{i=1}^{n} v_i^2}$$ where $v_i$ is the $i$-th component of vector $\\mathbf{v}$.",
+        "notation": "$\\|\\mathbf{v}\\|_2$ = L2 norm of vector $\\mathbf{v}$, $n$ = dimensionality of the vector, $v_i$ = $i$-th component of $\\mathbf{v}$",
+        "theorem": "Theorem (Norm Properties): The L2 norm satisfies the following properties: (1) Non-negativity: $\\|\\mathbf{v}\\|_2 \\geq 0$ with equality if and only if $\\mathbf{v} = \\mathbf{0}$, (2) Homogeneity: $\\|\\alpha \\mathbf{v}\\|_2 = |\\alpha| \\cdot \\|\\mathbf{v}\\|_2$ for any scalar $\\alpha \\in \\mathbb{R}$, (3) Triangle inequality: $\\|\\mathbf{u} + \\mathbf{v}\\|_2 \\leq \\|\\mathbf{u}\\|_2 + \\|\\mathbf{v}\\|_2$.",
+        "proof_sketch": "Proof of Homogeneity: $\\|\\alpha \\mathbf{v}\\|_2 = \\sqrt{\\sum_{i=1}^{n} (\\alpha v_i)^2} = \\sqrt{\\alpha^2 \\sum_{i=1}^{n} v_i^2} = \\sqrt{\\alpha^2} \\cdot \\sqrt{\\sum_{i=1}^{n} v_i^2} = |\\alpha| \\cdot \\|\\mathbf{v}\\|_2$. This property is crucial for gradient clipping as it ensures that scaling a vector by a constant scales its norm by the absolute value of that constant.",
+        "examples": [
+          "Example 1: For $\\mathbf{v} = [3, 4]$, compute $\\|\\mathbf{v}\\|_2 = \\sqrt{3^2 + 4^2} = \\sqrt{9 + 16} = \\sqrt{25} = 5$",
+          "Example 2: For $\\mathbf{v} = [1, 0, 0]$, compute $\\|\\mathbf{v}\\|_2 = \\sqrt{1^2 + 0^2 + 0^2} = \\sqrt{1} = 1$",
+          "Example 3: For $\\mathbf{v} = [0, 0, 0]$, compute $\\|\\mathbf{v}\\|_2 = \\sqrt{0^2 + 0^2 + 0^2} = 0$ (the zero vector has norm 0)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "L2 Norm Definition",
+          "latex": "$\\|\\mathbf{v}\\|_2 = \\sqrt{\\sum_{i=1}^{n} v_i^2}$",
+          "description": "Use this to compute the magnitude (length) of any vector in Euclidean space"
+        },
+        {
+          "name": "Squared L2 Norm",
+          "latex": "$\\|\\mathbf{v}\\|_2^2 = \\sum_{i=1}^{n} v_i^2$",
+          "description": "Often computed as an intermediate step to avoid repeated square root operations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the L2 (Euclidean) norm of a single vector. Given a list of floating-point numbers representing a vector, return the L2 norm as a single float.",
+        "function_signature": "def compute_l2_norm(vector: list[float]) -> float:",
+        "starter_code": "def compute_l2_norm(vector: list[float]) -> float:\n    \"\"\"\n    Compute the L2 (Euclidean) norm of a vector.\n    \n    Args:\n        vector: A list of float values representing a vector\n    \n    Returns:\n        The L2 norm as a float\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_l2_norm([3.0, 4.0])",
+            "expected": "5.0",
+            "explanation": "Using the formula: sqrt(3^2 + 4^2) = sqrt(9 + 16) = sqrt(25) = 5.0"
+          },
+          {
+            "input": "compute_l2_norm([0.0, 0.0])",
+            "expected": "0.0",
+            "explanation": "The zero vector has norm 0: sqrt(0^2 + 0^2) = 0.0"
+          },
+          {
+            "input": "compute_l2_norm([1.0, 0.0, 0.0])",
+            "expected": "1.0",
+            "explanation": "Unit vector in first dimension: sqrt(1^2 + 0^2 + 0^2) = 1.0"
+          },
+          {
+            "input": "compute_l2_norm([1.0, 1.0, 1.0])",
+            "expected": "1.7320508075688772",
+            "explanation": "sqrt(1^2 + 1^2 + 1^2) = sqrt(3) ≈ 1.732"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to take the square root after summing squared components",
+        "Using absolute values instead of squaring (that would be L1 norm)",
+        "Not handling empty vectors correctly",
+        "Using integer division which can lose precision"
+      ],
+      "hint": "First compute the sum of squared elements, then take the square root of the result. You can use the built-in sum() function and a list comprehension.",
+      "references": [
+        "Linear Algebra: Vector norms",
+        "Euclidean distance",
+        "Pythagorean theorem in n dimensions"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Computing Global Norm Across Multiple Vectors",
+      "relation_to_problem": "Gradient clipping requires computing a single global norm across all gradient arrays (representing different parameter groups). This sub-quest teaches how to extend the L2 norm computation from a single vector to multiple vectors by treating them as one concatenated vector.",
+      "prerequisites": [
+        "L2 norm computation",
+        "Nested iteration",
+        "Flattening multi-dimensional structures"
+      ],
+      "learning_objectives": [
+        "Define the global L2 norm across multiple vectors mathematically",
+        "Implement efficient computation by summing all squared elements before taking square root",
+        "Understand that the global norm treats multiple arrays as one long vector"
+      ],
+      "math_content": {
+        "definition": "Given a collection of $k$ vectors $\\{\\mathbf{v}^{(1)}, \\mathbf{v}^{(2)}, \\ldots, \\mathbf{v}^{(k)}\\}$ where $\\mathbf{v}^{(j)} \\in \\mathbb{R}^{n_j}$, the global L2 norm is defined as: $$\\|\\mathbf{v}\\|_{global} = \\sqrt{\\sum_{j=1}^{k} \\sum_{i=1}^{n_j} (v^{(j)}_i)^2}$$ This is equivalent to concatenating all vectors into a single vector and computing its L2 norm.",
+        "notation": "$k$ = number of vectors, $\\mathbf{v}^{(j)}$ = $j$-th vector, $n_j$ = dimension of $j$-th vector, $v^{(j)}_i$ = $i$-th component of $j$-th vector",
+        "theorem": "Theorem (Concatenation Property): The global norm of multiple vectors equals the L2 norm of their concatenation. Formally, if $\\mathbf{w} = [\\mathbf{v}^{(1)}, \\mathbf{v}^{(2)}, \\ldots, \\mathbf{v}^{(k)}]$ (concatenation), then $\\|\\mathbf{v}\\|_{global} = \\|\\mathbf{w}\\|_2$.",
+        "proof_sketch": "Proof: The squared L2 norm of the concatenated vector is $\\|\\mathbf{w}\\|_2^2 = \\sum_{i=1}^{n_1 + n_2 + \\cdots + n_k} w_i^2$. By grouping terms from each original vector: $= (v^{(1)}_1)^2 + \\cdots + (v^{(1)}_{n_1})^2 + (v^{(2)}_1)^2 + \\cdots + (v^{(k)}_{n_k})^2 = \\sum_{j=1}^{k} \\sum_{i=1}^{n_j} (v^{(j)}_i)^2$. Taking square root of both sides gives the result.",
+        "examples": [
+          "Example 1: For vectors $\\mathbf{v}^{(1)} = [3, 4]$ and $\\mathbf{v}^{(2)} = [0, 0]$: Global norm = $\\sqrt{3^2 + 4^2 + 0^2 + 0^2} = \\sqrt{25} = 5.0$",
+          "Example 2: For vectors $\\mathbf{v}^{(1)} = [1]$, $\\mathbf{v}^{(2)} = [2]$, $\\mathbf{v}^{(3)} = [2]$: Global norm = $\\sqrt{1^2 + 2^2 + 2^2} = \\sqrt{1 + 4 + 4} = \\sqrt{9} = 3.0$",
+          "Example 3: For a single vector $\\mathbf{v}^{(1)} = [3, 4]$: Global norm = L2 norm = $5.0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Global L2 Norm",
+          "latex": "$\\|\\mathbf{v}\\|_{global} = \\sqrt{\\sum_{j=1}^{k} \\sum_{i=1}^{n_j} (v^{(j)}_i)^2}$",
+          "description": "Compute the L2 norm across all elements in all vectors by treating them as one concatenated vector"
+        },
+        {
+          "name": "Computational Form",
+          "latex": "$\\|\\mathbf{v}\\|_{global} = \\sqrt{\\sum_{j=1}^{k} \\|\\mathbf{v}^{(j)}\\|_2^2}$",
+          "description": "Alternative formulation: sum the squared norms of individual vectors, then take square root"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the global L2 norm across multiple vectors. Given a list of vectors (where each vector is itself a list of floats), compute and return the single global norm value.",
+        "function_signature": "def compute_global_norm(vectors: list[list[float]]) -> float:",
+        "starter_code": "def compute_global_norm(vectors: list[list[float]]) -> float:\n    \"\"\"\n    Compute the global L2 norm across multiple vectors.\n    \n    Args:\n        vectors: A list of vectors, where each vector is a list of floats\n    \n    Returns:\n        The global L2 norm as a float\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_global_norm([[3.0, 4.0], [0.0, 0.0]])",
+            "expected": "5.0",
+            "explanation": "sqrt(3^2 + 4^2 + 0^2 + 0^2) = sqrt(25) = 5.0"
+          },
+          {
+            "input": "compute_global_norm([[1.0], [2.0], [2.0]])",
+            "expected": "3.0",
+            "explanation": "sqrt(1^2 + 2^2 + 2^2) = sqrt(9) = 3.0"
+          },
+          {
+            "input": "compute_global_norm([[3.0, 4.0]])",
+            "expected": "5.0",
+            "explanation": "For a single vector, global norm equals its L2 norm: sqrt(9 + 16) = 5.0"
+          },
+          {
+            "input": "compute_global_norm([[0.0], [0.0], [0.0]])",
+            "expected": "0.0",
+            "explanation": "All zeros gives global norm of 0.0"
+          },
+          {
+            "input": "compute_global_norm([[1.0, 1.0], [1.0, 1.0]])",
+            "expected": "2.0",
+            "explanation": "sqrt(1^2 + 1^2 + 1^2 + 1^2) = sqrt(4) = 2.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing individual L2 norms and averaging them (incorrect - need to sum squared elements first)",
+        "Taking square root inside the loop instead of after summing all squared values",
+        "Not handling empty sublists correctly",
+        "Computing max or sum of individual norms instead of global norm"
+      ],
+      "hint": "Use nested loops to iterate through all elements. Accumulate the sum of all squared elements across all vectors, then take the square root once at the end.",
+      "references": [
+        "Frobenius norm for matrices",
+        "Flattening nested structures",
+        "Neural network parameter gradients"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Vector Scaling and Scalar Multiplication",
+      "relation_to_problem": "After computing the global norm, gradient clipping requires scaling all gradients by a clipping coefficient. This sub-quest teaches the mathematical operation of scalar multiplication and its implementation for multiple vectors.",
+      "prerequisites": [
+        "Vector operations",
+        "Scalar multiplication",
+        "Homogeneity property of norms"
+      ],
+      "learning_objectives": [
+        "Define scalar multiplication of vectors formally",
+        "Implement efficient element-wise scaling of vectors",
+        "Understand how scalar multiplication affects vector norms (proportionally)",
+        "Apply the same scaling factor to multiple vectors maintaining their structure"
+      ],
+      "math_content": {
+        "definition": "Scalar multiplication of a vector $\\mathbf{v} \\in \\mathbb{R}^n$ by a scalar $c \\in \\mathbb{R}$ is defined as: $$c \\mathbf{v} = [c v_1, c v_2, \\ldots, c v_n]$$ where each component of the vector is multiplied by the scalar $c$.",
+        "notation": "$c$ = scaling factor (scalar), $\\mathbf{v}$ = original vector, $c\\mathbf{v}$ = scaled vector, $v_i$ = $i$-th component of $\\mathbf{v}$",
+        "theorem": "Theorem (Norm Scaling): For any vector $\\mathbf{v}$ and scalar $c$, the L2 norm of the scaled vector is: $$\\|c \\mathbf{v}\\|_2 = |c| \\cdot \\|\\mathbf{v}\\|_2$$ This means scaling a vector by factor $c$ scales its norm by factor $|c|$. For gradient clipping, when $c = \\frac{\\text{max_norm}}{\\|\\mathbf{g}\\|_{global}}$, the new global norm becomes exactly $\\text{max_norm}$.",
+        "proof_sketch": "Proof: $\\|c \\mathbf{v}\\|_2 = \\sqrt{\\sum_{i=1}^{n} (cv_i)^2} = \\sqrt{c^2 \\sum_{i=1}^{n} v_i^2} = \\sqrt{c^2} \\cdot \\sqrt{\\sum_{i=1}^{n} v_i^2} = |c| \\cdot \\|\\mathbf{v}\\|_2$. This property guarantees that clipping gradients by the factor $c = \\frac{\\text{max_norm}}{\\|\\mathbf{g}\\|_{global}}$ will result in a global norm of exactly $\\text{max_norm}$.",
+        "examples": [
+          "Example 1: Scale $\\mathbf{v} = [3, 4]$ by $c = 0.5$: Result = $[1.5, 2.0]$. Original norm: 5.0, new norm: $0.5 \\times 5.0 = 2.5$",
+          "Example 2: Scale $\\mathbf{v} = [1, 2, 3]$ by $c = 2.0$: Result = $[2, 4, 6]$. Original norm: $\\sqrt{14}$, new norm: $2\\sqrt{14}$",
+          "Example 3: Scale $\\mathbf{v} = [10, 20]$ by $c = 0.1$: Result = $[1, 2]$. This is how clipping scales down large gradients"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Scalar Multiplication",
+          "latex": "$c\\mathbf{v} = [cv_1, cv_2, \\ldots, cv_n]$",
+          "description": "Multiply each component of the vector by the scalar"
+        },
+        {
+          "name": "Norm After Scaling",
+          "latex": "$\\|c\\mathbf{v}\\|_2 = |c| \\cdot \\|\\mathbf{v}\\|_2$",
+          "description": "The norm scales proportionally with the absolute value of the scalar"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that scales multiple vectors by a single scalar factor. Given a list of vectors and a scaling factor, return a new list of vectors where each element has been multiplied by the factor. Maintain the original structure (list of lists).",
+        "function_signature": "def scale_vectors(vectors: list[list[float]], scale_factor: float) -> list[list[float]]:",
+        "starter_code": "def scale_vectors(vectors: list[list[float]], scale_factor: float) -> list[list[float]]:\n    \"\"\"\n    Scale multiple vectors by a single scalar factor.\n    \n    Args:\n        vectors: List of vectors (each vector is a list of floats)\n        scale_factor: Scalar value to multiply all elements by\n    \n    Returns:\n        List of scaled vectors maintaining original structure\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "scale_vectors([[3.0, 4.0], [0.0, 0.0]], 0.5)",
+            "expected": "[[1.5, 2.0], [0.0, 0.0]]",
+            "explanation": "Each element is multiplied by 0.5: 3.0*0.5=1.5, 4.0*0.5=2.0, 0.0*0.5=0.0"
+          },
+          {
+            "input": "scale_vectors([[1.0, 2.0], [3.0, 4.0]], 2.0)",
+            "expected": "[[2.0, 4.0], [6.0, 8.0]]",
+            "explanation": "Doubling all elements: [1*2, 2*2], [3*2, 4*2]"
+          },
+          {
+            "input": "scale_vectors([[10.0], [20.0]], 0.1)",
+            "expected": "[[1.0], [2.0]]",
+            "explanation": "Scaling down by factor of 10: 10.0*0.1=1.0, 20.0*0.1=2.0"
+          },
+          {
+            "input": "scale_vectors([[5.0, 5.0]], 1.0)",
+            "expected": "[[5.0, 5.0]]",
+            "explanation": "Scaling by 1.0 leaves vectors unchanged"
+          },
+          {
+            "input": "scale_vectors([[1.0, 2.0], [3.0, 4.0]], 0.0)",
+            "expected": "[[0.0, 0.0], [0.0, 0.0]]",
+            "explanation": "Scaling by 0.0 zeros out all vectors"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Modifying the original vectors instead of creating new ones",
+        "Only scaling the first vector or treating all vectors as one",
+        "Not preserving the nested structure (returning a flat list)",
+        "Forgetting to apply the scale to zero elements (though 0*c = 0)"
+      ],
+      "hint": "Use nested list comprehensions to create a new list of lists. The outer comprehension iterates over vectors, the inner over elements within each vector.",
+      "references": [
+        "Vector spaces",
+        "Linear transformations",
+        "Matrix-scalar multiplication"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Computing the Clipping Coefficient",
+      "relation_to_problem": "The heart of gradient clipping is determining when and by how much to scale gradients. This sub-quest focuses on computing the clipping coefficient, which depends on comparing the global norm to the threshold and calculating the appropriate scaling factor.",
+      "prerequisites": [
+        "Global norm computation",
+        "Conditional logic",
+        "Division and ratios"
+      ],
+      "learning_objectives": [
+        "Derive the clipping coefficient formula mathematically",
+        "Understand the conditions under which clipping is applied",
+        "Implement safe computation handling edge cases (zero norm, infinite values)",
+        "Connect the coefficient to the desired outcome (global norm = max_norm)"
+      ],
+      "math_content": {
+        "definition": "Given a global norm $\\|\\mathbf{g}\\|_{global}$ and a maximum allowed norm $\\tau > 0$ (the threshold), the clipping coefficient is defined as: $$c = \\begin{cases} \\frac{\\tau}{\\|\\mathbf{g}\\|_{global}} & \\text{if } \\|\\mathbf{g}\\|_{global} > \\tau \\\\ 1 & \\text{otherwise} \\end{cases}$$ When $c < 1$, the gradients need to be scaled down. When $c = 1$, no clipping is needed.",
+        "notation": "$c$ = clipping coefficient, $\\tau$ = maximum allowed norm (threshold), $\\|\\mathbf{g}\\|_{global}$ = current global norm, $\\mathbf{g}$ = collection of gradient vectors",
+        "theorem": "Theorem (Clipping Guarantee): Let $\\mathbf{g}'$ denote the clipped gradients obtained by scaling $\\mathbf{g}$ by coefficient $c$. Then $\\|\\mathbf{g}'\\|_{global} = \\min(\\|\\mathbf{g}\\|_{global}, \\tau)$. Proof: Case 1: If $\\|\\mathbf{g}\\|_{global} \\leq \\tau$, then $c = 1$, so $\\mathbf{g}' = \\mathbf{g}$ and $\\|\\mathbf{g}'\\|_{global} = \\|\\mathbf{g}\\|_{global} \\leq \\tau$. Case 2: If $\\|\\mathbf{g}\\|_{global} > \\tau$, then $c = \\frac{\\tau}{\\|\\mathbf{g}\\|_{global}}$ and by the norm scaling property: $\\|\\mathbf{g}'\\|_{global} = \\|c\\mathbf{g}\\|_{global} = c \\cdot \\|\\mathbf{g}\\|_{global} = \\frac{\\tau}{\\|\\mathbf{g}\\|_{global}} \\cdot \\|\\mathbf{g}\\|_{global} = \\tau$.",
+        "proof_sketch": "The formula ensures that after scaling, the new global norm equals exactly $\\tau$ when clipping is needed. If $\\|\\mathbf{g}\\|_{global} = 5.0$ and $\\tau = 1.0$, then $c = \\frac{1.0}{5.0} = 0.2$. After scaling by 0.2, the new norm is $0.2 \\times 5.0 = 1.0 = \\tau$ as desired.",
+        "examples": [
+          "Example 1: $\\|\\mathbf{g}\\|_{global} = 5.0$, $\\tau = 1.0$. Since $5.0 > 1.0$, compute $c = \\frac{1.0}{5.0} = 0.2$. Clipping needed.",
+          "Example 2: $\\|\\mathbf{g}\\|_{global} = 0.5$, $\\tau = 1.0$. Since $0.5 \\leq 1.0$, set $c = 1.0$. No clipping needed.",
+          "Example 3: $\\|\\mathbf{g}\\|_{global} = 10.0$, $\\tau = 5.0$. Since $10.0 > 5.0$, compute $c = \\frac{5.0}{10.0} = 0.5$. Clipping by half.",
+          "Example 4: $\\|\\mathbf{g}\\|_{global} = 0.0$ (all gradients zero), $\\tau = 1.0$. Set $c = 1.0$ (no division by zero needed)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Clipping Coefficient",
+          "latex": "$c = \\min\\left(1, \\frac{\\tau}{\\|\\mathbf{g}\\|_{global}}\\right)$",
+          "description": "Alternative compact form: take minimum of 1 and the ratio. Guarantees c ≤ 1."
+        },
+        {
+          "name": "Clipping Condition",
+          "latex": "$\\text{clip} = \\begin{cases} \\text{True} & \\text{if } \\|\\mathbf{g}\\|_{global} > \\tau \\\\ \\text{False} & \\text{otherwise} \\end{cases}$",
+          "description": "Boolean condition to determine if clipping is necessary"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the clipping coefficient. Given a global norm and a maximum norm threshold, return the appropriate scaling factor. Handle the edge case where global_norm is zero (return 1.0 to avoid division by zero).",
+        "function_signature": "def compute_clipping_coefficient(global_norm: float, max_norm: float) -> float:",
+        "starter_code": "def compute_clipping_coefficient(global_norm: float, max_norm: float) -> float:\n    \"\"\"\n    Compute the clipping coefficient for gradient clipping.\n    \n    Args:\n        global_norm: The current global L2 norm of gradients\n        max_norm: The maximum allowed norm (threshold)\n    \n    Returns:\n        The clipping coefficient (scale factor) to apply\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_clipping_coefficient(5.0, 1.0)",
+            "expected": "0.2",
+            "explanation": "Global norm exceeds threshold: 5.0 > 1.0, so c = 1.0/5.0 = 0.2"
+          },
+          {
+            "input": "compute_clipping_coefficient(0.5, 1.0)",
+            "expected": "1.0",
+            "explanation": "Global norm below threshold: 0.5 ≤ 1.0, so c = 1.0 (no clipping)"
+          },
+          {
+            "input": "compute_clipping_coefficient(10.0, 5.0)",
+            "expected": "0.5",
+            "explanation": "Need to scale by half: c = 5.0/10.0 = 0.5"
+          },
+          {
+            "input": "compute_clipping_coefficient(0.0, 1.0)",
+            "expected": "1.0",
+            "explanation": "Zero gradient norm: return 1.0 to avoid division by zero"
+          },
+          {
+            "input": "compute_clipping_coefficient(2.0, 2.0)",
+            "expected": "1.0",
+            "explanation": "Global norm equals threshold exactly: 2.0 ≤ 2.0, so c = 1.0"
+          },
+          {
+            "input": "compute_clipping_coefficient(7.5, 2.5)",
+            "expected": "0.3333333333333333",
+            "explanation": "c = 2.5/7.5 = 1/3 ≈ 0.333"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Dividing without checking if global_norm is zero (causes division by zero error)",
+        "Always dividing max_norm by global_norm (forgetting the conditional logic)",
+        "Using max() instead of min() when computing coefficient",
+        "Returning coefficients greater than 1.0 (which would amplify gradients instead of clipping)"
+      ],
+      "hint": "First check if global_norm is zero or if global_norm <= max_norm. In these cases, return 1.0. Otherwise, compute and return max_norm / global_norm.",
+      "references": [
+        "Conditional logic in algorithms",
+        "Safe division",
+        "Threshold-based normalization"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Understanding Directional Preservation in Clipping",
+      "relation_to_problem": "A critical property of global norm clipping is that it preserves the direction of the gradient update. This sub-quest explores why uniform scaling maintains relative magnitudes and gradient direction, which is essential for optimization convergence.",
+      "prerequisites": [
+        "Vector direction",
+        "Scalar multiplication",
+        "Unit vectors",
+        "Proportionality"
+      ],
+      "learning_objectives": [
+        "Understand the geometric meaning of gradient direction in optimization",
+        "Prove that scalar multiplication preserves vector direction",
+        "Analyze how uniform scaling maintains relative magnitudes between components",
+        "Contrast global norm clipping with per-element clipping in terms of direction preservation"
+      ],
+      "math_content": {
+        "definition": "Two vectors $\\mathbf{u}, \\mathbf{v} \\in \\mathbb{R}^n$ have the same direction if there exists a positive scalar $c > 0$ such that $\\mathbf{u} = c\\mathbf{v}$. The direction of a non-zero vector $\\mathbf{v}$ is characterized by its unit vector: $$\\hat{\\mathbf{v}} = \\frac{\\mathbf{v}}{\\|\\mathbf{v}\\|_2}$$ which has norm 1 and points in the same direction as $\\mathbf{v}$.",
+        "notation": "$\\hat{\\mathbf{v}}$ = unit vector in direction of $\\mathbf{v}$, $c$ = positive scaling constant, $\\mathbf{v}$ = original vector",
+        "theorem": "Theorem (Direction Preservation): Let $\\mathbf{g} = \\{\\mathbf{g}^{(1)}, \\ldots, \\mathbf{g}^{(k)}\\}$ be a collection of gradient vectors and $c > 0$ be the clipping coefficient. The clipped gradients $\\mathbf{g}' = c\\mathbf{g}$ satisfy: (1) Each clipped gradient points in the same direction: $\\frac{\\mathbf{g}'^{(j)}}{\\|\\mathbf{g}'^{(j)}\\|_2} = \\frac{\\mathbf{g}^{(j)}}{\\|\\mathbf{g}^{(j)}\\|_2}$ for all $j$. (2) Relative magnitudes are preserved: $\\frac{\\|\\mathbf{g}'^{(i)}\\|_2}{\\|\\mathbf{g}'^{(j)}\\|_2} = \\frac{\\|\\mathbf{g}^{(i)}\\|_2}{\\|\\mathbf{g}^{(j)}\\|_2}$ for all $i, j$.",
+        "proof_sketch": "Proof of (1): The unit vector of $\\mathbf{g}'^{(j)} = c\\mathbf{g}^{(j)}$ is $\\frac{c\\mathbf{g}^{(j)}}{\\|c\\mathbf{g}^{(j)}\\|_2} = \\frac{c\\mathbf{g}^{(j)}}{c\\|\\mathbf{g}^{(j)}\\|_2} = \\frac{\\mathbf{g}^{(j)}}{\\|\\mathbf{g}^{(j)}\\|_2}$. Proof of (2): $\\frac{\\|c\\mathbf{g}^{(i)}\\|_2}{\\|c\\mathbf{g}^{(j)}\\|_2} = \\frac{c\\|\\mathbf{g}^{(i)}\\|_2}{c\\|\\mathbf{g}^{(j)}\\|_2} = \\frac{\\|\\mathbf{g}^{(i)}\\|_2}{\\|\\mathbf{g}^{(j)}\\|_2}$. This property is crucial because it ensures the optimization dynamics are preserved—we only change the step size, not the step direction.",
+        "examples": [
+          "Example 1: Original gradient $\\mathbf{g} = [3, 4]$ with norm 5. Unit vector: $[0.6, 0.8]$. After scaling by $c=0.2$: $\\mathbf{g}' = [0.6, 0.8]$ with norm 1. Unit vector: still $[0.6, 0.8]$. Direction preserved.",
+          "Example 2: Two gradients $\\mathbf{g}^{(1)} = [10, 0]$ (norm 10) and $\\mathbf{g}^{(2)} = [0, 5]$ (norm 5). Ratio: $10/5 = 2$. After scaling by $c=0.1$: $\\mathbf{g}'^{(1)} = [1, 0]$ (norm 1), $\\mathbf{g}'^{(2)} = [0, 0.5]$ (norm 0.5). Ratio: $1/0.5 = 2$. Relative magnitudes preserved.",
+          "Example 3 (Contrast): Per-element clipping with threshold 1.0 applied to $[10, 0.5]$ gives $[1, 0.5]$ (changed from $[1, 0.05]$ after normalization), altering the direction."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Unit Vector",
+          "latex": "$\\hat{\\mathbf{v}} = \\frac{\\mathbf{v}}{\\|\\mathbf{v}\\|_2}$",
+          "description": "Normalized vector with magnitude 1 pointing in the same direction"
+        },
+        {
+          "name": "Direction Preservation Property",
+          "latex": "$\\frac{c\\mathbf{v}}{\\|c\\mathbf{v}\\|_2} = \\frac{\\mathbf{v}}{\\|\\mathbf{v}\\|_2}$ for $c > 0$",
+          "description": "Scaling by a positive constant preserves direction"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that verifies direction preservation after scaling. Given original vectors and scaled vectors, compute and return whether the direction (unit vectors) are preserved for each pair. Return a list of boolean values, one for each vector pair. Consider directions equal if all components match within a tolerance of 1e-9.",
+        "function_signature": "def verify_direction_preserved(original: list[list[float]], scaled: list[list[float]]) -> list[bool]:",
+        "starter_code": "def verify_direction_preserved(original: list[list[float]], scaled: list[list[float]]) -> list[bool]:\n    \"\"\"\n    Verify that direction is preserved after scaling for each vector pair.\n    \n    Args:\n        original: List of original vectors\n        scaled: List of scaled vectors (same structure as original)\n    \n    Returns:\n        List of booleans indicating if direction preserved for each vector\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "verify_direction_preserved([[3.0, 4.0]], [[0.6, 0.8]])",
+            "expected": "[True]",
+            "explanation": "Original unit vector: [0.6, 0.8]. Scaled unit vector: [0.6, 0.8]. Direction preserved."
+          },
+          {
+            "input": "verify_direction_preserved([[1.0, 0.0], [0.0, 1.0]], [[0.5, 0.0], [0.0, 0.5]])",
+            "expected": "[True, True]",
+            "explanation": "Both vectors scaled by 0.5. Unit vectors remain [1,0] and [0,1]. Directions preserved."
+          },
+          {
+            "input": "verify_direction_preserved([[10.0, 20.0]], [[1.0, 2.0]])",
+            "expected": "[True]",
+            "explanation": "Scaled by 0.1. Original unit vector: [0.447..., 0.894...], same after scaling."
+          },
+          {
+            "input": "verify_direction_preserved([[0.0, 0.0]], [[0.0, 0.0]])",
+            "expected": "[True]",
+            "explanation": "Zero vectors have undefined direction, but scaling zero by any factor gives zero. Consider as preserved."
+          },
+          {
+            "input": "verify_direction_preserved([[1.0, 1.0, 1.0]], [[2.0, 2.0, 2.0]])",
+            "expected": "[True]",
+            "explanation": "Scaled by 2.0. Unit vector [0.577..., 0.577..., 0.577...] remains the same."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Comparing scaled vectors directly instead of their unit vectors",
+        "Not handling zero vectors correctly (they have undefined direction)",
+        "Using exact equality instead of approximate equality for floating-point comparisons",
+        "Computing unit vectors incorrectly (not dividing by the norm)"
+      ],
+      "hint": "For each vector pair, compute the unit vector (vector divided by its norm). Compare corresponding components with a small tolerance. Handle zero vectors as a special case (both must be zero).",
+      "references": [
+        "Unit vectors",
+        "Vector normalization",
+        "Cosine similarity",
+        "Gradient descent optimization"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Integrating All Components: Complete Clipping Algorithm",
+      "relation_to_problem": "This final sub-quest combines all previous concepts into the complete gradient clipping algorithm. Students will integrate global norm computation, coefficient calculation, and vector scaling to implement the full clipping procedure with proper conditional logic.",
+      "prerequisites": [
+        "Global norm computation",
+        "Clipping coefficient",
+        "Vector scaling",
+        "Conditional execution"
+      ],
+      "learning_objectives": [
+        "Integrate all sub-components into a complete algorithm",
+        "Implement the full gradient clipping procedure with proper control flow",
+        "Handle edge cases: zero gradients, threshold-compliant gradients, single vectors",
+        "Verify the post-clipping guarantee: global norm ≤ max_norm"
+      ],
+      "math_content": {
+        "definition": "The Gradient Clipping by Global Norm algorithm is defined as follows: Given gradients $\\mathbf{g} = \\{\\mathbf{g}^{(1)}, \\ldots, \\mathbf{g}^{(k)}\\}$ and threshold $\\tau > 0$, compute clipped gradients $\\mathbf{g}'$: \n\n**Algorithm:** \n1. Compute global norm: $\\|\\mathbf{g}\\|_{global} = \\sqrt{\\sum_{j=1}^{k} \\sum_{i=1}^{n_j} (g^{(j)}_i)^2}$ \n2. Compute clipping coefficient: $c = \\min\\left(1, \\frac{\\tau}{\\|\\mathbf{g}\\|_{global}}\\right)$ \n3. Scale all gradients: $\\mathbf{g}'^{(j)} = c \\cdot \\mathbf{g}^{(j)}$ for all $j \\in \\{1, \\ldots, k\\}$ \n4. Return $\\mathbf{g}'$",
+        "notation": "$\\mathbf{g}$ = original gradients, $\\mathbf{g}'$ = clipped gradients, $\\tau$ = max_norm threshold, $c$ = clipping coefficient, $k$ = number of gradient arrays",
+        "theorem": "Theorem (Global Norm Bound): The gradient clipping algorithm guarantees that $\\|\\mathbf{g}'\\|_{global} \\leq \\tau$. More precisely: $$\\|\\mathbf{g}'\\|_{global} = \\min(\\|\\mathbf{g}\\|_{global}, \\tau)$$ Proof: If $\\|\\mathbf{g}\\|_{global} \\leq \\tau$, then $c = 1$ and $\\mathbf{g}' = \\mathbf{g}$, so $\\|\\mathbf{g}'\\|_{global} = \\|\\mathbf{g}\\|_{global} \\leq \\tau$. If $\\|\\mathbf{g}\\|_{global} > \\tau$, then $c = \\frac{\\tau}{\\|\\mathbf{g}\\|_{global}} < 1$ and by norm scaling: $\\|\\mathbf{g}'\\|_{global} = \\|c\\mathbf{g}\\|_{global} = c \\cdot \\|\\mathbf{g}\\|_{global} = \\frac{\\tau}{\\|\\mathbf{g}\\|_{global}} \\cdot \\|\\mathbf{g}\\|_{global} = \\tau$.",
+        "proof_sketch": "The algorithm's correctness relies on three key properties proven in previous sub-quests: (1) Global norm correctly aggregates all gradient magnitudes, (2) The clipping coefficient formula ensures the scaled norm equals the threshold when clipping is needed, (3) Uniform scaling preserves gradient direction and relative magnitudes. Together, these guarantee that the algorithm prevents gradient explosion while maintaining optimization dynamics.",
+        "examples": [
+          "Example 1 (Clipping needed): $\\mathbf{g} = \\{[3, 4], [0, 0]\\}$, $\\tau = 1.0$. Global norm = 5.0 > 1.0. Coefficient $c = 0.2$. Result: $\\{[0.6, 0.8], [0.0, 0.0]\\}$ with global norm = 1.0.",
+          "Example 2 (No clipping): $\\mathbf{g} = \\{[0.3, 0.4]\\}$, $\\tau = 1.0$. Global norm = 0.5 ≤ 1.0. Coefficient $c = 1.0$. Result: $\\{[0.3, 0.4]\\}$ unchanged.",
+          "Example 3 (Multiple arrays): $\\mathbf{g} = \\{[6], [8]\\}$, $\\tau = 5.0$. Global norm = $\\sqrt{36+64} = 10.0 > 5.0$. Coefficient $c = 0.5$. Result: $\\{[3], [4]\\}$ with global norm = 5.0."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Algorithm",
+          "latex": "$\\mathbf{g}' = \\min\\left(1, \\frac{\\tau}{\\|\\mathbf{g}\\|_{global}}\\right) \\cdot \\mathbf{g}$",
+          "description": "Compact representation: compute coefficient and scale in one expression"
+        },
+        {
+          "name": "Post-Clipping Guarantee",
+          "latex": "$\\|\\mathbf{g}'\\|_{global} = \\min(\\|\\mathbf{g}\\|_{global}, \\tau)$",
+          "description": "The output global norm is at most the threshold"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete gradient clipping by global norm algorithm. This is a simplified version of the final problem that doesn't require all the structure. Given a list of gradient arrays and a max_norm threshold, compute the global norm, determine if clipping is needed, and return the appropriately scaled gradients. This exercise combines all previous skills.",
+        "function_signature": "def clip_gradients_simple(gradients: list[list[float]], max_norm: float) -> list[list[float]]:",
+        "starter_code": "def clip_gradients_simple(gradients: list[list[float]], max_norm: float) -> list[list[float]]:\n    \"\"\"\n    Simplified gradient clipping by global norm.\n    \n    Args:\n        gradients: List of gradient arrays\n        max_norm: Maximum allowed global norm\n    \n    Returns:\n        List of clipped gradient arrays\n    \n    This is a building block for the main problem. Use the functions\n    you developed in previous sub-quests conceptually:\n    1. Compute global norm across all gradients\n    2. Compute clipping coefficient\n    3. Scale all gradients by the coefficient\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "clip_gradients_simple([[3.0, 4.0], [0.0, 0.0]], 1.0)",
+            "expected": "[[0.6, 0.8], [0.0, 0.0]]",
+            "explanation": "Global norm is 5.0 > 1.0. Clip by factor 0.2: [3*0.2, 4*0.2] = [0.6, 0.8]"
+          },
+          {
+            "input": "clip_gradients_simple([[0.3, 0.4]], 1.0)",
+            "expected": "[[0.3, 0.4]]",
+            "explanation": "Global norm is 0.5 ≤ 1.0. No clipping needed. Return unchanged."
+          },
+          {
+            "input": "clip_gradients_simple([[6.0], [8.0]], 5.0)",
+            "expected": "[[3.0], [4.0]]",
+            "explanation": "Global norm is 10.0 > 5.0. Clip by factor 0.5: [6*0.5] = [3.0], [8*0.5] = [4.0]"
+          },
+          {
+            "input": "clip_gradients_simple([[0.0], [0.0]], 1.0)",
+            "expected": "[[0.0], [0.0]]",
+            "explanation": "Zero gradients have global norm 0.0 ≤ 1.0. No clipping needed."
+          },
+          {
+            "input": "clip_gradients_simple([[1.0, 1.0], [1.0, 1.0]], 2.0)",
+            "expected": "[[1.0, 1.0], [1.0, 1.0]]",
+            "explanation": "Global norm is 2.0 = 2.0 (equal to threshold). No clipping: c = 1.0"
+          },
+          {
+            "input": "clip_gradients_simple([[5.0, 0.0], [0.0, 12.0]], 6.5)",
+            "expected": "[[2.5, 0.0], [0.0, 6.0]]",
+            "explanation": "Global norm is sqrt(25+144)=13.0 > 6.5. Clip by factor 0.5: scale all by 0.5"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check if clipping is actually needed (always scaling regardless of norm)",
+        "Computing multiple global norms instead of just one at the beginning",
+        "Scaling only some gradient arrays instead of all of them",
+        "Not handling the zero gradient case properly",
+        "Applying clipping coefficient incorrectly (e.g., using max_norm directly as scale)"
+      ],
+      "hint": "Follow the three-step algorithm: (1) Compute one global norm across all gradients, (2) Determine if global_norm > max_norm, (3) If yes, compute coefficient and scale all gradients; if no, return unchanged gradients.",
+      "references": [
+        "TensorFlow tf.clip_by_global_norm",
+        "PyTorch torch.nn.utils.clip_grad_norm_",
+        "Gradient explosion problem in RNNs",
+        "Adam optimizer with gradient clipping"
+      ]
+    }
+  ]
+}

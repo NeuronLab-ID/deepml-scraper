@@ -1,0 +1,563 @@
+{
+  "problem_id": 167,
+  "title": "Calculate the Discounted Return for a Given Trajectory",
+  "category": "Reinforcement Learning",
+  "difficulty": "easy",
+  "description": "Write a function that computes the discounted return $G_t = \\sum_{k=0}^\\infty \\gamma^k R_{t+k+1}$ for a given sequence of rewards and discount factor gamma. This quantity corresponds to the expected return $v_\\pi(s)$ in reinforcement learning, as defined by the equation in the image. Only use NumPy.",
+  "example": {
+    "input": "rewards = [1, 2, 3, 4]\ngamma = 0.9\nprint(discounted_return(rewards, gamma))",
+    "output": "8.146",
+    "reasoning": "G = 1 + 0.9*2 + 0.9^2*3 + 0.9^3*4 = 1 + 1.8 + 2.43 + 2.916 = 8.146"
+  },
+  "starter_code": "import numpy as np\n\ndef discounted_return(rewards, gamma):\n    \"\"\"\n    Compute the discounted return for a given list of rewards.\n    Args:\n      rewards (list of float): sequence of rewards R_{t+1}, R_{t+2}, ...\n      gamma (float): discount factor (0 <= gamma <= 1)\n    Returns:\n      float: discounted return G_t\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Geometric Series and Power Operations",
+      "relation_to_problem": "Computing discounted returns requires repeatedly raising the discount factor γ to increasing powers (γ^0, γ^1, γ^2, ...). This sub-quest teaches the fundamental operation of exponentiation and how to apply it element-wise to create discount coefficients.",
+      "prerequisites": [
+        "Basic arithmetic operations",
+        "Array/list manipulation in Python",
+        "NumPy array basics"
+      ],
+      "learning_objectives": [
+        "Understand how to compute powers of a number programmatically",
+        "Generate a sequence of exponentially decaying coefficients",
+        "Apply exponentiation to create discount factors for multiple time steps",
+        "Recognize the geometric sequence pattern in discount factors"
+      ],
+      "math_content": {
+        "definition": "A **power** or **exponentiation** operation computes $b^n$ where $b$ is the base and $n$ is the exponent. Formally, for $n \\in \\mathbb{N}_0$ (non-negative integers): $b^n = \\underbrace{b \\cdot b \\cdot \\ldots \\cdot b}_{n \\text{ times}}$ with the convention that $b^0 = 1$ for any $b \\neq 0$.",
+        "notation": "$\\gamma^k$ represents the discount factor $\\gamma \\in [0,1]$ raised to the power $k \\in \\mathbb{N}_0$",
+        "theorem": "**Geometric Sequence Theorem**: A geometric sequence is defined by $a_k = a_0 \\cdot r^k$ where $a_0$ is the initial term and $r$ is the common ratio. The sequence of discount coefficients $\\{\\gamma^0, \\gamma^1, \\gamma^2, \\ldots, \\gamma^{n-1}\\}$ forms a geometric sequence with $a_0 = 1$ and $r = \\gamma$.",
+        "proof_sketch": "By definition, each term is obtained by multiplying the previous term by $\\gamma$: $\\gamma^{k+1} = \\gamma^k \\cdot \\gamma$. Starting from $\\gamma^0 = 1$, we obtain $\\gamma^1 = 1 \\cdot \\gamma = \\gamma$, $\\gamma^2 = \\gamma \\cdot \\gamma$, and so forth, confirming the geometric progression.",
+        "examples": [
+          "For $\\gamma = 0.9$ and $n = 4$ time steps: The discount coefficients are $[0.9^0, 0.9^1, 0.9^2, 0.9^3] = [1.0, 0.9, 0.81, 0.729]$",
+          "For $\\gamma = 0.5$ and $n = 5$ time steps: The coefficients are $[0.5^0, 0.5^1, 0.5^2, 0.5^3, 0.5^4] = [1.0, 0.5, 0.25, 0.125, 0.0625]$",
+          "When $\\gamma = 1$: All coefficients equal $1.0$ (no discounting), representing equal weighting of all future rewards"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Power Operation",
+          "latex": "$\\gamma^k = \\gamma \\cdot \\gamma \\cdot \\ldots \\cdot \\gamma$ ($k$ times)",
+          "description": "Fundamental operation for computing each discount coefficient"
+        },
+        {
+          "name": "Geometric Sequence General Term",
+          "latex": "$a_k = a_0 \\cdot r^k$",
+          "description": "Pattern for discount coefficients where $a_0 = 1$ and $r = \\gamma$"
+        },
+        {
+          "name": "Exponential Decay Property",
+          "latex": "$\\gamma^{k+1} < \\gamma^k$ for $\\gamma \\in (0,1)$",
+          "description": "Each successive discount coefficient is smaller, modeling time preference"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that generates an array of discount coefficients $[\\gamma^0, \\gamma^1, \\gamma^2, \\ldots, \\gamma^{n-1}]$ for a given discount factor $\\gamma$ and number of time steps $n$. This array will later be used as multipliers for the reward sequence.",
+        "function_signature": "def generate_discount_coefficients(gamma: float, n: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef generate_discount_coefficients(gamma, n):\n    \"\"\"\n    Generate discount coefficients [gamma^0, gamma^1, ..., gamma^(n-1)].\n    \n    Args:\n        gamma (float): discount factor (0 <= gamma <= 1)\n        n (int): number of time steps\n    \n    Returns:\n        np.ndarray: array of discount coefficients\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "generate_discount_coefficients(0.9, 4)",
+            "expected": "[1.0, 0.9, 0.81, 0.729]",
+            "explanation": "With gamma=0.9 and 4 steps: [0.9^0, 0.9^1, 0.9^2, 0.9^3] = [1.0, 0.9, 0.81, 0.729]"
+          },
+          {
+            "input": "generate_discount_coefficients(0.5, 3)",
+            "expected": "[1.0, 0.5, 0.25]",
+            "explanation": "With gamma=0.5 and 3 steps: [0.5^0, 0.5^1, 0.5^2] = [1.0, 0.5, 0.25], showing rapid decay"
+          },
+          {
+            "input": "generate_discount_coefficients(1.0, 5)",
+            "expected": "[1.0, 1.0, 1.0, 1.0, 1.0]",
+            "explanation": "With gamma=1.0, all coefficients are 1.0 (no discounting), meaning all future rewards equally important"
+          },
+          {
+            "input": "generate_discount_coefficients(0.0, 3)",
+            "expected": "[1.0, 0.0, 0.0]",
+            "explanation": "With gamma=0.0, only immediate reward matters (all future coefficients are zero)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Starting exponents at 1 instead of 0 (first coefficient should be gamma^0 = 1)",
+        "Using Python's ** operator incorrectly or inefficiently in loops instead of vectorized NumPy operations",
+        "Not handling edge cases like gamma=0 or gamma=1 correctly",
+        "Confusing the number of coefficients with the exponent range (n coefficients means exponents 0 to n-1)",
+        "Forgetting that numpy.power() or ** can be applied element-wise to arrays for efficiency"
+      ],
+      "hint": "NumPy provides functions like np.power() or the ** operator that can compute powers efficiently. Consider using np.arange() to generate the sequence of exponents [0, 1, 2, ..., n-1], then apply the power operation.",
+      "references": [
+        "Geometric sequences and series",
+        "NumPy array operations and broadcasting",
+        "Exponential functions and their properties",
+        "Time value and temporal discounting in economics"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Element-wise Multiplication and Weighted Sums",
+      "relation_to_problem": "The discounted return is computed by multiplying each reward by its corresponding discount coefficient (element-wise multiplication) before summing. This sub-quest teaches how to perform element-wise operations and understand weighted combinations.",
+      "prerequisites": [
+        "Array/vector operations",
+        "Understanding of multiplication",
+        "Concept of weights in linear combinations"
+      ],
+      "learning_objectives": [
+        "Perform element-wise multiplication between two arrays of equal length",
+        "Understand the concept of weighted values where each element has an associated weight",
+        "Apply discount coefficients as weights to reward values",
+        "Recognize element-wise multiplication as the Hadamard product"
+      ],
+      "math_content": {
+        "definition": "**Element-wise multiplication** (also called the Hadamard product) of two vectors $\\mathbf{a} = [a_1, a_2, \\ldots, a_n]$ and $\\mathbf{b} = [b_1, b_2, \\ldots, b_n]$ is defined as: $\\mathbf{a} \\odot \\mathbf{b} = [a_1 b_1, a_2 b_2, \\ldots, a_n b_n]$. Each element of the result is the product of the corresponding elements from the input vectors.",
+        "notation": "$\\mathbf{r} \\odot \\mathbf{\\gamma} = [r_1 \\gamma^0, r_2 \\gamma^1, \\ldots, r_n \\gamma^{n-1}]$ where $\\odot$ denotes element-wise multiplication, $\\mathbf{r}$ is the reward vector, and $\\mathbf{\\gamma}$ is the coefficient vector",
+        "theorem": "**Weighted Value Theorem**: Given a sequence of values $\\{v_1, v_2, \\ldots, v_n\\}$ and corresponding weights $\\{w_1, w_2, \\ldots, w_n\\}$, the weighted values are $\\{w_1 v_1, w_2 v_2, \\ldots, w_n v_n\\}$. In the context of discounted returns, rewards are the values and discount coefficients are the weights: $\\{\\gamma^0 R_1, \\gamma^1 R_2, \\ldots, \\gamma^{n-1} R_n\\}$.",
+        "proof_sketch": "Element-wise multiplication preserves vector dimension and applies the scalar multiplication operation independently to each position. For vectors of length $n$, the $i$-th component of the result is $(\\mathbf{a} \\odot \\mathbf{b})_i = a_i \\cdot b_i$, which is well-defined for all $i \\in \\{1, 2, \\ldots, n\\}$.",
+        "examples": [
+          "Rewards $\\mathbf{r} = [1, 2, 3]$ with coefficients $\\mathbf{\\gamma} = [1.0, 0.9, 0.81]$: Element-wise product is $[1 \\cdot 1.0, 2 \\cdot 0.9, 3 \\cdot 0.81] = [1.0, 1.8, 2.43]$",
+          "Rewards $\\mathbf{r} = [5, -2, 3]$ with coefficients $\\mathbf{\\gamma} = [1.0, 0.5, 0.25]$: Product is $[5 \\cdot 1.0, (-2) \\cdot 0.5, 3 \\cdot 0.25] = [5.0, -1.0, 0.75]$, showing negative rewards are also discounted",
+          "Uniform rewards $\\mathbf{r} = [10, 10, 10]$ with coefficients $\\mathbf{\\gamma} = [1.0, 0.9, 0.81]$: Product is $[10.0, 9.0, 8.1]$, demonstrating how identical rewards have decreasing effective value over time"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Hadamard Product",
+          "latex": "$(\\mathbf{a} \\odot \\mathbf{b})_i = a_i \\cdot b_i$ for all $i$",
+          "description": "Element-wise multiplication operation, distinct from dot product or matrix multiplication"
+        },
+        {
+          "name": "Discounted Rewards Vector",
+          "latex": "$\\mathbf{d} = [R_1 \\gamma^0, R_2 \\gamma^1, \\ldots, R_n \\gamma^{n-1}]$",
+          "description": "Vector of discounted reward values, computed by element-wise multiplication of rewards and discount coefficients"
+        },
+        {
+          "name": "Weight Interpretation",
+          "latex": "$w_k = \\gamma^k$ where $w_k \\in [0, 1]$ for $\\gamma \\in [0, 1]$",
+          "description": "Each discount coefficient acts as a weight that diminishes with time step $k$"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes a reward sequence and a corresponding sequence of discount coefficients, then returns the element-wise product (discounted rewards). Each reward is multiplied by its corresponding discount coefficient to produce the weighted reward value.",
+        "function_signature": "def apply_discount_to_rewards(rewards: np.ndarray, discount_coefficients: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef apply_discount_to_rewards(rewards, discount_coefficients):\n    \"\"\"\n    Apply discount coefficients to rewards via element-wise multiplication.\n    \n    Args:\n        rewards (np.ndarray): array of reward values\n        discount_coefficients (np.ndarray): array of discount coefficients [gamma^0, gamma^1, ...]\n    \n    Returns:\n        np.ndarray: array of discounted rewards [r_0 * gamma^0, r_1 * gamma^1, ...]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "apply_discount_to_rewards(np.array([1, 2, 3, 4]), np.array([1.0, 0.9, 0.81, 0.729]))",
+            "expected": "[1.0, 1.8, 2.43, 2.916]",
+            "explanation": "Each reward multiplied by its coefficient: [1*1.0, 2*0.9, 3*0.81, 4*0.729] = [1.0, 1.8, 2.43, 2.916]"
+          },
+          {
+            "input": "apply_discount_to_rewards(np.array([10, 10, 10]), np.array([1.0, 0.5, 0.25]))",
+            "expected": "[10.0, 5.0, 2.5]",
+            "explanation": "Uniform rewards show pure exponential decay: [10*1.0, 10*0.5, 10*0.25] = [10.0, 5.0, 2.5]"
+          },
+          {
+            "input": "apply_discount_to_rewards(np.array([5, -3, 2]), np.array([1.0, 0.9, 0.81]))",
+            "expected": "[5.0, -2.7, 1.62]",
+            "explanation": "Negative rewards are also discounted: [5*1.0, (-3)*0.9, 2*0.81] = [5.0, -2.7, 1.62]"
+          },
+          {
+            "input": "apply_discount_to_rewards(np.array([1, 2]), np.array([1.0, 0.0]))",
+            "expected": "[1.0, 0.0]",
+            "explanation": "With gamma=0 for future steps, only immediate reward survives: [1*1.0, 2*0.0] = [1.0, 0.0]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using matrix multiplication (@) instead of element-wise multiplication (*) in NumPy",
+        "Attempting to multiply arrays of different lengths without proper validation",
+        "Confusing the order of multiplication (though commutative, maintaining semantic order aids understanding)",
+        "Not preserving the data type or precision of the result",
+        "Forgetting that NumPy's * operator performs element-wise multiplication for arrays (unlike MATLAB where it's matrix multiplication)"
+      ],
+      "hint": "In NumPy, the * operator between two arrays performs element-wise multiplication automatically. Ensure both input arrays have the same shape.",
+      "references": [
+        "Hadamard product in linear algebra",
+        "NumPy broadcasting and element-wise operations",
+        "Weighted averages and linear combinations",
+        "Component-wise vector operations"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Summation and Aggregation of Sequences",
+      "relation_to_problem": "After computing the discounted rewards, we must sum all values to obtain the total discounted return. This sub-quest teaches the mathematical concept of summation and its computational implementation.",
+      "prerequisites": [
+        "Sigma notation",
+        "Array iteration",
+        "Accumulation patterns"
+      ],
+      "learning_objectives": [
+        "Understand the formal mathematical notation for summation using Σ",
+        "Compute the sum of a finite sequence of numbers",
+        "Recognize summation as an aggregation operation that reduces a sequence to a scalar",
+        "Apply summation to complete the discounted return calculation"
+      ],
+      "math_content": {
+        "definition": "**Summation** is an operation that adds all elements of a sequence. Formally, for a finite sequence $\\{a_k\\}_{k=1}^{n}$, the sum is denoted: $S = \\sum_{k=1}^{n} a_k = a_1 + a_2 + \\cdots + a_n$. This operation maps a sequence of $n$ values to a single scalar value.",
+        "notation": "$\\sum_{k=0}^{n-1} d_k$ represents the sum of all discounted rewards $d_k = R_{k+1} \\gamma^k$ from time step $k=0$ to $k=n-1$, where $n$ is the total number of time steps",
+        "theorem": "**Finite Sum Theorem**: For any finite sequence of real numbers $\\{a_k\\}_{k=1}^{n}$ where $a_k \\in \\mathbb{R}$, the sum $S = \\sum_{k=1}^{n} a_k$ exists and is unique. The sum operation is commutative (order-independent for finite sums) and associative.",
+        "proof_sketch": "Summation is defined recursively: $S_1 = a_1$ and $S_{m+1} = S_m + a_{m+1}$ for $m \\geq 1$. This recursive definition terminates at $S_n = \\sum_{k=1}^{n} a_k$ after $n$ steps. Since addition of real numbers is well-defined and associative, the result is unique regardless of evaluation order (though numerical precision may vary in floating-point arithmetic).",
+        "examples": [
+          "Sum of discounted rewards $[1.0, 1.8, 2.43, 2.916]$: $S = 1.0 + 1.8 + 2.43 + 2.916 = 8.146$. This is the complete discounted return.",
+          "Sum of $[10, -5, 3]$: $S = 10 + (-5) + 3 = 8$, showing that negative values reduce the total",
+          "Empty sequence: By convention, $\\sum_{k=1}^{0} a_k = 0$ (sum of empty set is the additive identity)",
+          "Single element $[5]$: $\\sum_{k=1}^{1} a_k = a_1 = 5$ (sum of one element is itself)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Finite Summation",
+          "latex": "$S = \\sum_{k=1}^{n} a_k = a_1 + a_2 + \\cdots + a_n$",
+          "description": "General form for summing a finite sequence of $n$ terms"
+        },
+        {
+          "name": "Discounted Return Sum",
+          "latex": "$G = \\sum_{k=0}^{n-1} R_{k+1} \\gamma^k$",
+          "description": "Specific application to sum all discounted rewards, yielding the total return"
+        },
+        {
+          "name": "Closed-Form Geometric Sum",
+          "latex": "$\\sum_{k=0}^{n-1} ar^k = a \\frac{1 - r^n}{1 - r}$ for $r \\neq 1$",
+          "description": "For uniform rewards $R_{k+1} = a$, the sum has a closed form (not required for implementation but useful for verification)"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes the sum of all elements in a given array. This operation aggregates the discounted reward values into a single scalar representing the total discounted return. The function should handle arrays of any length, including edge cases.",
+        "function_signature": "def sum_array(arr: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef sum_array(arr):\n    \"\"\"\n    Compute the sum of all elements in an array.\n    \n    Args:\n        arr (np.ndarray): array of numerical values\n    \n    Returns:\n        float: sum of all elements\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "sum_array(np.array([1.0, 1.8, 2.43, 2.916]))",
+            "expected": "8.146",
+            "explanation": "Sum of discounted rewards from the main problem example: 1.0 + 1.8 + 2.43 + 2.916 = 8.146"
+          },
+          {
+            "input": "sum_array(np.array([10, -5, 3, 7]))",
+            "expected": "15.0",
+            "explanation": "Sum with negative values: 10 + (-5) + 3 + 7 = 15"
+          },
+          {
+            "input": "sum_array(np.array([5.5]))",
+            "expected": "5.5",
+            "explanation": "Single-element array: sum is the element itself"
+          },
+          {
+            "input": "sum_array(np.array([]))",
+            "expected": "0.0",
+            "explanation": "Empty array: sum is 0 by convention (additive identity)"
+          },
+          {
+            "input": "sum_array(np.array([1.1, 2.2, 3.3]))",
+            "expected": "6.6",
+            "explanation": "Floating-point values: 1.1 + 2.2 + 3.3 = 6.6 (note: may have minor floating-point precision differences)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using Python's built-in sum() instead of NumPy's np.sum() (both work, but np.sum() is more consistent with NumPy arrays)",
+        "Not handling empty arrays (should return 0, not raise an error)",
+        "Forgetting that summation accumulates all values, including negative ones (they don't cancel differently)",
+        "Confusing sum with mean (mean divides by count, sum does not)",
+        "Not considering floating-point precision issues for very large arrays or extreme values"
+      ],
+      "hint": "NumPy provides np.sum() function that efficiently computes the sum of array elements. Alternatively, the .sum() method can be called directly on NumPy arrays.",
+      "references": [
+        "Sigma notation and summation properties",
+        "Aggregation operations in data processing",
+        "NumPy reduction functions",
+        "Geometric series closed-form formulas"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Composition of Operations: Building the Complete Pipeline",
+      "relation_to_problem": "The discounted return calculation requires composing three operations in sequence: generating discount coefficients, applying them to rewards via element-wise multiplication, and summing the results. This sub-quest teaches function composition and pipeline construction.",
+      "prerequisites": [
+        "Function composition",
+        "Sequential operations",
+        "Data flow understanding"
+      ],
+      "learning_objectives": [
+        "Understand how to chain multiple operations sequentially",
+        "Recognize the discounted return as a composition of simpler functions",
+        "Apply the complete pipeline to transform reward sequences into scalar returns",
+        "Validate intermediate results in a multi-step computation"
+      ],
+      "math_content": {
+        "definition": "**Function composition** combines multiple functions where the output of one becomes the input of the next. For functions $f: A \\to B$ and $g: B \\to C$, the composition $(g \\circ f): A \\to C$ is defined by $(g \\circ f)(x) = g(f(x))$. The discounted return computation is a three-function composition: $G = h(g(f(\\gamma, n), \\mathbf{r}))$ where $f$ generates coefficients, $g$ performs element-wise multiplication, and $h$ sums the result.",
+        "notation": "Let $f(\\gamma, n) = [\\gamma^0, \\gamma^1, \\ldots, \\gamma^{n-1}]$, $g(\\mathbf{c}, \\mathbf{r}) = \\mathbf{c} \\odot \\mathbf{r}$, and $h(\\mathbf{d}) = \\sum d_k$. Then $G = (h \\circ g \\circ f)(\\gamma, n, \\mathbf{r})$",
+        "theorem": "**Associativity of Composition**: Function composition is associative: $(h \\circ g) \\circ f = h \\circ (g \\circ f)$. This means we can group operations differently while preserving the result. For discounted returns, we can compute $G = h(g(f(\\gamma, n), \\mathbf{r}))$ by first computing coefficients, then discounted rewards, then the sum, in that order.",
+        "proof_sketch": "For any input $x$, both $(h \\circ g) \\circ f$ and $h \\circ (g \\circ f)$ evaluate to $h(g(f(x)))$ through function application. Associativity follows from the associativity of function application itself. In our specific case: $G = \\sum_{k} (\\gamma^k \\cdot r_k) = \\sum_{k} d_k$ where $d_k = \\gamma^k \\cdot r_k$.",
+        "examples": [
+          "For rewards $[1, 2, 3, 4]$ and $\\gamma = 0.9$: Step 1 yields $[1.0, 0.9, 0.81, 0.729]$. Step 2 yields $[1.0, 1.8, 2.43, 2.916]$. Step 3 yields $8.146$.",
+          "For rewards $[5, 5, 5]$ and $\\gamma = 0.8$: Coefficients $[1.0, 0.8, 0.64]$, discounted $[5.0, 4.0, 3.2]$, sum $= 12.2$",
+          "For rewards $[10]$ (single reward) and $\\gamma = 0.5$: Coefficients $[1.0]$, discounted $[10.0]$, sum $= 10.0$ (no future rewards to discount)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Discounted Return Computation",
+          "latex": "$G = \\sum_{k=0}^{n-1} R_{k+1} \\cdot \\gamma^k$",
+          "description": "The full formula combining coefficient generation, element-wise multiplication, and summation"
+        },
+        {
+          "name": "Decomposed Pipeline",
+          "latex": "$G = h(g(f(\\gamma, n), \\mathbf{r}))$ where $f, g, h$ are coefficient generation, element-wise product, and sum respectively",
+          "description": "Explicit decomposition showing the three-stage pipeline"
+        },
+        {
+          "name": "Intermediate Result Validation",
+          "latex": "$\\mathbf{d} = [d_0, d_1, \\ldots, d_{n-1}]$ where $d_k = R_{k+1} \\gamma^k$, and $G = \\sum_{k=0}^{n-1} d_k$",
+          "description": "Shows the intermediate discounted rewards vector that can be inspected for debugging"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes the discounted return by composing the three operations: (1) generate discount coefficients, (2) multiply them element-wise with rewards, (3) sum the results. The function should take rewards and gamma as inputs and return the scalar discounted return. Implement this by explicitly calling helper functions for each stage.",
+        "function_signature": "def compute_discounted_return_pipeline(rewards: np.ndarray, gamma: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef generate_coefficients(gamma, n):\n    \"\"\"Helper: Generate discount coefficients.\"\"\"\n    # Your implementation from Step 1\n    pass\n\ndef apply_discount(rewards, coefficients):\n    \"\"\"Helper: Apply coefficients to rewards.\"\"\"\n    # Your implementation from Step 2\n    pass\n\ndef compute_sum(arr):\n    \"\"\"Helper: Sum array elements.\"\"\"\n    # Your implementation from Step 3\n    pass\n\ndef compute_discounted_return_pipeline(rewards, gamma):\n    \"\"\"\n    Compute discounted return using a three-stage pipeline.\n    \n    Args:\n        rewards (np.ndarray): sequence of rewards\n        gamma (float): discount factor\n    \n    Returns:\n        float: discounted return G\n    \"\"\"\n    # Your code here: compose the three helper functions\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_discounted_return_pipeline(np.array([1, 2, 3, 4]), 0.9)",
+            "expected": "8.146",
+            "explanation": "Main problem example: coefficients [1.0, 0.9, 0.81, 0.729], discounted [1.0, 1.8, 2.43, 2.916], sum = 8.146"
+          },
+          {
+            "input": "compute_discounted_return_pipeline(np.array([10, 5, 2]), 0.5)",
+            "expected": "12.0",
+            "explanation": "Coefficients [1.0, 0.5, 0.25], discounted [10.0, 2.5, 0.5], sum = 13.0"
+          },
+          {
+            "input": "compute_discounted_return_pipeline(np.array([1, 1, 1, 1]), 1.0)",
+            "expected": "4.0",
+            "explanation": "With gamma=1.0, no discounting: sum of [1, 1, 1, 1] = 4.0"
+          },
+          {
+            "input": "compute_discounted_return_pipeline(np.array([5]), 0.9)",
+            "expected": "5.0",
+            "explanation": "Single reward with coefficient 1.0: 5 * 1.0 = 5.0"
+          },
+          {
+            "input": "compute_discounted_return_pipeline(np.array([3, -2, 4, -1]), 0.8)",
+            "expected": "3.848",
+            "explanation": "Mixed positive/negative rewards: [3*1.0, -2*0.8, 4*0.64, -1*0.512] = [3.0, -1.6, 2.56, -0.512], sum = 3.448"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not extracting the length n from the rewards array (n = len(rewards) needed for coefficient generation)",
+        "Passing data in the wrong order between functions (ensure output of one matches expected input of next)",
+        "Forgetting to convert the final result to a Python float (may return numpy scalar)",
+        "Not validating that intermediate results have correct shape and values",
+        "Hardcoding values instead of using proper function composition",
+        "Computing operations out of order (must generate coefficients before multiplying)"
+      ],
+      "hint": "First determine n = len(rewards). Then generate coefficients using gamma and n. Next, multiply rewards by coefficients element-wise. Finally, sum the resulting array. Each operation feeds into the next.",
+      "references": [
+        "Function composition in mathematics and programming",
+        "Pipeline patterns in data processing",
+        "Modular design and decomposition",
+        "Validation of intermediate computational results"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Vectorization and Efficient Implementation",
+      "relation_to_problem": "While the pipeline approach is conceptually clear, practical implementations should use vectorized operations for efficiency. This sub-quest teaches how to optimize the discounted return calculation using NumPy's vectorized operations, achieving the same result with minimal code.",
+      "prerequisites": [
+        "NumPy broadcasting",
+        "Vectorized operations",
+        "Computational efficiency concepts"
+      ],
+      "learning_objectives": [
+        "Understand the benefits of vectorization over explicit loops",
+        "Use NumPy operations to express the entire computation concisely",
+        "Recognize opportunities to eliminate intermediate variables",
+        "Apply mathematical knowledge to write efficient numerical code"
+      ],
+      "math_content": {
+        "definition": "**Vectorization** is the process of expressing operations on entire arrays without explicit loops, leveraging optimized low-level implementations. In NumPy, vectorized operations apply functions element-wise across arrays in compiled C code, achieving significant performance improvements over Python loops. Mathematically, this doesn't change the computation—it's purely an implementation optimization.",
+        "notation": "The discounted return $G = \\sum_{k=0}^{n-1} R_{k+1} \\gamma^k$ can be vectorized as $G = \\mathbf{r}^T \\mathbf{c}$ where $\\mathbf{r} = [R_1, R_2, \\ldots, R_n]$ and $\\mathbf{c} = [\\gamma^0, \\gamma^1, \\ldots, \\gamma^{n-1}]$, computed via $G = \\texttt{np.sum}(\\mathbf{r} * \\mathbf{c})$ or $G = \\texttt{np.dot}(\\mathbf{r}, \\mathbf{c})$",
+        "theorem": "**Vectorization Equivalence Theorem**: For compatible array operations, vectorized implementations produce identical mathematical results to their loop-based equivalents, up to floating-point precision. Specifically, $\\sum_{k=0}^{n-1} a_k b_k = \\texttt{np.sum}(\\mathbf{a} * \\mathbf{b}) = \\texttt{np.dot}(\\mathbf{a}, \\mathbf{b})$ for arrays $\\mathbf{a}, \\mathbf{b} \\in \\mathbb{R}^n$.",
+        "proof_sketch": "Both loop-based and vectorized implementations execute the same sequence of arithmetic operations (multiplication and addition) on the same data. The difference lies in implementation: loops interpret Python bytecode per iteration, while vectorized operations dispatch to optimized native code operating on contiguous memory. The associativity and commutativity of addition ensure order-independence for finite sums (though floating-point accumulation order may cause minor numerical differences).",
+        "examples": [
+          "Loop version: `G = 0; for k in range(n): G += rewards[k] * (gamma ** k)` versus vectorized: `G = np.sum(rewards * np.power(gamma, np.arange(len(rewards))))`",
+          "Using dot product: `G = np.dot(rewards, np.power(gamma, np.arange(len(rewards))))` computes the same result as a single inner product operation",
+          "For rewards=[1,2,3,4], gamma=0.9: Both `sum([rewards[k] * 0.9**k for k in range(4)])` and `np.sum(np.array([1,2,3,4]) * 0.9**np.arange(4))` yield 8.146"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Vectorized Discounted Return",
+          "latex": "$G = \\sum_{k=0}^{n-1} R_{k+1} \\gamma^k = \\mathbf{r}^T \\mathbf{c}$",
+          "description": "Expressing the sum as a dot product of reward and coefficient vectors"
+        },
+        {
+          "name": "NumPy Implementation",
+          "latex": "$G = \\texttt{np.sum}(\\mathbf{r} \\odot \\gamma^{\\mathbf{k}})$ where $\\mathbf{k} = [0, 1, \\ldots, n-1]$",
+          "description": "Direct NumPy translation using element-wise operations and sum"
+        },
+        {
+          "name": "Alternative Dot Product Form",
+          "latex": "$G = \\langle \\mathbf{r}, \\mathbf{c} \\rangle = \\mathbf{r} \\cdot \\mathbf{c}$",
+          "description": "Inner product notation showing the computation as a single dot product"
+        }
+      ],
+      "exercise": {
+        "description": "Write an efficient, vectorized implementation of the discounted return calculation. The function should compute the result in a single expression (or very few expressions) using NumPy's vectorized operations, without explicit loops or separate helper functions. This represents production-quality code for the discounted return computation.",
+        "function_signature": "def discounted_return_vectorized(rewards: np.ndarray, gamma: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef discounted_return_vectorized(rewards, gamma):\n    \"\"\"\n    Compute discounted return using vectorized NumPy operations.\n    \n    Args:\n        rewards (np.ndarray): sequence of rewards\n        gamma (float): discount factor (0 <= gamma <= 1)\n    \n    Returns:\n        float: discounted return G\n    \"\"\"\n    # Your code here: use NumPy's vectorized operations\n    pass",
+        "test_cases": [
+          {
+            "input": "discounted_return_vectorized(np.array([1, 2, 3, 4]), 0.9)",
+            "expected": "8.146",
+            "explanation": "Standard example from main problem: G = 1*0.9^0 + 2*0.9^1 + 3*0.9^2 + 4*0.9^3 = 8.146"
+          },
+          {
+            "input": "discounted_return_vectorized(np.array([10, 5, 2]), 0.5)",
+            "expected": "13.0",
+            "explanation": "G = 10*1.0 + 5*0.5 + 2*0.25 = 10 + 2.5 + 0.5 = 13.0"
+          },
+          {
+            "input": "discounted_return_vectorized(np.array([1, 1, 1, 1, 1]), 1.0)",
+            "expected": "5.0",
+            "explanation": "No discounting with gamma=1.0: G = 1+1+1+1+1 = 5.0"
+          },
+          {
+            "input": "discounted_return_vectorized(np.array([100]), 0.9)",
+            "expected": "100.0",
+            "explanation": "Single reward: G = 100 * 0.9^0 = 100.0"
+          },
+          {
+            "input": "discounted_return_vectorized(np.array([5, -3, 2, -1, 4]), 0.8)",
+            "expected": "5.9488",
+            "explanation": "Mixed rewards: G = 5 - 2.4 + 1.28 - 0.512 + 2.048 = 5.416 (approximately, accounting for floating-point precision)"
+          },
+          {
+            "input": "discounted_return_vectorized(np.array([1, 0, 0, 10]), 0.9)",
+            "expected": "8.29",
+            "explanation": "Sparse rewards: G = 1*1.0 + 0*0.9 + 0*0.81 + 10*0.729 = 1 + 7.29 = 8.29"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using Python loops instead of vectorized operations (correct but inefficient)",
+        "Not converting rewards to NumPy array if provided as a list",
+        "Incorrectly generating the exponent sequence (should be 0 to len(rewards)-1)",
+        "Using ** operator on scalar gamma with array exponents without proper broadcasting",
+        "Forgetting that np.arange(n) generates [0, 1, ..., n-1], which is exactly what we need for exponents",
+        "Not extracting scalar result from numpy array (though often handled automatically)"
+      ],
+      "hint": "The key insight is that np.arange(len(rewards)) generates the exponent sequence [0, 1, 2, ...]. Use gamma ** np.arange(len(rewards)) to get all coefficients at once, multiply element-wise with rewards, then sum. Alternatively, use np.dot() for the dot product directly.",
+      "references": [
+        "NumPy vectorization and broadcasting",
+        "Computational complexity and performance optimization",
+        "Dot products and inner products in linear algebra",
+        "Efficient numerical computing practices"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Edge Cases, Validation, and Numerical Considerations",
+      "relation_to_problem": "Production implementations must handle edge cases correctly and be aware of numerical precision issues. This final sub-quest teaches how to make the discounted return calculation robust, handling empty rewards, extreme gamma values, and numerical stability concerns.",
+      "prerequisites": [
+        "Exception handling",
+        "Numerical precision awareness",
+        "Input validation practices"
+      ],
+      "learning_objectives": [
+        "Identify and handle edge cases in the discounted return calculation",
+        "Understand floating-point precision limitations and their implications",
+        "Validate inputs to ensure mathematical preconditions are met",
+        "Write robust, production-ready code that handles unusual inputs gracefully"
+      ],
+      "math_content": {
+        "definition": "**Edge cases** are inputs at the boundary of the function's domain or special cases requiring different handling. For discounted returns, edge cases include: empty reward sequences ($n=0$), single rewards ($n=1$), extreme discount factors ($\\gamma = 0$ or $\\gamma = 1$), very long sequences (numerical precision), and invalid inputs ($\\gamma < 0$ or $\\gamma > 1$). **Numerical stability** refers to how small perturbations in input propagate to output, particularly relevant in floating-point arithmetic.",
+        "notation": "Input validation: $\\gamma \\in [0, 1]$ (domain constraint), $n \\geq 0$ (non-negative sequence length), $\\mathbf{r} \\in \\mathbb{R}^n$ (real-valued rewards). Edge cases: $n = 0 \\Rightarrow G = 0$ (empty sum), $\\gamma = 0 \\Rightarrow G = r_1$ (only immediate reward), $\\gamma = 1 \\Rightarrow G = \\sum_{k=1}^{n} r_k$ (undiscounted sum)",
+        "theorem": "**Edge Case Preservation Theorem**: Well-defined mathematical operations should handle edge cases consistently with mathematical conventions. For the discounted return: (1) Empty sequence: $G([], \\gamma) = 0$ (empty sum identity), (2) Single element: $G([r], \\gamma) = r$ (since $\\gamma^0 = 1$), (3) Zero discount: $G(\\mathbf{r}, 0) = r_1$ (only first reward matters), (4) No discount: $G(\\mathbf{r}, 1) = \\sum r_k$ (standard sum).",
+        "proof_sketch": "Each edge case follows from the definition $G = \\sum_{k=0}^{n-1} R_{k+1} \\gamma^k$. Empty sequence: $n=0$ implies empty sum, conventionally 0. Single element: $G = R_1 \\cdot \\gamma^0 = R_1 \\cdot 1 = R_1$. Zero discount: $\\gamma^0 = 1$, $\\gamma^k = 0$ for $k > 0$, so only $R_1$ survives. No discount: $\\gamma = 1$ makes all $\\gamma^k = 1$, reducing to standard summation.",
+        "examples": [
+          "Empty rewards `[]` with any gamma: Should return 0.0 (empty sum)",
+          "Single reward `[5.0]` with gamma=0.7: Returns 5.0 (since 5.0 * 0.7^0 = 5.0 * 1 = 5.0)",
+          "Rewards `[1, 2, 3]` with gamma=0.0: Returns 1.0 (only first reward counts: 1*1 + 2*0 + 3*0 = 1)",
+          "Rewards `[1, 2, 3]` with gamma=1.0: Returns 6.0 (no discounting: 1 + 2 + 3 = 6)",
+          "Very long sequence (1000+ elements) with gamma=0.9: Later terms become negligibly small due to exponential decay (e.g., 0.9^100 ≈ 2.66e-5)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Empty Sum Convention",
+          "latex": "$\\sum_{k=0}^{-1} a_k = 0$",
+          "description": "Mathematical convention that empty sums equal zero (additive identity)"
+        },
+        {
+          "name": "Extreme Discount Factor Simplifications",
+          "latex": "$G(\\mathbf{r}, 0) = r_1$ and $G(\\mathbf{r}, 1) = \\sum_{k=1}^{n} r_k$",
+          "description": "Limiting cases for zero and unit discount factors"
+        },
+        {
+          "name": "Numerical Precision Bound",
+          "latex": "$|G_{\\text{computed}} - G_{\\text{true}}| \\leq \\epsilon_{\\text{machine}} \\cdot n \\cdot \\max_k |r_k \\gamma^k|$",
+          "description": "Error bound showing accumulation of floating-point errors over n operations"
+        }
+      ],
+      "exercise": {
+        "description": "Write a robust, production-ready implementation of the discounted return that handles all edge cases correctly, validates inputs, and includes appropriate documentation. The function should work correctly for empty arrays, single elements, extreme gamma values, and provide helpful error messages for invalid inputs.",
+        "function_signature": "def discounted_return_robust(rewards: np.ndarray, gamma: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef discounted_return_robust(rewards, gamma):\n    \"\"\"\n    Compute the discounted return with robust edge case handling.\n    \n    The discounted return is defined as:\n        G = sum_{k=0}^{n-1} rewards[k] * gamma^k\n    \n    Args:\n        rewards (np.ndarray or list): sequence of rewards (can be empty)\n        gamma (float): discount factor, must be in [0, 1]\n    \n    Returns:\n        float: discounted return G\n    \n    Raises:\n        ValueError: if gamma is not in [0, 1]\n    \n    Edge cases:\n        - Empty rewards: returns 0.0\n        - Single reward: returns that reward (multiplied by gamma^0 = 1)\n        - gamma = 0: returns first reward only\n        - gamma = 1: returns undiscounted sum\n    \"\"\"\n    # Your code here: implement with input validation and edge case handling\n    pass",
+        "test_cases": [
+          {
+            "input": "discounted_return_robust(np.array([]), 0.9)",
+            "expected": "0.0",
+            "explanation": "Empty rewards array should return 0.0 (empty sum convention)"
+          },
+          {
+            "input": "discounted_return_robust(np.array([5.0]), 0.7)",
+            "expected": "5.0",
+            "explanation": "Single reward: 5.0 * 0.7^0 = 5.0 * 1 = 5.0"
+          },
+          {
+            "input": "discounted_return_robust([1, 2, 3], 0.0)",
+            "expected": "1.0",
+            "explanation": "With gamma=0, only first reward matters: 1*1 + 2*0 + 3*0 = 1"
+          },
+          {
+            "input": "discounted_return_robust([1, 2, 3], 1.0)",
+            "expected": "6.0",
+            "explanation": "With gamma=1, no discounting: 1 + 2 + 3 = 6"
+          },
+          {
+            "input": "discounted_return_robust([1, 2, 3, 4], 0.9)",
+            "expected": "8.146",
+            "explanation": "Standard case from main problem: 1 + 1.8 + 2.43 + 2.916 = 8.146"
+          },
+          {
+            "input": "discounted_return_robust([10, -5, 3], 0.8)",
+            "expected": "8.92",
+            "explanation": "Mixed positive/negative rewards: 10*1 + (-5)*0.8 + 3*0.64 = 10 - 4 + 1.92 = 7.92"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not validating that gamma is in [0, 1] range (should raise ValueError for invalid gamma)",
+        "Failing to handle empty arrays (should return 0.0, not crash or return None)",
+        "Not converting list inputs to NumPy arrays when necessary",
+        "Using assertions for input validation instead of proper exceptions (assertions can be disabled)",
+        "Not documenting edge case behavior clearly",
+        "Assuming rewards array is always non-empty in the implementation",
+        "Not considering that very small gamma^k values (for large k) effectively become zero due to underflow"
+      ],
+      "hint": "Start by validating gamma is in [0, 1]. Check if rewards is empty and return 0.0 if so. Convert rewards to NumPy array if it's a list. Then apply the vectorized computation. Consider what happens for special gamma values (0 and 1) - your implementation should handle these automatically if coded correctly.",
+      "references": [
+        "Input validation and defensive programming",
+        "IEEE 754 floating-point arithmetic and precision",
+        "Exception handling best practices in Python",
+        "Edge case testing and boundary value analysis",
+        "Numerical stability in scientific computing"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,530 @@
+{
+  "problem_id": 253,
+  "title": "Feature Drift Detection using Population Stability Index",
+  "category": "MLOps",
+  "difficulty": "medium",
+  "description": "In production ML systems, detecting when input feature distributions change (drift) between training and production is crucial for maintaining model performance. The Population Stability Index (PSI) is a widely-used metric in MLOps for quantifying distribution shifts.\n\nWrite a function `detect_feature_drift(reference_data, production_data, num_bins)` that:\n\n1. Takes a reference distribution (e.g., training data feature values) and a production distribution (current incoming data)\n2. Computes the PSI to measure how much the production distribution has shifted from the reference\n3. Returns a dictionary with the PSI value and drift assessment\n\nThe function should return a dictionary containing:\n- `psi`: The calculated Population Stability Index (rounded to 4 decimal places)\n- `drift_detected`: Boolean indicating if drift is detected (PSI >= 0.1)\n- `drift_level`: One of 'none' (PSI < 0.1), 'moderate' (0.1 <= PSI < 0.25), or 'significant' (PSI >= 0.25)\n\nIf either input list is empty, return an empty dictionary.\n\nNote: When computing bin proportions, use a small epsilon value (0.0001) to replace zero proportions to avoid numerical issues with logarithms.",
+  "example": {
+    "input": "reference_data = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5], production_data = [3, 3, 4, 4, 5, 5, 6, 6, 7, 7], num_bins = 5",
+    "output": "{'psi': 0.1871, 'drift_detected': True, 'drift_level': 'moderate'}",
+    "reasoning": "The reference data is concentrated in range [1,5] while production data has shifted to [3,7]. Using 5 bins, we compute the proportion of data in each bin for both distributions. The PSI formula sums (prod_pct - ref_pct) * ln(prod_pct / ref_pct) across all bins. The resulting PSI of 0.1871 falls in the moderate drift range (0.1-0.25), indicating the distribution has shifted enough to warrant monitoring."
+  },
+  "starter_code": "import numpy as np\n\ndef detect_feature_drift(reference_data: list, production_data: list, num_bins: int = 10) -> dict:\n    \"\"\"\n    Detect feature drift using Population Stability Index (PSI).\n    \n    Args:\n        reference_data: List of feature values from reference distribution (e.g., training)\n        production_data: List of feature values from production distribution\n        num_bins: Number of bins for histogram comparison\n    \n    Returns:\n        dict with 'psi', 'drift_detected', and 'drift_level'\n    \"\"\"\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Data Binning and Histogram Construction",
+      "relation_to_problem": "PSI requires discretizing continuous data into bins to compare distributions. This sub-quest teaches how to partition data ranges and count observations per bin, which is the foundation for computing distribution proportions needed in the PSI formula.",
+      "prerequisites": [
+        "Basic statistics",
+        "Understanding of histograms",
+        "Python lists and numpy arrays"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition of data binning",
+        "Implement equal-width binning for continuous data",
+        "Compute bin edges and assign data points to bins",
+        "Handle edge cases like empty datasets and boundary values"
+      ],
+      "math_content": {
+        "definition": "Given a dataset $X = \\{x_1, x_2, \\ldots, x_n\\}$ with $x_i \\in \\mathbb{R}$ and a number of bins $k \\in \\mathbb{N}$, **binning** is a discretization process that partitions the range $[x_{\\min}, x_{\\max}]$ into $k$ contiguous intervals. For **equal-width binning**, the interval width is $w = \\frac{x_{\\max} - x_{\\min}}{k}$, and bin $i$ is defined as $B_i = [x_{\\min} + (i-1)w, x_{\\min} + iw)$ for $i = 1, 2, \\ldots, k-1$, with the last bin $B_k = [x_{\\min} + (k-1)w, x_{\\max}]$ (closed on both ends to include the maximum value).",
+        "notation": "$x_{\\min}$ = minimum value in dataset, $x_{\\max}$ = maximum value in dataset, $k$ = number of bins, $w$ = bin width, $B_i$ = the $i$-th bin interval",
+        "theorem": "**Theorem (Completeness of Binning)**: Every data point $x_j \\in X$ is assigned to exactly one bin. Formally, for all $x_j$, there exists a unique $i \\in \\{1, 2, \\ldots, k\\}$ such that $x_j \\in B_i$, and for all $i \\neq j$, $B_i \\cap B_j = \\emptyset$ (bins are mutually exclusive).",
+        "proof_sketch": "Proof: Since $\\bigcup_{i=1}^{k} B_i = [x_{\\min}, x_{\\max}]$ and each $x_j \\in [x_{\\min}, x_{\\max}]$ by construction, every point must belong to at least one bin. The half-open interval definition $[a, b)$ ensures that boundary points belong to the right bin only, except for $x_{\\max}$ which is explicitly included in $B_k$. Thus assignment is both complete and unique.",
+        "examples": [
+          "Example 1: Data $X = [1, 2, 3, 4, 5]$, $k=3$ bins. Range: $[1, 5]$, width $w = \\frac{5-1}{3} = 1.333$. Bins: $B_1 = [1, 2.333)$, $B_2 = [2.333, 3.667)$, $B_3 = [3.667, 5]$. Counts: $B_1$ contains $\\{1, 2\\}$ (2 points), $B_2$ contains $\\{3\\}$ (1 point), $B_3$ contains $\\{4, 5\\}$ (2 points).",
+          "Example 2: Data $X = [10, 15, 20, 25, 30]$, $k=5$ bins. Range: $[10, 30]$, width $w = 4$. Bins: $[10, 14), [14, 18), [18, 22), [22, 26), [26, 30]$. Counts: $[1, 1, 1, 1, 1]$ (one point per bin)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Bin Width Formula",
+          "latex": "$w = \\frac{x_{\\max} - x_{\\min}}{k}$",
+          "description": "Calculate the width of each equal-width bin"
+        },
+        {
+          "name": "Bin Edge Formula",
+          "latex": "$\\text{edge}_i = x_{\\min} + i \\cdot w$ for $i = 0, 1, \\ldots, k$",
+          "description": "Compute the boundary points that separate bins"
+        },
+        {
+          "name": "Bin Assignment",
+          "latex": "$\\text{bin}(x_j) = \\left\\lfloor \\frac{x_j - x_{\\min}}{w} \\right\\rfloor$",
+          "description": "Determine which bin index a value belongs to (with special handling for maximum value)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a list of numerical values and a number of bins, then returns a list of counts representing how many values fall into each bin. Use equal-width binning strategy. Handle the edge case where all values are identical (return a list with all counts in the first bin). If the input is empty, return an empty list.",
+        "function_signature": "def compute_histogram(data: list, num_bins: int) -> list:",
+        "starter_code": "def compute_histogram(data: list, num_bins: int) -> list:\n    \"\"\"\n    Create histogram bins and count observations in each bin.\n    \n    Args:\n        data: List of numerical values\n        num_bins: Number of equal-width bins to create\n    \n    Returns:\n        List of counts for each bin\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_histogram([1, 2, 3, 4, 5], 5)",
+            "expected": "[1, 1, 1, 1, 1]",
+            "explanation": "Each value falls into its own bin with equal-width binning over range [1,5]"
+          },
+          {
+            "input": "compute_histogram([1, 1, 2, 2, 3, 3], 3)",
+            "expected": "[2, 2, 2]",
+            "explanation": "Range [1,3] divided into 3 bins of width 0.667: [1,1.667), [1.667,2.333), [2.333,3]"
+          },
+          {
+            "input": "compute_histogram([5, 5, 5, 5], 3)",
+            "expected": "[4, 0, 0]",
+            "explanation": "All identical values fall into the first bin when min equals max"
+          },
+          {
+            "input": "compute_histogram([], 5)",
+            "expected": "[]",
+            "explanation": "Empty input returns empty histogram"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the maximum value correctly (should be included in the last bin, not excluded)",
+        "Integer division errors causing incorrect bin assignments",
+        "Not checking for empty input or zero range (all values identical)",
+        "Off-by-one errors in bin indexing",
+        "Forgetting that numpy.histogram has different conventions than manual implementation"
+      ],
+      "hint": "First compute the range (min and max), then calculate bin width. Use conditional logic to handle the special case where a value equals the maximum. Consider using numpy.linspace to generate bin edges.",
+      "references": [
+        "Histogram construction algorithms",
+        "Data discretization techniques",
+        "Numpy histogram documentation"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Probability Distribution Estimation from Frequencies",
+      "relation_to_problem": "PSI compares probability distributions, not raw counts. This sub-quest teaches how to normalize bin counts into probability mass functions, which are the $E_i$ and $A_i$ terms in the PSI formula.",
+      "prerequisites": [
+        "Histograms and binning",
+        "Basic probability theory",
+        "Sum of probabilities equals 1"
+      ],
+      "learning_objectives": [
+        "Convert frequency counts to probability distributions",
+        "Understand the normalization constraint in probability mass functions",
+        "Implement numerical smoothing for zero-frequency bins",
+        "Verify that computed distributions satisfy probability axioms"
+      ],
+      "math_content": {
+        "definition": "A **discrete probability mass function (PMF)** over a finite set of outcomes $\\{B_1, B_2, \\ldots, B_k\\}$ is a function $P: \\{B_1, \\ldots, B_k\\} \\to [0, 1]$ satisfying: (1) **Non-negativity**: $P(B_i) \\geq 0$ for all $i$, and (2) **Normalization**: $\\sum_{i=1}^{k} P(B_i) = 1$. Given observed counts $c_i$ for each bin $B_i$ with total observations $n = \\sum_{i=1}^{k} c_i$, the **empirical probability** is estimated as $\\hat{P}(B_i) = \\frac{c_i}{n}$.",
+        "notation": "$c_i$ = count of observations in bin $i$, $n$ = total number of observations, $\\hat{P}(B_i)$ = estimated probability of bin $i$, $\\epsilon$ = smoothing constant for zero counts",
+        "theorem": "**Theorem (Properties of Empirical Distribution)**: If $\\hat{P}(B_i) = \\frac{c_i}{n}$ where $c_i \\geq 0$ are counts and $n = \\sum c_i > 0$, then: (1) $\\hat{P}(B_i) \\in [0, 1]$ for all $i$, and (2) $\\sum_{i=1}^{k} \\hat{P}(B_i) = 1$.",
+        "proof_sketch": "Proof: (1) Since $c_i \\geq 0$ and $n > 0$, we have $\\hat{P}(B_i) = \\frac{c_i}{n} \\geq 0$. Also $c_i \\leq n$ implies $\\hat{P}(B_i) \\leq 1$. (2) $\\sum_{i=1}^{k} \\hat{P}(B_i) = \\sum_{i=1}^{k} \\frac{c_i}{n} = \\frac{1}{n} \\sum_{i=1}^{k} c_i = \\frac{n}{n} = 1$. Thus $\\hat{P}$ satisfies the probability axioms.",
+        "examples": [
+          "Example 1: Counts $[10, 20, 30, 40]$, total $n=100$. Probabilities: $[0.1, 0.2, 0.3, 0.4]$. Verification: $0.1 + 0.2 + 0.3 + 0.4 = 1.0$ ✓",
+          "Example 2: Counts $[5, 0, 3, 2]$, total $n=10$. Naive probabilities: $[0.5, 0.0, 0.3, 0.2]$. With smoothing $\\epsilon=0.0001$: Replace 0 with 0.0001, recompute total as $n' = 10 + 0.0001 = 10.0001$, giving approximately $[0.49995, 0.00001, 0.29997, 0.19998]$. This prevents division by zero in subsequent logarithm calculations."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Empirical Probability",
+          "latex": "$\\hat{P}(B_i) = \\frac{c_i}{n}$",
+          "description": "Estimate probability of bin $i$ from observed counts"
+        },
+        {
+          "name": "Smoothed Probability",
+          "latex": "$\\hat{P}_{\\epsilon}(B_i) = \\frac{\\max(c_i, \\epsilon)}{n + k\\epsilon}$",
+          "description": "Add small epsilon to zero counts and adjust denominator to maintain normalization"
+        },
+        {
+          "name": "Normalization Check",
+          "latex": "$\\sum_{i=1}^{k} \\hat{P}(B_i) = 1$",
+          "description": "Verify that probabilities sum to exactly 1 (within numerical precision)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that converts a list of bin counts into a probability distribution. Apply epsilon smoothing (epsilon=0.0001) to replace any zero counts before normalization. Return the list of probabilities rounded to 6 decimal places. If the input is empty or all counts are zero, return an empty list.",
+        "function_signature": "def counts_to_probabilities(counts: list, epsilon: float = 0.0001) -> list:",
+        "starter_code": "def counts_to_probabilities(counts: list, epsilon: float = 0.0001) -> list:\n    \"\"\"\n    Convert bin counts to probability distribution with epsilon smoothing.\n    \n    Args:\n        counts: List of observation counts per bin\n        epsilon: Small value to replace zero counts (default 0.0001)\n    \n    Returns:\n        List of probabilities (summing to 1.0)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "counts_to_probabilities([10, 20, 30, 40])",
+            "expected": "[0.1, 0.2, 0.3, 0.4]",
+            "explanation": "Simple normalization: each count divided by total 100"
+          },
+          {
+            "input": "counts_to_probabilities([5, 0, 3, 2])",
+            "expected": "[0.499950, 0.000010, 0.299970, 0.199970]",
+            "explanation": "Zero count replaced with epsilon=0.0001, then normalized by new total 10.0001"
+          },
+          {
+            "input": "counts_to_probabilities([0, 0, 0])",
+            "expected": "[0.333333, 0.333333, 0.333333]",
+            "explanation": "All zeros become epsilon, resulting in uniform distribution after normalization"
+          },
+          {
+            "input": "counts_to_probabilities([])",
+            "expected": "[]",
+            "explanation": "Empty input returns empty list"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to apply epsilon smoothing before computing probabilities",
+        "Not adjusting the denominator after adding epsilon to zero counts",
+        "Rounding errors causing probabilities to not sum exactly to 1.0",
+        "Applying smoothing after normalization instead of before",
+        "Not handling the edge case where all counts are zero"
+      ],
+      "hint": "Replace any zero in the counts list with epsilon, then compute the new total. Divide each smoothed count by the new total to get probabilities.",
+      "references": [
+        "Laplace smoothing",
+        "Add-epsilon smoothing",
+        "Probability mass functions",
+        "Maximum likelihood estimation"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Kullback-Leibler Divergence and Information Theory",
+      "relation_to_problem": "PSI is fundamentally based on KL divergence, which measures how one probability distribution differs from another. Understanding KL divergence is essential for interpreting what PSI actually measures and why the logarithm appears in the formula.",
+      "prerequisites": [
+        "Probability distributions",
+        "Logarithms",
+        "Information theory basics"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of Kullback-Leibler divergence",
+        "Interpret KL divergence as a measure of information loss",
+        "Compute KL divergence between two discrete distributions",
+        "Recognize the asymmetry property of KL divergence"
+      ],
+      "math_content": {
+        "definition": "The **Kullback-Leibler (KL) divergence** from a probability distribution $Q$ to a distribution $P$ over a discrete sample space $\\mathcal{X}$ is defined as: $$D_{KL}(P \\| Q) = \\sum_{x \\in \\mathcal{X}} P(x) \\ln\\left(\\frac{P(x)}{Q(x)}\\right)$$ where the logarithm is natural (base $e$). The KL divergence quantifies the expected excess information (in nats) required to encode samples from $P$ when using a code optimized for $Q$ instead of $P$.",
+        "notation": "$P(x)$ = probability of outcome $x$ under distribution $P$, $Q(x)$ = probability under distribution $Q$, $D_{KL}(P \\| Q)$ = KL divergence from $Q$ to $P$ (read as 'divergence of P from Q'), $\\ln$ = natural logarithm",
+        "theorem": "**Theorem (Gibbs' Inequality)**: For any two probability distributions $P$ and $Q$ over the same space, $D_{KL}(P \\| Q) \\geq 0$, with equality if and only if $P = Q$ (i.e., $P(x) = Q(x)$ for all $x$). This establishes that KL divergence is a valid measure of distributional difference.",
+        "proof_sketch": "Proof: Using the inequality $\\ln(y) \\leq y - 1$ with equality only when $y = 1$, we have: $$-D_{KL}(P \\| Q) = \\sum_x P(x) \\ln\\left(\\frac{Q(x)}{P(x)}\\right) \\leq \\sum_x P(x)\\left(\\frac{Q(x)}{P(x)} - 1\\right) = \\sum_x (Q(x) - P(x)) = 1 - 1 = 0$$ Therefore $D_{KL}(P \\| Q) \\geq 0$. Equality holds iff $\\frac{Q(x)}{P(x)} = 1$ for all $x$ where $P(x) > 0$, i.e., $P = Q$.",
+        "examples": [
+          "Example 1: $P = [0.5, 0.5]$, $Q = [0.5, 0.5]$ (identical distributions). $D_{KL}(P \\| Q) = 0.5 \\ln(0.5/0.5) + 0.5 \\ln(0.5/0.5) = 0.5 \\cdot 0 + 0.5 \\cdot 0 = 0$. No divergence as expected.",
+          "Example 2: $P = [0.8, 0.2]$, $Q = [0.5, 0.5]$ (uniform vs skewed). $D_{KL}(P \\| Q) = 0.8 \\ln(0.8/0.5) + 0.2 \\ln(0.2/0.5) = 0.8 \\ln(1.6) + 0.2 \\ln(0.4) = 0.8 \\cdot 0.470 + 0.2 \\cdot (-0.916) = 0.376 - 0.183 = 0.193$ nats.",
+          "Example 3 (Asymmetry): $D_{KL}(Q \\| P)$ with same $P, Q$ as above: $0.5 \\ln(0.5/0.8) + 0.5 \\ln(0.5/0.2) = 0.5 \\cdot (-0.470) + 0.5 \\cdot 0.916 = 0.223$ nats. Note $D_{KL}(P \\| Q) \\neq D_{KL}(Q \\| P)$, demonstrating asymmetry."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "KL Divergence Definition",
+          "latex": "$D_{KL}(P \\| Q) = \\sum_{i=1}^{k} P_i \\ln\\left(\\frac{P_i}{Q_i}\\right)$",
+          "description": "Measure information gain when using P instead of Q"
+        },
+        {
+          "name": "Symmetric KL Divergence",
+          "latex": "$D_{sym}(P, Q) = D_{KL}(P \\| Q) + D_{KL}(Q \\| P)$",
+          "description": "Sum of both directions, related to PSI (though PSI has a different formula)"
+        },
+        {
+          "name": "Base-2 KL Divergence",
+          "latex": "$D_{KL}^{(2)}(P \\| Q) = \\sum_i P_i \\log_2\\left(\\frac{P_i}{Q_i}\\right)$",
+          "description": "KL divergence in bits instead of nats, using base-2 logarithm"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the Kullback-Leibler divergence from distribution Q to distribution P. Both inputs are lists of probabilities that sum to 1. The function should compute D_KL(P || Q) using the natural logarithm. Return the result rounded to 6 decimal places. If inputs have different lengths or don't represent valid probability distributions (sum not equal to 1 within tolerance 1e-6), return None.",
+        "function_signature": "def compute_kl_divergence(p_probs: list, q_probs: list) -> float:",
+        "starter_code": "def compute_kl_divergence(p_probs: list, q_probs: list) -> float:\n    \"\"\"\n    Compute Kullback-Leibler divergence D_KL(P || Q).\n    \n    Args:\n        p_probs: Probability distribution P\n        q_probs: Probability distribution Q (reference)\n    \n    Returns:\n        KL divergence value in nats, or None if inputs invalid\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_kl_divergence([0.5, 0.5], [0.5, 0.5])",
+            "expected": "0.0",
+            "explanation": "Identical distributions have zero KL divergence"
+          },
+          {
+            "input": "compute_kl_divergence([0.8, 0.2], [0.5, 0.5])",
+            "expected": "0.193147",
+            "explanation": "Skewed distribution P diverges from uniform Q: 0.8*ln(1.6) + 0.2*ln(0.4)"
+          },
+          {
+            "input": "compute_kl_divergence([0.5, 0.5], [0.8, 0.2])",
+            "expected": "0.223144",
+            "explanation": "Asymmetry demonstration: D_KL(uniform || skewed) differs from previous case"
+          },
+          {
+            "input": "compute_kl_divergence([0.25, 0.25, 0.25, 0.25], [0.4, 0.3, 0.2, 0.1])",
+            "expected": "0.097478",
+            "explanation": "Four-bin case: uniform distribution diverges slightly from non-uniform reference"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing the order of arguments: D_KL(P || Q) is not the same as D_KL(Q || P)",
+        "Using log base 10 instead of natural logarithm ln (base e)",
+        "Not validating that input probabilities sum to 1",
+        "Forgetting that KL divergence is undefined when Q(x)=0 but P(x)>0 (this is why epsilon smoothing is crucial)",
+        "Attempting to use KL divergence as a distance metric (it's not symmetric and doesn't satisfy triangle inequality)"
+      ],
+      "hint": "Use numpy.log for natural logarithm. Iterate through both distributions simultaneously, computing P[i] * ln(P[i]/Q[i]) for each bin, then sum all terms.",
+      "references": [
+        "Information theory",
+        "Cross-entropy",
+        "Entropy",
+        "Relative entropy",
+        "Cover and Thomas - Elements of Information Theory"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Population Stability Index (PSI) Formula Derivation",
+      "relation_to_problem": "This sub-quest introduces the actual PSI formula used in the main problem. Unlike standard KL divergence, PSI has a specific form that makes it particularly useful for drift detection by measuring divergence in both directions simultaneously.",
+      "prerequisites": [
+        "KL divergence",
+        "Probability distributions",
+        "Binned data representation"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical formula for Population Stability Index",
+        "Recognize how PSI relates to KL divergence but differs in formulation",
+        "Compute PSI between reference and production distributions",
+        "Interpret PSI values using industry-standard thresholds"
+      ],
+      "math_content": {
+        "definition": "The **Population Stability Index (PSI)** is a metric for quantifying distribution shift between a reference (expected) distribution and a current (actual) distribution. Given two discrete distributions over $k$ bins with probabilities $E_i$ (expected/reference) and $A_i$ (actual/production) for bin $i$, PSI is defined as: $$\\text{PSI} = \\sum_{i=1}^{k} (A_i - E_i) \\cdot \\ln\\left(\\frac{A_i}{E_i}\\right)$$ Note the key structural element: the difference $(A_i - E_i)$ is multiplied by the logarithmic ratio, creating a weighted divergence measure.",
+        "notation": "$E_i$ = proportion of reference data in bin $i$, $A_i$ = proportion of current/production data in bin $i$, $k$ = number of bins, $\\ln$ = natural logarithm",
+        "theorem": "**Theorem (PSI Properties)**: (1) **Non-negativity**: $\\text{PSI} \\geq 0$ for all distributions $A$ and $E$. (2) **Zero Property**: $\\text{PSI} = 0$ if and only if $A_i = E_i$ for all $i$. (3) **Approximate Symmetry**: While not perfectly symmetric, PSI approximates $D_{KL}(A \\| E) + D_{KL}(E \\| A)$ in practice. (4) **Scale Invariance**: PSI depends only on proportions, not absolute sample sizes.",
+        "proof_sketch": "Proof of Non-negativity: Rewrite PSI as $\\sum_i (A_i - E_i) \\ln(A_i/E_i) = \\sum_i A_i \\ln(A_i/E_i) - \\sum_i E_i \\ln(A_i/E_i)$. The first term is $D_{KL}(A \\| E) \\geq 0$ by Gibbs' inequality. For the second term, $-\\sum_i E_i \\ln(A_i/E_i) = \\sum_i E_i \\ln(E_i/A_i)$. By Jensen's inequality applied to the convex function $x \\ln x$, this term is bounded. The full rigorous proof requires showing the sum is non-negative, which follows from the fact that $(x-y)\\ln(x/y) \\geq 0$ for positive $x, y$ (provable by considering cases $x > y$ and $x < y$ separately).",
+        "examples": [
+          "Example 1 (No drift): Reference $E = [0.25, 0.25, 0.25, 0.25]$, Production $A = [0.25, 0.25, 0.25, 0.25]$. PSI $= \\sum_i (0.25 - 0.25) \\ln(1) = 0$. Interpretation: No distribution change.",
+          "Example 2 (Moderate drift): Reference $E = [0.4, 0.3, 0.2, 0.1]$, Production $A = [0.3, 0.3, 0.25, 0.15]$. Computing term by term: Bin 1: $(0.3-0.4)\\ln(0.3/0.4) = -0.1 \\cdot (-0.288) = 0.0288$. Bin 2: $(0.3-0.3)\\ln(1) = 0$. Bin 3: $(0.25-0.2)\\ln(1.25) = 0.05 \\cdot 0.223 = 0.0112$. Bin 4: $(0.15-0.1)\\ln(1.5) = 0.05 \\cdot 0.405 = 0.0203$. Total PSI $= 0.0288 + 0 + 0.0112 + 0.0203 = 0.0603$. Interpretation: PSI < 0.1, no significant drift.",
+          "Example 3 (Significant drift): Reference $E = [0.5, 0.3, 0.15, 0.05]$, Production $A = [0.1, 0.2, 0.3, 0.4]$. PSI ≈ 0.413 (detailed calculation similar to above). Interpretation: PSI > 0.25, significant drift detected."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "PSI Formula",
+          "latex": "$\\text{PSI} = \\sum_{i=1}^{k} (A_i - E_i) \\cdot \\ln\\left(\\frac{A_i}{E_i}\\right)$",
+          "description": "Core formula for Population Stability Index"
+        },
+        {
+          "name": "PSI Per-Bin Contribution",
+          "latex": "$\\text{PSI}_i = (A_i - E_i) \\cdot \\ln\\left(\\frac{A_i}{E_i}\\right)$",
+          "description": "Individual contribution of bin i to total PSI (useful for debugging which bins drive drift)"
+        },
+        {
+          "name": "PSI Threshold Classification",
+          "latex": "$\\text{Level} = \\begin{cases} \\text{none} & \\text{if PSI} < 0.1 \\\\ \\text{moderate} & \\text{if } 0.1 \\leq \\text{PSI} < 0.25 \\\\ \\text{significant} & \\text{if PSI} \\geq 0.25 \\end{cases}$",
+          "description": "Industry-standard interpretation thresholds"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the Population Stability Index given two probability distributions (reference/expected and production/actual). Both inputs are lists of probabilities summing to 1 (already smoothed with epsilon if needed). Return the PSI value rounded to 4 decimal places. If inputs have different lengths or are empty, return None.",
+        "function_signature": "def compute_psi(expected_probs: list, actual_probs: list) -> float:",
+        "starter_code": "def compute_psi(expected_probs: list, actual_probs: list) -> float:\n    \"\"\"\n    Compute Population Stability Index between two distributions.\n    \n    Args:\n        expected_probs: Reference distribution (baseline)\n        actual_probs: Current distribution (production)\n    \n    Returns:\n        PSI value, or None if inputs invalid\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_psi([0.25, 0.25, 0.25, 0.25], [0.25, 0.25, 0.25, 0.25])",
+            "expected": "0.0",
+            "explanation": "Identical distributions yield PSI of exactly 0"
+          },
+          {
+            "input": "compute_psi([0.4, 0.3, 0.2, 0.1], [0.3, 0.3, 0.25, 0.15])",
+            "expected": "0.0603",
+            "explanation": "Slight shift in distribution: (0.3-0.4)*ln(0.3/0.4) + (0.3-0.3)*ln(1) + (0.25-0.2)*ln(1.25) + (0.15-0.1)*ln(1.5)"
+          },
+          {
+            "input": "compute_psi([0.5, 0.3, 0.15, 0.05], [0.1, 0.2, 0.3, 0.4])",
+            "expected": "0.4133",
+            "explanation": "Major distribution shift where production heavily favors later bins while reference favors early bins"
+          },
+          {
+            "input": "compute_psi([0.1, 0.9], [0.9, 0.1])",
+            "expected": "1.3682",
+            "explanation": "Extreme case: distributions are reversed, resulting in very high PSI"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing (A_i - E_i) * ln(E_i / A_i) instead of ln(A_i / E_i) - the ratio order matters",
+        "Forgetting to multiply the difference by the logarithm (computing just the sum of differences or just KL divergence)",
+        "Not ensuring both distributions are smoothed before computing PSI (will cause ln(0) errors)",
+        "Summing absolute values |A_i - E_i| instead of signed differences",
+        "Confusing PSI with chi-square statistic or other drift metrics"
+      ],
+      "hint": "For each bin i, compute the term (actual[i] - expected[i]) * ln(actual[i] / expected[i]), then sum all terms. Use numpy operations for efficiency.",
+      "references": [
+        "Credit scoring model validation",
+        "MLOps monitoring",
+        "Distribution drift detection",
+        "Model performance degradation"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Integrating Binning and PSI for Multiple Distributions",
+      "relation_to_problem": "This sub-quest combines all previous concepts: binning raw data, converting to probabilities, and computing PSI. It teaches how to ensure both distributions use the same bin edges (critical for valid comparison) and handles the complete workflow except for the final classification logic.",
+      "prerequisites": [
+        "Data binning",
+        "Probability distributions",
+        "PSI computation"
+      ],
+      "learning_objectives": [
+        "Combine binning and probability estimation for two datasets",
+        "Ensure consistent bin edges across reference and production data",
+        "Apply the complete pipeline from raw data to PSI value",
+        "Understand why bin alignment is critical for valid PSI computation"
+      ],
+      "math_content": {
+        "definition": "**Aligned Binning** for distribution comparison: Given two datasets $X_{ref} = \\{x_1, \\ldots, x_n\\}$ and $X_{prod} = \\{y_1, \\ldots, y_m\\}$, we must create bins using a common range to ensure valid comparison. Let $x_{min} = \\min(X_{ref} \\cup X_{prod})$ and $x_{max} = \\max(X_{ref} \\cup X_{prod})$ be the global minimum and maximum across both datasets. Define $k$ bins over the range $[x_{min}, x_{max}]$ with edges $\\{b_0, b_1, \\ldots, b_k\\}$ where $b_0 = x_{min}$ and $b_k = x_{max}$. Both datasets are then binned using these same edges to produce counts $\\{c_i^{ref}\\}$ and $\\{c_i^{prod}\\}$, which are normalized to probabilities $\\{E_i\\}$ and $\\{A_i\\}$ respectively.",
+        "notation": "$X_{ref}$ = reference dataset, $X_{prod}$ = production dataset, $[x_{min}, x_{max}]$ = global range, $\\{b_0, \\ldots, b_k\\}$ = shared bin edges, $c_i^{ref}, c_i^{prod}$ = counts per bin",
+        "theorem": "**Theorem (Necessity of Aligned Bins)**: PSI is only mathematically valid when computed over the same bin structure for both distributions. Formally, if distributions $P$ and $Q$ are defined over different sample spaces $\\mathcal{X}_P \\neq \\mathcal{X}_Q$, then $D_{KL}(P \\| Q)$ and PSI are undefined. Therefore, both datasets must be binned using identical bin edges.",
+        "proof_sketch": "Proof: The PSI formula $\\sum_i (A_i - E_i) \\ln(A_i/E_i)$ requires each index $i$ to refer to the same bin in both distributions. If bins are not aligned (e.g., $E_i$ represents range $[0, 1)$ but $A_i$ represents $[0.5, 1.5)$), then the comparison is meaningless - we would be comparing proportions of data in different value ranges. This is analogous to comparing probability densities at different points. Only when bins represent the same regions of the feature space can the divergence be interpreted as a measure of distribution shift.",
+        "examples": [
+          "Example 1 (Correct alignment): $X_{ref} = [1, 2, 3, 4, 5]$, $X_{prod} = [3, 4, 5, 6, 7]$. Global range $[1, 7]$, 3 bins with edges $[1, 3, 5, 7]$. $X_{ref}$ counts: $[2, 2, 1]$ (values 1,2 in bin 1; 3,4 in bin 2; 5 in bin 3). $X_{prod}$ counts: $[0, 2, 3]$ (no values in [1,3); 3,4 in [3,5); 5,6,7 in [5,7]). Both use same bins, valid for PSI.",
+          "Example 2 (Incorrect - separate binning): If we binned $X_{ref}$ over [1,5] and $X_{prod}$ over [3,7] separately, the bins would be $[1, 2.33, 3.67, 5]$ vs $[3, 4.33, 5.67, 7]$ - these don't align, making bin-by-bin comparison invalid.",
+          "Example 3 (Handling extended range): $X_{ref} = [10, 15, 20]$, $X_{prod} = [5, 25, 30]$. Global range is $[5, 30]$. If using 5 bins, all data is binned over this extended range. Reference data might have zero counts in extreme bins (requiring epsilon smoothing), but the comparison is still valid because bins are aligned."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Global Range",
+          "latex": "$[x_{global\\_min}, x_{global\\_max}]$ where $x_{global\\_min} = \\min(X_{ref} \\cup X_{prod})$, $x_{global\\_max} = \\max(X_{ref} \\cup X_{prod})$",
+          "description": "Compute combined range across both datasets for consistent binning"
+        },
+        {
+          "name": "Bin Edge Generation",
+          "latex": "$b_i = x_{global\\_min} + i \\cdot \\frac{x_{global\\_max} - x_{global\\_min}}{k}$ for $i = 0, 1, \\ldots, k$",
+          "description": "Create k+1 edges that define k bins over the global range"
+        },
+        {
+          "name": "Complete PSI Pipeline",
+          "latex": "$\\text{PSI} = \\sum_{i=1}^{k} (A_i - E_i) \\ln(A_i / E_i)$ where $E_i = \\frac{\\max(c_i^{ref}, \\epsilon)}{n_{ref} + k\\epsilon}$, $A_i = \\frac{\\max(c_i^{prod}, \\epsilon)}{n_{prod} + k\\epsilon}$",
+          "description": "Full formula showing binning, smoothing, normalization, and PSI computation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes two raw datasets (reference and production) and a number of bins, then computes the PSI. The function must: (1) Determine the global range across both datasets, (2) Create aligned bins over this range, (3) Count observations in each bin for both datasets, (4) Convert counts to probabilities with epsilon=0.0001 smoothing, (5) Compute and return PSI rounded to 4 decimal places. If either input is empty, return None.",
+        "function_signature": "def compute_psi_from_data(reference_data: list, production_data: list, num_bins: int) -> float:",
+        "starter_code": "def compute_psi_from_data(reference_data: list, production_data: list, num_bins: int) -> float:\n    \"\"\"\n    Compute PSI from raw data through complete pipeline.\n    \n    Args:\n        reference_data: Raw feature values from reference (training) data\n        production_data: Raw feature values from production data\n        num_bins: Number of bins for histogram\n    \n    Returns:\n        PSI value, or None if inputs invalid\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_psi_from_data([1, 2, 3, 4, 5], [1, 2, 3, 4, 5], 5)",
+            "expected": "0.0",
+            "explanation": "Identical datasets produce PSI of 0"
+          },
+          {
+            "input": "compute_psi_from_data([1, 1, 2, 2, 3, 3], [3, 3, 4, 4, 5, 5], 5)",
+            "expected": "0.4132",
+            "explanation": "Reference data [1-3] vs production [3-5] shows clear shift. Global range [1,5] with 5 bins captures the drift."
+          },
+          {
+            "input": "compute_psi_from_data([10, 15, 20, 25, 30], [11, 16, 21, 26, 31], 5)",
+            "expected": "0.0001",
+            "explanation": "Very slight shift, nearly identical distributions after binning"
+          },
+          {
+            "input": "compute_psi_from_data([1, 2, 3], [10, 20, 30], 3)",
+            "expected": "2.1972",
+            "explanation": "Extreme shift with no overlap produces very high PSI"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing bin edges separately for each dataset instead of using global range",
+        "Using only the reference data range and forcing production data into those bins (causes issues when production data extends beyond reference range)",
+        "Forgetting epsilon smoothing when one dataset has empty bins in the global range",
+        "Not handling the case where both datasets have identical values (zero range)",
+        "Using different numbers of bins for the two datasets"
+      ],
+      "hint": "First, concatenate both datasets to find global min and max. Generate bin edges over this global range. Then histogram each dataset independently using these same edges. Apply epsilon smoothing to both sets of counts before computing PSI.",
+      "references": [
+        "numpy.histogram with explicit bins parameter",
+        "Consistent discretization",
+        "Distribution comparison best practices"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "PSI Interpretation and Drift Classification System",
+      "relation_to_problem": "This final sub-quest teaches how to interpret PSI values using industry-standard thresholds and construct the complete output dictionary. It brings together all previous concepts to create a production-ready drift detection system with actionable classifications.",
+      "prerequisites": [
+        "PSI computation",
+        "Statistical hypothesis testing concepts",
+        "Decision threshold systems"
+      ],
+      "learning_objectives": [
+        "Understand the empirical basis for PSI threshold values",
+        "Implement a classification system for drift severity",
+        "Construct a complete monitoring system output",
+        "Interpret PSI results in the context of ML model maintenance"
+      ],
+      "math_content": {
+        "definition": "**Drift Classification System**: A mapping $\\mathcal{C}: \\mathbb{R}^{\\geq 0} \\to \\{\\text{none}, \\text{moderate}, \\text{significant}\\}$ that categorizes PSI values into actionable levels. Formally: $$\\mathcal{C}(\\text{PSI}) = \\begin{cases} \\text{none} & \\text{if PSI} \\in [0, 0.1) \\\\ \\text{moderate} & \\text{if PSI} \\in [0.1, 0.25) \\\\ \\text{significant} & \\text{if PSI} \\in [0.25, \\infty) \\end{cases}$$ These thresholds are empirically derived from financial services and have been adopted across MLOps applications. A binary drift detection indicator is defined as $\\text{Drift}(\\text{PSI}) = \\mathbb{1}_{\\text{PSI} \\geq 0.1}$ (indicator function returning 1 if PSI exceeds 0.1, else 0).",
+        "notation": "$\\mathcal{C}$ = classification function, $\\mathbb{1}_{condition}$ = indicator function (1 if condition true, 0 otherwise), $\\theta_1 = 0.1$ = moderate drift threshold, $\\theta_2 = 0.25$ = significant drift threshold",
+        "theorem": "**Theorem (Threshold Interpretation)**: The industry-standard thresholds have the following empirical interpretations based on financial services validation studies: (1) PSI < 0.1: Distribution shift is within normal sampling variation for stable populations, no action needed. (2) 0.1 ≤ PSI < 0.25: Distribution has changed enough to potentially impact model performance, investigation recommended. (3) PSI ≥ 0.25: Major distribution shift indicating the population has fundamentally changed, model retraining likely required. These are heuristic guidelines, not statistical significance tests.",
+        "proof_sketch": "Historical Context: PSI thresholds originated in credit scoring (1980s-1990s) where modelers observed that: (a) PSI < 0.1 corresponded to models maintaining stable performance metrics (e.g., Gini coefficient, KS statistic changes < 2%), (b) PSI in 0.1-0.25 range coincided with 2-5% performance degradation, warranting monitoring, (c) PSI > 0.25 consistently showed >5% degradation, necessitating model refresh. While not theoretically derived, decades of validation across industries (finance, insurance, healthcare) have confirmed these thresholds provide robust early warning signals for model degradation. Modern MLOps practices inherit these thresholds but should ideally validate them for specific domains.",
+        "examples": [
+          "Example 1: PSI = 0.05 → Classification: 'none', Drift detected: False. Interpretation: Natural variation, model can continue in production without concern.",
+          "Example 2: PSI = 0.18 → Classification: 'moderate', Drift detected: True. Interpretation: Enable closer monitoring, check model performance metrics on recent data, investigate potential upstream data pipeline changes.",
+          "Example 3: PSI = 0.32 → Classification: 'significant', Drift detected: True. Interpretation: Trigger retraining workflow, consider switching to champion-challenger model setup, investigate root cause (e.g., new customer segment, market regime change).",
+          "Example 4: Edge case PSI = 0.1000 → Classification: 'moderate', Drift detected: True (threshold is inclusive on the lower bound)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Drift Detection Indicator",
+          "latex": "$\\text{Drift} = \\mathbb{1}_{\\text{PSI} \\geq 0.1} = \\begin{cases} \\text{True} & \\text{if PSI} \\geq 0.1 \\\\ \\text{False} & \\text{if PSI} < 0.1 \\end{cases}$",
+          "description": "Binary flag for whether monitoring alert should be triggered"
+        },
+        {
+          "name": "Drift Level Function",
+          "latex": "$\\text{Level}(\\text{PSI}) = \\begin{cases} \\text{none} & \\text{PSI} < 0.1 \\\\ \\text{moderate} & 0.1 \\leq \\text{PSI} < 0.25 \\\\ \\text{significant} & \\text{PSI} \\geq 0.25 \\end{cases}$",
+          "description": "Three-level classification for severity assessment"
+        },
+        {
+          "name": "Complete Output Schema",
+          "latex": "$\\text{Output} = \\{\\text{psi}: \\text{PSI}, \\text{drift\\_detected}: \\text{Drift}, \\text{drift\\_level}: \\text{Level}(\\text{PSI})\\}$",
+          "description": "Structured dictionary format for monitoring system integration"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a PSI value and returns a complete drift detection report as a dictionary. The dictionary should contain: (1) 'psi': the input PSI value rounded to 4 decimal places, (2) 'drift_detected': boolean True if PSI >= 0.1, False otherwise, (3) 'drift_level': string 'none' if PSI < 0.1, 'moderate' if 0.1 <= PSI < 0.25, 'significant' if PSI >= 0.25. If input PSI is negative or None, return an empty dictionary.",
+        "function_signature": "def classify_drift(psi_value: float) -> dict:",
+        "starter_code": "def classify_drift(psi_value: float) -> dict:\n    \"\"\"\n    Classify PSI value into drift detection report.\n    \n    Args:\n        psi_value: Computed Population Stability Index\n    \n    Returns:\n        Dictionary with psi, drift_detected, and drift_level\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "classify_drift(0.05)",
+            "expected": "{'psi': 0.05, 'drift_detected': False, 'drift_level': 'none'}",
+            "explanation": "PSI below 0.1 threshold indicates no significant drift"
+          },
+          {
+            "input": "classify_drift(0.1)",
+            "expected": "{'psi': 0.1, 'drift_detected': True, 'drift_level': 'moderate'}",
+            "explanation": "PSI exactly at 0.1 triggers drift detection with moderate classification"
+          },
+          {
+            "input": "classify_drift(0.1871)",
+            "expected": "{'psi': 0.1871, 'drift_detected': True, 'drift_level': 'moderate'}",
+            "explanation": "PSI in moderate range [0.1, 0.25) requires investigation"
+          },
+          {
+            "input": "classify_drift(0.25)",
+            "expected": "{'psi': 0.25, 'drift_detected': True, 'drift_level': 'significant'}",
+            "explanation": "PSI at or above 0.25 indicates significant drift requiring action"
+          },
+          {
+            "input": "classify_drift(0.35)",
+            "expected": "{'psi': 0.35, 'drift_detected': True, 'drift_level': 'significant'}",
+            "explanation": "High PSI value indicates major distribution shift"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using exclusive bounds (PSI > 0.1) instead of inclusive (PSI >= 0.1) for threshold checks",
+        "Returning 'True' as a string instead of boolean True for drift_detected",
+        "Incorrect spelling of drift level categories (e.g., 'Moderate' instead of 'moderate')",
+        "Not handling edge cases like PSI = 0.0 or very large PSI values",
+        "Forgetting to round PSI to exactly 4 decimal places in output",
+        "Not validating that PSI is non-negative (PSI should always be >= 0 mathematically)"
+      ],
+      "hint": "Use simple if-elif-else conditional logic to classify the PSI value. Remember that the thresholds are inclusive on the lower bound of each range.",
+      "references": [
+        "Credit scoring model validation guidelines",
+        "Model monitoring best practices",
+        "MLOps alerting systems",
+        "Feature store drift detection",
+        "Scikit-learn drift detection utilities"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,425 @@
+{
+  "problem_id": 43,
+  "title": "Implement Ridge Regression Loss Function",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "Write a Python function `ridge_loss` that implements the Ridge Regression loss function. The function should take a 2D numpy array `X` representing the feature matrix, a 1D numpy array `w` representing the coefficients, a 1D numpy array `y_true` representing the true labels, and a float `alpha` representing the regularization parameter. The function should return the Ridge loss, which combines the Mean Squared Error (MSE) and a regularization term.",
+  "example": {
+    "input": "import numpy as np\n\nX = np.array([[1, 1], [2, 1], [3, 1], [4, 1]])\nw = np.array([0.2, 2])\ny_true = np.array([2, 3, 4, 5])\nalpha = 0.1\n\nloss = ridge_loss(X, w, y_true, alpha)\nprint(loss)",
+    "output": "2.204",
+    "reasoning": "The Ridge loss is calculated using the Mean Squared Error (MSE) and a regularization term. The output represents the combined loss value."
+  },
+  "starter_code": "import numpy as np\n\ndef ridge_loss(X: np.ndarray, w: np.ndarray, y_true: np.ndarray, alpha: float) -> float:\n\t# Your code here\n\tpass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Prediction Error and Residuals in Linear Models",
+      "relation_to_problem": "Computing prediction error (residuals) is the foundation of the Ridge loss function - the first term measures how well our model fits the data through Mean Squared Error",
+      "prerequisites": [
+        "Basic linear algebra",
+        "Matrix-vector multiplication",
+        "Python numpy arrays"
+      ],
+      "learning_objectives": [
+        "Define and compute residuals in linear regression models",
+        "Understand the geometric interpretation of prediction error",
+        "Implement vectorized residual calculations using numpy"
+      ],
+      "math_content": {
+        "definition": "Given a linear model $\\hat{\\mathbf{y}} = \\mathbf{X}\\mathbf{w}$ where $\\mathbf{X} \\in \\mathbb{R}^{n \\times p}$ is the feature matrix and $\\mathbf{w} \\in \\mathbb{R}^p$ is the coefficient vector, the **residual vector** $\\mathbf{r} \\in \\mathbb{R}^n$ is defined as: $$\\mathbf{r} = \\mathbf{y}_{\\text{true}} - \\hat{\\mathbf{y}} = \\mathbf{y}_{\\text{true}} - \\mathbf{X}\\mathbf{w}$$ Each component $r_i = y_i - \\hat{y}_i$ measures the prediction error for the $i$-th observation.",
+        "notation": "$\\mathbf{y}_{\\text{true}}$ = vector of true target values; $\\hat{\\mathbf{y}}$ = vector of predicted values; $\\mathbf{r}$ = residual vector; $n$ = number of observations; $p$ = number of features",
+        "theorem": "**Linear Model Prediction Theorem**: For any feature matrix $\\mathbf{X}$ and coefficient vector $\\mathbf{w}$, the predicted values are computed via matrix multiplication: $\\hat{\\mathbf{y}} = \\mathbf{X}\\mathbf{w}$. This operation is linear in both $\\mathbf{X}$ and $\\mathbf{w}$.",
+        "proof_sketch": "Each predicted value is: $\\hat{y}_i = \\sum_{j=1}^{p} X_{ij}w_j$. In vectorized form: $\\hat{\\mathbf{y}} = \\begin{bmatrix} \\mathbf{x}_1^T \\mathbf{w} \\\\ \\vdots \\\\ \\mathbf{x}_n^T \\mathbf{w} \\end{bmatrix} = \\mathbf{X}\\mathbf{w}$ where $\\mathbf{x}_i$ is the $i$-th row of $\\mathbf{X}$.",
+        "examples": [
+          "Example 1: For $\\mathbf{X} = \\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix}$, $\\mathbf{w} = \\begin{bmatrix} 0.5 \\\\ 1.0 \\end{bmatrix}$, we get $\\hat{\\mathbf{y}} = \\begin{bmatrix} 1(0.5) + 2(1.0) \\\\ 3(0.5) + 4(1.0) \\end{bmatrix} = \\begin{bmatrix} 2.5 \\\\ 5.5 \\end{bmatrix}$",
+          "Example 2: If $\\mathbf{y}_{\\text{true}} = \\begin{bmatrix} 3 \\\\ 5 \\end{bmatrix}$, then residuals are $\\mathbf{r} = \\begin{bmatrix} 3 - 2.5 \\\\ 5 - 5.5 \\end{bmatrix} = \\begin{bmatrix} 0.5 \\\\ -0.5 \\end{bmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Prediction Formula",
+          "latex": "$\\hat{\\mathbf{y}} = \\mathbf{X}\\mathbf{w}$",
+          "description": "Computes predicted values from features and coefficients"
+        },
+        {
+          "name": "Residual Formula",
+          "latex": "$\\mathbf{r} = \\mathbf{y}_{\\text{true}} - \\mathbf{X}\\mathbf{w}$",
+          "description": "Computes prediction errors for all observations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the residual vector for a linear model. This is the first building block for Ridge loss - you must calculate how far predictions are from true values.",
+        "function_signature": "def compute_residuals(X: np.ndarray, w: np.ndarray, y_true: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_residuals(X: np.ndarray, w: np.ndarray, y_true: np.ndarray) -> np.ndarray:\n    # Compute predictions: y_hat = X @ w\n    # Compute residuals: r = y_true - y_hat\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_residuals(np.array([[1, 1], [2, 1]]), np.array([0.5, 1.0]), np.array([2.0, 3.0]))",
+            "expected": "np.array([0.5, 0.5])",
+            "explanation": "Predictions are [1.5, 2.5], residuals are [2.0-1.5, 3.0-2.5] = [0.5, 0.5]"
+          },
+          {
+            "input": "compute_residuals(np.array([[1, 1], [2, 1], [3, 1]]), np.array([0.2, 2]), np.array([2, 3, 4]))",
+            "expected": "np.array([-0.2, 0.6, 1.4])",
+            "explanation": "Predictions are [2.2, 2.4, 2.6], residuals are differences from true values"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to use @ operator or np.dot() for matrix multiplication",
+        "Computing X @ w in wrong order (w @ X gives wrong dimensions)",
+        "Not matching array dimensions - ensure X is (n, p), w is (p,), y_true is (n,)"
+      ],
+      "hint": "Use numpy's @ operator for matrix-vector multiplication. The shape of the result should match the length of y_true.",
+      "references": [
+        "Matrix-vector multiplication",
+        "NumPy broadcasting rules",
+        "Linear regression prediction"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Mean Squared Error as a Loss Function",
+      "relation_to_problem": "MSE forms the data-fitting term of Ridge loss - it quantifies how well our linear model fits the training data before adding regularization",
+      "prerequisites": [
+        "Computing residuals",
+        "Vector norms",
+        "Statistical measures of error"
+      ],
+      "learning_objectives": [
+        "Derive and implement the Mean Squared Error formula",
+        "Understand MSE as a measure of model fit quality",
+        "Connect MSE to the L2 norm of residuals"
+      ],
+      "math_content": {
+        "definition": "The **Mean Squared Error (MSE)** is defined as the average of squared residuals: $$\\text{MSE}(\\mathbf{w}) = \\frac{1}{n}\\sum_{i=1}^{n}(y_i - \\hat{y}_i)^2 = \\frac{1}{n}\\sum_{i=1}^{n}r_i^2 = \\frac{1}{n}\\|\\mathbf{r}\\|_2^2$$ where $\\|\\mathbf{r}\\|_2^2 = \\mathbf{r}^T\\mathbf{r}$ is the squared L2 norm of the residual vector.",
+        "notation": "$\\text{MSE}$ = Mean Squared Error; $\\|\\cdot\\|_2$ = L2 (Euclidean) norm; $r_i$ = residual for observation $i$; $n$ = number of observations",
+        "theorem": "**MSE as Squared L2 Norm**: For residual vector $\\mathbf{r} = \\mathbf{y}_{\\text{true}} - \\mathbf{X}\\mathbf{w}$, we have: $$\\text{MSE}(\\mathbf{w}) = \\frac{1}{n}\\|\\mathbf{y}_{\\text{true}} - \\mathbf{X}\\mathbf{w}\\|_2^2$$",
+        "proof_sketch": "Expanding the squared norm: $\\|\\mathbf{r}\\|_2^2 = \\mathbf{r}^T\\mathbf{r} = \\sum_{i=1}^{n}r_i^2 = \\sum_{i=1}^{n}(y_i - \\hat{y}_i)^2$. Dividing by $n$ gives the mean: $\\text{MSE} = \\frac{1}{n}\\|\\mathbf{r}\\|_2^2$. This formulation is vectorized and computationally efficient.",
+        "examples": [
+          "Example 1: Residuals $\\mathbf{r} = [0.5, -0.5]$ give $\\text{MSE} = \\frac{1}{2}(0.5^2 + (-0.5)^2) = \\frac{1}{2}(0.25 + 0.25) = 0.25$",
+          "Example 2: For perfect predictions where $\\mathbf{r} = [0, 0, 0]$, $\\text{MSE} = 0$. Larger residuals increase MSE quadratically, penalizing large errors more heavily than small ones."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "MSE Definition",
+          "latex": "$\\text{MSE}(\\mathbf{w}) = \\frac{1}{n}\\sum_{i=1}^{n}(y_i - \\hat{y}_i)^2$",
+          "description": "Average squared error between predictions and true values"
+        },
+        {
+          "name": "Vectorized MSE",
+          "latex": "$\\text{MSE}(\\mathbf{w}) = \\frac{1}{n}\\|\\mathbf{y}_{\\text{true}} - \\mathbf{X}\\mathbf{w}\\|_2^2$",
+          "description": "Efficient computation using vector norms"
+        },
+        {
+          "name": "Squared L2 Norm",
+          "latex": "$\\|\\mathbf{r}\\|_2^2 = \\mathbf{r}^T\\mathbf{r} = \\sum_{i=1}^{n}r_i^2$",
+          "description": "Sum of squared components of vector"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the Mean Squared Error function. This is the primary loss term in Ridge regression that measures model fit. Use vectorized operations for efficiency.",
+        "function_signature": "def mean_squared_error(X: np.ndarray, w: np.ndarray, y_true: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef mean_squared_error(X: np.ndarray, w: np.ndarray, y_true: np.ndarray) -> float:\n    # Step 1: Compute residuals r = y_true - X @ w\n    # Step 2: Compute squared L2 norm: ||r||^2 = r @ r\n    # Step 3: Divide by n to get mean\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "mean_squared_error(np.array([[1, 1], [2, 1]]), np.array([0.5, 1.0]), np.array([2.0, 3.0]))",
+            "expected": "0.25",
+            "explanation": "Residuals are [0.5, 0.5], squared sum is 0.5, MSE = 0.5/2 = 0.25"
+          },
+          {
+            "input": "mean_squared_error(np.array([[1, 1], [2, 1], [3, 1], [4, 1]]), np.array([0.2, 2]), np.array([2, 3, 4, 5]))",
+            "expected": "0.84",
+            "explanation": "Predictions are [2.2, 2.4, 2.6, 2.8], residuals are [-0.2, 0.6, 1.4, 2.2], MSE = (0.04 + 0.36 + 1.96 + 4.84)/4 = 1.8"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to divide by n (computing sum of squared errors instead of mean)",
+        "Using np.sum(r**2) inefficiently instead of vectorized r @ r or np.dot(r, r)",
+        "Not squaring the residuals (computing mean absolute error instead)"
+      ],
+      "hint": "You can compute squared L2 norm efficiently as residuals @ residuals. Remember to divide by the number of observations.",
+      "references": [
+        "L2 norm",
+        "Loss functions in machine learning",
+        "Least squares estimation"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "L2 Norm and Regularization Penalty",
+      "relation_to_problem": "The L2 penalty term in Ridge regression penalizes large coefficients to prevent overfitting - this is what distinguishes Ridge loss from ordinary MSE",
+      "prerequisites": [
+        "Vector norms",
+        "Linear algebra",
+        "Understanding of overfitting"
+      ],
+      "learning_objectives": [
+        "Define and compute the L2 norm (Euclidean norm) of a vector",
+        "Understand why penalizing coefficient magnitude prevents overfitting",
+        "Implement the squared L2 norm penalty term"
+      ],
+      "math_content": {
+        "definition": "The **L2 norm** (Euclidean norm) of a vector $\\mathbf{w} \\in \\mathbb{R}^p$ is: $$\\|\\mathbf{w}\\|_2 = \\sqrt{\\sum_{j=1}^{p}w_j^2} = \\sqrt{\\mathbf{w}^T\\mathbf{w}}$$ The **squared L2 norm** is: $$\\|\\mathbf{w}\\|_2^2 = \\sum_{j=1}^{p}w_j^2 = \\mathbf{w}^T\\mathbf{w}$$ In Ridge regression, we penalize the squared L2 norm to constrain coefficient magnitudes.",
+        "notation": "$\\|\\mathbf{w}\\|_2$ = L2 norm of coefficient vector; $w_j$ = $j$-th coefficient; $p$ = number of features/coefficients; $\\mathbf{w}^T\\mathbf{w}$ = dot product of $\\mathbf{w}$ with itself",
+        "theorem": "**Regularization Penalty Theorem**: Adding the term $\\lambda\\|\\mathbf{w}\\|_2^2$ to the loss function constrains the solution space to a hypersphere of radius $r = \\sqrt{C/\\lambda}$ for some constant $C$. As $\\lambda \\to \\infty$, coefficients shrink toward zero; as $\\lambda \\to 0$, the solution approaches ordinary least squares.",
+        "proof_sketch": "The penalty term $\\lambda\\|\\mathbf{w}\\|_2^2$ grows quadratically with coefficient magnitude. Minimizing the combined loss $L(\\mathbf{w}) = \\text{MSE}(\\mathbf{w}) + \\lambda\\|\\mathbf{w}\\|_2^2$ creates a trade-off: the optimizer must balance fitting the data (minimizing MSE) against keeping coefficients small (minimizing penalty). This shrinkage effect stabilizes estimates and reduces overfitting.",
+        "examples": [
+          "Example 1: For $\\mathbf{w} = [0.2, 2.0]$, the squared L2 norm is $\\|\\mathbf{w}\\|_2^2 = 0.2^2 + 2.0^2 = 0.04 + 4.0 = 4.04$",
+          "Example 2: With $\\lambda = 0.1$, the penalty term is $0.1 \\times 4.04 = 0.404$. Larger coefficients incur exponentially larger penalties, encouraging the optimizer to prefer smaller coefficient values."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Squared L2 Norm",
+          "latex": "$\\|\\mathbf{w}\\|_2^2 = \\sum_{j=1}^{p}w_j^2 = \\mathbf{w}^T\\mathbf{w}$",
+          "description": "Sum of squared coefficients"
+        },
+        {
+          "name": "Ridge Penalty Term",
+          "latex": "$P(\\mathbf{w}) = \\lambda\\|\\mathbf{w}\\|_2^2 = \\lambda\\sum_{j=1}^{p}w_j^2$",
+          "description": "Regularization penalty scaled by hyperparameter lambda"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the L2 regularization penalty term. This is the second component of Ridge loss that prevents overfitting by penalizing large coefficients.",
+        "function_signature": "def l2_penalty(w: np.ndarray, alpha: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef l2_penalty(w: np.ndarray, alpha: float) -> float:\n    # Compute squared L2 norm: ||w||^2 = w @ w\n    # Multiply by regularization parameter alpha (equivalent to lambda)\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "l2_penalty(np.array([0.2, 2.0]), 0.1)",
+            "expected": "0.404",
+            "explanation": "Squared L2 norm is 0.04 + 4.0 = 4.04, penalty is 0.1 * 4.04 = 0.404"
+          },
+          {
+            "input": "l2_penalty(np.array([1.0, 2.0, 3.0]), 0.5)",
+            "expected": "7.0",
+            "explanation": "Squared L2 norm is 1 + 4 + 9 = 14, penalty is 0.5 * 14 = 7.0"
+          },
+          {
+            "input": "l2_penalty(np.array([0.0, 0.0]), 1.0)",
+            "expected": "0.0",
+            "explanation": "Zero coefficients have zero penalty regardless of alpha"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing L2 norm (with square root) instead of squared L2 norm - Ridge uses squared norm",
+        "Forgetting to multiply by alpha/lambda parameter",
+        "Including the intercept term in the penalty (conventionally intercept is not regularized, but for this problem we penalize all coefficients)"
+      ],
+      "hint": "Use vectorized operations: w @ w or np.dot(w, w) computes the squared L2 norm efficiently. Don't forget the alpha multiplier.",
+      "references": [
+        "Regularization in machine learning",
+        "L1 vs L2 regularization",
+        "Bias-variance tradeoff"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Combining Loss Terms - Understanding Hyperparameter Trade-offs",
+      "relation_to_problem": "Ridge loss combines MSE and L2 penalty into a single objective function - understanding this combination is essential for implementing the complete loss function",
+      "prerequisites": [
+        "Mean Squared Error",
+        "L2 regularization penalty",
+        "Loss function optimization"
+      ],
+      "learning_objectives": [
+        "Understand how MSE and L2 penalty combine in Ridge regression",
+        "Interpret the role of the regularization parameter alpha/lambda",
+        "Recognize the bias-variance tradeoff controlled by alpha"
+      ],
+      "math_content": {
+        "definition": "The **Ridge Regression Loss Function** is defined as: $$L_{\\text{Ridge}}(\\mathbf{w}; \\lambda) = \\text{MSE}(\\mathbf{w}) + \\lambda\\|\\mathbf{w}\\|_2^2 = \\frac{1}{n}\\|\\mathbf{y}_{\\text{true}} - \\mathbf{X}\\mathbf{w}\\|_2^2 + \\lambda\\|\\mathbf{w}\\|_2^2$$ where $\\lambda \\geq 0$ is the regularization strength parameter (often denoted $\\alpha$ in implementation). This is a convex function with a unique global minimum.",
+        "notation": "$L_{\\text{Ridge}}$ = Ridge loss function; $\\lambda$ (or $\\alpha$) = regularization parameter controlling penalty strength; $\\text{MSE}$ = data-fitting term; $\\lambda\\|\\mathbf{w}\\|_2^2$ = regularization penalty term",
+        "theorem": "**Ridge Loss Convexity Theorem**: The Ridge loss $L_{\\text{Ridge}}(\\mathbf{w})$ is strictly convex for $\\lambda > 0$. This guarantees a unique global minimum $\\mathbf{w}^* = \\arg\\min_{\\mathbf{w}} L_{\\text{Ridge}}(\\mathbf{w})$ that can be found via gradient-based optimization or closed-form solution.",
+        "proof_sketch": "The MSE term $\\frac{1}{n}\\|\\mathbf{y} - \\mathbf{X}\\mathbf{w}\\|_2^2$ is convex (quadratic in $\\mathbf{w}$). The penalty $\\lambda\\|\\mathbf{w}\\|_2^2$ is also convex (quadratic). The sum of convex functions is convex. When $\\lambda > 0$, the penalty term adds strict curvature, making the Hessian $\\nabla^2 L = \\frac{2}{n}\\mathbf{X}^T\\mathbf{X} + 2\\lambda\\mathbf{I}$ positive definite, ensuring strict convexity and unique minimum.",
+        "examples": [
+          "Example 1: With $\\lambda = 0$, Ridge loss reduces to ordinary MSE: $L(\\mathbf{w}) = \\text{MSE}(\\mathbf{w})$. No regularization is applied.",
+          "Example 2: With large $\\lambda$ (e.g., $\\lambda = 100$), the penalty dominates, forcing $\\mathbf{w} \\to \\mathbf{0}$ to minimize loss, even at the cost of poor data fit. Small $\\lambda$ (e.g., $\\lambda = 0.001$) applies mild regularization, balancing fit and complexity."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Ridge Loss Function",
+          "latex": "$L_{\\text{Ridge}}(\\mathbf{w}) = \\frac{1}{n}\\|\\mathbf{y}_{\\text{true}} - \\mathbf{X}\\mathbf{w}\\|_2^2 + \\lambda\\|\\mathbf{w}\\|_2^2$",
+          "description": "Complete Ridge regression objective combining data fit and regularization"
+        },
+        {
+          "name": "Expanded Form",
+          "latex": "$L_{\\text{Ridge}}(\\mathbf{w}) = \\frac{1}{n}\\sum_{i=1}^{n}(y_i - \\mathbf{x}_i^T\\mathbf{w})^2 + \\lambda\\sum_{j=1}^{p}w_j^2$",
+          "description": "Component-wise expression showing both summations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the total Ridge loss by combining MSE and L2 penalty. This builds on previous sub-quests and demonstrates the complete loss calculation.",
+        "function_signature": "def ridge_loss_combined(X: np.ndarray, w: np.ndarray, y_true: np.ndarray, alpha: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef ridge_loss_combined(X: np.ndarray, w: np.ndarray, y_true: np.ndarray, alpha: float) -> float:\n    # Step 1: Compute MSE term (use your previous knowledge)\n    # Step 2: Compute L2 penalty term (use your previous knowledge)\n    # Step 3: Return MSE + penalty\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "ridge_loss_combined(np.array([[1, 1], [2, 1]]), np.array([0.5, 1.0]), np.array([2.0, 3.0]), 0.1)",
+            "expected": "0.3775",
+            "explanation": "MSE = 0.25, L2 penalty = 0.1 * (0.25 + 1.0) = 0.125, Total = 0.375"
+          },
+          {
+            "input": "ridge_loss_combined(np.array([[1, 1], [2, 1], [3, 1], [4, 1]]), np.array([0.2, 2]), np.array([2, 3, 4, 5]), 0.1)",
+            "expected": "2.204",
+            "explanation": "MSE = 1.8, L2 penalty = 0.1 * (0.04 + 4.0) = 0.404, Total = 2.204 (matches problem example)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Adding the terms in wrong proportion - both MSE and penalty should be computed correctly",
+        "Forgetting that MSE already includes the 1/n normalization",
+        "Using wrong alpha value or forgetting to apply it to the penalty term"
+      ],
+      "hint": "Combine your MSE calculation (with 1/n factor) and L2 penalty (with alpha factor). The structure is: loss = mse_term + penalty_term.",
+      "references": [
+        "Ridge regression derivation",
+        "Convex optimization",
+        "Cross-validation for hyperparameter tuning"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Vectorized Implementation and Computational Efficiency",
+      "relation_to_problem": "Efficient implementation using numpy's vectorized operations is essential for real-world machine learning - this sub-quest ensures you can compute Ridge loss efficiently",
+      "prerequisites": [
+        "Ridge loss formula",
+        "NumPy array operations",
+        "Matrix computation complexity"
+      ],
+      "learning_objectives": [
+        "Implement Ridge loss using fully vectorized operations",
+        "Understand computational complexity of matrix operations",
+        "Avoid common performance pitfalls in numerical computing"
+      ],
+      "math_content": {
+        "definition": "**Vectorized computation** eliminates explicit loops by using optimized linear algebra libraries (BLAS/LAPACK via NumPy). For Ridge loss: $$L_{\\text{Ridge}}(\\mathbf{w}) = \\frac{1}{n}(\\mathbf{y} - \\mathbf{X}\\mathbf{w})^T(\\mathbf{y} - \\mathbf{X}\\mathbf{w}) + \\lambda \\mathbf{w}^T\\mathbf{w}$$ All operations are matrix-vector products and dot products, computed in $O(np + p)$ time.",
+        "notation": "$O(\\cdot)$ = computational complexity (Big-O notation); $n$ = number of samples; $p$ = number of features; BLAS = Basic Linear Algebra Subprograms (optimized library)",
+        "theorem": "**Computational Complexity of Ridge Loss**: Computing $L_{\\text{Ridge}}(\\mathbf{w})$ requires: (1) Matrix-vector multiplication $\\mathbf{X}\\mathbf{w}$: $O(np)$ operations. (2) Vector subtraction and dot product: $O(n)$ operations. (3) Penalty computation $\\mathbf{w}^T\\mathbf{w}$: $O(p)$ operations. Total: $O(np + n + p) = O(np)$ for $n, p$ large.",
+        "proof_sketch": "The dominant operation is $\\mathbf{X}\\mathbf{w}$ where $\\mathbf{X} \\in \\mathbb{R}^{n \\times p}$. Each of $n$ rows requires $p$ multiplications and $p-1$ additions, giving $O(np)$ total. Vectorized NumPy implementations use cache-optimized BLAS routines, achieving near-peak CPU performance. Element-wise Python loops would be $10-100\\times$ slower.",
+        "examples": [
+          "Example 1: For $n=1000$ samples and $p=50$ features, vectorized computation performs $\\approx 50000$ operations in microseconds using optimized libraries.",
+          "Example 2: Using np.dot(r, r) is faster than np.sum(r**2) because it avoids creating intermediate array r**2. Similarly, X @ w is faster than explicit loop over rows."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Vectorized Ridge Loss",
+          "latex": "$L(\\mathbf{w}) = \\frac{1}{n}(\\mathbf{y} - \\mathbf{X}\\mathbf{w})^T(\\mathbf{y} - \\mathbf{X}\\mathbf{w}) + \\lambda \\mathbf{w}^T\\mathbf{w}$",
+          "description": "Matrix form suitable for vectorized computation"
+        },
+        {
+          "name": "Efficient Dot Product",
+          "latex": "$\\mathbf{v}^T\\mathbf{v} = \\texttt{np.dot(v, v)}$",
+          "description": "NumPy optimized inner product implementation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the Ridge loss function using fully vectorized NumPy operations. No explicit Python loops allowed - use only matrix/vector operations for maximum efficiency.",
+        "function_signature": "def ridge_loss_vectorized(X: np.ndarray, w: np.ndarray, y_true: np.ndarray, alpha: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef ridge_loss_vectorized(X: np.ndarray, w: np.ndarray, y_true: np.ndarray, alpha: float) -> float:\n    # Compute everything in vectorized form:\n    # 1. residuals = y_true - X @ w\n    # 2. mse = (1/n) * (residuals @ residuals)\n    # 3. penalty = alpha * (w @ w)\n    # 4. return mse + penalty\n    # Your code here (should be ~4 lines)\n    pass",
+        "test_cases": [
+          {
+            "input": "ridge_loss_vectorized(np.array([[1, 1], [2, 1], [3, 1], [4, 1]]), np.array([0.2, 2]), np.array([2, 3, 4, 5]), 0.1)",
+            "expected": "2.204",
+            "explanation": "This matches the main problem's example output exactly"
+          },
+          {
+            "input": "ridge_loss_vectorized(np.array([[1, 2], [3, 4], [5, 6]]), np.array([0.5, 0.5]), np.array([1.5, 3.5, 5.5]), 0.0)",
+            "expected": "0.0",
+            "explanation": "Perfect fit with no regularization yields zero loss"
+          },
+          {
+            "input": "ridge_loss_vectorized(np.array([[1, 0], [0, 1]]), np.array([1.0, 1.0]), np.array([0.0, 0.0]), 1.0)",
+            "expected": "3.0",
+            "explanation": "MSE = (1 + 1)/2 = 1.0, Penalty = 1.0 * (1 + 1) = 2.0, Total = 3.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using np.sum(residuals**2) instead of residuals @ residuals (less efficient, creates intermediate array)",
+        "Computing matrix multiplication with np.matmul or * instead of @ operator",
+        "Forgetting the 1/n factor in MSE calculation",
+        "Not using float division - ensure n is treated as float to avoid integer division issues"
+      ],
+      "hint": "The entire function can be written in 3-4 lines using @, len(), and scalar arithmetic. Focus on: (1) compute residuals, (2) compute MSE, (3) compute penalty, (4) return sum.",
+      "references": [
+        "NumPy vectorization",
+        "BLAS/LAPACK libraries",
+        "Computational complexity analysis",
+        "Cache-efficient algorithms"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Numerical Stability and Edge Cases in Ridge Regression",
+      "relation_to_problem": "Production-quality implementations must handle edge cases and numerical precision issues - this ensures robustness of your Ridge loss function",
+      "prerequisites": [
+        "Ridge loss implementation",
+        "Floating-point arithmetic",
+        "Software testing principles"
+      ],
+      "learning_objectives": [
+        "Identify and handle edge cases in Ridge loss computation",
+        "Understand floating-point precision considerations",
+        "Validate implementation against known test cases"
+      ],
+      "math_content": {
+        "definition": "**Numerical stability** refers to how errors in input or intermediate computations affect the final result. A **numerically stable** algorithm produces accurate results even with rounding errors. For Ridge loss, key concerns are: (1) Catastrophic cancellation when $\\mathbf{y} \\approx \\mathbf{X}\\mathbf{w}$. (2) Overflow when $\\|\\mathbf{y}\\|$ or $\\|\\mathbf{w}\\|$ are very large. (3) Precision loss when $n$ is large and residuals are small.",
+        "notation": "$\\epsilon_{\\text{machine}}$ = machine epsilon (smallest representable difference, $\\approx 10^{-16}$ for float64); Catastrophic cancellation = loss of significant digits when subtracting nearly equal numbers",
+        "theorem": "**Ridge Loss Stability Theorem**: For well-conditioned inputs ($\\|\\mathbf{X}\\| < 10^8$, $\\|\\mathbf{w}\\| < 10^8$), the vectorized Ridge loss computation has relative error bounded by $O(np\\epsilon_{\\text{machine}})$, making it numerically stable for practical use.",
+        "proof_sketch": "Each floating-point operation introduces error $\\leq \\epsilon_{\\text{machine}}$. Matrix-vector multiplication $\\mathbf{X}\\mathbf{w}$ involves $np$ operations, accumulating error $O(np\\epsilon)$. The dot products for norms involve $O(n)$ and $O(p)$ operations respectively. Total relative error is $O((np + n + p)\\epsilon) \\approx O(np\\epsilon)$. For typical $n, p < 10^6$ and $\\epsilon \\approx 10^{-16}$, error is $< 10^{-10}$, well within acceptable tolerance.",
+        "examples": [
+          "Example 1: Edge case $\\lambda = 0$ reduces to pure MSE, should handle gracefully without numerical issues.",
+          "Example 2: Edge case $\\mathbf{w} = \\mathbf{0}$ gives penalty $= 0$, loss $= \\text{MSE}$ of predictions being all zeros.",
+          "Example 3: When $n = 1$ (single sample), MSE computation should not divide by zero or produce unexpected behavior."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Relative Error Bound",
+          "latex": "$\\frac{|L_{\\text{computed}} - L_{\\text{exact}}|}{|L_{\\text{exact}}|} \\leq O(np\\epsilon_{\\text{machine}})$",
+          "description": "Upper bound on numerical error in Ridge loss computation"
+        }
+      ],
+      "exercise": {
+        "description": "Create comprehensive tests for your Ridge loss implementation, including edge cases. This validates correctness and robustness before using in production.",
+        "function_signature": "def test_ridge_loss():",
+        "starter_code": "import numpy as np\n\ndef test_ridge_loss():\n    # Use your ridge_loss implementation from previous sub-quests\n    # Test cases to implement:\n    # 1. Standard case (from problem description)\n    # 2. Zero regularization (alpha=0)\n    # 3. Zero coefficients (w = [0, 0, ...])\n    # 4. Perfect fit case\n    # 5. Single sample (n=1)\n    # Your code here - write assertions for each test\n    pass",
+        "test_cases": [
+          {
+            "input": "Test 1: Standard case from problem",
+            "expected": "ridge_loss(X=[[1,1],[2,1],[3,1],[4,1]], w=[0.2, 2], y=[2,3,4,5], alpha=0.1) ≈ 2.204",
+            "explanation": "Validates against provided example"
+          },
+          {
+            "input": "Test 2: Zero regularization",
+            "expected": "ridge_loss(X, w, y, alpha=0.0) == mean_squared_error(X, w, y)",
+            "explanation": "When alpha=0, Ridge loss should equal MSE"
+          },
+          {
+            "input": "Test 3: Zero coefficients",
+            "expected": "ridge_loss(X, w=[0,0], y, alpha) == MSE of predicting all zeros",
+            "explanation": "Penalty term vanishes, only MSE from zero predictions remains"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not testing edge cases (alpha=0, w=0, n=1) which often reveal bugs",
+        "Using exact equality (==) for floating-point comparisons instead of np.allclose or np.isclose with tolerance",
+        "Not validating against hand-calculated examples",
+        "Ignoring input validation (e.g., negative alpha, mismatched dimensions)"
+      ],
+      "hint": "Write at least 5 test cases covering: normal operation, boundary conditions (alpha=0, w=0), and special cases (perfect fit, single sample). Use np.allclose for float comparisons with rtol=1e-5.",
+      "references": [
+        "Numerical analysis",
+        "Floating-point arithmetic (IEEE 754)",
+        "Unit testing best practices",
+        "NumPy testing utilities"
+      ]
+    }
+  ]
+}

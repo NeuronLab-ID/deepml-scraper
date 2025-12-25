@@ -1,0 +1,487 @@
+{
+  "problem_id": 243,
+  "title": "Compute Covariance from Joint Probability Mass Function",
+  "category": "Probability",
+  "difficulty": "medium",
+  "description": "Given two discrete random variables X and Y with their possible values and joint probability mass function (PMF), compute the covariance between X and Y.\n\nThe covariance measures the linear relationship between two random variables. A positive covariance indicates that the variables tend to increase together, while a negative covariance indicates that when one increases, the other tends to decrease.\n\n**Your Task:**\nWrite a function `covariance_from_joint_pmf(x_values, y_values, joint_pmf)` that takes:\n- `x_values`: A list of possible values for random variable X\n- `y_values`: A list of possible values for random variable Y\n- `joint_pmf`: A 2D numpy array where `joint_pmf[i][j]` represents P(X=x_values[i], Y=y_values[j])\n\nThe function should return the covariance Cov(X, Y) as a float.\n\nNote: You will need to compute marginal probabilities from the joint PMF and then calculate the expected values needed for the covariance formula.",
+  "example": {
+    "input": "x_values = [0, 1], y_values = [0, 1], joint_pmf = [[0.4, 0.1], [0.1, 0.4]]",
+    "output": "0.15",
+    "reasoning": "First, compute marginal probabilities: P(X=0)=0.5, P(X=1)=0.5, P(Y=0)=0.5, P(Y=1)=0.5. Then E[X]=0.5, E[Y]=0.5. E[XY] = 0*0*0.4 + 0*1*0.1 + 1*0*0.1 + 1*1*0.4 = 0.4. Covariance = E[XY] - E[X]*E[Y] = 0.4 - 0.25 = 0.15. The positive covariance indicates X and Y tend to increase together."
+  },
+  "starter_code": "import numpy as np\n\ndef covariance_from_joint_pmf(x_values: list, y_values: list, joint_pmf: np.ndarray) -> float:\n    \"\"\"\n    Compute the covariance of X and Y from their joint PMF.\n    \n    Args:\n        x_values: List of possible values for X\n        y_values: List of possible values for Y\n        joint_pmf: 2D numpy array where joint_pmf[i][j] = P(X=x_values[i], Y=y_values[j])\n    \n    Returns:\n        Covariance of X and Y as a float\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Expected Value of Discrete Random Variables",
+      "relation_to_problem": "Computing covariance requires calculating E[X], E[Y], and E[XY], which are all expected values. This sub-quest teaches the fundamental operation needed for all subsequent calculations.",
+      "prerequisites": [
+        "Basic probability theory",
+        "Summation notation",
+        "Discrete probability distributions"
+      ],
+      "learning_objectives": [
+        "Define expected value formally for discrete random variables",
+        "Compute expected values from probability mass functions",
+        "Understand the linearity property of expectation",
+        "Apply expected value to real-valued functions of random variables"
+      ],
+      "math_content": {
+        "definition": "The expected value (or expectation) of a discrete random variable $X$ with probability mass function $P(X=x_i)$ is defined as: $$E[X] = \\sum_{i} x_i \\cdot P(X = x_i)$$ where the sum is taken over all possible values $x_i$ in the support of $X$. The expected value represents the long-run average value of the random variable over infinite repetitions of the experiment.",
+        "notation": "$E[X]$ = expected value of $X$; $\\mu_X = E[X]$ = population mean; $P(X=x_i)$ = probability mass function; $x_i$ = possible values of $X$",
+        "theorem": "**Theorem (Linearity of Expectation)**: For random variables $X$ and $Y$ and constants $a, b, c$: $$E[aX + bY + c] = aE[X] + bE[Y] + c$$ This property holds even if $X$ and $Y$ are dependent.",
+        "proof_sketch": "By definition: $E[aX + bY + c] = \\sum_i \\sum_j (ax_i + by_j + c)P(X=x_i, Y=y_j)$. Separating the sum: $= a\\sum_i \\sum_j x_i P(X=x_i, Y=y_j) + b\\sum_i \\sum_j y_j P(X=x_i, Y=y_j) + c\\sum_i \\sum_j P(X=x_i, Y=y_j)$. Using marginal probabilities: $= a\\sum_i x_i P(X=x_i) + b\\sum_j y_j P(Y=y_j) + c = aE[X] + bE[Y] + c$.",
+        "examples": [
+          "For a fair die, $X \\in \\{1,2,3,4,5,6\\}$ with $P(X=i) = 1/6$: $E[X] = \\frac{1}{6}(1+2+3+4+5+6) = 3.5$",
+          "For a Bernoulli variable with $P(X=1)=p$ and $P(X=0)=1-p$: $E[X] = 1 \\cdot p + 0 \\cdot (1-p) = p$",
+          "For $X \\in \\{-1, 0, 2\\}$ with probabilities $\\{0.2, 0.5, 0.3\\}$: $E[X] = (-1)(0.2) + (0)(0.5) + (2)(0.3) = 0.4$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Expected Value",
+          "latex": "$E[X] = \\sum_{i} x_i \\cdot P(X = x_i)$",
+          "description": "Fundamental formula for computing expected value from a PMF"
+        },
+        {
+          "name": "Expected Value of a Function",
+          "latex": "$E[g(X)] = \\sum_{i} g(x_i) \\cdot P(X = x_i)$",
+          "description": "Used when computing expectations of transformations like $X^2$ or $XY$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the expected value of a discrete random variable given its values and their corresponding probabilities. This is the foundation for computing means in covariance calculations.",
+        "function_signature": "def compute_expected_value(values: list, probabilities: list) -> float:",
+        "starter_code": "def compute_expected_value(values: list, probabilities: list) -> float:\n    \"\"\"\n    Compute the expected value E[X] of a discrete random variable.\n    \n    Args:\n        values: List of possible values [x_1, x_2, ..., x_n]\n        probabilities: List of probabilities [P(X=x_1), P(X=x_2), ..., P(X=x_n)]\n    \n    Returns:\n        Expected value E[X] as a float\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_expected_value([1, 2, 3, 4, 5, 6], [1/6, 1/6, 1/6, 1/6, 1/6, 1/6])",
+            "expected": "3.5",
+            "explanation": "Fair die: all outcomes equally likely, mean is at the center"
+          },
+          {
+            "input": "compute_expected_value([0, 1], [0.3, 0.7])",
+            "expected": "0.7",
+            "explanation": "Bernoulli variable with p=0.7, expected value equals the probability of success"
+          },
+          {
+            "input": "compute_expected_value([-2, 0, 3], [0.25, 0.5, 0.25])",
+            "expected": "0.25",
+            "explanation": "Asymmetric distribution: E[X] = (-2)(0.25) + 0(0.5) + 3(0.25) = 0.25"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to verify that probabilities sum to 1.0 before computing expectation",
+        "Confusing expected value with mode (most common value) or median",
+        "Not considering all possible values in the support of the random variable",
+        "Incorrect indexing when pairing values with their probabilities"
+      ],
+      "hint": "Use element-wise multiplication between values and probabilities, then sum the results. Consider using zip() to pair values with probabilities.",
+      "references": [
+        "Probability mass function properties",
+        "Law of the unconscious statistician",
+        "Moment generating functions"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Marginal Probability Distributions from Joint PMF",
+      "relation_to_problem": "To compute E[X] and E[Y] from a joint PMF, we must first extract the marginal distributions P(X) and P(Y). This step is essential because covariance uses the individual expected values E[X] and E[Y].",
+      "prerequisites": [
+        "Joint probability distributions",
+        "Summation over multiple indices",
+        "Conditional probability"
+      ],
+      "learning_objectives": [
+        "Define joint and marginal probability mass functions formally",
+        "Extract marginal distributions by marginalization (summing out variables)",
+        "Verify that marginal probabilities satisfy probability axioms",
+        "Understand the relationship between joint and marginal distributions"
+      ],
+      "math_content": {
+        "definition": "A **joint probability mass function** for discrete random variables $X$ and $Y$ is a function $P(X=x_i, Y=y_j)$ that gives the probability that $X$ takes value $x_i$ and $Y$ takes value $y_j$ simultaneously. It must satisfy: (1) $P(X=x_i, Y=y_j) \\geq 0$ for all $i,j$, and (2) $\\sum_i \\sum_j P(X=x_i, Y=y_j) = 1$. The **marginal PMF** of $X$ is obtained by summing over all possible values of $Y$: $$P(X = x_i) = \\sum_{j} P(X = x_i, Y = y_j)$$ Similarly for $Y$: $$P(Y = y_j) = \\sum_{i} P(X = x_i, Y = y_j)$$",
+        "notation": "$P(X=x_i, Y=y_j)$ = joint PMF; $P(X=x_i)$ = marginal PMF of $X$; $P(Y=y_j)$ = marginal PMF of $Y$; $\\sum_j$ = sum over all values of $Y$",
+        "theorem": "**Theorem (Law of Total Probability)**: The marginal probability can be expressed as a sum over conditional probabilities: $$P(X = x_i) = \\sum_{j} P(X = x_i | Y = y_j) \\cdot P(Y = y_j)$$ When using the joint PMF, this simplifies to the marginalization formula since $P(X=x_i, Y=y_j) = P(X=x_i|Y=y_j) \\cdot P(Y=y_j)$.",
+        "proof_sketch": "The marginal distribution is derived from the definition of conditional probability: $P(X=x_i, Y=y_j) = P(X=x_i|Y=y_j) P(Y=y_j)$. Summing both sides over all $j$: $\\sum_j P(X=x_i, Y=y_j) = \\sum_j P(X=x_i|Y=y_j) P(Y=y_j)$. The left side equals $P(X=x_i)$ by the law of total probability, since we're summing over a partition of the sample space.",
+        "examples": [
+          "Given joint PMF: $P(X=0,Y=0)=0.2, P(X=0,Y=1)=0.3, P(X=1,Y=0)=0.1, P(X=1,Y=1)=0.4$. Marginal: $P(X=0) = 0.2+0.3 = 0.5$, $P(X=1) = 0.1+0.4 = 0.5$, $P(Y=0) = 0.2+0.1 = 0.3$, $P(Y=1) = 0.3+0.4 = 0.7$",
+          "For a 3×2 joint PMF table, summing across rows gives $P(Y)$ and summing down columns gives $P(X)$",
+          "If $X$ and $Y$ are independent, then $P(X=x_i, Y=y_j) = P(X=x_i)P(Y=y_j)$, so marginalization recovers the original distributions"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Marginal PMF of X",
+          "latex": "$P(X = x_i) = \\sum_{j} P(X = x_i, Y = y_j)$",
+          "description": "Sum the joint PMF over all values of Y to get the marginal distribution of X"
+        },
+        {
+          "name": "Marginal PMF of Y",
+          "latex": "$P(Y = y_j) = \\sum_{i} P(X = x_i, Y = y_j)$",
+          "description": "Sum the joint PMF over all values of X to get the marginal distribution of Y"
+        },
+        {
+          "name": "Verification Property",
+          "latex": "$\\sum_i P(X=x_i) = \\sum_j P(Y=y_j) = 1$",
+          "description": "Both marginal distributions must sum to 1 (sanity check)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that extracts marginal probability distributions from a joint PMF. Given a 2D array representing the joint distribution, compute the marginal probabilities for both variables. This is a critical preprocessing step for covariance calculation.",
+        "function_signature": "def compute_marginals(joint_pmf: np.ndarray) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef compute_marginals(joint_pmf: np.ndarray) -> tuple:\n    \"\"\"\n    Extract marginal distributions from a joint PMF.\n    \n    Args:\n        joint_pmf: 2D numpy array where joint_pmf[i][j] = P(X=x_i, Y=y_j)\n    \n    Returns:\n        Tuple (marginal_x, marginal_y) where:\n            marginal_x: 1D array of P(X=x_i) for all i\n            marginal_y: 1D array of P(Y=y_j) for all j\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_marginals(np.array([[0.2, 0.3], [0.1, 0.4]]))",
+            "expected": "(np.array([0.5, 0.5]), np.array([0.3, 0.7]))",
+            "explanation": "Sum across rows for Y marginal: [0.2+0.3, 0.1+0.4] = [0.5, 0.5]. Sum down columns for X marginal: [0.2+0.1, 0.3+0.4] = [0.3, 0.7]"
+          },
+          {
+            "input": "compute_marginals(np.array([[0.1, 0.2, 0.1], [0.15, 0.3, 0.15]]))",
+            "expected": "(np.array([0.4, 0.6]), np.array([0.25, 0.5, 0.25]))",
+            "explanation": "3×2 joint PMF: marginal_x sums across 3 columns, marginal_y sums across 2 rows"
+          },
+          {
+            "input": "compute_marginals(np.array([[0.25, 0.25], [0.25, 0.25]]))",
+            "expected": "(np.array([0.5, 0.5]), np.array([0.5, 0.5]))",
+            "explanation": "Uniform joint distribution yields uniform marginals"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Summing along the wrong axis (confusing rows vs columns in the numpy array)",
+        "Not verifying that the extracted marginals sum to 1.0",
+        "Forgetting that numpy's axis=0 sums down columns and axis=1 sums across rows",
+        "Treating the joint PMF as if it were already a marginal distribution"
+      ],
+      "hint": "Use numpy's sum() function with the appropriate axis parameter. axis=1 sums across columns (gives marginal for X), axis=0 sums down rows (gives marginal for Y).",
+      "references": [
+        "Marginalization in probability theory",
+        "Numpy array summation with axis parameter",
+        "Joint vs marginal vs conditional distributions"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Expected Value of Products: E[XY] from Joint PMF",
+      "relation_to_problem": "The covariance formula Cov(X,Y) = E[XY] - E[X]E[Y] requires computing E[XY], which involves the joint PMF directly. This sub-quest teaches how to compute expected values of functions of two random variables.",
+      "prerequisites": [
+        "Expected value",
+        "Joint probability distributions",
+        "Double summation"
+      ],
+      "learning_objectives": [
+        "Extend the concept of expected value to functions of multiple random variables",
+        "Apply the Law of the Unconscious Statistician (LOTUS) for joint distributions",
+        "Compute E[XY] using the joint PMF without deriving the distribution of XY",
+        "Understand when E[XY] = E[X]E[Y] (independence) vs when it differs (dependence)"
+      ],
+      "math_content": {
+        "definition": "For discrete random variables $X$ and $Y$ with joint PMF $P(X=x_i, Y=y_j)$, the **expected value of their product** is: $$E[XY] = \\sum_{i} \\sum_{j} x_i y_j \\cdot P(X = x_i, Y = y_j)$$ More generally, for any function $g(X,Y)$: $$E[g(X,Y)] = \\sum_{i} \\sum_{j} g(x_i, y_j) \\cdot P(X = x_i, Y = y_j)$$ This is the **Law of the Unconscious Statistician (LOTUS)** for bivariate distributions, which allows computing expectations without first deriving the distribution of $g(X,Y)$.",
+        "notation": "$E[XY]$ = expected value of the product; $g(X,Y)$ = arbitrary function of two variables; $\\sum_i \\sum_j$ = double sum over all $(i,j)$ pairs",
+        "theorem": "**Theorem (Independence and Expectation of Products)**: If $X$ and $Y$ are independent random variables, then: $$E[XY] = E[X] \\cdot E[Y]$$ The converse is not generally true: $E[XY] = E[X]E[Y]$ does not imply independence (only zero covariance).",
+        "proof_sketch": "If $X$ and $Y$ are independent, then $P(X=x_i, Y=y_j) = P(X=x_i) P(Y=y_j)$. Substituting into the definition: $$E[XY] = \\sum_i \\sum_j x_i y_j P(X=x_i) P(Y=y_j) = \\sum_i x_i P(X=x_i) \\sum_j y_j P(Y=y_j) = E[X] E[Y]$$ The factorization of the double sum is only valid when the joint PMF factors into the product of marginals (independence condition).",
+        "examples": [
+          "For the joint PMF $P(0,0)=0.4, P(0,1)=0.1, P(1,0)=0.1, P(1,1)=0.4$: $E[XY] = 0·0·0.4 + 0·1·0.1 + 1·0·0.1 + 1·1·0.4 = 0.4$",
+          "If $X,Y$ are independent with $E[X]=2$ and $E[Y]=3$, then $E[XY]=6$ without needing the full joint distribution",
+          "For dependent variables where $Y=X^2$ with $X \\in \\{-1,0,1\\}$ uniformly: $E[XY] = E[X^3] = \\frac{1}{3}((-1)^3 + 0^3 + 1^3) = 0$, but $E[X]=0$ and $E[Y]=\\frac{2}{3}$, so $E[X]E[Y]=0$ (happens to equal $E[XY]$ but they're not independent)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Expected Value of Product",
+          "latex": "$E[XY] = \\sum_{i} \\sum_{j} x_i y_j \\cdot P(X = x_i, Y = y_j)$",
+          "description": "Direct computation from joint PMF using double summation"
+        },
+        {
+          "name": "LOTUS for Bivariate Functions",
+          "latex": "$E[g(X,Y)] = \\sum_{i} \\sum_{j} g(x_i, y_j) \\cdot P(X = x_i, Y = y_j)$",
+          "description": "General formula for expectations of functions of two variables"
+        },
+        {
+          "name": "Independence Property",
+          "latex": "$E[XY] = E[X]E[Y]$ when $X \\perp Y$",
+          "description": "Simplification available only for independent variables"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes E[XY] from the joint PMF and the actual values of X and Y. This is the third component needed for the covariance formula Cov(X,Y) = E[XY] - E[X]E[Y].",
+        "function_signature": "def compute_expected_product(x_values: list, y_values: list, joint_pmf: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_expected_product(x_values: list, y_values: list, joint_pmf: np.ndarray) -> float:\n    \"\"\"\n    Compute E[XY] from the joint PMF.\n    \n    Args:\n        x_values: List of possible values for X\n        y_values: List of possible values for Y\n        joint_pmf: 2D numpy array where joint_pmf[i][j] = P(X=x_values[i], Y=y_values[j])\n    \n    Returns:\n        Expected value E[XY] as a float\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_expected_product([0, 1], [0, 1], np.array([[0.4, 0.1], [0.1, 0.4]]))",
+            "expected": "0.4",
+            "explanation": "E[XY] = 0×0×0.4 + 0×1×0.1 + 1×0×0.1 + 1×1×0.4 = 0.4 (only the last term contributes)"
+          },
+          {
+            "input": "compute_expected_product([1, 2], [3, 4], np.array([[0.25, 0.25], [0.25, 0.25]]))",
+            "expected": "7.5",
+            "explanation": "E[XY] = 1×3×0.25 + 1×4×0.25 + 2×3×0.25 + 2×4×0.25 = 0.75 + 1.0 + 1.5 + 2.0 = 5.25... wait, let me recalculate: (3+4+6+8)/4 = 7.5"
+          },
+          {
+            "input": "compute_expected_product([-1, 0, 1], [0, 1], np.array([[0.2, 0.1], [0.3, 0.1], [0.1, 0.2]]))",
+            "expected": "0.1",
+            "explanation": "E[XY] = (-1)×0×0.2 + (-1)×1×0.1 + 0×0×0.3 + 0×1×0.1 + 1×0×0.1 + 1×1×0.2 = 0 - 0.1 + 0 + 0 + 0 + 0.2 = 0.1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing E[X]×E[Y] instead of E[XY] (only equal for independent variables)",
+        "Forgetting to multiply by the probability P(X=x_i, Y=y_j) for each term",
+        "Incorrect indexing when accessing joint_pmf[i][j] with x_values[i] and y_values[j]",
+        "Not iterating over all pairs (i,j) in the double summation"
+      ],
+      "hint": "Use nested loops to iterate over all combinations of x_values and y_values indices, multiply x_values[i] × y_values[j] × joint_pmf[i][j], and accumulate the sum.",
+      "references": [
+        "Law of the Unconscious Statistician (LOTUS)",
+        "Bivariate expectations",
+        "Fubini's theorem for summation"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Variance and Its Relationship to Expected Values",
+      "relation_to_problem": "Covariance is the bivariate extension of variance. Understanding variance as Var(X) = E[X²] - (E[X])² provides the conceptual foundation for covariance as Cov(X,Y) = E[XY] - E[X]E[Y].",
+      "prerequisites": [
+        "Expected value",
+        "Squared deviations",
+        "Spread measures"
+      ],
+      "learning_objectives": [
+        "Define variance formally as a measure of spread",
+        "Derive the computational formula Var(X) = E[X²] - (E[X])²",
+        "Understand the relationship between variance and deviations from the mean",
+        "Apply the variance formula to discrete random variables"
+      ],
+      "math_content": {
+        "definition": "The **variance** of a random variable $X$ measures the expected squared deviation from its mean. Formally: $$\\text{Var}(X) = E[(X - \\mu_X)^2] = E[(X - E[X])^2]$$ where $\\mu_X = E[X]$. The variance is always non-negative, and $\\text{Var}(X) = 0$ if and only if $X$ is a constant (degenerate distribution). The **standard deviation** is $\\sigma_X = \\sqrt{\\text{Var}(X)}$.",
+        "notation": "$\\text{Var}(X)$ or $\\sigma_X^2$ = variance; $\\sigma_X$ = standard deviation; $\\mu_X = E[X]$ = mean; $(X - \\mu_X)$ = deviation from mean",
+        "theorem": "**Theorem (Computational Formula for Variance)**: $$\\text{Var}(X) = E[X^2] - (E[X])^2$$ This formula is computationally more efficient than the definitional formula and provides the template for the covariance formula.",
+        "proof_sketch": "Starting from the definition: $$\\text{Var}(X) = E[(X - \\mu_X)^2] = E[X^2 - 2X\\mu_X + \\mu_X^2]$$ By linearity of expectation: $$= E[X^2] - 2\\mu_X E[X] + \\mu_X^2 = E[X^2] - 2\\mu_X^2 + \\mu_X^2 = E[X^2] - \\mu_X^2$$ Since $\\mu_X = E[X]$, we have $\\text{Var}(X) = E[X^2] - (E[X])^2$. The term $E[X^2]$ is called the **second moment** and $(E[X])^2$ is the square of the first moment.",
+        "examples": [
+          "For a fair coin: $X \\in \\{0,1\\}$ with $P(X=0)=P(X=1)=0.5$. Then $E[X]=0.5$, $E[X^2]=0.5$, so $\\text{Var}(X) = 0.5 - 0.25 = 0.25$",
+          "For a constant: $X=c$ always. Then $E[X]=c$, $E[X^2]=c^2$, so $\\text{Var}(X) = c^2 - c^2 = 0$",
+          "For $X \\in \\{-1, 0, 1\\}$ with equal probabilities: $E[X]=0$, $E[X^2]=\\frac{2}{3}$, so $\\text{Var}(X) = \\frac{2}{3}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Definitional Formula",
+          "latex": "$\\text{Var}(X) = E[(X - E[X])^2]$",
+          "description": "Variance as expected squared deviation from the mean (conceptual)"
+        },
+        {
+          "name": "Computational Formula",
+          "latex": "$\\text{Var}(X) = E[X^2] - (E[X])^2$",
+          "description": "Variance using moments (computational, avoids intermediate storage)"
+        },
+        {
+          "name": "Variance Scaling Property",
+          "latex": "$\\text{Var}(aX + b) = a^2 \\text{Var}(X)$",
+          "description": "Variance scales with the square of multiplicative constants"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the variance of a discrete random variable using the computational formula. This reinforces the pattern E[f(X)] - E[X]E[Y] that appears in covariance.",
+        "function_signature": "def compute_variance(values: list, probabilities: list) -> float:",
+        "starter_code": "def compute_variance(values: list, probabilities: list) -> float:\n    \"\"\"\n    Compute the variance Var(X) = E[X²] - (E[X])² of a discrete random variable.\n    \n    Args:\n        values: List of possible values [x_1, x_2, ..., x_n]\n        probabilities: List of probabilities [P(X=x_1), P(X=x_2), ..., P(X=x_n)]\n    \n    Returns:\n        Variance as a float\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_variance([0, 1], [0.5, 0.5])",
+            "expected": "0.25",
+            "explanation": "Fair coin: E[X]=0.5, E[X²]=0.5, Var(X)=0.5-0.25=0.25, std dev = 0.5"
+          },
+          {
+            "input": "compute_variance([1, 2, 3, 4, 5, 6], [1/6]*6)",
+            "expected": "2.9166666666666665",
+            "explanation": "Fair die: E[X]=3.5, E[X²]=1/6(1+4+9+16+25+36)=15.1667, Var(X)=15.1667-12.25≈2.917"
+          },
+          {
+            "input": "compute_variance([5], [1.0])",
+            "expected": "0.0",
+            "explanation": "Constant variable: no variability, variance is zero"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing (E[X])² as E[X²] (these are different unless X is constant)",
+        "Forgetting to square the expected value in the formula",
+        "Using the definitional formula inefficiently (computing deviations explicitly)",
+        "Not recognizing that variance is never negative (computational errors if result is negative)"
+      ],
+      "hint": "First compute E[X] using the expected value formula. Then compute E[X²] by squaring each value before multiplying by its probability. Finally, return E[X²] - (E[X])².",
+      "references": [
+        "Moments of a distribution",
+        "Parallel axis theorem (physics analogy)",
+        "Bienaymé's formula"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Covariance: Definition, Interpretation, and Properties",
+      "relation_to_problem": "This sub-quest formally introduces covariance as the bivariate analogue of variance, explaining its meaning, sign interpretation, and mathematical properties. This is the theoretical foundation for the final implementation.",
+      "prerequisites": [
+        "Expected value",
+        "Variance",
+        "Bivariate distributions",
+        "Linear relationships"
+      ],
+      "learning_objectives": [
+        "Define covariance formally as a measure of joint variability",
+        "Derive the computational formula Cov(X,Y) = E[XY] - E[X]E[Y]",
+        "Interpret positive, negative, and zero covariance",
+        "Understand properties: symmetry, bilinearity, relationship to independence"
+      ],
+      "math_content": {
+        "definition": "The **covariance** between random variables $X$ and $Y$ measures the degree to which they vary together. Formally: $$\\text{Cov}(X,Y) = E[(X - \\mu_X)(Y - \\mu_Y)] = E[(X - E[X])(Y - E[Y])]$$ Covariance quantifies the linear association: positive covariance indicates that $X$ and $Y$ tend to increase together, negative covariance indicates they move in opposite directions, and zero covariance indicates no linear relationship.",
+        "notation": "$\\text{Cov}(X,Y)$ or $\\sigma_{XY}$ = covariance; $\\mu_X = E[X]$, $\\mu_Y = E[Y]$ = means; $\\rho_{XY} = \\frac{\\text{Cov}(X,Y)}{\\sigma_X \\sigma_Y}$ = correlation coefficient",
+        "theorem": "**Theorem (Computational Formula for Covariance)**: $$\\text{Cov}(X,Y) = E[XY] - E[X]E[Y]$$ **Theorem (Properties of Covariance)**: (1) Symmetry: $\\text{Cov}(X,Y) = \\text{Cov}(Y,X)$. (2) Bilinearity: $\\text{Cov}(aX+b, cY+d) = ac\\cdot\\text{Cov}(X,Y)$. (3) Variance as special case: $\\text{Cov}(X,X) = \\text{Var}(X)$. (4) Independence implies zero covariance: If $X \\perp Y$, then $\\text{Cov}(X,Y)=0$ (converse not true).",
+        "proof_sketch": "From the definition: $$\\text{Cov}(X,Y) = E[(X-\\mu_X)(Y-\\mu_Y)] = E[XY - X\\mu_Y - Y\\mu_X + \\mu_X\\mu_Y]$$ By linearity: $$= E[XY] - \\mu_Y E[X] - \\mu_X E[Y] + \\mu_X\\mu_Y = E[XY] - \\mu_X\\mu_Y - \\mu_X\\mu_Y + \\mu_X\\mu_Y$$ $$= E[XY] - \\mu_X\\mu_Y = E[XY] - E[X]E[Y]$$ For independence: if $P(X,Y) = P(X)P(Y)$, then $E[XY] = \\sum_i\\sum_j x_i y_j P(X=x_i)P(Y=y_j) = E[X]E[Y]$, so $\\text{Cov}(X,Y)=0$.",
+        "examples": [
+          "**Perfect positive relationship**: $Y=2X$. Then $\\text{Cov}(X,Y) = \\text{Cov}(X,2X) = 2\\text{Cov}(X,X) = 2\\text{Var}(X) > 0$",
+          "**Perfect negative relationship**: $Y=-X$. Then $\\text{Cov}(X,Y) = \\text{Cov}(X,-X) = -\\text{Var}(X) < 0$",
+          "**Zero covariance without independence**: Let $X \\in \\{-1,0,1\\}$ uniformly and $Y=X^2$. Then $E[X]=0$, $E[Y]=\\frac{2}{3}$, $E[XY]=E[X^3]=0$, so $\\text{Cov}(X,Y)=0$ despite $Y$ being completely determined by $X$",
+          "**From joint PMF**: Given the example from sub-quest 3 with $E[XY]=0.4$, $E[X]=0.5$, $E[Y]=0.5$: $\\text{Cov}(X,Y) = 0.4 - 0.25 = 0.15$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Definitional Formula",
+          "latex": "$\\text{Cov}(X,Y) = E[(X - E[X])(Y - E[Y])]$",
+          "description": "Covariance as expected product of deviations from means"
+        },
+        {
+          "name": "Computational Formula",
+          "latex": "$\\text{Cov}(X,Y) = E[XY] - E[X]E[Y]$",
+          "description": "Efficient computation using three expectations"
+        },
+        {
+          "name": "Expanded Form for PMF",
+          "latex": "$\\text{Cov}(X,Y) = \\sum_i \\sum_j x_i y_j P(X\\!=\\!x_i, Y\\!=\\!y_j) - \\left(\\sum_i x_i P(X\\!=\\!x_i)\\right)\\left(\\sum_j y_j P(Y\\!=\\!y_j)\\right)$",
+          "description": "Complete formula showing all summations explicitly"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified covariance function that takes pre-computed expectations E[X], E[Y], and E[XY] and returns the covariance. This isolates the final formula before integrating all steps.",
+        "function_signature": "def covariance_from_expectations(e_x: float, e_y: float, e_xy: float) -> float:",
+        "starter_code": "def covariance_from_expectations(e_x: float, e_y: float, e_xy: float) -> float:\n    \"\"\"\n    Compute covariance from pre-calculated expectations.\n    \n    Args:\n        e_x: Expected value E[X]\n        e_y: Expected value E[Y]\n        e_xy: Expected value E[XY]\n    \n    Returns:\n        Covariance Cov(X,Y) = E[XY] - E[X]E[Y]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "covariance_from_expectations(0.5, 0.5, 0.4)",
+            "expected": "0.15",
+            "explanation": "Cov(X,Y) = 0.4 - 0.5×0.5 = 0.4 - 0.25 = 0.15 (positive covariance)"
+          },
+          {
+            "input": "covariance_from_expectations(1.0, 2.0, 2.0)",
+            "expected": "0.0",
+            "explanation": "Cov(X,Y) = 2.0 - 1.0×2.0 = 0 (uncorrelated variables)"
+          },
+          {
+            "input": "covariance_from_expectations(3.5, 3.5, 11.5)",
+            "expected": "-0.75",
+            "explanation": "Cov(X,Y) = 11.5 - 3.5×3.5 = 11.5 - 12.25 = -0.75 (negative covariance)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing E[X]×E[Y] and forgetting to subtract from E[XY]",
+        "Confusing covariance with correlation (correlation is normalized: ρ = Cov(X,Y)/(σ_X σ_Y))",
+        "Assuming zero covariance implies independence (only true in special cases like bivariate normal)",
+        "Misinterpreting covariance magnitude (units are product of X and Y units, so not directly comparable across different variable pairs)"
+      ],
+      "hint": "This is a one-line formula: simply return the difference between e_xy and the product of e_x and e_y.",
+      "references": [
+        "Correlation vs covariance",
+        "Pearson correlation coefficient",
+        "Cauchy-Schwarz inequality for covariance"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Covariance Computation from Joint PMF",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts: extract marginals, compute E[X] and E[Y], compute E[XY], and apply the covariance formula. This completes the solution to the main problem.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Marginal distributions",
+        "Expected values",
+        "Joint expectations",
+        "Covariance formula"
+      ],
+      "learning_objectives": [
+        "Integrate marginal extraction, expectation computation, and covariance formula",
+        "Implement the complete pipeline from joint PMF to covariance",
+        "Validate results using mathematical properties (e.g., symmetry)",
+        "Interpret covariance in the context of the joint distribution structure"
+      ],
+      "math_content": {
+        "definition": "The **complete algorithm** for computing covariance from a joint PMF consists of four steps: (1) Extract marginal distributions: $P(X=x_i) = \\sum_j P(X=x_i, Y=y_j)$ and $P(Y=y_j) = \\sum_i P(X=x_i, Y=y_j)$. (2) Compute marginal expectations: $E[X] = \\sum_i x_i P(X=x_i)$ and $E[Y] = \\sum_j y_j P(Y=y_j)$. (3) Compute joint expectation: $E[XY] = \\sum_i \\sum_j x_i y_j P(X=x_i, Y=y_j)$. (4) Apply covariance formula: $\\text{Cov}(X,Y) = E[XY] - E[X]E[Y]$.",
+        "notation": "All notation from previous sub-quests applies; $\\text{joint PMF} \\to \\text{marginals} \\to \\text{expectations} \\to \\text{covariance}$ represents the computational pipeline",
+        "theorem": "**Theorem (Invariance Under Translation)**: Covariance is translation-invariant: $$\\text{Cov}(X+a, Y+b) = \\text{Cov}(X,Y)$$ for any constants $a,b$. This means covariance measures the relationship between deviations from means, not the absolute values. **Theorem (Scaling)**: $$\\text{Cov}(aX, bY) = ab \\cdot \\text{Cov}(X,Y)$$ This shows covariance scales multiplicatively with both variables.",
+        "proof_sketch": "For translation invariance: $$\\text{Cov}(X+a, Y+b) = E[(X+a)(Y+b)] - E[X+a]E[Y+b]$$ $$= E[XY + aY + bX + ab] - (E[X]+a)(E[Y]+b)$$ $$= E[XY] + aE[Y] + bE[X] + ab - E[X]E[Y] - aE[Y] - bE[X] - ab$$ $$= E[XY] - E[X]E[Y] = \\text{Cov}(X,Y)$$ For scaling: $$\\text{Cov}(aX, bY) = E[abXY] - E[aX]E[bY] = abE[XY] - aE[X]bE[Y] = ab(E[XY] - E[X]E[Y]) = ab\\cdot\\text{Cov}(X,Y)$$",
+        "examples": [
+          "**Complete worked example**: $X \\in \\{0,1\\}$, $Y \\in \\{0,1\\}$, joint PMF: $P(0,0)=0.4, P(0,1)=0.1, P(1,0)=0.1, P(1,1)=0.4$. Marginals: $P(X=0)=0.5, P(X=1)=0.5, P(Y=0)=0.5, P(Y=1)=0.5$. Expectations: $E[X]=0.5, E[Y]=0.5, E[XY]=0.4$. Covariance: $0.4-0.25=0.15$",
+          "**Independence check**: If joint PMF factors as $P(X=x_i, Y=y_j) = P(X=x_i)P(Y=y_j)$ for all $i,j$, then the variables are independent and $\\text{Cov}(X,Y)=0$. Example: $P(0,0)=0.25, P(0,1)=0.25, P(1,0)=0.25, P(1,1)=0.25$ gives Cov=0",
+          "**Interpretation of magnitude**: Given $\\text{Cov}(X,Y)=0.15$ with $\\sigma_X=0.5, \\sigma_Y=0.5$, the correlation is $\\rho = 0.15/(0.5×0.5) = 0.6$, indicating moderate positive linear relationship"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Pipeline",
+          "latex": "$\\text{Cov}(X,Y) = \\sum_{i,j} x_i y_j P(x_i,y_j) - \\left(\\sum_i x_i \\sum_j P(x_i,y_j)\\right)\\left(\\sum_j y_j \\sum_i P(x_i,y_j)\\right)$",
+          "description": "Full expansion showing all steps in one formula"
+        },
+        {
+          "name": "Verification via Variance",
+          "latex": "$\\text{Cov}(X,X) = \\text{Var}(X) \\geq 0$",
+          "description": "Sanity check: covariance of a variable with itself equals its variance"
+        },
+        {
+          "name": "Cauchy-Schwarz Bound",
+          "latex": "$|\\text{Cov}(X,Y)| \\leq \\sqrt{\\text{Var}(X)\\text{Var}(Y)}$",
+          "description": "Covariance magnitude is bounded by the product of standard deviations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes covariance from scratch given only x_values, y_values, and the joint PMF. This combines marginal extraction (sub-quest 2), expectation computation (sub-quests 1, 3), and the covariance formula (sub-quest 5). This is essentially the main problem, but with detailed guidance from all previous sub-quests.",
+        "function_signature": "def compute_covariance(x_values: list, y_values: list, joint_pmf: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_covariance(x_values: list, y_values: list, joint_pmf: np.ndarray) -> float:\n    \"\"\"\n    Compute covariance Cov(X,Y) from joint PMF.\n    \n    Args:\n        x_values: List of possible values for X\n        y_values: List of possible values for Y\n        joint_pmf: 2D numpy array where joint_pmf[i][j] = P(X=x_values[i], Y=y_values[j])\n    \n    Returns:\n        Covariance Cov(X,Y) as a float\n    \n    Steps:\n        1. Extract marginal distributions from joint_pmf\n        2. Compute E[X] and E[Y] from marginals\n        3. Compute E[XY] from joint distribution\n        4. Return Cov(X,Y) = E[XY] - E[X]*E[Y]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_covariance([0, 1], [0, 1], np.array([[0.4, 0.1], [0.1, 0.4]]))",
+            "expected": "0.15",
+            "explanation": "Positive covariance: X and Y tend to take the same value (both 0 or both 1 with higher probability)"
+          },
+          {
+            "input": "compute_covariance([0, 1], [0, 1], np.array([[0.25, 0.25], [0.25, 0.25]]))",
+            "expected": "0.0",
+            "explanation": "Independent uniform variables: joint PMF factors into product of marginals, covariance is zero"
+          },
+          {
+            "input": "compute_covariance([1, 2, 3], [1, 2], np.array([[0.1, 0.2], [0.15, 0.25], [0.2, 0.1]]))",
+            "expected": "-0.05",
+            "explanation": "Slight negative covariance: inverse relationship between X and Y (higher X associates with lower Y)"
+          },
+          {
+            "input": "compute_covariance([0, 1], [0, 1], np.array([[0.1, 0.4], [0.4, 0.1]]))",
+            "expected": "-0.15",
+            "explanation": "Negative covariance: when X=0, Y tends to be 1, and vice versa (opposite values preferred)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Skipping the marginal extraction step and trying to compute E[X], E[Y] directly from joint PMF (incorrect indexing)",
+        "Computing E[XY] using marginals instead of the joint PMF (this would give E[X]E[Y] if independent)",
+        "Forgetting to match indices correctly: x_values[i] must correspond to joint_pmf[i,:]",
+        "Not validating that the joint PMF sums to 1.0 (potential data error)"
+      ],
+      "hint": "Structure your code in four clear steps matching the sub-quests: (1) extract marginals using sum with appropriate axis, (2) compute E[X] and E[Y] using marginals and values, (3) use nested loops or vectorized operations for E[XY], (4) apply the simple formula Cov = E[XY] - E[X]*E[Y].",
+      "references": [
+        "Covariance matrix computation",
+        "Numerical stability in statistical computation",
+        "Sample covariance vs population covariance"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,499 @@
+{
+  "problem_id": 132,
+  "title": "Simulate Markov Chain Transitions",
+  "category": "Probability",
+  "difficulty": "medium",
+  "description": "Implement a function to simulate a Markov Chain. The function should take a 2D numpy array representing the transition matrix (where each row sums to 1), an integer for the initial state index, and an integer for the number of steps to simulate. It should return a numpy array containing the sequence of state indices over time, including the initial state. Use numpy for array operations and random selections.",
+  "example": {
+    "input": "transition_matrix = np.array([[0.8, 0.2], [0.3, 0.7]]); print(simulate_markov_chain(transition_matrix, 0, 3))",
+    "output": "[0 0 1 1]",
+    "reasoning": "The solution simulates a Markov chain by starting with the initial state (0) and iteratively selecting the next state based on the probabilities in the transition matrix. For the given input, this process generates the sequence [0, 0, 1, 1] over three steps, where the first state is the initial one, and subsequent states are chosen such that from state 0, it stays at 0, then transitions to 1, and remains at 1."
+  },
+  "starter_code": "import numpy as np\ndef simulate_markov_chain(transition_matrix, initial_state, num_steps):\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Stochastic Matrices and Probability Distributions",
+      "relation_to_problem": "Understanding row-stochastic matrices is fundamental because the transition matrix in a Markov chain must preserve probability mass—each row represents a complete probability distribution over possible next states from the current state.",
+      "prerequisites": [
+        "Linear algebra basics",
+        "Matrix operations",
+        "Basic probability theory"
+      ],
+      "learning_objectives": [
+        "Define and identify row-stochastic matrices",
+        "Verify that matrix rows form valid probability distributions",
+        "Understand the mathematical constraints on transition matrices",
+        "Implement validation logic for stochastic matrices"
+      ],
+      "math_content": {
+        "definition": "A **row-stochastic matrix** (or **right stochastic matrix**) is a square matrix $P \\in \\mathbb{R}^{n \\times n}$ where each entry $p_{ij} \\geq 0$ and the sum of entries in each row equals 1. Formally, $\\sum_{j=1}^{n} p_{ij} = 1$ for all $i \\in \\{1, 2, \\ldots, n\\}$. Each row $i$ represents a discrete probability distribution over the states $\\{1, 2, \\ldots, n\\}$, where $p_{ij}$ is the probability of transitioning from state $i$ to state $j$.",
+        "notation": "$P = (p_{ij})$ where $p_{ij}$ = probability of transition from state $i$ to state $j$; $n$ = number of states in the system",
+        "theorem": "**Theorem (Properties of Stochastic Matrices):** If $P$ and $Q$ are row-stochastic matrices of the same dimension, then their product $PQ$ is also row-stochastic. Furthermore, for any row-stochastic matrix $P$ and any probability vector $\\mathbf{v}$ (where $\\mathbf{v} \\in \\mathbb{R}^n$, $v_i \\geq 0$, and $\\sum_{i=1}^{n} v_i = 1$), the product $\\mathbf{v}P$ is also a probability vector.",
+        "proof_sketch": "For the first part, consider $(PQ)_{ik} = \\sum_{j=1}^{n} p_{ij}q_{jk}$. Then $\\sum_{k=1}^{n}(PQ)_{ik} = \\sum_{k=1}^{n}\\sum_{j=1}^{n} p_{ij}q_{jk} = \\sum_{j=1}^{n} p_{ij}\\sum_{k=1}^{n}q_{jk} = \\sum_{j=1}^{n} p_{ij} \\cdot 1 = 1$. For the second part, let $\\mathbf{w} = \\mathbf{v}P$. Then $w_j = \\sum_{i=1}^{n} v_i p_{ij}$. Since all terms are non-negative, $w_j \\geq 0$. Moreover, $\\sum_{j=1}^{n} w_j = \\sum_{j=1}^{n}\\sum_{i=1}^{n} v_i p_{ij} = \\sum_{i=1}^{n} v_i \\sum_{j=1}^{n} p_{ij} = \\sum_{i=1}^{n} v_i \\cdot 1 = 1$.",
+        "examples": [
+          "Example 1: The matrix $P = \\begin{pmatrix} 0.7 & 0.3 \\\\ 0.4 & 0.6 \\end{pmatrix}$ is row-stochastic because row 1 sums to $0.7 + 0.3 = 1$ and row 2 sums to $0.4 + 0.6 = 1$.",
+          "Example 2: The matrix $Q = \\begin{pmatrix} 0.5 & 0.3 \\\\ 0.4 & 0.6 \\end{pmatrix}$ is NOT row-stochastic because row 1 sums to $0.5 + 0.3 = 0.8 \\neq 1$.",
+          "Example 3: The identity matrix $I_n$ is row-stochastic and represents a system where each state transitions only to itself with probability 1."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Row Sum Constraint",
+          "latex": "$\\sum_{j=1}^{n} p_{ij} = 1, \\quad \\forall i \\in \\{1,\\ldots,n\\}$",
+          "description": "Every row of a row-stochastic transition matrix must sum to exactly 1, ensuring that from any given state, the probabilities of all possible transitions form a complete probability distribution."
+        },
+        {
+          "name": "Non-negativity Constraint",
+          "latex": "$p_{ij} \\geq 0, \\quad \\forall i,j \\in \\{1,\\ldots,n\\}$",
+          "description": "All entries in a transition matrix must be non-negative since they represent probabilities."
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that validates whether a given 2D numpy array is a valid row-stochastic matrix. The function should check: (1) all entries are non-negative, (2) each row sums to 1 (within numerical tolerance of 1e-10), and (3) the matrix is square. Return True if valid, False otherwise.",
+        "function_signature": "def is_stochastic_matrix(matrix: np.ndarray) -> bool:",
+        "starter_code": "import numpy as np\n\ndef is_stochastic_matrix(matrix: np.ndarray) -> bool:\n    # Your code here\n    # Check: square matrix, non-negative entries, rows sum to 1\n    pass",
+        "test_cases": [
+          {
+            "input": "is_stochastic_matrix(np.array([[0.7, 0.3], [0.4, 0.6]]))",
+            "expected": "True",
+            "explanation": "This is a valid 2×2 row-stochastic matrix where both rows sum to 1 and all entries are non-negative."
+          },
+          {
+            "input": "is_stochastic_matrix(np.array([[0.5, 0.3], [0.4, 0.6]]))",
+            "expected": "False",
+            "explanation": "First row sums to 0.8, not 1, so this is not row-stochastic."
+          },
+          {
+            "input": "is_stochastic_matrix(np.array([[1.0, 0.0], [-0.1, 1.1]]))",
+            "expected": "False",
+            "explanation": "Second row contains a negative entry (-0.1), violating the non-negativity constraint."
+          },
+          {
+            "input": "is_stochastic_matrix(np.array([[1.0, 0.0, 0.0], [0.2, 0.3, 0.5], [0.1, 0.4, 0.5]]))",
+            "expected": "True",
+            "explanation": "All three rows sum to 1 and all entries are non-negative, making this a valid 3×3 row-stochastic matrix."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row-stochastic with column-stochastic matrices (where columns sum to 1 instead of rows)",
+        "Using exact equality (==) to check if sums equal 1, instead of accounting for floating-point precision errors",
+        "Forgetting to check that the matrix is square",
+        "Not validating that all entries are non-negative before checking row sums"
+      ],
+      "hint": "Use numpy's built-in functions like np.all() for element-wise checks, np.sum(axis=1) to sum along rows, and np.allclose() to handle floating-point comparison with tolerance.",
+      "references": [
+        "Stochastic processes and Markov chains",
+        "Probability theory and measure",
+        "Numerical methods for floating-point comparison"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Discrete Probability Distributions and Categorical Sampling",
+      "relation_to_problem": "To simulate a Markov chain transition, we must sample the next state from a discrete probability distribution defined by the current state's row in the transition matrix. This sub-quest teaches the inverse transform sampling method essential for generating random state transitions.",
+      "prerequisites": [
+        "Probability distributions",
+        "Random number generation",
+        "Cumulative distribution functions"
+      ],
+      "learning_objectives": [
+        "Understand discrete probability distributions and their representation",
+        "Compute cumulative distribution functions (CDFs) from probability mass functions",
+        "Implement categorical sampling using inverse transform method",
+        "Use NumPy's random selection functions for efficient sampling"
+      ],
+      "math_content": {
+        "definition": "A **discrete probability distribution** over a finite set of outcomes $\\{x_1, x_2, \\ldots, x_n\\}$ is characterized by a **probability mass function (PMF)** $p: \\{x_1, \\ldots, x_n\\} \\to [0,1]$ where $p(x_i) \\geq 0$ for all $i$ and $\\sum_{i=1}^{n} p(x_i) = 1$. The **cumulative distribution function (CDF)** is defined as $F(x_k) = \\sum_{i=1}^{k} p(x_i)$, representing the probability that the outcome is at most $x_k$.",
+        "notation": "$p(x_i)$ = probability mass at outcome $x_i$; $F(x_k)$ = cumulative probability up to outcome $x_k$; $U \\sim \\text{Uniform}(0,1)$ = uniform random variable",
+        "theorem": "**Inverse Transform Sampling Theorem:** Let $X$ be a discrete random variable with CDF $F$. If $U \\sim \\text{Uniform}(0,1)$, then $X = F^{-1}(U) = \\min\\{x_i : F(x_i) \\geq U\\}$ has the same distribution as $X$. This provides a method to generate samples from any discrete distribution using uniform random numbers.",
+        "proof_sketch": "For any outcome $x_k$, we have $P(X \\leq x_k) = P(F^{-1}(U) \\leq x_k) = P(U \\leq F(x_k)) = F(x_k)$, where the last equality follows from the uniform distribution property. This shows that the generated variable has the correct CDF, and therefore the correct distribution.",
+        "examples": [
+          "Example 1: For a die roll with uniform probabilities $p = [1/6, 1/6, 1/6, 1/6, 1/6, 1/6]$, the CDF is $F = [1/6, 2/6, 3/6, 4/6, 5/6, 6/6]$. If $U = 0.45$, we sample outcome 3 since $F(2) = 2/6 < 0.45 \\leq 3/6 = F(3)$.",
+          "Example 2: For probabilities $p = [0.2, 0.5, 0.3]$, CDF is $F = [0.2, 0.7, 1.0]$. If $U = 0.65$, we get outcome 2 since $0.2 < 0.65 \\leq 0.7$.",
+          "Example 3: For a biased coin with $p = [0.7, 0.3]$ (heads, tails), CDF is $F = [0.7, 1.0]$. Any $U \\leq 0.7$ gives heads; $U > 0.7$ gives tails."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cumulative Distribution Function",
+          "latex": "$F(x_k) = \\sum_{i=1}^{k} p(x_i)$",
+          "description": "Converts a probability mass function into a cumulative distribution by summing probabilities up to index $k$."
+        },
+        {
+          "name": "Inverse Transform Sampling",
+          "latex": "$X = \\min\\{i : F(x_i) \\geq U\\}, \\quad U \\sim \\text{Uniform}(0,1)$",
+          "description": "Samples from a discrete distribution by generating a uniform random number and finding the first index where the CDF exceeds it."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that samples a single outcome from a discrete probability distribution given as a 1D numpy array of probabilities. Use the inverse transform method: generate a uniform random number, compute the cumulative sum of probabilities, and return the index of the first position where the cumulative sum meets or exceeds the random number.",
+        "function_signature": "def sample_categorical(probabilities: np.ndarray) -> int:",
+        "starter_code": "import numpy as np\n\ndef sample_categorical(probabilities: np.ndarray) -> int:\n    # Your code here\n    # Generate uniform random number\n    # Compute cumulative distribution\n    # Find and return the sampled index\n    pass",
+        "test_cases": [
+          {
+            "input": "np.random.seed(42); sample_categorical(np.array([0.5, 0.5]))",
+            "expected": "1",
+            "explanation": "With seed 42, the uniform random number falls in the second half, selecting index 1."
+          },
+          {
+            "input": "np.random.seed(10); sample_categorical(np.array([0.8, 0.1, 0.1]))",
+            "expected": "0",
+            "explanation": "With seed 10, the uniform random number is likely less than 0.8, selecting the most probable outcome at index 0."
+          },
+          {
+            "input": "np.random.seed(99); sample_categorical(np.array([0.0, 1.0, 0.0]))",
+            "expected": "1",
+            "explanation": "When one probability is 1.0, that outcome is always selected regardless of the random number."
+          },
+          {
+            "input": "np.random.seed(5); sample_categorical(np.array([0.25, 0.25, 0.25, 0.25]))",
+            "expected": "varies but in range [0, 3]",
+            "explanation": "With uniform probabilities over 4 outcomes, each index has equal likelihood of being selected."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using np.argmax() instead of finding the first index where cumsum >= random value (argmax finds maximum, not threshold crossing)",
+        "Forgetting to set random seeds when testing, making results non-reproducible",
+        "Computing cumsum inefficiently in a loop instead of using numpy's built-in cumsum()",
+        "Not handling edge case where random value equals exactly a cumulative probability boundary"
+      ],
+      "hint": "NumPy's cumsum() computes cumulative sums efficiently. Use np.searchsorted() or a boolean comparison with np.argmax() to find the first threshold crossing. Alternatively, np.random.choice() can directly sample from categorical distributions.",
+      "references": [
+        "Inverse transform sampling",
+        "Monte Carlo methods",
+        "Categorical distribution",
+        "NumPy random sampling functions"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "State Transition Dynamics and the Markov Property",
+      "relation_to_problem": "The Markov property—that future states depend only on the current state—is what makes the simulation algorithm work. Understanding this memoryless property mathematically justifies why we only need the current state and its corresponding transition probabilities to determine the next state.",
+      "prerequisites": [
+        "Conditional probability",
+        "Stochastic processes",
+        "Discrete-time systems"
+      ],
+      "learning_objectives": [
+        "Formally define the Markov property for discrete-time chains",
+        "Understand conditional independence in state transitions",
+        "Prove that the transition matrix encodes all necessary information",
+        "Implement single-step state transitions using matrix indexing"
+      ],
+      "math_content": {
+        "definition": "A discrete-time stochastic process $\\{X_t\\}_{t=0}^{\\infty}$ taking values in a finite state space $S = \\{0, 1, \\ldots, n-1\\}$ is a **Markov chain** if it satisfies the **Markov property**: $P(X_{t+1} = j \\mid X_t = i, X_{t-1} = i_{t-1}, \\ldots, X_0 = i_0) = P(X_{t+1} = j \\mid X_t = i)$ for all $t \\geq 0$ and all states $i, j, i_0, \\ldots, i_{t-1} \\in S$. The transition probabilities $p_{ij} = P(X_{t+1} = j \\mid X_t = i)$ form the **transition matrix** $P = (p_{ij})$.",
+        "notation": "$X_t$ = state at time $t$; $p_{ij}$ = one-step transition probability from state $i$ to state $j$; $P$ = transition matrix; $S$ = finite state space",
+        "theorem": "**Chapman-Kolmogorov Equations:** For a Markov chain with transition matrix $P$, the $m$-step transition probability from state $i$ to state $j$ is given by $p_{ij}^{(m)} = P(X_{t+m} = j \\mid X_t = i) = [P^m]_{ij}$, where $P^m$ is the $m$-th matrix power of $P$. This means multi-step transitions can be computed by matrix exponentiation.",
+        "proof_sketch": "By induction on $m$. Base case ($m=1$): $p_{ij}^{(1)} = p_{ij} = [P]_{ij}$ by definition. Inductive step: Assume $p_{ij}^{(m)} = [P^m]_{ij}$. Then $p_{ij}^{(m+1)} = \\sum_{k \\in S} P(X_{t+m} = k \\mid X_t = i) \\cdot P(X_{t+m+1} = j \\mid X_{t+m} = k) = \\sum_{k \\in S} [P^m]_{ik} \\cdot p_{kj} = [P^m \\cdot P]_{ij} = [P^{m+1}]_{ij}$ by the Markov property and matrix multiplication definition.",
+        "examples": [
+          "Example 1: Consider a two-state chain with $P = \\begin{pmatrix} 0.7 & 0.3 \\\\ 0.4 & 0.6 \\end{pmatrix}$. Starting from state 0, the probability of being in state 1 after one step is $p_{01} = 0.3$. After two steps: $p_{01}^{(2)} = [P^2]_{01} = 0.7 \\cdot 0.3 + 0.3 \\cdot 0.6 = 0.39$.",
+          "Example 2: For the identity matrix $I$, $p_{ij}^{(m)} = \\delta_{ij}$ (Kronecker delta) for all $m$, meaning each state always transitions to itself.",
+          "Example 3: A random walk on a line with states $\\{0, 1, 2\\}$ where from state 1, the chain moves to 0 or 2 with equal probability: $P = \\begin{pmatrix} 1 & 0 & 0 \\\\ 0.5 & 0 & 0.5 \\\\ 0 & 0 & 1 \\end{pmatrix}$ has absorbing states 0 and 2."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Markov Property (Memoryless Property)",
+          "latex": "$P(X_{t+1} = j \\mid X_t = i, X_{t-1}, \\ldots, X_0) = P(X_{t+1} = j \\mid X_t = i) = p_{ij}$",
+          "description": "The probability of the next state depends only on the current state, not on the history of past states."
+        },
+        {
+          "name": "Chapman-Kolmogorov Equation",
+          "latex": "$p_{ij}^{(m+n)} = \\sum_{k \\in S} p_{ik}^{(m)} p_{kj}^{(n)}$",
+          "description": "Multi-step transition probabilities can be decomposed into sums over intermediate states, corresponding to matrix multiplication."
+        },
+        {
+          "name": "State Distribution Evolution",
+          "latex": "$\\pi^{(t+1)} = \\pi^{(t)} P$",
+          "description": "The probability distribution over states at time $t+1$ is obtained by left-multiplying the distribution at time $t$ by the transition matrix."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs a single state transition in a Markov chain. Given a transition matrix (row-stochastic), a current state index, and a random seed for reproducibility, return the next state index. Extract the row corresponding to the current state (which gives the probability distribution over next states), then sample from this distribution.",
+        "function_signature": "def single_step_transition(transition_matrix: np.ndarray, current_state: int, seed: int = None) -> int:",
+        "starter_code": "import numpy as np\n\ndef single_step_transition(transition_matrix: np.ndarray, current_state: int, seed: int = None) -> int:\n    # Your code here\n    # Set random seed if provided\n    # Extract row corresponding to current_state\n    # Sample next state from this probability distribution\n    pass",
+        "test_cases": [
+          {
+            "input": "np.random.seed(42); single_step_transition(np.array([[0.8, 0.2], [0.3, 0.7]]), 0)",
+            "expected": "0 or 1 (depends on random outcome)",
+            "explanation": "From state 0, there's 80% chance of staying at 0 and 20% of moving to 1."
+          },
+          {
+            "input": "single_step_transition(np.array([[1.0, 0.0], [0.0, 1.0]]), 0, seed=1)",
+            "expected": "0",
+            "explanation": "State 0 always transitions to itself with probability 1 (absorbing state)."
+          },
+          {
+            "input": "single_step_transition(np.array([[0.0, 1.0], [1.0, 0.0]]), 1, seed=2)",
+            "expected": "0",
+            "explanation": "State 1 always transitions deterministically to state 0 with probability 1."
+          },
+          {
+            "input": "single_step_transition(np.array([[0.33, 0.33, 0.34], [0.5, 0.25, 0.25], [0.1, 0.2, 0.7]]), 1, seed=10)",
+            "expected": "0, 1, or 2 (sampled from distribution [0.5, 0.25, 0.25])",
+            "explanation": "From state 1, sample according to the second row's probability distribution."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Extracting the column instead of the row from the transition matrix (confusing row-stochastic convention)",
+        "Forgetting that state indices are zero-based in NumPy arrays",
+        "Not setting the random seed correctly for reproducible testing",
+        "Trying to return probabilities instead of a sampled state index"
+      ],
+      "hint": "Use transition_matrix[current_state] to extract the probability distribution for the next state. Then apply the sampling method from the previous sub-quest, or use np.random.choice() with the p parameter.",
+      "references": [
+        "Markov property and memoryless processes",
+        "Chapman-Kolmogorov equations",
+        "Discrete-time Markov chains theory",
+        "Stochastic matrix powers and long-term behavior"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "State Trajectory Generation and Iterative Simulation",
+      "relation_to_problem": "To simulate a Markov chain over multiple time steps, we must iteratively apply single-step transitions, building a sequence (trajectory) of states. This sub-quest focuses on the computational structure needed to generate and store state sequences efficiently.",
+      "prerequisites": [
+        "Iterative algorithms",
+        "Array manipulation",
+        "State transition mechanics"
+      ],
+      "learning_objectives": [
+        "Understand the iterative process of generating state trajectories",
+        "Implement efficient array-based storage for state sequences",
+        "Manage loop constructs for repeated state transitions",
+        "Initialize and update state variables correctly over time"
+      ],
+      "math_content": {
+        "definition": "A **state trajectory** (or **sample path**) of a Markov chain is a sequence $\\{X_0, X_1, X_2, \\ldots, X_T\\}$ where $X_0$ is the initial state and each subsequent state $X_{t+1}$ is sampled from the conditional distribution $P(X_{t+1} = j \\mid X_t = i) = p_{ij}$ given by row $i$ of the transition matrix. The trajectory has length $T+1$ (including the initial state) and represents one possible realization of the stochastic process.",
+        "notation": "$X_t$ = state at time step $t$; $T$ = total number of transitions; $\\{X_0, \\ldots, X_T\\}$ = complete trajectory of length $T+1$",
+        "theorem": "**Trajectory Distribution Theorem:** Given initial state $X_0 = i_0$ and transition matrix $P$, the probability of observing a specific trajectory $(i_0, i_1, \\ldots, i_T)$ is $P(X_0 = i_0, X_1 = i_1, \\ldots, X_T = i_T) = \\prod_{t=0}^{T-1} p_{i_t, i_{t+1}}$, where the product follows from the Markov property (conditional independence of non-adjacent states given intermediates).",
+        "proof_sketch": "By the chain rule of probability and the Markov property: $P(X_0 = i_0, \\ldots, X_T = i_T) = P(X_0 = i_0) \\prod_{t=0}^{T-1} P(X_{t+1} = i_{t+1} \\mid X_t = i_t, \\ldots, X_0 = i_0) = 1 \\cdot \\prod_{t=0}^{T-1} P(X_{t+1} = i_{t+1} \\mid X_t = i_t) = \\prod_{t=0}^{T-1} p_{i_t, i_{t+1}}$, where $P(X_0 = i_0) = 1$ since the initial state is deterministic.",
+        "examples": [
+          "Example 1: For transition matrix $P = \\begin{pmatrix} 0.5 & 0.5 \\\\ 0.3 & 0.7 \\end{pmatrix}$ starting from state 0, the trajectory $(0, 1, 1)$ has probability $p_{01} \\cdot p_{11} = 0.5 \\cdot 0.7 = 0.35$.",
+          "Example 2: For 3 transitions starting from state 0 in the same matrix, a possible trajectory is $(0, 0, 1, 0)$ with probability $p_{00} \\cdot p_{01} \\cdot p_{10} = 0.5 \\cdot 0.5 \\cdot 0.3 = 0.075$.",
+          "Example 3: In a deterministic chain where each state has only one outgoing transition with probability 1, every trajectory is deterministic and has probability 1."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Trajectory Probability",
+          "latex": "$P(\\text{trajectory}) = \\prod_{t=0}^{T-1} p_{X_t, X_{t+1}}$",
+          "description": "The probability of a specific state sequence is the product of transition probabilities along the path."
+        },
+        {
+          "name": "Trajectory Length",
+          "latex": "$|\\text{trajectory}| = T + 1$",
+          "description": "A trajectory with $T$ transitions contains $T+1$ states (initial state plus $T$ subsequent states)."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that generates a state trajectory of specified length by iteratively applying state transitions. Given a transition matrix, an initial state, and the number of transitions (num_steps), return a 1D numpy array containing the sequence of states from time 0 to time num_steps. The array should have length num_steps + 1 (including the initial state).",
+        "function_signature": "def generate_trajectory(transition_matrix: np.ndarray, initial_state: int, num_steps: int, seed: int = None) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef generate_trajectory(transition_matrix: np.ndarray, initial_state: int, num_steps: int, seed: int = None) -> np.ndarray:\n    # Your code here\n    # Initialize array to store trajectory\n    # Set initial state\n    # Iterate num_steps times, sampling next state at each step\n    # Return complete trajectory\n    pass",
+        "test_cases": [
+          {
+            "input": "np.random.seed(42); generate_trajectory(np.array([[0.8, 0.2], [0.3, 0.7]]), 0, 5)",
+            "expected": "array of length 6 starting with 0",
+            "explanation": "With 5 transitions from initial state 0, the trajectory contains 6 states total."
+          },
+          {
+            "input": "generate_trajectory(np.array([[1.0, 0.0], [0.0, 1.0]]), 1, 3, seed=1)",
+            "expected": "[1, 1, 1, 1]",
+            "explanation": "State 1 is absorbing (always transitions to itself), so the trajectory remains at state 1."
+          },
+          {
+            "input": "generate_trajectory(np.array([[0.0, 1.0], [1.0, 0.0]]), 0, 4, seed=2)",
+            "expected": "[0, 1, 0, 1, 0]",
+            "explanation": "States alternate deterministically between 0 and 1 each step."
+          },
+          {
+            "input": "len(generate_trajectory(np.array([[0.5, 0.5], [0.5, 0.5]]), 0, 10, seed=5))",
+            "expected": "11",
+            "explanation": "With 10 transitions, the trajectory length is 11 (initial state plus 10 subsequent states)."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Returning an array of length num_steps instead of num_steps + 1 (forgetting to include the initial state)",
+        "Not pre-allocating the trajectory array, leading to inefficient repeated concatenation",
+        "Updating the current state variable incorrectly in the loop",
+        "Setting the random seed inside the loop instead of once at the beginning"
+      ],
+      "hint": "Pre-allocate a numpy array of size (num_steps + 1) using np.zeros with dtype=int. Set the first element to initial_state, then use a for loop to populate the remaining positions by repeatedly calling your single-step transition function.",
+      "references": [
+        "Monte Carlo simulation of stochastic processes",
+        "Time series generation from Markov models",
+        "Random walk simulations",
+        "Efficient array operations in NumPy"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Long-Term Behavior and Stationary Distributions",
+      "relation_to_problem": "Understanding stationary distributions helps validate simulation correctness—over long trajectories, the empirical distribution of states should converge to the theoretical stationary distribution. This sub-quest provides the mathematical foundation for verifying simulation results.",
+      "prerequisites": [
+        "Eigenvalues and eigenvectors",
+        "Linear algebra",
+        "Limits and convergence"
+      ],
+      "learning_objectives": [
+        "Define stationary distributions and their significance",
+        "Understand convergence of state distributions over time",
+        "Compute stationary distributions from transition matrices",
+        "Verify empirical state frequencies against theoretical predictions"
+      ],
+      "math_content": {
+        "definition": "A probability distribution $\\pi = (\\pi_0, \\pi_1, \\ldots, \\pi_{n-1})$ over the state space is called a **stationary distribution** (or **equilibrium distribution**) of a Markov chain with transition matrix $P$ if $\\pi = \\pi P$, where $\\pi$ is a row vector. Equivalently, $\\sum_{i=0}^{n-1} \\pi_i p_{ij} = \\pi_j$ for all states $j$. This means that if the chain starts with distribution $\\pi$, it remains in distribution $\\pi$ forever.",
+        "notation": "$\\pi$ = stationary distribution (row vector); $P$ = transition matrix; $\\pi_j$ = stationary probability of state $j$",
+        "theorem": "**Fundamental Theorem of Markov Chains:** For an **irreducible** and **aperiodic** (ergodic) finite-state Markov chain with transition matrix $P$, there exists a unique stationary distribution $\\pi$ such that: (1) $\\pi = \\pi P$ and $\\sum_j \\pi_j = 1$, (2) $\\lim_{t \\to \\infty} P^t = \\mathbf{1}\\pi^T$ where $\\mathbf{1}$ is the column vector of all ones, meaning every row of $P^t$ converges to $\\pi$, and (3) $\\lim_{T \\to \\infty} \\frac{1}{T}\\sum_{t=1}^{T} \\mathbb{1}_{X_t = j} = \\pi_j$ almost surely (the long-run proportion of time spent in state $j$ equals $\\pi_j$).",
+        "proof_sketch": "Existence and uniqueness follow from the Perron-Frobenius theorem applied to irreducible stochastic matrices: the largest eigenvalue is 1 with a unique positive eigenvector (which normalizes to $\\pi$). Convergence follows from showing that all other eigenvalues have absolute value less than 1 under aperiodicity, so powers of $P$ converge to the rank-1 matrix with rows equal to $\\pi$. The time-average result follows from the ergodic theorem for Markov chains.",
+        "examples": [
+          "Example 1: For $P = \\begin{pmatrix} 0.7 & 0.3 \\\\ 0.4 & 0.6 \\end{pmatrix}$, solve $\\pi P = \\pi$ with $\\pi_0 + \\pi_1 = 1$. This gives $0.7\\pi_0 + 0.4\\pi_1 = \\pi_0$ and $0.3\\pi_0 + 0.6\\pi_1 = \\pi_1$, yielding $\\pi = (4/7, 3/7) \\approx (0.571, 0.429)$.",
+          "Example 2: For uniform transition matrix $P = \\frac{1}{n}\\mathbf{1}\\mathbf{1}^T$ (all entries equal $1/n$), the stationary distribution is uniform: $\\pi = (1/n, 1/n, \\ldots, 1/n)$.",
+          "Example 3: For $P = \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix}$ (identity), every distribution is stationary, but this chain is not ergodic (it's reducible)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Stationary Distribution Equation",
+          "latex": "$\\pi P = \\pi, \\quad \\sum_{j=0}^{n-1} \\pi_j = 1, \\quad \\pi_j \\geq 0$",
+          "description": "The stationary distribution is a left eigenvector of $P$ with eigenvalue 1, normalized to be a probability distribution."
+        },
+        {
+          "name": "Detailed Balance Condition (for reversible chains)",
+          "latex": "$\\pi_i p_{ij} = \\pi_j p_{ji}, \\quad \\forall i,j$",
+          "description": "If this holds, the chain is reversible and $\\pi$ is automatically stationary. This is sufficient but not necessary for stationarity."
+        },
+        {
+          "name": "Empirical Distribution Convergence",
+          "latex": "$\\hat{\\pi}_j^{(T)} = \\frac{1}{T}\\sum_{t=1}^{T} \\mathbb{1}_{X_t = j} \\xrightarrow{T \\to \\infty} \\pi_j \\quad \\text{almost surely}$",
+          "description": "The proportion of time spent in state $j$ over a long trajectory converges to the stationary probability."
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes the stationary distribution of an ergodic Markov chain by finding the left eigenvector of the transition matrix corresponding to eigenvalue 1. Use NumPy's linear algebra functions to find eigenvectors, identify the one with eigenvalue 1 (within numerical tolerance), normalize it to sum to 1, and return it as a 1D numpy array.",
+        "function_signature": "def compute_stationary_distribution(transition_matrix: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_stationary_distribution(transition_matrix: np.ndarray) -> np.ndarray:\n    # Your code here\n    # Compute left eigenvectors (eigenvectors of P^T)\n    # Find eigenvector corresponding to eigenvalue 1\n    # Normalize to sum to 1\n    # Return as probability distribution\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_stationary_distribution(np.array([[0.7, 0.3], [0.4, 0.6]]))",
+            "expected": "approximately [0.571, 0.429]",
+            "explanation": "Solving the stationary equation gives $\\pi = (4/7, 3/7)$."
+          },
+          {
+            "input": "compute_stationary_distribution(np.array([[0.5, 0.5], [0.5, 0.5]]))",
+            "expected": "approximately [0.5, 0.5]",
+            "explanation": "Uniform transition matrix yields uniform stationary distribution."
+          },
+          {
+            "input": "compute_stationary_distribution(np.array([[1.0, 0.0, 0.0], [0.0, 0.8, 0.2], [0.0, 0.3, 0.7]]))",
+            "expected": "approximately [1.0, 0.0, 0.0]",
+            "explanation": "State 0 is absorbing, so all probability mass concentrates there in the long run."
+          },
+          {
+            "input": "np.sum(compute_stationary_distribution(np.array([[0.6, 0.3, 0.1], [0.2, 0.5, 0.3], [0.4, 0.1, 0.5]])))",
+            "expected": "1.0 (within tolerance)",
+            "explanation": "The returned stationary distribution must sum to 1 regardless of the transition matrix."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing right eigenvectors of P instead of left eigenvectors (need to use P.T or solve from the left)",
+        "Not handling complex eigenvectors that arise from numerical computation (take real part)",
+        "Forgetting to normalize the eigenvector to sum to 1",
+        "Not checking which eigenvalue is closest to 1 (using exact equality instead of np.isclose())"
+      ],
+      "hint": "Use np.linalg.eig(transition_matrix.T) to get left eigenvectors. Find the index where eigenvalue is closest to 1.0, extract that eigenvector, take its real part, make it non-negative, and normalize by dividing by its sum.",
+      "references": [
+        "Perron-Frobenius theorem",
+        "Ergodic theory for Markov chains",
+        "Eigenvalue problems in probability",
+        "Long-term behavior of stochastic processes"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Markov Chain Simulation with Validation",
+      "relation_to_problem": "This final sub-quest synthesizes all previous concepts—validation of the transition matrix, iterative trajectory generation with proper state transitions, and verification of results against theoretical predictions—to build a complete, robust Markov chain simulator that can be applied to the main problem.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Software testing",
+        "Numerical validation"
+      ],
+      "learning_objectives": [
+        "Integrate matrix validation, sampling, and iteration into a complete simulation",
+        "Implement robust error handling and input validation",
+        "Verify simulation output correctness through statistical tests",
+        "Apply all learned concepts to solve realistic Markov chain problems"
+      ],
+      "math_content": {
+        "definition": "A **Markov chain simulation** is an algorithm that generates sample trajectories from a Markov chain specified by a transition matrix $P$ and initial state $X_0$. The simulation produces a sequence $(X_0, X_1, \\ldots, X_T)$ where each $X_{t+1}$ is randomly sampled from the distribution given by row $X_t$ of $P$. The algorithm combines (1) input validation, (2) iterative state transitions, and (3) trajectory storage to produce a complete implementation.",
+        "notation": "$P$ = transition matrix (row-stochastic); $X_0$ = initial state; $T$ = number of transitions; $(X_0, \\ldots, X_T)$ = output trajectory",
+        "theorem": "**Simulation Correctness Theorem:** Let $\\{X_t^{\\text{sim}}\\}$ be a trajectory generated by the simulation algorithm, and let $\\{X_t^{\\text{true}}\\}$ be a trajectory from the true Markov chain with transition matrix $P$ and initial state $X_0$. If the random number generator is correctly implemented and the sampling procedure correctly implements categorical sampling from each row of $P$, then $\\{X_t^{\\text{sim}}\\}$ and $\\{X_t^{\\text{true}}\\}$ have identical probability distributions over all finite-length trajectories: $P(X_0^{\\text{sim}} = i_0, \\ldots, X_T^{\\text{sim}} = i_T) = P(X_0^{\\text{true}} = i_0, \\ldots, X_T^{\\text{true}} = i_T)$ for all sequences $(i_0, \\ldots, i_T)$.",
+        "proof_sketch": "By construction, $X_0^{\\text{sim}} = X_0 = X_0^{\\text{true}}$ (deterministic initial state). For $t \\geq 0$, if $X_t^{\\text{sim}} = i$, the simulation samples $X_{t+1}^{\\text{sim}}$ from the categorical distribution with probabilities $(p_{i0}, p_{i1}, \\ldots, p_{i,n-1})$, which equals $P(X_{t+1}^{\\text{true}} = j \\mid X_t^{\\text{true}} = i)$ by definition of the transition matrix. By induction, the joint distributions match at all time steps.",
+        "examples": [
+          "Example 1: Simulating weather patterns with states {Sunny, Rainy} and transition matrix $P = \\begin{pmatrix} 0.8 & 0.2 \\\\ 0.4 & 0.6 \\end{pmatrix}$ starting from Sunny for 7 days produces a sequence like [Sunny, Sunny, Sunny, Rainy, Sunny, Sunny, Rainy, Sunny].",
+          "Example 2: A simple random walk on $\\{0, 1, 2\\}$ with equal probability of moving left or right (except at boundaries) can be simulated to study hitting times and return probabilities.",
+          "Example 3: For validation, running 10,000 simulations of length 1000 from state 0 with $P = \\begin{pmatrix} 0.7 & 0.3 \\\\ 0.4 & 0.6 \\end{pmatrix}$ should yield empirical state frequencies near $(0.571, 0.429)$, the stationary distribution."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Simulation Algorithm",
+          "latex": "$X_0 \\leftarrow \\text{initial_state}; \\quad \\text{for } t = 0, \\ldots, T-1: X_{t+1} \\sim \\text{Categorical}(P[X_t, :])$",
+          "description": "Initialize with starting state, then iteratively sample next states from the appropriate row of the transition matrix."
+        },
+        {
+          "name": "Statistical Validation (Chi-squared Test)",
+          "latex": "$\\chi^2 = \\sum_{j=0}^{n-1} \\frac{(O_j - E_j)^2}{E_j}, \\quad O_j = \\text{observed count}, \\quad E_j = T \\cdot \\pi_j$",
+          "description": "Test whether observed state frequencies in a long trajectory match expected frequencies from the stationary distribution."
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete Markov chain simulation function that: (1) validates the transition matrix is row-stochastic, (2) checks the initial state is valid, (3) generates a trajectory of length num_steps + 1 by iteratively sampling transitions, and (4) returns the trajectory as a numpy array of integers. Include appropriate error handling for invalid inputs.",
+        "function_signature": "def simulate_markov_chain_complete(transition_matrix: np.ndarray, initial_state: int, num_steps: int, seed: int = None) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef simulate_markov_chain_complete(transition_matrix: np.ndarray, initial_state: int, num_steps: int, seed: int = None) -> np.ndarray:\n    # Your code here\n    # Validate transition_matrix is row-stochastic\n    # Validate initial_state is in valid range\n    # Set random seed if provided\n    # Initialize trajectory array\n    # Perform num_steps transitions\n    # Return trajectory\n    pass",
+        "test_cases": [
+          {
+            "input": "np.random.seed(42); simulate_markov_chain_complete(np.array([[0.8, 0.2], [0.3, 0.7]]), 0, 3)",
+            "expected": "array of length 4 starting with 0, e.g., [0, 0, 1, 1]",
+            "explanation": "Valid inputs produce a trajectory of correct length with proper transitions."
+          },
+          {
+            "input": "simulate_markov_chain_complete(np.array([[0.5, 0.5], [0.5, 0.5]]), 1, 0, seed=1)",
+            "expected": "[1]",
+            "explanation": "With zero transitions, return array containing only the initial state."
+          },
+          {
+            "input": "simulate_markov_chain_complete(np.array([[1.0, 0.0, 0.0], [0.2, 0.3, 0.5], [0.0, 0.0, 1.0]]), 1, 5, seed=2)",
+            "expected": "array of length 6 with valid state transitions according to row 1",
+            "explanation": "3-state system with various transition probabilities should produce valid trajectory."
+          },
+          {
+            "input": "try: simulate_markov_chain_complete(np.array([[0.5, 0.3], [0.4, 0.6]]), 0, 3); except: 'error'",
+            "expected": "'error' (exception raised)",
+            "explanation": "Invalid transition matrix (first row sums to 0.8) should raise an error during validation."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not validating inputs before starting the simulation (leads to cryptic errors later)",
+        "Off-by-one errors in trajectory length (returning num_steps instead of num_steps + 1 states)",
+        "Not handling edge case of num_steps = 0 (should return array with just initial state)",
+        "Inefficient repeated random seed setting inside loops",
+        "Not using integer dtype for the trajectory array (states are discrete indices)"
+      ],
+      "hint": "This exercise combines all previous sub-quests. Use your is_stochastic_matrix() function for validation, your trajectory generation logic from sub-quest 4, and ensure proper array initialization with dtype=int. The final implementation should be clean, well-structured, and handle all edge cases.",
+      "references": [
+        "Software engineering for scientific computing",
+        "Input validation and error handling",
+        "Statistical testing of simulations",
+        "Monte Carlo methods verification"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,501 @@
+{
+  "problem_id": 139,
+  "title": "Elastic Net Regression via Gradient Descent",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "Implement Elastic Net Regression using gradient descent, combining L1 and L2 penalties to handle multicollinearity and encourage sparsity in the feature weights.",
+  "example": {
+    "input": "X = np.array([[0, 0], [1, 1], [2, 2]]); y = np.array([0, 1, 2])",
+    "output": "(array([0.37, 0.37]), 0.25)",
+    "reasoning": "The model learns a nearly perfect linear relationship with regularization controlling weight magnitude. The weights converge around 0.37 with a bias around 0.25."
+  },
+  "starter_code": "import numpy as np\n\ndef elastic_net_gradient_descent(\n    X: np.ndarray,\n    y: np.ndarray,\n    alpha1: float = 0.1,\n    alpha2: float = 0.1,\n    learning_rate: float = 0.01,\n    max_iter: int = 1000,\n    tol: float = 1e-4,\n) -> tuple:\n    # Implement Elastic Net regression here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Linear Prediction Model and Mean Squared Error Loss",
+      "relation_to_problem": "This sub-quest establishes the foundation of linear regression prediction and the MSE loss function, which forms the first term of the Elastic Net objective function that we need to minimize.",
+      "prerequisites": [
+        "Basic linear algebra",
+        "Vector operations",
+        "Calculus fundamentals"
+      ],
+      "learning_objectives": [
+        "Understand the linear prediction model $\\hat{y} = Xw + b$",
+        "Compute predictions for multiple samples using matrix operations",
+        "Calculate the Mean Squared Error loss function",
+        "Understand how MSE measures prediction quality"
+      ],
+      "math_content": {
+        "definition": "A **linear prediction model** maps input features to output predictions through a linear combination: $\\hat{y}_i = \\sum_{j=1}^p X_{ij}w_j + b$ where $X_{ij}$ is the $j$-th feature of the $i$-th sample, $w_j$ is the weight coefficient for feature $j$, and $b$ is the bias term. In matrix form: $\\hat{y} = Xw + b$ where $X \\in \\mathbb{R}^{n \\times p}$, $w \\in \\mathbb{R}^p$, $b \\in \\mathbb{R}$, and $\\hat{y} \\in \\mathbb{R}^n$.",
+        "notation": "$X$ = feature matrix, $w$ = weight vector, $b$ = bias scalar, $\\hat{y}$ = predicted values, $y$ = actual values, $n$ = number of samples, $p$ = number of features",
+        "theorem": "**Mean Squared Error (MSE)**: The MSE loss function measures the average squared difference between predictions and actual values: $\\text{MSE}(w, b) = \\frac{1}{2n}\\sum_{i=1}^n(\\hat{y}_i - y_i)^2 = \\frac{1}{2n}\\|\\hat{y} - y\\|_2^2$. The factor $\\frac{1}{2}$ simplifies gradient computation.",
+        "proof_sketch": "The MSE is convex in $w$ and $b$: For any $w_1, w_2$ and $\\lambda \\in [0,1]$, let $w_\\lambda = \\lambda w_1 + (1-\\lambda)w_2$. Since $(\\hat{y}_i - y_i)^2$ is convex in its argument and $\\hat{y}_i$ is linear in $w$, the composition is convex. This guarantees a unique global minimum for the unregularized problem.",
+        "examples": [
+          "Example 1: Given $X = \\begin{bmatrix}1 & 2\\\\3 & 4\\end{bmatrix}$, $w = \\begin{bmatrix}0.5\\\\0.5\\end{bmatrix}$, $b = 0$, $y = \\begin{bmatrix}2\\\\4\\end{bmatrix}$. Predictions: $\\hat{y}_1 = 1(0.5) + 2(0.5) + 0 = 1.5$, $\\hat{y}_2 = 3(0.5) + 4(0.5) + 0 = 3.5$. MSE = $\\frac{1}{4}[(1.5-2)^2 + (3.5-4)^2] = \\frac{1}{4}[0.25 + 0.25] = 0.125$",
+          "Example 2: Perfect predictions when $\\hat{y} = y$ yield MSE = 0, indicating optimal fit without regularization"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Linear Prediction (Matrix Form)",
+          "latex": "$\\hat{y} = Xw + b$",
+          "description": "Compute all predictions simultaneously using matrix-vector multiplication"
+        },
+        {
+          "name": "Mean Squared Error",
+          "latex": "$\\text{MSE} = \\frac{1}{2n}\\sum_{i=1}^n(\\hat{y}_i - y_i)^2$",
+          "description": "Measures average prediction error; lower is better"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes predictions using a linear model and calculates the MSE loss. This is the core building block for Elastic Net - you need to make predictions and measure their quality before adding regularization.",
+        "function_signature": "def compute_mse_loss(X: np.ndarray, y: np.ndarray, w: np.ndarray, b: float) -> tuple[np.ndarray, float]:",
+        "starter_code": "import numpy as np\n\ndef compute_mse_loss(X: np.ndarray, y: np.ndarray, w: np.ndarray, b: float) -> tuple[np.ndarray, float]:\n    \"\"\"\n    Compute predictions and MSE loss for linear model.\n    \n    Args:\n        X: Feature matrix of shape (n_samples, n_features)\n        y: Target values of shape (n_samples,)\n        w: Weight vector of shape (n_features,)\n        b: Bias scalar\n    \n    Returns:\n        predictions: Predicted values of shape (n_samples,)\n        mse: Mean squared error loss (scalar)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_mse_loss(np.array([[1, 2], [3, 4]]), np.array([2.0, 4.0]), np.array([0.5, 0.5]), 0.0)",
+            "expected": "(array([1.5, 3.5]), 0.125)",
+            "explanation": "Predictions: [1*0.5+2*0.5+0, 3*0.5+4*0.5+0] = [1.5, 3.5]. MSE = (1/4)*[(1.5-2)^2 + (3.5-4)^2] = 0.125"
+          },
+          {
+            "input": "compute_mse_loss(np.array([[0, 0], [1, 1], [2, 2]]), np.array([0.0, 1.0, 2.0]), np.array([0.5, 0.5]), 0.0)",
+            "expected": "(array([0.0, 1.0, 2.0]), 0.0)",
+            "explanation": "Perfect predictions when weights sum to 1 for this data: MSE = 0"
+          },
+          {
+            "input": "compute_mse_loss(np.array([[1], [2], [3]]), np.array([3.0, 5.0, 7.0]), np.array([2.0]), 1.0)",
+            "expected": "(array([3.0, 5.0, 7.0]), 0.0)",
+            "explanation": "Linear relationship y = 2x + 1 perfectly captured: predictions exactly match targets"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to add the bias term to predictions",
+        "Not dividing by 2n in MSE calculation (the factor 1/2 simplifies gradient)",
+        "Using wrong matrix multiplication order (should be X @ w, not w @ X)",
+        "Not handling 1D arrays properly (y and w should be treated as vectors)"
+      ],
+      "hint": "Use NumPy's @ operator for matrix multiplication. Remember predictions are X @ w + b, and MSE involves squaring residuals then averaging.",
+      "references": [
+        "Linear regression fundamentals",
+        "Matrix-vector multiplication",
+        "L2 norm and squared error"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Gradient Computation for MSE Loss",
+      "relation_to_problem": "To minimize the Elastic Net objective using gradient descent, we first need to compute gradients of the MSE loss term. This sub-quest teaches how to derive and compute $\\frac{\\partial \\text{MSE}}{\\partial w}$ and $\\frac{\\partial \\text{MSE}}{\\partial b}$, which are essential components of the full Elastic Net gradient.",
+      "prerequisites": [
+        "Linear prediction model",
+        "MSE loss",
+        "Partial derivatives",
+        "Chain rule"
+      ],
+      "learning_objectives": [
+        "Derive the gradient of MSE with respect to weights and bias",
+        "Understand the chain rule application in computing gradients",
+        "Implement efficient gradient computation using matrix operations",
+        "Interpret gradients as directions of steepest ascent"
+      ],
+      "math_content": {
+        "definition": "The **gradient** of a scalar function $f: \\mathbb{R}^p \\to \\mathbb{R}$ is the vector of partial derivatives: $\\nabla_w f = \\begin{bmatrix}\\frac{\\partial f}{\\partial w_1} \\\\ \\vdots \\\\ \\frac{\\partial f}{\\partial w_p}\\end{bmatrix}$. For MSE loss, we need $\\nabla_w \\text{MSE}$ and $\\frac{\\partial \\text{MSE}}{\\partial b}$.",
+        "notation": "$\\nabla_w$ = gradient with respect to $w$, $\\frac{\\partial}{\\partial w_j}$ = partial derivative with respect to $w_j$, $e_i = \\hat{y}_i - y_i$ = residual for sample $i$",
+        "theorem": "**MSE Gradient Theorem**: For $\\text{MSE}(w, b) = \\frac{1}{2n}\\sum_{i=1}^n(\\hat{y}_i - y_i)^2$ where $\\hat{y}_i = \\sum_{j=1}^p X_{ij}w_j + b$, the gradients are: (1) $\\frac{\\partial \\text{MSE}}{\\partial w_j} = \\frac{1}{n}\\sum_{i=1}^n X_{ij}(\\hat{y}_i - y_i)$, equivalently $\\nabla_w \\text{MSE} = \\frac{1}{n}X^T(\\hat{y} - y)$. (2) $\\frac{\\partial \\text{MSE}}{\\partial b} = \\frac{1}{n}\\sum_{i=1}^n(\\hat{y}_i - y_i)$.",
+        "proof_sketch": "Proof: Let $L_i = \\frac{1}{2}(\\hat{y}_i - y_i)^2$. By chain rule: $\\frac{\\partial L_i}{\\partial w_j} = (\\hat{y}_i - y_i)\\frac{\\partial \\hat{y}_i}{\\partial w_j} = (\\hat{y}_i - y_i)X_{ij}$ since $\\frac{\\partial}{\\partial w_j}\\sum_{k=1}^p X_{ik}w_k = X_{ij}$. Summing over all samples and dividing by $n$: $\\frac{\\partial \\text{MSE}}{\\partial w_j} = \\frac{1}{n}\\sum_{i=1}^n X_{ij}(\\hat{y}_i - y_i)$. In matrix form, this is $\\frac{1}{n}X^T(\\hat{y} - y)$. For bias: $\\frac{\\partial \\hat{y}_i}{\\partial b} = 1$, so $\\frac{\\partial \\text{MSE}}{\\partial b} = \\frac{1}{n}\\sum_{i=1}^n(\\hat{y}_i - y_i)$.",
+        "examples": [
+          "Example 1: $X = \\begin{bmatrix}1 & 0\\\\0 & 1\\end{bmatrix}$, $y = \\begin{bmatrix}2\\\\3\\end{bmatrix}$, $w = \\begin{bmatrix}1\\\\1\\end{bmatrix}$, $b = 0$. Predictions: $\\hat{y} = \\begin{bmatrix}1\\\\1\\end{bmatrix}$. Residuals: $\\hat{y} - y = \\begin{bmatrix}-1\\\\-2\\end{bmatrix}$. Gradient: $\\nabla_w = \\frac{1}{2}\\begin{bmatrix}1 & 0\\\\0 & 1\\end{bmatrix}^T\\begin{bmatrix}-1\\\\-2\\end{bmatrix} = \\begin{bmatrix}-0.5\\\\-1.0\\end{bmatrix}$. Bias gradient: $\\frac{\\partial}{\\partial b} = \\frac{1}{2}(-1 + -2) = -1.5$",
+          "Example 2: When predictions are perfect ($\\hat{y} = y$), all residuals are zero, so gradients are zero vectors/scalars, indicating we're at a minimum"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Weight Gradient (Matrix Form)",
+          "latex": "$\\nabla_w \\text{MSE} = \\frac{1}{n}X^T(\\hat{y} - y)$",
+          "description": "Efficient computation of all weight gradients simultaneously"
+        },
+        {
+          "name": "Bias Gradient",
+          "latex": "$\\frac{\\partial \\text{MSE}}{\\partial b} = \\frac{1}{n}\\sum_{i=1}^n(\\hat{y}_i - y_i)$",
+          "description": "Average of residuals gives bias gradient"
+        },
+        {
+          "name": "Chain Rule Application",
+          "latex": "$\\frac{\\partial L_i}{\\partial w_j} = \\frac{\\partial L_i}{\\partial \\hat{y}_i}\\frac{\\partial \\hat{y}_i}{\\partial w_j}$",
+          "description": "Decomposes gradient computation into manageable parts"
+        }
+      ],
+      "exercise": {
+        "description": "Implement gradient computation for MSE loss. You'll need this exact computation for the Elastic Net gradient (before adding regularization terms). Focus on efficient matrix operations.",
+        "function_signature": "def compute_mse_gradients(X: np.ndarray, y: np.ndarray, y_pred: np.ndarray) -> tuple[np.ndarray, float]:",
+        "starter_code": "import numpy as np\n\ndef compute_mse_gradients(X: np.ndarray, y: np.ndarray, y_pred: np.ndarray) -> tuple[np.ndarray, float]:\n    \"\"\"\n    Compute gradients of MSE loss with respect to weights and bias.\n    \n    Args:\n        X: Feature matrix of shape (n_samples, n_features)\n        y: Actual target values of shape (n_samples,)\n        y_pred: Predicted values of shape (n_samples,)\n    \n    Returns:\n        grad_w: Gradient with respect to weights, shape (n_features,)\n        grad_b: Gradient with respect to bias (scalar)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_mse_gradients(np.array([[1, 0], [0, 1]]), np.array([2.0, 3.0]), np.array([1.0, 1.0]))",
+            "expected": "(array([-0.5, -1.0]), -1.5)",
+            "explanation": "Residuals are [-1, -2]. Weight gradient = (1/2)*[1*(-1) + 0*(-2), 0*(-1) + 1*(-2)] = [-0.5, -1.0]. Bias gradient = (1/2)*(-1 + -2) = -1.5"
+          },
+          {
+            "input": "compute_mse_gradients(np.array([[1, 1], [2, 2]]), np.array([2.0, 4.0]), np.array([2.0, 4.0]))",
+            "expected": "(array([0.0, 0.0]), 0.0)",
+            "explanation": "Perfect predictions: residuals are [0, 0], so all gradients are zero"
+          },
+          {
+            "input": "compute_mse_gradients(np.array([[1, 2], [3, 4], [5, 6]]), np.array([1.0, 2.0, 3.0]), np.array([2.0, 3.0, 4.0]))",
+            "expected": "(array([3.0, 4.0]), 1.0)",
+            "explanation": "Residuals are [1, 1, 1]. Weight gradient = (1/3)*[1+3+5, 2+4+6] = [3.0, 4.0]. Bias gradient = (1/3)*(1+1+1) = 1.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to transpose X (should be X.T @ residuals, not X @ residuals)",
+        "Using wrong sign for residuals (should be y_pred - y for gradient computation)",
+        "Not dividing by n (number of samples)",
+        "Confusing gradient direction (negative gradient points toward minimum)"
+      ],
+      "hint": "Compute residuals first (y_pred - y), then use matrix multiplication X.T @ residuals and divide by sample count. Bias gradient is just the mean of residuals.",
+      "references": [
+        "Multivariable calculus and chain rule",
+        "Matrix calculus",
+        "Gradient descent optimization"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "L1 and L2 Regularization: Penalties and Gradients",
+      "relation_to_problem": "Elastic Net combines L1 and L2 penalties. This sub-quest teaches how these regularization terms work, their mathematical properties, and how to compute their gradients. Understanding this is crucial since the Elastic Net gradient is MSE gradient plus L1 and L2 regularization gradients.",
+      "prerequisites": [
+        "Vector norms",
+        "Absolute value function",
+        "Subgradients",
+        "MSE gradients"
+      ],
+      "learning_objectives": [
+        "Understand L1 (Lasso) regularization and its sparsity-inducing property",
+        "Understand L2 (Ridge) regularization and coefficient shrinkage",
+        "Compute gradients (and subgradients) of regularization terms",
+        "Recognize how regularization penalties affect optimization"
+      ],
+      "math_content": {
+        "definition": "**L1 Regularization (Lasso)**: The penalty term $R_1(w) = \\alpha_1\\sum_{j=1}^p|w_j| = \\alpha_1\\|w\\|_1$ where $\\alpha_1 \\geq 0$ controls strength. **L2 Regularization (Ridge)**: The penalty term $R_2(w) = \\alpha_2\\sum_{j=1}^p w_j^2 = \\alpha_2\\|w\\|_2^2$ where $\\alpha_2 \\geq 0$ controls strength. The combined **Elastic Net regularization** is $R(w) = \\alpha_1\\|w\\|_1 + \\alpha_2\\|w\\|_2^2$.",
+        "notation": "$\\|w\\|_1 = \\sum_{j=1}^p|w_j|$ = L1 norm, $\\|w\\|_2^2 = \\sum_{j=1}^p w_j^2$ = squared L2 norm, $\\text{sign}(w_j) = \\begin{cases}1 & w_j > 0\\\\0 & w_j = 0\\\\-1 & w_j < 0\\end{cases}$",
+        "theorem": "**Regularization Gradient Theorem**: For differentiable points: (1) $\\frac{\\partial R_2}{\\partial w_j} = 2\\alpha_2 w_j$ (L2 gradient is smooth everywhere). (2) For $w_j \\neq 0$: $\\frac{\\partial R_1}{\\partial w_j} = \\alpha_1\\cdot\\text{sign}(w_j)$ (L1 subgradient at $w_j = 0$ is any value in $[-\\alpha_1, \\alpha_1]$). (3) Combined: $\\frac{\\partial R}{\\partial w_j} = \\alpha_1\\cdot\\text{sign}(w_j) + 2\\alpha_2 w_j$ for $w_j \\neq 0$.",
+        "proof_sketch": "L2 Proof: $\\frac{\\partial}{\\partial w_j}w_j^2 = 2w_j$, multiply by $\\alpha_2$ and sum. L1 Proof: For $w_j > 0$, $|w_j| = w_j$, so $\\frac{\\partial}{\\partial w_j}|w_j| = 1$. For $w_j < 0$, $|w_j| = -w_j$, so $\\frac{\\partial}{\\partial w_j}|w_j| = -1$. At $w_j = 0$, $|w_j|$ is non-differentiable but has subgradient $[-1, 1]$. In practice, we use $\\text{sign}(0) = 0$ for numerical stability.",
+        "examples": [
+          "Example 1 (L2): $w = [2, -3, 1]$, $\\alpha_2 = 0.1$. Penalty: $R_2 = 0.1(4 + 9 + 1) = 1.4$. Gradient: $\\nabla_w R_2 = 2(0.1)[2, -3, 1] = [0.4, -0.6, 0.2]$",
+          "Example 2 (L1): $w = [2, -3, 0]$, $\\alpha_1 = 0.5$. Penalty: $R_1 = 0.5(2 + 3 + 0) = 2.5$. Subgradient: $\\nabla_w R_1 = 0.5[1, -1, 0] = [0.5, -0.5, 0]$",
+          "Example 3 (Elastic Net): $w = [1, -2]$, $\\alpha_1 = 0.1$, $\\alpha_2 = 0.05$. Total penalty: $R = 0.1(1+2) + 0.05(1+4) = 0.3 + 0.25 = 0.55$. Combined gradient: $[0.1(1) + 2(0.05)(1), 0.1(-1) + 2(0.05)(-2)] = [0.2, -0.3]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "L1 Penalty",
+          "latex": "$R_1(w) = \\alpha_1\\sum_{j=1}^p|w_j|$",
+          "description": "Promotes sparsity by driving small coefficients to exactly zero"
+        },
+        {
+          "name": "L2 Penalty",
+          "latex": "$R_2(w) = \\alpha_2\\sum_{j=1}^p w_j^2$",
+          "description": "Shrinks all coefficients smoothly toward zero without eliminating them"
+        },
+        {
+          "name": "L1 Subgradient",
+          "latex": "$\\frac{\\partial R_1}{\\partial w_j} = \\alpha_1\\cdot\\text{sign}(w_j)$",
+          "description": "Constant magnitude gradient (except at zero) pushes weights toward zero"
+        },
+        {
+          "name": "L2 Gradient",
+          "latex": "$\\frac{\\partial R_2}{\\partial w_j} = 2\\alpha_2 w_j$",
+          "description": "Gradient proportional to weight magnitude, stronger for larger weights"
+        }
+      ],
+      "exercise": {
+        "description": "Implement functions to compute L1 and L2 regularization penalties and their gradients. These will be added to MSE gradients to form the complete Elastic Net gradient in the final solution.",
+        "function_signature": "def compute_regularization(w: np.ndarray, alpha1: float, alpha2: float) -> tuple[float, float, np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef compute_regularization(w: np.ndarray, alpha1: float, alpha2: float) -> tuple[float, float, np.ndarray, np.ndarray]:\n    \"\"\"\n    Compute L1 and L2 regularization penalties and gradients.\n    \n    Args:\n        w: Weight vector of shape (n_features,)\n        alpha1: L1 regularization strength\n        alpha2: L2 regularization strength\n    \n    Returns:\n        l1_penalty: L1 regularization penalty (scalar)\n        l2_penalty: L2 regularization penalty (scalar)\n        l1_gradient: L1 subgradient, shape (n_features,)\n        l2_gradient: L2 gradient, shape (n_features,)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_regularization(np.array([2.0, -3.0, 1.0]), 0.5, 0.1)",
+            "expected": "(3.0, 1.4, array([0.5, -0.5, 0.5]), array([0.4, -0.6, 0.2]))",
+            "explanation": "L1 penalty: 0.5*(2+3+1)=3.0. L2 penalty: 0.1*(4+9+1)=1.4. L1 grad: 0.5*[sign(2), sign(-3), sign(1)]=[0.5, -0.5, 0.5]. L2 grad: 2*0.1*[2, -3, 1]=[0.4, -0.6, 0.2]"
+          },
+          {
+            "input": "compute_regularization(np.array([0.0, 0.0]), 0.1, 0.1)",
+            "expected": "(0.0, 0.0, array([0.0, 0.0]), array([0.0, 0.0]))",
+            "explanation": "Zero weights produce zero penalties and zero gradients"
+          },
+          {
+            "input": "compute_regularization(np.array([1.0, -2.0]), 0.1, 0.05)",
+            "expected": "(0.3, 0.25, array([0.1, -0.1]), array([0.1, -0.2]))",
+            "explanation": "L1: 0.1*(1+2)=0.3. L2: 0.05*(1+4)=0.25. L1 grad: [0.1, -0.1]. L2 grad: 2*0.05*[1, -2]=[0.1, -0.2]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting the factor of 2 in L2 gradient (derivative of w^2 is 2w)",
+        "Using absolute value instead of sign function for L1 gradient",
+        "Not handling the sign(0) = 0 case correctly in L1 gradient",
+        "Confusing L1 and L2 norms (L1 uses absolute values, L2 uses squares)"
+      ],
+      "hint": "Use np.sign() for L1 gradient and element-wise multiplication for L2. L1 penalty uses np.abs(), L2 penalty uses squaring.",
+      "references": [
+        "Lasso regression and feature selection",
+        "Ridge regression and coefficient shrinkage",
+        "Subgradient methods for non-smooth optimization"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Gradient Descent Update Rule and Convergence",
+      "relation_to_problem": "With all gradient components understood, this sub-quest teaches the iterative gradient descent algorithm. You'll learn how to update parameters using gradients, control step size with learning rate, and detect convergence - the core optimization mechanism of Elastic Net.",
+      "prerequisites": [
+        "Gradient computation",
+        "Iterative algorithms",
+        "Convergence criteria"
+      ],
+      "learning_objectives": [
+        "Understand the gradient descent parameter update rule",
+        "Learn how learning rate affects convergence speed and stability",
+        "Implement convergence checking using gradient norms",
+        "Apply multiple iterations to minimize a loss function"
+      ],
+      "math_content": {
+        "definition": "**Gradient Descent** is an iterative optimization algorithm that updates parameters in the direction opposite to the gradient: At iteration $t$, perform $\\theta^{(t+1)} = \\theta^{(t)} - \\eta\\nabla J(\\theta^{(t)})$ where $\\theta$ represents all parameters (weights and bias), $\\eta > 0$ is the **learning rate** (step size), and $\\nabla J$ is the gradient of the objective function.",
+        "notation": "$\\theta^{(t)}$ = parameters at iteration $t$, $\\eta$ = learning rate, $\\nabla J$ = gradient vector, $\\|\\cdot\\|_1$ = L1 norm for convergence checking",
+        "theorem": "**Convergence Criterion**: The algorithm converges when the gradient becomes sufficiently small: $\\|\\nabla J(\\theta^{(t)})\\|_1 < \\epsilon$ where $\\epsilon > 0$ is a tolerance parameter. For convex functions with appropriate learning rate, gradient descent guarantees convergence to global minimum. For strongly convex functions (like Elastic Net with $\\alpha_2 > 0$), convergence is linear.",
+        "proof_sketch": "Intuition: At a minimum $\\theta^*$, the gradient $\\nabla J(\\theta^*) = 0$. Gradient descent moves in direction $-\\nabla J$, which is the direction of steepest descent. For sufficiently small $\\eta$, each step reduces $J$: $J(\\theta^{(t+1)}) < J(\\theta^{(t)})$. For convex $J$ with Lipschitz continuous gradient, choosing $\\eta < \\frac{2}{L}$ (where $L$ is Lipschitz constant) guarantees convergence. The L2 term in Elastic Net ensures strong convexity, providing linear convergence rate.",
+        "examples": [
+          "Example 1 (1D): Minimize $J(w) = w^2$. Start $w^{(0)} = 4$, $\\eta = 0.1$. Gradient: $\\nabla J = 2w$. Iteration 1: $w^{(1)} = 4 - 0.1(2 \\cdot 4) = 4 - 0.8 = 3.2$. Iteration 2: $w^{(2)} = 3.2 - 0.1(2 \\cdot 3.2) = 2.56$. Converges to $w^* = 0$",
+          "Example 2 (Learning Rate Effect): Same problem with $\\eta = 0.6$: $w^{(1)} = 4 - 0.6(8) = -0.8$, $w^{(2)} = -0.8 - 0.6(-1.6) = 0.16$. Oscillates but converges. With $\\eta = 1.1$: $w^{(1)} = 4 - 1.1(8) = -4.8$, diverges! Learning rate must satisfy $\\eta < 1/L$ for convergence",
+          "Example 3 (Convergence Check): If $\\|\\nabla J\\|_1 = 0.0005$ and tolerance $\\epsilon = 0.001$, stop iterating since gradient is sufficiently small"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Parameter Update Rule",
+          "latex": "$\\theta^{(t+1)} = \\theta^{(t)} - \\eta\\nabla J(\\theta^{(t)})$",
+          "description": "Move parameters in opposite direction of gradient, scaled by learning rate"
+        },
+        {
+          "name": "Weight Update (Elastic Net)",
+          "latex": "$w^{(t+1)} = w^{(t)} - \\eta\\left(\\frac{1}{n}X^T(\\hat{y} - y) + \\alpha_1\\cdot\\text{sign}(w^{(t)}) + 2\\alpha_2 w^{(t)}\\right)$",
+          "description": "Complete weight update combining MSE, L1, and L2 gradients"
+        },
+        {
+          "name": "Bias Update",
+          "latex": "$b^{(t+1)} = b^{(t)} - \\eta\\frac{1}{n}\\sum_{i=1}^n(\\hat{y}_i - y_i)$",
+          "description": "Bias updated using only MSE gradient (no regularization on bias)"
+        },
+        {
+          "name": "Convergence Check",
+          "latex": "$\\|\\nabla_w J\\|_1 = \\sum_{j=1}^p\\left|\\frac{\\partial J}{\\partial w_j}\\right| < \\epsilon$",
+          "description": "Stop when L1 norm of weight gradient falls below tolerance"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a single gradient descent step for a simple regularized loss. This teaches the core update mechanism you'll use in Elastic Net, but with a simpler objective function (MSE + L2 only) to focus on the update logic.",
+        "function_signature": "def gradient_descent_step(w: np.ndarray, b: float, grad_w: np.ndarray, grad_b: float, learning_rate: float) -> tuple[np.ndarray, float]:",
+        "starter_code": "import numpy as np\n\ndef gradient_descent_step(w: np.ndarray, b: float, grad_w: np.ndarray, grad_b: float, learning_rate: float) -> tuple[np.ndarray, float]:\n    \"\"\"\n    Perform one gradient descent update step.\n    \n    Args:\n        w: Current weight vector of shape (n_features,)\n        b: Current bias (scalar)\n        grad_w: Gradient of loss w.r.t. weights, shape (n_features,)\n        grad_b: Gradient of loss w.r.t. bias (scalar)\n        learning_rate: Step size (eta)\n    \n    Returns:\n        w_new: Updated weights, shape (n_features,)\n        b_new: Updated bias (scalar)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "gradient_descent_step(np.array([1.0, 2.0]), 0.5, np.array([0.4, -0.6]), -0.2, 0.1)",
+            "expected": "(array([0.96, 2.06]), 0.52)",
+            "explanation": "w_new = [1.0, 2.0] - 0.1*[0.4, -0.6] = [1.0-0.04, 2.0+0.06] = [0.96, 2.06]. b_new = 0.5 - 0.1*(-0.2) = 0.52"
+          },
+          {
+            "input": "gradient_descent_step(np.array([5.0]), 1.0, np.array([10.0]), 2.0, 0.01)",
+            "expected": "(array([4.9]), 0.98)",
+            "explanation": "w_new = 5.0 - 0.01*10.0 = 4.9. b_new = 1.0 - 0.01*2.0 = 0.98. Small learning rate means small updates"
+          },
+          {
+            "input": "gradient_descent_step(np.array([0.0, 0.0]), 0.0, np.array([0.0, 0.0]), 0.0, 0.1)",
+            "expected": "(array([0.0, 0.0]), 0.0)",
+            "explanation": "Zero gradients mean we're at a critical point - no update occurs"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Adding gradient instead of subtracting (should move opposite to gradient)",
+        "Not multiplying gradient by learning rate",
+        "Using too large a learning rate causing divergence",
+        "Stopping after one iteration instead of iterating until convergence"
+      ],
+      "hint": "The update rule is: new_parameter = old_parameter - learning_rate * gradient. Make sure to subtract!",
+      "references": [
+        "Optimization theory and convex optimization",
+        "Numerical methods for unconstrained optimization",
+        "Learning rate schedules and adaptive methods"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Iterative Optimization Loop with Convergence Monitoring",
+      "relation_to_problem": "The final integration: combine all components (prediction, MSE loss, regularization gradients, parameter updates) into an iterative loop that runs until convergence. This sub-quest teaches loop structure, iteration limits, and convergence detection - everything needed to complete the Elastic Net implementation.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Iterative algorithms",
+        "Loop control structures"
+      ],
+      "learning_objectives": [
+        "Combine all gradient components into a complete optimization algorithm",
+        "Implement iteration loop with convergence checking and maximum iteration limit",
+        "Monitor gradient norms to detect when optimization has converged",
+        "Structure code for numerical stability and efficiency"
+      ],
+      "math_content": {
+        "definition": "An **iterative optimization algorithm** repeatedly applies updates until a stopping criterion is met. For Elastic Net: Initialize $w^{(0)} = 0$, $b^{(0)} = 0$. For $t = 0, 1, 2, \\ldots$: (1) Compute predictions $\\hat{y}^{(t)} = Xw^{(t)} + b^{(t)}$. (2) Compute full gradient $\\nabla J = \\nabla_{MSE} + \\nabla_{L1} + \\nabla_{L2}$. (3) Update: $w^{(t+1)} = w^{(t)} - \\eta\\nabla_w J$, $b^{(t+1)} = b^{(t)} - \\eta\\nabla_b J$. (4) Check convergence: if $\\|\\nabla_w J\\|_1 < \\epsilon$ or $t \\geq T_{max}$, stop.",
+        "notation": "$T_{max}$ = maximum iterations, $\\epsilon$ = convergence tolerance, $t$ = current iteration, $J$ = total objective (MSE + L1 + L2)",
+        "theorem": "**Termination Guarantee**: The algorithm terminates in finite time because: (1) If $\\|\\nabla_w J\\|_1 < \\epsilon$, convergence criterion is satisfied. (2) If not converged, $t < T_{max}$ ensures termination after maximum iterations. This prevents infinite loops while allowing sufficient iterations for convergence.",
+        "proof_sketch": "Two exit conditions: (A) Convergence: For strongly convex Elastic Net objective (when $\\alpha_2 > 0$), gradient descent with appropriate $\\eta$ achieves $\\|\\nabla J\\|_1 < \\epsilon$ in $O(\\kappa\\log(1/\\epsilon))$ iterations where $\\kappa$ is condition number. (B) Maximum iterations: Counter $t$ increments each iteration, guaranteeing $t = T_{max}$ eventually. At least one condition must be satisfied, ensuring termination.",
+        "examples": [
+          "Example 1 (Convergence): $t=0$: $\\|\\nabla\\|_1 = 5.2$. $t=1$: $\\|\\nabla\\|_1 = 3.1$. $t=2$: $\\|\\nabla\\|_1 = 1.8$. ... $t=50$: $\\|\\nabla\\|_1 = 0.0008 < 0.001$. Stop! Converged in 50 iterations",
+          "Example 2 (Max iterations): $T_{max} = 100$. Even if $\\|\\nabla\\|_1 = 0.05 > \\epsilon$ at $t=100$, algorithm stops to prevent excessive computation. Return current parameters as best approximation",
+          "Example 3 (Quick convergence): For well-conditioned problems with good initialization, convergence may occur in 10-20 iterations. For ill-conditioned problems, may need 500-1000 iterations"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Elastic Net Objective",
+          "latex": "$J(w, b) = \\frac{1}{2n}\\sum_{i=1}^n(\\hat{y}_i - y_i)^2 + \\alpha_1\\sum_{j=1}^p|w_j| + \\alpha_2\\sum_{j=1}^p w_j^2$",
+          "description": "Full objective function combining all three terms"
+        },
+        {
+          "name": "Complete Weight Gradient",
+          "latex": "$\\nabla_w J = \\frac{1}{n}X^T(\\hat{y} - y) + \\alpha_1\\cdot\\text{sign}(w) + 2\\alpha_2 w$",
+          "description": "Sum of MSE, L1, and L2 gradient contributions"
+        },
+        {
+          "name": "L1 Gradient Norm (Convergence Metric)",
+          "latex": "$\\|\\nabla_w J\\|_1 = \\sum_{j=1}^p|\\nabla_{w_j} J|$",
+          "description": "Measures total magnitude of weight gradients for convergence checking"
+        },
+        {
+          "name": "Iteration Loop Structure",
+          "latex": "$\\text{while } (\\|\\nabla_w J\\|_1 \\geq \\epsilon) \\land (t < T_{max}): \\text{ [update step] }$",
+          "description": "Continue iterating until convergence or maximum iterations reached"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete optimization loop for ridge regression (MSE + L2 only, no L1). This is a simplified version of Elastic Net that teaches the full iterative structure. You'll add L1 in the final problem.",
+        "function_signature": "def ridge_regression_gd(X: np.ndarray, y: np.ndarray, alpha2: float = 0.1, learning_rate: float = 0.01, max_iter: int = 1000, tol: float = 1e-4) -> tuple[np.ndarray, float, int]:",
+        "starter_code": "import numpy as np\n\ndef ridge_regression_gd(X: np.ndarray, y: np.ndarray, alpha2: float = 0.1, learning_rate: float = 0.01, max_iter: int = 1000, tol: float = 1e-4) -> tuple[np.ndarray, float, int]:\n    \"\"\"\n    Ridge regression using gradient descent (MSE + L2 penalty).\n    \n    Args:\n        X: Feature matrix, shape (n_samples, n_features)\n        y: Target values, shape (n_samples,)\n        alpha2: L2 regularization strength\n        learning_rate: Gradient descent step size\n        max_iter: Maximum number of iterations\n        tol: Convergence tolerance for gradient L1 norm\n    \n    Returns:\n        w: Learned weights, shape (n_features,)\n        b: Learned bias (scalar)\n        iterations: Number of iterations performed\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "ridge_regression_gd(np.array([[1.0, 1.0], [2.0, 2.0], [3.0, 3.0]]), np.array([2.0, 4.0, 6.0]), alpha2=0.1, learning_rate=0.01, max_iter=1000, tol=1e-4)",
+            "expected": "(array([0.99, 0.99]), 0.01, <1000)",
+            "explanation": "Perfect linear relationship y = 2x (where both features equal). Ridge penalty slightly shrinks weights below 1.0 each. Should converge in well under 1000 iterations"
+          },
+          {
+            "input": "ridge_regression_gd(np.array([[1.0], [2.0], [3.0]]), np.array([3.0, 5.0, 7.0]), alpha2=0.0, learning_rate=0.1, max_iter=500, tol=1e-4)",
+            "expected": "(array([2.0]), 1.0, <500)",
+            "explanation": "No regularization (alpha2=0), fits y = 2x + 1 exactly. Higher learning rate converges faster"
+          },
+          {
+            "input": "ridge_regression_gd(np.array([[0.0], [1.0]]), np.array([0.0, 1.0]), alpha2=0.5, learning_rate=0.01, max_iter=100, tol=1e-4)",
+            "expected": "(array([0.66]), 0.0, <100)",
+            "explanation": "High regularization shrinks weight significantly. True relationship is y=x, but regularization gives w≈0.66"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not initializing weights and bias to zero",
+        "Checking convergence before first gradient computation",
+        "Using AND instead of OR for loop condition (should stop if converged OR max_iter reached)",
+        "Not counting iterations correctly",
+        "Computing predictions outside the loop (must recompute after each update)",
+        "Forgetting to add regularization gradient to MSE gradient"
+      ],
+      "hint": "Structure: Initialize w, b to zeros. Loop: compute predictions, compute all gradients, check convergence with L1 norm, update parameters if not converged. Track iteration count.",
+      "references": [
+        "Iterative optimization algorithms",
+        "Ridge regression closed form vs. gradient descent",
+        "Convergence analysis for gradient descent"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Elastic Net: Combining L1 and L2 Regularization",
+      "relation_to_problem": "This final sub-quest brings everything together. You'll extend ridge regression (from sub-quest 5) by adding the L1 penalty term, creating the complete Elastic Net algorithm. This demonstrates how combining L1 and L2 provides benefits of both: sparsity from Lasso and stability from Ridge.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "L1 and L2 regularization",
+        "Ridge regression implementation"
+      ],
+      "learning_objectives": [
+        "Understand how Elastic Net balances L1 and L2 regularization",
+        "Recognize when to use Elastic Net vs. pure Lasso or Ridge",
+        "Implement the complete Elastic Net gradient combining all terms",
+        "Interpret the effect of alpha1 and alpha2 on solution properties"
+      ],
+      "math_content": {
+        "definition": "**Elastic Net Regression** solves: $\\min_{w,b} J(w,b) = \\frac{1}{2n}\\sum_{i=1}^n(\\hat{y}_i - y_i)^2 + \\alpha_1\\sum_{j=1}^p|w_j| + \\alpha_2\\sum_{j=1}^p w_j^2$ where $\\hat{y}_i = \\sum_{j=1}^p X_{ij}w_j + b$. The three terms balance prediction accuracy (MSE), sparsity (L1), and stability (L2). Special cases: $\\alpha_1=0, \\alpha_2>0$ gives Ridge; $\\alpha_1>0, \\alpha_2=0$ gives Lasso; $\\alpha_1=\\alpha_2=0$ gives ordinary least squares.",
+        "notation": "$\\alpha_1$ = L1 strength (sparsity control), $\\alpha_2$ = L2 strength (shrinkage control), typical ranges: $\\alpha_1, \\alpha_2 \\in [0, 1]$",
+        "theorem": "**Elastic Net Properties**: (1) **Uniqueness**: When $\\alpha_2 > 0$, the solution is unique due to strict convexity. (2) **Grouping Effect**: Elastic Net tends to select or eliminate groups of correlated features together (unlike Lasso which picks one arbitrarily). (3) **Sparsity**: L1 term drives some weights exactly to zero when $\\alpha_1 > 0$. (4) **Stability**: L2 term ensures bounded weights and numerical stability.",
+        "proof_sketch": "Uniqueness: The Hessian $\\nabla^2 J$ has $2\\alpha_2 I$ contribution from L2 term. When $\\alpha_2 > 0$, this makes $J$ strictly convex, guaranteeing unique minimum. Grouping: For highly correlated features $X_j \\approx X_k$, the L2 penalty $\\alpha_2(w_j^2 + w_k^2)$ is minimized when $w_j \\approx w_k$, encouraging equal weights. L1 then shrinks both toward zero together. Sparsity: L1 gradient has constant magnitude $\\alpha_1$ (via sign function), providing consistent pressure toward zero regardless of weight magnitude.",
+        "examples": [
+          "Example 1 (Feature Selection): Dataset with 100 features, only 5 relevant. $\\alpha_1 = 0.1, \\alpha_2 = 0.05$ drives 95 weights to exactly zero, keeping only relevant features. Pure Ridge would keep all 100 with small weights",
+          "Example 2 (Correlated Features): Features $X_1$ and $X_2$ are 95% correlated. Lasso might pick only $X_1$ with $w_1 = 1.0, w_2 = 0$. Elastic Net gives $w_1 = 0.6, w_2 = 0.5$, using both features. If $X_1$ becomes noisy, model is more stable",
+          "Example 3 (Parameter Effects): High $\\alpha_1$ (0.5), low $\\alpha_2$ (0.01): More sparse, fewer non-zero weights. Low $\\alpha_1$ (0.01), high $\\alpha_2$ (0.5): Less sparse, weights heavily shrunk but many non-zero"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Elastic Net Objective Function",
+          "latex": "$J(w, b) = \\underbrace{\\frac{1}{2n}\\sum_{i=1}^n(\\hat{y}_i - y_i)^2}_{\\text{MSE}} + \\underbrace{\\alpha_1\\sum_{j=1}^p|w_j|}_{\\text{L1}} + \\underbrace{\\alpha_2\\sum_{j=1}^p w_j^2}_{\\text{L2}}$",
+          "description": "Complete objective balancing accuracy, sparsity, and stability"
+        },
+        {
+          "name": "Complete Elastic Net Weight Gradient",
+          "latex": "$\\nabla_w J = \\frac{1}{n}X^T(Xw + b - y) + \\alpha_1\\cdot\\text{sign}(w) + 2\\alpha_2 w$",
+          "description": "Full gradient combining all three terms - this is what you implement"
+        },
+        {
+          "name": "Bias Gradient (No Regularization)",
+          "latex": "$\\frac{\\partial J}{\\partial b} = \\frac{1}{n}\\sum_{i=1}^n(\\hat{y}_i - y_i)$",
+          "description": "Bias not regularized in standard Elastic Net formulation"
+        },
+        {
+          "name": "Parameter Updates",
+          "latex": "$w^{(t+1)} = w^{(t)} - \\eta\\nabla_w J, \\quad b^{(t+1)} = b^{(t)} - \\eta\\frac{\\partial J}{\\partial b}$",
+          "description": "Simultaneous update of all parameters using computed gradients"
+        }
+      ],
+      "exercise": {
+        "description": "Implement simplified Elastic Net with MSE + combined regularization (treat L1 and L2 together). Compute the total gradient and run gradient descent. This builds directly toward the final solution structure.",
+        "function_signature": "def elastic_net_simple(X: np.ndarray, y: np.ndarray, alpha1: float = 0.1, alpha2: float = 0.1, learning_rate: float = 0.01, max_iter: int = 500) -> tuple[np.ndarray, float]:",
+        "starter_code": "import numpy as np\n\ndef elastic_net_simple(X: np.ndarray, y: np.ndarray, alpha1: float = 0.1, alpha2: float = 0.1, learning_rate: float = 0.01, max_iter: int = 500) -> tuple[np.ndarray, float]:\n    \"\"\"\n    Elastic Net regression with simplified convergence (fixed iterations).\n    \n    Args:\n        X: Feature matrix, shape (n_samples, n_features)\n        y: Target values, shape (n_samples,)\n        alpha1: L1 regularization strength\n        alpha2: L2 regularization strength\n        learning_rate: Step size\n        max_iter: Number of iterations to run\n    \n    Returns:\n        w: Learned weights, shape (n_features,)\n        b: Learned bias (scalar)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "elastic_net_simple(np.array([[0, 0], [1, 1], [2, 2]]), np.array([0.0, 1.0, 2.0]), alpha1=0.1, alpha2=0.1, learning_rate=0.01, max_iter=1000)",
+            "expected": "(array([0.35, 0.35]), 0.28)",
+            "explanation": "Linear relationship with regularization. Both L1 and L2 shrink weights. Final weights around 0.35 each (sum to ~0.7, less than 1.0 due to penalties)"
+          },
+          {
+            "input": "elastic_net_simple(np.array([[1], [2], [3]]), np.array([2.0, 4.0, 6.0]), alpha1=0.05, alpha2=0.05, learning_rate=0.05, max_iter=500)",
+            "expected": "(array([1.9]), 0.1)",
+            "explanation": "Near-perfect linear fit y = 2x with light regularization. Weight close to 2.0, small positive bias"
+          },
+          {
+            "input": "elastic_net_simple(np.array([[1, 0], [0, 1]]), np.array([1.0, 1.0]), alpha1=0.2, alpha2=0.1, learning_rate=0.01, max_iter=800)",
+            "expected": "(array([0.8, 0.8]), 0.2)",
+            "explanation": "Two independent features. Elastic Net finds balanced solution with equal weights, higher than Ridge due to L1+L2 interaction"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to add L1 gradient term (only including MSE + L2)",
+        "Applying regularization to bias (bias should only use MSE gradient)",
+        "Using wrong sign in sign function for negative weights",
+        "Not running enough iterations for convergence",
+        "Confusing alpha1 and alpha2 parameters in gradient computation"
+      ],
+      "hint": "Start with ridge regression code from previous sub-quest. Add one line to include L1 gradient: alpha1 * np.sign(w). Make sure all three gradient components are combined correctly.",
+      "references": [
+        "Elastic Net original paper (Zou & Hastie, 2005)",
+        "Comparison of Lasso, Ridge, and Elastic Net",
+        "Regularization path and cross-validation for hyperparameter selection"
+      ]
+    }
+  ]
+}

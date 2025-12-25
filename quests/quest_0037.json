@@ -1,0 +1,516 @@
+{
+  "problem_id": 37,
+  "title": "Calculate Correlation Matrix",
+  "category": "Linear Algebra",
+  "difficulty": "medium",
+  "description": "Write a Python function to calculate the correlation matrix for a given dataset. The function should take in a 2D numpy array X and an optional 2D numpy array Y. If Y is not provided, the function should calculate the correlation matrix of X with itself. It should return the correlation matrix as a 2D numpy array.",
+  "example": {
+    "input": "X = np.array([[1, 2],\n                  [3, 4],\n                  [5, 6]])\n    output = calculate_correlation_matrix(X)\n    print(output)",
+    "output": "# [[1. 1.]\n    #  [1. 1.]]",
+    "reasoning": "The function calculates the correlation matrix for the dataset X. In this example, the correlation between the two features is 1, indicating a perfect linear relationship."
+  },
+  "starter_code": "import numpy as np\n\ndef calculate_correlation_matrix(X, Y=None):\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Computing Column-wise Mean and Data Centering",
+      "relation_to_problem": "Centering data (subtracting the mean) is the first step in computing covariance, which is essential for correlation calculation. Without centered data, we cannot properly measure linear relationships.",
+      "prerequisites": [
+        "Basic linear algebra",
+        "Vector operations",
+        "NumPy array indexing"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition of sample mean for multivariate data",
+        "Implement efficient column-wise mean computation using matrix operations",
+        "Apply data centering transformation to prepare for covariance calculation"
+      ],
+      "math_content": {
+        "definition": "For a data matrix $\\mathbf{X} \\in \\mathbb{R}^{n \\times p}$ with $n$ observations and $p$ features, the column-wise mean vector $\\boldsymbol{\\mu} \\in \\mathbb{R}^{p}$ is defined as: $$\\mu_j = \\frac{1}{n}\\sum_{i=1}^{n} x_{ij}$$ where $x_{ij}$ is the element in row $i$, column $j$. The centered data matrix $\\mathbf{X}_c$ is obtained by: $$\\mathbf{X}_c = \\mathbf{X} - \\mathbf{1}_n \\boldsymbol{\\mu}^T$$ where $\\mathbf{1}_n$ is an $n$-dimensional column vector of ones.",
+        "notation": "$\\mathbf{X}$ = data matrix (n × p), $\\boldsymbol{\\mu}$ = mean vector (p × 1), $\\mathbf{X}_c$ = centered matrix (n × p), $n$ = number of observations, $p$ = number of features",
+        "theorem": "Theorem (Properties of Centered Data): Let $\\mathbf{X}_c$ be the centered version of $\\mathbf{X}$. Then: (1) The column-wise mean of $\\mathbf{X}_c$ is the zero vector: $\\frac{1}{n}\\sum_{i=1}^{n}(x_c)_{ij} = 0$ for all $j$. (2) Centering preserves relative differences: $(x_c)_{ij} - (x_c)_{kj} = x_{ij} - x_{kj}$ for all $i,k,j$.",
+        "proof_sketch": "For property (1): $$\\frac{1}{n}\\sum_{i=1}^{n}(x_c)_{ij} = \\frac{1}{n}\\sum_{i=1}^{n}(x_{ij} - \\mu_j) = \\frac{1}{n}\\sum_{i=1}^{n}x_{ij} - \\mu_j = \\mu_j - \\mu_j = 0$$",
+        "examples": [
+          "Example 1: For $\\mathbf{X} = \\begin{pmatrix} 1 & 4 \\\\ 2 & 5 \\\\ 3 & 6 \\end{pmatrix}$, we have $\\boldsymbol{\\mu} = (2, 5)^T$, so $\\mathbf{X}_c = \\begin{pmatrix} -1 & -1 \\\\ 0 & 0 \\\\ 1 & 1 \\end{pmatrix}$",
+          "Example 2: For constant column $\\mathbf{X} = \\begin{pmatrix} 5 \\\\ 5 \\\\ 5 \\end{pmatrix}$, we have $\\mu = 5$, so $\\mathbf{X}_c = \\begin{pmatrix} 0 \\\\ 0 \\\\ 0 \\end{pmatrix}$ (all zeros)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sample Mean",
+          "latex": "$\\mu_j = \\frac{1}{n}\\sum_{i=1}^{n} x_{ij}$",
+          "description": "Compute the average value for each feature column"
+        },
+        {
+          "name": "Centering Transformation",
+          "latex": "$(x_c)_{ij} = x_{ij} - \\mu_j$",
+          "description": "Subtract the mean from each element in the column"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes a 2D numpy array and returns: (1) the column-wise mean vector, and (2) the centered data matrix. This is a critical building block for computing covariance and correlation.",
+        "function_signature": "def center_data(X: np.ndarray) -> tuple[np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef center_data(X: np.ndarray) -> tuple[np.ndarray, np.ndarray]:\n    \"\"\"\n    Compute column-wise mean and center the data.\n    \n    Args:\n        X: Input data matrix of shape (n, p)\n    \n    Returns:\n        mean_vector: Column-wise means of shape (p,)\n        X_centered: Centered data matrix of shape (n, p)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "center_data(np.array([[1, 2], [3, 4], [5, 6]]))",
+            "expected": "(array([3., 4.]), array([[-2., -2.], [0., 0.], [2., 2.]]))",
+            "explanation": "Mean of column 1 is (1+3+5)/3=3, mean of column 2 is (2+4+6)/3=4. After centering, each column sums to 0."
+          },
+          {
+            "input": "center_data(np.array([[10], [20], [30]]))",
+            "expected": "(array([20.]), array([[-10.], [0.], [10.]]))",
+            "explanation": "Single column case: mean is 20, centered values are deviations from mean"
+          },
+          {
+            "input": "center_data(np.array([[5, 5, 5], [5, 5, 5]]))",
+            "expected": "(array([5., 5., 5.]), array([[0., 0., 0.], [0., 0., 0.]]))",
+            "explanation": "Constant values: all centered values become 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing mean along wrong axis (row-wise instead of column-wise)",
+        "Broadcasting errors when subtracting mean from matrix",
+        "Using integer division instead of float division for mean",
+        "Not handling single-column or single-row matrices correctly"
+      ],
+      "hint": "Use NumPy's axis parameter to specify column-wise operations. Remember that axis=0 operates down columns.",
+      "references": [
+        "NumPy broadcasting rules",
+        "Sample statistics",
+        "Data preprocessing in machine learning"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Computing Standard Deviation and Data Standardization",
+      "relation_to_problem": "Standardization (dividing by standard deviation) normalizes the scale of each variable. The correlation coefficient requires standardized variables to ensure scale-invariance—correlations should not depend on measurement units.",
+      "prerequisites": [
+        "Data centering",
+        "Square root operations",
+        "Understanding of variance"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition of sample standard deviation",
+        "Distinguish between biased and unbiased estimators (n vs n-1)",
+        "Implement z-score standardization for multivariate data",
+        "Handle edge cases where standard deviation is zero"
+      ],
+      "math_content": {
+        "definition": "For a data matrix $\\mathbf{X} \\in \\mathbb{R}^{n \\times p}$, the sample standard deviation for feature $j$ is: $$s_j = \\sqrt{\\frac{1}{n-1}\\sum_{i=1}^{n}(x_{ij} - \\mu_j)^2}$$ where $\\mu_j$ is the sample mean. The standardized data matrix $\\mathbf{Z}$ has elements: $$z_{ij} = \\frac{x_{ij} - \\mu_j}{s_j}$$ Each column of $\\mathbf{Z}$ has mean 0 and standard deviation 1.",
+        "notation": "$s_j$ = standard deviation of feature j, $\\mathbf{Z}$ = standardized matrix (n × p), $z_{ij}$ = z-score (standardized value), $\\sigma_j^2 = s_j^2$ = variance",
+        "theorem": "Theorem (Properties of Standardized Data): For standardized matrix $\\mathbf{Z}$: (1) Column-wise mean: $\\mathbb{E}[z_{\\cdot j}] = 0$ for all $j$. (2) Column-wise variance: $\\text{Var}(z_{\\cdot j}) = 1$ for all $j$. (3) If $s_j = 0$ (constant feature), standardization is undefined.",
+        "proof_sketch": "For property (1): $\\mathbb{E}[z_{\\cdot j}] = \\mathbb{E}\\left[\\frac{x_{\\cdot j} - \\mu_j}{s_j}\\right] = \\frac{1}{s_j}(\\mathbb{E}[x_{\\cdot j}] - \\mu_j) = \\frac{1}{s_j}(\\mu_j - \\mu_j) = 0$. For property (2): $\\text{Var}(z_{\\cdot j}) = \\text{Var}\\left(\\frac{x_{\\cdot j} - \\mu_j}{s_j}\\right) = \\frac{1}{s_j^2}\\text{Var}(x_{\\cdot j}) = \\frac{s_j^2}{s_j^2} = 1$.",
+        "examples": [
+          "Example 1: For $\\mathbf{X} = \\begin{pmatrix} 1 \\\\ 2 \\\\ 3 \\end{pmatrix}$, $\\mu = 2$, $s = \\sqrt{\\frac{(1-2)^2+(2-2)^2+(3-2)^2}{2}} = 1$, so $\\mathbf{Z} = \\begin{pmatrix} -1 \\\\ 0 \\\\ 1 \\end{pmatrix}$",
+          "Example 2: For $\\mathbf{X} = \\begin{pmatrix} 10 & 100 \\\\ 20 & 200 \\\\ 30 & 300 \\end{pmatrix}$, despite different scales, both columns standardize to $\\begin{pmatrix} -1 & -1 \\\\ 0 & 0 \\\\ 1 & 1 \\end{pmatrix}$, showing scale-invariance"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sample Variance",
+          "latex": "$s_j^2 = \\frac{1}{n-1}\\sum_{i=1}^{n}(x_{ij} - \\mu_j)^2$",
+          "description": "Unbiased estimator of variance (Bessel's correction with n-1)"
+        },
+        {
+          "name": "Sample Standard Deviation",
+          "latex": "$s_j = \\sqrt{s_j^2}$",
+          "description": "Square root of variance, measures spread in original units"
+        },
+        {
+          "name": "Z-Score Standardization",
+          "latex": "$z_{ij} = \\frac{x_{ij} - \\mu_j}{s_j}$",
+          "description": "Transform to mean 0 and standard deviation 1"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that takes a 2D numpy array and returns the standardized (z-score normalized) version. Each column should have mean 0 and standard deviation 1. Handle the case where a column has zero standard deviation by replacing those values with 0.",
+        "function_signature": "def standardize_data(X: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef standardize_data(X: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Standardize the data using z-score normalization.\n    \n    Args:\n        X: Input data matrix of shape (n, p)\n    \n    Returns:\n        Z: Standardized data matrix of shape (n, p)\n        Each column has mean ≈ 0 and std ≈ 1\n        Columns with zero std are set to 0\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "standardize_data(np.array([[1.0, 2.0], [2.0, 4.0], [3.0, 6.0]]))",
+            "expected": "array([[-1.22474487, -1.22474487], [0., 0.], [1.22474487, 1.22474487]])",
+            "explanation": "Both columns have perfect linear relationship. std for col1 = 1, std for col2 = 2, after standardization both become identical z-scores."
+          },
+          {
+            "input": "standardize_data(np.array([[5.0, 10.0], [5.0, 20.0], [5.0, 30.0]]))",
+            "expected": "array([[0., -1.22474487], [0., 0.], [0., 1.22474487]])",
+            "explanation": "First column is constant (std=0), so it becomes all zeros. Second column gets standardized normally."
+          },
+          {
+            "input": "standardize_data(np.array([[10.0], [20.0], [30.0]]))",
+            "expected": "array([[-1.22474487], [0.], [1.22474487]])",
+            "explanation": "Single column case: mean=20, std=10, standardized values are (10-20)/10=-1.224, (20-20)/10=0, (30-20)/10=1.224"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using n instead of n-1 in variance calculation (biased estimator)",
+        "Division by zero when standard deviation is zero (constant features)",
+        "Not handling numerical precision issues (e.g., very small standard deviations)",
+        "Forgetting to center data before dividing by standard deviation",
+        "Applying operations along wrong axis"
+      ],
+      "hint": "First compute the mean and center the data, then compute standard deviation from centered data. Use np.where() or conditional logic to handle zero standard deviations.",
+      "references": [
+        "Bessel's correction",
+        "Z-score normalization",
+        "Feature scaling in machine learning",
+        "Numerical stability in statistics"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Computing Covariance Between Two Variables",
+      "relation_to_problem": "Covariance is the numerator in the correlation formula. Understanding covariance calculation is essential before computing correlation, as correlation is simply normalized covariance.",
+      "prerequisites": [
+        "Data centering",
+        "Vector dot products",
+        "Understanding of linear relationships"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition of sample covariance",
+        "Implement covariance using matrix operations",
+        "Interpret positive, negative, and zero covariance",
+        "Recognize the relationship between covariance and correlation"
+      ],
+      "math_content": {
+        "definition": "The sample covariance between two variables $X$ and $Y$ with $n$ observations is defined as: $$\\text{cov}(X, Y) = \\frac{1}{n-1}\\sum_{i=1}^{n}(x_i - \\bar{x})(y_i - \\bar{y})$$ where $\\bar{x}$ and $\\bar{y}$ are the sample means. In vector form, if $\\mathbf{x}_c$ and $\\mathbf{y}_c$ are centered vectors, then: $$\\text{cov}(X, Y) = \\frac{1}{n-1}\\mathbf{x}_c^T \\mathbf{y}_c = \\frac{1}{n-1}\\sum_{i=1}^{n}(x_c)_i(y_c)_i$$",
+        "notation": "$\\text{cov}(X,Y)$ = covariance between X and Y, $\\mathbf{x}_c, \\mathbf{y}_c$ = centered vectors (n × 1), $\\bar{x}, \\bar{y}$ = sample means",
+        "theorem": "Theorem (Properties of Covariance): (1) Symmetry: $\\text{cov}(X,Y) = \\text{cov}(Y,X)$. (2) Relationship to variance: $\\text{cov}(X,X) = \\text{Var}(X) = s_X^2$. (3) Bilinearity: $\\text{cov}(aX + b, cY + d) = ac\\cdot\\text{cov}(X,Y)$ for constants $a,b,c,d$. (4) Cauchy-Schwarz inequality: $|\\text{cov}(X,Y)| \\leq \\sqrt{\\text{Var}(X)\\text{Var}(Y)} = s_X s_Y$.",
+        "proof_sketch": "For property (4): By Cauchy-Schwarz inequality for vectors, $|\\mathbf{x}_c^T\\mathbf{y}_c| \\leq \\|\\mathbf{x}_c\\|_2 \\|\\mathbf{y}_c\\|_2$. Dividing by $n-1$: $|\\text{cov}(X,Y)| \\leq \\sqrt{\\frac{\\mathbf{x}_c^T\\mathbf{x}_c}{n-1}}\\sqrt{\\frac{\\mathbf{y}_c^T\\mathbf{y}_c}{n-1}} = s_X s_Y$. This inequality motivates the correlation coefficient as a normalized measure.",
+        "examples": [
+          "Example 1 (Positive covariance): $X = [1, 2, 3]$, $Y = [2, 4, 5]$. Centered: $x_c = [-1, 0, 1]$, $y_c = [-1.67, 0.33, 1.33]$. $\\text{cov}(X,Y) = \\frac{(-1)(-1.67) + (0)(0.33) + (1)(1.33)}{2} = \\frac{3}{2} = 1.5 > 0$, indicating positive relationship.",
+          "Example 2 (Negative covariance): $X = [1, 2, 3]$, $Y = [6, 4, 2]$. As X increases, Y decreases, so $\\text{cov}(X,Y) < 0$.",
+          "Example 3 (Zero covariance): $X = [1, 2, 3]$, $Y = [1, 3, 1]$. The relationship is non-linear (quadratic-like), so linear covariance ≈ 0."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sample Covariance (Definitional)",
+          "latex": "$\\text{cov}(X, Y) = \\frac{1}{n-1}\\sum_{i=1}^{n}(x_i - \\bar{x})(y_i - \\bar{y})$",
+          "description": "Sum of products of deviations from means"
+        },
+        {
+          "name": "Sample Covariance (Vector Form)",
+          "latex": "$\\text{cov}(X, Y) = \\frac{1}{n-1}\\mathbf{x}_c^T \\mathbf{y}_c$",
+          "description": "Dot product of centered vectors divided by n-1"
+        },
+        {
+          "name": "Cauchy-Schwarz Bound",
+          "latex": "$|\\text{cov}(X,Y)| \\leq s_X s_Y$",
+          "description": "Covariance is bounded by product of standard deviations"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes the sample covariance between two 1D numpy arrays representing two variables. This function will be used as a building block for computing the full covariance matrix.",
+        "function_signature": "def compute_covariance(x: np.ndarray, y: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_covariance(x: np.ndarray, y: np.ndarray) -> float:\n    \"\"\"\n    Compute sample covariance between two variables.\n    \n    Args:\n        x: First variable, shape (n,)\n        y: Second variable, shape (n,)\n    \n    Returns:\n        cov_xy: Sample covariance (scalar)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_covariance(np.array([1.0, 2.0, 3.0]), np.array([2.0, 4.0, 6.0]))",
+            "expected": "2.0",
+            "explanation": "Perfect positive linear relationship. Centered: x_c=[-1,0,1], y_c=[-2,0,2]. Cov = ((-1)(-2) + 0*0 + 1*2)/2 = 4/2 = 2.0"
+          },
+          {
+            "input": "compute_covariance(np.array([1.0, 2.0, 3.0]), np.array([3.0, 2.0, 1.0]))",
+            "expected": "-1.0",
+            "explanation": "Perfect negative linear relationship. Centered: x_c=[-1,0,1], y_c=[1,0,-1]. Cov = ((-1)(1) + 0*0 + 1*(-1))/2 = -2/2 = -1.0"
+          },
+          {
+            "input": "compute_covariance(np.array([5.0, 5.0, 5.0]), np.array([1.0, 2.0, 3.0]))",
+            "expected": "0.0",
+            "explanation": "First variable is constant (no variation), so covariance is 0. Centered: x_c=[0,0,0], y_c=[-1,0,1]. Cov = 0."
+          },
+          {
+            "input": "compute_covariance(np.array([1.0, 3.0, 2.0, 4.0]), np.array([2.0, 6.0, 4.0, 8.0]))",
+            "expected": "3.333...",
+            "explanation": "Y = 2X relationship. Mean(x)=2.5, mean(y)=5. Covariance reflects the linear scaling."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using n instead of n-1 as denominator (produces biased estimator)",
+        "Forgetting to center the data before computing dot product",
+        "Confusing covariance with correlation (covariance is not bounded by ±1)",
+        "Not handling the case where one or both variables are constant",
+        "Assuming zero covariance means no relationship (it means no linear relationship)"
+      ],
+      "hint": "Center both vectors first, then compute their dot product, then divide by n-1. You can use the formula directly or leverage numpy operations like np.dot().",
+      "references": [
+        "Covariance matrix theory",
+        "Cauchy-Schwarz inequality",
+        "Bivariate statistics"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Understanding Correlation Coefficient and Its Interpretation",
+      "relation_to_problem": "The correlation coefficient is the core output of our target function. Understanding its mathematical properties, interpretation, and relationship to covariance is crucial for implementing the correlation matrix correctly.",
+      "prerequisites": [
+        "Covariance computation",
+        "Standard deviation",
+        "Data standardization"
+      ],
+      "learning_objectives": [
+        "Understand Pearson correlation coefficient as normalized covariance",
+        "Prove that correlation is bounded between -1 and +1",
+        "Interpret correlation values in terms of linear relationships",
+        "Recognize the connection between correlation and standardized data"
+      ],
+      "math_content": {
+        "definition": "The Pearson correlation coefficient between variables $X$ and $Y$ is defined as: $$r_{XY} = \\frac{\\text{cov}(X,Y)}{s_X s_Y} = \\frac{\\sum_{i=1}^{n}(x_i - \\bar{x})(y_i - \\bar{y})}{\\sqrt{\\sum_{i=1}^{n}(x_i-\\bar{x})^2}\\sqrt{\\sum_{i=1}^{n}(y_i-\\bar{y})^2}}$$ Equivalently, if $\\mathbf{z}_X$ and $\\mathbf{z}_Y$ are standardized versions of $X$ and $Y$, then: $$r_{XY} = \\frac{1}{n-1}\\mathbf{z}_X^T \\mathbf{z}_Y$$ This shows correlation is the covariance of standardized variables.",
+        "notation": "$r_{XY}$ = Pearson correlation between X and Y, $s_X, s_Y$ = standard deviations, $\\mathbf{z}_X, \\mathbf{z}_Y$ = standardized (z-score) vectors",
+        "theorem": "Theorem (Properties of Correlation): (1) Boundedness: $-1 \\leq r_{XY} \\leq 1$. (2) Scale invariance: $r_{aX+b,cY+d} = \\text{sgn}(ac) \\cdot r_{XY}$ for $a,c \\neq 0$. (3) Perfect correlation: $r_{XY} = \\pm 1$ if and only if $Y = aX + b$ for some constants $a \\neq 0, b$. (4) Symmetry: $r_{XY} = r_{YX}$. (5) Self-correlation: $r_{XX} = 1$.",
+        "proof_sketch": "For property (1): From Cauchy-Schwarz inequality, $|\\text{cov}(X,Y)| \\leq s_X s_Y$. Therefore $|r_{XY}| = \\left|\\frac{\\text{cov}(X,Y)}{s_X s_Y}\\right| \\leq \\frac{s_X s_Y}{s_X s_Y} = 1$. For property (3): $r_{XY} = 1$ means $\\frac{\\mathbf{x}_c^T\\mathbf{y}_c}{\\|\\mathbf{x}_c\\|\\|\\mathbf{y}_c\\|} = 1$, which by Cauchy-Schwarz equality condition occurs when $\\mathbf{y}_c = k\\mathbf{x}_c$ for $k > 0$, implying $Y = aX + b$.",
+        "examples": [
+          "Example 1 (Perfect positive): $X=[1,2,3]$, $Y=[10,20,30]$. Since $Y=10X$, we have $r_{XY}=1$.",
+          "Example 2 (Perfect negative): $X=[1,2,3]$, $Y=[30,20,10]$. Since $Y=40-10X$, we have $r_{XY}=-1$.",
+          "Example 3 (Strong positive): $X=[1,2,3,4]$, $Y=[2.1,3.9,6.2,7.8]$. Approximately $Y \\approx 2X$ with noise, so $r_{XY} \\approx 0.99$.",
+          "Example 4 (No linear relationship): $X=[-2,-1,0,1,2]$, $Y=[4,1,0,1,4]$ where $Y=X^2$. Despite strong relationship, $r_{XY}=0$ because relationship is not linear."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Pearson Correlation (Covariance Form)",
+          "latex": "$r_{XY} = \\frac{\\text{cov}(X,Y)}{s_X s_Y}$",
+          "description": "Normalized covariance; scale-invariant measure of linear relationship"
+        },
+        {
+          "name": "Pearson Correlation (Standardized Form)",
+          "latex": "$r_{XY} = \\frac{1}{n-1}\\mathbf{z}_X^T \\mathbf{z}_Y$",
+          "description": "Covariance of z-scores; reveals correlation as inner product in standardized space"
+        },
+        {
+          "name": "Computational Formula",
+          "latex": "$r_{XY} = \\frac{\\sum(x_i-\\bar{x})(y_i-\\bar{y})}{\\sqrt{\\sum(x_i-\\bar{x})^2\\sum(y_i-\\bar{y})^2}}$",
+          "description": "Direct computation from raw data"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes the Pearson correlation coefficient between two 1D arrays. Your implementation should handle edge cases including constant variables (zero standard deviation) by returning 0 for undefined correlations.",
+        "function_signature": "def compute_correlation(x: np.ndarray, y: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_correlation(x: np.ndarray, y: np.ndarray) -> float:\n    \"\"\"\n    Compute Pearson correlation coefficient between two variables.\n    \n    Args:\n        x: First variable, shape (n,)\n        y: Second variable, shape (n,)\n    \n    Returns:\n        r_xy: Correlation coefficient in [-1, 1]\n              Returns 0 if either variable has zero variance\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_correlation(np.array([1.0, 2.0, 3.0]), np.array([2.0, 4.0, 6.0]))",
+            "expected": "1.0",
+            "explanation": "Perfect positive linear relationship: Y = 2X. Correlation is exactly 1.0"
+          },
+          {
+            "input": "compute_correlation(np.array([1.0, 2.0, 3.0]), np.array([6.0, 4.0, 2.0]))",
+            "expected": "-1.0",
+            "explanation": "Perfect negative linear relationship: Y = 8 - 2X. Correlation is exactly -1.0"
+          },
+          {
+            "input": "compute_correlation(np.array([5.0, 5.0, 5.0]), np.array([1.0, 2.0, 3.0]))",
+            "expected": "0.0",
+            "explanation": "First variable is constant (zero variance), correlation undefined, return 0.0"
+          },
+          {
+            "input": "compute_correlation(np.array([1.0, 2.0, 3.0, 4.0, 5.0]), np.array([2.0, 2.5, 3.0, 3.5, 4.0]))",
+            "expected": "1.0",
+            "explanation": "Perfect linear relationship Y = 0.5X + 1.5, different scale but r = 1.0 (scale-invariant)"
+          },
+          {
+            "input": "compute_correlation(np.array([1.0, 2.0, 1.5, 2.5]), np.array([3.0, 1.0, 2.5, 0.5]))",
+            "expected": "≈ -0.98",
+            "explanation": "Strong negative correlation but not perfect due to slight deviation from linearity"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Dividing by n instead of n-1 when using covariance formula",
+        "Not handling division by zero when standard deviation is 0",
+        "Forgetting that correlation measures only linear relationships",
+        "Confusing correlation with causation in interpretation",
+        "Not ensuring the result is exactly 1.0 or -1.0 for perfect correlations due to floating point errors",
+        "Assuming high correlation implies strong relationship (could be coincidental in small samples)"
+      ],
+      "hint": "You can either: (1) compute covariance and divide by product of standard deviations, or (2) standardize both vectors and compute their covariance. Both approaches should yield the same result.",
+      "references": [
+        "Pearson correlation coefficient",
+        "Anscombe's quartet (limitations of correlation)",
+        "Scale invariance in statistics"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Computing Covariance Matrix Using Matrix Multiplication",
+      "relation_to_problem": "The covariance matrix is one step away from the correlation matrix. Understanding how to efficiently compute all pairwise covariances using matrix operations (rather than loops) is crucial for implementing the correlation matrix function.",
+      "prerequisites": [
+        "Matrix multiplication",
+        "Matrix transpose",
+        "Covariance computation",
+        "Centered data"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical structure of a covariance matrix",
+        "Implement covariance matrix using efficient matrix operations",
+        "Recognize the relationship between covariance and correlation matrices",
+        "Understand the properties of covariance matrices (symmetry, positive semi-definiteness)"
+      ],
+      "math_content": {
+        "definition": "For a data matrix $\\mathbf{X} \\in \\mathbb{R}^{n \\times p}$ with $n$ observations and $p$ features, the sample covariance matrix $\\boldsymbol{\\Sigma} \\in \\mathbb{R}^{p \\times p}$ is defined as: $$\\boldsymbol{\\Sigma} = \\frac{1}{n-1}\\mathbf{X}_c^T\\mathbf{X}_c$$ where $\\mathbf{X}_c$ is the centered data matrix. Each element $\\sigma_{ij}$ is the covariance between features $i$ and $j$: $$\\sigma_{ij} = \\text{cov}(X_i, X_j) = \\frac{1}{n-1}\\sum_{k=1}^{n}(x_{ki} - \\bar{x}_i)(x_{kj} - \\bar{x}_j)$$",
+        "notation": "$\\boldsymbol{\\Sigma}$ = covariance matrix (p × p), $\\mathbf{X}_c$ = centered data (n × p), $\\sigma_{ij}$ = covariance between features i and j, $\\sigma_{ii} = s_i^2$ = variance of feature i",
+        "theorem": "Theorem (Properties of Covariance Matrix): (1) Symmetry: $\\boldsymbol{\\Sigma} = \\boldsymbol{\\Sigma}^T$, so $\\sigma_{ij} = \\sigma_{ji}$. (2) Diagonal elements are variances: $\\sigma_{ii} = \\text{Var}(X_i) = s_i^2$. (3) Positive semi-definiteness: $\\boldsymbol{\\Sigma}$ is PSD; all eigenvalues $\\lambda_i \\geq 0$. (4) For any vector $\\mathbf{v} \\in \\mathbb{R}^p$: $\\mathbf{v}^T\\boldsymbol{\\Sigma}\\mathbf{v} \\geq 0$.",
+        "proof_sketch": "For property (1): $\\boldsymbol{\\Sigma}^T = \\left(\\frac{1}{n-1}\\mathbf{X}_c^T\\mathbf{X}_c\\right)^T = \\frac{1}{n-1}(\\mathbf{X}_c^T\\mathbf{X}_c)^T = \\frac{1}{n-1}\\mathbf{X}_c^T(\\mathbf{X}_c^T)^T = \\frac{1}{n-1}\\mathbf{X}_c^T\\mathbf{X}_c = \\boldsymbol{\\Sigma}$. For property (3): For any $\\mathbf{v}$, $\\mathbf{v}^T\\boldsymbol{\\Sigma}\\mathbf{v} = \\frac{1}{n-1}\\mathbf{v}^T\\mathbf{X}_c^T\\mathbf{X}_c\\mathbf{v} = \\frac{1}{n-1}\\|\\mathbf{X}_c\\mathbf{v}\\|^2 \\geq 0$.",
+        "examples": [
+          "Example 1: For $\\mathbf{X} = \\begin{pmatrix} 1 & 4 \\\\ 2 & 5 \\\\ 3 & 6 \\end{pmatrix}$, $\\mathbf{X}_c = \\begin{pmatrix} -1 & -1 \\\\ 0 & 0 \\\\ 1 & 1 \\end{pmatrix}$, $\\boldsymbol{\\Sigma} = \\frac{1}{2}\\begin{pmatrix} -1 & 0 & 1 \\\\ -1 & 0 & 1 \\end{pmatrix}\\begin{pmatrix} -1 & -1 \\\\ 0 & 0 \\\\ 1 & 1 \\end{pmatrix} = \\frac{1}{2}\\begin{pmatrix} 2 & 2 \\\\ 2 & 2 \\end{pmatrix} = \\begin{pmatrix} 1 & 1 \\\\ 1 & 1 \\end{pmatrix}$",
+          "Example 2: For uncorrelated features, covariance matrix is diagonal: $\\boldsymbol{\\Sigma} = \\begin{pmatrix} s_1^2 & 0 \\\\ 0 & s_2^2 \\end{pmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Covariance Matrix (Matrix Form)",
+          "latex": "$\\boldsymbol{\\Sigma} = \\frac{1}{n-1}\\mathbf{X}_c^T\\mathbf{X}_c$",
+          "description": "Efficient computation using single matrix multiplication"
+        },
+        {
+          "name": "Covariance Matrix Element",
+          "latex": "$\\sigma_{ij} = \\frac{1}{n-1}\\sum_{k=1}^{n}(x_{ki} - \\bar{x}_i)(x_{kj} - \\bar{x}_j)$",
+          "description": "Individual element definition (for understanding, not implementation)"
+        },
+        {
+          "name": "Relationship to Correlation",
+          "latex": "$\\boldsymbol{\\Sigma} = \\mathbf{D}\\mathbf{R}\\mathbf{D}$",
+          "description": "where $\\mathbf{D} = \\text{diag}(s_1, \\ldots, s_p)$ and $\\mathbf{R}$ is correlation matrix"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that computes the sample covariance matrix for a dataset. Use efficient matrix operations (no explicit loops over features). This is the penultimate step before computing the correlation matrix.",
+        "function_signature": "def compute_covariance_matrix(X: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_covariance_matrix(X: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute the sample covariance matrix.\n    \n    Args:\n        X: Input data matrix of shape (n, p)\n           n = number of observations\n           p = number of features\n    \n    Returns:\n        cov_matrix: Covariance matrix of shape (p, p)\n                    Element (i,j) is covariance between features i and j\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_covariance_matrix(np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]]))",
+            "expected": "array([[4., 4.], [4., 4.]])",
+            "explanation": "Both features vary together perfectly. Var(col1) = 4, Var(col2) = 4, Cov(col1,col2) = 4. Matrix is [[4,4],[4,4]]"
+          },
+          {
+            "input": "compute_covariance_matrix(np.array([[1.0, 5.0], [2.0, 5.0], [3.0, 5.0]]))",
+            "expected": "array([[1., 0.], [0., 0.]])",
+            "explanation": "First feature varies (variance=1), second is constant (variance=0), no covariation"
+          },
+          {
+            "input": "compute_covariance_matrix(np.array([[1.0, 6.0], [2.0, 4.0], [3.0, 2.0]]))",
+            "expected": "array([[1., -2.], [-2., 4.]])",
+            "explanation": "Negative covariance: as feature 1 increases, feature 2 decreases. Var(f1)=1, Var(f2)=4, Cov=-2"
+          },
+          {
+            "input": "compute_covariance_matrix(np.array([[10.0], [20.0], [30.0]]))",
+            "expected": "array([[100.]])",
+            "explanation": "Single feature case: covariance matrix is 1×1 with the variance. Var = ((−10)²+0²+10²)/2 = 100"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not centering the data before computing X^T X",
+        "Using wrong normalization factor (n instead of n-1)",
+        "Computing X X^T instead of X^T X (results in n×n matrix instead of p×p)",
+        "Forgetting that result should be symmetric (can use this as a sanity check)",
+        "Not handling numerical precision issues (covariance matrix should be exactly symmetric)"
+      ],
+      "hint": "First center the data, then use np.dot() or @ operator to compute the matrix product X_c^T @ X_c, then divide by n-1. The result should be a symmetric p×p matrix.",
+      "references": [
+        "Matrix multiplication complexity",
+        "Positive semi-definite matrices",
+        "Computational efficiency in statistics"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Converting Covariance Matrix to Correlation Matrix",
+      "relation_to_problem": "This is the final conceptual step needed to solve the main problem. Understanding how to convert a covariance matrix to a correlation matrix (by normalizing with standard deviations) completes the knowledge needed for implementing calculate_correlation_matrix.",
+      "prerequisites": [
+        "Covariance matrix computation",
+        "Standard deviation",
+        "Matrix operations",
+        "Diagonal matrices"
+      ],
+      "learning_objectives": [
+        "Understand the relationship between covariance and correlation matrices",
+        "Implement the normalization process to convert covariance to correlation",
+        "Handle edge cases where variables have zero variance",
+        "Apply matrix operations efficiently for the conversion"
+      ],
+      "math_content": {
+        "definition": "The correlation matrix $\\mathbf{R} \\in \\mathbb{R}^{p \\times p}$ is derived from the covariance matrix $\\boldsymbol{\\Sigma}$ by normalizing each element: $$r_{ij} = \\frac{\\sigma_{ij}}{\\sqrt{\\sigma_{ii}\\sigma_{jj}}} = \\frac{\\sigma_{ij}}{s_i s_j}$$ where $s_i = \\sqrt{\\sigma_{ii}}$ is the standard deviation of feature $i$. In matrix form: $$\\mathbf{R} = \\mathbf{D}^{-1}\\boldsymbol{\\Sigma}\\mathbf{D}^{-1}$$ where $\\mathbf{D} = \\text{diag}(s_1, s_2, \\ldots, s_p)$ is the diagonal matrix of standard deviations. Equivalently: $$\\mathbf{R} = \\frac{1}{n-1}\\mathbf{Z}^T\\mathbf{Z}$$ where $\\mathbf{Z}$ is the standardized data matrix.",
+        "notation": "$\\mathbf{R}$ = correlation matrix (p × p), $r_{ij}$ = correlation between features i and j, $\\mathbf{D}$ = diagonal matrix of standard deviations, $\\mathbf{Z}$ = standardized data matrix",
+        "theorem": "Theorem (Properties of Correlation Matrix): (1) Diagonal elements are unity: $r_{ii} = 1$ for all $i$. (2) Off-diagonal bounded: $-1 \\leq r_{ij} \\leq 1$ for $i \\neq j$. (3) Symmetry: $\\mathbf{R} = \\mathbf{R}^T$. (4) Positive semi-definite: all eigenvalues $\\lambda_i \\geq 0$. (5) Scale invariance: correlation matrix is unchanged if features are scaled by non-zero constants.",
+        "proof_sketch": "For property (1): $r_{ii} = \\frac{\\sigma_{ii}}{\\sqrt{\\sigma_{ii}\\sigma_{ii}}} = \\frac{\\sigma_{ii}}{\\sigma_{ii}} = 1$. For property (5): If $\\mathbf{X}' = \\mathbf{X}\\mathbf{A}$ where $\\mathbf{A}$ is diagonal with non-zero entries, then standardizing $\\mathbf{X}'$ yields the same $\\mathbf{Z}$ as standardizing $\\mathbf{X}$, hence same $\\mathbf{R}$. This shows correlation captures relationships independent of measurement units.",
+        "examples": [
+          "Example 1: From covariance matrix $\\boldsymbol{\\Sigma} = \\begin{pmatrix} 4 & 2 \\\\ 2 & 9 \\end{pmatrix}$, we have $s_1=2, s_2=3$, so $\\mathbf{R} = \\begin{pmatrix} 1 & 2/(2\\cdot3) \\\\ 2/(2\\cdot3) & 1 \\end{pmatrix} = \\begin{pmatrix} 1 & 0.333 \\\\ 0.333 & 1 \\end{pmatrix}$",
+          "Example 2: If $\\boldsymbol{\\Sigma}$ is diagonal (features uncorrelated), then $\\mathbf{R} = \\mathbf{I}$ (identity matrix)",
+          "Example 3: For perfect positive covariance $\\boldsymbol{\\Sigma} = \\begin{pmatrix} 1 & 1 \\\\ 1 & 1 \\end{pmatrix}$, correlation is $\\mathbf{R} = \\begin{pmatrix} 1 & 1 \\\\ 1 & 1 \\end{pmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Element-wise Conversion",
+          "latex": "$r_{ij} = \\frac{\\sigma_{ij}}{\\sqrt{\\sigma_{ii}\\sigma_{jj}}}$",
+          "description": "Convert each covariance to correlation by normalizing"
+        },
+        {
+          "name": "Matrix Form Conversion",
+          "latex": "$\\mathbf{R} = \\mathbf{D}^{-1}\\boldsymbol{\\Sigma}\\mathbf{D}^{-1}$",
+          "description": "where $\\mathbf{D} = \\text{diag}(\\sqrt{\\sigma_{11}}, \\ldots, \\sqrt{\\sigma_{pp}})$"
+        },
+        {
+          "name": "Direct from Standardized Data",
+          "latex": "$\\mathbf{R} = \\frac{1}{n-1}\\mathbf{Z}^T\\mathbf{Z}$",
+          "description": "Most efficient approach: standardize first, then compute covariance"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that converts a covariance matrix to a correlation matrix. Handle the edge case where a feature has zero variance (set corresponding correlations to 0). This exercise integrates all previous concepts.",
+        "function_signature": "def covariance_to_correlation(cov_matrix: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef covariance_to_correlation(cov_matrix: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Convert covariance matrix to correlation matrix.\n    \n    Args:\n        cov_matrix: Covariance matrix of shape (p, p)\n    \n    Returns:\n        corr_matrix: Correlation matrix of shape (p, p)\n                     Diagonal elements are 1\n                     Off-diagonal elements in [-1, 1]\n                     If a feature has zero variance, set its\n                     correlations with other features to 0\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "covariance_to_correlation(np.array([[4.0, 2.0], [2.0, 9.0]]))",
+            "expected": "array([[1.0, 0.333...], [0.333..., 1.0]])",
+            "explanation": "Standard deviations are 2 and 3. Correlation = 2/(2*3) = 0.333. Diagonal is 1.0"
+          },
+          {
+            "input": "covariance_to_correlation(np.array([[1.0, 0.0], [0.0, 4.0]]))",
+            "expected": "array([[1.0, 0.0], [0.0, 1.0]])",
+            "explanation": "Diagonal covariance matrix (uncorrelated features) becomes identity matrix"
+          },
+          {
+            "input": "covariance_to_correlation(np.array([[1.0, -1.0], [-1.0, 1.0]]))",
+            "expected": "array([[1.0, -1.0], [-1.0, 1.0]])",
+            "explanation": "Perfect negative correlation: cov=-1, std=1 for both, so r=-1/1=-1"
+          },
+          {
+            "input": "covariance_to_correlation(np.array([[0.0, 0.0], [0.0, 4.0]]))",
+            "expected": "array([[0.0, 0.0], [0.0, 1.0]])",
+            "explanation": "First feature has zero variance (constant), so its correlations are undefined/set to 0"
+          },
+          {
+            "input": "covariance_to_correlation(np.array([[9.0]]))",
+            "expected": "array([[1.0]])",
+            "explanation": "Single feature case: correlation with itself is 1.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Dividing by variance instead of standard deviation (need square root)",
+        "Not handling zero variance features (division by zero)",
+        "Forgetting to extract diagonal elements first before normalization",
+        "Not ensuring diagonal elements are exactly 1.0 after conversion",
+        "Computing D^(-1) * Sigma * D^(-1) incorrectly (order matters if not using element-wise operations)",
+        "Not maintaining symmetry of the matrix due to numerical precision issues"
+      ],
+      "hint": "Extract the diagonal elements (variances), take their square roots to get standard deviations, then normalize each element (i,j) by dividing by the product of standard deviations i and j. Use np.outer() to create the normalization matrix efficiently. Handle zero standard deviations carefully.",
+      "references": [
+        "Correlation vs covariance",
+        "Scale-invariant statistics",
+        "Matrix normalization techniques",
+        "Numerical stability in matrix computations"
+      ]
+    }
+  ]
+}

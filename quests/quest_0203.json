@@ -1,0 +1,441 @@
+{
+  "problem_id": 203,
+  "title": "Jensen-Shannon Divergence",
+  "category": "Information Theory",
+  "difficulty": "medium",
+  "description": "Implement the Jensen-Shannon Divergence (JSD) between two probability distributions. JSD is a symmetric and smoothed version of the Kullback-Leibler divergence that measures the similarity between two probability distributions. Unlike KL divergence, JSD is symmetric (the order of P and Q doesn't matter) and always produces a finite value. The result should be a value between 0 (identical distributions) and log(2) (completely different distributions).",
+  "example": {
+    "input": "P = [0.5, 0.5], Q = [0.4, 0.6]",
+    "output": "0.005059",
+    "reasoning": "First, compute the average distribution $M = 0.5(P + Q) = [0.45, 0.55]$. Then compute $KL(P||M) = 0.5\\log(0.5/0.45) + 0.5\\log(0.5/0.55) \\approx 0.005025$. Similarly, $KL(Q||M) = 0.4\\log(0.4/0.45) + 0.6\\log(0.6/0.55) \\approx 0.005094$. Finally, $JSD = 0.5 \\times 0.005025 + 0.5 \\times 0.005094 \\approx 0.005059$."
+  },
+  "starter_code": "import numpy as np\n\ndef jensen_shannon_divergence(P: list[float], Q: list[float]) -> float:\n\t\"\"\"\n\tCompute the Jensen-Shannon Divergence between two probability distributions.\n\t\n\tArgs:\n\t\tP: First probability distribution\n\t\tQ: Second probability distribution\n\t\n\tReturns:\n\t\tJensen-Shannon Divergence value\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Probability Distributions and Entropy",
+      "relation_to_problem": "Jensen-Shannon Divergence measures similarity between probability distributions. Understanding Shannon entropy is the foundation - it quantifies uncertainty in a distribution and is the building block for KL divergence and JSD.",
+      "prerequisites": [
+        "Basic probability theory",
+        "Logarithms",
+        "Summation notation"
+      ],
+      "learning_objectives": [
+        "Define and compute Shannon entropy for discrete probability distributions",
+        "Understand entropy as a measure of uncertainty",
+        "Validate probability distributions (non-negative values, sum to 1)",
+        "Handle numerical edge cases in entropy computation"
+      ],
+      "math_content": {
+        "definition": "Shannon entropy $H(P)$ of a discrete probability distribution $P = \\{p_1, p_2, \\ldots, p_n\\}$ is defined as:\n\n$$H(P) = -\\sum_{i=1}^{n} p_i \\log(p_i)$$\n\nBy convention, $0 \\log(0) = 0$ (since $\\lim_{x \\to 0^+} x \\log(x) = 0$).",
+        "notation": "$H(P)$ = entropy of distribution $P$\n$p_i$ = probability of outcome $i$\n$n$ = number of possible outcomes\n$\\log$ = natural logarithm (base $e$) unless specified otherwise",
+        "theorem": "**Properties of Entropy**:\n1. **Non-negativity**: $H(P) \\geq 0$ for all distributions $P$\n2. **Maximum entropy**: For discrete distribution with $n$ outcomes, $H(P) \\leq \\log(n)$, with equality when $P$ is uniform ($p_i = 1/n$ for all $i$)\n3. **Minimum entropy**: $H(P) = 0$ if and only if $P$ is deterministic (one $p_i = 1$, others are 0)",
+        "proof_sketch": "**Maximum Entropy Proof Sketch**: Using Lagrange multipliers to maximize $H(P) = -\\sum_i p_i \\log(p_i)$ subject to $\\sum_i p_i = 1$, we find that the uniform distribution $p_i = 1/n$ maximizes entropy. This gives $H(P) = -n \\cdot \\frac{1}{n} \\log(\\frac{1}{n}) = \\log(n)$.",
+        "examples": [
+          "**Example 1**: Fair coin: $P = [0.5, 0.5]$\n$$H(P) = -0.5\\log(0.5) - 0.5\\log(0.5) = -\\log(0.5) = \\log(2) \\approx 0.693$$",
+          "**Example 2**: Biased coin: $P = [0.9, 0.1]$\n$$H(P) = -0.9\\log(0.9) - 0.1\\log(0.1) \\approx 0.095 + 0.230 \\approx 0.325$$\nNote: Less entropy than fair coin (more predictable)",
+          "**Example 3**: Deterministic: $P = [1.0, 0.0]$\n$$H(P) = -1.0\\log(1.0) - 0 = 0$$\nNote: Zero entropy (completely predictable)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Shannon Entropy",
+          "latex": "$H(P) = -\\sum_{i=1}^{n} p_i \\log(p_i)$",
+          "description": "Measures average information content or uncertainty in a probability distribution"
+        },
+        {
+          "name": "Convention for zero probability",
+          "latex": "$0 \\log(0) := 0$",
+          "description": "Handles edge case when probability is zero; justified by limit"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to compute the Shannon entropy of a discrete probability distribution. This is essential for JSD since entropy relates directly to divergence measures. Your implementation must handle edge cases like zero probabilities and validate that inputs are proper probability distributions.",
+        "function_signature": "def compute_entropy(P: list[float]) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_entropy(P: list[float]) -> float:\n    \"\"\"\n    Compute the Shannon entropy of a probability distribution.\n    \n    Args:\n        P: A probability distribution (list of non-negative values summing to 1)\n    \n    Returns:\n        Shannon entropy H(P)\n    \n    Raises:\n        ValueError: If P is not a valid probability distribution\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_entropy([0.5, 0.5])",
+            "expected": "0.693 (approximately log(2))",
+            "explanation": "Fair coin has maximum entropy for 2 outcomes"
+          },
+          {
+            "input": "compute_entropy([1.0, 0.0])",
+            "expected": "0.0",
+            "explanation": "Deterministic distribution has zero entropy"
+          },
+          {
+            "input": "compute_entropy([0.25, 0.25, 0.25, 0.25])",
+            "expected": "1.386 (approximately log(4))",
+            "explanation": "Uniform distribution over 4 outcomes achieves maximum entropy"
+          },
+          {
+            "input": "compute_entropy([0.7, 0.2, 0.1])",
+            "expected": "0.802",
+            "explanation": "Non-uniform distribution has entropy between 0 and log(3)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle the case where $p_i = 0$ (should contribute 0 to sum, not NaN)",
+        "Using the wrong logarithm base (natural log vs log base 2)",
+        "Not validating that probabilities sum to 1",
+        "Not checking for negative probabilities",
+        "Numerical instability when probabilities are very small"
+      ],
+      "hint": "Use numpy's logarithm with careful handling of zero values. Consider adding a small epsilon (like 1e-10) to avoid log(0), or use conditional logic to skip zero probabilities.",
+      "references": [
+        "Information Theory and Statistical Mechanics",
+        "Shannon's 1948 paper 'A Mathematical Theory of Communication'",
+        "Entropy in thermodynamics and its connection to information"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Kullback-Leibler Divergence: Measuring Distribution Asymmetry",
+      "relation_to_problem": "JSD is defined as the average of two KL divergences from distributions P and Q to their midpoint M. Understanding KL divergence is essential because it's the core component we'll combine to create the symmetric JSD measure.",
+      "prerequisites": [
+        "Shannon entropy",
+        "Logarithm properties",
+        "Probability distributions"
+      ],
+      "learning_objectives": [
+        "Define and compute KL divergence between two distributions",
+        "Understand KL divergence as relative entropy",
+        "Recognize that KL divergence is asymmetric",
+        "Handle numerical issues when Q has zero probability where P doesn't",
+        "Interpret KL divergence values"
+      ],
+      "math_content": {
+        "definition": "The **Kullback-Leibler (KL) divergence** from distribution $Q$ to distribution $P$ is:\n\n$$D_{KL}(P \\| Q) = \\sum_{i=1}^{n} p_i \\log\\frac{p_i}{q_i}$$\n\nIt measures how much information is lost when $Q$ is used to approximate $P$. Also called **relative entropy**.",
+        "notation": "$D_{KL}(P \\| Q)$ = KL divergence from $Q$ to $P$\n$p_i, q_i$ = probabilities at outcome $i$ for distributions $P$ and $Q$\nNote: The notation $P \\| Q$ reads as 'P relative to Q'",
+        "theorem": "**Properties of KL Divergence**:\n1. **Non-negativity**: $D_{KL}(P \\| Q) \\geq 0$ for all $P, Q$\n2. **Identity**: $D_{KL}(P \\| Q) = 0$ if and only if $P = Q$\n3. **Asymmetry**: $D_{KL}(P \\| Q) \\neq D_{KL}(Q \\| P)$ in general\n4. **Not a metric**: Does not satisfy triangle inequality\n5. **Can be infinite**: If $q_i = 0$ but $p_i > 0$, then $D_{KL}(P \\| Q) = \\infty$",
+        "proof_sketch": "**Non-negativity (Gibbs' inequality)**: Using the inequality $\\log(x) \\leq x - 1$ for $x > 0$:\n\n$$D_{KL}(P \\| Q) = \\sum_i p_i \\log\\frac{p_i}{q_i} = -\\sum_i p_i \\log\\frac{q_i}{p_i} \\geq -\\sum_i p_i(\\frac{q_i}{p_i} - 1) = -\\sum_i(q_i - p_i) = 0$$\n\nEquality holds when $p_i = q_i$ for all $i$.",
+        "examples": [
+          "**Example 1**: $P = [0.5, 0.5]$, $Q = [0.4, 0.6]$\n$$D_{KL}(P \\| Q) = 0.5\\log\\frac{0.5}{0.4} + 0.5\\log\\frac{0.5}{0.6}$$\n$$= 0.5\\log(1.25) + 0.5\\log(0.833) \\approx 0.5(0.223) + 0.5(-0.182) \\approx 0.020$$",
+          "**Example 2**: Asymmetry demonstration with same $P$, $Q$:\n$$D_{KL}(Q \\| P) = 0.4\\log\\frac{0.4}{0.5} + 0.6\\log\\frac{0.6}{0.5}$$\n$$\\approx 0.4(-0.223) + 0.6(0.182) \\approx 0.020$$\nNote: Values are close but not identical (asymmetry)",
+          "**Example 3**: Identical distributions: $P = Q = [0.3, 0.7]$\n$$D_{KL}(P \\| Q) = 0.3\\log(1) + 0.7\\log(1) = 0$$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "KL Divergence",
+          "latex": "$D_{KL}(P \\| Q) = \\sum_{i} p_i \\log\\frac{p_i}{q_i}$",
+          "description": "Measures information loss when Q approximates P"
+        },
+        {
+          "name": "Alternative form using entropy",
+          "latex": "$D_{KL}(P \\| Q) = -H(P) - \\sum_i p_i \\log(q_i)$",
+          "description": "Cross-entropy minus entropy of P"
+        },
+        {
+          "name": "Cross-entropy",
+          "latex": "$H(P, Q) = -\\sum_i p_i \\log(q_i)$",
+          "description": "Expected code length when using Q to encode P"
+        }
+      ],
+      "exercise": {
+        "description": "Implement KL divergence computation. This is a direct building block for JSD - you'll need to compute KL divergence twice (from P to M and Q to M) in the final solution. Handle numerical stability carefully.",
+        "function_signature": "def kl_divergence(P: list[float], Q: list[float]) -> float:",
+        "starter_code": "import numpy as np\n\ndef kl_divergence(P: list[float], Q: list[float]) -> float:\n    \"\"\"\n    Compute the Kullback-Leibler divergence from Q to P.\n    \n    Args:\n        P: First probability distribution\n        Q: Second probability distribution\n    \n    Returns:\n        KL divergence D_KL(P || Q)\n    \n    Note:\n        Add small epsilon to avoid division by zero and log(0)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "kl_divergence([0.5, 0.5], [0.5, 0.5])",
+            "expected": "0.0",
+            "explanation": "Identical distributions have zero divergence"
+          },
+          {
+            "input": "kl_divergence([0.5, 0.5], [0.4, 0.6])",
+            "expected": "0.020",
+            "explanation": "Small difference between nearly uniform distributions"
+          },
+          {
+            "input": "kl_divergence([0.9, 0.1], [0.1, 0.9])",
+            "expected": "1.757",
+            "explanation": "Large divergence when distributions are reversed"
+          },
+          {
+            "input": "kl_divergence([1.0, 0.0], [0.5, 0.5])",
+            "expected": "0.693 (approximately log(2))",
+            "explanation": "Deterministic P vs uniform Q"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing the direction: D_KL(P||Q) weights by P, not Q",
+        "Not adding epsilon to prevent division by zero when q_i = 0",
+        "Treating KL divergence as symmetric (it's not!)",
+        "Using base-10 log instead of natural log",
+        "Not handling edge case where both p_i and q_i are zero"
+      ],
+      "hint": "Convert lists to numpy arrays and add a small epsilon (e.g., 1e-10) to Q to avoid numerical issues. Use numpy's log function and element-wise operations for efficiency.",
+      "references": [
+        "Information theory and coding theory",
+        "Relative entropy in statistical mechanics",
+        "Applications in machine learning loss functions (cross-entropy loss)"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Computing the Midpoint Distribution",
+      "relation_to_problem": "JSD requires computing M = (P + Q)/2, the average distribution between P and Q. This midpoint is what makes JSD symmetric - both P and Q are compared against the same reference point M, ensuring JSD(P||Q) = JSD(Q||P).",
+      "prerequisites": [
+        "Probability distributions",
+        "Vector arithmetic",
+        "Probability axioms"
+      ],
+      "learning_objectives": [
+        "Understand why averaging distributions preserves probability axioms",
+        "Compute the midpoint distribution between two probability distributions",
+        "Verify that the midpoint is itself a valid probability distribution",
+        "Generalize to weighted averages of distributions"
+      ],
+      "math_content": {
+        "definition": "Given two probability distributions $P = (p_1, \\ldots, p_n)$ and $Q = (q_1, \\ldots, q_n)$, the **midpoint (or average) distribution** is:\n\n$$M = \\frac{1}{2}(P + Q) = \\left(\\frac{p_1 + q_1}{2}, \\ldots, \\frac{p_n + q_n}{2}\\right)$$\n\nMore generally, for weights $\\pi_1, \\pi_2$ with $\\pi_1 + \\pi_2 = 1$:\n\n$$M = \\pi_1 P + \\pi_2 Q$$",
+        "notation": "$M$ = midpoint or average distribution\n$\\pi_1, \\pi_2$ = weights (default: $\\pi_1 = \\pi_2 = 0.5$)\n$m_i = \\frac{p_i + q_i}{2}$ = probability at outcome $i$ in midpoint distribution",
+        "theorem": "**Theorem**: If $P$ and $Q$ are probability distributions and $\\pi_1 + \\pi_2 = 1$ with $\\pi_1, \\pi_2 \\geq 0$, then $M = \\pi_1 P + \\pi_2 Q$ is also a probability distribution.\n\n**Proof**: Need to show:\n1. Non-negativity: $m_i \\geq 0$ for all $i$\n2. Normalization: $\\sum_i m_i = 1$",
+        "proof_sketch": "**Proof**:\n1. **Non-negativity**: Since $p_i, q_i \\geq 0$ and $\\pi_1, \\pi_2 \\geq 0$:\n   $$m_i = \\pi_1 p_i + \\pi_2 q_i \\geq 0$$\n\n2. **Normalization**:\n   $$\\sum_i m_i = \\sum_i (\\pi_1 p_i + \\pi_2 q_i) = \\pi_1 \\sum_i p_i + \\pi_2 \\sum_i q_i = \\pi_1(1) + \\pi_2(1) = 1$$\n\nTherefore, $M$ is a valid probability distribution. $\\square$",
+        "examples": [
+          "**Example 1**: $P = [0.5, 0.5]$, $Q = [0.4, 0.6]$\n$$M = \\frac{1}{2}([0.5, 0.5] + [0.4, 0.6]) = [0.45, 0.55]$$\nVerify: $0.45 + 0.55 = 1$ ✓",
+          "**Example 2**: $P = [0.7, 0.2, 0.1]$, $Q = [0.1, 0.3, 0.6]$\n$$M = [\\frac{0.7+0.1}{2}, \\frac{0.2+0.3}{2}, \\frac{0.1+0.6}{2}] = [0.4, 0.25, 0.35]$$\nVerify: $0.4 + 0.25 + 0.35 = 1$ ✓",
+          "**Example 3**: Weighted average with $\\pi_1 = 0.3, \\pi_2 = 0.7$:\n$$P = [0.8, 0.2]$$, $$Q = [0.2, 0.8]$$\n$$M = 0.3[0.8, 0.2] + 0.7[0.2, 0.8] = [0.24 + 0.14, 0.06 + 0.56] = [0.38, 0.62]$$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Midpoint Distribution",
+          "latex": "$M = \\frac{1}{2}(P + Q)$",
+          "description": "Average of two probability distributions; used in standard JSD"
+        },
+        {
+          "name": "Weighted Midpoint",
+          "latex": "$M = \\pi_1 P + \\pi_2 Q$, where $\\pi_1 + \\pi_2 = 1$",
+          "description": "Generalized weighted average; used in weighted JSD variants"
+        },
+        {
+          "name": "Element-wise computation",
+          "latex": "$m_i = \\frac{p_i + q_i}{2}$",
+          "description": "Each element of M is the average of corresponding elements in P and Q"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to compute the midpoint distribution between two probability distributions. This is the critical 'M' distribution that you'll use in computing JSD - you'll compare both P and Q against this midpoint.",
+        "function_signature": "def compute_midpoint(P: list[float], Q: list[float], pi1: float = 0.5) -> list[float]:",
+        "starter_code": "import numpy as np\n\ndef compute_midpoint(P: list[float], Q: list[float], pi1: float = 0.5) -> list[float]:\n    \"\"\"\n    Compute the weighted midpoint distribution between P and Q.\n    \n    Args:\n        P: First probability distribution\n        Q: Second probability distribution\n        pi1: Weight for P (default 0.5 for equal weighting)\n    \n    Returns:\n        Midpoint distribution M = pi1*P + (1-pi1)*Q\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_midpoint([0.5, 0.5], [0.4, 0.6])",
+            "expected": "[0.45, 0.55]",
+            "explanation": "Average of two 2-outcome distributions"
+          },
+          {
+            "input": "compute_midpoint([1.0, 0.0], [0.0, 1.0])",
+            "expected": "[0.5, 0.5]",
+            "explanation": "Midpoint of opposite extreme distributions is uniform"
+          },
+          {
+            "input": "compute_midpoint([0.7, 0.2, 0.1], [0.1, 0.3, 0.6])",
+            "expected": "[0.4, 0.25, 0.35]",
+            "explanation": "Midpoint of 3-outcome distributions"
+          },
+          {
+            "input": "compute_midpoint([0.8, 0.2], [0.2, 0.8], pi1=0.3)",
+            "expected": "[0.38, 0.62]",
+            "explanation": "Weighted midpoint with pi1=0.3, pi2=0.7"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle the weighted case (assuming always 0.5/0.5)",
+        "Not verifying that the result sums to 1 (should always for valid inputs)",
+        "Modifying input arrays instead of creating new output",
+        "Not handling mismatched distribution lengths",
+        "Confusing weights with probabilities"
+      ],
+      "hint": "Use numpy arrays for efficient element-wise operations. The computation is straightforward: multiply each distribution by its weight and add them together.",
+      "references": [
+        "Convex combinations in probability theory",
+        "Mixture distributions",
+        "Barycentric coordinates"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Understanding Symmetry and Why JSD Improves Upon KL Divergence",
+      "relation_to_problem": "JSD's key advantage over KL divergence is symmetry. This sub-quest explains why the midpoint-based construction JSD(P||Q) = [D_KL(P||M) + D_KL(Q||M)]/2 guarantees symmetry and bounded values, making it suitable as a distance measure.",
+      "prerequisites": [
+        "KL divergence",
+        "Midpoint distributions",
+        "Properties of logarithms"
+      ],
+      "learning_objectives": [
+        "Prove that JSD is symmetric: JSD(P||Q) = JSD(Q||P)",
+        "Understand why JSD is always finite (bounded)",
+        "Derive the bounds: 0 ≤ JSD ≤ log(2)",
+        "Compare JSD and KL divergence in practical scenarios",
+        "Understand when to use JSD vs KL divergence"
+      ],
+      "math_content": {
+        "definition": "The **Jensen-Shannon Divergence** between distributions $P$ and $Q$ is:\n\n$$JSD(P \\| Q) = \\frac{1}{2} D_{KL}(P \\| M) + \\frac{1}{2} D_{KL}(Q \\| M)$$\n\nwhere $M = \\frac{1}{2}(P + Q)$ is the midpoint distribution.\n\nEquivalently, using entropy:\n\n$$JSD(P \\| Q) = H(M) - \\frac{1}{2}H(P) - \\frac{1}{2}H(Q)$$",
+        "notation": "$JSD(P \\| Q)$ = Jensen-Shannon divergence\n$M$ = midpoint distribution\n$H(X)$ = Shannon entropy of distribution $X$",
+        "theorem": "**Main Properties of JSD**:\n\n1. **Symmetry**: $JSD(P \\| Q) = JSD(Q \\| P)$\n\n2. **Non-negativity**: $JSD(P \\| Q) \\geq 0$\n\n3. **Identity**: $JSD(P \\| Q) = 0 \\iff P = Q$\n\n4. **Bounded**: $0 \\leq JSD(P \\| Q) \\leq \\log(2)$\n\n5. **Metric property**: $\\sqrt{JSD(P \\| Q)}$ is a true metric (satisfies triangle inequality)",
+        "proof_sketch": "**Proof of Symmetry**:\nLet $M_1 = \\frac{1}{2}(P + Q)$ when computing $JSD(P \\| Q)$\nLet $M_2 = \\frac{1}{2}(Q + P)$ when computing $JSD(Q \\| P)$\n\nSince addition is commutative: $M_1 = M_2 = M$\n\n$$JSD(P \\| Q) = \\frac{1}{2}D_{KL}(P \\| M) + \\frac{1}{2}D_{KL}(Q \\| M)$$\n$$JSD(Q \\| P) = \\frac{1}{2}D_{KL}(Q \\| M) + \\frac{1}{2}D_{KL}(P \\| M)$$\n\nBy commutativity of addition: $JSD(P \\| Q) = JSD(Q \\| P)$ $\\square$\n\n**Proof Sketch for Upper Bound**:\nUsing the entropy form $JSD = H(M) - \\frac{1}{2}H(P) - \\frac{1}{2}H(Q)$:\n\nThe maximum occurs when $P$ and $Q$ are completely disjoint (no overlap). Consider binary case: $P = [1, 0]$, $Q = [0, 1]$, then $M = [0.5, 0.5]$:\n\n$$JSD = H([0.5, 0.5]) - \\frac{1}{2}H([1,0]) - \\frac{1}{2}H([0,1]) = \\log(2) - 0 - 0 = \\log(2)$$\n\nFor $n > 2$ outcomes, JSD is maximized when distributions partition outcomes (still bounded by $\\log(2)$).",
+        "examples": [
+          "**Example 1**: Demonstrating symmetry\n$P = [0.7, 0.3]$, $Q = [0.4, 0.6]$, $M = [0.55, 0.45]$\n\n$JSD(P \\| Q) = \\frac{1}{2}D_{KL}(P \\| M) + \\frac{1}{2}D_{KL}(Q \\| M)$\n$= \\frac{1}{2}[0.7\\log(0.7/0.55) + 0.3\\log(0.3/0.45)]$\n$+ \\frac{1}{2}[0.4\\log(0.4/0.55) + 0.6\\log(0.6/0.45)]$\n$\\approx 0.0174$\n\nSwitching order gives same result: $JSD(Q \\| P) \\approx 0.0174$",
+          "**Example 2**: Maximum divergence\n$P = [1, 0]$, $Q = [0, 1]$ (completely different)\n$M = [0.5, 0.5]$\n$JSD = \\log(2) \\approx 0.693$ (maximum possible value)",
+          "**Example 3**: Zero divergence\n$P = Q = [0.3, 0.7]$ (identical)\n$M = [0.3, 0.7] = P = Q$\n$JSD = 0$ (minimum value)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "JSD using KL divergence",
+          "latex": "$JSD(P \\| Q) = \\frac{1}{2}D_{KL}(P \\| M) + \\frac{1}{2}D_{KL}(Q \\| M)$",
+          "description": "Definition via weighted average of KL divergences to midpoint"
+        },
+        {
+          "name": "JSD using entropy",
+          "latex": "$JSD(P \\| Q) = H(M) - \\frac{1}{2}H(P) - \\frac{1}{2}H(Q)$",
+          "description": "Alternative form showing relationship to entropy"
+        },
+        {
+          "name": "Upper bound",
+          "latex": "$JSD(P \\| Q) \\leq \\log(2)$",
+          "description": "Maximum divergence achieved when distributions are disjoint"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes both JSD(P||Q) and JSD(Q||P) to verify symmetry empirically. This exercise reinforces that the order doesn't matter for JSD (unlike KL divergence), which is crucial for understanding why JSD is preferred as a distance measure.",
+        "function_signature": "def verify_jsd_symmetry(P: list[float], Q: list[float]) -> dict:",
+        "starter_code": "import numpy as np\n\ndef compute_entropy(P: list[float]) -> float:\n    \"\"\"Helper: compute Shannon entropy.\"\"\"\n    # Implement from previous exercise\n    pass\n\ndef kl_divergence(P: list[float], Q: list[float]) -> float:\n    \"\"\"Helper: compute KL divergence.\"\"\"\n    # Implement from previous exercise\n    pass\n\ndef compute_midpoint(P: list[float], Q: list[float]) -> list[float]:\n    \"\"\"Helper: compute midpoint distribution.\"\"\"\n    # Implement from previous exercise\n    pass\n\ndef verify_jsd_symmetry(P: list[float], Q: list[float]) -> dict:\n    \"\"\"\n    Compute JSD(P||Q) and JSD(Q||P) and verify they're equal.\n    Also compute D_KL(P||Q) and D_KL(Q||P) to show KL asymmetry.\n    \n    Args:\n        P: First probability distribution\n        Q: Second probability distribution\n    \n    Returns:\n        Dictionary with 'jsd_pq', 'jsd_qp', 'kl_pq', 'kl_qp', 'is_symmetric'\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "verify_jsd_symmetry([0.5, 0.5], [0.4, 0.6])",
+            "expected": "{'jsd_pq': 0.0051, 'jsd_qp': 0.0051, 'is_symmetric': True, 'kl_pq': ~0.020, 'kl_qp': ~0.020}",
+            "explanation": "JSD values are identical; KL values are close but not exactly equal (near symmetric case)"
+          },
+          {
+            "input": "verify_jsd_symmetry([0.9, 0.1], [0.1, 0.9])",
+            "expected": "{'jsd_pq': 0.528, 'jsd_qp': 0.528, 'is_symmetric': True, 'kl_pq': 1.757, 'kl_qp': 1.757}",
+            "explanation": "JSD is symmetric; KL divergence happens to be equal here due to symmetry in input"
+          },
+          {
+            "input": "verify_jsd_symmetry([0.8, 0.1, 0.1], [0.1, 0.8, 0.1])",
+            "expected": "{'jsd_pq': ~0.341, 'jsd_qp': ~0.341, 'is_symmetric': True}",
+            "explanation": "JSD maintains symmetry even with multiple outcomes"
+          },
+          {
+            "input": "verify_jsd_symmetry([1.0, 0.0], [0.0, 1.0])",
+            "expected": "{'jsd_pq': 0.693, 'jsd_qp': 0.693, 'is_symmetric': True}",
+            "explanation": "Maximum JSD value (log 2) for completely disjoint distributions"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing M differently for JSD(P||Q) vs JSD(Q||P) - M should be the same!",
+        "Comparing JSD and KL divergence without understanding they measure different things",
+        "Thinking JSD is always exactly equal to (D_KL(P||Q) + D_KL(Q||P))/2 - that's NOT the definition",
+        "Not recognizing that log(2) ≈ 0.693 is the theoretical maximum",
+        "Forgetting to use the same logarithm base consistently"
+      ],
+      "hint": "For each direction, compute the midpoint M (which should be the same both times!), then compute the KL divergences from P and Q to M, and average them. Use helpers from previous exercises.",
+      "references": [
+        "Information theory: symmetric divergence measures",
+        "Distance metrics in probability space",
+        "Applications in generative adversarial networks (GANs)"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Implementing Jensen-Shannon Divergence with Numerical Stability",
+      "relation_to_problem": "This final sub-quest combines all previous concepts to implement the complete JSD algorithm. You'll integrate entropy, KL divergence, and midpoint computation while handling numerical edge cases that arise in real-world applications.",
+      "prerequisites": [
+        "Shannon entropy",
+        "KL divergence",
+        "Midpoint distributions",
+        "Understanding of JSD properties"
+      ],
+      "learning_objectives": [
+        "Implement complete JSD computation pipeline",
+        "Handle numerical stability issues (log(0), division by zero)",
+        "Validate input probability distributions",
+        "Optimize computation for efficiency",
+        "Test implementation against known values and edge cases"
+      ],
+      "math_content": {
+        "definition": "Complete **Jensen-Shannon Divergence** algorithm:\n\n**Input**: Two probability distributions $P = (p_1, \\ldots, p_n)$ and $Q = (q_1, \\ldots, q_n)$\n\n**Output**: $JSD(P \\| Q) \\in [0, \\log(2)]$\n\n**Algorithm**:\n1. Validate: Check $p_i, q_i \\geq 0$ and $\\sum_i p_i = \\sum_i q_i = 1$\n2. Compute: $M = \\frac{1}{2}(P + Q)$\n3. Compute: $D_{KL}(P \\| M) = \\sum_i p_i \\log\\frac{p_i}{m_i}$\n4. Compute: $D_{KL}(Q \\| M) = \\sum_i q_i \\log\\frac{q_i}{m_i}$\n5. Return: $JSD = \\frac{1}{2}[D_{KL}(P \\| M) + D_{KL}(Q \\| M)]$",
+        "notation": "$\\epsilon$ = small constant for numerical stability (typically $10^{-10}$)\n$p'_i = \\max(p_i, \\epsilon)$ = stabilized probability\n$\\log$ = natural logarithm (base $e$)",
+        "theorem": "**Numerical Stability Considerations**:\n\n1. **Zero probabilities**: When $p_i = 0$, the term $p_i \\log(p_i/m_i) = 0$ by convention\n\n2. **Near-zero probabilities**: Add $\\epsilon$ to avoid underflow:\n   $$p'_i = p_i + \\epsilon, \\quad m'_i = m_i + \\epsilon$$\n   Then: $D_{KL}(P \\| M) \\approx \\sum_i p'_i \\log\\frac{p'_i}{m'_i}$\n\n3. **Logarithm computation**: Use $\\log(p_i) - \\log(m_i)$ instead of $\\log(p_i/m_i)$ for better precision",
+        "proof_sketch": "**Why epsilon method works**:\n\nAdding $\\epsilon \\ll 1$ to probabilities:\n- Preserves ordering: if $p_i > p_j$ then $p'_i > p'_j$\n- Minimal distortion: $|p'_i - p_i| = \\epsilon$ is negligible\n- Prevents undefined operations: $\\log(0)$ and $0/0$ are avoided\n- Maintains approximate normalization: $\\sum_i p'_i \\approx 1 + n\\epsilon$\n\nFor $\\epsilon = 10^{-10}$ and $n < 10^6$, the error is negligible compared to JSD magnitude.",
+        "examples": [
+          "**Example 1**: Standard case from problem\n$P = [0.5, 0.5]$, $Q = [0.4, 0.6]$\n$M = [0.45, 0.55]$\n$D_{KL}(P \\| M) = 0.5\\log(0.5/0.45) + 0.5\\log(0.5/0.55) \\approx 0.00503$\n$D_{KL}(Q \\| M) = 0.4\\log(0.4/0.45) + 0.6\\log(0.6/0.55) \\approx 0.00509$\n$JSD = \\frac{1}{2}(0.00503 + 0.00509) \\approx 0.00506$",
+          "**Example 2**: Edge case with zero probability\n$P = [0.5, 0.5, 0.0]$, $Q = [0.4, 0.6, 0.0]$\n$M = [0.45, 0.55, 0.0]$\nThird term contributes 0 to both KL divergences\nResult same as 2D case: $JSD \\approx 0.00506$",
+          "**Example 3**: Near-deterministic distributions\n$P = [0.99, 0.01]$, $Q = [0.01, 0.99]$\n$M = [0.5, 0.5]$\n$JSD \\approx 0.688$ (close to maximum $\\log(2) \\approx 0.693$)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Stabilized KL divergence",
+          "latex": "$D_{KL}(P \\| M) = \\sum_i (p_i + \\epsilon) \\log\\frac{p_i + \\epsilon}{m_i + \\epsilon}$",
+          "description": "Numerically stable version using epsilon smoothing"
+        },
+        {
+          "name": "Log difference form",
+          "latex": "$\\log\\frac{p_i}{m_i} = \\log(p_i) - \\log(m_i)$",
+          "description": "Alternative computation for better numerical precision"
+        },
+        {
+          "name": "Complete JSD formula",
+          "latex": "$JSD(P \\| Q) = \\frac{1}{2}\\sum_i \\left[p_i\\log\\frac{2p_i}{p_i+q_i} + q_i\\log\\frac{2q_i}{p_i+q_i}\\right]$",
+          "description": "Expanded form without explicit M variable"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete Jensen-Shannon Divergence function by combining all previous sub-quest concepts. This is the culmination of your learning - ensure robust handling of edge cases and numerical stability. Your implementation should match the problem's expected outputs.",
+        "function_signature": "def jensen_shannon_divergence(P: list[float], Q: list[float]) -> float:",
+        "starter_code": "import numpy as np\n\ndef jensen_shannon_divergence(P: list[float], Q: list[float]) -> float:\n    \"\"\"\n    Compute the Jensen-Shannon Divergence between two probability distributions.\n    \n    Args:\n        P: First probability distribution\n        Q: Second probability distribution\n    \n    Returns:\n        Jensen-Shannon Divergence value between 0 and log(2)\n    \n    Implementation requirements:\n    - Handle zero probabilities gracefully\n    - Use epsilon for numerical stability\n    - Validate inputs are valid probability distributions\n    - Return float rounded to appropriate precision\n    \"\"\"\n    # Your code here - combine all previous concepts\n    pass",
+        "test_cases": [
+          {
+            "input": "jensen_shannon_divergence([0.5, 0.5], [0.4, 0.6])",
+            "expected": "0.005059",
+            "explanation": "Example from problem description - nearly uniform distributions"
+          },
+          {
+            "input": "jensen_shannon_divergence([0.5, 0.5], [0.5, 0.5])",
+            "expected": "0.0",
+            "explanation": "Identical distributions have zero divergence"
+          },
+          {
+            "input": "jensen_shannon_divergence([1.0, 0.0], [0.0, 1.0])",
+            "expected": "0.693 (log 2)",
+            "explanation": "Maximum divergence for completely disjoint distributions"
+          },
+          {
+            "input": "jensen_shannon_divergence([0.25, 0.25, 0.25, 0.25], [0.5, 0.3, 0.15, 0.05])",
+            "expected": "~0.072",
+            "explanation": "Multi-outcome distributions with moderate difference"
+          },
+          {
+            "input": "jensen_shannon_divergence([0.9, 0.05, 0.05], [0.05, 0.9, 0.05])",
+            "expected": "~0.459",
+            "explanation": "Large divergence when peak probabilities are in different positions"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling zero probabilities in P or Q before computing logarithms",
+        "Forgetting to compute the midpoint M first",
+        "Computing D_KL(P||Q) instead of D_KL(P||M) - wrong reference distribution!",
+        "Using different epsilon values inconsistently across P, Q, and M",
+        "Not validating that inputs sum to 1 (or close to 1 within tolerance)",
+        "Returning values outside [0, log(2)] range indicates implementation error"
+      ],
+      "hint": "Structure your solution in clear steps: (1) convert to numpy arrays, (2) add epsilon, (3) compute M, (4) compute both KL divergences using helper logic, (5) average them. Test each component separately before combining.",
+      "references": [
+        "Numerical methods for information-theoretic measures",
+        "Scipy.stats.entropy for reference implementation",
+        "Applications in deep learning: comparing distributions in VAEs and GANs",
+        "Connection to mutual information and channel capacity"
+      ]
+    }
+  ]
+}

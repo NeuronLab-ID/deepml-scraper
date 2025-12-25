@@ -1,0 +1,487 @@
+{
+  "problem_id": 57,
+  "title": "Gauss-Seidel Method for Solving Linear Systems",
+  "category": "Linear Algebra",
+  "difficulty": "medium",
+  "description": "## Task: Implement the Gauss-Seidel Method\n\nYour task is to implement the Gauss-Seidel method, an iterative technique for solving a system of linear equations \\(Ax = b\\).\n\nThe function should iteratively update the solution vector \\(x\\) by using the most recent values available during the iteration process.\n\nWrite a function `gauss_seidel(A, b, n, x_ini=None)` where:\n\n- `A` is a square matrix of coefficients,\n- `b` is the right-hand side vector,\n- `n` is the number of iterations,\n- `x_ini` is an optional initial guess for \\(x\\) (if not provided, assume a vector of zeros).\n\nThe function should return the approximated solution vector \\(x\\) after performing the specified number of iterations.\n\n    ",
+  "example": {
+    "input": "A = np.array([[4, 1, 2], [3, 5, 1], [1, 1, 3]], dtype=float)\nb = np.array([4, 7, 3], dtype=float)\n\nn = 100\nprint(gauss_seidel(A, b, n))",
+    "output": "# [0.2, 1.4, 0.8]  (Approximate, values may vary depending on iterations)",
+    "reasoning": "The Gauss-Seidel method iteratively updates the solution vector \\(x\\) until convergence. The output is an approximate solution to the linear system."
+  },
+  "starter_code": "import numpy as np\n\ndef gauss_seidel(A, b, n, x_ini=None):\n\treturn np.zeros_like(b)\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Matrix Decomposition: Splitting A into D, L, and U",
+      "relation_to_problem": "The Gauss-Seidel method requires decomposing the coefficient matrix A into its diagonal (D), strictly lower triangular (L), and strictly upper triangular (U) components. This decomposition is fundamental to understanding how the algorithm uses updated values from the current iteration alongside old values.",
+      "prerequisites": [
+        "Matrix indexing",
+        "Matrix operations",
+        "NumPy array manipulation"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition of matrix decomposition A = D + L + U",
+        "Extract diagonal, lower triangular, and upper triangular parts from a matrix",
+        "Verify that the decomposition correctly reconstructs the original matrix"
+      ],
+      "math_content": {
+        "definition": "For any square matrix $A \\in \\mathbb{R}^{n \\times n}$, we can uniquely decompose it as $A = L + D + U$ where: $D$ is a diagonal matrix with $d_{ij} = \\begin{cases} a_{ij} & \\text{if } i = j \\\\ 0 & \\text{if } i \\neq j \\end{cases}$, $L$ is a strictly lower triangular matrix with $l_{ij} = \\begin{cases} a_{ij} & \\text{if } i > j \\\\ 0 & \\text{if } i \\leq j \\end{cases}$, and $U$ is a strictly upper triangular matrix with $u_{ij} = \\begin{cases} a_{ij} & \\text{if } i < j \\\\ 0 & \\text{if } i \\geq j \\end{cases}$",
+        "notation": "$A$ = original matrix, $D$ = diagonal component, $L$ = strictly lower triangular component, $U$ = strictly upper triangular component",
+        "theorem": "For any square matrix $A$, the decomposition $A = L + D + U$ is unique and satisfies $A_{ij} = L_{ij} + D_{ij} + U_{ij}$ for all $i, j$.",
+        "proof_sketch": "The decomposition is unique because each element $a_{ij}$ is assigned to exactly one of $L$, $D$, or $U$ based on the relationship between indices $i$ and $j$. The reconstruction property follows immediately from the definitions: when $i > j$, only $L_{ij}$ is non-zero; when $i = j$, only $D_{ij}$ is non-zero; when $i < j$, only $U_{ij}$ is non-zero.",
+        "examples": [
+          "For $A = \\begin{pmatrix} 4 & 1 & 2 \\\\ 3 & 5 & 1 \\\\ 1 & 1 & 3 \\end{pmatrix}$, we have $D = \\begin{pmatrix} 4 & 0 & 0 \\\\ 0 & 5 & 0 \\\\ 0 & 0 & 3 \\end{pmatrix}$, $L = \\begin{pmatrix} 0 & 0 & 0 \\\\ 3 & 0 & 0 \\\\ 1 & 1 & 0 \\end{pmatrix}$, $U = \\begin{pmatrix} 0 & 1 & 2 \\\\ 0 & 0 & 1 \\\\ 0 & 0 & 0 \\end{pmatrix}$",
+          "For a $2 \\times 2$ matrix $A = \\begin{pmatrix} 3 & 1 \\\\ 1 & 2 \\end{pmatrix}$: $D = \\begin{pmatrix} 3 & 0 \\\\ 0 & 2 \\end{pmatrix}$, $L = \\begin{pmatrix} 0 & 0 \\\\ 1 & 0 \\end{pmatrix}$, $U = \\begin{pmatrix} 0 & 1 \\\\ 0 & 0 \\end{pmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Diagonal Extraction",
+          "latex": "$D_{ij} = \\begin{cases} A_{ij} & \\text{if } i = j \\\\ 0 & \\text{otherwise} \\end{cases}$",
+          "description": "Extract the main diagonal elements"
+        },
+        {
+          "name": "Lower Triangle Extraction",
+          "latex": "$L_{ij} = \\begin{cases} A_{ij} & \\text{if } i > j \\\\ 0 & \\text{otherwise} \\end{cases}$",
+          "description": "Extract elements below the main diagonal"
+        },
+        {
+          "name": "Upper Triangle Extraction",
+          "latex": "$U_{ij} = \\begin{cases} A_{ij} & \\text{if } i < j \\\\ 0 & \\text{otherwise} \\end{cases}$",
+          "description": "Extract elements above the main diagonal"
+        },
+        {
+          "name": "Reconstruction",
+          "latex": "$A = L + D + U$",
+          "description": "Verify the decomposition by summing components"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that decomposes a square matrix A into its diagonal (D), strictly lower triangular (L), and strictly upper triangular (U) components. Return all three matrices as a tuple (D, L, U).",
+        "function_signature": "def decompose_matrix(A: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef decompose_matrix(A):\n    # Extract D, L, U from matrix A\n    # Your code here\n    n = A.shape[0]\n    D = np.zeros_like(A)\n    L = np.zeros_like(A)\n    U = np.zeros_like(A)\n    return D, L, U",
+        "test_cases": [
+          {
+            "input": "decompose_matrix(np.array([[4, 1, 2], [3, 5, 1], [1, 1, 3]], dtype=float))",
+            "expected": "(array([[4., 0., 0.], [0., 5., 0.], [0., 0., 3.]]), array([[0., 0., 0.], [3., 0., 0.], [1., 1., 0.]]), array([[0., 1., 2.], [0., 0., 1.], [0., 0., 0.]]))",
+            "explanation": "D contains diagonal [4,5,3], L contains elements below diagonal [3,1,1], U contains elements above diagonal [1,2,1]"
+          },
+          {
+            "input": "decompose_matrix(np.array([[3, 1], [1, 2]], dtype=float))",
+            "expected": "(array([[3., 0.], [0., 2.]]), array([[0., 0.], [1., 0.]]), array([[0., 1.], [0., 0.]]))",
+            "explanation": "For a 2x2 matrix, D has the diagonal, L has one element below, U has one element above"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Including diagonal elements in L or U (they should only be in D)",
+        "Using np.tril() or np.triu() which include diagonal elements - you need strict triangular parts",
+        "Not preserving the data type (should match input matrix type)",
+        "Forgetting to verify that D + L + U equals the original matrix A"
+      ],
+      "hint": "Use NumPy functions like np.diag() to extract the diagonal, and np.tril()/np.triu() with appropriate offsets (k=-1 and k=1) to get strictly lower and upper parts.",
+      "references": [
+        "Matrix decomposition",
+        "Triangular matrices",
+        "NumPy indexing and slicing"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Understanding Diagonal Dominance and Convergence Criteria",
+      "relation_to_problem": "The Gauss-Seidel method is guaranteed to converge for strictly diagonally dominant matrices. Before implementing the algorithm, we need to verify that the input matrix satisfies convergence conditions to ensure the iterative process will produce a valid solution.",
+      "prerequisites": [
+        "Matrix norms",
+        "Absolute value operations",
+        "Row-wise operations in NumPy"
+      ],
+      "learning_objectives": [
+        "Define strict diagonal dominance mathematically",
+        "Implement a function to check if a matrix is strictly diagonally dominant",
+        "Understand why diagonal dominance guarantees convergence of iterative methods"
+      ],
+      "math_content": {
+        "definition": "A square matrix $A \\in \\mathbb{R}^{n \\times n}$ is **strictly diagonally dominant** if for every row $i$, the absolute value of the diagonal element is strictly greater than the sum of absolute values of all other elements in that row: \\[ |a_{ii}| > \\sum_{j=1, j \\neq i}^{n} |a_{ij}| \\quad \\text{for all } i = 1, 2, \\ldots, n \\]",
+        "notation": "$a_{ii}$ = diagonal element at position $(i,i)$, $a_{ij}$ = off-diagonal element at position $(i,j)$ where $j \\neq i$",
+        "theorem": "**Convergence Theorem**: If matrix $A$ is strictly diagonally dominant, then the Gauss-Seidel iterative method converges to the unique solution of $Ax = b$ for any initial guess $x^{(0)}$ and any right-hand side vector $b$.",
+        "proof_sketch": "For strictly diagonally dominant matrices, the iteration matrix $M_{GS} = -(D+L)^{-1}U$ has spectral radius $\\rho(M_{GS}) < 1$. This means all eigenvalues have magnitude less than 1, ensuring that errors decay geometrically: $\\|e^{(k)}\\| \\leq \\rho(M_{GS})^k \\|e^{(0)}\\|$. Since $\\rho(M_{GS}) < 1$, we have $\\lim_{k \\to \\infty} \\rho(M_{GS})^k = 0$, guaranteeing convergence.",
+        "examples": [
+          "Matrix $A = \\begin{pmatrix} 4 & 1 & 2 \\\\ 3 & 5 & 1 \\\\ 1 & 1 & 3 \\end{pmatrix}$: Row 1: $|4| = 4 > |1| + |2| = 3$ ✓; Row 2: $|5| = 5 > |3| + |1| = 4$ ✓; Row 3: $|3| = 3 > |1| + |1| = 2$ ✓. This matrix is strictly diagonally dominant.",
+          "Matrix $B = \\begin{pmatrix} 2 & 1 & 3 \\\\ 1 & 3 & 1 \\\\ 1 & 1 & 2 \\end{pmatrix}$: Row 1: $|2| = 2 \\not> |1| + |3| = 4$ ✗. This matrix is NOT strictly diagonally dominant (fails in row 1)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Diagonal Dominance Condition",
+          "latex": "$|a_{ii}| > \\sum_{j \\neq i} |a_{ij}|$",
+          "description": "Must hold for ALL rows to guarantee convergence"
+        },
+        {
+          "name": "Off-Diagonal Row Sum",
+          "latex": "$R_i = \\sum_{j=1, j \\neq i}^{n} |a_{ij}|$",
+          "description": "Sum of absolute values of all off-diagonal elements in row i"
+        },
+        {
+          "name": "Dominance Ratio",
+          "latex": "$\\alpha_i = \\frac{|a_{ii}|}{\\sum_{j \\neq i} |a_{ij}|}$",
+          "description": "If $\\alpha_i > 1$ for all i, matrix is strictly diagonally dominant"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that checks whether a square matrix is strictly diagonally dominant. Return True if the matrix satisfies the strict diagonal dominance condition for all rows, and False otherwise. Also return an array indicating which rows satisfy the condition.",
+        "function_signature": "def is_diagonally_dominant(A: np.ndarray) -> tuple[bool, np.ndarray]:",
+        "starter_code": "import numpy as np\n\ndef is_diagonally_dominant(A):\n    # Check if A is strictly diagonally dominant\n    # Return (is_dominant, row_checks) where row_checks[i] indicates if row i satisfies the condition\n    n = A.shape[0]\n    row_checks = np.zeros(n, dtype=bool)\n    # Your code here\n    is_dominant = False\n    return is_dominant, row_checks",
+        "test_cases": [
+          {
+            "input": "is_diagonally_dominant(np.array([[4, 1, 2], [3, 5, 1], [1, 1, 3]], dtype=float))",
+            "expected": "(True, array([True, True, True]))",
+            "explanation": "Row 1: |4| > |1|+|2| = 3; Row 2: |5| > |3|+|1| = 4; Row 3: |3| > |1|+|1| = 2. All rows satisfy the condition."
+          },
+          {
+            "input": "is_diagonally_dominant(np.array([[2, 1, 3], [1, 5, 1], [1, 1, 4]], dtype=float))",
+            "expected": "(False, array([False, True, True]))",
+            "explanation": "Row 1: |2| NOT > |1|+|3| = 4 (fails); Row 2: |5| > |1|+|1| = 2; Row 3: |4| > |1|+|1| = 2. Overall fails because row 1 doesn't satisfy the condition."
+          },
+          {
+            "input": "is_diagonally_dominant(np.array([[10, -1], [-1, 10]], dtype=float))",
+            "expected": "(True, array([True, True]))",
+            "explanation": "Row 1: |10| > |-1| = 1; Row 2: |10| > |-1| = 1. Both rows satisfy the condition."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using weak diagonal dominance (≥) instead of strict dominance (>) - convergence requires strict inequality",
+        "Forgetting to take absolute values of matrix elements",
+        "Including the diagonal element in the row sum when it should be excluded",
+        "Checking only some rows instead of all rows - all rows must satisfy the condition",
+        "Not handling negative diagonal elements correctly (must use absolute value)"
+      ],
+      "hint": "For each row i, compute the absolute value of the diagonal element and compare it to the sum of absolute values of all other elements in that row. Use np.abs(), np.sum(), and boolean indexing.",
+      "references": [
+        "Diagonal dominance",
+        "Convergence of iterative methods",
+        "Gershgorin circle theorem"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Single Variable Update: The Core Gauss-Seidel Formula",
+      "relation_to_problem": "The heart of the Gauss-Seidel method is updating each variable using the most recent values available. This sub-quest focuses on implementing the update formula for a single variable, which uses already-updated variables from the current iteration and not-yet-updated variables from the previous iteration.",
+      "prerequisites": [
+        "Linear equation solving",
+        "Array indexing",
+        "Summation operations"
+      ],
+      "learning_objectives": [
+        "Derive the update formula for a single variable from the system Ax = b",
+        "Understand the difference between using x^(k+1) and x^(k) values",
+        "Implement the computational formula that splits the sum into two parts"
+      ],
+      "math_content": {
+        "definition": "For a linear system $Ax = b$, the $i$-th equation can be written as: \\[ \\sum_{j=1}^{n} a_{ij} x_j = b_i \\] Solving for $x_i$ gives: \\[ x_i = \\frac{1}{a_{ii}} \\left( b_i - \\sum_{j=1, j \\neq i}^{n} a_{ij} x_j \\right) \\] The Gauss-Seidel iteration formula splits this sum into two parts: \\[ x_i^{(k+1)} = \\frac{1}{a_{ii}} \\left( b_i - \\sum_{j=1}^{i-1} a_{ij} x_j^{(k+1)} - \\sum_{j=i+1}^{n} a_{ij} x_j^{(k)} \\right) \\]",
+        "notation": "$x_i^{(k+1)}$ = updated value at iteration k+1, $x_j^{(k+1)}$ = already computed values (j < i), $x_j^{(k)}$ = old values from previous iteration (j > i), $a_{ii}$ = diagonal coefficient (must be non-zero)",
+        "theorem": "**Sequential Update Property**: The Gauss-Seidel method uses a forward-substitution approach where variable $x_i^{(k+1)}$ is computed using the most recently computed values $x_1^{(k+1)}, x_2^{(k+1)}, \\ldots, x_{i-1}^{(k+1)}$ and the old values $x_{i+1}^{(k)}, \\ldots, x_n^{(k)}$. This immediate use of updated values often leads to faster convergence than the Jacobi method.",
+        "proof_sketch": "Starting from the $i$-th equation $\\sum_{j=1}^{n} a_{ij} x_j = b_i$, we isolate $a_{ii} x_i$ on the left side: $a_{ii} x_i = b_i - \\sum_{j \\neq i} a_{ij} x_j$. Dividing by $a_{ii}$ (assuming $a_{ii} \\neq 0$): $x_i = \\frac{b_i - \\sum_{j \\neq i} a_{ij} x_j}{a_{ii}}$. In the iterative context, when computing $x_i^{(k+1)}$, variables $x_1, \\ldots, x_{i-1}$ have already been updated to iteration $k+1$, while $x_{i+1}, \\ldots, x_n$ are still at iteration $k$.",
+        "examples": [
+          "For the system $4x_1 + x_2 + 2x_3 = 4$, the update formula for $x_1$ is: $x_1^{(k+1)} = \\frac{1}{4}(4 - x_2^{(k)} - 2x_3^{(k)})$ (no terms with index j < 1)",
+          "For the same system's second equation $3x_1 + 5x_2 + x_3 = 7$, the update formula for $x_2$ is: $x_2^{(k+1)} = \\frac{1}{5}(7 - 3x_1^{(k+1)} - x_3^{(k)})$ (uses updated $x_1^{(k+1)}$ but old $x_3^{(k)}$)",
+          "For the third equation $x_1 + x_2 + 3x_3 = 3$, the update formula for $x_3$ is: $x_3^{(k+1)} = \\frac{1}{3}(3 - x_1^{(k+1)} - x_2^{(k+1)})$ (uses both updated values)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "General Update Formula",
+          "latex": "$x_i^{(k+1)} = \\frac{1}{a_{ii}} \\left( b_i - \\sum_{j=1}^{i-1} a_{ij} x_j^{(k+1)} - \\sum_{j=i+1}^{n} a_{ij} x_j^{(k)} \\right)$",
+          "description": "Updates variable i using most recent values"
+        },
+        {
+          "name": "Left Sum (Updated Values)",
+          "latex": "$S_L = \\sum_{j=1}^{i-1} a_{ij} x_j^{(k+1)}$",
+          "description": "Sum of terms using already-updated variables"
+        },
+        {
+          "name": "Right Sum (Old Values)",
+          "latex": "$S_R = \\sum_{j=i+1}^{n} a_{ij} x_j^{(k)}$",
+          "description": "Sum of terms using not-yet-updated variables"
+        },
+        {
+          "name": "Compact Form",
+          "latex": "$x_i^{(k+1)} = \\frac{b_i - S_L - S_R}{a_{ii}}$",
+          "description": "Simplified computational form"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the updated value for a single variable x[i] in one Gauss-Seidel iteration. The function takes the coefficient matrix A, the right-hand side vector b, the current solution vector x, and the index i of the variable to update. Return the new value for x[i].",
+        "function_signature": "def gauss_seidel_update_single(A: np.ndarray, b: np.ndarray, x: np.ndarray, i: int) -> float:",
+        "starter_code": "import numpy as np\n\ndef gauss_seidel_update_single(A, b, x, i):\n    # Compute the updated value for x[i] using the Gauss-Seidel formula\n    # x contains the current state: x[0:i] are from iteration k+1, x[i+1:n] are from iteration k\n    # Your code here\n    return 0.0",
+        "test_cases": [
+          {
+            "input": "gauss_seidel_update_single(np.array([[4, 1, 2], [3, 5, 1], [1, 1, 3]], dtype=float), np.array([4, 7, 3], dtype=float), np.array([0, 0, 0], dtype=float), 0)",
+            "expected": "1.0",
+            "explanation": "For i=0 (first variable): x1 = (4 - 1*0 - 2*0) / 4 = 1.0. No left sum since no variables before index 0."
+          },
+          {
+            "input": "gauss_seidel_update_single(np.array([[4, 1, 2], [3, 5, 1], [1, 1, 3]], dtype=float), np.array([4, 7, 3], dtype=float), np.array([1.0, 0, 0], dtype=float), 1)",
+            "expected": "0.8",
+            "explanation": "For i=1 (second variable): x2 = (7 - 3*1.0 - 1*0) / 5 = 4/5 = 0.8. Uses updated x[0]=1.0 and old x[2]=0."
+          },
+          {
+            "input": "gauss_seidel_update_single(np.array([[4, 1, 2], [3, 5, 1], [1, 1, 3]], dtype=float), np.array([4, 7, 3], dtype=float), np.array([1.0, 0.8, 0], dtype=float), 2)",
+            "expected": "0.4",
+            "explanation": "For i=2 (third variable): x3 = (3 - 1*1.0 - 1*0.8) / 3 = 1.2/3 = 0.4. Uses both updated values x[0]=1.0 and x[1]=0.8."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not distinguishing between updated (j < i) and old (j > i) values - this is crucial for Gauss-Seidel",
+        "Including the diagonal term a[i,i] * x[i] in the summations - it should be excluded",
+        "Dividing by the wrong diagonal element or not dividing at all",
+        "Computing the entire dot product A[i] @ x instead of splitting into left and right sums",
+        "Not handling the edge cases when i=0 (no left sum) or i=n-1 (no right sum)"
+      ],
+      "hint": "Use array slicing: A[i, 0:i] for elements before the diagonal, A[i, i+1:n] for elements after. Compute dot products separately for the left and right sums, then apply the formula.",
+      "references": [
+        "Forward substitution",
+        "Iterative refinement",
+        "In-place updates"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Complete Iteration Sweep: Updating All Variables",
+      "relation_to_problem": "A single Gauss-Seidel iteration consists of updating all n variables sequentially using the update formula. This sub-quest implements one complete sweep through all variables, which forms the inner loop of the full algorithm.",
+      "prerequisites": [
+        "Previous sub-quest on single variable update",
+        "For loops",
+        "In-place array modification"
+      ],
+      "learning_objectives": [
+        "Understand that one iteration updates all variables in sequence",
+        "Implement in-place updates where each new value immediately replaces the old",
+        "Recognize the forward-substitution pattern in the sequential updates"
+      ],
+      "math_content": {
+        "definition": "A **single Gauss-Seidel iteration** consists of updating each variable $x_i$ sequentially from $i=1$ to $i=n$ using the formula: \\[ x_i^{(k+1)} = \\frac{1}{a_{ii}} \\left( b_i - \\sum_{j=1}^{i-1} a_{ij} x_j^{(k+1)} - \\sum_{j=i+1}^{n} a_{ij} x_j^{(k)} \\right) \\] After one complete iteration, all components of the solution vector have been updated from $x^{(k)}$ to $x^{(k+1)}$.",
+        "notation": "$k$ = iteration number, $n$ = number of variables/equations, $x^{(k)} \\in \\mathbb{R}^n$ = solution vector at iteration k, $x^{(k+1)} \\in \\mathbb{R}^n$ = solution vector at iteration k+1",
+        "theorem": "**In-Place Update Theorem**: The Gauss-Seidel method can be implemented with in-place updates, storing only a single solution vector $x$. As we iterate through $i = 1, 2, \\ldots, n$, we overwrite $x[i]$ with its new value, which is immediately available for subsequent updates of $x[i+1], x[i+2], \\ldots, x[n]$ in the same iteration.",
+        "proof_sketch": "The sequential nature of the updates ensures correctness of in-place modification. When updating $x_i^{(k+1)}$, we need $x_1^{(k+1)}, \\ldots, x_{i-1}^{(k+1)}$ (which have already been computed and stored in x[0:i]) and $x_{i+1}^{(k)}, \\ldots, x_n^{(k)}$ (which are still in x[i+1:n] and haven't been overwritten yet). This temporal ordering makes in-place updates safe and memory-efficient.",
+        "examples": [
+          "For the system with $A = \\begin{pmatrix} 4 & 1 & 2 \\\\ 3 & 5 & 1 \\\\ 1 & 1 & 3 \\end{pmatrix}$, $b = \\begin{pmatrix} 4 \\\\ 7 \\\\ 3 \\end{pmatrix}$, starting with $x^{(0)} = \\begin{pmatrix} 0 \\\\ 0 \\\\ 0 \\end{pmatrix}$: First update $x_1^{(1)} = \\frac{4 - 0 - 0}{4} = 1.0$, then update $x_2^{(1)} = \\frac{7 - 3(1.0) - 0}{5} = 0.8$ using the new $x_1^{(1)}$, finally update $x_3^{(1)} = \\frac{3 - 1.0 - 0.8}{3} = 0.4$ using both new values. Result: $x^{(1)} = \\begin{pmatrix} 1.0 \\\\ 0.8 \\\\ 0.4 \\end{pmatrix}$",
+          "Second iteration starting from $x^{(1)} = \\begin{pmatrix} 1.0 \\\\ 0.8 \\\\ 0.4 \\end{pmatrix}$: $x_1^{(2)} = \\frac{4 - 0.8 - 0.8}{4} = 0.6$, $x_2^{(2)} = \\frac{7 - 3(0.6) - 0.4}{5} = 1.04$, $x_3^{(2)} = \\frac{3 - 0.6 - 1.04}{3} = 0.453\\overline{3}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Iteration Loop",
+          "latex": "$\\text{For } i = 1 \\text{ to } n: \\quad x_i^{(k+1)} = \\frac{1}{a_{ii}} \\left( b_i - \\sum_{j=1}^{i-1} a_{ij} x_j^{(k+1)} - \\sum_{j=i+1}^{n} a_{ij} x_j^{(k)} \\right)$",
+          "description": "Sequential update of all variables in one iteration"
+        },
+        {
+          "name": "Matrix Form",
+          "latex": "$(D + L)x^{(k+1)} = b - Ux^{(k)}$",
+          "description": "Equivalent matrix representation of one iteration"
+        },
+        {
+          "name": "Error Reduction",
+          "latex": "$\\|x^{(k+1)} - x^*\\| \\leq C \\|x^{(k)} - x^*\\|$",
+          "description": "Error contracts by factor C < 1 for convergent systems"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs exactly one complete Gauss-Seidel iteration on the system Ax = b. Given the current solution vector x, update all components in-place using the sequential Gauss-Seidel formula. The function should modify x in-place and return it.",
+        "function_signature": "def gauss_seidel_single_iteration(A: np.ndarray, b: np.ndarray, x: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef gauss_seidel_single_iteration(A, b, x):\n    # Perform one complete Gauss-Seidel iteration\n    # Update all components of x in-place using sequential updates\n    n = len(x)\n    # Your code here\n    return x",
+        "test_cases": [
+          {
+            "input": "gauss_seidel_single_iteration(np.array([[4, 1, 2], [3, 5, 1], [1, 1, 3]], dtype=float), np.array([4, 7, 3], dtype=float), np.array([0, 0, 0], dtype=float))",
+            "expected": "array([1.0, 0.8, 0.4])",
+            "explanation": "Starting from zeros: x1 = 4/4 = 1.0; x2 = (7-3*1.0)/5 = 0.8; x3 = (3-1.0-0.8)/3 = 0.4"
+          },
+          {
+            "input": "gauss_seidel_single_iteration(np.array([[4, 1, 2], [3, 5, 1], [1, 1, 3]], dtype=float), np.array([4, 7, 3], dtype=float), np.array([1.0, 0.8, 0.4], dtype=float))",
+            "expected": "array([0.6, 1.04, 0.45333333])",
+            "explanation": "Second iteration: x1 = (4-0.8-0.8)/4 = 0.6; x2 = (7-1.8-0.4)/5 = 1.04; x3 = (3-0.6-1.04)/3 ≈ 0.453"
+          },
+          {
+            "input": "gauss_seidel_single_iteration(np.array([[10, -1], [-1, 10]], dtype=float), np.array([9, 11], dtype=float), np.array([0, 0], dtype=float))",
+            "expected": "array([0.9, 1.19])",
+            "explanation": "For 2x2 system: x1 = 9/10 = 0.9; x2 = (11+0.9)/10 = 1.19"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not updating in-place - creating a new vector instead of modifying the existing one",
+        "Using old values when new values should be used (reverting to Jacobi method)",
+        "Incorrect loop order - must go sequentially from i=0 to i=n-1",
+        "Storing all updates and applying them simultaneously (that's Jacobi, not Gauss-Seidel)",
+        "Not returning the modified vector"
+      ],
+      "hint": "Loop through indices i from 0 to n-1. For each i, compute the new x[i] using the formula from the previous sub-quest, and immediately store it in x[i]. This ensures subsequent updates in the same iteration use the new value.",
+      "references": [
+        "Iterative methods",
+        "Forward substitution",
+        "In-place algorithms"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Implementing Stopping Criteria and Error Measurement",
+      "relation_to_problem": "Iterative methods need a termination condition to know when to stop. While the main problem specifies a fixed number of iterations, understanding convergence criteria based on error measurement is essential for practical implementations and validating that the solution is approaching the true answer.",
+      "prerequisites": [
+        "Vector norms",
+        "Convergence concepts",
+        "Relative and absolute error"
+      ],
+      "learning_objectives": [
+        "Define multiple stopping criteria for iterative methods",
+        "Compute the difference between consecutive iterations",
+        "Understand the relationship between iteration count and solution accuracy"
+      ],
+      "math_content": {
+        "definition": "**Stopping criteria** are conditions used to terminate iterative algorithms. For the Gauss-Seidel method, common criteria include: (1) **Absolute error**: $\\|x^{(k+1)} - x^{(k)}\\| < \\varepsilon_{abs}$, (2) **Relative error**: $\\frac{\\|x^{(k+1)} - x^{(k)}\\|}{\\|x^{(k+1)}\\|} < \\varepsilon_{rel}$, (3) **Residual norm**: $\\|Ax^{(k)} - b\\| < \\varepsilon_{res}$, (4) **Maximum iterations**: $k \\geq k_{max}$",
+        "notation": "$\\|\\cdot\\|$ = vector norm (typically Euclidean $L^2$ norm or infinity $L^\\infty$ norm), $\\varepsilon$ = tolerance threshold, $k$ = current iteration number, $r^{(k)} = Ax^{(k)} - b$ = residual vector",
+        "theorem": "**Convergence Monitoring Theorem**: For convergent iterations, both $\\|x^{(k+1)} - x^{(k)}\\|$ and $\\|Ax^{(k)} - b\\|$ approach zero as $k \\to \\infty$. The rate of convergence is determined by the spectral radius: $\\|x^{(k)} - x^*\\| \\approx \\rho(M_{GS})^k \\|x^{(0)} - x^*\\|$ where $x^*$ is the true solution.",
+        "proof_sketch": "If the iteration converges to $x^*$, then $\\lim_{k \\to \\infty} x^{(k)} = x^*$. By continuity, $\\lim_{k \\to \\infty} \\|x^{(k+1)} - x^{(k)}\\| = \\|x^* - x^*\\| = 0$. Similarly, since $Ax^* = b$, we have $\\lim_{k \\to \\infty} \\|Ax^{(k)} - b\\| = \\|Ax^* - b\\| = 0$. The exponential rate follows from the iteration error formula involving the spectral radius.",
+        "examples": [
+          "For tolerance $\\varepsilon = 10^{-6}$ and spectral radius $\\rho = 0.5$: Number of iterations needed $k \\approx \\frac{\\ln(10^{-6})}{\\ln(0.5)} \\approx \\frac{-13.82}{-0.693} \\approx 20$ iterations",
+          "Computing iteration difference: If $x^{(5)} = [0.99, 2.01, -0.98]$ and $x^{(6)} = [1.001, 1.999, -1.002]$, then $\\|x^{(6)} - x^{(5)}\\|_2 = \\sqrt{(0.011)^2 + (-0.011)^2 + (-0.022)^2} \\approx 0.027$",
+          "Residual check: For $A = \\begin{pmatrix} 4 & 1 \\\\ 1 & 3 \\end{pmatrix}$, $b = \\begin{pmatrix} 5 \\\\ 4 \\end{pmatrix}$, $x = \\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}$: $r = Ax - b = \\begin{pmatrix} 5 \\\\ 4 \\end{pmatrix} - \\begin{pmatrix} 5 \\\\ 4 \\end{pmatrix} = \\begin{pmatrix} 0 \\\\ 0 \\end{pmatrix}$, so $\\|r\\| = 0$ (exact solution)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Euclidean Norm",
+          "latex": "$\\|x\\|_2 = \\sqrt{\\sum_{i=1}^{n} x_i^2}$",
+          "description": "Standard L2 norm for measuring vector magnitude"
+        },
+        {
+          "name": "Infinity Norm",
+          "latex": "$\\|x\\|_\\infty = \\max_{i} |x_i|$",
+          "description": "Maximum absolute component value"
+        },
+        {
+          "name": "Relative Error",
+          "latex": "$e_{rel} = \\frac{\\|x^{(k+1)} - x^{(k)}\\|}{\\|x^{(k+1)}\\|}$",
+          "description": "Error relative to current solution magnitude"
+        },
+        {
+          "name": "Residual",
+          "latex": "$r^{(k)} = b - Ax^{(k)}$",
+          "description": "How well current x satisfies the equation Ax = b"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes convergence metrics for evaluating Gauss-Seidel iterations. Given the previous solution x_old and current solution x_new, compute: (1) the absolute difference norm, (2) the relative difference, and (3) the residual norm for the current solution. Return all three metrics as a tuple.",
+        "function_signature": "def compute_convergence_metrics(A: np.ndarray, b: np.ndarray, x_old: np.ndarray, x_new: np.ndarray) -> tuple[float, float, float]:",
+        "starter_code": "import numpy as np\n\ndef compute_convergence_metrics(A, b, x_old, x_new):\n    # Compute convergence metrics\n    # Returns: (absolute_diff, relative_diff, residual_norm)\n    absolute_diff = 0.0\n    relative_diff = 0.0\n    residual_norm = 0.0\n    # Your code here\n    return absolute_diff, relative_diff, residual_norm",
+        "test_cases": [
+          {
+            "input": "compute_convergence_metrics(np.array([[4, 1, 2], [3, 5, 1], [1, 1, 3]], dtype=float), np.array([4, 7, 3], dtype=float), np.array([0, 0, 0], dtype=float), np.array([1.0, 0.8, 0.4], dtype=float))",
+            "expected": "(1.4422, 1.0, 1.7)",
+            "explanation": "Absolute diff = ||[1,0.8,0.4] - [0,0,0]|| ≈ 1.442; Relative = 1.442/1.442 = 1.0; Residual = ||A*[1,0.8,0.4] - [4,7,3]|| = ||[5.6,8.4,2.0] - [4,7,3]|| = ||[1.6,1.4,-1]|| ≈ 1.7"
+          },
+          {
+            "input": "compute_convergence_metrics(np.array([[10, -1], [-1, 10]], dtype=float), np.array([9, 11], dtype=float), np.array([1.0, 1.0], dtype=float), np.array([1.0, 1.0], dtype=float))",
+            "expected": "(0.0, 0.0, 1.0)",
+            "explanation": "No change between iterations: absolute=0, relative=0. Residual = ||[10-1, -1+10]*[1,1] - [9,11]|| = ||[9,9] - [9,11]|| = ||[0,-2]|| = 2.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using the wrong norm (e.g., L1 when L2 is expected)",
+        "Computing relative error with x_old in denominator instead of x_new",
+        "Forgetting to handle the case when x_new has zero norm (division by zero)",
+        "Computing residual as Ax - b instead of b - Ax (sign doesn't affect norm but is conventional)",
+        "Not using np.linalg.norm() and implementing norm calculation incorrectly"
+      ],
+      "hint": "Use np.linalg.norm() to compute vector norms. For absolute difference, compute the norm of (x_new - x_old). For relative error, divide by the norm of x_new. For residual, compute A @ x_new - b and take its norm.",
+      "references": [
+        "Vector norms",
+        "Convergence criteria",
+        "Numerical stability",
+        "Residual analysis"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Gauss-Seidel Implementation with Multiple Iterations",
+      "relation_to_problem": "This final sub-quest combines all previous concepts to implement the complete Gauss-Seidel algorithm. You'll perform multiple iterations, optionally track convergence, and return the final approximate solution after n iterations.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Initialization strategies",
+        "Loop control"
+      ],
+      "learning_objectives": [
+        "Integrate matrix decomposition, iteration sweeps, and convergence checking",
+        "Handle initialization with default or user-provided starting vectors",
+        "Implement the complete iterative loop structure",
+        "Understand when to use fixed iterations vs. tolerance-based stopping"
+      ],
+      "math_content": {
+        "definition": "The **complete Gauss-Seidel algorithm** for solving $Ax = b$ consists of: (1) Initialize $x^{(0)}$ (typically as zero vector or user-provided guess), (2) For $k = 0, 1, 2, \\ldots, n-1$: Update each component $x_i^{(k+1)} = \\frac{1}{a_{ii}} \\left( b_i - \\sum_{j=1}^{i-1} a_{ij} x_j^{(k+1)} - \\sum_{j=i+1}^{n} a_{ij} x_j^{(k)} \\right)$ for $i = 1, 2, \\ldots, n$, (3) Return $x^{(n)}$ as the approximate solution.",
+        "notation": "$n$ = number of iterations (not to be confused with matrix dimension), $x^{(0)}$ = initial guess, $x^{(k)}$ = solution approximation at iteration k, $x^{(n)}$ = final returned solution",
+        "theorem": "**Fixed Iteration Guarantee**: For strictly diagonally dominant or symmetric positive definite matrices, performing $n$ Gauss-Seidel iterations produces a solution $x^{(n)}$ with error $\\|x^{(n)} - x^*\\| \\leq \\rho(M_{GS})^n \\|x^{(0)} - x^*\\|$. The error decreases exponentially with the number of iterations.",
+        "proof_sketch": "Each iteration applies the transformation $x^{(k+1)} = M_{GS} x^{(k)} + c_{GS}$. The fixed point is $x^* = M_{GS} x^* + c_{GS}$. Subtracting: $e^{(k+1)} = M_{GS} e^{(k)}$ where $e^{(k)} = x^{(k)} - x^*$. Iterating: $e^{(n)} = M_{GS}^n e^{(0)}$. Taking norms and using the spectral radius: $\\|e^{(n)}\\| \\leq \\|M_{GS}^n\\| \\|e^{(0)}\\| \\leq \\rho(M_{GS})^n \\|e^{(0)}\\|$.",
+        "examples": [
+          "Complete algorithm trace for $A = \\begin{pmatrix} 4 & 1 & 2 \\\\ 3 & 5 & 1 \\\\ 1 & 1 & 3 \\end{pmatrix}$, $b = \\begin{pmatrix} 4 \\\\ 7 \\\\ 3 \\end{pmatrix}$, $n=3$ iterations: Start $x^{(0)} = [0,0,0]$, After iter 1: $x^{(1)} = [1.0, 0.8, 0.4]$, After iter 2: $x^{(2)} \\approx [0.6, 1.04, 0.453]$, After iter 3: $x^{(3)} \\approx [0.529, 1.169, 0.434]$",
+          "Convergence behavior: For this system, the spectral radius is $\\rho \\approx 0.3$, so error reduces by factor of ~0.3 each iteration. After 100 iterations, error is reduced by factor of $0.3^{100} \\approx 10^{-52}$, achieving machine precision."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Algorithm Loop",
+          "latex": "$\\text{For } k = 0 \\text{ to } n-1: \\quad \\text{For } i = 1 \\text{ to } m: \\quad x_i^{(k+1)} = \\frac{1}{a_{ii}} \\left( b_i - \\sum_{j<i} a_{ij} x_j^{(k+1)} - \\sum_{j>i} a_{ij} x_j^{(k)} \\right)$",
+          "description": "Nested loops: outer for iterations, inner for variables"
+        },
+        {
+          "name": "Initialization",
+          "latex": "$x^{(0)} = \\begin{cases} x_{\\text{ini}} & \\text{if provided} \\\\ \\mathbf{0} & \\text{otherwise} \\end{cases}$",
+          "description": "Default to zero vector if no initial guess given"
+        },
+        {
+          "name": "Error Bound",
+          "latex": "$\\|x^{(n)} - x^*\\| \\leq \\frac{\\rho^n}{1-\\rho} \\|x^{(1)} - x^{(0)}\\|$",
+          "description": "Practical error estimate using first step size"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete Gauss-Seidel method that performs exactly n iterations. The function takes coefficient matrix A, right-hand side b, number of iterations n, and optional initial guess x_ini. If x_ini is not provided, initialize with zeros. Perform n complete iteration sweeps and return the final approximation. This combines all concepts from previous sub-quests into the final working algorithm.",
+        "function_signature": "def gauss_seidel_method(A: np.ndarray, b: np.ndarray, n: int, x_ini: np.ndarray = None) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef gauss_seidel_method(A, b, n, x_ini=None):\n    # Complete Gauss-Seidel implementation\n    # Initialize x\n    if x_ini is None:\n        x = np.zeros_like(b, dtype=float)\n    else:\n        x = x_ini.copy()\n    \n    # Perform n iterations\n    # Your code here\n    \n    return x",
+        "test_cases": [
+          {
+            "input": "gauss_seidel_method(np.array([[4, 1, 2], [3, 5, 1], [1, 1, 3]], dtype=float), np.array([4, 7, 3], dtype=float), 10, None)",
+            "expected": "array([0.18518519, 1.40740741, 0.79259259]) (approximate)",
+            "explanation": "After 10 iterations from zero initial guess, the solution converges toward [0.2, 1.4, 0.8] with high accuracy"
+          },
+          {
+            "input": "gauss_seidel_method(np.array([[10, -1, 2], [-1, 11, -1], [2, -1, 10]], dtype=float), np.array([6, 25, -11], dtype=float), 25, None)",
+            "expected": "array([1.0, 2.0, -1.0]) (approximate to high precision)",
+            "explanation": "This diagonally dominant system converges to the exact solution [1, 2, -1] after 25 iterations"
+          },
+          {
+            "input": "gauss_seidel_method(np.array([[4, 1], [1, 3]], dtype=float), np.array([5, 4], dtype=float), 5, np.array([0, 0], dtype=float))",
+            "expected": "array([1.0, 1.0]) (approximate)",
+            "explanation": "Simple 2x2 system converges to exact solution [1, 1] quickly"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not copying x_ini when provided - modifying the input argument is bad practice",
+        "Confusing n (number of iterations) with matrix dimension - they're different!",
+        "Not initializing with correct data type (should be float)",
+        "Performing n-1 iterations instead of n (off-by-one error in loop)",
+        "Not preserving the in-place update pattern from previous sub-quests",
+        "Returning a reference to mutable array instead of the actual result"
+      ],
+      "hint": "Use a for loop from 0 to n-1 for iterations. Inside each iteration, loop through each index i and update x[i] using the formula from sub-quest 3. Make sure to update in-place so that new values are immediately available for subsequent updates in the same iteration.",
+      "references": [
+        "Complete iterative solver implementation",
+        "Numerical linear algebra",
+        "Fixed-point iteration",
+        "Convergence analysis"
+      ]
+    }
+  ]
+}

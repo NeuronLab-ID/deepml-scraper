@@ -1,0 +1,502 @@
+{
+  "problem_id": 32,
+  "title": "Generate Sorted Polynomial Features",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "Write a Python function that takes a 2-D NumPy array **X** and an integer **degree**, generates all polynomial feature combinations of the columns of **X** up to the given degree **inclusive**, **then sorts the resulting features for each sample from lowest to highest value**. The function should return a new 2-D NumPy array whose rows correspond to the input samples and whose columns are the **ascending-sorted** polynomial features.",
+  "example": {
+    "input": "X = np.array([[2, 3],\n              [3, 4],\n              [5, 6]])\ndegree = 2\noutput = polynomial_features(X, degree)\nprint(output)",
+    "output": "[[ 1.  2.  3.  4.  6.  9.]\n [ 1.  3.  4.  9. 12. 16.]\n [ 1.  5.  6. 25. 30. 36.]]",
+    "reasoning": "For **degree = 2**, the raw polynomial terms for the first sample are [1, 2, 3, 4, 6, 9].  Sorting them from smallest to largest yields [1, 2, 3, 4, 6, 9]. The same procedure is applied to every sample."
+  },
+  "starter_code": "import numpy as np\nfrom itertools import combinations_with_replacement\n\ndef polynomial_features(X, degree):\n    # ✏️  Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Polynomial Basis and Monomial Generation",
+      "relation_to_problem": "Understanding monomials is the foundation for polynomial features. Each polynomial feature is a monomial formed by multiplying input features raised to various powers.",
+      "prerequisites": [
+        "Basic algebra",
+        "Exponent rules",
+        "Python itertools"
+      ],
+      "learning_objectives": [
+        "Define monomials formally and understand their role in polynomial expansion",
+        "Generate all monomials up to a given degree for a single data point",
+        "Understand the combinatorial structure of multivariate polynomial terms"
+      ],
+      "math_content": {
+        "definition": "A **monomial** in variables $x_1, x_2, \\ldots, x_n$ is an expression of the form $c \\cdot x_1^{\\alpha_1} x_2^{\\alpha_2} \\cdots x_n^{\\alpha_n}$ where $c$ is a coefficient (typically 1 in feature engineering) and $\\alpha_i \\in \\mathbb{Z}_{\\geq 0}$ are non-negative integer exponents. The **degree** of a monomial is $\\sum_{i=1}^{n} \\alpha_i$.",
+        "notation": "$\\alpha = (\\alpha_1, \\alpha_2, \\ldots, \\alpha_n)$ = multi-index representing exponents; $|\\alpha| = \\sum_{i=1}^{n} \\alpha_i$ = total degree; $x^\\alpha = x_1^{\\alpha_1} x_2^{\\alpha_2} \\cdots x_n^{\\alpha_n}$ = monomial evaluation",
+        "theorem": "**Combinatorial Count Theorem**: The number of distinct monomials of degree exactly $d$ in $n$ variables is $\\binom{n+d-1}{d}$. The total number of monomials of degree at most $D$ is $\\sum_{d=0}^{D} \\binom{n+d-1}{d} = \\binom{n+D}{D}$.",
+        "proof_sketch": "The problem reduces to distributing $d$ identical items (the total degree) into $n$ distinct bins (variables). This is a stars-and-bars combinatorics problem: we need to place $d$ stars and $n-1$ dividers, giving $\\binom{n+d-1}{d}$ arrangements. For degree at most $D$, we sum over all degrees $d$ from 0 to $D$, which by the hockey-stick identity equals $\\binom{n+D}{D}$.",
+        "examples": [
+          "**Example 1**: For $n=2$ variables $(x_1, x_2)$ and degree $d=2$, the monomials are: $x_1^0 x_2^0 = 1$, $x_1^1 x_2^0 = x_1$, $x_1^0 x_2^1 = x_2$, $x_1^2 x_2^0 = x_1^2$, $x_1^1 x_2^1 = x_1 x_2$, $x_1^0 x_2^2 = x_2^2$. Total: $\\binom{2+2}{2} = 6$ monomials.",
+          "**Example 2**: For input vector $[2, 3]$ with degree 2, evaluating all monomials gives: $1^1 = 1$, $2^1 = 2$, $3^1 = 3$, $2^2 = 4$, $2 \\cdot 3 = 6$, $3^2 = 9$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Monomial Evaluation",
+          "latex": "$m(x; \\alpha) = \\prod_{i=1}^{n} x_i^{\\alpha_i}$",
+          "description": "Evaluates a monomial with multi-index $\\alpha$ at point $x$"
+        },
+        {
+          "name": "Total Degree",
+          "latex": "$\\deg(x^\\alpha) = \\sum_{i=1}^{n} \\alpha_i$",
+          "description": "The sum of all exponents in the monomial"
+        },
+        {
+          "name": "Number of Features",
+          "latex": "$N_{\\text{features}} = \\binom{n + D}{D}$",
+          "description": "Total polynomial features of degree at most $D$ for $n$ input features"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that generates all monomial multi-indices (exponent combinations) for a given number of features and maximum degree. This directly builds the structure needed for polynomial feature generation.",
+        "function_signature": "def generate_monomial_indices(n_features: int, degree: int) -> list:",
+        "starter_code": "def generate_monomial_indices(n_features, degree):\n    \"\"\"\n    Generate all multi-indices (tuples of exponents) for monomials\n    of degree at most 'degree' with 'n_features' variables.\n    \n    Args:\n        n_features: Number of input features (variables)\n        degree: Maximum total degree\n    \n    Returns:\n        List of tuples, where each tuple represents exponents (alpha_1, ..., alpha_n)\n    \n    Example: n_features=2, degree=2 should return:\n    [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (2, 0)]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "generate_monomial_indices(2, 1)",
+            "expected": "[(0, 0), (0, 1), (1, 0), (1, 1)]",
+            "explanation": "Degree 0: (0,0). Degree 1: (0,1), (1,0). These represent [1, x_2, x_1, x_1*x_2]. Note the lexicographic-like ordering from itertools.combinations_with_replacement."
+          },
+          {
+            "input": "generate_monomial_indices(3, 1)",
+            "expected": "[(0, 0, 0), (0, 0, 1), (0, 1, 0), (1, 0, 0), (0, 1, 1), (1, 0, 1), (1, 1, 0), (1, 1, 1)]",
+            "explanation": "For 3 features and degree 1, we get 8 total monomials including the constant term"
+          },
+          {
+            "input": "len(generate_monomial_indices(2, 2))",
+            "expected": "6",
+            "explanation": "Using the formula: C(2+2, 2) = 6 monomials total"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing 'degree at most D' with 'degree exactly D' - we need all degrees from 0 to D inclusive",
+        "Forgetting to include the constant term (multi-index of all zeros)",
+        "Not understanding that multi-indices represent which features to multiply together",
+        "Manually iterating instead of using itertools.combinations_with_replacement"
+      ],
+      "hint": "Use itertools.combinations_with_replacement to generate combinations of feature indices, where each combination indicates which features to multiply. The length of each combination corresponds to the degree.",
+      "references": [
+        "Combinatorics: stars and bars method",
+        "Multivariate polynomials and multi-index notation",
+        "Python itertools.combinations_with_replacement documentation"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Evaluating Monomials on Data Points",
+      "relation_to_problem": "To generate polynomial features, we must evaluate each monomial at each data point. This step teaches how to compute the actual feature values from multi-indices.",
+      "prerequisites": [
+        "Monomial definition",
+        "Multi-index notation",
+        "NumPy array operations"
+      ],
+      "learning_objectives": [
+        "Compute monomial values given a data point and multi-index",
+        "Apply vectorized operations to evaluate multiple monomials efficiently",
+        "Understand the connection between symbolic monomials and numerical feature values"
+      ],
+      "math_content": {
+        "definition": "Given a data point $x = (x_1, x_2, \\ldots, x_n) \\in \\mathbb{R}^n$ and a multi-index $\\alpha = (\\alpha_1, \\alpha_2, \\ldots, \\alpha_n)$, the **evaluation** of the monomial $x^\\alpha$ is defined as $\\phi_\\alpha(x) = \\prod_{j=1}^{n} x_j^{\\alpha_j}$. This maps a point in feature space to a scalar polynomial feature value.",
+        "notation": "$\\phi_\\alpha : \\mathbb{R}^n \\to \\mathbb{R}$ = monomial evaluation map; $x = (x_1, \\ldots, x_n)$ = input feature vector; $\\alpha = (\\alpha_1, \\ldots, \\alpha_n)$ = exponent vector",
+        "theorem": "**Multiplicative Property**: For multi-indices $\\alpha$ and $\\beta$, $\\phi_{\\alpha + \\beta}(x) = \\phi_\\alpha(x) \\cdot \\phi_\\beta(x)$ where $\\alpha + \\beta$ denotes component-wise addition. This property underlies the algebraic structure of polynomial rings.",
+        "proof_sketch": "$\\phi_{\\alpha+\\beta}(x) = \\prod_{j=1}^{n} x_j^{\\alpha_j + \\beta_j} = \\prod_{j=1}^{n} x_j^{\\alpha_j} \\cdot x_j^{\\beta_j} = \\left(\\prod_{j=1}^{n} x_j^{\\alpha_j}\\right) \\left(\\prod_{j=1}^{n} x_j^{\\beta_j}\\right) = \\phi_\\alpha(x) \\cdot \\phi_\\beta(x)$ by the laws of exponents.",
+        "examples": [
+          "**Example 1**: Let $x = (2, 3)$ and $\\alpha = (1, 2)$. Then $\\phi_\\alpha(x) = 2^1 \\cdot 3^2 = 2 \\cdot 9 = 18$.",
+          "**Example 2**: For $x = (5, 2, 3)$ and $\\alpha = (0, 1, 1)$, we have $\\phi_\\alpha(x) = 5^0 \\cdot 2^1 \\cdot 3^1 = 1 \\cdot 2 \\cdot 3 = 6$.",
+          "**Example 3**: The constant monomial $\\alpha = (0, 0, \\ldots, 0)$ gives $\\phi_\\alpha(x) = 1$ for all $x$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Monomial Evaluation",
+          "latex": "$\\phi_\\alpha(x) = \\prod_{j=1}^{n} x_j^{\\alpha_j}$",
+          "description": "Core formula for computing polynomial feature values"
+        },
+        {
+          "name": "Vectorized Evaluation",
+          "latex": "$\\phi_\\alpha(x) = \\exp\\left(\\sum_{j=1}^{n} \\alpha_j \\log x_j\\right)$ (when $x_j > 0$)",
+          "description": "Alternative form useful for numerical stability and vectorization"
+        },
+        {
+          "name": "Power Product",
+          "latex": "$x^\\alpha = \\prod_{j \\in \\text{supp}(\\alpha)} x_j^{\\alpha_j}$ where $\\text{supp}(\\alpha) = \\{j : \\alpha_j > 0\\}$",
+          "description": "Only multiply non-zero exponent terms for efficiency"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that evaluates a single monomial (given by a multi-index) at a single data point. This is the atomic operation for polynomial feature generation.",
+        "function_signature": "def evaluate_monomial(x: np.ndarray, multi_index: tuple) -> float:",
+        "starter_code": "import numpy as np\n\ndef evaluate_monomial(x, multi_index):\n    \"\"\"\n    Evaluate a monomial at data point x.\n    \n    Args:\n        x: 1-D NumPy array of feature values, shape (n_features,)\n        multi_index: Tuple of exponents (alpha_1, ..., alpha_n)\n    \n    Returns:\n        Float: the monomial value\n    \n    Example: x = np.array([2, 3]), multi_index = (1, 2)\n    Returns: 2^1 * 3^2 = 18\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "evaluate_monomial(np.array([2, 3]), (1, 2))",
+            "expected": "18.0",
+            "explanation": "2^1 * 3^2 = 2 * 9 = 18"
+          },
+          {
+            "input": "evaluate_monomial(np.array([5, 2, 3]), (0, 1, 1))",
+            "expected": "6.0",
+            "explanation": "5^0 * 2^1 * 3^1 = 1 * 2 * 3 = 6"
+          },
+          {
+            "input": "evaluate_monomial(np.array([4, 5]), (0, 0))",
+            "expected": "1.0",
+            "explanation": "The constant monomial always evaluates to 1"
+          },
+          {
+            "input": "evaluate_monomial(np.array([3, 4]), (2, 1))",
+            "expected": "36.0",
+            "explanation": "3^2 * 4^1 = 9 * 4 = 36"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the case where exponents are zero (x^0 = 1)",
+        "Mismatching the length of x and multi_index",
+        "Using inefficient loops instead of NumPy's element-wise power operation",
+        "Forgetting that np.power with arrays can be vectorized: np.prod(x ** multi_index)"
+      ],
+      "hint": "Use NumPy's element-wise power operation (x ** multi_index) to raise each feature to its corresponding exponent, then multiply all results together using np.prod().",
+      "references": [
+        "NumPy broadcasting and element-wise operations",
+        "Numerical stability in computing products",
+        "Python np.prod() function"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Polynomial Feature Transformation Theory",
+      "relation_to_problem": "Understanding the formal structure of polynomial feature maps is essential for implementing the full transformation from raw features to polynomial features for an entire dataset.",
+      "prerequisites": [
+        "Monomial evaluation",
+        "Linear algebra basics",
+        "Feature space transformations"
+      ],
+      "learning_objectives": [
+        "Define the polynomial feature map as a function from input space to feature space",
+        "Understand dimensionality expansion and its implications",
+        "Implement the feature map for multiple data points simultaneously"
+      ],
+      "math_content": {
+        "definition": "The **polynomial feature map** of degree $D$ is a function $\\Phi_D : \\mathbb{R}^n \\to \\mathbb{R}^M$ defined by $\\Phi_D(x) = (\\phi_{\\alpha_1}(x), \\phi_{\\alpha_2}(x), \\ldots, \\phi_{\\alpha_M}(x))^T$ where $\\{\\alpha_1, \\alpha_2, \\ldots, \\alpha_M\\}$ are all multi-indices with $|\\alpha_i| \\leq D$, and $M = \\binom{n+D}{D}$ is the number of polynomial features.",
+        "notation": "$\\Phi_D$ = polynomial feature map; $\\mathbb{R}^n$ = input feature space; $\\mathbb{R}^M$ = expanded polynomial feature space; $M = \\binom{n+D}{D}$ = output dimension",
+        "theorem": "**Dimension Expansion Theorem**: The polynomial feature map $\\Phi_D : \\mathbb{R}^n \\to \\mathbb{R}^M$ increases dimensionality from $n$ to $M = \\binom{n+D}{D}$. For fixed $n$, this grows as $O(D^n)$ as $D \\to \\infty$, which can lead to computational and statistical challenges (curse of dimensionality).",
+        "proof_sketch": "From the combinatorial count theorem, we have $M = \\binom{n+D}{D} = \\frac{(n+D)!}{n! D!}$. For large $D$ with fixed $n$, this behaves like $\\frac{D^n}{n!} + O(D^{n-1})$ by expanding the binomial coefficient. The exponential growth in dimension makes high-degree polynomial features computationally expensive.",
+        "examples": [
+          "**Example 1**: For $n=2$ features and $D=2$, we have $M = \\binom{4}{2} = 6$ polynomial features. Input $x = (2, 3)$ maps to $\\Phi_2(x) = (1, 2, 3, 4, 6, 9)$.",
+          "**Example 2**: For $n=3$ features and $D=2$, $M = \\binom{5}{2} = 10$ features. A dataset with 100 samples goes from shape (100, 3) to (100, 10).",
+          "**Example 3**: With $n=10$ and $D=3$, we get $M = \\binom{13}{3} = 286$ features - nearly 30x expansion!"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Polynomial Feature Map",
+          "latex": "$\\Phi_D(x) = \\begin{pmatrix} \\phi_{\\alpha_1}(x) \\\\ \\phi_{\\alpha_2}(x) \\\\ \\vdots \\\\ \\phi_{\\alpha_M}(x) \\end{pmatrix}$",
+          "description": "Vector of all polynomial feature evaluations"
+        },
+        {
+          "name": "Dataset Transformation",
+          "latex": "$X \\in \\mathbb{R}^{N \\times n} \\xrightarrow{\\Phi_D} Z \\in \\mathbb{R}^{N \\times M}$ where $Z_{ij} = \\phi_{\\alpha_j}(X_i)$",
+          "description": "Transform dataset of N samples from n features to M polynomial features"
+        },
+        {
+          "name": "Kernel Interpretation",
+          "latex": "$K(x, x') = \\langle \\Phi_D(x), \\Phi_D(x') \\rangle = \\sum_{|\\alpha| \\leq D} \\phi_\\alpha(x) \\phi_\\alpha(x')$",
+          "description": "Polynomial features correspond to a polynomial kernel in kernel methods"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that generates all unsorted polynomial features for a 2-D dataset. Each row should contain all polynomial features for that sample, but NOT yet sorted. This builds the core transformation before adding the sorting requirement.",
+        "function_signature": "def generate_polynomial_features(X: np.ndarray, degree: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\nfrom itertools import combinations_with_replacement\n\ndef generate_polynomial_features(X, degree):\n    \"\"\"\n    Generate polynomial features for all samples (unsorted).\n    \n    Args:\n        X: 2-D NumPy array of shape (n_samples, n_features)\n        degree: Maximum polynomial degree\n    \n    Returns:\n        2-D NumPy array of shape (n_samples, n_poly_features)\n        where n_poly_features = C(n_features + degree, degree)\n    \n    Example: X = np.array([[2, 3]]), degree = 2\n    Returns array with features [1, 2, 3, 4, 6, 9] (or similar order)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "generate_polynomial_features(np.array([[2, 3]]), 1)",
+            "expected": "np.array([[1., 2., 3.]])",
+            "explanation": "Degree 1: constant (1), first feature (2), second feature (3)"
+          },
+          {
+            "input": "generate_polynomial_features(np.array([[2, 3], [5, 6]]), 1).shape",
+            "expected": "(2, 3)",
+            "explanation": "2 samples, 3 polynomial features each (degree 0 and 1)"
+          },
+          {
+            "input": "generate_polynomial_features(np.array([[2, 3]]), 2).shape",
+            "expected": "(1, 6)",
+            "explanation": "1 sample, 6 polynomial features: C(2+2, 2) = 6"
+          },
+          {
+            "input": "set(generate_polynomial_features(np.array([[2, 3]]), 2)[0])",
+            "expected": "{1., 2., 3., 4., 6., 9.}",
+            "explanation": "Should contain all values: 1, 2, 3, 2^2=4, 2*3=6, 3^2=9 (order may vary)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not understanding that combinations_with_replacement generates feature INDEX combinations, not exponent tuples directly",
+        "Confusing the number of features (columns) with the number of samples (rows)",
+        "Inefficiently looping over samples instead of vectorizing the computation",
+        "Not including the constant term (degree 0)"
+      ],
+      "hint": "Use combinations_with_replacement(range(n_features), d) for each degree d from 0 to degree. Each combination tells you which feature indices to multiply together. For example, (0, 1) means multiply feature 0 by feature 1.",
+      "references": [
+        "Scikit-learn PolynomialFeatures implementation",
+        "Feature engineering in machine learning",
+        "NumPy vectorization techniques"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Array Sorting Algorithms and Row-wise Operations",
+      "relation_to_problem": "The final step requires sorting each sample's polynomial features in ascending order. Understanding efficient sorting methods for 2-D arrays is crucial for completing the problem.",
+      "prerequisites": [
+        "NumPy array indexing",
+        "Sorting algorithms",
+        "Broadcasting"
+      ],
+      "learning_objectives": [
+        "Understand different sorting algorithms and their complexity",
+        "Apply row-wise sorting operations on 2-D NumPy arrays",
+        "Preserve data integrity while reordering features"
+      ],
+      "math_content": {
+        "definition": "A **sorting algorithm** is a function $\\sigma : A^n \\to S_n$ that takes a sequence of $n$ comparable elements from set $A$ and returns a permutation $\\pi \\in S_n$ (the symmetric group) such that $a_{\\pi(1)} \\leq a_{\\pi(2)} \\leq \\cdots \\leq a_{\\pi(n)}$. The **sorted sequence** is $a_{\\pi(i)}$ for $i = 1, \\ldots, n$. In our context, we sort each row vector independently.",
+        "notation": "$S_n$ = symmetric group (all permutations of $n$ elements); $\\pi \\in S_n$ = a permutation; $(A, \\leq)$ = totally ordered set; $\\text{sort} : \\mathbb{R}^n \\to \\mathbb{R}^n$ = sorting function",
+        "theorem": "**Comparison Sort Lower Bound**: Any comparison-based sorting algorithm requires $\\Omega(n \\log n)$ comparisons in the worst case to sort $n$ elements. NumPy's sort uses Quicksort (average $O(n \\log n)$), Mergesort (worst $O(n \\log n)$), or Heapsort depending on the data type and array properties.",
+        "proof_sketch": "There are $n!$ possible permutations of $n$ elements. A comparison-based algorithm can be modeled as a decision tree where each internal node represents a comparison. The tree must have at least $n!$ leaves (one for each permutation). Since a binary tree of height $h$ has at most $2^h$ leaves, we need $2^h \\geq n!$. By Stirling's approximation, $\\log_2(n!) \\approx n \\log_2 n - n \\log_2 e$, giving $h \\geq \\Omega(n \\log n)$.",
+        "examples": [
+          "**Example 1**: For array $[3, 1, 4, 1, 5]$, sorting gives $[1, 1, 3, 4, 5]$ using permutation $\\pi = (2, 4, 1, 3, 5)$ in cycle notation.",
+          "**Example 2**: For 2-D array $\\begin{pmatrix} 9 & 2 & 5 \\\\ 4 & 1 & 8 \\end{pmatrix}$, row-wise sorting yields $\\begin{pmatrix} 2 & 5 & 9 \\\\ 1 & 4 & 8 \\end{pmatrix}$.",
+          "**Example 3**: Sorting $[1., 2., 3., 4., 6., 9.]$ (already sorted) returns the same array in $O(n)$ time for adaptive algorithms."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sorting Function",
+          "latex": "$\\text{sort}(a) = (a_{\\pi(1)}, a_{\\pi(2)}, \\ldots, a_{\\pi(n)})$ where $a_{\\pi(i)} \\leq a_{\\pi(i+1)}$",
+          "description": "Formal definition of sorting operation"
+        },
+        {
+          "name": "Row-wise Sort",
+          "latex": "$Z'_{i,:} = \\text{sort}(Z_{i,:})$ for $i = 1, \\ldots, N$",
+          "description": "Apply sorting independently to each row of matrix Z"
+        },
+        {
+          "name": "Time Complexity",
+          "latex": "$T(N, M) = O(N \\cdot M \\log M)$",
+          "description": "Total time to sort N rows of M elements each"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that sorts each row of a 2-D NumPy array in ascending order. This is the final piece needed for the main problem - once you have unsorted polynomial features, apply this operation.",
+        "function_signature": "def sort_rows(X: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef sort_rows(X):\n    \"\"\"\n    Sort each row of a 2-D array in ascending order.\n    \n    Args:\n        X: 2-D NumPy array of shape (n_samples, n_features)\n    \n    Returns:\n        2-D NumPy array with each row sorted independently\n    \n    Example: X = np.array([[3, 1, 2], [9, 5, 7]])\n    Returns: np.array([[1, 2, 3], [5, 7, 9]])\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "sort_rows(np.array([[3, 1, 2]]))",
+            "expected": "np.array([[1, 2, 3]])",
+            "explanation": "Single row sorted in ascending order"
+          },
+          {
+            "input": "sort_rows(np.array([[9, 5, 7], [3, 1, 2]]))",
+            "expected": "np.array([[5, 7, 9], [1, 2, 3]])",
+            "explanation": "Each row sorted independently - row 1: [5, 7, 9], row 2: [1, 2, 3]"
+          },
+          {
+            "input": "sort_rows(np.array([[1, 2, 3], [4, 5, 6]]))",
+            "expected": "np.array([[1, 2, 3], [4, 5, 6]])",
+            "explanation": "Already sorted rows remain unchanged"
+          },
+          {
+            "input": "sort_rows(np.array([[5.5, 2.1, 3.7]]))",
+            "expected": "np.array([[2.1, 3.7, 5.5]])",
+            "explanation": "Works with floating-point values"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using np.sort() on the entire array, which flattens it instead of sorting row-wise",
+        "Forgetting to specify axis=1 for row-wise operations",
+        "Modifying the original array instead of returning a new sorted array",
+        "Not handling edge cases like single-row or single-column arrays"
+      ],
+      "hint": "Use np.sort() with the axis parameter to specify which dimension to sort along. For row-wise sorting of a 2-D array, you need axis=1.",
+      "references": [
+        "NumPy sort() and argsort() functions",
+        "Sorting algorithm complexity analysis",
+        "NumPy axis parameter in aggregation functions"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Combinatorial Feature Generation with itertools",
+      "relation_to_problem": "The key to efficiently generating polynomial features is understanding how to use itertools.combinations_with_replacement to systematically enumerate all monomial terms without explicit multi-index manipulation.",
+      "prerequisites": [
+        "Itertools module",
+        "Combinatorics",
+        "Generator expressions"
+      ],
+      "learning_objectives": [
+        "Master combinations_with_replacement for generating polynomial terms",
+        "Understand the correspondence between combinations and monomials",
+        "Implement efficient feature generation using Python itertools"
+      ],
+      "math_content": {
+        "definition": "**Combinations with replacement** from a set $S$ of size $n$ taken $k$ at a time are all $k$-element multisets formed from $S$. Each multiset can be represented as a sorted tuple $(s_1, s_2, \\ldots, s_k)$ where $s_i \\in S$ and $s_1 \\leq s_2 \\leq \\cdots \\leq s_k$ under some ordering on $S$. The number of such combinations is $\\binom{n+k-1}{k}$.",
+        "notation": "$\\left(\\!\\binom{n}{k}\\!\\right) = \\binom{n+k-1}{k}$ = multicombination notation; $S = \\{0, 1, \\ldots, n-1\\}$ = feature indices; $M(S, k)$ = all $k$-element multisets from $S$",
+        "theorem": "**Bijection Theorem**: There exists a bijection between $k$-element multisets from $n$ elements and monomials of degree exactly $k$ in $n$ variables. Specifically, a multiset $\\{i_1, i_2, \\ldots, i_k\\}$ (with possible repetitions) corresponds to the monomial $x_{i_1} x_{i_2} \\cdots x_{i_k}$.",
+        "proof_sketch": "Given a multiset represented as a sorted sequence $(i_1, \\ldots, i_k)$ with $i_j \\in \\{0, \\ldots, n-1\\}$, define the monomial $m = \\prod_{j=1}^{k} x_{i_j}$. This monomial has degree $k$ and uses variables from $\\{x_0, \\ldots, x_{n-1}\\}$. Conversely, any degree-$k$ monomial $x_0^{\\alpha_0} \\cdots x_{n-1}^{\\alpha_{n-1}}$ with $\\sum \\alpha_i = k$ corresponds to the multiset containing $\\alpha_i$ copies of index $i$. This establishes a bijection.",
+        "examples": [
+          "**Example 1**: For $n=2$ features and degree $k=2$, combinations_with_replacement(range(2), 2) gives: (0,0), (0,1), (1,1). These represent monomials: $x_0^2$, $x_0 x_1$, $x_1^2$.",
+          "**Example 2**: For combination (0,0,1) from features $[2,3]$, we compute $x_0 \\cdot x_0 \\cdot x_1 = 2 \\cdot 2 \\cdot 3 = 12$.",
+          "**Example 3**: To get all degree $\\leq 2$ terms, iterate: degree 0 gives (), degree 1 gives (0), (1), degree 2 gives (0,0), (0,1), (1,1)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Multicombination Count",
+          "latex": "$\\left|M(S, k)\\right| = \\binom{n+k-1}{k}$",
+          "description": "Number of ways to choose $k$ items from $n$ types with replacement"
+        },
+        {
+          "name": "Feature Evaluation from Combination",
+          "latex": "$f(x; c) = \\prod_{i \\in c} x_i$ where $c = (c_1, \\ldots, c_k)$ is a combination",
+          "description": "Evaluate polynomial term by multiplying features at indices in combination"
+        },
+        {
+          "name": "Total Features",
+          "latex": "$N_{\\text{total}} = \\sum_{d=0}^{D} \\binom{n+d-1}{d}$",
+          "description": "Total polynomial features by summing over all degrees"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that generates all polynomial feature values for a single sample using itertools.combinations_with_replacement. This directly demonstrates the technique used in the main problem.",
+        "function_signature": "def polynomial_features_single_sample(x: np.ndarray, degree: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\nfrom itertools import combinations_with_replacement\n\ndef polynomial_features_single_sample(x, degree):\n    \"\"\"\n    Generate all polynomial features for a single sample using combinations.\n    \n    Args:\n        x: 1-D NumPy array of shape (n_features,)\n        degree: Maximum polynomial degree\n    \n    Returns:\n        1-D NumPy array of all polynomial feature values (unsorted)\n    \n    Example: x = np.array([2, 3]), degree = 2\n    Should return array containing [1, 2, 3, 4, 6, 9] in some order\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "set(polynomial_features_single_sample(np.array([2, 3]), 2))",
+            "expected": "{1., 2., 3., 4., 6., 9.}",
+            "explanation": "Degree 0: 1. Degree 1: 2, 3. Degree 2: 4 (2²), 6 (2×3), 9 (3²)"
+          },
+          {
+            "input": "len(polynomial_features_single_sample(np.array([2, 3, 4]), 1))",
+            "expected": "4",
+            "explanation": "C(3+0, 0) + C(3+1-1, 1) = 1 + 3 = 4 features total"
+          },
+          {
+            "input": "polynomial_features_single_sample(np.array([5]), 2).tolist()",
+            "expected": "[1.0, 5.0, 25.0]",
+            "explanation": "Single feature: 1, 5, 5² = 1, 5, 25"
+          },
+          {
+            "input": "1.0 in polynomial_features_single_sample(np.array([7, 8]), 1)",
+            "expected": "True",
+            "explanation": "Constant term (degree 0) always present"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not understanding that combinations return INDEX tuples, not the actual values",
+        "Forgetting to iterate over all degrees from 0 to degree (inclusive)",
+        "Inefficiently converting combinations to multi-indices instead of directly using them",
+        "Not including the empty combination () for the constant term (degree 0)"
+      ],
+      "hint": "For each degree d from 0 to degree, use combinations_with_replacement(range(n_features), d). Each combination tuple contains indices - use these indices to select and multiply the corresponding values from x.",
+      "references": [
+        "Python itertools.combinations_with_replacement documentation",
+        "Multiset combinatorics",
+        "Stars and bars method in combinatorics"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Polynomial Feature Transformation with Sorting",
+      "relation_to_problem": "This final sub-quest synthesizes all previous concepts to implement the complete solution: generating polynomial features for a dataset and sorting each sample's features in ascending order.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "NumPy vectorization",
+        "Matrix operations"
+      ],
+      "learning_objectives": [
+        "Combine feature generation and sorting into a complete pipeline",
+        "Handle edge cases and optimize for performance",
+        "Understand the full workflow from raw data to sorted polynomial features"
+      ],
+      "math_content": {
+        "definition": "The **sorted polynomial feature transformation** is a composite function $\\Psi_D = \\sigma \\circ \\Phi_D : \\mathbb{R}^n \\to \\mathbb{R}^M$ where $\\Phi_D$ is the polynomial feature map and $\\sigma : \\mathbb{R}^M \\to \\mathbb{R}^M$ is the sorting permutation operator that reorders components in ascending order. For a dataset $X \\in \\mathbb{R}^{N \\times n}$, we apply $\\Psi_D$ row-wise to obtain $Z \\in \\mathbb{R}^{N \\times M}$ where $Z_i = \\Psi_D(X_i)$.",
+        "notation": "$\\Psi_D$ = sorted polynomial feature map; $\\sigma$ = sorting operator; $\\Phi_D$ = unsorted polynomial feature map; $Z = \\Psi_D(X)$ = transformed dataset",
+        "theorem": "**Composition Complexity Theorem**: The time complexity of computing the sorted polynomial feature transformation for $N$ samples with $n$ features and degree $D$ is $O(N \\cdot M \\cdot \\log M)$ where $M = \\binom{n+D}{D}$. This is dominated by the sorting step, as feature generation takes $O(N \\cdot M)$ time.",
+        "proof_sketch": "Generating polynomial features requires evaluating $M$ monomials for each of $N$ samples. Each monomial evaluation takes $O(n)$ time in the worst case, but using combinations_with_replacement and NumPy operations, we can achieve $O(M)$ per sample, giving $O(N \\cdot M)$ total. Sorting each of the $N$ rows with $M$ elements takes $O(M \\log M)$ per row, yielding $O(N \\cdot M \\log M)$ for sorting. Since $M \\log M > M$ for $M > 1$, sorting dominates, making the total complexity $O(N \\cdot M \\log M)$.",
+        "examples": [
+          "**Example 1**: Input $X = \\begin{pmatrix} 2 & 3 \\end{pmatrix}$, degree 2. Unsorted features: $[1, 2, 3, 4, 6, 9]$ or similar. After sorting: $[1, 2, 3, 4, 6, 9]$ (already sorted in this order).",
+          "**Example 2**: Input $X = \\begin{pmatrix} 3 & 4 \\\\ 5 & 6 \\end{pmatrix}$, degree 2. Row 1 unsorted might be $[1, 3, 4, 9, 12, 16]$, sorted: $[1, 3, 4, 9, 12, 16]$. Row 2 unsorted might be $[1, 5, 6, 25, 30, 36]$, sorted: $[1, 5, 6, 25, 30, 36]$.",
+          "**Example 3**: With $n=10$, $D=3$, we get $M=286$ features. For a dataset of 1000 samples, we perform $1000 \\times 286 \\log(286) \\approx 2.3$ million operations for sorting alone."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sorted Transformation",
+          "latex": "$\\Psi_D(x) = \\text{sort}(\\Phi_D(x)) = \\text{sort}\\left((\\phi_{\\alpha_1}(x), \\ldots, \\phi_{\\alpha_M}(x))\\right)$",
+          "description": "Apply polynomial feature map then sort the result"
+        },
+        {
+          "name": "Dataset Transformation",
+          "latex": "$Z_{i,j} = \\sigma_i(\\Phi_D(X_i))_j$ where $\\sigma_i$ is the sorting permutation for row $i$",
+          "description": "Each row independently sorted"
+        },
+        {
+          "name": "Space Complexity",
+          "latex": "$S(N, n, D) = O(N \\cdot \\binom{n+D}{D})$",
+          "description": "Memory required for output array"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete polynomial feature transformation with sorting. This is similar to the final problem but serves as practice before tackling the exact specification. Generate all polynomial features for each sample, then sort each row.",
+        "function_signature": "def polynomial_transform_sorted(X: np.ndarray, degree: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\nfrom itertools import combinations_with_replacement\n\ndef polynomial_transform_sorted(X, degree):\n    \"\"\"\n    Generate sorted polynomial features for all samples.\n    \n    Args:\n        X: 2-D NumPy array of shape (n_samples, n_features)\n        degree: Maximum polynomial degree\n    \n    Returns:\n        2-D NumPy array where each row contains sorted polynomial features\n    \n    Example: X = np.array([[2, 3]]), degree = 2\n    Returns: np.array([[1., 2., 3., 4., 6., 9.]])\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "polynomial_transform_sorted(np.array([[2, 3]]), 2)",
+            "expected": "np.array([[1., 2., 3., 4., 6., 9.]])",
+            "explanation": "Single sample with degree 2: all features sorted ascending"
+          },
+          {
+            "input": "polynomial_transform_sorted(np.array([[3, 4], [5, 6]]), 2)",
+            "expected": "np.array([[1., 3., 4., 9., 12., 16.], [1., 5., 6., 25., 30., 36.]])",
+            "explanation": "Two samples, each row sorted independently"
+          },
+          {
+            "input": "polynomial_transform_sorted(np.array([[2, 3]]), 1)",
+            "expected": "np.array([[1., 2., 3.]])",
+            "explanation": "Degree 1: constant term and original features"
+          },
+          {
+            "input": "polynomial_transform_sorted(np.array([[5]]), 2).tolist()",
+            "expected": "[[1.0, 5.0, 25.0]]",
+            "explanation": "Single feature: 1, 5, 25 (already sorted)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Sorting the entire output array instead of each row independently",
+        "Not handling the constant term correctly",
+        "Inefficient nested loops instead of vectorized NumPy operations",
+        "Memory issues when working with high degrees or many features",
+        "Off-by-one errors in degree iteration (forgetting degree is inclusive)"
+      ],
+      "hint": "Combine techniques from previous sub-quests: (1) Use combinations_with_replacement to generate feature indices for each degree, (2) Apply np.prod() to compute each feature, (3) Use np.sort(axis=1) to sort each row. Consider building the unsorted array first, then sorting.",
+      "references": [
+        "Complete polynomial feature engineering workflow",
+        "NumPy advanced indexing and broadcasting",
+        "Scikit-learn PolynomialFeatures for comparison"
+      ]
+    }
+  ]
+}

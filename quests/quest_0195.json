@@ -1,0 +1,401 @@
+{
+  "problem_id": 195,
+  "title": "Matrix Determinant & Trace",
+  "category": "Linear Algebra",
+  "difficulty": "easy",
+  "description": "Implement a function that computes both the determinant and trace of a square matrix. The determinant is a scalar value that can be computed from the elements of a square matrix and encodes certain properties of the matrix. The trace is simply the sum of the elements on the main diagonal. Return both values as a tuple.",
+  "example": {
+    "input": "matrix=[[2, 3], [1, 4]]",
+    "output": "(5.0, 6.0)",
+    "reasoning": "The determinant of a 2x2 matrix is computed as $ad - bc$ where the matrix is $\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$. Here: $2 \\times 4 - 3 \\times 1 = 8 - 3 = 5$. The trace is the sum of diagonal elements: $2 + 4 = 6$."
+  },
+  "starter_code": "def matrix_determinant_and_trace(matrix: list[list[float]]) -> tuple[float, float]:\n\t\"\"\"\n\tCompute the determinant and trace of a square matrix.\n\t\n\tArgs:\n\t\tmatrix: A square matrix (n x n) represented as list of lists\n\t\n\tReturns:\n\t\tTuple of (determinant, trace)\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Matrix Representation and Diagonal Element Access",
+      "relation_to_problem": "Understanding how to access matrix elements programmatically is fundamental for computing the trace (sum of diagonal elements) and implementing determinant computation through cofactor expansion.",
+      "prerequisites": [
+        "Basic Python lists",
+        "2D array indexing",
+        "Square matrix concept"
+      ],
+      "learning_objectives": [
+        "Understand matrix representation as nested lists in Python",
+        "Access diagonal elements using index patterns",
+        "Validate square matrix properties"
+      ],
+      "math_content": {
+        "definition": "A **square matrix** $A$ of order $n$ is an $n \\times n$ array of elements where the number of rows equals the number of columns. The element at position $(i, j)$ is denoted $a_{ij}$ where $1 \\leq i, j \\leq n$. The **main diagonal** consists of all elements $a_{ii}$ where the row index equals the column index.",
+        "notation": "$A = (a_{ij})_{n \\times n}$ represents a square matrix; $a_{ii}$ denotes diagonal elements where $i = 1, 2, \\ldots, n$",
+        "theorem": "For a matrix to have a defined determinant and trace, it must be square: the number of rows must equal the number of columns.",
+        "proof_sketch": "The trace is defined as $\\text{tr}(A) = \\sum_{i=1}^{n} a_{ii}$, which requires a unique diagonal element for each index $i$. Similarly, determinant recursive formulas require equal dimensions.",
+        "examples": [
+          "For $A = \\begin{pmatrix} 2 & 3 \\\\ 1 & 4 \\end{pmatrix}$, the diagonal elements are $a_{11} = 2$ and $a_{22} = 4$",
+          "For $B = \\begin{pmatrix} 1 & 0 & 5 \\\\ 2 & 3 & 6 \\\\ 7 & 8 & 9 \\end{pmatrix}$, diagonal elements are $b_{11} = 1$, $b_{22} = 3$, $b_{33} = 9$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Diagonal Element",
+          "latex": "$a_{ii}$ where $i = 1, 2, \\ldots, n$",
+          "description": "Access elements where row index equals column index"
+        },
+        {
+          "name": "Matrix Order",
+          "latex": "$n \\times n$ where $n = \\text{len}(\\text{matrix})$",
+          "description": "Square matrix has equal number of rows and columns"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that extracts all diagonal elements from a square matrix. This is the core building block for computing the trace. Your function should return a list of diagonal elements in order.",
+        "function_signature": "def get_diagonal_elements(matrix: list[list[float]]) -> list[float]:",
+        "starter_code": "def get_diagonal_elements(matrix: list[list[float]]) -> list[float]:\n    \"\"\"\n    Extract all diagonal elements from a square matrix.\n    \n    Args:\n        matrix: A square matrix (n x n) as list of lists\n    \n    Returns:\n        List of diagonal elements [a_11, a_22, ..., a_nn]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "get_diagonal_elements([[2, 3], [1, 4]])",
+            "expected": "[2, 4]",
+            "explanation": "For a 2x2 matrix, diagonal elements are at positions (0,0) and (1,1)"
+          },
+          {
+            "input": "get_diagonal_elements([[1, 0, 5], [2, 3, 6], [7, 8, 9]])",
+            "expected": "[1, 3, 9]",
+            "explanation": "For a 3x3 matrix, diagonal elements are at positions (0,0), (1,1), and (2,2)"
+          },
+          {
+            "input": "get_diagonal_elements([[5]])",
+            "expected": "[5]",
+            "explanation": "A 1x1 matrix has only one diagonal element"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using different indices for row and column when accessing diagonal elements",
+        "Forgetting that Python uses 0-based indexing",
+        "Not validating that the matrix is square before processing"
+      ],
+      "hint": "The pattern for diagonal elements is that the row index always equals the column index. Use a loop with the same variable for both indices.",
+      "references": [
+        "Matrix indexing in Python",
+        "Nested list traversal",
+        "2D array diagonal access patterns"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Computing the Trace of a Matrix",
+      "relation_to_problem": "The trace is one of the two required outputs. This sub-quest teaches the formal definition and computational method for the trace, which is a direct application of diagonal element extraction.",
+      "prerequisites": [
+        "Diagonal element access",
+        "Sum function",
+        "Linear functionals"
+      ],
+      "learning_objectives": [
+        "Understand the formal mathematical definition of trace",
+        "Implement trace computation efficiently",
+        "Recognize trace properties and invariants"
+      ],
+      "math_content": {
+        "definition": "The **trace** of a square matrix $A$ of order $n \\times n$, denoted $\\text{tr}(A)$ or $\\text{Tr}(A)$, is defined as the sum of all diagonal elements: $$\\text{tr}(A) = \\sum_{i=1}^{n} a_{ii} = a_{11} + a_{22} + \\cdots + a_{nn}$$ The trace is a **linear functional** that maps the space of $n \\times n$ matrices to the underlying field (typically $\\mathbb{R}$ or $\\mathbb{C}$).",
+        "notation": "$\\text{tr}(A) = \\sum_{i=1}^{n} a_{ii}$ where $a_{ii}$ are the diagonal elements",
+        "theorem": "**Trace Linearity**: The trace operator satisfies linearity properties: (1) $\\text{tr}(A + B) = \\text{tr}(A) + \\text{tr}(B)$, (2) $\\text{tr}(cA) = c \\cdot \\text{tr}(A)$ for scalar $c$, (3) $\\text{tr}(A^T) = \\text{tr}(A)$ (invariant under transpose).",
+        "proof_sketch": "For linearity: $\\text{tr}(A + B) = \\sum_{i=1}^{n}(a_{ii} + b_{ii}) = \\sum_{i=1}^{n} a_{ii} + \\sum_{i=1}^{n} b_{ii} = \\text{tr}(A) + \\text{tr}(B)$. For transpose: $(A^T)_{ii} = A_{ii}$ for all diagonal elements, so $\\text{tr}(A^T) = \\sum_{i=1}^{n} A_{ii} = \\text{tr}(A)$.",
+        "examples": [
+          "For $A = \\begin{pmatrix} 2 & 3 \\\\ 1 & 4 \\end{pmatrix}$, $\\text{tr}(A) = 2 + 4 = 6$",
+          "For $B = \\begin{pmatrix} 1 & 2 & 3 \\\\ 0 & -1 & 4 \\\\ -2 & 1 & 0 \\end{pmatrix}$, $\\text{tr}(B) = 1 + (-1) + 0 = 0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Trace Definition",
+          "latex": "$\\text{tr}(A) = \\sum_{i=1}^{n} a_{ii}$",
+          "description": "Sum of diagonal elements for an n×n matrix"
+        },
+        {
+          "name": "Trace-Eigenvalue Relationship",
+          "latex": "$\\text{tr}(A) = \\sum_{i=1}^{n} \\lambda_i$",
+          "description": "The trace equals the sum of all eigenvalues (counted with multiplicity)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the trace of a square matrix. Use the diagonal elements to calculate the sum. This directly builds toward one component of the final solution.",
+        "function_signature": "def compute_trace(matrix: list[list[float]]) -> float:",
+        "starter_code": "def compute_trace(matrix: list[list[float]]) -> float:\n    \"\"\"\n    Compute the trace (sum of diagonal elements) of a square matrix.\n    \n    Args:\n        matrix: A square matrix (n x n) as list of lists\n    \n    Returns:\n        The trace of the matrix as a float\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_trace([[2, 3], [1, 4]])",
+            "expected": "6.0",
+            "explanation": "Trace = 2 + 4 = 6"
+          },
+          {
+            "input": "compute_trace([[1, 2, 3], [0, -1, 4], [-2, 1, 0]])",
+            "expected": "0.0",
+            "explanation": "Trace = 1 + (-1) + 0 = 0"
+          },
+          {
+            "input": "compute_trace([[5, 7], [2, 9]])",
+            "expected": "14.0",
+            "explanation": "Trace = 5 + 9 = 14"
+          },
+          {
+            "input": "compute_trace([[10]])",
+            "expected": "10.0",
+            "explanation": "For a 1x1 matrix, the trace is the single element"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Summing all elements instead of only diagonal elements",
+        "Using the wrong index pattern (e.g., summing anti-diagonal)",
+        "Forgetting to convert to float for consistency"
+      ],
+      "hint": "The trace is simply the sum of elements where row index equals column index. Consider using a generator expression with sum().",
+      "references": [
+        "Trace of a matrix",
+        "Linear functionals",
+        "Matrix invariants"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Determinant of 2×2 Matrices",
+      "relation_to_problem": "The 2×2 determinant formula is the base case for the recursive cofactor expansion. Understanding this simple case is essential before implementing the general determinant algorithm.",
+      "prerequisites": [
+        "Matrix element access",
+        "Arithmetic operations",
+        "Cross-multiplication"
+      ],
+      "learning_objectives": [
+        "Master the 2×2 determinant formula",
+        "Understand geometric interpretation as area scaling",
+        "Recognize when a matrix is singular (determinant = 0)"
+      ],
+      "math_content": {
+        "definition": "For a $2 \\times 2$ matrix $A = \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$, the **determinant** is defined as: $$\\det(A) = ad - bc$$ This formula computes the signed area of the parallelogram formed by the column vectors of $A$.",
+        "notation": "$\\det(A)$ or $|A|$ denotes the determinant; for $A = \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$, $\\det(A) = ad - bc$",
+        "theorem": "**Invertibility Criterion**: A $2 \\times 2$ matrix $A$ is invertible if and only if $\\det(A) \\neq 0$. When $\\det(A) \\neq 0$, the inverse is given by: $$A^{-1} = \\frac{1}{\\det(A)} \\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix}$$",
+        "proof_sketch": "For $A = \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$, multiply $A$ by the proposed inverse: $$\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} \\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix} = \\begin{pmatrix} ad-bc & 0 \\\\ 0 & ad-bc \\end{pmatrix} = (ad-bc)I$$ Dividing by $(ad-bc) = \\det(A)$ yields the identity matrix, confirming the inverse formula.",
+        "examples": [
+          "For $A = \\begin{pmatrix} 2 & 3 \\\\ 1 & 4 \\end{pmatrix}$: $\\det(A) = 2 \\cdot 4 - 3 \\cdot 1 = 8 - 3 = 5$",
+          "For $B = \\begin{pmatrix} 3 & 6 \\\\ 2 & 4 \\end{pmatrix}$: $\\det(B) = 3 \\cdot 4 - 6 \\cdot 2 = 12 - 12 = 0$ (singular matrix)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "2×2 Determinant",
+          "latex": "$\\det\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} = ad - bc$",
+          "description": "Product of main diagonal minus product of anti-diagonal"
+        },
+        {
+          "name": "Geometric Interpretation",
+          "latex": "$|\\det(A)| = \\text{Area of parallelogram}$",
+          "description": "Absolute value gives area scaling factor"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the determinant of a 2×2 matrix using the formula $ad - bc$. This is the base case that will be used recursively in the general determinant computation.",
+        "function_signature": "def determinant_2x2(matrix: list[list[float]]) -> float:",
+        "starter_code": "def determinant_2x2(matrix: list[list[float]]) -> float:\n    \"\"\"\n    Compute the determinant of a 2x2 matrix.\n    \n    Args:\n        matrix: A 2x2 matrix as list of lists\n    \n    Returns:\n        The determinant as a float\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "determinant_2x2([[2, 3], [1, 4]])",
+            "expected": "5.0",
+            "explanation": "det = 2*4 - 3*1 = 8 - 3 = 5"
+          },
+          {
+            "input": "determinant_2x2([[3, 6], [2, 4]])",
+            "expected": "0.0",
+            "explanation": "det = 3*4 - 6*2 = 12 - 12 = 0 (singular matrix with linearly dependent rows)"
+          },
+          {
+            "input": "determinant_2x2([[1, 0], [0, 1]])",
+            "expected": "1.0",
+            "explanation": "det of identity matrix = 1*1 - 0*0 = 1"
+          },
+          {
+            "input": "determinant_2x2([[5, 7], [2, 3]])",
+            "expected": "1.0",
+            "explanation": "det = 5*3 - 7*2 = 15 - 14 = 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing $ac - bd$ instead of $ad - bc$ (wrong diagonal products)",
+        "Computing $ad + bc$ instead of $ad - bc$ (wrong sign)",
+        "Confusing row-major vs column-major indexing"
+      ],
+      "hint": "Remember the pattern: main diagonal product (top-left × bottom-right) minus anti-diagonal product (top-right × bottom-left).",
+      "references": [
+        "2×2 matrix determinant",
+        "Matrix invertibility",
+        "Geometric interpretation of determinant"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Minor Matrices and Cofactor Expansion Foundation",
+      "relation_to_problem": "Computing determinants of larger matrices requires extracting minor matrices (submatrices with one row and column removed). This is essential for the recursive cofactor expansion method.",
+      "prerequisites": [
+        "Matrix manipulation",
+        "Submatrix extraction",
+        "2×2 determinants"
+      ],
+      "learning_objectives": [
+        "Understand the concept of matrix minors",
+        "Implement submatrix extraction by removing specific row and column",
+        "Recognize how minors enable recursive determinant computation"
+      ],
+      "math_content": {
+        "definition": "For an $n \\times n$ matrix $A$, the **minor** $M_{ij}$ is the determinant of the $(n-1) \\times (n-1)$ submatrix obtained by deleting row $i$ and column $j$ from $A$. The **cofactor** $C_{ij}$ is defined as: $$C_{ij} = (-1)^{i+j} M_{ij}$$ The sign factor $(-1)^{i+j}$ creates a checkerboard pattern of signs starting with $+$ at position $(1,1)$.",
+        "notation": "$M_{ij}$ denotes the minor at position $(i,j)$; $C_{ij} = (-1)^{i+j} M_{ij}$ denotes the cofactor; $A_{[i,j]}$ denotes the submatrix with row $i$ and column $j$ removed",
+        "theorem": "**Cofactor Expansion (Laplace Expansion)**: The determinant of an $n \\times n$ matrix $A$ can be computed by expanding along any row $i$ or column $j$. Expansion along row $i$: $$\\det(A) = \\sum_{j=1}^{n} a_{ij} C_{ij} = \\sum_{j=1}^{n} (-1)^{i+j} a_{ij} M_{ij}$$",
+        "proof_sketch": "The cofactor expansion is derived from the Leibniz formula for determinants by grouping terms according to which element from row $i$ appears in each permutation. Each group corresponds to the determinant of a minor matrix, and the alternating sign comes from the parity of permutations.",
+        "examples": [
+          "For $A = \\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\\\ 7 & 8 & 9 \\end{pmatrix}$, the minor $M_{12}$ is the determinant of $\\begin{pmatrix} 4 & 6 \\\\ 7 & 9 \\end{pmatrix} = 4 \\cdot 9 - 6 \\cdot 7 = -6$",
+          "The cofactor $C_{12} = (-1)^{1+2} M_{12} = (-1)^3 \\cdot (-6) = 6$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cofactor",
+          "latex": "$C_{ij} = (-1)^{i+j} M_{ij}$",
+          "description": "Cofactor is the signed minor with checkerboard sign pattern"
+        },
+        {
+          "name": "Sign Pattern",
+          "latex": "$(-1)^{i+j} = \\begin{cases} +1 & \\text{if } i+j \\text{ even} \\\\ -1 & \\text{if } i+j \\text{ odd} \\end{cases}$",
+          "description": "Alternating signs form a checkerboard starting with + at (1,1)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that creates a minor matrix by removing a specified row and column from a given matrix. This submatrix extraction is the key operation needed for recursive determinant computation.",
+        "function_signature": "def get_minor_matrix(matrix: list[list[float]], row: int, col: int) -> list[list[float]]:",
+        "starter_code": "def get_minor_matrix(matrix: list[list[float]], row: int, col: int) -> list[list[float]]:\n    \"\"\"\n    Create a minor matrix by removing specified row and column.\n    \n    Args:\n        matrix: An n×n matrix as list of lists\n        row: Row index to remove (0-based)\n        col: Column index to remove (0-based)\n    \n    Returns:\n        The (n-1)×(n-1) minor matrix\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "get_minor_matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]], 0, 0)",
+            "expected": "[[5, 6], [8, 9]]",
+            "explanation": "Removing row 0 and column 0 leaves the bottom-right 2×2 submatrix"
+          },
+          {
+            "input": "get_minor_matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]], 0, 1)",
+            "expected": "[[4, 6], [7, 9]]",
+            "explanation": "Removing row 0 and column 1 leaves elements from columns 0 and 2 of rows 1 and 2"
+          },
+          {
+            "input": "get_minor_matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]], 1, 1)",
+            "expected": "[[1, 3], [7, 9]]",
+            "explanation": "Removing row 1 and column 1 leaves the corners of the original matrix"
+          },
+          {
+            "input": "get_minor_matrix([[5, 7], [2, 3]], 0, 0)",
+            "expected": "[[3]]",
+            "explanation": "Removing row 0 and column 0 from a 2×2 matrix leaves a 1×1 matrix"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using 1-based indexing instead of 0-based indexing for row/col parameters",
+        "Modifying the original matrix instead of creating a new one",
+        "Incorrect list slicing that includes the row/column to be removed"
+      ],
+      "hint": "Use list comprehension with enumerate to skip the specified row index, and for each row, skip the specified column index. Consider: [[matrix[i][j] for j in range(n) if j != col] for i in range(n) if i != row]",
+      "references": [
+        "Matrix minors",
+        "Cofactor expansion",
+        "Submatrix extraction"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Recursive Determinant via Cofactor Expansion",
+      "relation_to_problem": "This is the complete algorithm for computing determinants of any square matrix. It combines the 2×2 base case with recursive minor extraction to handle matrices of arbitrary size.",
+      "prerequisites": [
+        "2×2 determinant formula",
+        "Minor matrix extraction",
+        "Recursion",
+        "Cofactor signs"
+      ],
+      "learning_objectives": [
+        "Implement the full recursive determinant algorithm",
+        "Apply cofactor expansion along the first row",
+        "Handle base cases (1×1 and 2×2 matrices) correctly",
+        "Understand computational complexity and optimization strategies"
+      ],
+      "math_content": {
+        "definition": "The **determinant** of an $n \\times n$ matrix $A$, denoted $\\det(A)$, is defined recursively via **cofactor expansion** along any row or column. For expansion along the first row: $$\\det(A) = \\sum_{j=1}^{n} (-1)^{1+j} a_{1j} \\det(M_{1j})$$ where $M_{1j}$ is the minor matrix obtained by removing row 1 and column $j$. **Base cases**: For $n=1$: $\\det([a]) = a$; For $n=2$: $\\det\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} = ad - bc$",
+        "notation": "$\\det(A)$ or $|A|$ for determinant; $M_{ij}$ for minor; $(-1)^{i+j}$ for sign factor",
+        "theorem": "**Determinant Properties**: (1) $\\det(AB) = \\det(A) \\cdot \\det(B)$ (multiplicativity), (2) $\\det(A^T) = \\det(A)$ (transpose invariance), (3) $\\det(A^{-1}) = \\frac{1}{\\det(A)}$ if $A$ is invertible, (4) $\\det(cA) = c^n \\det(A)$ for $n \\times n$ matrix $A$",
+        "proof_sketch": "The recursive definition is well-founded because each recursive call reduces the matrix dimension by 1, eventually reaching the base case of $1 \\times 1$ or $2 \\times 2$ matrices. The result is independent of which row or column is chosen for expansion, though this requires proving the expansion theorem (Laplace expansion theorem).",
+        "examples": [
+          "For $A = \\begin{pmatrix} 1 & 2 & 3 \\\\ 0 & 1 & 4 \\\\ 5 & 6 & 0 \\end{pmatrix}$, expanding along row 1: $\\det(A) = 1 \\cdot \\det\\begin{pmatrix} 1 & 4 \\\\ 6 & 0 \\end{pmatrix} - 2 \\cdot \\det\\begin{pmatrix} 0 & 4 \\\\ 5 & 0 \\end{pmatrix} + 3 \\cdot \\det\\begin{pmatrix} 0 & 1 \\\\ 5 & 6 \\end{pmatrix} = 1(-24) - 2(-20) + 3(-5) = 1$",
+          "For identity matrix $I_n$: $\\det(I_n) = 1$ for all $n$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cofactor Expansion (Row 1)",
+          "latex": "$\\det(A) = \\sum_{j=1}^{n} (-1)^{1+j} a_{1j} \\det(M_{1j})$",
+          "description": "Recursive formula expanding along the first row"
+        },
+        {
+          "name": "Sign Calculation",
+          "latex": "$\\text{sign} = (-1)^{i+j} = 1 \\text{ if } (i+j) \\text{ even, else } -1$",
+          "description": "Compute the cofactor sign for position (i,j)"
+        },
+        {
+          "name": "Computational Complexity",
+          "latex": "$O(n!)$ for naive recursion; $O(n^3)$ using LU decomposition",
+          "description": "Cofactor expansion is expensive for large matrices"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete recursive determinant algorithm using cofactor expansion along the first row. Handle base cases for 1×1 and 2×2 matrices, then recursively compute determinants of minor matrices. This is the final piece needed for the complete solution.",
+        "function_signature": "def compute_determinant(matrix: list[list[float]]) -> float:",
+        "starter_code": "def compute_determinant(matrix: list[list[float]]) -> float:\n    \"\"\"\n    Compute the determinant of a square matrix using recursive cofactor expansion.\n    \n    Args:\n        matrix: A square matrix (n x n) as list of lists\n    \n    Returns:\n        The determinant as a float\n    \"\"\"\n    # Your code here\n    # Hint: Handle base cases first (n=1 and n=2)\n    # Then use recursion with cofactor expansion\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_determinant([[5]])",
+            "expected": "5.0",
+            "explanation": "For a 1×1 matrix, the determinant is the single element"
+          },
+          {
+            "input": "compute_determinant([[2, 3], [1, 4]])",
+            "expected": "5.0",
+            "explanation": "2×2 determinant: 2*4 - 3*1 = 5"
+          },
+          {
+            "input": "compute_determinant([[1, 2, 3], [0, 1, 4], [5, 6, 0]])",
+            "expected": "1.0",
+            "explanation": "3×3 determinant computed via cofactor expansion"
+          },
+          {
+            "input": "compute_determinant([[1, 0, 0], [0, 1, 0], [0, 0, 1]])",
+            "expected": "1.0",
+            "explanation": "Identity matrix has determinant 1"
+          },
+          {
+            "input": "compute_determinant([[2, 4], [1, 2]])",
+            "expected": "0.0",
+            "explanation": "Singular matrix (linearly dependent rows) has determinant 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to apply the alternating sign pattern (-1)^(i+j)",
+        "Not handling base cases correctly (especially 1×1 matrices)",
+        "Computing sign as (-1)^j instead of (-1)^(1+j) when expanding along row 1",
+        "Incorrectly extracting minor matrices",
+        "Integer division issues when working with whole numbers"
+      ],
+      "hint": "Start with base cases: if n==1, return the single element; if n==2, use the ad-bc formula. For larger matrices, iterate through the first row, compute the sign as (-1)^(1+j), extract the minor matrix, and recursively compute its determinant. Sum all contributions: sum += sign * element * determinant(minor).",
+      "references": [
+        "Cofactor expansion",
+        "Laplace expansion theorem",
+        "Recursive algorithms",
+        "Matrix determinant computation",
+        "LU decomposition for efficiency"
+      ]
+    }
+  ]
+}

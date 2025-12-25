@@ -1,0 +1,426 @@
+{
+  "problem_id": 215,
+  "title": "Partial Derivatives of Multivariable Functions",
+  "category": "Calculus",
+  "difficulty": "medium",
+  "description": "Implement a function to compute partial derivatives of multivariable functions at a given point. Partial derivatives measure the rate of change with respect to one variable while holding others constant. Given a function name and a point, return the tuple of all partial derivatives at that point.",
+  "example": {
+    "input": "func_name='poly2d', point=(2.0, 3.0)",
+    "output": "(21.0, 16.0)",
+    "reasoning": "f(x,y) = x²y + xy². ∂f/∂x = 2xy + y² = 2(2)(3) + 9 = 21. ∂f/∂y = x² + 2xy = 4 + 2(2)(3) = 16. Gradient at (2,3) is (21, 16)."
+  },
+  "starter_code": "import numpy as np\n\ndef compute_partial_derivatives(func_name: str, point: tuple[float, ...]) -> tuple[float, ...]:\n\t\"\"\"\n\tCompute partial derivatives of multivariable functions.\n\t\n\tArgs:\n\t\tfunc_name: Function identifier\n\t\t\t'poly2d': f(x,y) = x²y + xy²\n\t\t\t'exp_sum': f(x,y) = e^(x+y)\n\t\t\t'product_sin': f(x,y) = x·sin(y)\n\t\t\t'poly3d': f(x,y,z) = x²y + yz²\n\t\t\t'squared_error': f(x,y) = (x-y)²\n\t\tpoint: Point (x, y) or (x, y, z) at which to evaluate\n\t\n\tReturns:\n\t\tTuple of partial derivatives (∂f/∂x, ∂f/∂y, ...) at point\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Limit Definition and Numerical Approximation of Derivatives",
+      "relation_to_problem": "The foundation for computing partial derivatives is understanding the limit definition. This sub-quest teaches how to approximate derivatives numerically using finite differences, which is the computational basis for evaluating partial derivatives at specific points.",
+      "prerequisites": [
+        "Single-variable calculus",
+        "Basic limits",
+        "Function evaluation"
+      ],
+      "learning_objectives": [
+        "Understand the formal limit definition of derivatives",
+        "Implement numerical differentiation using finite differences",
+        "Recognize the role of step size (h) in approximation accuracy",
+        "Connect discrete approximations to continuous derivatives"
+      ],
+      "math_content": {
+        "definition": "The derivative of a function $f(x)$ at a point $x_0$ is defined as the limit: $$f'(x_0) = \\lim_{h \\to 0} \\frac{f(x_0+h) - f(x_0)}{h}$$ provided this limit exists. This measures the instantaneous rate of change of $f$ at $x_0$.",
+        "notation": "$f'(x)$ = derivative of $f$ with respect to $x$\n$h$ = increment (step size approaching 0)\n$\\Delta f$ = change in function value $f(x_0+h) - f(x_0)$\n$\\frac{\\Delta f}{\\Delta x}$ = difference quotient",
+        "theorem": "**Forward Difference Approximation**: For small $h > 0$, the derivative can be approximated as: $$f'(x_0) \\approx \\frac{f(x_0+h) - f(x_0)}{h}$$ with error $O(h)$. **Central Difference Approximation** (more accurate): $$f'(x_0) \\approx \\frac{f(x_0+h) - f(x_0-h)}{2h}$$ with error $O(h^2)$.",
+        "proof_sketch": "By Taylor expansion: $f(x_0+h) = f(x_0) + f'(x_0)h + \\frac{f''(x_0)}{2}h^2 + O(h^3)$. Rearranging: $\\frac{f(x_0+h) - f(x_0)}{h} = f'(x_0) + \\frac{f''(x_0)}{2}h + O(h^2)$. As $h \\to 0$, the approximation converges to $f'(x_0)$.",
+        "examples": [
+          "For $f(x) = x^2$ at $x_0=3$ with $h=0.01$: $f'(3) \\approx \\frac{(3.01)^2 - 3^2}{0.01} = \\frac{9.0601 - 9}{0.01} = 6.01 \\approx 6$ (exact: $2x|_{x=3} = 6$)",
+          "For $f(x) = e^x$ at $x_0=0$ with $h=0.001$: $f'(0) \\approx \\frac{e^{0.001} - e^0}{0.001} = \\frac{1.001001 - 1}{0.001} \\approx 1.001 \\approx 1$ (exact: $e^0 = 1$)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Forward Difference",
+          "latex": "$f'(x) \\approx \\frac{f(x+h) - f(x)}{h}$",
+          "description": "Use when you can only evaluate the function forward from the point"
+        },
+        {
+          "name": "Central Difference",
+          "latex": "$f'(x) \\approx \\frac{f(x+h) - f(x-h)}{2h}$",
+          "description": "More accurate; use when you can evaluate the function on both sides of the point"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that approximates the derivative of a single-variable function at a given point using the forward difference method. This is the building block for understanding how to numerically compute rates of change.",
+        "function_signature": "def approximate_derivative(f, x: float, h: float = 1e-5) -> float:",
+        "starter_code": "def approximate_derivative(f, x: float, h: float = 1e-5) -> float:\n    \"\"\"\n    Approximate the derivative of function f at point x using forward difference.\n    \n    Args:\n        f: A callable function that takes a float and returns a float\n        x: Point at which to evaluate the derivative\n        h: Small step size for approximation (default: 1e-5)\n    \n    Returns:\n        Approximate value of f'(x)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "approximate_derivative(lambda x: x**2, 3.0)",
+            "expected": "6.00001",
+            "explanation": "For f(x)=x², f'(x)=2x, so f'(3)=6. With h=1e-5, we get approximately 6.00001"
+          },
+          {
+            "input": "approximate_derivative(lambda x: x**3, 2.0)",
+            "expected": "12.0003",
+            "explanation": "For f(x)=x³, f'(x)=3x², so f'(2)=12. The approximation yields approximately 12.0003"
+          },
+          {
+            "input": "approximate_derivative(lambda x: 2*x + 5, 10.0)",
+            "expected": "2.0",
+            "explanation": "For linear f(x)=2x+5, f'(x)=2 everywhere. The approximation is exact regardless of x"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using h that is too large (e.g., h=1), which gives poor approximations",
+        "Using h that is too small (e.g., h=1e-15), which causes numerical precision errors due to floating-point arithmetic",
+        "Forgetting to handle the case where the function is not differentiable at the point",
+        "Confusing the difference quotient with the derivative itself—they are only approximately equal"
+      ],
+      "hint": "The forward difference formula is a direct translation of the limit definition. Compute f(x+h), subtract f(x), and divide by h.",
+      "references": [
+        "Numerical differentiation",
+        "Finite difference methods",
+        "Taylor series expansion",
+        "Computational derivatives"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Partial Derivatives: Definition and the Principle of Holding Variables Constant",
+      "relation_to_problem": "This sub-quest introduces the core concept of partial derivatives—differentiating with respect to one variable while treating others as constants. This is the fundamental operation needed to solve the main problem.",
+      "prerequisites": [
+        "Single-variable derivatives",
+        "Multivariable functions",
+        "Function evaluation at points"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of partial derivatives using limits",
+        "Master the technique of treating variables as constants",
+        "Compute partial derivatives of simple two-variable functions",
+        "Apply numerical approximation to partial derivatives"
+      ],
+      "math_content": {
+        "definition": "For a function $f(x, y)$, the **partial derivative with respect to $x$** at point $(x_0, y_0)$ is: $$\\frac{\\partial f}{\\partial x}\\bigg|_{(x_0,y_0)} = \\lim_{h \\to 0} \\frac{f(x_0+h, y_0) - f(x_0, y_0)}{h}$$ Similarly, the **partial derivative with respect to $y$** is: $$\\frac{\\partial f}{\\partial y}\\bigg|_{(x_0,y_0)} = \\lim_{h \\to 0} \\frac{f(x_0, y_0+h) - f(x_0, y_0)}{h}$$ The key idea: vary only one variable while keeping all others fixed.",
+        "notation": "$\\frac{\\partial f}{\\partial x}$ or $f_x$ or $\\partial_x f$ or $D_x f$ = partial derivative with respect to $x$\n$(x_0, y_0)$ = point of evaluation\n$h$ = infinitesimal increment in the direction of differentiation\n$\\nabla f$ = gradient vector of all partial derivatives",
+        "theorem": "**Computation Rule for Partial Derivatives**: To compute $\\frac{\\partial f}{\\partial x}$, treat all variables except $x$ as constants and apply standard single-variable differentiation rules. This is equivalent to the limit definition but computationally simpler. **Existence Theorem**: If $f$ is differentiable at $(x_0, y_0)$, then all partial derivatives exist at that point. The converse is not always true—existence of partial derivatives does not guarantee differentiability.",
+        "proof_sketch": "The computation rule follows from the definition: when we compute $\\lim_{h \\to 0} \\frac{f(x+h, y) - f(x, y)}{h}$, the variable $y$ appears as a fixed parameter in both terms. Therefore, any expression involving only $y$ behaves as a constant coefficient when differentiating with respect to $x$. For example, if $f(x,y) = xy^2$, then $\\frac{\\partial f}{\\partial x} = \\frac{\\partial}{\\partial x}(xy^2) = y^2 \\cdot \\frac{\\partial x}{\\partial x} = y^2$.",
+        "examples": [
+          "For $f(x,y) = x^2y$: $\\frac{\\partial f}{\\partial x} = 2xy$ (treat $y$ as constant), $\\frac{\\partial f}{\\partial y} = x^2$ (treat $x$ as constant)",
+          "For $f(x,y) = 3x^2 + 2xy + y^2$: $\\frac{\\partial f}{\\partial x} = 6x + 2y$, $\\frac{\\partial f}{\\partial y} = 2x + 2y$",
+          "At point $(2,3)$ for $f(x,y) = x^2y$: $f_x(2,3) = 2(2)(3) = 12$, $f_y(2,3) = 2^2 = 4$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Partial Derivative with respect to x",
+          "latex": "$\\frac{\\partial f}{\\partial x} = \\lim_{h \\to 0} \\frac{f(x+h, y) - f(x, y)}{h}$",
+          "description": "Vary only x while holding y constant"
+        },
+        {
+          "name": "Numerical Approximation",
+          "latex": "$\\frac{\\partial f}{\\partial x}\\bigg|_{(x_0,y_0)} \\approx \\frac{f(x_0+h, y_0) - f(x_0, y_0)}{h}$",
+          "description": "Forward difference for computing partial derivatives numerically"
+        },
+        {
+          "name": "Power Rule for Partials",
+          "latex": "$\\frac{\\partial}{\\partial x}(x^n y^m) = nx^{n-1}y^m$",
+          "description": "Treat y as constant when differentiating with respect to x"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the partial derivative of a two-variable function with respect to x at a given point using numerical approximation. This isolates the concept of holding one variable constant while varying another.",
+        "function_signature": "def partial_derivative_x(f, x: float, y: float, h: float = 1e-5) -> float:",
+        "starter_code": "def partial_derivative_x(f, x: float, y: float, h: float = 1e-5) -> float:\n    \"\"\"\n    Compute the partial derivative of f with respect to x at point (x, y).\n    \n    Args:\n        f: A callable function that takes two floats (x, y) and returns a float\n        x: x-coordinate of the point\n        y: y-coordinate of the point (held constant)\n        h: Small step size for approximation\n    \n    Returns:\n        Approximate value of ∂f/∂x at (x, y)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "partial_derivative_x(lambda x, y: x**2 * y, 2.0, 3.0)",
+            "expected": "12.00003",
+            "explanation": "For f(x,y)=x²y, ∂f/∂x=2xy. At (2,3): 2(2)(3)=12"
+          },
+          {
+            "input": "partial_derivative_x(lambda x, y: x + y**2, 5.0, 4.0)",
+            "expected": "1.0",
+            "explanation": "For f(x,y)=x+y², ∂f/∂x=1 (y² is constant with respect to x)"
+          },
+          {
+            "input": "partial_derivative_x(lambda x, y: 3*x*y + x**3, 1.0, 2.0)",
+            "expected": "9.0003",
+            "explanation": "For f(x,y)=3xy+x³, ∂f/∂x=3y+3x². At (1,2): 3(2)+3(1)²=9"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Varying both x and y instead of keeping y constant when computing ∂f/∂x",
+        "Treating expressions with y as if they disappear during x-differentiation (they are constants, not zero)",
+        "Confusing partial derivatives with total derivatives—partial derivatives measure change in only one direction",
+        "Incorrectly applying the chain rule when it's not needed for simple products"
+      ],
+      "hint": "To compute ∂f/∂x numerically, evaluate f at (x+h, y) and (x, y), keeping the y-coordinate identical in both evaluations.",
+      "references": [
+        "Partial differentiation",
+        "Multivariable calculus",
+        "Directional derivatives",
+        "Level curves and tangent planes"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Computing All Partial Derivatives: The Gradient Vector",
+      "relation_to_problem": "To solve the main problem, we need to compute partial derivatives with respect to all variables and return them as a tuple. This sub-quest teaches how to construct the gradient vector, which is exactly what the problem requires.",
+      "prerequisites": [
+        "Partial derivatives",
+        "Vector notation",
+        "Function evaluation at points"
+      ],
+      "learning_objectives": [
+        "Understand the gradient as the vector of all partial derivatives",
+        "Compute gradients for functions of 2 and 3 variables",
+        "Recognize the gradient's geometric interpretation",
+        "Implement systematic computation of all partial derivatives"
+      ],
+      "math_content": {
+        "definition": "The **gradient** of a scalar function $f: \\mathbb{R}^n \\to \\mathbb{R}$ is the vector of all its partial derivatives: $$\\nabla f = \\left(\\frac{\\partial f}{\\partial x_1}, \\frac{\\partial f}{\\partial x_2}, \\ldots, \\frac{\\partial f}{\\partial x_n}\\right)$$ For $f(x,y)$: $\\nabla f = \\left(\\frac{\\partial f}{\\partial x}, \\frac{\\partial f}{\\partial y}\\right)$. For $f(x,y,z)$: $\\nabla f = \\left(\\frac{\\partial f}{\\partial x}, \\frac{\\partial f}{\\partial y}, \\frac{\\partial f}{\\partial z}\\right)$.",
+        "notation": "$\\nabla f$ = gradient (del operator applied to $f$)\n$(f_{x_1}, f_{x_2}, \\ldots, f_{x_n})$ = alternative notation for gradient components\n$\\|\\nabla f\\|$ = magnitude of gradient (rate of steepest ascent)\n$\\mathbf{u} \\cdot \\nabla f$ = directional derivative in direction $\\mathbf{u}$",
+        "theorem": "**Geometric Interpretation**: The gradient $\\nabla f(\\mathbf{x}_0)$ points in the direction of steepest increase of $f$ at $\\mathbf{x}_0$, and its magnitude $\\|\\nabla f(\\mathbf{x}_0)\\|$ equals the rate of increase in that direction. **Orthogonality Property**: The gradient is perpendicular to the level sets (curves where $f$ is constant). Formally, if $\\mathbf{r}(t)$ parameterizes a level curve $f(\\mathbf{r}(t)) = c$, then $\\nabla f \\perp \\mathbf{r}'(t)$.",
+        "proof_sketch": "For the directional derivative in direction $\\mathbf{u} = (u_1, u_2)$: $D_{\\mathbf{u}}f = \\lim_{h \\to 0} \\frac{f(\\mathbf{x}+h\\mathbf{u}) - f(\\mathbf{x})}{h}$. By the chain rule: $D_{\\mathbf{u}}f = \\nabla f \\cdot \\mathbf{u} = \\|\\nabla f\\|\\|\\mathbf{u}\\|\\cos\\theta$. This is maximized when $\\theta = 0$, i.e., when $\\mathbf{u}$ points in the direction of $\\nabla f$, proving that $\\nabla f$ points in the direction of maximum increase.",
+        "examples": [
+          "For $f(x,y) = x^2y + xy^2$ at $(2,3)$: $\\nabla f = (2xy+y^2, x^2+2xy) = (2(2)(3)+9, 4+2(2)(3)) = (21, 16)$",
+          "For $f(x,y,z) = x^2y + yz^2$ at $(1,2,3)$: $\\nabla f = (2xy, x^2+z^2, 2yz) = (2(1)(2), 1+9, 2(2)(3)) = (4, 10, 12)$",
+          "For $f(x,y) = e^{x+y}$ at $(0,0)$: $\\nabla f = (e^{x+y}, e^{x+y})|_{(0,0)} = (1, 1)$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gradient (2D)",
+          "latex": "$\\nabla f(x,y) = \\left(\\frac{\\partial f}{\\partial x}, \\frac{\\partial f}{\\partial y}\\right)$",
+          "description": "Vector of partial derivatives for two-variable functions"
+        },
+        {
+          "name": "Gradient (3D)",
+          "latex": "$\\nabla f(x,y,z) = \\left(\\frac{\\partial f}{\\partial x}, \\frac{\\partial f}{\\partial y}, \\frac{\\partial f}{\\partial z}\\right)$",
+          "description": "Vector of partial derivatives for three-variable functions"
+        },
+        {
+          "name": "Gradient (n-D)",
+          "latex": "$\\nabla f = \\sum_{i=1}^{n} \\frac{\\partial f}{\\partial x_i} \\mathbf{e}_i$",
+          "description": "General form for n-dimensional functions, where $\\mathbf{e}_i$ are basis vectors"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the complete gradient vector (all partial derivatives) for a two-variable function at a given point. This directly practices the main skill needed for the final problem.",
+        "function_signature": "def compute_gradient_2d(f, x: float, y: float, h: float = 1e-5) -> tuple[float, float]:",
+        "starter_code": "def compute_gradient_2d(f, x: float, y: float, h: float = 1e-5) -> tuple[float, float]:\n    \"\"\"\n    Compute the gradient (all partial derivatives) of a 2D function at (x, y).\n    \n    Args:\n        f: A callable function that takes two floats (x, y) and returns a float\n        x: x-coordinate of the point\n        y: y-coordinate of the point\n        h: Small step size for approximation\n    \n    Returns:\n        Tuple (∂f/∂x, ∂f/∂y) at point (x, y)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_gradient_2d(lambda x, y: x**2*y + x*y**2, 2.0, 3.0)",
+            "expected": "(21.0, 16.0)",
+            "explanation": "For f(x,y)=x²y+xy², ∂f/∂x=2xy+y²=21 and ∂f/∂y=x²+2xy=16 at (2,3)"
+          },
+          {
+            "input": "compute_gradient_2d(lambda x, y: x + y, 5.0, 7.0)",
+            "expected": "(1.0, 1.0)",
+            "explanation": "For f(x,y)=x+y, ∂f/∂x=1 and ∂f/∂y=1 everywhere"
+          },
+          {
+            "input": "compute_gradient_2d(lambda x, y: (x - y)**2, 5.0, 3.0)",
+            "expected": "(4.0, -4.0)",
+            "explanation": "For f(x,y)=(x-y)², ∂f/∂x=2(x-y)=4 and ∂f/∂y=-2(x-y)=-4 at (5,3)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing partial derivatives in the wrong order or missing one",
+        "Returning individual values instead of a tuple/vector",
+        "Using the same increment direction for both partials (must vary x for ∂f/∂x and y for ∂f/∂y)",
+        "Confusing the gradient with the Jacobian matrix (gradient is for scalar functions only)"
+      ],
+      "hint": "Compute the partial derivative with respect to x by varying x, then compute the partial derivative with respect to y by varying y, and return both as a tuple.",
+      "references": [
+        "Gradient vector",
+        "Vector calculus",
+        "Level curves and surfaces",
+        "Directional derivatives"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Analytical Computation Using Differentiation Rules",
+      "relation_to_problem": "While numerical approximation works, understanding analytical differentiation rules (power rule, product rule, chain rule applied to partials) allows us to recognize patterns in the given function types and compute exact derivatives symbolically.",
+      "prerequisites": [
+        "Single-variable differentiation rules",
+        "Partial derivatives",
+        "Algebraic manipulation"
+      ],
+      "learning_objectives": [
+        "Apply power rule, product rule, and chain rule to compute partial derivatives analytically",
+        "Recognize common function patterns and their derivatives",
+        "Compute exact symbolic partial derivatives for polynomial, exponential, and trigonometric functions",
+        "Understand when numerical vs. analytical methods are appropriate"
+      ],
+      "math_content": {
+        "definition": "**Analytical differentiation** computes exact partial derivatives using established calculus rules rather than numerical approximation. For partial derivatives, we apply single-variable rules while treating other variables as constants. **Key Principle**: $\\frac{\\partial}{\\partial x}[g(x) \\cdot h(y)] = g'(x) \\cdot h(y)$ because $h(y)$ is constant with respect to $x$.",
+        "notation": "$c$ = constant (any expression not containing the variable of differentiation)\n$u, v$ = functions of $x$\n$(uv)' = u'v + uv'$ = product rule\n$[f(g(x))]' = f'(g(x)) \\cdot g'(x)$ = chain rule",
+        "theorem": "**Differentiation Rules for Partial Derivatives**: 1) **Power Rule**: $\\frac{\\partial}{\\partial x}(x^n y^m) = nx^{n-1}y^m$ (treat $y^m$ as constant). 2) **Product Rule**: $\\frac{\\partial}{\\partial x}[u(x,y)v(x,y)] = \\frac{\\partial u}{\\partial x}v + u\\frac{\\partial v}{\\partial x}$. 3) **Chain Rule**: $\\frac{\\partial}{\\partial x}[f(g(x,y))] = f'(g) \\cdot \\frac{\\partial g}{\\partial x}$. 4) **Exponential**: $\\frac{\\partial}{\\partial x}(e^{u(x,y)}) = e^{u} \\cdot \\frac{\\partial u}{\\partial x}$. 5) **Trigonometric**: $\\frac{\\partial}{\\partial x}(\\sin(u)) = \\cos(u) \\cdot \\frac{\\partial u}{\\partial x}$.",
+        "proof_sketch": "The power rule for partials follows from treating constants correctly: $\\frac{\\partial}{\\partial x}(x^n y^m) = y^m \\frac{\\partial}{\\partial x}(x^n) = y^m \\cdot nx^{n-1}$. The product rule is proven by considering the limit definition: $\\frac{\\partial}{\\partial x}[u(x,y)v(x,y)] = \\lim_{h \\to 0} \\frac{u(x+h,y)v(x+h,y) - u(x,y)v(x,y)}{h}$. Adding and subtracting $u(x+h,y)v(x,y)$ in the numerator and factoring yields the product rule.",
+        "examples": [
+          "$f(x,y) = x^2y + xy^2$: $\\frac{\\partial f}{\\partial x} = 2xy + y^2$, $\\frac{\\partial f}{\\partial y} = x^2 + 2xy$",
+          "$f(x,y) = e^{x+y}$: $\\frac{\\partial f}{\\partial x} = e^{x+y} \\cdot 1 = e^{x+y}$, $\\frac{\\partial f}{\\partial y} = e^{x+y}$",
+          "$f(x,y) = x\\sin(y)$: $\\frac{\\partial f}{\\partial x} = \\sin(y)$, $\\frac{\\partial f}{\\partial y} = x\\cos(y)$",
+          "$f(x,y,z) = x^2y + yz^2$: $\\frac{\\partial f}{\\partial x} = 2xy$, $\\frac{\\partial f}{\\partial y} = x^2 + z^2$, $\\frac{\\partial f}{\\partial z} = 2yz$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Power Rule for Partials",
+          "latex": "$\\frac{\\partial}{\\partial x}(x^n y^m) = nx^{n-1}y^m$",
+          "description": "Differentiate the x term; y terms are constant coefficients"
+        },
+        {
+          "name": "Exponential with Sum",
+          "latex": "$\\frac{\\partial}{\\partial x}(e^{x+y}) = e^{x+y}$",
+          "description": "Chain rule: derivative of $x+y$ with respect to $x$ is 1"
+        },
+        {
+          "name": "Product of Independent Terms",
+          "latex": "$\\frac{\\partial}{\\partial x}[g(x)h(y)] = g'(x)h(y)$",
+          "description": "$h(y)$ factors out as a constant when differentiating with respect to $x$"
+        },
+        {
+          "name": "Squared Difference",
+          "latex": "$\\frac{\\partial}{\\partial x}[(x-y)^2] = 2(x-y)$",
+          "description": "Chain rule: derivative of $(x-y)$ with respect to $x$ is 1"
+        }
+      ],
+      "exercise": {
+        "description": "Implement analytical formulas for computing partial derivatives of specific function types. Given a function identifier and a point, compute the exact gradient using mathematical formulas rather than numerical approximation.",
+        "function_signature": "def analytical_gradient(func_name: str, point: tuple[float, ...]) -> tuple[float, ...]:",
+        "starter_code": "def analytical_gradient(func_name: str, point: tuple[float, ...]) -> tuple[float, ...]:\n    \"\"\"\n    Compute partial derivatives analytically for specific functions.\n    \n    Args:\n        func_name: One of 'poly_xy', 'exp_sum', 'product_sin'\n            'poly_xy': f(x,y) = x²y + xy²\n            'exp_sum': f(x,y) = e^(x+y)\n            'product_sin': f(x,y) = x·sin(y)\n        point: Tuple (x, y) at which to evaluate\n    \n    Returns:\n        Tuple of partial derivatives (∂f/∂x, ∂f/∂y)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "analytical_gradient('poly_xy', (2.0, 3.0))",
+            "expected": "(21.0, 16.0)",
+            "explanation": "f(x,y)=x²y+xy²: ∂f/∂x=2xy+y²=2(2)(3)+9=21, ∂f/∂y=x²+2xy=4+12=16"
+          },
+          {
+            "input": "analytical_gradient('exp_sum', (0.0, 0.0))",
+            "expected": "(1.0, 1.0)",
+            "explanation": "f(x,y)=e^(x+y): ∂f/∂x=e^(x+y)=e^0=1, ∂f/∂y=e^(x+y)=e^0=1 at origin"
+          },
+          {
+            "input": "analytical_gradient('product_sin', (2.0, 3.14159/2))",
+            "expected": "(1.0, 0.0)",
+            "explanation": "f(x,y)=x·sin(y): ∂f/∂x=sin(y)=sin(π/2)=1, ∂f/∂y=x·cos(y)=2·cos(π/2)≈0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to apply the chain rule when functions are composed (e.g., e^(x+y) requires chain rule)",
+        "Treating all terms as variables instead of recognizing which are constant for a given partial",
+        "Incorrectly applying the product rule when terms are actually independent (e.g., x·y² doesn't need product rule for ∂/∂x)",
+        "Sign errors in chain rule, especially with expressions like (x-y)²"
+      ],
+      "hint": "For each function type, derive the analytical formulas for ∂f/∂x and ∂f/∂y on paper first, then implement them using basic arithmetic and math functions (exp, sin, cos).",
+      "references": [
+        "Differentiation rules",
+        "Multivariable chain rule",
+        "Symbolic differentiation",
+        "Calculus identities"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Extensible Gradient Computation for Arbitrary Functions",
+      "relation_to_problem": "The main problem requires computing gradients for any of several function types and handling both 2D and 3D cases. This sub-quest teaches how to build a flexible system that dispatches to the correct computation based on function identifiers and adapts to varying numbers of variables.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Function dispatch patterns",
+        "Tuple operations"
+      ],
+      "learning_objectives": [
+        "Design a function that handles multiple function types through conditional dispatch",
+        "Adapt gradient computation to functions with varying numbers of variables",
+        "Implement a complete solution that matches function signatures to their derivatives",
+        "Validate gradient computations with test cases"
+      ],
+      "math_content": {
+        "definition": "A **gradient computation system** is a function that takes a function identifier and a point, determines the function's formula and dimensionality, computes all partial derivatives analytically or numerically, and returns them as a vector (tuple). For a function $f: \\mathbb{R}^n \\to \\mathbb{R}$, the system must: 1) Parse the function identifier to determine $f$'s formula, 2) Determine $n$ from the point dimension, 3) Compute $\\nabla f = (\\frac{\\partial f}{\\partial x_1}, \\ldots, \\frac{\\partial f}{\\partial x_n})$, 4) Evaluate at the given point.",
+        "notation": "$f_i$ = $i$-th function in a library of functions\n$\\text{func\\_name}$ = string identifier mapping to $f_i$\n$\\mathbf{x} = (x_1, \\ldots, x_n)$ = point of evaluation\n$\\nabla f(\\mathbf{x})$ = gradient vector evaluated at $\\mathbf{x}$\n$n = \\dim(\\mathbf{x})$ = number of variables",
+        "theorem": "**Gradient Dimensionality Theorem**: For a scalar function $f: \\mathbb{R}^n \\to \\mathbb{R}$, the gradient $\\nabla f \\in \\mathbb{R}^n$ has exactly $n$ components, one for each independent variable. The gradient's dimension matches the domain dimension. **Implementation Strategy**: Use a dispatch table (dictionary) mapping function names to tuples of (function_callable, gradient_formula_functions). For each function type, store both the function and its analytical gradient formulas.",
+        "proof_sketch": "The gradient is defined as $\\nabla f = \\sum_{i=1}^{n} \\frac{\\partial f}{\\partial x_i} \\mathbf{e}_i$, which explicitly has $n$ components. For implementation, a dispatch table provides $O(1)$ lookup: given func_name, retrieve the corresponding derivative formulas. For extensibility, new functions are added by inserting new entries in the dispatch table without modifying core logic.",
+        "examples": [
+          "For 'poly2d' at (2,3): Dispatch finds f(x,y)=x²y+xy², computes gradient (21,16), returns tuple of length 2",
+          "For 'poly3d' at (1,2,3): Dispatch finds f(x,y,z)=x²y+yz², computes gradient (4,10,12), returns tuple of length 3",
+          "For 'squared_error' at (5,3): f(x,y)=(x-y)², gradient is (2(x-y), -2(x-y)) = (4,-4)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gradient of Polynomial (2D)",
+          "latex": "$\\nabla(x^2y + xy^2) = (2xy+y^2, x^2+2xy)$",
+          "description": "Standard polynomial partial derivatives"
+        },
+        {
+          "name": "Gradient of Exponential Sum",
+          "latex": "$\\nabla(e^{x+y}) = (e^{x+y}, e^{x+y})$",
+          "description": "Both partials equal the function itself"
+        },
+        {
+          "name": "Gradient of Product with Sine",
+          "latex": "$\\nabla(x \\sin(y)) = (\\sin(y), x\\cos(y))$",
+          "description": "Product factors cleanly for each partial"
+        },
+        {
+          "name": "Gradient of Polynomial (3D)",
+          "latex": "$\\nabla(x^2y + yz^2) = (2xy, x^2+z^2, 2yz)$",
+          "description": "Three partials for three-variable function"
+        },
+        {
+          "name": "Gradient of Squared Error",
+          "latex": "$\\nabla((x-y)^2) = (2(x-y), -2(x-y))$",
+          "description": "Chain rule on squared difference"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete gradient computation system that handles multiple function types (poly2d, exp_sum, product_sin, poly3d) and automatically adapts to the number of variables in the point. This combines all skills from previous sub-quests into a unified solution.",
+        "function_signature": "def compute_gradient(func_name: str, point: tuple[float, ...]) -> tuple[float, ...]:",
+        "starter_code": "import math\n\ndef compute_gradient(func_name: str, point: tuple[float, ...]) -> tuple[float, ...]:\n    \"\"\"\n    Compute partial derivatives for various multivariable functions.\n    \n    Args:\n        func_name: Function identifier\n            'poly2d': f(x,y) = x²y + xy²\n            'exp_sum': f(x,y) = e^(x+y)\n            'product_sin': f(x,y) = x·sin(y)\n            'poly3d': f(x,y,z) = x²y + yz²\n        point: Point (x, y) or (x, y, z) at which to evaluate\n    \n    Returns:\n        Tuple of partial derivatives at the point\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_gradient('poly2d', (2.0, 3.0))",
+            "expected": "(21.0, 16.0)",
+            "explanation": "f(x,y)=x²y+xy²: ∂f/∂x=2xy+y²=21, ∂f/∂y=x²+2xy=16 at (2,3)"
+          },
+          {
+            "input": "compute_gradient('exp_sum', (0.0, 0.0))",
+            "expected": "(1.0, 1.0)",
+            "explanation": "f(x,y)=e^(x+y): both partials equal e^0=1 at origin"
+          },
+          {
+            "input": "compute_gradient('product_sin', (2.0, 1.5708))",
+            "expected": "(1.0, 0.0)",
+            "explanation": "f(x,y)=x·sin(y): ∂f/∂x=sin(π/2)≈1, ∂f/∂y=2·cos(π/2)≈0"
+          },
+          {
+            "input": "compute_gradient('poly3d', (1.0, 2.0, 3.0))",
+            "expected": "(4.0, 10.0, 12.0)",
+            "explanation": "f(x,y,z)=x²y+yz²: ∂f/∂x=2xy=4, ∂f/∂y=x²+z²=10, ∂f/∂z=2yz=12 at (1,2,3)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Hardcoding for only 2D or only 3D cases instead of adapting to point length",
+        "Not unpacking the point tuple correctly for functions with different numbers of variables",
+        "Returning partials in the wrong order",
+        "Forgetting to handle all specified function types in the dispatch logic",
+        "Using numerical approximation when analytical formulas are straightforward and more accurate"
+      ],
+      "hint": "Create a dictionary that maps each function name to the formulas for its partial derivatives. Unpack the point tuple into variables, evaluate the derivative formulas, and return as a tuple.",
+      "references": [
+        "Function dispatch patterns",
+        "Dictionary-based polymorphism",
+        "Gradient computation systems",
+        "Multi-dimensional calculus"
+      ]
+    }
+  ]
+}

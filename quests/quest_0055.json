@@ -1,0 +1,499 @@
+{
+  "problem_id": 55,
+  "title": "2D Translation Matrix Implementation",
+  "category": "Linear Algebra",
+  "difficulty": "medium",
+  "description": "## Task: Implement a 2D Translation Matrix\n\nYour task is to implement a function that applies a 2D translation matrix to a set of points. A translation matrix is used to move points in 2D space by a specified distance in the x and y directions.\n\nWrite a function `translate_object(points, tx, ty)` where `points` is a list of [x, y] coordinates and `tx` and `ty` are the translation distances in the x and y directions, respectively.\n\nThe function should return a new list of points after applying the translation matrix.\n\n    ",
+  "example": {
+    "input": "points = [[0, 0], [1, 0], [0.5, 1]]\ntx, ty = 2, 3\n\nprint(translate_object(points, tx, ty))",
+    "output": "[[2.0, 3.0], [3.0, 3.0], [2.5, 4.0]]",
+    "reasoning": "The translation matrix moves the points by 2 units in the x-direction and 3 units in the y-direction. The resulting points are [[2.0, 3.0], [3.0, 3.0], [2.5, 4.0]]."
+  },
+  "starter_code": "import numpy as np\ndef translate_object(points, tx, ty):\n\treturn translated_points\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Homogeneous Coordinates in 2D Space",
+      "relation_to_problem": "Homogeneous coordinates are essential for representing translation as a matrix operation. Understanding this coordinate system is the foundation for implementing the translation matrix, as it allows us to express translation (a non-linear transformation in Cartesian space) as a linear transformation in 3D homogeneous space.",
+      "prerequisites": [
+        "Basic linear algebra",
+        "Matrix multiplication",
+        "2D Cartesian coordinate system"
+      ],
+      "learning_objectives": [
+        "Understand why standard 2x2 matrices cannot represent translation",
+        "Convert between Cartesian and homogeneous coordinates",
+        "Recognize equivalent homogeneous representations of the same point",
+        "Apply homogeneous coordinate arithmetic"
+      ],
+      "math_content": {
+        "definition": "A point $(x, y)$ in the Euclidean plane $\\mathbb{R}^2$ can be represented in homogeneous coordinates as the triple $(x, y, 1) \\in \\mathbb{R}^3$. More generally, the homogeneous coordinates $(X, Y, W)$ where $W \\neq 0$ represent the Cartesian point $(X/W, Y/W)$. The set of homogeneous coordinates $\\{(kx, ky, k) : k \\in \\mathbb{R}, k \\neq 0\\}$ all represent the same Cartesian point $(x, y)$.",
+        "notation": "$P_{\\text{Cartesian}} = (x, y) \\in \\mathbb{R}^2$, $P_{\\text{Homogeneous}} = (x, y, 1) \\in \\mathbb{R}^3$, or more generally $(wx, wy, w)$ where $w \\neq 0$",
+        "theorem": "**Non-linearity of Translation Theorem**: Translation is not a linear transformation in $\\mathbb{R}^2$. A function $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ is linear if and only if $T(\\vec{0}) = \\vec{0}$, $T(\\vec{u} + \\vec{v}) = T(\\vec{u}) + T(\\vec{v})$, and $T(c\\vec{u}) = cT(\\vec{u})$. Translation by $(t_x, t_y)$ maps $(0, 0) \\mapsto (t_x, t_y) \\neq (0, 0)$, violating linearity.",
+        "proof_sketch": "Consider translation $T_{(t_x, t_y)}(x, y) = (x + t_x, y + t_y)$. Applying to origin: $T_{(t_x, t_y)}(0, 0) = (t_x, t_y)$. Since $(t_x, t_y) \\neq (0, 0)$ for non-trivial translation, the zero vector is not preserved, thus translation cannot be represented by a $2 \\times 2$ matrix. However, in homogeneous coordinates, we embed $\\mathbb{R}^2$ into $\\mathbb{R}^3$, where translation becomes a linear transformation in the higher-dimensional space.",
+        "examples": [
+          "The Cartesian point $(3, 5)$ in homogeneous coordinates is $(3, 5, 1)$ or equivalently $(6, 10, 2)$ or $(-3, -5, -1)$.",
+          "The homogeneous point $(8, 12, 4)$ converts to Cartesian as $(8/4, 12/4) = (2, 3)$.",
+          "The origin $(0, 0)$ in homogeneous coordinates is $(0, 0, 1)$ or any $(0, 0, w)$ where $w \\neq 0$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cartesian to Homogeneous",
+          "latex": "$P_{\\text{Cart}} = (x, y) \\rightarrow P_{\\text{Hom}} = (x, y, 1)$",
+          "description": "Append a 1 as the third coordinate to convert from Cartesian to homogeneous coordinates"
+        },
+        {
+          "name": "Homogeneous to Cartesian",
+          "latex": "$P_{\\text{Hom}} = (X, Y, W) \\rightarrow P_{\\text{Cart}} = (X/W, Y/W)$ where $W \\neq 0$",
+          "description": "Divide the first two coordinates by the third to convert from homogeneous to Cartesian"
+        },
+        {
+          "name": "Equivalence Relation",
+          "latex": "$(X, Y, W) \\sim (kX, kY, kW)$ for any $k \\neq 0$",
+          "description": "Scalar multiples of homogeneous coordinates represent the same Cartesian point"
+        }
+      ],
+      "exercise": {
+        "description": "Implement functions to convert between Cartesian and homogeneous coordinates. This is the foundational step for working with transformation matrices, as all matrix operations will be performed in homogeneous space before converting back to Cartesian coordinates.",
+        "function_signature": "def cartesian_to_homogeneous(points: list) -> list:\ndef homogeneous_to_cartesian(points: list) -> list:",
+        "starter_code": "import numpy as np\n\ndef cartesian_to_homogeneous(points):\n    \"\"\"\n    Convert 2D Cartesian coordinates to homogeneous coordinates.\n    Input: points - list of [x, y] coordinates\n    Output: list of [x, y, 1] coordinates\n    \"\"\"\n    # Your code here\n    pass\n\ndef homogeneous_to_cartesian(points):\n    \"\"\"\n    Convert homogeneous coordinates to 2D Cartesian coordinates.\n    Input: points - list of [X, Y, W] coordinates\n    Output: list of [X/W, Y/W] coordinates\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "cartesian_to_homogeneous([[0, 0], [1, 2], [3.5, -1.5]])",
+            "expected": "[[0, 0, 1], [1, 2, 1], [3.5, -1.5, 1]]",
+            "explanation": "Each 2D point gets a 1 appended as the homogeneous coordinate"
+          },
+          {
+            "input": "homogeneous_to_cartesian([[2, 4, 1], [6, 9, 3], [0, 0, 1]])",
+            "expected": "[[2.0, 4.0], [2.0, 3.0], [0.0, 0.0]]",
+            "explanation": "Divide X and Y by W to get Cartesian coordinates. Note that [6, 9, 3] and [2, 3, 1] represent the same point"
+          },
+          {
+            "input": "homogeneous_to_cartesian([[10, 15, 5], [-4, -8, -2]])",
+            "expected": "[[2.0, 3.0], [2.0, 4.0]]",
+            "explanation": "Homogeneous coordinates with W ≠ 1 still convert correctly by dividing by W"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that homogeneous coordinates with different W values can represent the same Cartesian point",
+        "Trying to convert homogeneous coordinates with W = 0 to Cartesian (these represent points at infinity)",
+        "Not using floating-point division when converting from homogeneous to Cartesian",
+        "Assuming homogeneous coordinates always have W = 1"
+      ],
+      "hint": "For Cartesian to homogeneous, you're adding an extra dimension. For homogeneous to Cartesian, you're performing element-wise division. Consider using NumPy arrays for efficient computation.",
+      "references": [
+        "Projective geometry",
+        "Homogeneous coordinate systems",
+        "Affine transformations"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Matrix Multiplication in Homogeneous Coordinates",
+      "relation_to_problem": "The translation operation is performed by multiplying a 3×3 translation matrix with a 3×1 homogeneous coordinate vector. Mastering this matrix multiplication is essential for applying the translation transformation correctly.",
+      "prerequisites": [
+        "Matrix multiplication",
+        "Homogeneous coordinates",
+        "Vector notation"
+      ],
+      "learning_objectives": [
+        "Perform matrix-vector multiplication with 3×3 matrices and 3×1 vectors",
+        "Understand the geometric interpretation of transformation matrices",
+        "Apply matrix multiplication to multiple points efficiently",
+        "Recognize the structure of affine transformation matrices"
+      ],
+      "math_content": {
+        "definition": "Given a $3 \\times 3$ matrix $M = \\begin{bmatrix} m_{11} & m_{12} & m_{13} \\\\ m_{21} & m_{22} & m_{23} \\\\ m_{31} & m_{32} & m_{33} \\end{bmatrix}$ and a $3 \\times 1$ vector $\\vec{v} = \\begin{bmatrix} x \\\\ y \\\\ 1 \\end{bmatrix}$, the matrix-vector product is $M\\vec{v} = \\begin{bmatrix} m_{11}x + m_{12}y + m_{13} \\\\ m_{21}x + m_{22}y + m_{23} \\\\ m_{31}x + m_{32}y + m_{33} \\end{bmatrix}$.",
+        "notation": "$M \\in \\mathbb{R}^{3 \\times 3}$ denotes a $3 \\times 3$ matrix, $\\vec{v} \\in \\mathbb{R}^3$ denotes a column vector, $M\\vec{v}$ denotes matrix-vector multiplication",
+        "theorem": "**Affine Transformation Structure Theorem**: Any 2D affine transformation (linear transformation plus translation) can be represented as a $3 \\times 3$ matrix of the form $\\begin{bmatrix} a & b & t_x \\\\ c & d & t_y \\\\ 0 & 0 & 1 \\end{bmatrix}$ where the upper-left $2 \\times 2$ submatrix $\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}$ represents the linear part (rotation, scaling, shear) and the rightmost column $\\begin{bmatrix} t_x \\\\ t_y \\\\ 1 \\end{bmatrix}$ encodes the translation.",
+        "proof_sketch": "Consider the transformation $T(x, y) = (ax + by + t_x, cx + dy + t_y)$. In homogeneous coordinates: $\\begin{bmatrix} a & b & t_x \\\\ c & d & t_y \\\\ 0 & 0 & 1 \\end{bmatrix} \\begin{bmatrix} x \\\\ y \\\\ 1 \\end{bmatrix} = \\begin{bmatrix} ax + by + t_x \\\\ cx + dy + t_y \\\\ 1 \\end{bmatrix}$. The bottom row $(0, 0, 1)$ ensures the homogeneous coordinate remains 1, preserving the embedding in $\\mathbb{R}^2$.",
+        "examples": [
+          "Identity transformation: $I = \\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & 1 & 0 \\\\ 0 & 0 & 1 \\end{bmatrix}$, which leaves all points unchanged",
+          "Applying $\\begin{bmatrix} 2 & 0 & 1 \\\\ 0 & 3 & 2 \\\\ 0 & 0 & 1 \\end{bmatrix}$ to $(1, 1, 1)$ yields $(2 \\cdot 1 + 0 \\cdot 1 + 1, 0 \\cdot 1 + 3 \\cdot 1 + 2, 1) = (3, 5, 1)$",
+          "Multiple points can be transformed by treating them as columns of a $3 \\times n$ matrix and computing $M \\cdot P$ where $P$ contains all points"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Matrix-Vector Product",
+          "latex": "$\\begin{bmatrix} m_{11} & m_{12} & m_{13} \\\\ m_{21} & m_{22} & m_{23} \\\\ m_{31} & m_{32} & m_{33} \\end{bmatrix} \\begin{bmatrix} x \\\\ y \\\\ w \\end{bmatrix} = \\begin{bmatrix} m_{11}x + m_{12}y + m_{13}w \\\\ m_{21}x + m_{22}y + m_{23}w \\\\ m_{31}x + m_{32}y + m_{33}w \\end{bmatrix}$",
+          "description": "Each component of the result is the dot product of the corresponding row with the vector"
+        },
+        {
+          "name": "Batch Transformation",
+          "latex": "$M \\cdot P = M \\begin{bmatrix} x_1 & x_2 & \\cdots & x_n \\\\ y_1 & y_2 & \\cdots & y_n \\\\ 1 & 1 & \\cdots & 1 \\end{bmatrix} = \\begin{bmatrix} x_1' & x_2' & \\cdots & x_n' \\\\ y_1' & y_2' & \\cdots & y_n' \\\\ 1 & 1 & \\cdots & 1 \\end{bmatrix}$",
+          "description": "Transform multiple points simultaneously using matrix multiplication"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that applies a general 3×3 affine transformation matrix to a set of points in homogeneous coordinates. This prepares you for the specific case of translation matrices by practicing the matrix multiplication mechanics.",
+        "function_signature": "def apply_transformation_matrix(matrix, points_homogeneous: list) -> list:",
+        "starter_code": "import numpy as np\n\ndef apply_transformation_matrix(matrix, points_homogeneous):\n    \"\"\"\n    Apply a 3x3 transformation matrix to points in homogeneous coordinates.\n    Input: \n        matrix - 3x3 numpy array or nested list\n        points_homogeneous - list of [x, y, 1] coordinates\n    Output: list of transformed [x', y', 1] coordinates\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "apply_transformation_matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]], [[2, 3, 1], [4, 5, 1]])",
+            "expected": "[[2.0, 3.0, 1.0], [4.0, 5.0, 1.0]]",
+            "explanation": "Identity matrix leaves points unchanged"
+          },
+          {
+            "input": "apply_transformation_matrix([[2, 0, 1], [0, 2, 1], [0, 0, 1]], [[1, 1, 1], [0, 0, 1]])",
+            "expected": "[[3.0, 3.0, 1.0], [1.0, 1.0, 1.0]]",
+            "explanation": "Matrix scales by 2 and translates by (1,1). Point (1,1) becomes (2*1+1, 2*1+1)=(3,3), origin becomes (1,1)"
+          },
+          {
+            "input": "apply_transformation_matrix([[1, 0, 5], [0, 1, -3], [0, 0, 1]], [[0, 0, 1], [2, 4, 1]])",
+            "expected": "[[5.0, -3.0, 1.0], [7.0, 1.0, 1.0]]",
+            "explanation": "Pure translation by (5, -3). Point (0,0) becomes (5,-3), point (2,4) becomes (7,1)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row-major and column-major matrix multiplication order",
+        "Forgetting to convert the result back to a list format if using NumPy",
+        "Not preserving the homogeneous coordinate (should remain 1 for affine transformations)",
+        "Transposing the matrix or vector incorrectly"
+      ],
+      "hint": "NumPy's @ operator or np.dot() can perform matrix multiplication efficiently. Ensure your points are column vectors (shape 3×n) or transpose appropriately. The last row of the transformation matrix should be [0, 0, 1] for affine transformations.",
+      "references": [
+        "Affine transformations",
+        "Matrix algebra",
+        "Computer graphics transformations"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Structure and Properties of Translation Matrices",
+      "relation_to_problem": "Understanding the specific structure of translation matrices and their algebraic properties is crucial for correctly implementing the translate_object function. This knowledge ensures you construct the correct 3×3 matrix for any given translation vector.",
+      "prerequisites": [
+        "Homogeneous coordinates",
+        "Matrix multiplication",
+        "Linear transformations"
+      ],
+      "learning_objectives": [
+        "Construct translation matrices from translation vectors",
+        "Understand the mathematical properties of translation matrices (invertibility, composition)",
+        "Prove key theorems about translation matrix algebra",
+        "Apply translation matrices to transform points"
+      ],
+      "math_content": {
+        "definition": "The 2D translation matrix that translates points by $t_x$ units in the x-direction and $t_y$ units in the y-direction is $T(t_x, t_y) = \\begin{bmatrix} 1 & 0 & t_x \\\\ 0 & 1 & t_y \\\\ 0 & 0 & 1 \\end{bmatrix}$. The upper-left $2 \\times 2$ identity submatrix preserves the point's coordinates, while the rightmost column encodes the translation vector.",
+        "notation": "$T(t_x, t_y)$ denotes translation by vector $(t_x, t_y)$, $T^{-1}$ denotes the inverse transformation, $T_2 \\circ T_1 = T_2 \\cdot T_1$ denotes composition",
+        "theorem": "**Translation Composition Theorem**: The composition of two translations is commutative and equivalent to a single translation by the vector sum: $T(t_x^{(2)}, t_y^{(2)}) \\cdot T(t_x^{(1)}, t_y^{(1)}) = T(t_x^{(1)} + t_x^{(2)}, t_y^{(1)} + t_y^{(2)}) = T(t_x^{(1)}, t_y^{(1)}) \\cdot T(t_x^{(2)}, t_y^{(2)})$.",
+        "proof_sketch": "Direct matrix multiplication: $\\begin{bmatrix} 1 & 0 & t_x^{(2)} \\\\ 0 & 1 & t_y^{(2)} \\\\ 0 & 0 & 1 \\end{bmatrix} \\begin{bmatrix} 1 & 0 & t_x^{(1)} \\\\ 0 & 1 & t_y^{(1)} \\\\ 0 & 0 & 1 \\end{bmatrix}$. Computing element-by-element: first row third column gives $1 \\cdot t_x^{(1)} + 0 \\cdot t_y^{(1)} + t_x^{(2)} \\cdot 1 = t_x^{(1)} + t_x^{(2)}$. Similarly for second row third column: $t_y^{(1)} + t_y^{(2)}$. All other entries remain as in the identity structure, yielding $T(t_x^{(1)} + t_x^{(2)}, t_y^{(1)} + t_y^{(2)})$. Commutativity follows from commutativity of addition.",
+        "examples": [
+          "Translation by (3, 2): $T(3, 2) = \\begin{bmatrix} 1 & 0 & 3 \\\\ 0 & 1 & 2 \\\\ 0 & 0 & 1 \\end{bmatrix}$",
+          "Composing $T(1, 2)$ and $T(3, -1)$: $T(3, -1) \\cdot T(1, 2) = T(4, 1) = \\begin{bmatrix} 1 & 0 & 4 \\\\ 0 & 1 & 1 \\\\ 0 & 0 & 1 \\end{bmatrix}$",
+          "Inverse of $T(5, -3)$ is $T(-5, 3) = \\begin{bmatrix} 1 & 0 & -5 \\\\ 0 & 1 & 3 \\\\ 0 & 0 & 1 \\end{bmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Translation Matrix Construction",
+          "latex": "$T(t_x, t_y) = \\begin{bmatrix} 1 & 0 & t_x \\\\ 0 & 1 & t_y \\\\ 0 & 0 & 1 \\end{bmatrix}$",
+          "description": "Create a 3×3 matrix with identity in upper-left 2×2, translation vector in rightmost column, and [0,0,1] in bottom row"
+        },
+        {
+          "name": "Translation Application",
+          "latex": "$T(t_x, t_y) \\begin{bmatrix} x \\\\ y \\\\ 1 \\end{bmatrix} = \\begin{bmatrix} x + t_x \\\\ y + t_y \\\\ 1 \\end{bmatrix}$",
+          "description": "Applying the translation matrix adds the translation vector to the point coordinates"
+        },
+        {
+          "name": "Translation Inverse",
+          "latex": "$T(t_x, t_y)^{-1} = T(-t_x, -t_y)$",
+          "description": "The inverse translation negates the translation vector"
+        },
+        {
+          "name": "Determinant",
+          "latex": "$\\det(T(t_x, t_y)) = 1$",
+          "description": "Translation matrices have determinant 1, indicating they preserve area and orientation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that constructs a 3×3 translation matrix from given translation parameters tx and ty. This function will be the core building block for your final solution, as it creates the mathematical object that performs the translation operation.",
+        "function_signature": "def create_translation_matrix(tx: float, ty: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef create_translation_matrix(tx, ty):\n    \"\"\"\n    Create a 3x3 translation matrix for 2D translation.\n    Input:\n        tx - translation in x-direction\n        ty - translation in y-direction\n    Output: 3x3 numpy array representing the translation matrix\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "create_translation_matrix(2, 3)",
+            "expected": "[[1.0, 0.0, 2.0], [0.0, 1.0, 3.0], [0.0, 0.0, 1.0]]",
+            "explanation": "Standard translation matrix with tx=2 and ty=3 in the third column"
+          },
+          {
+            "input": "create_translation_matrix(0, 0)",
+            "expected": "[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]",
+            "explanation": "Zero translation yields the identity matrix (no movement)"
+          },
+          {
+            "input": "create_translation_matrix(-5.5, 7.2)",
+            "expected": "[[1.0, 0.0, -5.5], [0.0, 1.0, 7.2], [0.0, 0.0, 1.0]]",
+            "explanation": "Translation matrices work with negative and floating-point values"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Placing tx and ty in the wrong positions (e.g., in the bottom row instead of rightmost column)",
+        "Creating a 2×2 matrix instead of 3×3 (forgetting homogeneous coordinates)",
+        "Using zeros instead of ones in the diagonal (should be identity in upper-left 2×2)",
+        "Putting non-zero values in the bottom row (should always be [0, 0, 1])"
+      ],
+      "hint": "Start with a 3×3 identity matrix, then modify only the elements in the third column (indices [0,2] and [1,2]) to hold the translation values. Use np.eye(3) or np.identity(3) as a starting point.",
+      "references": [
+        "Translation transformation",
+        "Affine transformation matrices",
+        "Homogeneous transformation matrices"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Batch Processing Points with Matrix Operations",
+      "relation_to_problem": "The translate_object function must efficiently apply translation to multiple points. This requires understanding how to organize multiple points into a matrix format and perform batch transformations, which is essential for the final implementation.",
+      "prerequisites": [
+        "NumPy array operations",
+        "Matrix multiplication",
+        "Translation matrices"
+      ],
+      "learning_objectives": [
+        "Organize multiple 2D points into matrix format for batch processing",
+        "Perform efficient batch transformations using matrix multiplication",
+        "Extract and format results from transformed point matrices",
+        "Understand computational efficiency of batch vs. iterative operations"
+      ],
+      "math_content": {
+        "definition": "Given $n$ points $P_1, P_2, \\ldots, P_n$ where $P_i = (x_i, y_i)$, we form the point matrix $\\mathbf{P} = \\begin{bmatrix} x_1 & x_2 & \\cdots & x_n \\\\ y_1 & y_2 & \\cdots & y_n \\\\ 1 & 1 & \\cdots & 1 \\end{bmatrix} \\in \\mathbb{R}^{3 \\times n}$. A transformation matrix $T \\in \\mathbb{R}^{3 \\times 3}$ applied to all points simultaneously is computed as $T \\cdot \\mathbf{P}$, yielding a $3 \\times n$ matrix of transformed points.",
+        "notation": "$\\mathbf{P} \\in \\mathbb{R}^{3 \\times n}$ denotes a matrix where each column is a point in homogeneous coordinates, $T\\mathbf{P}$ denotes batch transformation",
+        "theorem": "**Batch Transformation Equivalence Theorem**: Applying a transformation matrix $T$ to a set of points $\\{P_1, \\ldots, P_n\\}$ simultaneously via matrix multiplication $T\\mathbf{P}$ produces identical results to applying $T$ to each point individually: $(T\\mathbf{P})_{:,i} = T P_i$ for all $i \\in \\{1, \\ldots, n\\}$, where $\\mathbf{P}_{:,i}$ denotes the $i$-th column.",
+        "proof_sketch": "By definition of matrix multiplication, $(T\\mathbf{P})_{:,i}$ equals $T$ multiplied by the $i$-th column of $\\mathbf{P}$, which is $P_i$. Thus $(T\\mathbf{P})_{:,i} = T P_i$. This holds for all columns independently, so batch and individual transformations are equivalent. The batch approach is computationally more efficient due to vectorization in modern numerical libraries.",
+        "examples": [
+          "Three points $(1,2), (3,4), (5,6)$ form matrix $\\begin{bmatrix} 1 & 3 & 5 \\\\ 2 & 4 & 6 \\\\ 1 & 1 & 1 \\end{bmatrix}$",
+          "Translating by $(2,1)$: $\\begin{bmatrix} 1 & 0 & 2 \\\\ 0 & 1 & 1 \\\\ 0 & 0 & 1 \\end{bmatrix} \\begin{bmatrix} 1 & 3 & 5 \\\\ 2 & 4 & 6 \\\\ 1 & 1 & 1 \\end{bmatrix} = \\begin{bmatrix} 3 & 5 & 7 \\\\ 3 & 5 & 7 \\\\ 1 & 1 & 1 \\end{bmatrix}$",
+          "Extract results: columns are $(3,3), (5,5), (7,7)$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Point Matrix Construction",
+          "latex": "$\\mathbf{P} = \\begin{bmatrix} \\mid & \\mid & & \\mid \\\\ P_1 & P_2 & \\cdots & P_n \\\\ \\mid & \\mid & & \\mid \\end{bmatrix} = \\begin{bmatrix} x_1 & \\cdots & x_n \\\\ y_1 & \\cdots & y_n \\\\ 1 & \\cdots & 1 \\end{bmatrix}$",
+          "description": "Arrange points as columns of a 3×n matrix with homogeneous coordinates"
+        },
+        {
+          "name": "Batch Transformation",
+          "latex": "$\\mathbf{P}' = T \\cdot \\mathbf{P}$",
+          "description": "Single matrix multiplication transforms all points simultaneously"
+        },
+        {
+          "name": "Result Extraction",
+          "latex": "$P_i' = (\\mathbf{P}'[0,i], \\mathbf{P}'[1,i])$ for $i = 1, \\ldots, n$",
+          "description": "Extract individual transformed points from columns of result matrix"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a list of 2D Cartesian points, converts them to a homogeneous point matrix, applies a given transformation matrix, and returns the transformed points in Cartesian format. This combines all previous concepts and demonstrates the efficient batch processing pattern.",
+        "function_signature": "def batch_transform_points(transformation_matrix, points: list) -> list:",
+        "starter_code": "import numpy as np\n\ndef batch_transform_points(transformation_matrix, points):\n    \"\"\"\n    Apply a transformation matrix to multiple 2D points using batch processing.\n    Input:\n        transformation_matrix - 3x3 numpy array\n        points - list of [x, y] Cartesian coordinates\n    Output: list of transformed [x', y'] Cartesian coordinates\n    \"\"\"\n    # Your code here\n    # Steps:\n    # 1. Convert Cartesian points to homogeneous coordinates\n    # 2. Arrange as columns in a 3×n matrix\n    # 3. Apply transformation via matrix multiplication\n    # 4. Extract columns and convert back to Cartesian\n    pass",
+        "test_cases": [
+          {
+            "input": "batch_transform_points([[1, 0, 0], [0, 1, 0], [0, 0, 1]], [[1, 2], [3, 4]])",
+            "expected": "[[1.0, 2.0], [3.0, 4.0]]",
+            "explanation": "Identity transformation leaves points unchanged"
+          },
+          {
+            "input": "batch_transform_points([[1, 0, 2], [0, 1, 3], [0, 0, 1]], [[0, 0], [1, 1], [2, 2]])",
+            "expected": "[[2.0, 3.0], [3.0, 4.0], [4.0, 5.0]]",
+            "explanation": "Translation by (2,3) adds (2,3) to each point"
+          },
+          {
+            "input": "batch_transform_points([[2, 0, 1], [0, 2, -1], [0, 0, 1]], [[1, 0], [0, 1]])",
+            "expected": "[[3.0, -1.0], [1.0, 1.0]]",
+            "explanation": "Combined scaling (×2) and translation. Point (1,0) becomes (2*1+1, 2*0-1)=(3,-1)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Arranging points as rows instead of columns (should be 3×n, not n×3)",
+        "Forgetting to add the homogeneous coordinate (1s in the third row)",
+        "Incorrect matrix multiplication order (should be T @ P, not P @ T)",
+        "Not converting back to Cartesian coordinates (removing the homogeneous coordinate)",
+        "Using loops instead of matrix operations (inefficient)"
+      ],
+      "hint": "Use np.array() to convert the point list to a NumPy array, then use .T to transpose if needed. The @ operator performs matrix multiplication. Remember to slice the result to get only the first two rows (x and y coordinates) and transpose back to list format.",
+      "references": [
+        "Batch matrix operations",
+        "Vectorized computation",
+        "NumPy broadcasting"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Verifying Translation Properties and Edge Cases",
+      "relation_to_problem": "Before implementing the final solution, it's crucial to understand the mathematical properties that translation must satisfy and handle edge cases correctly. This ensures your implementation is mathematically sound and robust.",
+      "prerequisites": [
+        "Translation matrices",
+        "Matrix composition",
+        "Inverse transformations"
+      ],
+      "learning_objectives": [
+        "Verify mathematical properties of translation transformations",
+        "Test inverse and identity properties",
+        "Handle edge cases (empty point sets, zero translation, negative coordinates)",
+        "Validate transformation correctness through property-based testing"
+      ],
+      "math_content": {
+        "definition": "A translation transformation $T_{(t_x, t_y)}: \\mathbb{R}^2 \\to \\mathbb{R}^2$ satisfies the following properties: (1) **Bijectivity**: Every point has a unique image and preimage; (2) **Group structure**: Translations form a commutative group under composition; (3) **Distance preservation**: $\\|T(P) - T(Q)\\| = \\|P - Q\\|$ for all points $P, Q$ (isometry); (4) **Orientation preservation**: Translation does not flip or mirror objects.",
+        "notation": "$T_{(t_x, t_y)}(P)$ denotes translation of point $P$, $T^{-1}$ denotes inverse, $\\|P - Q\\|$ denotes Euclidean distance",
+        "theorem": "**Translation as Isometry**: Translation is a distance-preserving transformation (isometry). For any translation $T$ and points $P, Q \\in \\mathbb{R}^2$: $\\|T(P) - T(Q)\\| = \\|P - Q\\|$. Furthermore, translations preserve angles, parallel lines, and collinearity.",
+        "proof_sketch": "Let $T(P) = P + \\vec{t}$ where $\\vec{t} = (t_x, t_y)$. Then $\\|T(P) - T(Q)\\| = \\|(P + \\vec{t}) - (Q + \\vec{t})\\| = \\|P - Q\\|$. The translation vector cancels in the difference, preserving distances. Angle preservation follows from the fact that translation doesn't change relative positions of points. Since translation is just vector addition, it cannot change the parallel relationship between lines or the collinearity of points.",
+        "examples": [
+          "**Identity**: $T(0, 0)$ leaves all points unchanged, acting as the identity transformation",
+          "**Inverse**: $T(3, -2)^{-1} = T(-3, 2)$. Applying both yields identity: $T(3, -2) \\circ T(-3, 2) = T(0, 0)$",
+          "**Composition**: $T(1, 2) \\circ T(3, 4) = T(4, 6)$, demonstrating vector addition of translations",
+          "**Distance preservation**: Triangle with vertices $(0,0), (3,0), (0,4)$ has side lengths $3, 4, 5$. After $T(2,1)$, vertices become $(2,1), (5,1), (2,5)$ with same side lengths $3, 4, 5$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Inverse Property",
+          "latex": "$T(t_x, t_y) \\cdot T(-t_x, -t_y) = I$ where $I = \\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & 1 & 0 \\\\ 0 & 0 & 1 \\end{bmatrix}$",
+          "description": "Applying a translation and its inverse returns to the original position"
+        },
+        {
+          "name": "Associativity",
+          "latex": "$(T_3 \\cdot T_2) \\cdot T_1 = T_3 \\cdot (T_2 \\cdot T_1)$",
+          "description": "Translation composition is associative"
+        },
+        {
+          "name": "Commutativity",
+          "latex": "$T_1 \\cdot T_2 = T_2 \\cdot T_1$",
+          "description": "Translation order doesn't matter (unlike rotation or scaling)"
+        },
+        {
+          "name": "Distance Invariance",
+          "latex": "$d(T(P), T(Q)) = d(P, Q) = \\sqrt{(x_P - x_Q)^2 + (y_P - y_Q)^2}$",
+          "description": "Euclidean distance between points is preserved under translation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a comprehensive testing function that verifies the mathematical properties of translation transformations: identity property (T(0,0) is identity), inverse property (T composed with T^(-1) returns original points), composition property (two translations equal combined translation), and distance preservation. This validates your understanding before tackling the main problem.",
+        "function_signature": "def verify_translation_properties(points: list, tx1: float, ty1: float, tx2: float, ty2: float) -> dict:",
+        "starter_code": "import numpy as np\n\ndef verify_translation_properties(points, tx1, ty1, tx2, ty2):\n    \"\"\"\n    Verify mathematical properties of translation transformations.\n    Input:\n        points - list of [x, y] coordinates to test with\n        tx1, ty1 - first translation vector\n        tx2, ty2 - second translation vector\n    Output: dictionary with boolean values for each property\n        {\n            'identity': bool,  # T(0,0) leaves points unchanged\n            'inverse': bool,   # T(tx,ty) then T(-tx,-ty) returns original\n            'composition': bool,  # T(tx2,ty2) @ T(tx1,ty1) = T(tx1+tx2, ty1+ty2)\n            'distance_preservation': bool  # distances between points unchanged\n        }\n    \"\"\"\n    # Your code here\n    # Implement helper functions for creating translation matrices\n    # and applying transformations, then verify each property\n    pass",
+        "test_cases": [
+          {
+            "input": "verify_translation_properties([[0, 0], [1, 1], [2, 0]], 3, 2, -1, 4)",
+            "expected": "{'identity': True, 'inverse': True, 'composition': True, 'distance_preservation': True}",
+            "explanation": "All translation properties should hold for any valid input points and translation vectors"
+          },
+          {
+            "input": "verify_translation_properties([[5, 5]], 0, 0, 0, 0)",
+            "expected": "{'identity': True, 'inverse': True, 'composition': True, 'distance_preservation': True}",
+            "explanation": "Properties hold even for zero translations and single points"
+          },
+          {
+            "input": "verify_translation_properties([[-1, -2], [3, 4], [0, 0]], 2.5, -3.7, -2.5, 3.7)",
+            "expected": "{'identity': True, 'inverse': True, 'composition': True, 'distance_preservation': True}",
+            "explanation": "Properties hold for negative coordinates and floating-point translations that are inverses"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not using sufficient numerical precision when checking equality (use np.allclose instead of ==)",
+        "Forgetting to test with empty or single-point arrays (edge cases)",
+        "Comparing matrices directly instead of comparing their effect on points",
+        "Not accounting for floating-point rounding errors in distance calculations"
+      ],
+      "hint": "Use np.allclose(a, b, atol=1e-9) to compare floating-point results. For distance preservation, compute pairwise distances before and after transformation. For the inverse property, apply T(tx, ty) followed by T(-tx, -ty) and verify you get the original points back.",
+      "references": [
+        "Isometries",
+        "Euclidean transformations",
+        "Group theory in geometry",
+        "Property-based testing"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Translation Implementation with Optimization",
+      "relation_to_problem": "This final sub-quest synthesizes all previous concepts to implement the complete translate_object function. You'll combine homogeneous coordinates, matrix construction, batch processing, and property verification to create an efficient, mathematically rigorous solution.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "NumPy operations",
+        "Code optimization"
+      ],
+      "learning_objectives": [
+        "Integrate all translation concepts into a single cohesive implementation",
+        "Optimize for computational efficiency using vectorized operations",
+        "Handle edge cases and validate inputs",
+        "Produce output in the exact format required by the problem specification"
+      ],
+      "math_content": {
+        "definition": "The complete 2D translation operation on a set of points $\\mathcal{S} = \\{P_1, \\ldots, P_n\\}$ by translation vector $(t_x, t_y)$ is defined as $T_{(t_x, t_y)}(\\mathcal{S}) = \\{T_{(t_x, t_y)}(P_i) : P_i \\in \\mathcal{S}\\} = \\{(x_i + t_x, y_i + t_y) : (x_i, y_i) \\in \\mathcal{S}\\}$. This is efficiently computed using the matrix operation $\\mathbf{P}' = T(t_x, t_y) \\cdot \\mathbf{P}$ where $\\mathbf{P}$ is the homogeneous point matrix.",
+        "notation": "$\\mathcal{S}$ denotes a set of points, $T_{(t_x, t_y)}(\\mathcal{S})$ denotes the translated point set, $\\mathbf{P} \\in \\mathbb{R}^{3 \\times n}$ is the homogeneous point matrix",
+        "theorem": "**Computational Complexity Theorem**: Translating $n$ points using matrix operations has time complexity $O(n)$ (linear in the number of points) with vectorized operations, compared to $O(n)$ for naive iteration. However, matrix operations have better constant factors due to hardware optimization (SIMD, cache efficiency). Space complexity is $O(n)$ for storing the point matrix.",
+        "proof_sketch": "Constructing the translation matrix is $O(1)$ (constant size $3 \\times 3$). Converting $n$ points to homogeneous coordinates requires appending a 1 to each, which is $O(n)$. The matrix multiplication $T \\cdot \\mathbf{P}$ where $T \\in \\mathbb{R}^{3 \\times 3}$ and $\\mathbf{P} \\in \\mathbb{R}^{3 \\times n}$ involves $3 \\times n$ vector dot products of dimension 3, totaling $O(3 \\cdot 3 \\cdot n) = O(n)$ operations. Extracting results is $O(n)$. Total: $O(n)$. Modern BLAS implementations and vectorization provide significant performance improvements over naive Python loops.",
+        "examples": [
+          "**Complete workflow**: Given points $[(0, 0), (1, 0), (0.5, 1)]$ and translation $(2, 3)$, construct $T = \\begin{bmatrix} 1 & 0 & 2 \\\\ 0 & 1 & 3 \\\\ 0 & 0 & 1 \\end{bmatrix}$, form $\\mathbf{P} = \\begin{bmatrix} 0 & 1 & 0.5 \\\\ 0 & 0 & 1 \\\\ 1 & 1 & 1 \\end{bmatrix}$, compute $T\\mathbf{P} = \\begin{bmatrix} 2 & 3 & 2.5 \\\\ 3 & 3 & 4 \\\\ 1 & 1 & 1 \\end{bmatrix}$, extract $[(2, 3), (3, 3), (2.5, 4)]$",
+          "**Empty input**: Translating an empty list $[]$ should return $[]$ (handle gracefully)",
+          "**Large scale**: Translating 10,000 points is efficiently handled by single matrix multiplication"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Translation Pipeline",
+          "latex": "$T_{(t_x, t_y)}(\\mathcal{S}) = \\text{extract}\\left(\\begin{bmatrix} 1 & 0 & t_x \\\\ 0 & 1 & t_y \\\\ 0 & 0 & 1 \\end{bmatrix} \\cdot \\text{homogenize}(\\mathcal{S})\\right)$",
+          "description": "Complete pipeline: homogenize points → multiply by translation matrix → extract Cartesian coordinates"
+        },
+        {
+          "name": "Output Format",
+          "latex": "$\\text{output}_i = [x_i + t_x, y_i + t_y]$ for each input $[x_i, y_i]$",
+          "description": "Final output is a list of [x', y'] coordinate pairs in floating-point format"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete translate_object function that takes a list of 2D points and translation parameters, and returns the translated points. Use all concepts from previous sub-quests: convert to homogeneous coordinates, create translation matrix, perform batch transformation, and extract results. Ensure efficient implementation using NumPy and proper handling of edge cases.",
+        "function_signature": "def translate_object(points: list, tx: float, ty: float) -> list:",
+        "starter_code": "import numpy as np\n\ndef translate_object(points, tx, ty):\n    \"\"\"\n    Apply 2D translation to a set of points using transformation matrix.\n    \n    Input:\n        points - list of [x, y] coordinates (e.g., [[0, 0], [1, 2]])\n        tx - translation distance in x-direction (float)\n        ty - translation distance in y-direction (float)\n    \n    Output:\n        list of translated [x', y'] coordinates where x' = x + tx, y' = y + ty\n        All coordinates should be floats\n    \n    Edge cases to handle:\n        - Empty point list should return empty list\n        - Single point should work correctly\n        - Negative coordinates and translations are valid\n    \"\"\"\n    # Your implementation here\n    # Step 1: Handle edge case of empty input\n    # Step 2: Convert points to homogeneous coordinates (add column of ones)\n    # Step 3: Create 3x3 translation matrix\n    # Step 4: Apply transformation via matrix multiplication\n    # Step 5: Extract first two rows and convert to list format\n    pass",
+        "test_cases": [
+          {
+            "input": "translate_object([[0, 0], [1, 0], [0.5, 1]], 2, 3)",
+            "expected": "[[2.0, 3.0], [3.0, 3.0], [2.5, 4.0]]",
+            "explanation": "Standard case from problem description: each point (x,y) becomes (x+2, y+3)"
+          },
+          {
+            "input": "translate_object([], 5, 5)",
+            "expected": "[]",
+            "explanation": "Empty input should return empty output"
+          },
+          {
+            "input": "translate_object([[1, 1]], 0, 0)",
+            "expected": "[[1.0, 1.0]]",
+            "explanation": "Zero translation leaves point unchanged (identity transformation)"
+          },
+          {
+            "input": "translate_object([[-1, -2], [3, 4]], -2, 5)",
+            "expected": "[[-3.0, 3.0], [1.0, 9.0]]",
+            "explanation": "Negative coordinates and translations: (-1-2, -2+5)=(-3,3) and (3-2, 4+5)=(1,9)"
+          },
+          {
+            "input": "translate_object([[0.0, 0.0], [1.5, 2.5], [3.7, 4.2]], 1.1, -0.5)",
+            "expected": "[[1.1, -0.5], [2.6, 2.0], [4.8, 3.7]]",
+            "explanation": "Floating-point coordinates and translations work correctly"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Returning integer coordinates instead of floats (use .tolist() after ensuring dtype is float)",
+        "Not handling empty input list (check length before processing)",
+        "Incorrect matrix dimensions causing multiplication errors (ensure 3×3 matrix and 3×n points)",
+        "Forgetting to remove the homogeneous coordinate from final output",
+        "Using nested loops instead of vectorized operations (inefficient)",
+        "Not converting NumPy array back to Python list format"
+      ],
+      "hint": "Structure your solution in clear steps: (1) Handle empty case early; (2) Convert input list to NumPy array; (3) Add a row of ones for homogeneous coordinates; (4) Create translation matrix using np.eye(3) and modify appropriate elements; (5) Use @ for matrix multiplication; (6) Slice first two rows; (7) Transpose and convert to list. Test each step independently.",
+      "references": [
+        "NumPy documentation",
+        "Computer graphics transformations",
+        "Affine transformation implementation",
+        "Matrix operations optimization"
+      ]
+    }
+  ]
+}

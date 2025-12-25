@@ -1,0 +1,457 @@
+{
+  "problem_id": 175,
+  "title": "Implement the SARSA Algorithm on policy",
+  "category": "Reinforcement Learning",
+  "difficulty": "medium",
+  "description": "Implement the **SARSA** algorithm to estimate Q-values for a given set of deterministic transitions using greedy action selection.\n\n- All Q-values are initialized to zero.\n- Each episode starts from a given initial state.\n- The episode ends when it reaches the $terminal$ state or when the number of steps exceeds $maxsteps$.\n- Changes made to Q-values are persistent across episodes.",
+  "example": {
+    "input": "transitions = {\n    ('A', 'left'): (5.0, 'B'),\n    ('A', 'right'): (1.0, 'C'),\n    ('B', 'left'): (2.0, 'A'),\n    ('B', 'right'): (0.0, 'C'),\n    ('C', 'down'): (1.0, 'terminal')\n}\n\ninitial_states = ['A', 'B']\nalpha = 0.1\ngamma = 0.9\nmax_steps = 10\n\nQ = sarsa_update(transitions, initial_states, alpha, gamma, max_steps)\n\nfor k in sorted(transitions):\n    print(f\"Q{str(k):15} = {Q[k]:.4f}\")",
+    "output": "Q('A', 'left')   = 4.2181\nQ('A', 'right')  = 0.0000\nQ('B', 'left')   = 2.7901\nQ('B', 'right')  = 0.0000",
+    "reasoning": "The SARSA update rule is:\nQ(s,a) <- Q(s,a) + alpha * [reward + gamma * Q(s',a') - Q(s,a)]\n\nStarting from initial Q-values of 0, each episode updates Q-values based on the transitions.\n- Q('A', 'left') increases because it leads to B, and B can eventually return to A or C with additional rewards.\n- Q('A', 'right') and Q('B', 'right') remain 0.0 because the next state C leads directly to terminal with small reward.\n- Q('B', 'left') increases due to cyclic transitions giving non-zero rewards."
+  },
+  "starter_code": "def sarsa_update(transitions, initial_states, alpha, gamma, max_steps):\n    \"\"\"\n    Perform SARSA updates on the given environment transitions.\n    Args:\n        transitions (dict): mapping (state, action) -> (reward, next_state)\n        initial_states (list): list of starting states to simulate episodes from\n        alpha (float): learning rate\n        gamma (float): discount factor\n        max_steps (int): maximum steps allowed per episode\n    Returns:\n        dict: final Q-table as a dictionary {(state, action): value}\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Temporal Difference (TD) Error and Q-Value Updates",
+      "relation_to_problem": "The core of SARSA is the TD error calculation: $\\delta = R + \\gamma Q(S', A') - Q(S, A)$. Understanding this is essential for implementing the Q-value update mechanism.",
+      "prerequisites": [
+        "Basic algebra",
+        "Understanding of state-action pairs",
+        "Dictionary data structures in Python"
+      ],
+      "learning_objectives": [
+        "Understand the temporal difference error as the discrepancy between predicted and observed values",
+        "Compute Q-value updates using the TD learning rule",
+        "Implement incremental updates to a Q-table"
+      ],
+      "math_content": {
+        "definition": "**Temporal Difference Error** is the difference between the observed return (immediate reward plus discounted future value) and the current estimate. Formally, for a state-action pair $(s, a)$ with reward $r$, next state $s'$, and next action $a'$: $$\\delta_t = r + \\gamma Q(s', a') - Q(s, a)$$ where $\\delta_t$ is the TD error at time $t$.",
+        "notation": "$Q(s, a)$ = current estimate of action-value for state $s$ and action $a$; $\\alpha$ = learning rate, $0 < \\alpha \\leq 1$; $\\gamma$ = discount factor, $0 \\leq \\gamma \\leq 1$; $r$ = immediate reward; $\\delta$ = temporal difference error",
+        "theorem": "**TD Update Rule**: The Q-value is updated incrementally using: $$Q_{\\text{new}}(s, a) = Q_{\\text{old}}(s, a) + \\alpha \\cdot \\delta$$ This is equivalent to: $$Q(s, a) \\leftarrow Q(s, a) + \\alpha [r + \\gamma Q(s', a') - Q(s, a)]$$",
+        "proof_sketch": "The TD update rule can be derived from gradient descent on the squared TD error. Let $L = \\frac{1}{2}\\delta^2$ be the loss function. Then: $$\\frac{\\partial L}{\\partial Q(s,a)} = \\delta \\cdot \\frac{\\partial}{\\partial Q(s,a)}[r + \\gamma Q(s',a') - Q(s,a)] = -\\delta$$. A gradient descent step with learning rate $\\alpha$ gives: $$Q(s,a) \\leftarrow Q(s,a) - \\alpha(-\\delta) = Q(s,a) + \\alpha\\delta$$",
+        "examples": [
+          "Example 1: Given $Q(s,a) = 0$, $r = 5$, $\\gamma = 0.9$, $Q(s',a') = 2$, $\\alpha = 0.1$. TD error: $\\delta = 5 + 0.9(2) - 0 = 6.8$. New Q-value: $Q(s,a) = 0 + 0.1(6.8) = 0.68$",
+          "Example 2: Given $Q(s,a) = 3.5$, $r = 1$, $\\gamma = 0.5$, $Q(s',a') = 4$, $\\alpha = 0.2$. TD error: $\\delta = 1 + 0.5(4) - 3.5 = -0.5$. New Q-value: $Q(s,a) = 3.5 + 0.2(-0.5) = 3.4$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Temporal Difference Error",
+          "latex": "$\\delta = r + \\gamma Q(s', a') - Q(s, a)$",
+          "description": "Measures the difference between expected and observed values"
+        },
+        {
+          "name": "Q-Value Update",
+          "latex": "$Q(s, a) \\leftarrow Q(s, a) + \\alpha \\delta$",
+          "description": "Updates Q-value by moving it toward the observed target"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs a single TD update on a Q-value given the current Q-value, reward, next Q-value, learning rate, and discount factor. This is the fundamental building block of SARSA.",
+        "function_signature": "def td_update(current_q: float, reward: float, next_q: float, alpha: float, gamma: float) -> float:",
+        "starter_code": "def td_update(current_q: float, reward: float, next_q: float, alpha: float, gamma: float) -> float:\n    \"\"\"\n    Perform a single temporal difference update.\n    Args:\n        current_q: Current Q-value Q(s, a)\n        reward: Immediate reward r\n        next_q: Next Q-value Q(s', a')\n        alpha: Learning rate\n        gamma: Discount factor\n    Returns:\n        Updated Q-value\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "td_update(0, 5, 2, 0.1, 0.9)",
+            "expected": "0.68",
+            "explanation": "TD error is 5 + 0.9*2 - 0 = 6.8, update is 0 + 0.1*6.8 = 0.68"
+          },
+          {
+            "input": "td_update(3.5, 1, 4, 0.2, 0.5)",
+            "expected": "3.4",
+            "explanation": "TD error is 1 + 0.5*4 - 3.5 = -0.5, update is 3.5 + 0.2*(-0.5) = 3.4"
+          },
+          {
+            "input": "td_update(10, 2, 8, 0.5, 1.0)",
+            "expected": "10.0",
+            "explanation": "TD error is 2 + 1.0*8 - 10 = 0, no change to Q-value"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to multiply gamma by the next Q-value before adding to reward",
+        "Using the wrong sign for the TD error in the update",
+        "Confusing the order of operations: the TD error must be computed before the update",
+        "Not handling terminal states where next_q should be 0"
+      ],
+      "hint": "First compute the target value (reward + discounted next Q-value), then compute the difference from current Q-value, then move the current Q-value toward the target by alpha times this difference.",
+      "references": [
+        "Sutton & Barto Chapter 6: Temporal-Difference Learning",
+        "TD(0) learning",
+        "Bellman expectation equation"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Greedy Action Selection from Q-Values",
+      "relation_to_problem": "SARSA requires selecting actions based on Q-values. For this problem, we use greedy action selection: choose the action with highest Q-value. This is critical for the on-policy behavior.",
+      "prerequisites": [
+        "Q-value concept",
+        "Dictionary operations",
+        "Finding maximum values"
+      ],
+      "learning_objectives": [
+        "Understand greedy action selection as maximizing expected value",
+        "Extract available actions for a given state from transition structure",
+        "Implement argmax operation over action space"
+      ],
+      "math_content": {
+        "definition": "**Greedy Policy** $\\pi_g$ is a deterministic policy that selects the action with maximum Q-value: $$\\pi_g(s) = \\arg\\max_{a \\in \\mathcal{A}(s)} Q(s, a)$$ where $\\mathcal{A}(s)$ is the set of actions available in state $s$.",
+        "notation": "$\\pi(s)$ = policy function mapping state to action; $\\mathcal{A}(s)$ = set of available actions in state $s$; $\\arg\\max$ = argument that maximizes the function",
+        "theorem": "**Greedy Policy Improvement Theorem**: Given a Q-function $Q^\\pi$ for policy $\\pi$, the greedy policy $\\pi'(s) = \\arg\\max_a Q^\\pi(s,a)$ satisfies $V^{\\pi'}(s) \\geq V^\\pi(s)$ for all states $s$, where $V^\\pi(s) = \\max_a Q^\\pi(s,a)$ is the state-value function.",
+        "proof_sketch": "For any state $s$: $$V^{\\pi'}(s) = Q^\\pi(s, \\pi'(s)) = Q^\\pi(s, \\arg\\max_a Q^\\pi(s,a)) = \\max_a Q^\\pi(s,a) = V^\\pi(s)$$ with equality when $\\pi$ is already greedy. If $\\pi$ is not greedy at $s$, then $\\pi'(s)$ selects an action with higher Q-value than $\\pi(s)$, giving strict improvement.",
+        "examples": [
+          "Example 1: State A with Q(A, left)=3.5, Q(A, right)=1.2. Greedy action: $\\arg\\max\\{3.5, 1.2\\} = \\text{left}$",
+          "Example 2: State B with Q(B, up)=2.0, Q(B, down)=2.0, Q(B, stay)=1.5. Greedy action: $\\arg\\max\\{2.0, 2.0, 1.5\\} = \\text{up or down}$ (ties broken arbitrarily)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Greedy Action",
+          "latex": "$a^* = \\arg\\max_{a \\in \\mathcal{A}(s)} Q(s, a)$",
+          "description": "Select action with highest Q-value"
+        },
+        {
+          "name": "State Value under Greedy Policy",
+          "latex": "$V(s) = \\max_{a \\in \\mathcal{A}(s)} Q(s, a)$",
+          "description": "Value of state when acting greedily"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that selects a greedy action given a state and Q-table. The function should find all actions available from the state (present in transitions) and return the action with highest Q-value. Break ties by returning the first maximum found.",
+        "function_signature": "def select_greedy_action(state: str, transitions: dict, Q: dict) -> str:",
+        "starter_code": "def select_greedy_action(state: str, transitions: dict, Q: dict) -> str:\n    \"\"\"\n    Select the greedy action (highest Q-value) for a given state.\n    Args:\n        state: Current state\n        transitions: Dict mapping (state, action) -> (reward, next_state)\n        Q: Q-table as dict {(state, action): value}\n    Returns:\n        Action with highest Q-value (or first action if all Q-values equal)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "select_greedy_action('A', {('A', 'left'): (5, 'B'), ('A', 'right'): (1, 'C')}, {('A', 'left'): 3.5, ('A', 'right'): 1.2})",
+            "expected": "'left'",
+            "explanation": "Q(A, left)=3.5 > Q(A, right)=1.2, so left is greedy"
+          },
+          {
+            "input": "select_greedy_action('B', {('B', 'up'): (2, 'A'), ('B', 'down'): (3, 'C')}, {('B', 'up'): 0, ('B', 'down'): 0})",
+            "expected": "'up' or 'down'",
+            "explanation": "Both actions have Q=0, either is valid (implementation dependent)"
+          },
+          {
+            "input": "select_greedy_action('C', {('C', 'jump'): (10, 'D'), ('C', 'walk'): (1, 'E'), ('C', 'run'): (5, 'F')}, {('C', 'jump'): 8.5, ('C', 'walk'): 2.1, ('C', 'run'): 4.3})",
+            "expected": "'jump'",
+            "explanation": "Q(C, jump)=8.5 is maximum among all three actions"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not extracting available actions from the transitions dictionary structure",
+        "Returning the Q-value instead of the action",
+        "Not handling the case where Q-values are not yet initialized (should default to 0)",
+        "Inefficient iteration through all Q-table entries instead of just relevant state-action pairs"
+      ],
+      "hint": "Extract all actions available from the given state by checking which (state, action) keys exist in transitions. Then compare Q-values for these state-action pairs.",
+      "references": [
+        "Greedy policy",
+        "Argmax operation",
+        "Policy improvement theorem"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Episode Simulation with State Transitions",
+      "relation_to_problem": "SARSA runs multiple episodes to learn Q-values. Each episode involves following a sequence of state transitions until reaching a terminal state or maximum steps. This teaches how to simulate trajectories.",
+      "prerequisites": [
+        "State transition dynamics",
+        "Episode termination conditions",
+        "Loop control structures"
+      ],
+      "learning_objectives": [
+        "Understand episode-based learning in reinforcement learning",
+        "Implement trajectory generation following a deterministic transition function",
+        "Handle terminal states and maximum step constraints"
+      ],
+      "math_content": {
+        "definition": "An **episode** (or **trajectory**) is a finite sequence of states, actions, and rewards: $$\\tau = (s_0, a_0, r_1, s_1, a_1, r_2, ..., s_T)$$ starting from initial state $s_0$ and ending at terminal state $s_T$ or after maximum time steps $T_{\\max}$. The transition function $\\mathcal{T}: \\mathcal{S} \\times \\mathcal{A} \\rightarrow \\mathcal{R} \\times \\mathcal{S}$ maps $(s_t, a_t)$ to $(r_{t+1}, s_{t+1})$.",
+        "notation": "$\\tau$ = trajectory/episode; $s_t$ = state at time $t$; $a_t$ = action at time $t$; $r_t$ = reward at time $t$; $T$ = episode length; $\\mathcal{T}$ = transition function",
+        "theorem": "**Episode Return**: The total return from an episode is: $$G_0 = \\sum_{t=0}^{T-1} \\gamma^t r_{t+1}$$ where $\\gamma \\in [0,1]$ is the discount factor. For $\\gamma < 1$, this sum is finite even for infinite episodes.",
+        "proof_sketch": "If $|r_t| \\leq R_{\\max}$ for all $t$, then: $$|G_0| \\leq \\sum_{t=0}^{\\infty} \\gamma^t R_{\\max} = R_{\\max} \\frac{1}{1-\\gamma} < \\infty$$ by the geometric series formula, provided $\\gamma < 1$.",
+        "examples": [
+          "Example 1: Episode starting at A: $s_0=A \\xrightarrow{\\text{left}} s_1=B \\xrightarrow{\\text{right}} s_2=C \\xrightarrow{\\text{end}} \\text{terminal}$. If rewards are $r_1=5, r_2=2, r_3=1$ with $\\gamma=0.9$: $G_0 = 5 + 0.9(2) + 0.81(1) = 7.61$",
+          "Example 2: Episode with max steps=3 starting at A: $s_0=A \\rightarrow s_1=B \\rightarrow s_2=A \\rightarrow s_3=B$ (stopped at 3 steps). Trajectory: $(A, a_0, r_1, B, a_1, r_2, A, a_2, r_3, B)$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Episode Return",
+          "latex": "$G_t = \\sum_{k=0}^{T-t-1} \\gamma^k r_{t+k+1}$",
+          "description": "Cumulative discounted reward from time t"
+        },
+        {
+          "name": "State Transition",
+          "latex": "$(r_{t+1}, s_{t+1}) = \\mathcal{T}(s_t, a_t)$",
+          "description": "Deterministic transition from state-action to reward-next_state"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that simulates a single episode given an initial state, transition function, and action selection policy. Return the trajectory as a list of tuples: [(state, action, reward, next_state), ...]. Stop when reaching 'terminal' state or after max_steps.",
+        "function_signature": "def simulate_episode(initial_state: str, transitions: dict, policy: callable, max_steps: int) -> list:",
+        "starter_code": "def simulate_episode(initial_state: str, transitions: dict, policy: callable, max_steps: int) -> list:\n    \"\"\"\n    Simulate one episode following the given policy.\n    Args:\n        initial_state: Starting state\n        transitions: Dict mapping (state, action) -> (reward, next_state)\n        policy: Function that takes (state, transitions) and returns action\n        max_steps: Maximum number of steps before termination\n    Returns:\n        List of (state, action, reward, next_state) tuples representing the trajectory\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "simulate_episode('A', {('A', 'move'): (1, 'terminal')}, lambda s, t: 'move', 10)",
+            "expected": "[('A', 'move', 1, 'terminal')]",
+            "explanation": "Single step from A to terminal with reward 1"
+          },
+          {
+            "input": "simulate_episode('A', {('A', 'right'): (5, 'B'), ('B', 'left'): (2, 'A')}, lambda s, t: 'right' if s == 'A' else 'left', 3)",
+            "expected": "[('A', 'right', 5, 'B'), ('B', 'left', 2, 'A'), ('A', 'right', 5, 'B')]",
+            "explanation": "Cycles A->B->A->B for 3 steps (max_steps reached)"
+          },
+          {
+            "input": "simulate_episode('S', {('S', 'go'): (10, 'terminal')}, lambda s, t: 'go', 100)",
+            "expected": "[('S', 'go', 10, 'terminal')]",
+            "explanation": "Reaches terminal before max_steps"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking for terminal state before incrementing step counter",
+        "Off-by-one errors in max_steps comparison",
+        "Trying to select action from terminal state (should stop immediately)",
+        "Not properly extracting reward and next_state from transitions dictionary"
+      ],
+      "hint": "Use a loop that continues while steps < max_steps AND current state != 'terminal'. In each iteration: select action, look up transition, record tuple, move to next state.",
+      "references": [
+        "Markov Decision Process episodes",
+        "Trajectory generation",
+        "Episode termination conditions"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Q-Table Initialization and Management",
+      "relation_to_problem": "SARSA maintains a Q-table that persists across episodes. Understanding how to initialize, access, and update Q-values with proper default handling is essential for the implementation.",
+      "prerequisites": [
+        "Dictionary data structures",
+        "Default values",
+        "Hashable keys"
+      ],
+      "learning_objectives": [
+        "Initialize Q-tables with appropriate default values",
+        "Access Q-values with fallback to default when not yet computed",
+        "Update Q-table entries in-place across multiple episodes"
+      ],
+      "math_content": {
+        "definition": "A **Q-table** is a function $Q: \\mathcal{S} \\times \\mathcal{A} \\rightarrow \\mathbb{R}$ that maps each state-action pair to an estimated action-value. In tabular form: $$Q = \\{((s, a), v) : s \\in \\mathcal{S}, a \\in \\mathcal{A}(s), v \\in \\mathbb{R}\\}$$ Initial values are typically set to: $$Q_0(s, a) = 0 \\quad \\forall s, a$$ or to small random values to encourage exploration.",
+        "notation": "$Q(s, a)$ = action-value estimate; $\\mathcal{S}$ = state space; $\\mathcal{A}(s)$ = actions available in state $s$; $Q_0$ = initial Q-table",
+        "theorem": "**Initialization Impact**: The choice of initial Q-values affects convergence speed but not the final converged values (under appropriate conditions). **Optimistic initialization** (setting $Q_0(s,a) > 0$) encourages exploration by making all actions initially attractive.",
+        "proof_sketch": "Under SARSA with appropriate learning rate decay $\\sum_t \\alpha_t = \\infty$ and $\\sum_t \\alpha_t^2 < \\infty$, and assuming all state-action pairs are visited infinitely often, the Q-values converge to the true Q-function $Q^\\pi$ regardless of initialization: $$\\lim_{t \\rightarrow \\infty} Q_t(s,a) = Q^\\pi(s,a)$$ This follows from stochastic approximation theory (Robbins-Monro conditions).",
+        "examples": [
+          "Example 1: Zero initialization with 2 states and 2 actions each: $Q = \\{(A, \\text{left}): 0, (A, \\text{right}): 0, (B, \\text{up}): 0, (B, \\text{down}): 0\\}$",
+          "Example 2: After one update: $Q(A, \\text{left})$ updated to 0.5, others remain 0: $Q = \\{(A, \\text{left}): 0.5, (A, \\text{right}): 0, (B, \\text{up}): 0, (B, \\text{down}): 0\\}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Q-Table Access with Default",
+          "latex": "$Q(s, a) = \\begin{cases} Q_{\\text{table}}[(s,a)] & \\text{if } (s,a) \\in Q_{\\text{table}} \\\\ 0 & \\text{otherwise} \\end{cases}$",
+          "description": "Return stored value or default to 0"
+        },
+        {
+          "name": "Terminal State Value",
+          "latex": "$Q(\\text{terminal}, a) = 0 \\quad \\forall a$",
+          "description": "Terminal states have zero value by definition"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a Q-table class that initializes all state-action pairs to zero and provides safe access with default values. Include methods to get Q-value (defaulting to 0) and update Q-value. Handle terminal states specially by always returning 0.",
+        "function_signature": "class QTable:\n    def __init__(self):\n        pass\n    def get(self, state: str, action: str) -> float:\n        pass\n    def update(self, state: str, action: str, value: float) -> None:\n        pass",
+        "starter_code": "class QTable:\n    def __init__(self):\n        \"\"\"\n        Initialize an empty Q-table.\n        \"\"\"\n        # Your code here\n        pass\n    \n    def get(self, state: str, action: str) -> float:\n        \"\"\"\n        Get Q-value for (state, action), returning 0 if not found or if state is 'terminal'.\n        \"\"\"\n        # Your code here\n        pass\n    \n    def update(self, state: str, action: str, value: float) -> None:\n        \"\"\"\n        Update Q-value for (state, action). Do nothing if state is 'terminal'.\n        \"\"\"\n        # Your code here\n        pass",
+        "test_cases": [
+          {
+            "input": "q = QTable(); q.get('A', 'left')",
+            "expected": "0.0",
+            "explanation": "Uninitialized Q-values default to 0"
+          },
+          {
+            "input": "q = QTable(); q.update('A', 'left', 3.5); q.get('A', 'left')",
+            "expected": "3.5",
+            "explanation": "After update, Q-value is stored and retrieved"
+          },
+          {
+            "input": "q = QTable(); q.update('terminal', 'any', 100); q.get('terminal', 'any')",
+            "expected": "0.0",
+            "explanation": "Terminal state always returns 0, updates ignored"
+          },
+          {
+            "input": "q = QTable(); q.update('B', 'up', 2.0); q.update('B', 'up', 5.0); q.get('B', 'up')",
+            "expected": "5.0",
+            "explanation": "Subsequent updates overwrite previous values"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling missing keys with default value of 0",
+        "Forgetting to special-case terminal states",
+        "Allowing updates to terminal state Q-values",
+        "Using mutable default arguments in function definitions"
+      ],
+      "hint": "Use a dictionary to store Q-values with (state, action) tuples as keys. In the get method, check if state is 'terminal' first, then use dict.get() with default value 0.",
+      "references": [
+        "Q-function representation",
+        "Optimistic initialization",
+        "Terminal state handling"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "On-Policy Action Selection in SARSA",
+      "relation_to_problem": "The defining characteristic of SARSA is that it's on-policy: it updates Q(s,a) using the action a' that the agent will actually take in state s', not the optimal action. This step teaches the critical difference from off-policy methods.",
+      "prerequisites": [
+        "Q-table operations",
+        "Greedy action selection",
+        "Policy concepts"
+      ],
+      "learning_objectives": [
+        "Understand the on-policy nature of SARSA vs off-policy methods like Q-learning",
+        "Implement the SARSA action selection pattern: select next action BEFORE updating",
+        "Recognize why SARSA needs both current and next actions for updates"
+      ],
+      "math_content": {
+        "definition": "**On-Policy Learning**: An algorithm that learns the value of the policy being executed. SARSA learns $Q^\\pi$ where $\\pi$ is the current behavior policy. The update uses the actual next action $a'$ taken by policy $\\pi$: $$Q(s, a) \\leftarrow Q(s, a) + \\alpha[r + \\gamma Q(s', a') - Q(s, a)]$$ **Off-Policy Learning** (like Q-learning) learns the value of a different policy (usually optimal) than the one being executed: $$Q(s, a) \\leftarrow Q(s, a) + \\alpha[r + \\gamma \\max_{a'} Q(s', a') - Q(s, a)]$$",
+        "notation": "$\\pi$ = behavior policy being followed; $Q^\\pi(s,a)$ = value of state-action under policy $\\pi$; $a' \\sim \\pi(\\cdot|s')$ = next action sampled from policy $\\pi$ at state $s'$",
+        "theorem": "**SARSA Convergence (Tabular Case)**: For a fixed policy $\\pi$ and learning rate satisfying $\\sum_t \\alpha_t = \\infty$ and $\\sum_t \\alpha_t^2 < \\infty$, SARSA converges to the true action-value function $Q^\\pi$ with probability 1: $$\\lim_{t \\rightarrow \\infty} Q_t(s,a) = Q^\\pi(s,a) \\quad \\forall (s,a)$$ This holds when all state-action pairs are visited infinitely often (ensured by exploration).",
+        "proof_sketch": "SARSA is a stochastic approximation algorithm. The target $r + \\gamma Q(s', a')$ is an unbiased estimator of $Q^\\pi(s,a)$ when $a' \\sim \\pi$: $$\\mathbb{E}_{a' \\sim \\pi}[r + \\gamma Q^\\pi(s', a')] = Q^\\pi(s,a)$$ by the Bellman expectation equation. The Robbins-Monro theorem guarantees convergence under the learning rate conditions.",
+        "examples": [
+          "Example 1 (SARSA): In state A, agent selects action 'left' greedily. Before updating, agent observes next state B and selects next action 'up' greedily. Update uses Q(B, 'up'), the action the agent will actually take.",
+          "Example 2 (Q-learning contrast): Same scenario, but Q-learning updates using $\\max\\{Q(B, \\text{'up'}), Q(B, \\text{'down'}), ...\\}$ regardless of which action the agent will actually take. This is off-policy."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "SARSA Update (On-Policy)",
+          "latex": "$Q(s, a) \\leftarrow Q(s, a) + \\alpha[r + \\gamma Q(s', a') - Q(s, a)]$",
+          "description": "Uses actual next action $a'$ chosen by policy"
+        },
+        {
+          "name": "Q-Learning Update (Off-Policy)",
+          "latex": "$Q(s, a) \\leftarrow Q(s, a) + \\alpha[r + \\gamma \\max_{a'} Q(s', a') - Q(s, a)]$",
+          "description": "Uses maximum Q-value regardless of actual next action"
+        },
+        {
+          "name": "Action Selection Sequence",
+          "latex": "$s_t \\xrightarrow{\\pi} a_t \\xrightarrow{\\mathcal{T}} (r_{t+1}, s_{t+1}) \\xrightarrow{\\pi} a_{t+1}$",
+          "description": "SARSA requires selecting $a_{t+1}$ before updating $Q(s_t, a_t)$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs a SARSA-style trajectory with Q-updates. Given initial state and policy, simulate one step: select action using policy, observe transition, select NEXT action using policy, compute SARSA update, return the updated Q-value and next state/action for continuing the episode.",
+        "function_signature": "def sarsa_step(state: str, Q: dict, transitions: dict, policy: callable, alpha: float, gamma: float) -> tuple:",
+        "starter_code": "def sarsa_step(state: str, Q: dict, transitions: dict, policy: callable, alpha: float, gamma: float) -> tuple:\n    \"\"\"\n    Perform one SARSA step: select action, transition, select next action, update Q.\n    Args:\n        state: Current state\n        Q: Q-table as dict {(state, action): value}\n        transitions: Dict mapping (state, action) -> (reward, next_state)\n        policy: Function(state, transitions, Q) -> action\n        alpha: Learning rate\n        gamma: Discount factor\n    Returns:\n        (updated_Q_value, next_state, next_action) tuple\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "sarsa_step('A', {('A','left'):0, ('B','right'):0}, {('A','left'):(5,'B'), ('B','right'):(2,'terminal')}, lambda s,t,q: 'left' if s=='A' else 'right', 0.1, 0.9)",
+            "expected": "(0.5, 'B', 'right')",
+            "explanation": "Action 'left' selected, reward=5, next_state='B', next_action='right' (Q=0), TD_error=5+0.9*0-0=5, new_Q=0+0.1*5=0.5"
+          },
+          {
+            "input": "sarsa_step('A', {('A','go'):2.0, ('B','stop'):3.0}, {('A','go'):(1,'B')}, lambda s,t,q: 'go' if s=='A' else 'stop', 0.5, 1.0)",
+            "expected": "(2.0, 'B', 'stop')",
+            "explanation": "TD_error=1+1.0*3-2=2, new_Q=2+0.5*2=3.0... Wait, this should be 3.0, not 2.0. Let me recalculate: current Q(A,go)=2, reward=1, next Q(B,stop)=3, target=1+1*3=4, error=4-2=2, update=2+0.5*2=3.0"
+          },
+          {
+            "input": "sarsa_step('S', {('S','act'):10}, {('S','act'):(5,'terminal')}, lambda s,t,q: 'act', 0.2, 0.5)",
+            "expected": "(9.0, 'terminal', None)",
+            "explanation": "Next state is terminal (Q=0), TD_error=5+0.5*0-10=-5, new_Q=10+0.2*(-5)=9.0, next_action is None or doesn't matter for terminal"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Selecting next action AFTER updating Q-value (breaks SARSA pattern)",
+        "Using max Q-value instead of the actual next action's Q-value (makes it Q-learning, not SARSA)",
+        "Not handling terminal states where next action doesn't exist",
+        "Modifying Q-table in-place but not returning updated value"
+      ],
+      "hint": "Follow this exact sequence: (1) select action a from state s using policy, (2) look up (reward, next_state) from transitions, (3) select next_action from next_state using policy, (4) compute Q_next using next_state and next_action (0 if terminal), (5) apply SARSA update formula.",
+      "references": [
+        "On-policy vs off-policy learning",
+        "SARSA vs Q-learning comparison",
+        "Policy evaluation and control"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Multi-Episode SARSA Learning with Persistent Q-Values",
+      "relation_to_problem": "The final piece is running multiple episodes where Q-values learned in one episode persist and improve over successive episodes. This teaches the complete SARSA learning loop.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Episode simulation",
+        "Q-table persistence"
+      ],
+      "learning_objectives": [
+        "Implement the complete SARSA algorithm with multiple episodes",
+        "Understand how Q-values improve across episodes through experience",
+        "Handle multiple initial states and aggregate learning"
+      ],
+      "math_content": {
+        "definition": "**Multi-Episode SARSA** runs the SARSA update procedure for $N$ episodes, where each episode $i$ starts from an initial state $s_0^{(i)}$ and proceeds until terminal or maximum steps. The Q-table $Q$ is shared across all episodes and updated incrementally: $$\\text{For episode } i = 1, ..., N:\\\\s \\leftarrow s_0^{(i)}, \\; a \\leftarrow \\pi(s)\\\\\\text{While } s \\neq \\text{terminal and steps} < T_{\\max}:\\\\\\quad (r, s') \\leftarrow \\mathcal{T}(s, a), \\; a' \\leftarrow \\pi(s')\\\\\\quad Q(s, a) \\leftarrow Q(s, a) + \\alpha[r + \\gamma Q(s', a') - Q(s, a)]\\\\\\quad s \\leftarrow s', \\; a \\leftarrow a'$$",
+        "notation": "$N$ = number of episodes; $s_0^{(i)}$ = initial state for episode $i$; $T_{\\max}$ = maximum steps per episode; $Q$ = shared Q-table across episodes",
+        "theorem": "**Experience Aggregation**: Running multiple episodes with different initial states provides broader coverage of the state-action space, accelerating convergence. The effective sample size after $N$ episodes with average length $\\bar{T}$ is $N \\cdot \\bar{T}$ state-action updates.",
+        "proof_sketch": "Each episode of length $T_i$ contributes $T_i$ Q-value updates. Over $N$ episodes: $$\\text{Total updates} = \\sum_{i=1}^N T_i \\approx N \\cdot \\mathbb{E}[T] = N \\cdot \\bar{T}$$ More episodes and longer episodes both increase the number of learning updates, improving Q-value estimates through the law of large numbers.",
+        "examples": [
+          "Example 1: Two episodes starting from A and B respectively. Episode 1: A→B→terminal (updates Q(A,a₁) and Q(B,a₂)). Episode 2: B→A→C→terminal (updates Q(B,a₃), Q(A,a₄), Q(C,a₅)). Q(A,a₄) uses the improved Q(B,a₃) from episode 2.",
+          "Example 2: Same initial state A for 3 episodes. Even with same start, stochastic policy or different action selections lead to different trajectories, each contributing new updates that refine Q-values."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Episode Loop",
+          "latex": "$\\text{for } i = 1 \\text{ to } N: \\text{ run episode with initial state } s_0^{(i)}$",
+          "description": "Iterate through all episodes"
+        },
+        {
+          "name": "Q-Value Persistence",
+          "latex": "$Q_{\\text{after episode } i} = Q_{\\text{before episode } i} + \\Delta Q_i$",
+          "description": "Changes accumulate across episodes"
+        },
+        {
+          "name": "Learning Progress",
+          "latex": "$\\|Q_N - Q^\\pi\\| \\leq \\|Q_0 - Q^\\pi\\| \\cdot (1-\\alpha)^{N \\cdot \\bar{T}}$",
+          "description": "Q-values converge exponentially to true values (simplified)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a simplified multi-episode SARSA function that runs episodes from multiple initial states. For each episode, perform SARSA updates until terminal or max_steps. The Q-table persists across episodes. Use greedy policy for action selection. Return the final Q-table.",
+        "function_signature": "def multi_episode_sarsa(transitions: dict, initial_states: list, alpha: float, gamma: float, max_steps: int) -> dict:",
+        "starter_code": "def multi_episode_sarsa(transitions: dict, initial_states: list, alpha: float, gamma: float, max_steps: int) -> dict:\n    \"\"\"\n    Run SARSA for multiple episodes with persistent Q-values.\n    Args:\n        transitions: Dict mapping (state, action) -> (reward, next_state)\n        initial_states: List of starting states for episodes\n        alpha: Learning rate\n        gamma: Discount factor\n        max_steps: Maximum steps per episode\n    Returns:\n        Final Q-table as dict {(state, action): value}\n    \"\"\"\n    # Your code here\n    # Hint: Initialize Q-table to empty dict (defaults to 0)\n    # For each initial state, run one episode\n    # In each episode: select actions greedily, apply SARSA updates\n    pass",
+        "test_cases": [
+          {
+            "input": "multi_episode_sarsa({('A','go'):(10,'terminal')}, ['A'], 0.1, 0.9, 5)",
+            "expected": "{('A','go'): 1.0}",
+            "explanation": "One episode: A-go->terminal with reward 10. Q(A,go) = 0 + 0.1*(10 + 0.9*0 - 0) = 1.0"
+          },
+          {
+            "input": "multi_episode_sarsa({('A','right'):(1,'B'), ('B','left'):(1,'A')}, ['A','B'], 0.5, 1.0, 2)",
+            "expected": "Q-values after 2 episodes of max 2 steps each",
+            "explanation": "Episode 1 from A: A-right->B-left->A (2 steps). Episode 2 from B: B-left->A-right->B. Multiple updates accumulate."
+          },
+          {
+            "input": "multi_episode_sarsa({('S','act'):(5,'terminal')}, ['S','S','S'], 0.1, 0.5, 10)",
+            "expected": "{('S','act'): approximately 1.355}",
+            "explanation": "Three identical episodes, each updating Q(S,act): iter1: 0+0.1*5=0.5, iter2: 0.5+0.1*(5-0.5)=0.95, iter3: 0.95+0.1*(5-0.95)=1.355"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Reinitializing Q-table for each episode (loses persistence)",
+        "Not selecting next action before updating in the episode loop",
+        "Off-by-one errors when checking max_steps",
+        "Not handling terminal states properly (should stop episode immediately)",
+        "Forgetting to transition s←s', a←a' at end of each step"
+      ],
+      "hint": "Create one Q-table before the episode loop. For each initial state, run an episode: start with state, select action, loop (transition, select next action, SARSA update, advance state and action) until terminal or max steps. The Q-table accumulates all updates.",
+      "references": [
+        "SARSA algorithm (Sutton & Barto Section 6.4)",
+        "Experience replay",
+        "Sample efficiency in RL"
+      ]
+    }
+  ]
+}

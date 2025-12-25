@@ -1,0 +1,62 @@
+{
+  "description": "V3JpdGUgYSBQeXRob24gZnVuY3Rpb24gdGhhdCB1c2VzIHRoZSBKYWNvYmkgbWV0aG9kIHRvIHNvbHZlIGEgc3lzdGVtIG9mIGxpbmVhciBlcXVhdGlvbnMgZ2l2ZW4gYnkgQXggPSBiLiBUaGUgZnVuY3Rpb24gc2hvdWxkIGl0ZXJhdGUgbiB0aW1lcywgcm91bmRpbmcgZWFjaCBpbnRlcm1lZGlhdGUgc29sdXRpb24gdG8gZm91ciBkZWNpbWFsIHBsYWNlcywgYW5kIHJldHVybiB0aGUgYXBwcm94aW1hdGUgc29sdXRpb24geC4",
+  "mdx_file": "dd4e1cc5-6bce-4b68-902f-eb1745151039.mdx",
+  "test_cases": [
+    {
+      "test": "print(solve_jacobi(np.array([[5, -2, 3], [-3, 9, 1], [2, -1, -7]]), np.array([-1, 2, 3]),2))",
+      "expected_output": "[0.146, 0.2032, -0.5175]"
+    },
+    {
+      "test": "print(solve_jacobi(np.array([[4, 1, 2], [1, 5, 1], [2, 1, 3]]), np.array([4, 6, 7]),5))",
+      "expected_output": "[-0.0806, 0.9324, 2.4422]"
+    }
+  ],
+  "difficulty": "medium",
+  "pytorch_difficulty": "medium",
+  "video": "https://youtu.be/Y7WSn7K092g",
+  "likes": "0",
+  "cuda_difficulty": "hard",
+  "cuda_test_cases": [
+    {
+      "test": "#include <iostream>\n#include <vector>\n#include <cmath>\n\nstd::vector<float> solve_jacobi(const std::vector<std::vector<float>>& A, const std::vector<float>& b, int n_iterations);\n\nint main() {\n    std::vector<std::vector<float>> A = {{5, -2, 3}, {-3, 9, 1}, {2, -1, -7}};\n    std::vector<float> b = {-1, 2, 3};\n    auto result = solve_jacobi(A, b, 2);\n    std::cout << \"[\" << result[0] << \", \" << result[1] << \", \" << result[2] << \"]\" << std::endl;\n    return 0;\n}",
+      "expected_output": "[0.146, 0.2032, -0.5175]"
+    },
+    {
+      "test": "#include <iostream>\n#include <vector>\n#include <cmath>\n\nstd::vector<float> solve_jacobi(const std::vector<std::vector<float>>& A, const std::vector<float>& b, int n_iterations);\n\nint main() {\n    std::vector<std::vector<float>> A = {{4, 1, 2}, {1, 5, 1}, {2, 1, 3}};\n    std::vector<float> b = {4, 6, 7};\n    auto result = solve_jacobi(A, b, 5);\n    std::cout << \"[\" << result[0] << \", \" << result[1] << \", \" << result[2] << \"]\" << std::endl;\n    return 0;\n}",
+      "expected_output": "[-0.0806, 0.9324, 2.4422]"
+    }
+  ],
+  "example": {
+    "input": "A = [[5, -2, 3], [-3, 9, 1], [2, -1, -7]], b = [-1, 2, 3], n=2",
+    "output": "[0.146, 0.2032, -0.5175]",
+    "reasoning": "The Jacobi method iteratively solves each equation for x[i] using the formula x[i] = (1/a_ii) * (b[i] - sum(a_ij * x[j] for j != i)), where a_ii is the diagonal element of A and a_ij are the off-diagonal elements."
+  },
+  "dislikes": "0",
+  "category": "Linear Algebra",
+  "starter_code": "import numpy as np\ndef solve_jacobi(A: np.ndarray, b: np.ndarray, n: int) -> list:\n\treturn x",
+  "title": "Solve Linear Equations using Jacobi Method",
+  "cuda_starter_code": "I2luY2x1ZGUgPGN1ZGFfcnVudGltZS5oPgojaW5jbHVkZSA8aW9zdHJlYW0+CiNpbmNsdWRlIDx2ZWN0b3I+CiNpbmNsdWRlIDxjbWF0aD4KCl9fZ2xvYmFsX18gdm9pZCBqYWNvYmlfaXRlcmF0aW9uX2tlcm5lbCgKICAgIGNvbnN0IGZsb2F0KiBBLAogICAgY29uc3QgZmxvYXQqIGIsCiAgICBjb25zdCBmbG9hdCogeF9vbGQsCiAgICBmbG9hdCogeF9uZXcsCiAgICBpbnQgbgopIHsKICAgIC8vIEVhY2ggdGhyZWFkIGNvbXB1dGVzIG9uZSBlbGVtZW50IG9mIHhfbmV3CiAgICAvLyB4X25ld1tpXSA9IChiW2ldIC0gc3VtKEFbaV1bal0gKiB4X29sZFtqXSBmb3IgaiAhPSBpKSkgLyBBW2ldW2ldCn0KCnN0ZDo6dmVjdG9yPGZsb2F0PiBzb2x2ZV9qYWNvYmkoCiAgICBjb25zdCBzdGQ6OnZlY3RvcjxzdGQ6OnZlY3RvcjxmbG9hdD4+JiBBLAogICAgY29uc3Qgc3RkOjp2ZWN0b3I8ZmxvYXQ+JiBiLAogICAgaW50IG5faXRlcmF0aW9ucwopIHsKICAgIC8vIDEuIEFsbG9jYXRlIGRldmljZSBtZW1vcnkgZm9yIEEsIGIsIHhfb2xkLCB4X25ldwogICAgLy8gMi4gSW5pdGlhbGl6ZSB4IHRvIHplcm9zCiAgICAvLyAzLiBGb3IgZWFjaCBpdGVyYXRpb24sIGxhdW5jaCBrZXJuZWwgYW5kIHN3YXAgeF9vbGQveF9uZXcKICAgIC8vIDQuIENvcHkgcmVzdWx0IGJhY2sgYW5kIHJvdW5kIHRvIDQgZGVjaW1hbCBwbGFjZXMKICAgIHJldHVybiB7fTsKfQ==",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/moe18",
+      "name": "Moe Chabot"
+    },
+    {
+      "profile_link": "https://github.com/Haleshot",
+      "name": "Haleshot"
+    }
+  ],
+  "pytorch_test_cases": [
+    {
+      "test": "import torch\nres = solve_jacobi(\n    torch.tensor([[4.0,1.0],[2.0,3.0]]),\n    torch.tensor([1.0,2.0]),\n    10\n)\nprint(res.numpy().tolist())",
+      "expected_output": "[0.1, 0.6]"
+    },
+    {
+      "test": "import torch\nres = solve_jacobi(\n    torch.tensor([[3.0,0.0],[0.0,3.0]]),\n    torch.tensor([3.0,6.0]),\n    5\n)\nprint(res.numpy().tolist())",
+      "expected_output": "[1.0, 2.0]"
+    }
+  ],
+  "pytorch_starter_code": "aW1wb3J0IHRvcmNoCgpkZWYgc29sdmVfamFjb2JpKEEsIGIsIG4pIC0+IHRvcmNoLlRlbnNvcjoKICAgICIiIgogICAgU29sdmUgQXggPSBiIHVzaW5nIHRoZSBKYWNvYmkgaXRlcmF0aXZlIG1ldGhvZCBmb3IgbiBpdGVyYXRpb25zLgogICAgQTogKG0sbSkgdGVuc29yOyBiOiAobSwpIHRlbnNvcjsgbjogbnVtYmVyIG9mIGl0ZXJhdGlvbnMuCiAgICBSZXR1cm5zIGEgMS1EIHRlbnNvciBvZiBsZW5ndGggbSwgcm91bmRlZCB0byA0IGRlY2ltYWxzLgogICAgIiIiCiAgICBBX3QgPSB0b3JjaC5hc190ZW5zb3IoQSwgZHR5cGU9dG9yY2guZmxvYXQpCiAgICBiX3QgPSB0b3JjaC5hc190ZW5zb3IoYiwgZHR5cGU9dG9yY2guZmxvYXQpCiAgICAjIFlvdXIgaW1wbGVtZW50YXRpb24gaGVyZQogICAgcGFzcwo=",
+  "learn_section": "CiMjIFNvbHZpbmcgTGluZWFyIEVxdWF0aW9ucyBVc2luZyB0aGUgSmFjb2JpIE1ldGhvZAoKVGhlIEphY29iaSBtZXRob2QgaXMgYW4gaXRlcmF0aXZlIGFsZ29yaXRobSB1c2VkIGZvciBzb2x2aW5nIGEgc3lzdGVtIG9mIGxpbmVhciBlcXVhdGlvbnMgXCggQXggPSBiIFwpLiBUaGlzIG1ldGhvZCBpcyBwYXJ0aWN1bGFybHkgdXNlZnVsIGZvciBsYXJnZSBzeXN0ZW1zIHdoZXJlIGRpcmVjdCBtZXRob2RzLCBzdWNoIGFzIEdhdXNzaWFuIGVsaW1pbmF0aW9uLCBhcmUgY29tcHV0YXRpb25hbGx5IGV4cGVuc2l2ZS4KCgojIyMgQWxnb3JpdGhtIE92ZXJ2aWV3CgpGb3IgYSBzeXN0ZW0gb2YgZXF1YXRpb25zIHJlcHJlc2VudGVkIGJ5IFwoIEF4ID0gYiBcKSwgd2hlcmUgXCggQSBcKSBpcyBhIG1hdHJpeCBhbmQgXCggeCBcKSBhbmQgXCggYiBcKSBhcmUgdmVjdG9ycywgdGhlIEphY29iaSBtZXRob2QgaW52b2x2ZXMgdGhlIGZvbGxvd2luZyBzdGVwczoKCjEuICoqSW5pdGlhbGl6YXRpb24qKjogU3RhcnQgd2l0aCBhbiBpbml0aWFsIGd1ZXNzIGZvciBcKCB4IFwpLgoKMi4gKipJdGVyYXRpb24qKjogRm9yIGVhY2ggZXF1YXRpb24gXCggaSBcKSwgdXBkYXRlIFwoIHhbaV0gXCkgdXNpbmc6CiAgICQkCiAgIHhbaV0gPSBcZnJhY3sxfXthX3tpaX19IFxsZWZ0KGJbaV0gLSBcc3VtX3tqIFxuZXEgaX0gYV97aWp9IHhbal1ccmlnaHQpCiAgICQkCiAgIHdoZXJlIFwoIGFfe2lpfSBcKSBhcmUgdGhlIGRpYWdvbmFsIGVsZW1lbnRzIG9mIFwoIEEgXCksIGFuZCBcKCBhX3tpan0gXCkgYXJlIHRoZSBvZmYtZGlhZ29uYWwgZWxlbWVudHMuCgozLiAqKkNvbnZlcmdlbmNlKio6IFJlcGVhdCB0aGUgaXRlcmF0aW9uIHVudGlsIHRoZSBjaGFuZ2VzIGluIFwoIHggXCkgYXJlIGJlbG93IGEgY2VydGFpbiB0b2xlcmFuY2Ugb3IgdW50aWwgYSBtYXhpbXVtIG51bWJlciBvZiBpdGVyYXRpb25zIGlzIHJlYWNoZWQuCgpUaGlzIG1ldGhvZCBhc3N1bWVzIHRoYXQgYWxsIGRpYWdvbmFsIGVsZW1lbnRzIG9mIFwoIEEgXCkgYXJlIG5vbi16ZXJvIGFuZCB0aGF0IHRoZSBtYXRyaXggaXMgZGlhZ29uYWxseSBkb21pbmFudCBvciBwcm9wZXJseSBjb25kaXRpb25lZCBmb3IgY29udmVyZ2VuY2UuCgojIyMgUHJhY3RpY2FsIENvbnNpZGVyYXRpb25zCgotIFRoZSBtZXRob2QgbWF5IG5vdCBjb252ZXJnZSBmb3IgYWxsIG1hdHJpY2VzLgotIENob29zaW5nIGEgZ29vZCBpbml0aWFsIGd1ZXNzIGNhbiBpbXByb3ZlIGNvbnZlcmdlbmNlICh5b3UgY2FuIHN0YXJ0IHdpdGggdHJ5aW5nIDApLgotIERpYWdvbmFsIGRvbWluYW5jZSBvZiBcKCBBIFwpIGVuc3VyZXMgdGhlIGNvbnZlcmdlbmNlIG9mIHRoZSBKYWNvYmkgbWV0aG9kLgoK",
+  "learn_section_decoded": "\n## Solving Linear Equations Using the Jacobi Method\n\nThe Jacobi method is an iterative algorithm used for solving a system of linear equations \\( Ax = b \\). This method is particularly useful for large systems where direct methods, such as Gaussian elimination, are computationally expensive.\n\n\n### Algorithm Overview\n\nFor a system of equations represented by \\( Ax = b \\), where \\( A \\) is a matrix and \\( x \\) and \\( b \\) are vectors, the Jacobi method involves the following steps:\n\n1. **Initialization**: Start with an initial guess for \\( x \\).\n\n2. **Iteration**: For each equation \\( i \\), update \\( x[i] \\) using:\n   $$\n   x[i] = \\frac{1}{a_{ii}} \\left(b[i] - \\sum_{j \\neq i} a_{ij} x[j]\\right)\n   $$\n   where \\( a_{ii} \\) are the diagonal elements of \\( A \\), and \\( a_{ij} \\) are the off-diagonal elements.\n\n3. **Convergence**: Repeat the iteration until the changes in \\( x \\) are below a certain tolerance or until a maximum number of iterations is reached.\n\nThis method assumes that all diagonal elements of \\( A \\) are non-zero and that the matrix is diagonally dominant or properly conditioned for convergence.\n\n### Practical Considerations\n\n- The method may not converge for all matrices.\n- Choosing a good initial guess can improve convergence (you can start with trying 0).\n- Diagonal dominance of \\( A \\) ensures the convergence of the Jacobi method.\n\n"
+}

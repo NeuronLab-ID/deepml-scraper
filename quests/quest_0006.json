@@ -1,0 +1,435 @@
+{
+  "problem_id": 6,
+  "title": "Calculate Eigenvalues of a Matrix",
+  "category": "Linear Algebra",
+  "difficulty": "medium",
+  "description": "Write a Python function that calculates the eigenvalues of a 2x2 matrix. The function should return a list containing the eigenvalues, sort values from highest to lowest.",
+  "example": {
+    "input": "matrix = [[2, 1], [1, 2]]",
+    "output": "[3.0, 1.0]",
+    "reasoning": "The eigenvalues of the matrix are calculated using the characteristic equation of the matrix, which for a 2x2 matrix is $\\lambda^2 - \ttrace(A)\\lambda + \tdet(A) = 0$, where $\\lambda$ are the eigenvalues."
+  },
+  "starter_code": "def calculate_eigenvalues(matrix: list[list[float|int]]) -> list[float]:\n\treturn eigenvalues",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Computing the Trace of a Matrix",
+      "relation_to_problem": "The trace appears in the characteristic equation λ² - tr(A)λ + det(A) = 0, which is used to compute eigenvalues. Understanding trace is the first building block.",
+      "prerequisites": [
+        "Basic matrix notation",
+        "Matrix indexing",
+        "Addition of real numbers"
+      ],
+      "learning_objectives": [
+        "Define the trace of a square matrix formally",
+        "Compute the trace for 2×2 matrices",
+        "Understand the geometric interpretation of trace as sum of diagonal stretching factors"
+      ],
+      "math_content": {
+        "definition": "For a square matrix A ∈ ℝⁿˣⁿ, the trace is defined as the sum of its diagonal elements: tr(A) = Σᵢ₌₁ⁿ aᵢᵢ. For a 2×2 matrix A = [[a, b], [c, d]], we have tr(A) = a + d.",
+        "notation": "$A = \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$, $\\text{tr}(A) = a + d$, where $a_{11} = a$ and $a_{22} = d$ are diagonal entries",
+        "theorem": "The trace is a linear operator: tr(A + B) = tr(A) + tr(B) and tr(cA) = c·tr(A) for any scalar c. Furthermore, tr(A) equals the sum of eigenvalues (counting multiplicities): tr(A) = Σλᵢ.",
+        "proof_sketch": "Linearity follows directly from the definition since (A+B)ᵢᵢ = Aᵢᵢ + Bᵢᵢ. The eigenvalue property follows from the fact that the characteristic polynomial can be written as det(A - λI) = (-1)ⁿ(λⁿ - tr(A)λⁿ⁻¹ + ... + (-1)ⁿdet(A)), making the coefficient of λⁿ⁻¹ equal to -tr(A), which by Vieta's formulas equals -Σλᵢ.",
+        "examples": [
+          "For A = [[3, 5], [2, 7]], tr(A) = 3 + 7 = 10",
+          "For the identity matrix I₂ = [[1, 0], [0, 1]], tr(I₂) = 1 + 1 = 2",
+          "For a zero matrix O₂ = [[0, 0], [0, 0]], tr(O₂) = 0 + 0 = 0"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Trace of 2×2 Matrix",
+          "latex": "$\\text{tr}(A) = a_{11} + a_{22}$",
+          "description": "Sum the main diagonal elements from top-left to bottom-right"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the trace of a 2×2 matrix. This builds the first component needed for the characteristic equation.",
+        "function_signature": "def calculate_trace(matrix: list[list[float|int]]) -> float:",
+        "starter_code": "def calculate_trace(matrix: list[list[float|int]]) -> float:\n    # Extract diagonal elements and compute their sum\n    # matrix[i][i] represents the i-th diagonal element\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_trace([[3, 5], [2, 7]])",
+            "expected": "10.0",
+            "explanation": "tr(A) = 3 + 7 = 10, summing the diagonal entries a₁₁ = 3 and a₂₂ = 7"
+          },
+          {
+            "input": "calculate_trace([[1, 0], [0, 1]])",
+            "expected": "2.0",
+            "explanation": "The identity matrix has trace 2, which equals the sum of its eigenvalues (both are 1)"
+          },
+          {
+            "input": "calculate_trace([[-2, 3], [1, 4]])",
+            "expected": "2.0",
+            "explanation": "tr(A) = -2 + 4 = 2, demonstrating that trace can be positive even with negative diagonal entries"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Summing all matrix elements instead of only diagonal elements",
+        "Accessing wrong indices: matrix[0][1] + matrix[1][0] gives the off-diagonal sum, not the trace",
+        "Forgetting to convert integer inputs to float for consistency with return type"
+      ],
+      "hint": "The diagonal elements of a 2×2 matrix are at positions (0,0) and (1,1). Focus on accessing these specific positions.",
+      "references": [
+        "Linear Algebra and Its Applications by Lay",
+        "Matrix Analysis by Horn and Johnson",
+        "Trace operator properties"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Computing the Determinant of a 2×2 Matrix",
+      "relation_to_problem": "The determinant appears as the constant term in the characteristic equation λ² - tr(A)λ + det(A) = 0. It's essential for finding eigenvalues and determines if the matrix is invertible.",
+      "prerequisites": [
+        "Matrix multiplication",
+        "Basic arithmetic operations",
+        "Understanding of matrix singularity"
+      ],
+      "learning_objectives": [
+        "Define the determinant formally for 2×2 matrices",
+        "Compute determinants using the cross-multiplication formula",
+        "Understand the geometric meaning as area scaling factor and connection to invertibility"
+      ],
+      "math_content": {
+        "definition": "For a 2×2 matrix A = [[a, b], [c, d]], the determinant is defined as det(A) = ad - bc. Geometrically, |det(A)| represents the scaling factor of area under the linear transformation defined by A. The determinant is the unique function satisfying: (1) multilinearity, (2) alternating property, and (3) det(I) = 1.",
+        "notation": "$\\det(A) = |A| = \\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix} = ad - bc$",
+        "theorem": "A square matrix A is invertible (non-singular) if and only if det(A) ≠ 0. Moreover, det(A) equals the product of eigenvalues: det(A) = Πλᵢ. For the characteristic polynomial det(A - λI) = 0, when λ = 0, we get det(A), showing that 0 is an eigenvalue if and only if det(A) = 0.",
+        "proof_sketch": "For 2×2 case, A = [[a,b],[c,d]] is invertible when the system has a unique solution. Row reduction shows this requires ad - bc ≠ 0. For the eigenvalue product property, the constant term of the characteristic polynomial det(A - λI) = λ² - tr(A)λ + det(A) equals (-1)²·(-λ₁)·(-λ₂) = λ₁λ₂ by Vieta's formulas, which must equal det(A).",
+        "examples": [
+          "For A = [[2, 1], [1, 2]], det(A) = 2·2 - 1·1 = 4 - 1 = 3 > 0, so A is invertible with eigenvalue product = 3",
+          "For A = [[3, 6], [1, 2]], det(A) = 3·2 - 6·1 = 6 - 6 = 0, so A is singular with at least one zero eigenvalue",
+          "For A = [[1, 0], [0, -1]], det(A) = 1·(-1) - 0·0 = -1, negative determinant indicates orientation reversal"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Determinant of 2×2 Matrix",
+          "latex": "$\\det(A) = a_{11}a_{22} - a_{12}a_{21}$",
+          "description": "Cross-multiply: product of main diagonal minus product of anti-diagonal"
+        },
+        {
+          "name": "Invertibility Criterion",
+          "latex": "$A \\text{ invertible} \\iff \\det(A) \\neq 0$",
+          "description": "Non-zero determinant is necessary and sufficient for matrix invertibility"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the determinant of a 2×2 matrix. This provides the constant term for the characteristic equation used in eigenvalue calculation.",
+        "function_signature": "def calculate_determinant(matrix: list[list[float|int]]) -> float:",
+        "starter_code": "def calculate_determinant(matrix: list[list[float|int]]) -> float:\n    # Apply the formula: ad - bc for matrix [[a,b],[c,d]]\n    # Remember: main diagonal product minus anti-diagonal product\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_determinant([[2, 1], [1, 2]])",
+            "expected": "3.0",
+            "explanation": "det(A) = 2×2 - 1×1 = 4 - 1 = 3, indicating invertible matrix with eigenvalue product = 3"
+          },
+          {
+            "input": "calculate_determinant([[3, 6], [1, 2]])",
+            "expected": "0.0",
+            "explanation": "det(A) = 3×2 - 6×1 = 0, singular matrix with at least one eigenvalue equal to zero"
+          },
+          {
+            "input": "calculate_determinant([[4, 2], [3, 5]])",
+            "expected": "14.0",
+            "explanation": "det(A) = 4×5 - 2×3 = 20 - 6 = 14, invertible with eigenvalues multiplying to 14"
+          },
+          {
+            "input": "calculate_determinant([[1, 0], [0, 1]])",
+            "expected": "1.0",
+            "explanation": "Identity matrix has determinant 1, with both eigenvalues equal to 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Wrong order: computing bc - ad instead of ad - bc (sign error)",
+        "Confusing indices: using matrix[0][0]*matrix[0][1] instead of matrix[0][0]*matrix[1][1]",
+        "Adding instead of subtracting: computing ad + bc gives incorrect result",
+        "Not handling the case when determinant is zero (which indicates zero eigenvalue)"
+      ],
+      "hint": "Visualize the 2×2 matrix and draw diagonals: main diagonal (top-left to bottom-right) product minus anti-diagonal (top-right to bottom-left) product.",
+      "references": [
+        "Determinant properties and geometric interpretation",
+        "Cramer's rule",
+        "Volume scaling in linear transformations"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Solving Quadratic Equations Using the Quadratic Formula",
+      "relation_to_problem": "The characteristic equation λ² - tr(A)λ + det(A) = 0 is a quadratic equation. Solving it yields the two eigenvalues of the 2×2 matrix. This step bridges matrix theory with algebraic equation solving.",
+      "prerequisites": [
+        "Quadratic equations",
+        "Square roots",
+        "Complex numbers (for negative discriminants)",
+        "Understanding of polynomial roots"
+      ],
+      "learning_objectives": [
+        "Apply the quadratic formula to solve equations of form ax² + bx + c = 0",
+        "Compute the discriminant and interpret its sign for real vs complex roots",
+        "Handle both distinct and repeated roots correctly",
+        "Understand connection between quadratic coefficients and eigenvalue properties"
+      ],
+      "math_content": {
+        "definition": "A quadratic equation is a second-degree polynomial equation of the form ax² + bx + c = 0, where a ≠ 0. The solutions (roots) are given by the quadratic formula: x = (-b ± √(b² - 4ac))/(2a). The expression Δ = b² - 4ac is called the discriminant and determines the nature of roots.",
+        "notation": "$ax^2 + bx + c = 0$, $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$, $\\Delta = b^2 - 4ac$ (discriminant)",
+        "theorem": "Discriminant Classification Theorem: (1) If Δ > 0, the equation has two distinct real roots. (2) If Δ = 0, the equation has one repeated real root (algebraic multiplicity 2). (3) If Δ < 0, the equation has two complex conjugate roots. Furthermore, by Vieta's formulas: sum of roots = -b/a and product of roots = c/a.",
+        "proof_sketch": "Completing the square: ax² + bx + c = 0 → x² + (b/a)x + c/a = 0 → (x + b/(2a))² = (b² - 4ac)/(4a²). Taking square roots: x + b/(2a) = ±√(b² - 4ac)/(2a), yielding x = (-b ± √(b² - 4ac))/(2a). The discriminant's sign determines whether the square root is real or imaginary. Vieta's formulas follow from expanding (x - x₁)(x - x₂) = x² - (x₁+x₂)x + x₁x₂.",
+        "examples": [
+          "For x² - 5x + 6 = 0: a=1, b=-5, c=6. Δ = 25-24 = 1 > 0. Roots: x = (5±1)/2 = {3, 2}",
+          "For x² - 4x + 4 = 0: Δ = 16-16 = 0. Repeated root: x = 4/2 = 2 (multiplicity 2)",
+          "For x² + x + 1 = 0: Δ = 1-4 = -3 < 0. Complex roots: x = (-1±i√3)/2",
+          "Connection to eigenvalues: λ² - 3λ + 2 = 0 gives λ = {2, 1}. Sum = 3 = tr(A), product = 2 = det(A)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Quadratic Formula",
+          "latex": "$x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$",
+          "description": "Gives both roots of ax² + bx + c = 0; use + for larger root, - for smaller root"
+        },
+        {
+          "name": "Discriminant",
+          "latex": "$\\Delta = b^2 - 4ac$",
+          "description": "Determines root nature: Δ>0 (two real), Δ=0 (one repeated), Δ<0 (complex conjugates)"
+        },
+        {
+          "name": "Vieta's Formulas",
+          "latex": "$x_1 + x_2 = -\\frac{b}{a}, \\quad x_1 x_2 = \\frac{c}{a}$",
+          "description": "Relates roots to coefficients; for eigenvalues: λ₁+λ₂=tr(A), λ₁λ₂=det(A)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that solves a quadratic equation ax² + bx + c = 0 and returns both roots sorted from highest to lowest. This is the core algebraic tool needed to find eigenvalues from the characteristic equation.",
+        "function_signature": "def solve_quadratic(a: float, b: float, c: float) -> list[float]:",
+        "starter_code": "def solve_quadratic(a: float, b: float, c: float) -> list[float]:\n    # Compute discriminant: b² - 4ac\n    # Apply quadratic formula: (-b ± √discriminant)/(2a)\n    # Return [larger_root, smaller_root] sorted in descending order\n    pass",
+        "test_cases": [
+          {
+            "input": "solve_quadratic(1, -5, 6)",
+            "expected": "[3.0, 2.0]",
+            "explanation": "x² - 5x + 6 = 0 has roots 3 and 2. Discriminant = 25-24 = 1, roots = (5±1)/2"
+          },
+          {
+            "input": "solve_quadratic(1, -3, 2)",
+            "expected": "[2.0, 1.0]",
+            "explanation": "x² - 3x + 2 = 0 factors as (x-2)(x-1) = 0, giving roots 2 and 1"
+          },
+          {
+            "input": "solve_quadratic(1, -4, 4)",
+            "expected": "[2.0, 2.0]",
+            "explanation": "x² - 4x + 4 = (x-2)² has repeated root 2 with multiplicity 2 (Δ = 0)"
+          },
+          {
+            "input": "solve_quadratic(1, 0, -4)",
+            "expected": "[2.0, -2.0]",
+            "explanation": "x² - 4 = 0 gives x = ±2. Discriminant = 16, roots = (0±4)/2"
+          },
+          {
+            "input": "solve_quadratic(2, -10, 12)",
+            "expected": "[3.0, 2.0]",
+            "explanation": "2x² - 10x + 12 = 0 → x² - 5x + 6 = 0 after dividing by 2"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not sorting roots in descending order as required (highest to lowest)",
+        "Forgetting to divide by 2a: using (-b ± √Δ)/a instead of (-b ± √Δ)/(2a)",
+        "Sign error in discriminant calculation: computing b² + 4ac instead of b² - 4ac",
+        "Not handling repeated roots (Δ = 0): should return [root, root], not just [root]",
+        "Precision issues with square root computation for near-zero discriminant"
+      ],
+      "hint": "The formula has three parts: (1) compute discriminant, (2) compute both roots using ± in formula, (3) sort them. Remember that matrix eigenvalues must be sorted from largest to smallest.",
+      "references": [
+        "Fundamental Theorem of Algebra",
+        "Vieta's formulas and their applications",
+        "Discriminant analysis",
+        "Connection to eigenvalue theory"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "The Characteristic Equation and Polynomial",
+      "relation_to_problem": "The characteristic equation det(A - λI) = 0 is the fundamental equation for finding eigenvalues. For 2×2 matrices, it reduces to the quadratic λ² - tr(A)λ + det(A) = 0, connecting all previous concepts.",
+      "prerequisites": [
+        "Matrix subtraction",
+        "Identity matrix",
+        "Determinant calculation",
+        "Eigenvalue definition Av = λv"
+      ],
+      "learning_objectives": [
+        "Derive the characteristic equation from the eigenvalue definition",
+        "Understand why det(A - λI) = 0 gives eigenvalues",
+        "Connect the characteristic polynomial coefficients to trace and determinant",
+        "Formulate the characteristic equation for any 2×2 matrix"
+      ],
+      "math_content": {
+        "definition": "The characteristic polynomial of a square matrix A is defined as p(λ) = det(A - λI), where I is the identity matrix and λ is a scalar variable. The characteristic equation is p(λ) = 0. The roots of this equation are precisely the eigenvalues of A. For a 2×2 matrix A = [[a,b],[c,d]], this becomes det([[a-λ, b],[c, d-λ]]) = (a-λ)(d-λ) - bc = λ² - (a+d)λ + (ad-bc) = λ² - tr(A)λ + det(A) = 0.",
+        "notation": "$p(\\lambda) = \\det(A - \\lambda I)$, $A - \\lambda I = \\begin{pmatrix} a-\\lambda & b \\\\ c & d-\\lambda \\end{pmatrix}$, characteristic equation: $\\lambda^2 - \\text{tr}(A)\\lambda + \\det(A) = 0$",
+        "theorem": "Eigenvalue Characterization Theorem: λ is an eigenvalue of A if and only if det(A - λI) = 0. This is because Av = λv for non-zero v is equivalent to (A - λI)v = 0, which has a non-trivial solution if and only if A - λI is singular (det(A - λI) = 0). For 2×2 matrices, the characteristic polynomial always has degree 2, guaranteeing exactly 2 eigenvalues (counting multiplicities).",
+        "proof_sketch": "Starting from Av = λv with v ≠ 0: Av - λv = 0 → Av - λIv = 0 → (A - λI)v = 0. This homogeneous system has a non-zero solution v if and only if the coefficient matrix A - λI is non-invertible, which occurs precisely when det(A - λI) = 0. For 2×2: expanding det([[a-λ,b],[c,d-λ]]) = (a-λ)(d-λ) - bc = ad - aλ - dλ + λ² - bc = λ² - (a+d)λ + (ad-bc).",
+        "examples": [
+          "For A = [[2, 1], [1, 2]]: A - λI = [[2-λ, 1], [1, 2-λ]]. det(A-λI) = (2-λ)² - 1 = λ² - 4λ + 3 = 0, giving λ = {3, 1}",
+          "For A = [[3, 0], [0, 3]]: A - λI = [[3-λ, 0], [0, 3-λ]]. det(A-λI) = (3-λ)² = 0, giving λ = 3 (repeated)",
+          "For A = [[0, -1], [1, 0]]: tr(A) = 0, det(A) = 1. Characteristic equation: λ² + 1 = 0, giving λ = ±i (rotation matrix)",
+          "Verification using Vieta's formulas: If λ² - 3λ + 2 = 0 has roots λ₁=2, λ₂=1, then λ₁+λ₂=3=tr(A) ✓, λ₁λ₂=2=det(A) ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Characteristic Polynomial for 2×2 Matrix",
+          "latex": "$p(\\lambda) = \\lambda^2 - \\text{tr}(A)\\lambda + \\det(A)$",
+          "description": "Second-degree polynomial whose roots are the eigenvalues; coefficients are trace and determinant"
+        },
+        {
+          "name": "Characteristic Equation",
+          "latex": "$\\det(A - \\lambda I) = 0 \\iff \\lambda^2 - \\text{tr}(A)\\lambda + \\det(A) = 0$",
+          "description": "Setting characteristic polynomial to zero gives equation to solve for eigenvalues"
+        },
+        {
+          "name": "Matrix Subtraction with Scalar",
+          "latex": "$A - \\lambda I = \\begin{pmatrix} a-\\lambda & b \\\\ c & d-\\lambda \\end{pmatrix}$",
+          "description": "Subtract λ from each diagonal element only; off-diagonal elements unchanged"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that constructs the characteristic equation coefficients for a 2×2 matrix. Return [a, b, c] representing the quadratic equation aλ² + bλ + c = 0. This bridges matrix properties to the quadratic equation solver.",
+        "function_signature": "def characteristic_coefficients(matrix: list[list[float|int]]) -> list[float]:",
+        "starter_code": "def characteristic_coefficients(matrix: list[list[float|int]]) -> list[float]:\n    # The characteristic equation is: λ² - tr(A)λ + det(A) = 0\n    # Standard quadratic form is: aλ² + bλ + c = 0\n    # So: a = 1, b = -tr(A), c = det(A)\n    # Return [a, b, c]\n    pass",
+        "test_cases": [
+          {
+            "input": "characteristic_coefficients([[2, 1], [1, 2]])",
+            "expected": "[1.0, -4.0, 3.0]",
+            "explanation": "tr(A) = 4, det(A) = 3. Equation: λ² - 4λ + 3 = 0, so [a=1, b=-4, c=3]"
+          },
+          {
+            "input": "characteristic_coefficients([[5, 0], [0, 5]])",
+            "expected": "[1.0, -10.0, 25.0]",
+            "explanation": "tr(A) = 10, det(A) = 25. Equation: λ² - 10λ + 25 = 0, giving repeated eigenvalue λ = 5"
+          },
+          {
+            "input": "characteristic_coefficients([[3, 2], [4, 1]])",
+            "expected": "[1.0, -4.0, -5.0]",
+            "explanation": "tr(A) = 4, det(A) = 3×1 - 2×4 = -5. Equation: λ² - 4λ - 5 = 0"
+          },
+          {
+            "input": "characteristic_coefficients([[1, 0], [0, 1]])",
+            "expected": "[1.0, -2.0, 1.0]",
+            "explanation": "Identity matrix: tr(I) = 2, det(I) = 1. Equation: λ² - 2λ + 1 = (λ-1)² = 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Wrong sign on the trace coefficient: returning +tr(A) instead of -tr(A) for the linear term",
+        "Forgetting that the leading coefficient is always 1 for the characteristic polynomial",
+        "Confusing the order: returning [det(A), tr(A), 1] instead of [1, -tr(A), det(A)]",
+        "Computing tr(A) or det(A) incorrectly from previous sub-quests",
+        "Not converting to float type for consistency"
+      ],
+      "hint": "The characteristic polynomial has a specific form: λ² - (sum of eigenvalues)λ + (product of eigenvalues) = 0. The trace gives the sum, and the determinant gives the product. Watch the sign on the middle term!",
+      "references": [
+        "Cayley-Hamilton theorem",
+        "Characteristic polynomial properties",
+        "Relationship between polynomial coefficients and eigenvalue symmetric functions"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Integrating Components: From Matrix to Eigenvalues",
+      "relation_to_problem": "This final step synthesizes all previous sub-quests into the complete eigenvalue computation algorithm. It demonstrates the full pipeline from a 2×2 matrix to its sorted eigenvalues.",
+      "prerequisites": [
+        "Trace computation (Step 1)",
+        "Determinant computation (Step 2)",
+        "Quadratic equation solving (Step 3)",
+        "Characteristic equation formulation (Step 4)"
+      ],
+      "learning_objectives": [
+        "Combine trace, determinant, and quadratic solving into a complete algorithm",
+        "Understand the complete mathematical pipeline for eigenvalue computation",
+        "Verify eigenvalues satisfy the defining equation Av = λv",
+        "Interpret eigenvalue results in terms of matrix properties and transformations"
+      ],
+      "math_content": {
+        "definition": "The eigenvalue computation algorithm for a 2×2 matrix A = [[a,b],[c,d]] consists of: (1) Compute trace: τ = a + d, (2) Compute determinant: δ = ad - bc, (3) Form characteristic equation: λ² - τλ + δ = 0, (4) Solve using quadratic formula: λ = (τ ± √(τ² - 4δ))/2, (5) Sort eigenvalues in descending order. The discriminant Δ = τ² - 4δ = (tr(A))² - 4det(A) determines whether eigenvalues are real and distinct (Δ>0), repeated (Δ=0), or complex conjugates (Δ<0).",
+        "notation": "$\\tau = \\text{tr}(A)$, $\\delta = \\det(A)$, $\\Delta = \\tau^2 - 4\\delta$, $\\lambda_{1,2} = \\frac{\\tau \\pm \\sqrt{\\Delta}}{2}$",
+        "theorem": "Spectral Theorem (2×2 Case): Every real symmetric 2×2 matrix has real eigenvalues and orthogonal eigenvectors. For general 2×2 matrices: (1) Sum of eigenvalues always equals trace: λ₁ + λ₂ = tr(A), (2) Product of eigenvalues always equals determinant: λ₁λ₂ = det(A), (3) If A has distinct eigenvalues, it is diagonalizable: A = PDP⁻¹ where D = diag(λ₁, λ₂).",
+        "proof_sketch": "The algorithm correctness follows from: (1) Characteristic equation det(A - λI) = 0 is equivalent to finding λ where (A - λI) is singular, (2) For 2×2, this determinant expands to λ² - tr(A)λ + det(A) = 0, (3) Quadratic formula gives all roots of this polynomial, (4) By Fundamental Theorem of Algebra, a degree-2 polynomial has exactly 2 roots (counting multiplicities). Verification using Vieta's formulas confirms λ₁+λ₂ = tr(A) and λ₁λ₂ = det(A).",
+        "examples": [
+          "A = [[2,1],[1,2]]: τ=4, δ=3, Δ=16-12=4, λ=(4±2)/2={3,1}. Verify: 3+1=4✓, 3×1=3✓",
+          "A = [[5,0],[0,5]]: τ=10, δ=25, Δ=100-100=0, λ=(10±0)/2={5,5}. Repeated eigenvalue (scalar matrix)",
+          "A = [[0,-1],[1,0]]: τ=0, δ=1, Δ=0-4=-4<0, λ=(0±2i)/2={i,-i}. Complex eigenvalues (rotation by 90°)",
+          "A = [[4,2],[3,5]]: τ=9, δ=14, Δ=81-56=25, λ=(9±5)/2={7,2}. Verify: 7+2=9✓, 7×2=14✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Eigenvalue Formula",
+          "latex": "$\\lambda_{1,2} = \\frac{\\text{tr}(A) \\pm \\sqrt{(\\text{tr}(A))^2 - 4\\det(A)}}{2}$",
+          "description": "Direct formula combining trace and determinant to compute both eigenvalues"
+        },
+        {
+          "name": "Discriminant Interpretation",
+          "latex": "$\\Delta = (\\text{tr}(A))^2 - 4\\det(A)$",
+          "description": "Δ>0: distinct real eigenvalues; Δ=0: repeated eigenvalue; Δ<0: complex conjugate eigenvalues"
+        },
+        {
+          "name": "Eigenvalue Sum and Product",
+          "latex": "$\\lambda_1 + \\lambda_2 = \\text{tr}(A), \\quad \\lambda_1 \\lambda_2 = \\det(A)$",
+          "description": "Verification formulas derived from Vieta's relations; useful for checking correctness"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a comprehensive function that takes a 2×2 matrix and computes its eigenvalues by integrating all previous steps. The function should: extract matrix elements, compute trace and determinant, formulate the characteristic equation, solve it, and return eigenvalues sorted from highest to lowest. This is the capstone exercise that demonstrates mastery of the complete eigenvalue computation process.",
+        "function_signature": "def compute_matrix_eigenvalues(matrix: list[list[float|int]]) -> list[float]:",
+        "starter_code": "def compute_matrix_eigenvalues(matrix: list[list[float|int]]) -> list[float]:\n    # Step 1: Extract matrix elements\n    # Step 2: Compute trace (sum of diagonal)\n    # Step 3: Compute determinant (ad - bc)\n    # Step 4: Form characteristic equation coefficients [1, -trace, det]\n    # Step 5: Solve quadratic equation\n    # Step 6: Return eigenvalues sorted from largest to smallest\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_matrix_eigenvalues([[2, 1], [1, 2]])",
+            "expected": "[3.0, 1.0]",
+            "explanation": "tr=4, det=3. Equation: λ²-4λ+3=0. Eigenvalues: (4±√4)/2 = (4±2)/2 = {3,1}"
+          },
+          {
+            "input": "compute_matrix_eigenvalues([[5, 0], [0, 5]])",
+            "expected": "[5.0, 5.0]",
+            "explanation": "Scalar matrix: tr=10, det=25. Equation: λ²-10λ+25=(λ-5)²=0. Repeated eigenvalue λ=5"
+          },
+          {
+            "input": "compute_matrix_eigenvalues([[4, 2], [3, 5]])",
+            "expected": "[7.0, 2.0]",
+            "explanation": "tr=9, det=14. Equation: λ²-9λ+14=0. Eigenvalues: (9±√25)/2 = (9±5)/2 = {7,2}"
+          },
+          {
+            "input": "compute_matrix_eigenvalues([[1, 0], [0, 1]])",
+            "expected": "[1.0, 1.0]",
+            "explanation": "Identity matrix: tr=2, det=1. Equation: λ²-2λ+1=(λ-1)²=0. Both eigenvalues equal 1"
+          },
+          {
+            "input": "compute_matrix_eigenvalues([[3, 2], [4, 1]])",
+            "expected": "[5.0, -1.0]",
+            "explanation": "tr=4, det=-5. Equation: λ²-4λ-5=0. Eigenvalues: (4±√36)/2 = (4±6)/2 = {5,-1}"
+          },
+          {
+            "input": "compute_matrix_eigenvalues([[6, -1], [2, 3]])",
+            "expected": "[5.0, 4.0]",
+            "explanation": "tr=9, det=20. Equation: λ²-9λ+20=0. Eigenvalues: (9±√1)/2 = (9±1)/2 = {5,4}"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Pipeline errors: using incorrect intermediate values from trace or determinant calculations",
+        "Not sorting the final eigenvalues in descending order as required",
+        "Sign errors in the characteristic equation: using λ² + tr(A)λ instead of λ² - tr(A)λ",
+        "Numerical precision issues when discriminant is very small (near-zero)",
+        "Forgetting to handle the case of repeated eigenvalues (when discriminant equals zero)",
+        "Not validating results using λ₁+λ₂=tr(A) and λ₁λ₂=det(A)"
+      ],
+      "hint": "Break this into clear steps: (1) compute τ and δ, (2) compute discriminant Δ = τ² - 4δ, (3) apply quadratic formula with a=1, b=-τ, c=δ, (4) sort results. Each step builds on previous sub-quests. Verify your answer: does λ₁+λ₂ equal the trace?",
+      "references": [
+        "Linear Algebra Done Right by Axler - Eigenvalue theory",
+        "Matrix Computations by Golub and Van Loan - Numerical eigenvalue algorithms",
+        "Applications: PCA, stability analysis, Markov chains, differential equations",
+        "Extension: Power iteration method for large matrices",
+        "Advanced: QR algorithm for n×n matrices"
+      ]
+    }
+  ]
+}

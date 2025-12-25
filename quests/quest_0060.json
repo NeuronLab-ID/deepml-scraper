@@ -1,0 +1,448 @@
+{
+  "problem_id": 60,
+  "title": "Implement TF-IDF (Term Frequency-Inverse Document Frequency)",
+  "category": "NLP",
+  "difficulty": "medium",
+  "description": "## Task: Implement TF-IDF (Term Frequency-Inverse Document Frequency)\n\nYour task is to implement a function that computes the TF-IDF scores for a query against a given corpus of documents.\n\n### Function Signature\n\nWrite a function `compute_tf_idf(corpus, query)` that takes the following inputs:\n\n- `corpus`: A list of documents, where each document is a list of words.\n- `query`: A list of words for which you want to compute the TF-IDF scores.\n\n### Output\n\nThe function should return a list of lists containing the TF-IDF scores for the query words in each document, rounded to five decimal places.\n\n### Important Considerations\n\n1. **Handling Division by Zero:**  \n   When implementing the Inverse Document Frequency (IDF) calculation, you must account for cases where a term does not appear in any document (`df = 0`). This can lead to division by zero in the standard IDF formula. Add smoothing (e.g., adding 1 to both numerator and denominator) to avoid such errors.\n\n2. **Empty Corpus:**  \n   Ensure your implementation gracefully handles the case of an empty corpus. If no documents are provided, your function should either raise an appropriate error or return an empty result. This will ensure the program remains robust and predictable.\n\n3. **Edge Cases:**  \n   - Query terms not present in the corpus.  \n   - Documents with no words.  \n   - Extremely large or small values for term frequencies or document frequencies.\n\nBy addressing these considerations, your implementation will be robust and handle real-world scenarios effectively.\n",
+  "example": {
+    "input": "corpus = [\n    [\"the\", \"cat\", \"sat\", \"on\", \"the\", \"mat\"],\n    [\"the\", \"dog\", \"chased\", \"the\", \"cat\"],\n    [\"the\", \"bird\", \"flew\", \"over\", \"the\", \"mat\"]\n]\nquery = [\"cat\"]\n\nprint(compute_tf_idf(corpus, query))",
+    "output": "[[0.21461], [0.25754], [0.0]]",
+    "reasoning": "The TF-IDF scores for the word \"cat\" in each document are computed and rounded to five decimal places."
+  },
+  "starter_code": "import numpy as np\n\ndef compute_tf_idf(corpus, query):\n\t\"\"\"\n\tCompute TF-IDF scores for a query against a corpus of documents.\n    \n\t:param corpus: List of documents, where each document is a list of words\n\t:param query: List of words in the query\n\t:return: List of lists containing TF-IDF scores for the query words in each document\n\t\"\"\"\n\tpass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Term Frequency: Computing Word Occurrence Ratios",
+      "relation_to_problem": "Term Frequency (TF) is the first component of TF-IDF that measures how frequently a term appears in a document relative to the document's total length, which is essential for weighting terms locally within each document.",
+      "prerequisites": [
+        "Basic Python dictionaries",
+        "List comprehension",
+        "Division and fractions"
+      ],
+      "learning_objectives": [
+        "Understand the formal mathematical definition of Term Frequency",
+        "Implement TF computation for a single document",
+        "Handle edge cases like empty documents and zero division"
+      ],
+      "math_content": {
+        "definition": "Term Frequency (TF) is a function $\\text{TF}: \\mathcal{V} \\times \\mathcal{D} \\to [0, 1]$ that maps a term $t$ from vocabulary $\\mathcal{V}$ and a document $d \\in \\mathcal{D}$ to a real number representing the relative frequency of that term in the document. Formally: $$\\text{TF}(t, d) = \\frac{f_{t,d}}{\\sum_{t' \\in d} f_{t',d}}$$ where $f_{t,d}$ denotes the raw count of term $t$ in document $d$, and the denominator is the total number of terms in document $d$.",
+        "notation": "$t$ = term (word), $d$ = document (list of words), $f_{t,d}$ = frequency of term $t$ in document $d$, $|d|$ = length of document $d$",
+        "theorem": "**Bounded TF Property**: For any term $t$ and document $d$, we have $0 \\leq \\text{TF}(t, d) \\leq 1$. The upper bound is achieved when $d$ contains only repetitions of $t$, and the lower bound when $t$ does not appear in $d$.",
+        "proof_sketch": "Since $f_{t,d} \\geq 0$ and $f_{t,d} \\leq \\sum_{t' \\in d} f_{t',d}$, the ratio is bounded between 0 and 1. Equality at 1 occurs when $f_{t,d} = |d|$, meaning all terms in $d$ are $t$.",
+        "examples": [
+          "For document $d = [\\text{\"cat\"}, \\text{\"dog\"}, \\text{\"cat\"}]$: $\\text{TF}(\\text{\"cat\"}, d) = \\frac{2}{3} \\approx 0.6667$, $\\text{TF}(\\text{\"dog\"}, d) = \\frac{1}{3} \\approx 0.3333$",
+          "For document $d = [\\text{\"the\"}, \\text{\"the\"}, \\text{\"the\"}, \\text{\"the\"}]$: $\\text{TF}(\\text{\"the\"}, d) = \\frac{4}{4} = 1.0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Term Frequency",
+          "latex": "$\\text{TF}(t, d) = \\frac{f_{t,d}}{|d|}$",
+          "description": "Use this to compute the normalized frequency of a term in a document. The denominator ensures different document lengths are comparable."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the term frequency for all unique words in a single document. Return a dictionary mapping each word to its TF score.",
+        "function_signature": "def compute_term_frequency(document: list) -> dict:",
+        "starter_code": "def compute_term_frequency(document: list) -> dict:\n    \"\"\"\n    Compute term frequency for all words in a document.\n    \n    :param document: List of words (strings)\n    :return: Dictionary mapping each word to its TF score\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_term_frequency(['cat', 'dog', 'cat'])",
+            "expected": "{'cat': 0.66667, 'dog': 0.33333}",
+            "explanation": "The word 'cat' appears 2 times out of 3 total words (2/3), and 'dog' appears 1 time out of 3 (1/3)"
+          },
+          {
+            "input": "compute_term_frequency(['the', 'the', 'the'])",
+            "expected": "{'the': 1.0}",
+            "explanation": "The word 'the' appears 3 times out of 3 total words, giving TF = 1.0"
+          },
+          {
+            "input": "compute_term_frequency([])",
+            "expected": "{}",
+            "explanation": "An empty document has no terms, so the result is an empty dictionary"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle empty documents (division by zero)",
+        "Not normalizing by document length, just returning raw counts",
+        "Using integer division instead of float division in Python 2.x style",
+        "Not accounting for case sensitivity (e.g., 'Cat' vs 'cat')"
+      ],
+      "hint": "Use a dictionary to count term occurrences first, then divide each count by the total document length. Remember to handle the empty document case.",
+      "references": [
+        "Frequency distributions in Python",
+        "Dictionary comprehension",
+        "Counter class from collections module"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Document Frequency: Counting Term Occurrence Across Corpus",
+      "relation_to_problem": "Document Frequency (DF) is needed to compute IDF, which identifies how common or rare a term is across the entire corpus. This is the foundation for the second component of TF-IDF.",
+      "prerequisites": [
+        "Term Frequency concept",
+        "Set operations",
+        "Iterating over nested lists"
+      ],
+      "learning_objectives": [
+        "Understand the distinction between term frequency and document frequency",
+        "Implement DF computation across a corpus",
+        "Recognize why DF is a corpus-level statistic, not document-level"
+      ],
+      "math_content": {
+        "definition": "Document Frequency (DF) is a function $\\text{DF}: \\mathcal{V} \\to \\mathbb{N}$ that maps each term $t$ in vocabulary $\\mathcal{V}$ to the number of documents in corpus $\\mathcal{C}$ that contain at least one occurrence of $t$. Formally: $$\\text{DF}(t) = |\\{d \\in \\mathcal{C} : f_{t,d} > 0\\}|$$ where $\\mathcal{C}$ is the corpus (set of documents) and $f_{t,d}$ is the frequency of term $t$ in document $d$.",
+        "notation": "$\\mathcal{C}$ = corpus (collection of documents), $N = |\\mathcal{C}|$ = total number of documents, $\\text{DF}(t)$ = number of documents containing term $t$",
+        "theorem": "**DF Bounds**: For any term $t$ in corpus $\\mathcal{C}$, we have $1 \\leq \\text{DF}(t) \\leq N$ where $N = |\\mathcal{C}|$. The lower bound is achieved when $t$ appears in exactly one document, and the upper bound when $t$ appears in all documents.",
+        "proof_sketch": "Since $\\text{DF}(t)$ counts documents containing $t$, and $t$ must appear in at least one document to be in the vocabulary, $\\text{DF}(t) \\geq 1$. Since no term can appear in more documents than exist in the corpus, $\\text{DF}(t) \\leq N$.",
+        "examples": [
+          "Corpus: $[['cat', 'dog'], ['cat', 'bird'], ['fish']]$. Then $\\text{DF}('cat') = 2$ (appears in first two documents), $\\text{DF}('fish') = 1$ (appears in only third document)",
+          "For stopwords like 'the' in English text: $\\text{DF}('the') \\approx N$ since 'the' appears in almost all documents"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Document Frequency",
+          "latex": "$\\text{DF}(t) = \\sum_{d \\in \\mathcal{C}} \\mathbb{1}_{t \\in d}$",
+          "description": "Sum the indicator function over all documents: it equals 1 if term t appears in document d, 0 otherwise"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the document frequency for all unique terms across an entire corpus. Return a dictionary mapping each term to the number of documents it appears in.",
+        "function_signature": "def compute_document_frequency(corpus: list) -> dict:",
+        "starter_code": "def compute_document_frequency(corpus: list) -> dict:\n    \"\"\"\n    Compute document frequency for all terms in a corpus.\n    \n    :param corpus: List of documents, where each document is a list of words\n    :return: Dictionary mapping each term to its document frequency\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_document_frequency([['cat', 'dog'], ['cat', 'bird'], ['fish']])",
+            "expected": "{'cat': 2, 'dog': 1, 'bird': 1, 'fish': 1}",
+            "explanation": "'cat' appears in 2 documents, while 'dog', 'bird', and 'fish' each appear in 1 document"
+          },
+          {
+            "input": "compute_document_frequency([['the', 'cat'], ['the', 'dog'], ['the', 'bird']])",
+            "expected": "{'the': 3, 'cat': 1, 'dog': 1, 'bird': 1}",
+            "explanation": "'the' appears in all 3 documents, while each animal appears in only 1 document"
+          },
+          {
+            "input": "compute_document_frequency([['cat', 'cat', 'cat'], ['dog']])",
+            "expected": "{'cat': 1, 'dog': 1}",
+            "explanation": "Even though 'cat' appears 3 times in the first document, it only counts as appearing in 1 document for DF purposes"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Counting term occurrences instead of document occurrences (confusing TF with DF)",
+        "Counting duplicate terms multiple times within the same document",
+        "Not using sets to check for term presence in each document",
+        "Forgetting to handle empty documents in the corpus"
+      ],
+      "hint": "For each document, find the unique set of terms it contains. Then count how many documents contain each term. Using sets is key to avoiding duplicate counts within a document.",
+      "references": [
+        "Set operations in Python",
+        "Nested loops and collections",
+        "defaultdict for counting"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Inverse Document Frequency: Measuring Term Rarity with Logarithmic Scaling",
+      "relation_to_problem": "IDF transforms document frequency into an inverse measure of term importance using logarithmic scaling and smoothing. This is the second critical component of TF-IDF that penalizes common words and rewards rare ones.",
+      "prerequisites": [
+        "Document Frequency computation",
+        "Logarithms and their properties",
+        "Understanding of smoothing techniques"
+      ],
+      "learning_objectives": [
+        "Understand why IDF uses inverse and logarithmic transformations",
+        "Implement IDF with proper smoothing to prevent division by zero",
+        "Recognize the mathematical intuition behind logarithmic scaling"
+      ],
+      "math_content": {
+        "definition": "Inverse Document Frequency (IDF) is a function $\\text{IDF}: \\mathcal{V} \\to \\mathbb{R}^+$ that transforms document frequency into a measure of term rarity. The standard smoothed IDF formula is: $$\\text{IDF}(t) = \\log\\left(\\frac{N + 1}{\\text{DF}(t) + 1}\\right) + 1$$ where $N = |\\mathcal{C}|$ is the total number of documents, $\\text{DF}(t)$ is the document frequency of term $t$, and $\\log$ typically denotes the natural logarithm.",
+        "notation": "$N$ = total documents in corpus, $\\text{DF}(t)$ = document frequency of term $t$, $\\log$ = natural logarithm (can also be $\\log_{10}$)",
+        "theorem": "**IDF Monotonicity**: IDF is a strictly decreasing function of document frequency. If $\\text{DF}(t_1) < \\text{DF}(t_2)$, then $\\text{IDF}(t_1) > \\text{IDF}(t_2)$. This ensures rarer terms receive higher IDF scores.",
+        "proof_sketch": "The function $f(x) = \\log\\left(\\frac{N+1}{x+1}\\right)$ is strictly decreasing in $x$ for $x > 0$ because $\\log$ is an increasing function and $\\frac{N+1}{x+1}$ is decreasing in $x$. Adding 1 preserves monotonicity. Therefore, higher DF leads to lower IDF.",
+        "examples": [
+          "With $N = 100$ documents: If $\\text{DF}('rare') = 2$, then $\\text{IDF}('rare') = \\log(\\frac{101}{3}) + 1 \\approx \\log(33.67) + 1 \\approx 3.52 + 1 = 4.52$",
+          "With $N = 100$ documents: If $\\text{DF}('common') = 90$, then $\\text{IDF}('common') = \\log(\\frac{101}{91}) + 1 \\approx \\log(1.11) + 1 \\approx 0.10 + 1 = 1.10$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Smoothed IDF",
+          "latex": "$\\text{IDF}(t) = \\log\\left(\\frac{N + 1}{\\text{DF}(t) + 1}\\right) + 1$",
+          "description": "The +1 smoothing in numerator and denominator prevents division by zero and ensures non-negative IDF. The outer +1 ensures IDF is always at least 1."
+        },
+        {
+          "name": "Alternative IDF (without outer +1)",
+          "latex": "$\\text{IDF}(t) = \\log\\left(\\frac{N + 1}{\\text{DF}(t) + 1}\\right)$",
+          "description": "A variant without the outer +1. Some implementations use this form. The key is consistency across your implementation."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes IDF scores for all terms in a corpus using the smoothed IDF formula. The function should take a corpus and return a dictionary mapping each term to its IDF score.",
+        "function_signature": "def compute_idf(corpus: list) -> dict:",
+        "starter_code": "import math\n\ndef compute_idf(corpus: list) -> dict:\n    \"\"\"\n    Compute IDF scores for all terms in a corpus.\n    \n    :param corpus: List of documents, where each document is a list of words\n    :return: Dictionary mapping each term to its IDF score\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_idf([['cat', 'dog'], ['cat', 'bird'], ['fish']])",
+            "expected": "{'cat': 1.28768, 'dog': 1.69315, 'bird': 1.69315, 'fish': 1.69315}",
+            "explanation": "N=3. 'cat' appears in 2 docs: IDF = ln((3+1)/(2+1)) + 1 = ln(4/3) + 1 ≈ 1.288. Others appear in 1 doc: IDF = ln((3+1)/(1+1)) + 1 = ln(2) + 1 ≈ 1.693"
+          },
+          {
+            "input": "compute_idf([['the'], ['the'], ['the']])",
+            "expected": "{'the': 1.0}",
+            "explanation": "N=3, DF('the')=3: IDF = ln((3+1)/(3+1)) + 1 = ln(1) + 1 = 0 + 1 = 1.0. A term in all documents has minimal IDF"
+          },
+          {
+            "input": "compute_idf([['unique']])",
+            "expected": "{'unique': 1.69315}",
+            "explanation": "N=1, DF('unique')=1: IDF = ln((1+1)/(1+1)) + 1 = ln(1) + 1 = 1.0 (with this formula). Note: different formulas give different edge case results"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting the smoothing (+1 in numerator and denominator), leading to division by zero",
+        "Forgetting the outer +1, which changes the range of IDF values",
+        "Using the wrong logarithm base (mixing natural log and log base 10)",
+        "Computing IDF per document instead of per corpus (IDF is a corpus-level statistic)",
+        "Not handling the edge case where the corpus is empty"
+      ],
+      "hint": "First compute document frequencies for all terms using your previous function. Then apply the IDF formula to each term's DF. Use math.log() for natural logarithm.",
+      "references": [
+        "Logarithm properties",
+        "Smoothing techniques in NLP",
+        "Information theory: information content and entropy"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "TF-IDF Multiplication: Combining Local and Global Term Weights",
+      "relation_to_problem": "TF-IDF is the product of TF (local document importance) and IDF (global corpus importance). This step combines both components to create the final term weighting scheme used in the main problem.",
+      "prerequisites": [
+        "Term Frequency computation",
+        "Inverse Document Frequency computation",
+        "Matrix/vector operations"
+      ],
+      "learning_objectives": [
+        "Understand how TF-IDF balances local and global term importance",
+        "Implement TF-IDF computation for a single document",
+        "Interpret TF-IDF scores in the context of information retrieval"
+      ],
+      "math_content": {
+        "definition": "TF-IDF is a function $\\text{TFIDF}: \\mathcal{V} \\times \\mathcal{D} \\to \\mathbb{R}^+$ that combines Term Frequency and Inverse Document Frequency through multiplication: $$\\text{TFIDF}(t, d) = \\text{TF}(t, d) \\times \\text{IDF}(t)$$ This creates a weighting scheme where a term's importance in a document is proportional to its frequency in that document (TF) and inversely proportional to its frequency across all documents (IDF).",
+        "notation": "$\\text{TFIDF}(t, d)$ = TF-IDF score of term $t$ in document $d$, $\\text{TF}(t, d)$ = term frequency, $\\text{IDF}(t)$ = inverse document frequency",
+        "theorem": "**TF-IDF Zero Property**: $\\text{TFIDF}(t, d) = 0$ if and only if $\\text{TF}(t, d) = 0$ (i.e., term $t$ does not appear in document $d$). This is true regardless of the IDF value, since $0 \\times \\text{IDF}(t) = 0$.",
+        "proof_sketch": "Since $\\text{TFIDF}(t, d) = \\text{TF}(t, d) \\times \\text{IDF}(t)$ and $\\text{IDF}(t) > 0$ for all terms (due to smoothing), the product equals zero if and only if $\\text{TF}(t, d) = 0$.",
+        "examples": [
+          "Term 'algorithm' in a technical paper: High TF (appears frequently) × High IDF (rare in general corpus) = Very High TF-IDF (important term)",
+          "Term 'the' in any document: High TF (appears frequently) × Low IDF (appears in all documents) = Low TF-IDF (not distinctive)",
+          "Term 'quantum' in a cooking article: Low TF (doesn't appear) × High IDF (rare term) = Zero TF-IDF (not relevant)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "TF-IDF Score",
+          "latex": "$\\text{TFIDF}(t, d) = \\frac{f_{t,d}}{|d|} \\times \\left(\\log\\left(\\frac{N + 1}{\\text{DF}(t) + 1}\\right) + 1\\right)$",
+          "description": "The complete TF-IDF formula combining both components. Use this to score any term in any document."
+        },
+        {
+          "name": "Document TF-IDF Vector",
+          "latex": "$\\vec{v}_d = [\\text{TFIDF}(t_1, d), \\text{TFIDF}(t_2, d), \\ldots, \\text{TFIDF}(t_m, d)]$",
+          "description": "A document can be represented as a vector in $\\mathbb{R}^m$ where $m$ is the vocabulary size, with each dimension being the TF-IDF score of a term."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes TF-IDF scores for all terms in a single document given a corpus context. The function should return a dictionary mapping each term in the document to its TF-IDF score.",
+        "function_signature": "def compute_tfidf_for_document(document: list, corpus: list) -> dict:",
+        "starter_code": "import math\n\ndef compute_tfidf_for_document(document: list, corpus: list) -> dict:\n    \"\"\"\n    Compute TF-IDF scores for all terms in a document.\n    \n    :param document: A list of words (the document to score)\n    :param corpus: List of all documents, where each document is a list of words\n    :return: Dictionary mapping each term in the document to its TF-IDF score\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_tfidf_for_document(['cat', 'dog'], [['cat', 'dog'], ['cat', 'bird'], ['fish']])",
+            "expected": "{'cat': 0.42923, 'dog': 0.56438}",
+            "explanation": "TF('cat')=0.5, IDF('cat')≈1.288, so TFIDF≈0.644. TF('dog')=0.5, IDF('dog')≈1.693, so TFIDF≈0.847"
+          },
+          {
+            "input": "compute_tfidf_for_document(['the', 'cat'], [['the', 'cat'], ['the', 'dog'], ['the', 'bird']])",
+            "expected": "{'the': 0.5, 'cat': 0.84657}",
+            "explanation": "'the' appears in all docs (low IDF), 'cat' appears in 1 doc (high IDF), both have TF=0.5 in the document"
+          },
+          {
+            "input": "compute_tfidf_for_document([], [['cat']])",
+            "expected": "{}",
+            "explanation": "An empty document has no terms, so the result is an empty dictionary"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing IDF separately for each document instead of using the corpus-level IDF",
+        "Forgetting to filter TF-IDF scores to only terms present in the target document",
+        "Not handling the case where a term appears in the document but not elsewhere in the corpus",
+        "Rounding too early in the computation, leading to accumulated numerical errors"
+      ],
+      "hint": "Reuse your previous functions: compute TF for the target document and IDF for the entire corpus. Then multiply corresponding TF and IDF values for each term in the document.",
+      "references": [
+        "Vector space model in information retrieval",
+        "Document similarity metrics",
+        "Cosine similarity"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Query-Based TF-IDF: Computing Scores for Specific Terms Across Documents",
+      "relation_to_problem": "In many applications, we don't need TF-IDF for all terms, only for specific query terms. This step teaches how to efficiently compute TF-IDF for a query subset, which is exactly what the main problem requires.",
+      "prerequisites": [
+        "TF-IDF computation",
+        "Query processing concepts",
+        "Efficient lookup in data structures"
+      ],
+      "learning_objectives": [
+        "Understand the difference between full vectorization and query-based scoring",
+        "Implement selective TF-IDF computation for query terms only",
+        "Handle edge cases where query terms don't appear in documents or corpus"
+      ],
+      "math_content": {
+        "definition": "Query-based TF-IDF restricts the TF-IDF computation to a specific set of query terms $Q \\subset \\mathcal{V}$. For each document $d \\in \\mathcal{C}$ and each query term $q \\in Q$, we compute: $$\\text{TFIDF}_Q(q, d) = \\text{TF}(q, d) \\times \\text{IDF}(q)$$ The result is typically a matrix $M \\in \\mathbb{R}^{|\\mathcal{C}| \\times |Q|}$ where $M_{ij} = \\text{TFIDF}(q_j, d_i)$.",
+        "notation": "$Q$ = query (subset of vocabulary), $|Q|$ = number of query terms, $M_{ij}$ = TF-IDF score of $j$-th query term in $i$-th document",
+        "theorem": "**Query Independence**: For any two queries $Q_1$ and $Q_2$, and any term $q \\in Q_1 \\cap Q_2$, the TF-IDF score $\\text{TFIDF}(q, d)$ for a fixed document $d$ is the same whether computed in the context of $Q_1$ or $Q_2$. This is because TF-IDF depends only on the term, document, and corpus, not on the query set.",
+        "proof_sketch": "TF-IDF is defined as $\\text{TF}(q, d) \\times \\text{IDF}(q)$. Neither TF nor IDF depends on which other terms are in the query $Q$. Therefore, the score for term $q$ is invariant to the composition of $Q$.",
+        "examples": [
+          "Query $Q = ['machine', 'learning']$, Document $d = ['machine', 'learning', 'is', 'fun', 'learning']$: We only compute TF-IDF for 'machine' and 'learning', ignoring 'is' and 'fun'",
+          "If a query term 'quantum' doesn't appear in document $d$, then $\\text{TFIDF}('quantum', d) = 0 \\times \\text{IDF}('quantum') = 0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Query TF-IDF Matrix",
+          "latex": "$M_{ij} = \\text{TFIDF}(q_j, d_i) = \\frac{f_{q_j, d_i}}{|d_i|} \\times \\text{IDF}(q_j)$",
+          "description": "Matrix representation where rows are documents and columns are query terms. Each entry is the TF-IDF score of a query term in a document."
+        },
+        {
+          "name": "Zero-score for absent terms",
+          "latex": "$\\text{TFIDF}(q, d) = 0 \\text{ if } q \\notin d$",
+          "description": "If a query term doesn't appear in a document, its TF-IDF score is zero. This is important for sparse representations."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes TF-IDF scores for a list of query terms across all documents in a corpus. Return a list of lists where each inner list contains the TF-IDF scores for the query terms in the corresponding document (in query order).",
+        "function_signature": "def compute_query_tfidf(corpus: list, query: list) -> list:",
+        "starter_code": "import math\n\ndef compute_query_tfidf(corpus: list, query: list) -> list:\n    \"\"\"\n    Compute TF-IDF scores for query terms across all documents in corpus.\n    \n    :param corpus: List of documents, where each document is a list of words\n    :param query: List of query terms\n    :return: List of lists, where each inner list contains TF-IDF scores for query terms in that document\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_query_tfidf([['cat', 'dog'], ['cat', 'bird']], ['cat'])",
+            "expected": "[[0.64385], [0.64385]]",
+            "explanation": "'cat' appears with TF=0.5 in both documents. IDF('cat')=ln((2+1)/(2+1))+1=1.0. So TFIDF = 0.5 × 1.288 in each doc"
+          },
+          {
+            "input": "compute_query_tfidf([['cat', 'dog'], ['bird']], ['cat', 'bird'])",
+            "expected": "[[0.64385, 0.0], [0.0, 1.69315]]",
+            "explanation": "First doc has 'cat' but not 'bird'. Second doc has 'bird' but not 'cat'. Absent terms get score 0.0"
+          },
+          {
+            "input": "compute_query_tfidf([['a', 'b'], ['c', 'd']], ['x', 'y'])",
+            "expected": "[[0.0, 0.0], [0.0, 0.0]]",
+            "explanation": "Query terms 'x' and 'y' don't appear in any document, so all scores are 0.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing TF-IDF for all terms in the corpus instead of just the query terms (inefficient)",
+        "Not maintaining the correct order of query terms in the output",
+        "Forgetting to handle query terms that don't appear in the corpus (should use smoothed IDF)",
+        "Not returning scores for all documents, even when query terms are absent (should return 0.0)",
+        "Confusing rows and columns in the output matrix structure"
+      ],
+      "hint": "First compute IDF for all terms in the corpus (or at least for query terms). Then for each document, compute TF for query terms only. Multiply TF and IDF for each query term in each document. Maintain the query term order in your output.",
+      "references": [
+        "Sparse matrix representations",
+        "Query processing in information retrieval",
+        "Efficient TF-IDF computation"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Precision and Edge Cases: Rounding, Empty Inputs, and Numerical Stability",
+      "relation_to_problem": "The final problem requires rounding TF-IDF scores to 5 decimal places and handling edge cases like empty corpora, empty documents, and out-of-vocabulary query terms. This step ensures robustness and precision.",
+      "prerequisites": [
+        "Query-based TF-IDF computation",
+        "Floating-point arithmetic",
+        "Error handling in Python"
+      ],
+      "learning_objectives": [
+        "Understand floating-point precision and rounding in TF-IDF computations",
+        "Implement proper error handling for edge cases",
+        "Ensure numerical stability in logarithmic and division operations"
+      ],
+      "math_content": {
+        "definition": "Numerical precision in TF-IDF refers to controlling the decimal representation of computed scores to avoid both floating-point errors and excessive precision. For a computed value $x \\in \\mathbb{R}$, rounding to $k$ decimal places gives: $$\\text{round}_k(x) = \\frac{\\lfloor x \\cdot 10^k + 0.5 \\rfloor}{10^k}$$ In Python, this is typically implemented as `round(x, k)`.",
+        "notation": "$\\text{round}_k(x)$ = value $x$ rounded to $k$ decimal places, $\\epsilon$ = machine epsilon (smallest representable difference)",
+        "theorem": "**Rounding Error Bound**: When rounding a value $x$ to $k$ decimal places, the absolute error is bounded by $|x - \\text{round}_k(x)| \\leq 0.5 \\times 10^{-k}$. For $k=5$, the maximum error is $0.000005$.",
+        "proof_sketch": "Rounding to the nearest $k$-th decimal place means the error cannot exceed half of the unit in the last place, which is $\\frac{1}{2} \\times 10^{-k}$.",
+        "examples": [
+          "$\\text{round}_5(0.123456789) = 0.12346$ (rounds up from 6)",
+          "$\\text{round}_5(0.123454999) = 0.12345$ (rounds down from 4)",
+          "For TF-IDF: $\\text{round}_5(0.214607) = 0.21461$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Safe Division",
+          "latex": "$\\text{safe\\_divide}(a, b) = \\begin{cases} \\frac{a}{b} & \\text{if } b \\neq 0 \\\\ 0 & \\text{if } b = 0 \\end{cases}$",
+          "description": "Prevents division by zero errors when computing TF for empty documents"
+        },
+        {
+          "name": "Smoothed IDF (repeated for emphasis)",
+          "latex": "$\\text{IDF}(t) = \\log\\left(\\frac{N + 1}{\\text{DF}(t) + 1}\\right) + 1$",
+          "description": "The +1 smoothing prevents log(0) errors when a term appears in all documents or doesn't appear at all"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a robust version of the query TF-IDF function that handles all edge cases and returns results rounded to 5 decimal places. This is essentially the final solution structure for the main problem.",
+        "function_signature": "def compute_robust_tfidf(corpus: list, query: list) -> list:",
+        "starter_code": "import math\n\ndef compute_robust_tfidf(corpus: list, query: list) -> list:\n    \"\"\"\n    Compute TF-IDF scores for query terms with proper rounding and edge case handling.\n    \n    :param corpus: List of documents, where each document is a list of words\n    :param query: List of query terms\n    :return: List of lists with TF-IDF scores rounded to 5 decimal places\n    \"\"\"\n    # Your code here\n    # Handle edge cases: empty corpus, empty documents, empty query\n    # Compute IDF with smoothing\n    # Compute TF for each document\n    # Multiply and round to 5 decimal places\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_robust_tfidf([['cat', 'dog'], ['cat', 'bird']], ['cat'])",
+            "expected": "[[0.64385], [0.64385]]",
+            "explanation": "Standard case with proper rounding to 5 decimal places"
+          },
+          {
+            "input": "compute_robust_tfidf([['cat'], [], ['dog']], ['cat'])",
+            "expected": "[[1.28768], [0.0], [0.0]]",
+            "explanation": "Handles empty document (second document). TF for empty doc is 0.0 for all terms."
+          },
+          {
+            "input": "compute_robust_tfidf([['cat', 'dog']], ['bird'])",
+            "expected": "[[0.0]]",
+            "explanation": "Query term 'bird' doesn't appear in corpus. TF=0, so TF-IDF=0.0"
+          },
+          {
+            "input": "compute_robust_tfidf([], ['cat'])",
+            "expected": "[]",
+            "explanation": "Empty corpus should return empty list (or could raise an error, depending on specification)"
+          },
+          {
+            "input": "compute_robust_tfidf([['cat']], [])",
+            "expected": "[[]]",
+            "explanation": "Empty query should return list of empty lists (one per document)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Rounding too early (e.g., rounding TF and IDF separately before multiplication)",
+        "Not handling empty documents (leads to division by zero in TF computation)",
+        "Not handling empty corpus (leads to division by zero in IDF computation)",
+        "Not handling query terms absent from corpus (should still compute IDF with smoothing)",
+        "Using incorrect rounding (truncation instead of proper rounding)",
+        "Forgetting to convert integer division to float division"
+      ],
+      "hint": "Start by handling edge cases at the beginning of your function (empty corpus, empty query). Use the smoothed IDF formula throughout. When computing TF, check if document is empty before dividing. Round only at the final output stage, not intermediate calculations.",
+      "references": [
+        "Floating-point arithmetic in Python",
+        "IEEE 754 standard",
+        "Defensive programming practices",
+        "Unit testing for edge cases"
+      ]
+    }
+  ]
+}

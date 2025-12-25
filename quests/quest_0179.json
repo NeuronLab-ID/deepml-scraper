@@ -1,0 +1,493 @@
+{
+  "problem_id": 179,
+  "title": "Expected Value and Variance of an n-Sided Die",
+  "category": "Probability",
+  "difficulty": "easy",
+  "description": "Write a Python function that computes the expected value and variance of a fair n-sided die roll. The die has faces numbered 1 through n, each equally likely. The function should return a tuple (expected_value, variance).",
+  "example": {
+    "input": "dice_statistics(6)",
+    "output": "(3.5, 2.9167)",
+    "reasoning": "For n=6, the expected value is (6+1)/2 = 3.5 and the variance is (6^2-1)/12 = 35/12 ≈ 2.9167."
+  },
+  "starter_code": "def dice_statistics(n: int) -> tuple[float, float]:\n\t\"\"\"\n\tCompute the expected value and variance of a fair n-sided die roll.\n\n\tArgs:\n\t\tn (int): Number of sides of the die\n\n\tReturns:\n\t\ttuple: (expected_value, variance)\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Summation Formulas for Arithmetic Series",
+      "relation_to_problem": "Computing expected value requires summing consecutive integers (1 through n), and computing E[X²] requires summing squares of integers, both fundamental to calculating the dice statistics.",
+      "prerequisites": [
+        "Basic algebra",
+        "Sequence and series notation"
+      ],
+      "learning_objectives": [
+        "Derive and apply the formula for sum of first n natural numbers",
+        "Derive and apply the formula for sum of squares of first n natural numbers",
+        "Understand the closed-form representation of arithmetic series"
+      ],
+      "math_content": {
+        "definition": "An **arithmetic series** is the sum of terms in an arithmetic sequence. For the sequence of natural numbers $1, 2, 3, \\ldots, n$, the sum is denoted $\\sum_{i=1}^{n} i$. For squares, we have $\\sum_{i=1}^{n} i^2$.",
+        "notation": "$S_n = \\sum_{i=1}^{n} i$ represents the sum of first n natural numbers; $S_n^{(2)} = \\sum_{i=1}^{n} i^2$ represents the sum of their squares",
+        "theorem": "**Theorem 1:** $\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}$\n\n**Theorem 2:** $\\sum_{i=1}^{n} i^2 = \\frac{n(n+1)(2n+1)}{6}$",
+        "proof_sketch": "**Proof of Theorem 1 (Gauss's Method):** Write the sum forwards and backwards:\n$S_n = 1 + 2 + \\cdots + (n-1) + n$\n$S_n = n + (n-1) + \\cdots + 2 + 1$\nAdding: $2S_n = (n+1) + (n+1) + \\cdots + (n+1) = n(n+1)$\nThus: $S_n = \\frac{n(n+1)}{2}$\n\n**Proof of Theorem 2:** Can be proven by mathematical induction or by telescoping sums using the identity $(k+1)^3 - k^3 = 3k^2 + 3k + 1$.",
+        "examples": [
+          "For n=6: $\\sum_{i=1}^{6} i = \\frac{6 \\cdot 7}{2} = 21$. Verification: $1+2+3+4+5+6 = 21$ ✓",
+          "For n=6: $\\sum_{i=1}^{6} i^2 = \\frac{6 \\cdot 7 \\cdot 13}{6} = 91$. Verification: $1+4+9+16+25+36 = 91$ ✓",
+          "For n=4: $\\sum_{i=1}^{4} i = \\frac{4 \\cdot 5}{2} = 10$ and $\\sum_{i=1}^{4} i^2 = \\frac{4 \\cdot 5 \\cdot 9}{6} = 30$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sum of Natural Numbers",
+          "latex": "$\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}$",
+          "description": "Use when computing the sum of die face values 1 through n"
+        },
+        {
+          "name": "Sum of Squares",
+          "latex": "$\\sum_{i=1}^{n} i^2 = \\frac{n(n+1)(2n+1)}{6}$",
+          "description": "Use when computing the sum of squared die face values, needed for variance"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes both the sum of first n natural numbers and the sum of their squares using the closed-form formulas (not loops). This is essential for efficiently calculating dice statistics.",
+        "function_signature": "def compute_sums(n: int) -> tuple[int, int]:",
+        "starter_code": "def compute_sums(n: int) -> tuple[int, int]:\n    \"\"\"\n    Compute the sum of first n natural numbers and sum of their squares.\n    \n    Args:\n        n (int): Positive integer\n    \n    Returns:\n        tuple: (sum_of_numbers, sum_of_squares)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_sums(6)",
+            "expected": "(21, 91)",
+            "explanation": "For n=6: sum=6×7/2=21, sum_squares=6×7×13/6=91"
+          },
+          {
+            "input": "compute_sums(1)",
+            "expected": "(1, 1)",
+            "explanation": "Edge case: For n=1, both sums equal 1"
+          },
+          {
+            "input": "compute_sums(10)",
+            "expected": "(55, 385)",
+            "explanation": "For n=10: sum=10×11/2=55, sum_squares=10×11×21/6=385"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using loops instead of closed-form formulas, which is inefficient for large n",
+        "Integer division errors when computing n(n+1)/2 (ensure proper division)",
+        "Forgetting to handle edge case n=1",
+        "Confusing the sum formula with the average formula"
+      ],
+      "hint": "Both formulas involve multiplying terms related to n, then dividing. The sum of squares formula has three factors in the numerator.",
+      "references": [
+        "Arithmetic series",
+        "Gauss summation",
+        "Mathematical induction for sum of squares"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Discrete Probability Distributions and Sample Spaces",
+      "relation_to_problem": "Understanding how to assign probabilities to die outcomes and work with discrete uniform distributions is fundamental to computing expected value and variance.",
+      "prerequisites": [
+        "Basic set theory",
+        "Fractions and ratios"
+      ],
+      "learning_objectives": [
+        "Define a discrete probability distribution formally",
+        "Understand the uniform distribution on finite sample spaces",
+        "Verify that probability assignments satisfy the axioms of probability"
+      ],
+      "math_content": {
+        "definition": "A **discrete random variable** $X$ takes values from a countable set. A **probability mass function (PMF)** $P(X=x_i)$ assigns probabilities to each value. For an n-sided die, the **sample space** is $\\Omega = \\{1, 2, 3, \\ldots, n\\}$. A **discrete uniform distribution** assigns equal probability to each outcome.",
+        "notation": "$P(X=i)$ or $P(i)$ denotes the probability of outcome $i$; $\\Omega$ is the sample space; $|\\Omega| = n$ is the size of the sample space",
+        "theorem": "**Axioms of Probability:**\n1. $0 \\leq P(x_i) \\leq 1$ for all outcomes\n2. $\\sum_{i=1}^{n} P(x_i) = 1$ (total probability)\n\n**Discrete Uniform Distribution:** For a fair n-sided die, $P(X=i) = \\frac{1}{n}$ for all $i \\in \\{1, 2, \\ldots, n\\}$",
+        "proof_sketch": "For a fair die, by symmetry, all outcomes are equally likely. Since there are n outcomes and probabilities must sum to 1:\n$n \\cdot P(X=i) = 1$\nTherefore: $P(X=i) = \\frac{1}{n}$ for each $i$.\n\nVerification: $\\sum_{i=1}^{n} \\frac{1}{n} = \\frac{n}{n} = 1$ ✓",
+        "examples": [
+          "Six-sided die: $P(X=1) = P(X=2) = \\cdots = P(X=6) = \\frac{1}{6} \\approx 0.1667$. Sum: $6 \\times \\frac{1}{6} = 1$ ✓",
+          "Four-sided die: Each face has probability $\\frac{1}{4} = 0.25$",
+          "Unfair six-sided die (not uniform): Suppose $P(6) = 0.5$ and $P(1)=\\cdots=P(5) = 0.1$. Check: $5(0.1) + 0.5 = 1$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Uniform Probability",
+          "latex": "$P(X=i) = \\frac{1}{n}$ for $i = 1, 2, \\ldots, n$",
+          "description": "Probability of each outcome on a fair n-sided die"
+        },
+        {
+          "name": "Probability Normalization",
+          "latex": "$\\sum_{i=1}^{n} P(x_i) = 1$",
+          "description": "Total probability across all outcomes must equal 1"
+        }
+      ],
+      "exercise": {
+        "description": "Create a function that generates the probability distribution for a fair n-sided die and verifies it satisfies the probability axioms. Return a dictionary mapping each outcome to its probability.",
+        "function_signature": "def die_probability_distribution(n: int) -> dict[int, float]:",
+        "starter_code": "def die_probability_distribution(n: int) -> dict[int, float]:\n    \"\"\"\n    Generate probability distribution for a fair n-sided die.\n    \n    Args:\n        n (int): Number of sides on the die\n    \n    Returns:\n        dict: Mapping from outcome (1 to n) to probability\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "die_probability_distribution(6)",
+            "expected": "{1: 0.16667, 2: 0.16667, 3: 0.16667, 4: 0.16667, 5: 0.16667, 6: 0.16667}",
+            "explanation": "Each of 6 outcomes has probability 1/6 ≈ 0.16667, and they sum to 1.0"
+          },
+          {
+            "input": "die_probability_distribution(1)",
+            "expected": "{1: 1.0}",
+            "explanation": "A one-sided die always shows 1 with probability 1"
+          },
+          {
+            "input": "die_probability_distribution(4)",
+            "expected": "{1: 0.25, 2: 0.25, 3: 0.25, 4: 0.25}",
+            "explanation": "Each of 4 outcomes has probability 1/4 = 0.25"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that probabilities must sum to exactly 1",
+        "Using integer division when computing 1/n, leading to incorrect probabilities",
+        "Not handling the edge case where n=1",
+        "Confusing probability (1/n) with the outcome value (i)"
+      ],
+      "hint": "For a fair die, every outcome from 1 to n has the same probability. Use a dictionary comprehension to create the distribution efficiently.",
+      "references": [
+        "Probability mass functions",
+        "Discrete uniform distribution",
+        "Axioms of probability"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Expected Value of Discrete Random Variables",
+      "relation_to_problem": "The expected value formula is the first component of the solution—computing the weighted average of die outcomes using summation formulas and probabilities.",
+      "prerequisites": [
+        "Summation formulas",
+        "Discrete probability distributions",
+        "Weighted averages"
+      ],
+      "learning_objectives": [
+        "Define expected value formally for discrete random variables",
+        "Compute expected value using the weighted sum formula",
+        "Derive the closed-form expected value for a uniform distribution",
+        "Interpret expected value as a long-run average"
+      ],
+      "math_content": {
+        "definition": "The **expected value** (or **expectation**) of a discrete random variable $X$ is defined as:\n$$E[X] = \\sum_{i=1}^{n} x_i \\cdot P(X=x_i)$$\nThis represents the probability-weighted average of all possible outcomes. It is also called the **mean** of the distribution and denoted $\\mu$.",
+        "notation": "$E[X]$ or $\\mu$ represents the expected value; $x_i$ are the possible outcomes; $P(X=x_i)$ or $P(x_i)$ are their probabilities",
+        "theorem": "**Expected Value of Uniform Distribution on $\\{1, 2, \\ldots, n\\}$:**\n$$E[X] = \\sum_{i=1}^{n} i \\cdot \\frac{1}{n} = \\frac{1}{n} \\sum_{i=1}^{n} i = \\frac{1}{n} \\cdot \\frac{n(n+1)}{2} = \\frac{n+1}{2}$$\n\n**Linearity of Expectation:** For constants $a, b$: $E[aX + b] = aE[X] + b$",
+        "proof_sketch": "For a fair n-sided die:\n$$E[X] = 1 \\cdot \\frac{1}{n} + 2 \\cdot \\frac{1}{n} + \\cdots + n \\cdot \\frac{1}{n}$$\n$$= \\frac{1}{n}(1 + 2 + \\cdots + n)$$\n$$= \\frac{1}{n} \\cdot \\frac{n(n+1)}{2}$$ (using sum formula from step 1)\n$$= \\frac{n+1}{2}$$\n\nNote that this is exactly the midpoint between the minimum (1) and maximum (n) values, which makes intuitive sense for a symmetric distribution.",
+        "examples": [
+          "Six-sided die: $E[X] = \\frac{6+1}{2} = 3.5$. This means the long-run average roll is 3.5, though no single roll equals 3.5.",
+          "Ten-sided die (d10): $E[X] = \\frac{10+1}{2} = 5.5$",
+          "Two-sided die (coin flip labeled 1,2): $E[X] = \\frac{2+1}{2} = 1.5$, confirming the average is between 1 and 2",
+          "Verification for n=3: $E[X] = 1(\\frac{1}{3}) + 2(\\frac{1}{3}) + 3(\\frac{1}{3}) = \\frac{6}{3} = 2 = \\frac{3+1}{2}$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Expected Value Definition",
+          "latex": "$E[X] = \\sum_{i=1}^{n} x_i \\cdot P(x_i)$",
+          "description": "Fundamental formula for computing expected value as a weighted sum"
+        },
+        {
+          "name": "Expected Value for n-Sided Die",
+          "latex": "$E[X] = \\frac{n+1}{2}$",
+          "description": "Closed-form formula for the expected value of a fair n-sided die"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the expected value of a fair n-sided die using the closed-form formula. This is the first key component needed for the final problem.",
+        "function_signature": "def expected_value_die(n: int) -> float:",
+        "starter_code": "def expected_value_die(n: int) -> float:\n    \"\"\"\n    Compute the expected value of a fair n-sided die roll.\n    \n    Args:\n        n (int): Number of sides on the die\n    \n    Returns:\n        float: Expected value\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "expected_value_die(6)",
+            "expected": "3.5",
+            "explanation": "For a standard die, E[X] = (6+1)/2 = 3.5"
+          },
+          {
+            "input": "expected_value_die(20)",
+            "expected": "10.5",
+            "explanation": "For a d20, E[X] = (20+1)/2 = 10.5"
+          },
+          {
+            "input": "expected_value_die(1)",
+            "expected": "1.0",
+            "explanation": "A one-sided die always shows 1, so E[X] = 1"
+          },
+          {
+            "input": "expected_value_die(100)",
+            "expected": "50.5",
+            "explanation": "For n=100, E[X] = 101/2 = 50.5"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing expected value with the most likely outcome (mode)",
+        "Thinking expected value must be an integer (it can be fractional)",
+        "Computing the sum explicitly instead of using the closed formula",
+        "Integer division errors: use (n+1)/2 not (n+1)//2 to get a float"
+      ],
+      "hint": "The expected value is simply the arithmetic mean of all possible outcomes. For consecutive integers from 1 to n, this is the midpoint of the range.",
+      "references": [
+        "Expected value",
+        "Discrete uniform distribution",
+        "Linearity of expectation"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Second Moment and E[X²]",
+      "relation_to_problem": "Computing variance requires calculating E[X²], the expected value of the squared outcomes. This is a prerequisite for the variance formula.",
+      "prerequisites": [
+        "Expected value",
+        "Sum of squares formula",
+        "Probability distributions"
+      ],
+      "learning_objectives": [
+        "Define the second moment of a random variable",
+        "Compute E[X²] for discrete uniform distributions",
+        "Understand the relationship between moments and distribution shape",
+        "Derive the closed-form formula for E[X²] of an n-sided die"
+      ],
+      "math_content": {
+        "definition": "The **k-th moment** of a random variable $X$ is defined as $E[X^k] = \\sum_{i} x_i^k \\cdot P(x_i)$. The **second moment** $E[X^2]$ is particularly important for variance calculations. When $k=1$, we get the expected value; when $k=2$, we get the second moment.",
+        "notation": "$E[X^k]$ denotes the k-th moment; $E[X^2]$ is the second moment (not to be confused with $(E[X])^2$)",
+        "theorem": "**Second Moment for n-Sided Die:**\n$$E[X^2] = \\sum_{i=1}^{n} i^2 \\cdot \\frac{1}{n} = \\frac{1}{n} \\sum_{i=1}^{n} i^2 = \\frac{1}{n} \\cdot \\frac{n(n+1)(2n+1)}{6} = \\frac{(n+1)(2n+1)}{6}$$\n\n**General Moment Property:** $E[X^k] \\neq (E[X])^k$ in general (Jensen's inequality for convex functions).",
+        "proof_sketch": "For a fair n-sided die:\n$$E[X^2] = 1^2 \\cdot \\frac{1}{n} + 2^2 \\cdot \\frac{1}{n} + \\cdots + n^2 \\cdot \\frac{1}{n}$$\n$$= \\frac{1}{n}(1^2 + 2^2 + \\cdots + n^2)$$\n$$= \\frac{1}{n} \\cdot \\frac{n(n+1)(2n+1)}{6}$$ (using sum of squares from step 1)\n$$= \\frac{(n+1)(2n+1)}{6}$$\n\nSimplifying: The factor $(n+1)$ appears in both $E[X]$ and $E[X^2]$, reflecting the symmetry of the uniform distribution.",
+        "examples": [
+          "Six-sided die: $E[X^2] = \\frac{7 \\times 13}{6} = \\frac{91}{6} \\approx 15.167$. Note: $(E[X])^2 = 3.5^2 = 12.25 \\neq E[X^2]$",
+          "Four-sided die: $E[X^2] = \\frac{5 \\times 9}{6} = \\frac{45}{6} = 7.5$",
+          "Two-sided die: $E[X^2] = \\frac{3 \\times 5}{6} = \\frac{15}{6} = 2.5$. Verification: $1^2(0.5) + 2^2(0.5) = 0.5 + 2 = 2.5$ ✓",
+          "General pattern: As n increases, $E[X^2]$ grows approximately as $\\frac{n^2}{3}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Second Moment Definition",
+          "latex": "$E[X^2] = \\sum_{i=1}^{n} x_i^2 \\cdot P(x_i)$",
+          "description": "Expected value of the squared random variable"
+        },
+        {
+          "name": "Second Moment for n-Sided Die",
+          "latex": "$E[X^2] = \\frac{(n+1)(2n+1)}{6}$",
+          "description": "Closed-form formula for E[X²] needed to compute variance"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes E[X²] for a fair n-sided die using the closed-form formula. This is the second key component needed to calculate variance.",
+        "function_signature": "def expected_value_squared(n: int) -> float:",
+        "starter_code": "def expected_value_squared(n: int) -> float:\n    \"\"\"\n    Compute E[X²] for a fair n-sided die roll.\n    \n    Args:\n        n (int): Number of sides on the die\n    \n    Returns:\n        float: Expected value of X²\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "expected_value_squared(6)",
+            "expected": "15.16667",
+            "explanation": "For n=6: E[X²] = (7×13)/6 = 91/6 ≈ 15.16667"
+          },
+          {
+            "input": "expected_value_squared(1)",
+            "expected": "1.0",
+            "explanation": "For n=1: E[X²] = (2×3)/6 = 1"
+          },
+          {
+            "input": "expected_value_squared(4)",
+            "expected": "7.5",
+            "explanation": "For n=4: E[X²] = (5×9)/6 = 7.5"
+          },
+          {
+            "input": "expected_value_squared(10)",
+            "expected": "38.5",
+            "explanation": "For n=10: E[X²] = (11×21)/6 = 38.5"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing E[X²] with (E[X])² — these are different values!",
+        "Forgetting to apply the 1/n probability weight to each squared term",
+        "Computational errors in the formula (n+1)(2n+1)/6",
+        "Not recognizing that E[X²] is always greater than (E[X])² for non-constant distributions"
+      ],
+      "hint": "The formula involves multiplying (n+1) and (2n+1), then dividing by 6. Notice how (n+1) appears in both the E[X] and E[X²] formulas.",
+      "references": [
+        "Moments of probability distributions",
+        "Sum of squares",
+        "Jensen's inequality"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Variance and the Computational Formula",
+      "relation_to_problem": "Variance measures the spread of outcomes around the mean and is the second component of the solution. The computational formula Var(X) = E[X²] - (E[X])² efficiently combines the previous concepts.",
+      "prerequisites": [
+        "Expected value",
+        "Second moment E[X²]",
+        "Algebraic manipulation"
+      ],
+      "learning_objectives": [
+        "Define variance formally as a measure of dispersion",
+        "Derive the computational formula for variance",
+        "Apply the variance formula to uniform distributions",
+        "Understand the relationship between variance and standard deviation"
+      ],
+      "math_content": {
+        "definition": "**Variance** measures the expected squared deviation from the mean:\n$$\\text{Var}(X) = E[(X - \\mu)^2] = E[(X - E[X])^2]$$\nEquivalently, using the **computational formula**:\n$$\\text{Var}(X) = E[X^2] - (E[X])^2$$\nThe **standard deviation** is $\\sigma = \\sqrt{\\text{Var}(X)}$, measured in the same units as $X$.",
+        "notation": "$\\text{Var}(X)$ or $\\sigma^2$ denotes variance; $\\sigma$ denotes standard deviation; $\\mu = E[X]$ is the mean",
+        "theorem": "**Variance for n-Sided Die:**\n$$\\text{Var}(X) = E[X^2] - (E[X])^2 = \\frac{(n+1)(2n+1)}{6} - \\left(\\frac{n+1}{2}\\right)^2$$\nSimplifying:\n$$\\text{Var}(X) = \\frac{(n+1)(2n+1)}{6} - \\frac{(n+1)^2}{4} = \\frac{2(n+1)(2n+1) - 3(n+1)^2}{12}$$\n$$= \\frac{(n+1)[4n + 2 - 3n - 3]}{12} = \\frac{(n+1)(n-1)}{12} = \\frac{n^2-1}{12}$$\n\n**Properties:**\n1. $\\text{Var}(aX + b) = a^2 \\text{Var}(X)$ (translation invariant, scales with $a^2$)\n2. For independent variables: $\\text{Var}(X + Y) = \\text{Var}(X) + \\text{Var}(Y)$",
+        "proof_sketch": "**Derivation of Computational Formula:**\n$$\\text{Var}(X) = E[(X - \\mu)^2]$$\n$$= E[X^2 - 2\\mu X + \\mu^2]$$\n$$= E[X^2] - 2\\mu E[X] + \\mu^2$$ (by linearity of expectation)\n$$= E[X^2] - 2\\mu^2 + \\mu^2$$ (since $\\mu = E[X]$)\n$$= E[X^2] - \\mu^2 = E[X^2] - (E[X])^2$$\n\n**Simplification for Die:**\nStarting with $\\text{Var}(X) = \\frac{(n+1)(2n+1)}{6} - \\frac{(n+1)^2}{4}$, find common denominator 12:\n$$= \\frac{2(n+1)(2n+1) - 3(n+1)^2}{12} = \\frac{(n+1)[2(2n+1) - 3(n+1)]}{12}$$\n$$= \\frac{(n+1)(4n + 2 - 3n - 3)}{12} = \\frac{(n+1)(n-1)}{12} = \\frac{n^2-1}{12}$$",
+        "examples": [
+          "Six-sided die: $\\text{Var}(X) = \\frac{36-1}{12} = \\frac{35}{12} \\approx 2.917$. Standard deviation: $\\sigma = \\sqrt{2.917} \\approx 1.708$",
+          "Twenty-sided die: $\\text{Var}(X) = \\frac{400-1}{12} = \\frac{399}{12} = 33.25$. Much higher spread than a d6.",
+          "Two-sided die: $\\text{Var}(X) = \\frac{4-1}{12} = 0.25$. Small variance since outcomes are close together.",
+          "Verification for n=4: $E[X] = 2.5$, $E[X^2] = 7.5$, so $\\text{Var}(X) = 7.5 - 6.25 = 1.25 = \\frac{15}{12}$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Variance Definition",
+          "latex": "$\\text{Var}(X) = E[(X - E[X])^2]$",
+          "description": "Expected squared deviation from the mean"
+        },
+        {
+          "name": "Computational Formula",
+          "latex": "$\\text{Var}(X) = E[X^2] - (E[X])^2$",
+          "description": "Efficient formula using first and second moments"
+        },
+        {
+          "name": "Variance for n-Sided Die",
+          "latex": "$\\text{Var}(X) = \\frac{n^2-1}{12}$",
+          "description": "Closed-form variance formula for fair n-sided die"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the variance of a fair n-sided die using the closed-form formula. This combines your understanding of E[X] and E[X²] through the computational formula.",
+        "function_signature": "def variance_die(n: int) -> float:",
+        "starter_code": "def variance_die(n: int) -> float:\n    \"\"\"\n    Compute the variance of a fair n-sided die roll.\n    \n    Args:\n        n (int): Number of sides on the die\n    \n    Returns:\n        float: Variance\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "variance_die(6)",
+            "expected": "2.91667",
+            "explanation": "For n=6: Var(X) = (36-1)/12 = 35/12 ≈ 2.91667"
+          },
+          {
+            "input": "variance_die(1)",
+            "expected": "0.0",
+            "explanation": "A one-sided die has no variability, so variance is 0"
+          },
+          {
+            "input": "variance_die(20)",
+            "expected": "33.25",
+            "explanation": "For n=20: Var(X) = (400-1)/12 = 399/12 = 33.25"
+          },
+          {
+            "input": "variance_die(2)",
+            "expected": "0.25",
+            "explanation": "For n=2: Var(X) = (4-1)/12 = 0.25"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing (E[X])² instead of using E[X²] in the formula",
+        "Forgetting to square the expected value in (E[X])²",
+        "Using the wrong formula (n+1)/12 instead of (n²-1)/12",
+        "Not recognizing that variance is always non-negative",
+        "Confusing variance (squared units) with standard deviation (original units)"
+      ],
+      "hint": "The variance formula (n²-1)/12 can be factored as (n-1)(n+1)/12. Use this simple closed form rather than computing E[X²] - (E[X])² separately.",
+      "references": [
+        "Variance",
+        "Computational formula for variance",
+        "Standard deviation",
+        "Properties of variance"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Integration: Computing Complete Dice Statistics",
+      "relation_to_problem": "This final step synthesizes all previous concepts to compute both expected value and variance together, matching the exact requirements of the main problem.",
+      "prerequisites": [
+        "Expected value formula",
+        "Variance formula",
+        "All previous sub-quests"
+      ],
+      "learning_objectives": [
+        "Combine E[X] and Var(X) computations in a single function",
+        "Apply closed-form formulas efficiently",
+        "Validate results against mathematical properties",
+        "Return structured output as a tuple"
+      ],
+      "math_content": {
+        "definition": "The **complete statistical summary** of a discrete uniform distribution on $\\{1, 2, \\ldots, n\\}$ consists of:\n1. **Location parameter** (central tendency): $E[X] = \\frac{n+1}{2}$\n2. **Dispersion parameter** (spread): $\\text{Var}(X) = \\frac{n^2-1}{12}$\n\nTogether, these two parameters fully characterize the distribution's shape.",
+        "notation": "$\\mu = E[X]$ is the mean; $\\sigma^2 = \\text{Var}(X)$ is the variance; the pair $(\\mu, \\sigma^2)$ summarizes the distribution",
+        "theorem": "**Complete Characterization of Uniform Die Distribution:**\nFor a fair n-sided die with outcomes $\\{1, 2, \\ldots, n\\}$:\n$$E[X] = \\frac{n+1}{2}, \\quad \\text{Var}(X) = \\frac{n^2-1}{12}$$\n\n**Validation Properties:**\n1. As $n \\to \\infty$: $E[X] \\approx \\frac{n}{2}$ and $\\text{Var}(X) \\approx \\frac{n^2}{12}$\n2. For $n=1$: $E[X] = 1$ and $\\text{Var}(X) = 0$ (degenerate case)\n3. $\\text{Var}(X) > 0$ for all $n > 1$ (positive spread)\n4. The coefficient of variation: $\\frac{\\sigma}{\\mu} = \\frac{\\sqrt{(n^2-1)/12}}{(n+1)/2}$ decreases as $n$ increases",
+        "proof_sketch": "We have derived both formulas in previous steps:\n- From step 3: $E[X] = \\frac{1}{n}\\sum_{i=1}^n i = \\frac{n(n+1)}{2n} = \\frac{n+1}{2}$\n- From step 5: $\\text{Var}(X) = E[X^2] - (E[X])^2 = \\frac{(n+1)(2n+1)}{6} - \\frac{(n+1)^2}{4} = \\frac{n^2-1}{12}$\n\n**Relationship:** Notice that $(n^2-1) = (n-1)(n+1)$, so variance involves both the span and the midpoint of the distribution.",
+        "examples": [
+          "Standard six-sided die: $(E[X], \\text{Var}(X)) = (3.5, 2.917)$. About 68% of rolls fall within $\\mu \\pm \\sigma \\approx 3.5 \\pm 1.71 = [1.79, 5.21]$",
+          "Four-sided die: $(E[X], \\text{Var}(X)) = (2.5, 1.25)$. Standard deviation $\\approx 1.118$",
+          "Twenty-sided die: $(E[X], \\text{Var}(X)) = (10.5, 33.25)$. Standard deviation $\\approx 5.77$",
+          "Edge case n=1: $(E[X], \\text{Var}(X)) = (1.0, 0.0)$ — no randomness",
+          "Large n (n=100): $(E[X], \\text{Var}(X)) = (50.5, 833.25)$ — high spread"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Expected Value",
+          "latex": "$E[X] = \\frac{n+1}{2}$",
+          "description": "Mean of the die roll"
+        },
+        {
+          "name": "Variance",
+          "latex": "$\\text{Var}(X) = \\frac{n^2-1}{12}$",
+          "description": "Measure of spread around the mean"
+        },
+        {
+          "name": "Standard Deviation",
+          "latex": "$\\sigma = \\sqrt{\\frac{n^2-1}{12}}$",
+          "description": "Square root of variance, in original units"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes BOTH the expected value and variance of a fair n-sided die, returning them as a tuple. This exercise integrates all concepts from previous sub-quests into a complete solution that directly addresses the structure (though not the exact function name) of the main problem.",
+        "function_signature": "def compute_die_statistics(n: int) -> tuple[float, float]:",
+        "starter_code": "def compute_die_statistics(n: int) -> tuple[float, float]:\n    \"\"\"\n    Compute both expected value and variance of a fair n-sided die.\n    \n    Args:\n        n (int): Number of sides on the die\n    \n    Returns:\n        tuple: (expected_value, variance)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_die_statistics(6)",
+            "expected": "(3.5, 2.91667)",
+            "explanation": "Standard die: E[X] = 7/2 = 3.5, Var(X) = 35/12 ≈ 2.91667"
+          },
+          {
+            "input": "compute_die_statistics(1)",
+            "expected": "(1.0, 0.0)",
+            "explanation": "Degenerate case: single outcome, no variance"
+          },
+          {
+            "input": "compute_die_statistics(20)",
+            "expected": "(10.5, 33.25)",
+            "explanation": "d20: E[X] = 21/2 = 10.5, Var(X) = 399/12 = 33.25"
+          },
+          {
+            "input": "compute_die_statistics(4)",
+            "expected": "(2.5, 1.25)",
+            "explanation": "d4: E[X] = 5/2 = 2.5, Var(X) = 15/12 = 1.25"
+          },
+          {
+            "input": "compute_die_statistics(100)",
+            "expected": "(50.5, 833.25)",
+            "explanation": "d100: E[X] = 101/2 = 50.5, Var(X) = 9999/12 = 833.25"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Returning results in wrong order (variance, expected_value) instead of (expected_value, variance)",
+        "Computing one value correctly but making errors in the other",
+        "Not using closed-form formulas, leading to inefficiency",
+        "Forgetting to handle the edge case n=1",
+        "Rounding errors due to integer division"
+      ],
+      "hint": "You've learned the formulas for E[X] and Var(X) in previous steps. Simply compute both using the closed-form expressions and return them as a tuple. No iteration needed!",
+      "references": [
+        "Summary statistics",
+        "Discrete uniform distribution",
+        "Method of moments",
+        "Distribution characterization"
+      ]
+    }
+  ]
+}

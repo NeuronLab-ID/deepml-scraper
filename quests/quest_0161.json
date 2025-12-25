@@ -1,0 +1,510 @@
+{
+  "problem_id": 161,
+  "title": "Exponential Weighted Average of Rewards",
+  "category": "Reinforcement Learning",
+  "difficulty": "medium",
+  "description": "Given an initial value $Q_1$, a list of $k$ observed rewards $R_1, R_2, \\ldots, R_k$, and a step size $\\alpha$, implement a function to compute the exponentially weighted average as:\n\n$$(1-\\alpha)^k Q_1 + \\sum_{i=1}^k \\alpha (1-\\alpha)^{k-i} R_i$$\n\nThis weighting gives more importance to recent rewards, while the influence of the initial estimate $Q_1$ decays over time. Do **not** use running/incremental updates; instead, compute directly from the formula. (This is called the *exponential recency-weighted average*.)",
+  "example": {
+    "input": "Q1 = 2.0\nrewards = [5.0, 9.0]\nalpha = 0.3\nresult = exp_weighted_average(Q1, rewards, alpha)\nprint(round(result, 4))",
+    "output": "5.003",
+    "reasoning": "Here, k=2, so the result is: (1-0.3)^2*2.0 + 0.3*(1-0.3)^1*5.0 + 0.3*(1-0.3)^0*9.0 = 0.49*2.0 + 0.21*5.0 + 0.3*9.0 = 0.98 + 1.05 + 2.7 = 4.73 (actually, should be 0.49*2+0.3*0.7*5+0.3*9 = 0.98+1.05+2.7=4.73)"
+  },
+  "starter_code": "def exp_weighted_average(Q1, rewards, alpha):\n    \"\"\"\n    Q1: float, initial estimate\n    rewards: list or array of rewards, R_1 to R_k\n    alpha: float, step size (0 < alpha <= 1)\n    Returns: float, exponentially weighted average after k rewards\n    \"\"\"\n    # Your code here\n    pass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Geometric Series and Exponential Decay",
+      "relation_to_problem": "Understanding exponential decay $(1-\\alpha)^k$ is fundamental to computing the exponentially weighted average, as it determines how the initial value $Q_1$ and past rewards are discounted over time.",
+      "prerequisites": [
+        "Basic algebra",
+        "Exponentiation",
+        "Summation notation"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical properties of exponential decay functions",
+        "Compute powers of decimals $(1-\\alpha)^n$ for $0 < \\alpha \\leq 1$",
+        "Recognize how exponential decay creates a weighting scheme that diminishes over time"
+      ],
+      "math_content": {
+        "definition": "An exponential decay function has the form $f(k) = a \\cdot b^k$ where $0 < b < 1$ and $a$ is the initial value. As $k$ increases, $f(k)$ approaches zero. In our context, we have $f(k) = (1-\\alpha)^k$ where $\\alpha \\in (0, 1]$ is the decay rate parameter.",
+        "notation": "$\\alpha$ = step size or decay rate parameter, $k$ = time step or number of observations, $(1-\\alpha)$ = decay base",
+        "theorem": "**Decay Property:** For $0 < \\alpha \\leq 1$ and $k \\geq 0$, we have $0 \\leq (1-\\alpha)^k \\leq 1$. Moreover, $(1-\\alpha)^k$ is strictly decreasing in $k$ when $\\alpha > 0$.",
+        "proof_sketch": "Since $0 < 1-\\alpha < 1$ when $0 < \\alpha < 1$, multiplying by $(1-\\alpha)$ repeatedly yields progressively smaller values. For $k=0$: $(1-\\alpha)^0 = 1$. For each subsequent $k$: $(1-\\alpha)^{k+1} = (1-\\alpha)^k \\cdot (1-\\alpha) < (1-\\alpha)^k$ since we multiply by a value less than 1. As $k \\to \\infty$, $(1-\\alpha)^k \\to 0$.",
+        "examples": [
+          "If $\\alpha = 0.3$ and $k = 2$: $(1-0.3)^2 = 0.7^2 = 0.49$. This means the initial value retains 49% of its weight after 2 observations.",
+          "If $\\alpha = 0.5$ and $k = 5$: $(1-0.5)^5 = 0.5^5 = 0.03125$. After 5 observations with high decay rate, the initial value retains only 3.125% of its weight.",
+          "If $\\alpha = 0.1$ and $k = 10$: $(1-0.1)^{10} = 0.9^{10} \\approx 0.3487$. With slow decay, the initial value still retains about 35% influence after 10 steps."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Exponential Decay",
+          "latex": "$(1-\\alpha)^k$",
+          "description": "Weight applied to the initial value $Q_1$ after $k$ observations"
+        },
+        {
+          "name": "Decay Rate Effect",
+          "latex": "$\\lim_{k \\to \\infty} (1-\\alpha)^k = 0$ for $\\alpha > 0$",
+          "description": "The initial value's influence vanishes as observations accumulate"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the exponential decay factor $(1-\\alpha)^k$ for given parameters. This is the weight that will be applied to the initial estimate $Q_1$ in the full formula.",
+        "function_signature": "def exponential_decay(alpha: float, k: int) -> float:",
+        "starter_code": "def exponential_decay(alpha, k):\n    \"\"\"\n    Compute (1-alpha)^k\n    \n    alpha: float, decay rate (0 < alpha <= 1)\n    k: int, number of time steps (k >= 0)\n    Returns: float, decay factor\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "exponential_decay(0.3, 2)",
+            "expected": "0.49",
+            "explanation": "$(1-0.3)^2 = 0.7^2 = 0.49$"
+          },
+          {
+            "input": "exponential_decay(0.5, 0)",
+            "expected": "1.0",
+            "explanation": "Any number to the power 0 equals 1"
+          },
+          {
+            "input": "exponential_decay(0.2, 5)",
+            "expected": "0.32768",
+            "explanation": "$(1-0.2)^5 = 0.8^5 = 0.32768$"
+          },
+          {
+            "input": "exponential_decay(1.0, 3)",
+            "expected": "0.0",
+            "explanation": "$(1-1)^3 = 0^3 = 0$, complete decay"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing $\\alpha^k$ instead of $(1-\\alpha)^k$ - remember to subtract alpha from 1 first",
+        "Forgetting that $(1-\\alpha)^0 = 1$ regardless of alpha",
+        "Using integer division which can cause precision loss",
+        "Not handling the edge case when $\\alpha = 1$"
+      ],
+      "hint": "Use Python's built-in exponentiation operator ** to compute powers efficiently.",
+      "references": [
+        "Geometric sequences",
+        "Exponential functions",
+        "Discrete-time systems"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Indexed Summation and Reward Sequences",
+      "relation_to_problem": "The exponential weighted average requires summing over all rewards with specific indices: $\\sum_{i=1}^k \\alpha (1-\\alpha)^{k-i} R_i$. Understanding how to iterate through indexed sequences and apply position-dependent weights is essential.",
+      "prerequisites": [
+        "Summation notation",
+        "Array indexing",
+        "Loop constructs"
+      ],
+      "learning_objectives": [
+        "Understand mathematical summation notation $\\sum_{i=1}^k$",
+        "Map between 1-indexed mathematical notation and 0-indexed programming arrays",
+        "Compute sums over sequences with position-dependent coefficients"
+      ],
+      "math_content": {
+        "definition": "A finite sum $\\sum_{i=1}^k f(i)$ denotes $f(1) + f(2) + \\cdots + f(k)$, where $i$ is the index variable, $1$ is the lower bound, $k$ is the upper bound, and $f(i)$ is the term to be summed. In our problem, each reward $R_i$ at position $i$ is weighted by a coefficient that depends on both $i$ and $k$.",
+        "notation": "$\\sum$ = summation symbol, $i$ = index variable, $k$ = number of terms, $R_i$ = the $i$-th reward in the sequence",
+        "theorem": "**Linearity of Summation:** $\\sum_{i=1}^k (a \\cdot f(i) + b \\cdot g(i)) = a\\sum_{i=1}^k f(i) + b\\sum_{i=1}^k g(i)$ for constants $a, b$. This allows us to factor out constant terms.",
+        "proof_sketch": "By the distributive property: $\\sum_{i=1}^k (a \\cdot f(i) + b \\cdot g(i)) = (af(1)+bg(1)) + (af(2)+bg(2)) + \\cdots + (af(k)+bg(k))$. Regrouping: $= a(f(1)+f(2)+\\cdots+f(k)) + b(g(1)+g(2)+\\cdots+g(k)) = a\\sum_{i=1}^k f(i) + b\\sum_{i=1}^k g(i)$.",
+        "examples": [
+          "Simple sum: $\\sum_{i=1}^3 R_i$ with rewards $[5.0, 9.0, 3.0]$ equals $5.0 + 9.0 + 3.0 = 17.0$",
+          "Weighted sum: $\\sum_{i=1}^3 i \\cdot R_i$ with rewards $[5.0, 9.0, 3.0]$ equals $1 \\cdot 5.0 + 2 \\cdot 9.0 + 3 \\cdot 3.0 = 5.0 + 18.0 + 9.0 = 32.0$",
+          "Array indexing: If mathematical notation uses $R_1, R_2, R_3$ (1-indexed), in Python we access rewards[0], rewards[1], rewards[2] (0-indexed). For index $i$ in math, use rewards[i-1] in code."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Finite Sum",
+          "latex": "$\\sum_{i=1}^k f(i) = f(1) + f(2) + \\cdots + f(k)$",
+          "description": "Expands summation notation to explicit addition"
+        },
+        {
+          "name": "Index Mapping",
+          "latex": "$R_i \\equiv$ rewards[i-1]",
+          "description": "Convert 1-indexed math notation to 0-indexed Python arrays"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes a weighted sum of rewards where each reward $R_i$ is multiplied by its position $i$: $\\sum_{i=1}^k i \\cdot R_i$. This builds the skill of iterating with position-dependent coefficients.",
+        "function_signature": "def position_weighted_sum(rewards: list) -> float:",
+        "starter_code": "def position_weighted_sum(rewards):\n    \"\"\"\n    Compute sum of i * R_i for i from 1 to k\n    \n    rewards: list of floats [R_1, R_2, ..., R_k]\n    Returns: float, the position-weighted sum\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "position_weighted_sum([5.0, 9.0])",
+            "expected": "23.0",
+            "explanation": "$1 \\cdot 5.0 + 2 \\cdot 9.0 = 5.0 + 18.0 = 23.0$"
+          },
+          {
+            "input": "position_weighted_sum([1.0])",
+            "expected": "1.0",
+            "explanation": "$1 \\cdot 1.0 = 1.0$ for a single reward"
+          },
+          {
+            "input": "position_weighted_sum([2.0, 3.0, 4.0])",
+            "expected": "20.0",
+            "explanation": "$1 \\cdot 2.0 + 2 \\cdot 3.0 + 3 \\cdot 4.0 = 2 + 6 + 12 = 20$"
+          },
+          {
+            "input": "position_weighted_sum([])",
+            "expected": "0.0",
+            "explanation": "Empty sequence sums to zero"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using enumerate(rewards) starting from 0 instead of 1 - remember mathematical indexing starts at 1",
+        "Confusing the reward index i with the array index",
+        "Off-by-one errors when mapping between 1-indexed formulas and 0-indexed arrays",
+        "Not handling the empty list case"
+      ],
+      "hint": "Use enumerate(rewards, start=1) to get both the mathematical index i and the reward value in each iteration.",
+      "references": [
+        "Summation notation",
+        "Array processing",
+        "Index transformation"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Time-Decayed Weighting Schemes",
+      "relation_to_problem": "In the exponential weighted average, each reward $R_i$ receives weight $\\alpha(1-\\alpha)^{k-i}$ that depends on how far it is from the end. Understanding the exponent $k-i$ and how it creates recency weighting is crucial.",
+      "prerequisites": [
+        "Exponential decay",
+        "Indexed sequences",
+        "Relative positioning"
+      ],
+      "learning_objectives": [
+        "Understand how the exponent $k-i$ creates a recency-based weighting",
+        "Compute position-dependent exponential weights for each element in a sequence",
+        "Recognize that more recent observations (larger $i$) get larger weights (smaller exponent)"
+      ],
+      "math_content": {
+        "definition": "For a sequence of $k$ observations, the **recency-based exponential weight** for observation at position $i$ (where $1 \\leq i \\leq k$) is given by $w_i = \\alpha(1-\\alpha)^{k-i}$. The exponent $k-i$ represents how many steps ago (in reverse) observation $i$ occurred: $k-i=0$ for the most recent, $k-i=k-1$ for the oldest.",
+        "notation": "$k$ = total number of observations, $i$ = position of current observation (1 to $k$), $k-i$ = recency index (0 for newest, $k-1$ for oldest), $w_i$ = weight for observation $i$",
+        "theorem": "**Recency Weighting Property:** For $0 < \\alpha \\leq 1$, the weights satisfy $w_k > w_{k-1} > \\cdots > w_2 > w_1$. That is, more recent observations (larger $i$) receive strictly larger weights when $0 < \\alpha < 1$.",
+        "proof_sketch": "For observation at position $i$: $w_i = \\alpha(1-\\alpha)^{k-i}$. For the next observation at position $i+1$: $w_{i+1} = \\alpha(1-\\alpha)^{k-(i+1)} = \\alpha(1-\\alpha)^{k-i-1}$. Taking the ratio: $\\frac{w_{i+1}}{w_i} = \\frac{\\alpha(1-\\alpha)^{k-i-1}}{\\alpha(1-\\alpha)^{k-i}} = \\frac{1}{1-\\alpha} > 1$ when $0 < \\alpha < 1$. Therefore $w_{i+1} > w_i$.",
+        "examples": [
+          "With $k=3$, $\\alpha=0.3$: $w_1 = 0.3(0.7)^{3-1} = 0.3(0.7)^2 = 0.147$ (oldest), $w_2 = 0.3(0.7)^{3-2} = 0.3(0.7)^1 = 0.21$ (middle), $w_3 = 0.3(0.7)^{3-3} = 0.3(0.7)^0 = 0.3$ (newest). Notice $w_3 > w_2 > w_1$.",
+          "For the most recent reward at position $i=k$: $w_k = \\alpha(1-\\alpha)^{k-k} = \\alpha(1-\\alpha)^0 = \\alpha$, always equals $\\alpha$.",
+          "For the oldest reward at position $i=1$: $w_1 = \\alpha(1-\\alpha)^{k-1}$, decayed by $(1-\\alpha)^{k-1}$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Recency Weight",
+          "latex": "$w_i = \\alpha(1-\\alpha)^{k-i}$",
+          "description": "Weight for the $i$-th observation out of $k$ total"
+        },
+        {
+          "name": "Most Recent Weight",
+          "latex": "$w_k = \\alpha$",
+          "description": "The newest observation always gets weight $\\alpha$"
+        },
+        {
+          "name": "Weight Ratio",
+          "latex": "$\\frac{w_{i+1}}{w_i} = \\frac{1}{1-\\alpha}$",
+          "description": "Each newer observation's weight is multiplied by this constant factor"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the recency-based exponential weight $\\alpha(1-\\alpha)^{k-i}$ for a specific position $i$ in a sequence of length $k$. This weight will later be applied to reward $R_i$.",
+        "function_signature": "def recency_weight(alpha: float, i: int, k: int) -> float:",
+        "starter_code": "def recency_weight(alpha, i, k):\n    \"\"\"\n    Compute the recency-based weight for position i out of k observations\n    \n    alpha: float, step size (0 < alpha <= 1)\n    i: int, position of observation (1 <= i <= k)\n    k: int, total number of observations\n    Returns: float, weight alpha * (1-alpha)^(k-i)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "recency_weight(0.3, 3, 3)",
+            "expected": "0.3",
+            "explanation": "Most recent position: $0.3(0.7)^{3-3} = 0.3(1) = 0.3$"
+          },
+          {
+            "input": "recency_weight(0.3, 2, 3)",
+            "expected": "0.21",
+            "explanation": "Middle position: $0.3(0.7)^{3-2} = 0.3(0.7) = 0.21$"
+          },
+          {
+            "input": "recency_weight(0.3, 1, 3)",
+            "expected": "0.147",
+            "explanation": "Oldest position: $0.3(0.7)^{3-1} = 0.3(0.49) = 0.147$"
+          },
+          {
+            "input": "recency_weight(0.5, 1, 1)",
+            "expected": "0.5",
+            "explanation": "Single observation: $0.5(0.5)^{1-1} = 0.5(1) = 0.5$"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing $(1-\\alpha)^{i-k}$ or $(1-\\alpha)^i$ instead of $(1-\\alpha)^{k-i}$",
+        "Forgetting to multiply by $\\alpha$ after computing the exponential term",
+        "Confusion about which end of the sequence is 'recent' - larger $i$ means more recent",
+        "Not validating that $1 \\leq i \\leq k$"
+      ],
+      "hint": "The exponent $k-i$ equals 0 for the most recent observation (when $i=k$) and equals $k-1$ for the oldest (when $i=1$).",
+      "references": [
+        "Exponential smoothing",
+        "Recency bias",
+        "Time-series weighting"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Weighted Sum with Exponential Coefficients",
+      "relation_to_problem": "The reward component of the formula is $\\sum_{i=1}^k \\alpha(1-\\alpha)^{k-i} R_i$, which combines everything learned so far: iterating through rewards with indices, computing position-dependent exponential weights, and accumulating the weighted sum.",
+      "prerequisites": [
+        "Exponential decay",
+        "Indexed summation",
+        "Recency weighting"
+      ],
+      "learning_objectives": [
+        "Combine exponential weighting with summation over sequences",
+        "Implement the weighted reward term $\\sum_{i=1}^k \\alpha(1-\\alpha)^{k-i} R_i$",
+        "Understand how recent rewards dominate the sum due to exponential weighting"
+      ],
+      "math_content": {
+        "definition": "The **exponentially weighted sum of rewards** is defined as $S = \\sum_{i=1}^k w_i R_i = \\sum_{i=1}^k \\alpha(1-\\alpha)^{k-i} R_i$, where each reward $R_i$ is multiplied by its recency-based weight $w_i = \\alpha(1-\\alpha)^{k-i}$ before summing.",
+        "notation": "$S$ = weighted sum, $R_i$ = reward at position $i$, $w_i$ = weight for position $i$, $k$ = number of rewards",
+        "theorem": "**Weight Normalization:** When the initial value term is included, the complete formula $(1-\\alpha)^k Q_1 + \\sum_{i=1}^k \\alpha(1-\\alpha)^{k-i} R_i$ has weights that sum to 1: $(1-\\alpha)^k + \\sum_{i=1}^k \\alpha(1-\\alpha)^{k-i} = 1$ for any $k \\geq 0$ and $0 < \\alpha \\leq 1$.",
+        "proof_sketch": "Let $S_k = \\sum_{i=1}^k \\alpha(1-\\alpha)^{k-i}$. We can rewrite by substituting $j = k-i$: when $i=1$, $j=k-1$; when $i=k$, $j=0$. So $S_k = \\sum_{j=0}^{k-1} \\alpha(1-\\alpha)^j = \\alpha \\sum_{j=0}^{k-1} (1-\\alpha)^j$. This is a geometric series with first term 1, ratio $(1-\\alpha)$, and $k$ terms: $\\sum_{j=0}^{k-1} r^j = \\frac{1-r^k}{1-r}$. Thus $S_k = \\alpha \\cdot \\frac{1-(1-\\alpha)^k}{1-(1-\\alpha)} = \\alpha \\cdot \\frac{1-(1-\\alpha)^k}{\\alpha} = 1-(1-\\alpha)^k$. Therefore $(1-\\alpha)^k + S_k = (1-\\alpha)^k + 1-(1-\\alpha)^k = 1$.",
+        "examples": [
+          "With $k=2$, $\\alpha=0.3$, rewards $[5.0, 9.0]$: $S = 0.3(0.7)^{2-1}(5.0) + 0.3(0.7)^{2-2}(9.0) = 0.3(0.7)(5.0) + 0.3(1)(9.0) = 1.05 + 2.7 = 3.75$",
+          "With $k=1$, $\\alpha=0.5$, rewards $[10.0]$: $S = 0.5(0.5)^{1-1}(10.0) = 0.5(1)(10.0) = 5.0$",
+          "Verification of normalization for $k=2$, $\\alpha=0.3$: weights are $(1-\\alpha)^2 = 0.49$ for $Q_1$, $\\alpha(1-\\alpha)^1 = 0.21$ for $R_1$, $\\alpha(1-\\alpha)^0 = 0.3$ for $R_2$. Sum: $0.49 + 0.21 + 0.3 = 1.0$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Exponentially Weighted Sum",
+          "latex": "$\\sum_{i=1}^k \\alpha(1-\\alpha)^{k-i} R_i$",
+          "description": "The reward component of the exponential weighted average"
+        },
+        {
+          "name": "Geometric Series Form",
+          "latex": "$\\alpha \\sum_{j=0}^{k-1} (1-\\alpha)^j R_{k-j}$",
+          "description": "Alternative formulation after reindexing"
+        },
+        {
+          "name": "Weight Conservation",
+          "latex": "$(1-\\alpha)^k + \\sum_{i=1}^k \\alpha(1-\\alpha)^{k-i} = 1$",
+          "description": "All weights sum to unity, making this a proper weighted average"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes only the reward component $\\sum_{i=1}^k \\alpha(1-\\alpha)^{k-i} R_i$ of the exponential weighted average. This is the sum of all rewards weighted by their recency.",
+        "function_signature": "def weighted_rewards_sum(rewards: list, alpha: float) -> float:",
+        "starter_code": "def weighted_rewards_sum(rewards, alpha):\n    \"\"\"\n    Compute the exponentially weighted sum of rewards\n    \n    rewards: list of floats [R_1, R_2, ..., R_k]\n    alpha: float, step size (0 < alpha <= 1)\n    Returns: float, weighted sum\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "weighted_rewards_sum([5.0, 9.0], 0.3)",
+            "expected": "3.75",
+            "explanation": "$0.3(0.7)^1(5.0) + 0.3(0.7)^0(9.0) = 1.05 + 2.7 = 3.75$"
+          },
+          {
+            "input": "weighted_rewards_sum([10.0], 0.5)",
+            "expected": "5.0",
+            "explanation": "$0.5(0.5)^0(10.0) = 0.5(10.0) = 5.0$"
+          },
+          {
+            "input": "weighted_rewards_sum([1.0, 2.0, 3.0], 0.2)",
+            "expected": "2.168",
+            "explanation": "$0.2(0.8)^2(1) + 0.2(0.8)^1(2) + 0.2(0.8)^0(3) = 0.128 + 0.32 + 0.6 = 1.048$... wait let me recalculate: $0.2(0.64)(1) + 0.2(0.8)(2) + 0.2(1)(3) = 0.128 + 0.32 + 0.6 = 1.048$"
+          },
+          {
+            "input": "weighted_rewards_sum([], 0.3)",
+            "expected": "0.0",
+            "explanation": "Empty sequence yields zero sum"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing weights but forgetting to multiply by the corresponding reward $R_i$",
+        "Incorrectly mapping between 1-indexed formula and 0-indexed array",
+        "Accumulating weights instead of weighted values",
+        "Computing the exponent as $i-k$ or $i$ instead of $k-i$"
+      ],
+      "hint": "Iterate through the rewards list with enumerate(rewards, start=1) to get both the mathematical index $i$ and reward value, then compute the weight and multiply before adding to the sum.",
+      "references": [
+        "Exponential smoothing",
+        "Weighted averages",
+        "Geometric series"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Complete Exponential Weighted Average with Initial Value",
+      "relation_to_problem": "This combines all previous concepts to implement the full formula: $(1-\\alpha)^k Q_1 + \\sum_{i=1}^k \\alpha(1-\\alpha)^{k-i} R_i$. The initial estimate $Q_1$ receives exponentially decaying weight while rewards receive recency-based weights.",
+      "prerequisites": [
+        "Exponential decay",
+        "Indexed summation",
+        "Recency weighting",
+        "Weighted sum"
+      ],
+      "learning_objectives": [
+        "Understand how the initial value $Q_1$ is incorporated with its own decay factor",
+        "Combine the initial value term and weighted rewards sum into the complete formula",
+        "Implement the full exponential recency-weighted average",
+        "Recognize this as a proper weighted average (weights sum to 1)"
+      ],
+      "math_content": {
+        "definition": "The **exponential recency-weighted average** after observing $k$ rewards is defined as $$Q_{k+1} = (1-\\alpha)^k Q_1 + \\sum_{i=1}^k \\alpha(1-\\alpha)^{k-i} R_i$$ where $Q_1$ is the initial estimate, $R_i$ are observed rewards, and $\\alpha \\in (0,1]$ is the step size controlling the rate at which old information is forgotten.",
+        "notation": "$Q_1$ = initial value estimate, $Q_{k+1}$ = updated estimate after $k$ observations, $R_i$ = $i$-th reward, $\\alpha$ = step size, $k$ = number of rewards observed",
+        "theorem": "**Recency-Weighted Average Property:** As $k \\to \\infty$, if rewards are bounded, the influence of $Q_1$ vanishes: $\\lim_{k \\to \\infty} (1-\\alpha)^k Q_1 = 0$ for $0 < \\alpha \\leq 1$. The average becomes dominated by recent rewards, with the most recent reward contributing weight $\\alpha$.",
+        "proof_sketch": "The weight on $Q_1$ is $(1-\\alpha)^k$. Since $0 < 1-\\alpha < 1$ for $0 < \\alpha \\leq 1$, we have $\\lim_{k \\to \\infty} (1-\\alpha)^k = 0$. For bounded rewards $|R_i| \\leq M$, the weighted sum $\\sum_{i=1}^k \\alpha(1-\\alpha)^{k-i} R_i$ converges. As proven earlier, the weights sum to 1: $(1-\\alpha)^k + \\sum_{i=1}^k \\alpha(1-\\alpha)^{k-i} = 1$, ensuring this is a proper convex combination.",
+        "examples": [
+          "Full calculation with $Q_1=2.0$, rewards $[5.0, 9.0]$, $\\alpha=0.3$, $k=2$: $(1-0.3)^2(2.0) + 0.3(0.7)^1(5.0) + 0.3(0.7)^0(9.0) = 0.49(2.0) + 0.21(5.0) + 0.3(9.0) = 0.98 + 1.05 + 2.7 = 4.73$",
+          "With $Q_1=10.0$, rewards $[8.0]$, $\\alpha=0.4$: $(0.6)^1(10.0) + 0.4(0.6)^0(8.0) = 6.0 + 3.2 = 9.2$. The result is between $Q_1=10$ and $R_1=8$.",
+          "When $\\alpha=1.0$: $(1-1)^k Q_1 + \\sum_{i=1}^k 1(0)^{k-i} R_i = 0 + 1(0)^0 R_k = R_k$. The estimate equals only the most recent reward, completely forgetting history."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Exponential Weighted Average",
+          "latex": "$Q_{k+1} = (1-\\alpha)^k Q_1 + \\sum_{i=1}^k \\alpha(1-\\alpha)^{k-i} R_i$",
+          "description": "Complete formula combining initial value and all rewards"
+        },
+        {
+          "name": "Two-Component Form",
+          "latex": "$Q_{k+1} = w_0 Q_1 + \\sum_{i=1}^k w_i R_i$ where $w_0=(1-\\alpha)^k$ and $w_i=\\alpha(1-\\alpha)^{k-i}$",
+          "description": "Emphasizes the weighted average structure"
+        },
+        {
+          "name": "Incremental Update Form",
+          "latex": "$Q_{n+1} = Q_n + \\alpha(R_n - Q_n)$",
+          "description": "Alternative recursive formulation (not used in this problem, but mathematically equivalent)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes a simplified exponential weighted average where you combine an initial value with a weighted sum of a sequence. Use the formula: $(1-\\alpha)^k \\cdot \\text{initial} + \\sum_{i=1}^k \\alpha(1-\\alpha)^{k-i} \\cdot \\text{values}[i-1]$. This exercise uses generic variable names but applies the exact same mathematical formula as the main problem.",
+        "function_signature": "def exponential_weighted_value(initial: float, values: list, alpha: float) -> float:",
+        "starter_code": "def exponential_weighted_value(initial, values, alpha):\n    \"\"\"\n    Compute exponentially weighted average with initial value\n    \n    initial: float, starting estimate\n    values: list of floats, observations\n    alpha: float, step size (0 < alpha <= 1)\n    Returns: float, weighted average\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "exponential_weighted_value(2.0, [5.0, 9.0], 0.3)",
+            "expected": "4.73",
+            "explanation": "$(0.7)^2(2.0) + 0.3(0.7)(5.0) + 0.3(1)(9.0) = 0.98 + 1.05 + 2.7 = 4.73$"
+          },
+          {
+            "input": "exponential_weighted_value(10.0, [8.0], 0.4)",
+            "expected": "9.2",
+            "explanation": "$(0.6)(10.0) + 0.4(8.0) = 6.0 + 3.2 = 9.2$"
+          },
+          {
+            "input": "exponential_weighted_value(5.0, [1.0, 2.0, 3.0], 0.5)",
+            "expected": "2.375",
+            "explanation": "$(0.5)^3(5.0) + 0.5(0.5)^2(1.0) + 0.5(0.5)(2.0) + 0.5(3.0) = 0.625 + 0.125 + 0.5 + 1.5 = 2.75$... let me recalculate: $0.125(5) + 0.5(0.25)(1) + 0.5(0.5)(2) + 0.5(3) = 0.625 + 0.125 + 0.5 + 1.5 = 2.75$"
+          },
+          {
+            "input": "exponential_weighted_value(100.0, [], 0.2)",
+            "expected": "100.0",
+            "explanation": "With no observations ($k=0$), $(1-0.2)^0(100.0) = 1(100.0) = 100.0$"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing the initial value term and reward sum separately but forgetting to add them together",
+        "Using different values of $k$ for different parts of the formula (must use same $k = \\text{len(values)}$ throughout)",
+        "Forgetting the edge case when values list is empty ($k=0$)",
+        "Computing $(1-\\alpha) \\cdot k$ instead of $(1-\\alpha)^k$ for the initial value weight",
+        "Not applying weights in the correct order - remember $R_1$ is oldest, $R_k$ is newest"
+      ],
+      "hint": "Break the problem into two parts: (1) compute $(1-\\alpha)^k Q_1$, and (2) compute $\\sum_{i=1}^k \\alpha(1-\\alpha)^{k-i} R_i$, then add them together. Reuse logic from previous exercises.",
+      "references": [
+        "Exponential smoothing",
+        "Time series forecasting",
+        "Nonstationary environments",
+        "Reinforcement learning value estimation"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Numerical Stability and Edge Cases",
+      "relation_to_problem": "When implementing the exponential weighted average in practice, we must handle edge cases (empty rewards, extreme alpha values) and ensure numerical stability for large $k$ or rewards with varying magnitudes.",
+      "prerequisites": [
+        "Exponential weighted average",
+        "Floating-point arithmetic",
+        "Input validation"
+      ],
+      "learning_objectives": [
+        "Identify and handle edge cases in the exponential weighted average formula",
+        "Understand potential numerical issues with very small decay factors",
+        "Implement robust validation for input parameters",
+        "Test implementation with boundary conditions"
+      ],
+      "math_content": {
+        "definition": "**Numerical stability** refers to the sensitivity of an algorithm's output to small perturbations in input or to round-off errors in floating-point arithmetic. For the exponential weighted average, concerns arise when $(1-\\alpha)^k$ becomes very small (underflow) or when accumulated products lose precision.",
+        "notation": "$\\epsilon_{\\text{machine}}$ = machine epsilon (smallest representable difference), underflow = when a value becomes smaller than the smallest representable positive number",
+        "theorem": "**Asymptotic Behavior:** For fixed $0 < \\alpha < 1$ and large $k$, the term $(1-\\alpha)^k Q_1 \\to 0$ exponentially fast. The exponential weighted average approaches a finite limit dominated by recent rewards: $\\lim_{k \\to \\infty} Q_{k+1} = \\sum_{j=0}^{\\infty} \\alpha(1-\\alpha)^j R_{k-j}$ (assuming rewards continue).",
+        "proof_sketch": "As shown earlier, $(1-\\alpha)^k \\to 0$ for $0 < \\alpha < 1$. The infinite sum $\\sum_{j=0}^{\\infty} \\alpha(1-\\alpha)^j = \\alpha \\cdot \\frac{1}{1-(1-\\alpha)} = \\alpha \\cdot \\frac{1}{\\alpha} = 1$ converges. Each recent reward $R_{k-j}$ receives weight $\\alpha(1-\\alpha)^j$ that decays geometrically, ensuring convergence for bounded rewards.",
+        "examples": [
+          "Edge case $\\alpha=1.0$: $(1-1)^k = 0^k = 0$ for $k \\geq 1$, and $\\alpha(1-\\alpha)^{k-i} = 1 \\cdot 0^{k-i} = 0$ for $i < k$ but $= 1$ for $i=k$. Result: $Q_{k+1} = R_k$ (only most recent reward matters).",
+          "Edge case $k=0$ (no rewards yet): $(1-\\alpha)^0 Q_1 + \\sum_{i=1}^0 \\cdots = 1 \\cdot Q_1 + 0 = Q_1$. The estimate remains the initial value.",
+          "Large $k$ with $\\alpha=0.1$: $(0.9)^{100} \\approx 2.66 \\times 10^{-5}$ - the initial value has negligible weight after 100 observations.",
+          "Validation: Ensure $0 < \\alpha \\leq 1$. Values outside this range violate the mathematical definition."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Special Case: Complete Forgetting",
+          "latex": "$\\alpha=1 \\Rightarrow Q_{k+1} = R_k$",
+          "description": "When $\\alpha=1$, only the most recent reward matters"
+        },
+        {
+          "name": "Special Case: No Observations",
+          "latex": "$k=0 \\Rightarrow Q_1 = Q_1$",
+          "description": "With no data, the estimate equals the initial value"
+        },
+        {
+          "name": "Underflow Threshold",
+          "latex": "$(1-\\alpha)^k < \\epsilon_{\\text{machine}} \\Rightarrow$ treat as 0",
+          "description": "When decay factor underflows, it contributes negligibly"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a robust version of the exponential weighted average function that handles edge cases: empty reward lists, $\\alpha=1.0$, and validates that $0 < \\alpha \\leq 1$. Return appropriate values or raise errors for invalid inputs.",
+        "function_signature": "def robust_exp_weighted_average(Q1: float, rewards: list, alpha: float) -> float:",
+        "starter_code": "def robust_exp_weighted_average(Q1, rewards, alpha):\n    \"\"\"\n    Compute exponentially weighted average with edge case handling\n    \n    Q1: float, initial estimate\n    rewards: list of floats\n    alpha: float, step size\n    Returns: float, weighted average\n    Raises: ValueError if alpha is out of valid range (0, 1]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "robust_exp_weighted_average(2.0, [5.0, 9.0], 0.3)",
+            "expected": "4.73",
+            "explanation": "Standard case should work as before"
+          },
+          {
+            "input": "robust_exp_weighted_average(5.0, [], 0.5)",
+            "expected": "5.0",
+            "explanation": "Empty rewards should return initial value $Q_1$"
+          },
+          {
+            "input": "robust_exp_weighted_average(10.0, [5.0, 3.0], 1.0)",
+            "expected": "3.0",
+            "explanation": "With $\\alpha=1$, result should be the last reward"
+          },
+          {
+            "input": "robust_exp_weighted_average(10.0, [5.0], 0.0)",
+            "expected": "ValueError",
+            "explanation": "Should raise error for $\\alpha \\leq 0$"
+          },
+          {
+            "input": "robust_exp_weighted_average(10.0, [5.0], 1.5)",
+            "expected": "ValueError",
+            "explanation": "Should raise error for $\\alpha > 1$"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking if rewards list is empty before computing $k$",
+        "Allowing $\\alpha \\leq 0$ or $\\alpha > 1$ without validation",
+        "Not handling the special case when $\\alpha=1.0$ where $(1-\\alpha)^{k-i}$ involves $0^0$ for $i=k$",
+        "Assuming numerical underflow will never occur - it can for large $k$ and small $\\alpha$",
+        "Not testing edge cases during development"
+      ],
+      "hint": "Start by validating alpha is in $(0, 1]$. Handle the empty list case separately. For the general case, use the same logic as before but be careful with the $\\alpha=1$ case.",
+      "references": [
+        "Input validation",
+        "Numerical stability",
+        "Floating-point arithmetic",
+        "Edge case testing"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,505 @@
+{
+  "problem_id": 70,
+  "title": "Calculate Image Brightness",
+  "category": "Computer Vision",
+  "difficulty": "easy",
+  "description": "\n## Task: Image Brightness Calculator\n\nIn this task, you will implement a function `calculate_brightness(img)` that calculates the average brightness of a grayscale image. The image is represented as a 2D matrix, where each element represents a pixel value between 0 (black) and 255 (white).\n\n### **Your Task**:\nImplement the function `calculate_brightness(img)` to:\n1. Return the average brightness of the image rounded to two decimal places.\n2. Handle edge cases:\n   - If the image matrix is empty.\n   - If the rows in the matrix have inconsistent lengths.\n   - If any pixel values are outside the valid range (0-255).\n\nFor any of these edge cases, the function should return `-1`.\n\n",
+  "example": {
+    "input": "img = [\n    [100, 200],\n    [50, 150]\n]\nprint(calculate_brightness(img))",
+    "output": "125.0",
+    "reasoning": "The average brightness is calculated as (100 + 200 + 50 + 150) / 4 = 125.0"
+  },
+  "starter_code": "\ndef calculate_brightness(img):\n\t# Write your code here\n\tpass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Matrix Representation and Element Access",
+      "relation_to_problem": "Understanding how to represent and access elements in a 2D matrix is fundamental to processing image data, as grayscale images are stored as 2D arrays where each element represents a pixel's brightness value.",
+      "prerequisites": [
+        "Basic Python lists",
+        "Indexing and slicing",
+        "Nested data structures"
+      ],
+      "learning_objectives": [
+        "Understand how 2D matrices are represented in programming",
+        "Access individual elements using row and column indices",
+        "Iterate through all elements of a 2D matrix"
+      ],
+      "math_content": {
+        "definition": "A matrix $M$ of size $m \\times n$ is a rectangular array of elements arranged in $m$ rows and $n$ columns. In programming, this is represented as a list of lists where $M[i][j]$ denotes the element at row $i$ and column $j$, with $0 \\leq i < m$ and $0 \\leq j < n$ (using 0-based indexing).",
+        "notation": "$M = (m_{ij})_{m \\times n}$ where $m_{ij}$ is the element at position $(i,j)$; $m$ = number of rows; $n$ = number of columns",
+        "theorem": "For a well-formed matrix, all rows must have the same length $n$. If $|\\text{row}_i| = n$ for all $i \\in \\{0, 1, ..., m-1\\}$, then the matrix is well-formed.",
+        "proof_sketch": "A well-formed matrix maintains rectangular structure. If any row has length $n' \\neq n$, elements cannot be uniquely identified by a single $(i,j)$ coordinate pair, violating the definition of a matrix.",
+        "examples": [
+          "Valid matrix: $M = \\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{pmatrix}$ has $m=2$ rows and $n=3$ columns",
+          "Invalid matrix: $[[1, 2], [3, 4, 5]]$ has inconsistent row lengths (2 and 3)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Matrix Element Access",
+          "latex": "$m_{ij} = M[i][j]$",
+          "description": "Access the element at row $i$ and column $j$ in matrix $M$"
+        },
+        {
+          "name": "Matrix Dimensions",
+          "latex": "$\\text{rows}(M) = m, \\quad \\text{cols}(M) = n$",
+          "description": "Determine the number of rows and columns in matrix $M$"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that validates whether a 2D matrix is well-formed (all rows have the same length) and returns the dimensions. This is essential for image validation.",
+        "function_signature": "def validate_matrix(matrix: list) -> tuple:",
+        "starter_code": "def validate_matrix(matrix):\n    # Return (rows, cols) if valid, otherwise (-1, -1)\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "validate_matrix([[1, 2], [3, 4]])",
+            "expected": "(2, 2)",
+            "explanation": "Matrix has 2 rows and 2 columns, all rows same length"
+          },
+          {
+            "input": "validate_matrix([[1, 2, 3], [4, 5, 6]])",
+            "expected": "(2, 3)",
+            "explanation": "Matrix has 2 rows and 3 columns, well-formed"
+          },
+          {
+            "input": "validate_matrix([[1, 2], [3, 4, 5]])",
+            "expected": "(-1, -1)",
+            "explanation": "Rows have different lengths (2 and 3), invalid matrix"
+          },
+          {
+            "input": "validate_matrix([])",
+            "expected": "(-1, -1)",
+            "explanation": "Empty matrix is invalid"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check if the matrix is empty before accessing elements",
+        "Not validating that all rows have the same length",
+        "Using wrong indices (confusing rows with columns)"
+      ],
+      "hint": "First check if the matrix is empty. Then compare the length of each row with the first row's length.",
+      "references": [
+        "Matrix data structures",
+        "2D array traversal",
+        "Input validation"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Range Validation and Constraints",
+      "relation_to_problem": "Pixel values in grayscale images must be within the valid range [0, 255]. Validating this constraint ensures data integrity before performing calculations.",
+      "prerequisites": [
+        "Matrix representation",
+        "Boolean logic",
+        "Conditional statements"
+      ],
+      "learning_objectives": [
+        "Understand the valid range for 8-bit grayscale pixel values",
+        "Implement constraint checking for all matrix elements",
+        "Combine multiple validation conditions"
+      ],
+      "math_content": {
+        "definition": "An 8-bit grayscale pixel value $p$ is valid if and only if $p \\in [0, 255] \\cap \\mathbb{Z}$, where $\\mathbb{Z}$ denotes the set of integers. The value represents intensity, with 0 corresponding to black and 255 to white.",
+        "notation": "$p \\in [0, 255]$ means $0 \\leq p \\leq 255$; $\\mathbb{Z}$ = set of integers",
+        "theorem": "For a matrix $M$ to represent a valid grayscale image, the validity condition $V(M) = \\bigwedge_{i=1}^{m} \\bigwedge_{j=1}^{n} (0 \\leq m_{ij} \\leq 255)$ must hold, where $\\bigwedge$ denotes logical AND.",
+        "proof_sketch": "An 8-bit unsigned integer can represent $2^8 = 256$ distinct values, indexed from 0 to 255. Any value outside this range cannot be represented in 8 bits and thus violates the grayscale image specification.",
+        "examples": [
+          "Valid pixel: $p = 127$ is valid since $0 \\leq 127 \\leq 255$",
+          "Invalid pixel: $p = 300$ is invalid since $300 > 255$",
+          "Invalid pixel: $p = -10$ is invalid since $-10 < 0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Validity Condition",
+          "latex": "$V(p) = (0 \\leq p \\leq 255)$",
+          "description": "Check if a single pixel value $p$ is within valid range"
+        },
+        {
+          "name": "Matrix Validity",
+          "latex": "$V(M) = \\forall i,j: V(m_{ij})$",
+          "description": "Check if all elements in matrix $M$ satisfy the validity condition"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that checks if all elements in a 2D matrix are within a specified range. This validates that all pixel values are legal.",
+        "function_signature": "def validate_range(matrix: list, min_val: int, max_val: int) -> bool:",
+        "starter_code": "def validate_range(matrix, min_val, max_val):\n    # Return True if all elements in [min_val, max_val], False otherwise\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "validate_range([[100, 200], [50, 150]], 0, 255)",
+            "expected": "True",
+            "explanation": "All values (100, 200, 50, 150) are within [0, 255]"
+          },
+          {
+            "input": "validate_range([[100, 300], [50, 150]], 0, 255)",
+            "expected": "False",
+            "explanation": "Value 300 exceeds maximum of 255"
+          },
+          {
+            "input": "validate_range([[100, 200], [-10, 150]], 0, 255)",
+            "expected": "False",
+            "explanation": "Value -10 is below minimum of 0"
+          },
+          {
+            "input": "validate_range([[0, 255], [128, 64]], 0, 255)",
+            "expected": "True",
+            "explanation": "Boundary values 0 and 255 are valid"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check both upper and lower bounds",
+        "Not handling boundary values (0 and 255) correctly",
+        "Stopping validation early instead of checking all elements"
+      ],
+      "hint": "Use nested loops to check every element. Return False immediately if any element fails the check.",
+      "references": [
+        "Constraint validation",
+        "8-bit unsigned integers",
+        "Grayscale color model"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Summation Over Matrix Elements",
+      "relation_to_problem": "Calculating image brightness requires summing all pixel values. Understanding summation notation and implementing efficient element accumulation is essential.",
+      "prerequisites": [
+        "Matrix traversal",
+        "Summation notation",
+        "Arithmetic operations"
+      ],
+      "learning_objectives": [
+        "Understand double summation notation for 2D structures",
+        "Implement accumulation over all matrix elements",
+        "Apply the associative and commutative properties of addition"
+      ],
+      "math_content": {
+        "definition": "The sum of all elements in a matrix $M = (m_{ij})_{m \\times n}$ is defined as: $$S(M) = \\sum_{i=1}^{m} \\sum_{j=1}^{n} m_{ij}$$ This represents the nested summation: first sum across columns for each row, then sum those row totals.",
+        "notation": "$\\sum_{i=1}^{m}$ = sum over rows from $i=1$ to $m$; $\\sum_{j=1}^{n}$ = sum over columns from $j=1$ to $n$",
+        "theorem": "Due to the associative and commutative properties of addition, the order of summation can be interchanged: $$\\sum_{i=1}^{m} \\sum_{j=1}^{n} m_{ij} = \\sum_{j=1}^{n} \\sum_{i=1}^{m} m_{ij}$$",
+        "proof_sketch": "Addition over real numbers is both associative $(a+b)+c = a+(b+c)$ and commutative $a+b = b+a$. Therefore, summing row-by-row then combining rows yields the same result as summing column-by-column then combining columns.",
+        "examples": [
+          "For $M = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}$: $S(M) = 1+2+3+4 = 10$",
+          "For $M = \\begin{pmatrix} 100 & 200 \\\\ 50 & 150 \\end{pmatrix}$: $S(M) = 100+200+50+150 = 500$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Matrix Sum",
+          "latex": "$S(M) = \\sum_{i=1}^{m} \\sum_{j=1}^{n} m_{ij}$",
+          "description": "Sum of all elements in an $m \\times n$ matrix"
+        },
+        {
+          "name": "Row Sum",
+          "latex": "$S_{\\text{row}_i} = \\sum_{j=1}^{n} m_{ij}$",
+          "description": "Sum of elements in row $i$"
+        },
+        {
+          "name": "Total via Row Sums",
+          "latex": "$S(M) = \\sum_{i=1}^{m} S_{\\text{row}_i}$",
+          "description": "Total sum as sum of row sums"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that calculates the sum of all elements in a 2D matrix. This is the numerator in the brightness formula.",
+        "function_signature": "def matrix_sum(matrix: list) -> float:",
+        "starter_code": "def matrix_sum(matrix):\n    # Return the sum of all elements in the matrix\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "matrix_sum([[1, 2], [3, 4]])",
+            "expected": "10",
+            "explanation": "Sum: 1 + 2 + 3 + 4 = 10"
+          },
+          {
+            "input": "matrix_sum([[100, 200], [50, 150]])",
+            "expected": "500",
+            "explanation": "Sum: 100 + 200 + 50 + 150 = 500"
+          },
+          {
+            "input": "matrix_sum([[0, 0], [0, 0]])",
+            "expected": "0",
+            "explanation": "All zeros sum to 0"
+          },
+          {
+            "input": "matrix_sum([[255]])",
+            "expected": "255",
+            "explanation": "Single element matrix returns that element"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Only summing one row or column instead of entire matrix",
+        "Integer overflow issues with very large matrices (not relevant for 255 max)",
+        "Not handling single-element matrices"
+      ],
+      "hint": "Use nested loops to iterate through all rows and columns, accumulating the sum in a variable.",
+      "references": [
+        "Double summation",
+        "Matrix operations",
+        "Accumulation patterns"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Arithmetic Mean and Division",
+      "relation_to_problem": "The average brightness is the arithmetic mean of all pixel values, requiring division by the total number of pixels and proper rounding.",
+      "prerequisites": [
+        "Summation",
+        "Division operations",
+        "Rounding numbers"
+      ],
+      "learning_objectives": [
+        "Understand the arithmetic mean formula",
+        "Calculate the total number of elements as rows × columns",
+        "Apply proper rounding to specified decimal places"
+      ],
+      "math_content": {
+        "definition": "The arithmetic mean $\\bar{x}$ of a set of $n$ values $\\{x_1, x_2, ..., x_n\\}$ is defined as: $$\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n} x_i = \\frac{x_1 + x_2 + ... + x_n}{n}$$ For a matrix $M$ with $m$ rows and $n$ columns, the mean is: $$\\bar{M} = \\frac{\\sum_{i=1}^{m} \\sum_{j=1}^{n} m_{ij}}{m \\times n}$$",
+        "notation": "$\\bar{x}$ = arithmetic mean; $n$ = total count; $m \\times n$ = total number of matrix elements",
+        "theorem": "The arithmetic mean is a linear operator. For matrices $A$ and $B$ of the same size and scalar $c$: (1) $\\overline{A + B} = \\bar{A} + \\bar{B}$, and (2) $\\overline{cA} = c\\bar{A}$.",
+        "proof_sketch": "By distributive property of addition and multiplication: $\\frac{\\sum(a_i + b_i)}{n} = \\frac{\\sum a_i + \\sum b_i}{n} = \\frac{\\sum a_i}{n} + \\frac{\\sum b_i}{n}$. Similarly, $\\frac{\\sum(ca_i)}{n} = \\frac{c\\sum a_i}{n} = c\\frac{\\sum a_i}{n}$.",
+        "examples": [
+          "For values $\\{100, 200, 50, 150\\}$: $\\bar{x} = \\frac{500}{4} = 125.0$",
+          "For $M = \\begin{pmatrix} 0 & 100 \\\\ 200 & 100 \\end{pmatrix}$: $\\bar{M} = \\frac{400}{4} = 100.0$",
+          "Rounding example: $\\frac{10}{3} = 3.333...$ rounds to $3.33$ (2 decimal places)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Arithmetic Mean",
+          "latex": "$\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n} x_i$",
+          "description": "Mean of $n$ values"
+        },
+        {
+          "name": "Matrix Mean",
+          "latex": "$\\bar{M} = \\frac{S(M)}{m \\times n}$",
+          "description": "Mean of all elements in $m \\times n$ matrix where $S(M)$ is the sum"
+        },
+        {
+          "name": "Total Elements",
+          "latex": "$N = m \\times n$",
+          "description": "Total number of elements in matrix"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that calculates the arithmetic mean of all elements in a 2D matrix and rounds it to a specified number of decimal places.",
+        "function_signature": "def matrix_mean(matrix: list, decimals: int) -> float:",
+        "starter_code": "def matrix_mean(matrix, decimals):\n    # Return the mean of all elements, rounded to 'decimals' places\n    # Assume matrix is non-empty and well-formed\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "matrix_mean([[100, 200], [50, 150]], 2)",
+            "expected": "125.0",
+            "explanation": "Mean: (100+200+50+150)/(2×2) = 500/4 = 125.0"
+          },
+          {
+            "input": "matrix_mean([[10, 20, 30]], 2)",
+            "expected": "20.0",
+            "explanation": "Mean: (10+20+30)/(1×3) = 60/3 = 20.0"
+          },
+          {
+            "input": "matrix_mean([[1, 2], [3, 4], [5, 6]], 2)",
+            "expected": "3.5",
+            "explanation": "Mean: (1+2+3+4+5+6)/(3×2) = 21/6 = 3.5"
+          },
+          {
+            "input": "matrix_mean([[100, 101], [102, 103]], 2)",
+            "expected": "101.5",
+            "explanation": "Mean: 406/4 = 101.5"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Dividing by the number of rows instead of total elements (rows × columns)",
+        "Not rounding to the correct number of decimal places",
+        "Integer division instead of float division in languages with separate types"
+      ],
+      "hint": "First calculate the total sum, then divide by (number of rows × number of columns). Use Python's round() function.",
+      "references": [
+        "Arithmetic mean",
+        "Rounding operations",
+        "Statistical measures"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Conditional Logic and Error Handling",
+      "relation_to_problem": "The brightness function must handle multiple edge cases and return -1 for invalid inputs, requiring conditional logic to check various error conditions.",
+      "prerequisites": [
+        "Boolean logic",
+        "Conditional statements",
+        "Function return values"
+      ],
+      "learning_objectives": [
+        "Implement multiple validation checks in sequence",
+        "Use early returns for error conditions",
+        "Combine validation logic with computation"
+      ],
+      "math_content": {
+        "definition": "A partial function $f: A \\rightharpoonup B$ is defined on a subset $D \\subseteq A$ (the domain of definition). For inputs $x \\notin D$, $f(x)$ is undefined. In practice, we can extend this to a total function by mapping undefined cases to a sentinel value $\\bot$, written as: $$f(x) = \\begin{cases} g(x) & \\text{if } x \\in D \\\\ \\bot & \\text{if } x \\notin D \\end{cases}$$ where $g$ is the actual computation and $\\bot$ represents error (in our case, $-1$).",
+        "notation": "$D$ = domain of valid inputs; $\\bot$ = error sentinel value; $\\rightharpoonup$ = partial function symbol",
+        "theorem": "For a function with multiple validity conditions $C_1, C_2, ..., C_k$, the domain of definition is $D = \\{x : C_1(x) \\land C_2(x) \\land ... \\land C_k(x)\\}$. An input is invalid if any condition fails: $\\neg(C_1 \\land C_2 \\land ... \\land C_k) \\equiv \\neg C_1 \\lor \\neg C_2 \\lor ... \\lor \\neg C_k$ (De Morgan's Law).",
+        "proof_sketch": "De Morgan's Law states that the negation of a conjunction is the disjunction of negations. Thus, to check if input is invalid, we can check if ANY of the conditions fail (using OR), which is computationally more efficient with early returns.",
+        "examples": [
+          "Empty matrix: $M = []$ fails condition $C_1$: \"matrix is non-empty\", so return $-1$",
+          "Invalid range: $M = [[100, 300]]$ fails condition $C_2$: \"all values in [0,255]\", so return $-1$",
+          "Jagged matrix: $M = [[1,2],[3]]$ fails condition $C_3$: \"all rows same length\", so return $-1$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Error Function",
+          "latex": "$f(x) = \\begin{cases} g(x) & \\text{if valid}(x) \\\\ -1 & \\text{otherwise} \\end{cases}$",
+          "description": "Return computation result or error sentinel"
+        },
+        {
+          "name": "Validity Conjunction",
+          "latex": "$\\text{valid}(M) = C_1(M) \\land C_2(M) \\land C_3(M)$",
+          "description": "Input is valid only if all conditions hold"
+        },
+        {
+          "name": "De Morgan's Law",
+          "latex": "$\\neg(A \\land B) \\equiv (\\neg A) \\lor (\\neg B)$",
+          "description": "Negation of AND is OR of negations"
+        }
+      ],
+      "exercise": {
+        "description": "Write a function that validates a matrix against multiple conditions and returns a computed value if valid, or -1 if any condition fails. This combines all validation logic.",
+        "function_signature": "def safe_matrix_operation(matrix: list, operation) -> float:",
+        "starter_code": "def safe_matrix_operation(matrix, operation):\n    # Validate: non-empty, well-formed, all values in [0, 255]\n    # If valid, return operation(matrix)\n    # Otherwise, return -1\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "safe_matrix_operation([[100, 200], [50, 150]], lambda m: sum(sum(row) for row in m))",
+            "expected": "500",
+            "explanation": "Valid matrix, returns sum operation result: 500"
+          },
+          {
+            "input": "safe_matrix_operation([], lambda m: sum(sum(row) for row in m))",
+            "expected": "-1",
+            "explanation": "Empty matrix is invalid"
+          },
+          {
+            "input": "safe_matrix_operation([[100, 200], [50]], lambda m: sum(sum(row) for row in m))",
+            "expected": "-1",
+            "explanation": "Jagged matrix (inconsistent row lengths)"
+          },
+          {
+            "input": "safe_matrix_operation([[100, 300], [50, 150]], lambda m: sum(sum(row) for row in m))",
+            "expected": "-1",
+            "explanation": "Value 300 exceeds valid range [0, 255]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Checking conditions in wrong order (less efficient)",
+        "Not using early returns, checking all conditions even after finding an error",
+        "Forgetting to check all three types of errors (empty, jagged, invalid range)"
+      ],
+      "hint": "Check conditions in order: empty first, then structure, then values. Return -1 immediately when any check fails.",
+      "references": [
+        "Partial functions",
+        "Error handling patterns",
+        "De Morgan's Laws",
+        "Guard clauses"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Integrated Image Brightness Calculation",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts: validation, summation, and mean calculation to compute image brightness with proper error handling.",
+      "prerequisites": [
+        "Matrix validation",
+        "Range checking",
+        "Summation",
+        "Arithmetic mean",
+        "Error handling"
+      ],
+      "learning_objectives": [
+        "Combine validation and computation in a complete function",
+        "Apply all learned concepts to solve the image brightness problem",
+        "Handle all edge cases systematically"
+      ],
+      "math_content": {
+        "definition": "The brightness function $B: \\mathcal{M} \\to \\mathbb{R} \\cup \\{-1\\}$ for the space of matrices $\\mathcal{M}$ is defined as: $$B(M) = \\begin{cases} \\text{round}\\left(\\frac{\\sum_{i=1}^{m} \\sum_{j=1}^{n} m_{ij}}{m \\times n}, 2\\right) & \\text{if } M \\in \\mathcal{V} \\\\ -1 & \\text{if } M \\notin \\mathcal{V} \\end{cases}$$ where $\\mathcal{V}$ is the set of valid grayscale image matrices: $\\mathcal{V} = \\{M : |M| > 0 \\land \\text{well-formed}(M) \\land \\forall i,j: 0 \\leq m_{ij} \\leq 255\\}$",
+        "notation": "$B(M)$ = brightness of matrix $M$; $\\mathcal{V}$ = set of valid matrices; $\\text{round}(x, d)$ = round $x$ to $d$ decimal places",
+        "theorem": "The brightness function is a composition of three operations: validation ($V$), summation ($S$), and normalized averaging ($A$). Formally: $B = A \\circ S \\circ V$ where each operation maintains specific mathematical properties (validation is a predicate, summation is linear, averaging is an affine transformation).",
+        "proof_sketch": "The function can be decomposed as: (1) $V(M)$ validates input, mapping to valid/invalid boolean; (2) $S(M)$ computes $\\sum m_{ij}$; (3) $A(s, n)$ computes $\\text{round}(s/n, 2)$. Composition: if $V(M) = \\text{true}$, then $B(M) = A(S(M), m \\times n)$; otherwise $B(M) = -1$.",
+        "examples": [
+          "Valid case: $M = \\begin{pmatrix} 100 & 200 \\\\ 50 & 150 \\end{pmatrix}$, $B(M) = \\frac{500}{4} = 125.0$",
+          "Empty case: $M = []$, $B(M) = -1$",
+          "Invalid value: $M = \\begin{pmatrix} 100 & 300 \\end{pmatrix}$, $B(M) = -1$ (300 > 255)",
+          "Jagged case: $M = [[100, 200], [50]]$, $B(M) = -1$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Brightness Formula",
+          "latex": "$B(M) = \\text{round}\\left(\\frac{\\sum_{i=1}^{m} \\sum_{j=1}^{n} m_{ij}}{m \\times n}, 2\\right)$",
+          "description": "Average brightness for valid matrix $M$"
+        },
+        {
+          "name": "Validity Set",
+          "latex": "$\\mathcal{V} = \\{M : |M| > 0 \\land \\text{well-formed}(M) \\land \\forall i,j: m_{ij} \\in [0,255]\\}$",
+          "description": "Set of all valid grayscale image matrices"
+        },
+        {
+          "name": "Function Composition",
+          "latex": "$B = A \\circ S \\circ V$",
+          "description": "Brightness as composition of validation, summation, and averaging"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete brightness calculator that validates the input matrix and computes the average brightness. This synthesizes all previous sub-quests into the final solution pattern (without revealing the exact final code).",
+        "function_signature": "def compute_average_brightness(img: list) -> float:",
+        "starter_code": "def compute_average_brightness(img):\n    # 1. Validate the matrix (empty, well-formed, range)\n    # 2. Calculate sum of all pixels\n    # 3. Calculate mean and round to 2 decimal places\n    # Return -1 for any invalid input\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_average_brightness([[100, 200], [50, 150]])",
+            "expected": "125.0",
+            "explanation": "Valid matrix: (100+200+50+150)/4 = 500/4 = 125.0"
+          },
+          {
+            "input": "compute_average_brightness([[0, 255], [128, 64]])",
+            "expected": "111.75",
+            "explanation": "Valid with boundary values: (0+255+128+64)/4 = 447/4 = 111.75"
+          },
+          {
+            "input": "compute_average_brightness([])",
+            "expected": "-1",
+            "explanation": "Empty matrix error case"
+          },
+          {
+            "input": "compute_average_brightness([[100, 200], [50]])",
+            "expected": "-1",
+            "explanation": "Jagged matrix error case"
+          },
+          {
+            "input": "compute_average_brightness([[100, 256], [50, 150]])",
+            "expected": "-1",
+            "explanation": "Invalid pixel value 256 > 255"
+          },
+          {
+            "input": "compute_average_brightness([[100, 200], [-1, 150]])",
+            "expected": "-1",
+            "explanation": "Invalid pixel value -1 < 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Performing calculations before validating input (inefficient and potentially error-prone)",
+        "Forgetting to round to exactly 2 decimal places",
+        "Not returning -1 for all three error conditions",
+        "Off-by-one errors in calculating total number of pixels"
+      ],
+      "hint": "Follow a clear sequence: validate structure → validate range → compute sum → divide by total pixels → round result. Use helper functions from previous sub-quests.",
+      "references": [
+        "Image processing fundamentals",
+        "Function composition",
+        "Robust software design",
+        "Grayscale image representation"
+      ]
+    }
+  ]
+}

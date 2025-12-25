@@ -1,0 +1,443 @@
+{
+  "problem_id": 11,
+  "title": "Solve Linear Equations using Jacobi Method",
+  "category": "Linear Algebra",
+  "difficulty": "medium",
+  "description": "V3JpdGUgYSBQeXRob24gZnVuY3Rpb24gdGhhdCB1c2VzIHRoZSBKYWNvYmkgbWV0aG9kIHRvIHNvbHZlIGEgc3lzdGVtIG9mIGxpbmVhciBlcXVhdGlvbnMgZ2l2ZW4gYnkgQXggPSBiLiBUaGUgZnVuY3Rpb24gc2hvdWxkIGl0ZXJhdGUgbiB0aW1lcywgcm91bmRpbmcgZWFjaCBpbnRlcm1lZGlhdGUgc29sdXRpb24gdG8gZm91ciBkZWNpbWFsIHBsYWNlcywgYW5kIHJldHVybiB0aGUgYXBwcm94aW1hdGUgc29sdXRpb24geC4",
+  "example": {
+    "input": "A = [[5, -2, 3], [-3, 9, 1], [2, -1, -7]], b = [-1, 2, 3], n=2",
+    "output": "[0.146, 0.2032, -0.5175]",
+    "reasoning": "The Jacobi method iteratively solves each equation for x[i] using the formula x[i] = (1/a_ii) * (b[i] - sum(a_ij * x[j] for j != i)), where a_ii is the diagonal element of A and a_ij are the off-diagonal elements."
+  },
+  "starter_code": "import numpy as np\ndef solve_jacobi(A: np.ndarray, b: np.ndarray, n: int) -> list:\n\treturn x",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Matrix Decomposition: Diagonal, Lower, and Upper Triangular Components",
+      "relation_to_problem": "The Jacobi method fundamentally requires decomposing the coefficient matrix A into diagonal (D), strictly lower triangular (L), and strictly upper triangular (U) components. This decomposition enables the iterative formula derivation.",
+      "prerequisites": [
+        "Matrix representation",
+        "Matrix indexing",
+        "Basic linear algebra"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of matrix decomposition A = D + L + U",
+        "Extract diagonal, strictly lower triangular, and strictly upper triangular matrices from a given matrix",
+        "Verify that the decomposition is correct by reconstructing the original matrix"
+      ],
+      "math_content": {
+        "definition": "Given a square matrix $A \\in \\mathbb{R}^{n \\times n}$, we can uniquely decompose it into three components: $A = D + L + U$, where:\n\n$D$ is the **diagonal matrix** containing only the diagonal elements:\n$$D_{ij} = \\begin{cases} A_{ij} & \\text{if } i = j \\\\ 0 & \\text{otherwise} \\end{cases}$$\n\n$L$ is the **strictly lower triangular matrix** containing elements below the diagonal:\n$$L_{ij} = \\begin{cases} A_{ij} & \\text{if } i > j \\\\ 0 & \\text{otherwise} \\end{cases}$$\n\n$U$ is the **strictly upper triangular matrix** containing elements above the diagonal:\n$$U_{ij} = \\begin{cases} A_{ij} & \\text{if } i < j \\\\ 0 & \\text{otherwise} \\end{cases}$$",
+        "notation": "$A$ = original matrix, $D$ = diagonal matrix, $L$ = strictly lower triangular matrix, $U$ = strictly upper triangular matrix, $A_{ij}$ = element at row $i$, column $j$",
+        "theorem": "**Theorem (Uniqueness of Decomposition):** For any square matrix $A \\in \\mathbb{R}^{n \\times n}$, the decomposition $A = D + L + U$ is unique.",
+        "proof_sketch": "The proof follows from the uniqueness of each component. Since $D_{ij}$ is defined only by diagonal elements, $L_{ij}$ only by strictly lower elements, and $U_{ij}$ only by strictly upper elements, and these sets are disjoint, each element of $A$ contributes to exactly one component matrix. Therefore, the decomposition is unique.",
+        "examples": [
+          "For $A = \\begin{bmatrix} 4 & -1 & 0 \\\\ -1 & 4 & -1 \\\\ 0 & -1 & 4 \\end{bmatrix}$:\n\n$D = \\begin{bmatrix} 4 & 0 & 0 \\\\ 0 & 4 & 0 \\\\ 0 & 0 & 4 \\end{bmatrix}$, $L = \\begin{bmatrix} 0 & 0 & 0 \\\\ -1 & 0 & 0 \\\\ 0 & -1 & 0 \\end{bmatrix}$, $U = \\begin{bmatrix} 0 & -1 & 0 \\\\ 0 & 0 & -1 \\\\ 0 & 0 & 0 \\end{bmatrix}$",
+          "For a $2 \\times 2$ matrix $A = \\begin{bmatrix} 5 & 2 \\\\ 3 & 8 \\end{bmatrix}$:\n\n$D = \\begin{bmatrix} 5 & 0 \\\\ 0 & 8 \\end{bmatrix}$, $L = \\begin{bmatrix} 0 & 0 \\\\ 3 & 0 \\end{bmatrix}$, $U = \\begin{bmatrix} 0 & 2 \\\\ 0 & 0 \\end{bmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Diagonal Extraction",
+          "latex": "$D_{ij} = A_{ij} \\cdot \\delta_{ij}$ where $\\delta_{ij}$ is the Kronecker delta",
+          "description": "Extract only diagonal elements; all off-diagonal elements become zero"
+        },
+        {
+          "name": "Strictly Lower Triangular Extraction",
+          "latex": "$L_{ij} = A_{ij} \\cdot \\mathbb{1}_{i > j}$ where $\\mathbb{1}_{i > j}$ is the indicator function",
+          "description": "Extract only elements where row index exceeds column index"
+        },
+        {
+          "name": "Strictly Upper Triangular Extraction",
+          "latex": "$U_{ij} = A_{ij} \\cdot \\mathbb{1}_{i < j}$",
+          "description": "Extract only elements where column index exceeds row index"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that decomposes a square matrix A into its diagonal (D), strictly lower triangular (L), and strictly upper triangular (U) components. Return these three matrices as a tuple (D, L, U).",
+        "function_signature": "def decompose_matrix(A: np.ndarray) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef decompose_matrix(A: np.ndarray) -> tuple:\n    \"\"\"\n    Decompose matrix A into D + L + U\n    Args:\n        A: Square matrix of shape (n, n)\n    Returns:\n        tuple: (D, L, U) where D is diagonal, L is strictly lower, U is strictly upper\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "decompose_matrix(np.array([[4, -1, 0], [-1, 4, -1], [0, -1, 4]]))",
+            "expected": "(array([[4, 0, 0], [0, 4, 0], [0, 0, 4]]), array([[0, 0, 0], [-1, 0, 0], [0, -1, 0]]), array([[0, -1, 0], [0, 0, -1], [0, 0, 0]]))",
+            "explanation": "The diagonal matrix D contains [4,4,4] on diagonal, L contains the lower triangular part [-1,-1], and U contains the upper triangular part [-1,-1]"
+          },
+          {
+            "input": "decompose_matrix(np.array([[5, -2, 3], [-3, 9, 1], [2, -1, -7]]))",
+            "expected": "(array([[5, 0, 0], [0, 9, 0], [0, 0, -7]]), array([[0, 0, 0], [-3, 0, 0], [2, -1, 0]]), array([[0, -2, 3], [0, 0, 1], [0, 0, 0]]))",
+            "explanation": "D extracts [5, 9, -7], L extracts lower elements [-3, 2, -1], U extracts upper elements [-2, 3, 1]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Including diagonal elements in L or U matrices (they should only appear in D)",
+        "Confusing lower triangular with strictly lower triangular - the strictly lower excludes the diagonal",
+        "Not handling the case where matrix dimensions need to be verified as square",
+        "Using incorrect indexing when extracting matrix elements"
+      ],
+      "hint": "Use numpy's indexing capabilities or loops with conditional checks on indices i and j. For diagonal: i == j, for strictly lower: i > j, for strictly upper: i < j.",
+      "references": [
+        "Matrix decomposition theory",
+        "Triangular matrices in linear algebra",
+        "NumPy array indexing and masking"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Diagonal Dominance and Convergence Conditions",
+      "relation_to_problem": "Before applying the Jacobi method, we must verify that the matrix satisfies conditions for convergence. Diagonal dominance is a sufficient condition that guarantees the Jacobi method will converge to the correct solution.",
+      "prerequisites": [
+        "Matrix norms",
+        "Row and column operations",
+        "Absolute value and summation"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of strict diagonal dominance",
+        "Verify whether a given matrix is strictly diagonally dominant",
+        "Recognize why diagonal dominance ensures convergence of iterative methods",
+        "Check that all diagonal elements are non-zero (necessary for Jacobi method)"
+      ],
+      "math_content": {
+        "definition": "A square matrix $A \\in \\mathbb{R}^{n \\times n}$ is **strictly diagonally dominant** if for every row $i$, the absolute value of the diagonal element exceeds the sum of absolute values of all other elements in that row:\n\n$$|A_{ii}| > \\sum_{j=1, j \\neq i}^{n} |A_{ij}| \\quad \\text{for all } i = 1, 2, \\ldots, n$$\n\nEquivalently, the diagonal element dominates the row in the sense that:\n\n$$|A_{ii}| > |A_{i1}| + |A_{i2}| + \\cdots + |A_{i,i-1}| + |A_{i,i+1}| + \\cdots + |A_{in}|$$\n\nA matrix is **weakly diagonally dominant** if the inequality is non-strict ($\\geq$ instead of $>$).",
+        "notation": "$|A_{ii}|$ = absolute value of diagonal element in row $i$, $\\sum_{j \\neq i} |A_{ij}|$ = sum of absolute values of off-diagonal elements in row $i$",
+        "theorem": "**Theorem (Convergence of Jacobi Method):** If matrix $A$ is strictly diagonally dominant, then the Jacobi method converges to the unique solution of $Ax = b$ for any initial guess $x^{(0)}$.",
+        "proof_sketch": "The proof relies on showing that the spectral radius $\\rho(J) < 1$ where $J = -D^{-1}(L+U)$ is the Jacobi iteration matrix. Under strict diagonal dominance, we can apply the Gershgorin circle theorem which states that all eigenvalues lie within the union of discs centered at diagonal elements with radius equal to the sum of off-diagonal elements. For the Jacobi matrix $J$, these discs have radius less than 1, ensuring $\\rho(J) < 1$ and thus convergence.",
+        "examples": [
+          "Matrix $A = \\begin{bmatrix} 5 & -2 & 3 \\\\ -3 & 9 & 1 \\\\ 2 & -1 & -7 \\end{bmatrix}$:\n\nRow 1: $|5| = 5 > |-2| + |3| = 5$ ✗ (not strict, equality)\nRow 2: $|9| = 9 > |-3| + |1| = 4$ ✓\nRow 3: $|-7| = 7 > |2| + |-1| = 3$ ✓\n\nThis matrix is NOT strictly diagonally dominant (row 1 fails).",
+          "Matrix $A = \\begin{bmatrix} 10 & -1 & 2 \\\\ -1 & 11 & -1 \\\\ 2 & -1 & 10 \\end{bmatrix}$:\n\nRow 1: $|10| = 10 > |-1| + |2| = 3$ ✓\nRow 2: $|11| = 11 > |-1| + |-1| = 2$ ✓\nRow 3: $|10| = 10 > |2| + |-1| = 3$ ✓\n\nThis matrix IS strictly diagonally dominant."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Diagonal Dominance Criterion",
+          "latex": "$|A_{ii}| > \\sum_{j \\neq i} |A_{ij}|$ for all rows $i$",
+          "description": "Each diagonal element must exceed the sum of absolute values of other elements in its row"
+        },
+        {
+          "name": "Row Sum Criterion",
+          "latex": "$|A_{ii}| > \\sum_{j=1}^{n} |A_{ij}| - |A_{ii}|$",
+          "description": "Alternative formulation: diagonal exceeds total row sum minus itself"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that checks whether a square matrix satisfies the conditions for the Jacobi method: (1) all diagonal elements are non-zero, and (2) the matrix is strictly diagonally dominant. Return True if both conditions are met, False otherwise.",
+        "function_signature": "def check_jacobi_conditions(A: np.ndarray) -> bool:",
+        "starter_code": "import numpy as np\n\ndef check_jacobi_conditions(A: np.ndarray) -> bool:\n    \"\"\"\n    Check if matrix A satisfies conditions for Jacobi method convergence\n    Args:\n        A: Square matrix of shape (n, n)\n    Returns:\n        bool: True if all diagonal elements are non-zero AND matrix is strictly diagonally dominant\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "check_jacobi_conditions(np.array([[10, -1, 2], [-1, 11, -1], [2, -1, 10]]))",
+            "expected": "True",
+            "explanation": "All diagonal elements [10, 11, 10] are non-zero, and the matrix is strictly diagonally dominant: 10>3, 11>2, 10>3"
+          },
+          {
+            "input": "check_jacobi_conditions(np.array([[5, -2, 3], [-3, 9, 1], [2, -1, -7]]))",
+            "expected": "False",
+            "explanation": "Although diagonal elements are non-zero, row 1 fails strict diagonal dominance: |5| = 5 is NOT > |-2|+|3| = 5"
+          },
+          {
+            "input": "check_jacobi_conditions(np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]))",
+            "expected": "False",
+            "explanation": "The first diagonal element is zero, which violates the non-zero diagonal requirement for the Jacobi method"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to take absolute values when checking diagonal dominance",
+        "Using non-strict inequality (≥) instead of strict inequality (>) for diagonal dominance",
+        "Not checking that all diagonal elements are non-zero before checking diagonal dominance",
+        "Including the diagonal element itself in the off-diagonal sum",
+        "Checking column dominance instead of row dominance"
+      ],
+      "hint": "For each row i, extract the diagonal element A[i,i] and compare its absolute value with the sum of absolute values of all other elements in row i. Use numpy operations like np.sum() and np.abs() for efficiency.",
+      "references": [
+        "Gershgorin circle theorem",
+        "Spectral radius and eigenvalue bounds",
+        "Sufficient conditions for iterative method convergence"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Component-wise Jacobi Iteration Formula",
+      "relation_to_problem": "The core of the Jacobi method is the component-wise iteration formula that updates each variable independently using values from the previous iteration. Understanding this formula is essential for implementing the iterative solver.",
+      "prerequisites": [
+        "Matrix-vector multiplication",
+        "Summation notation",
+        "Iterative algorithms"
+      ],
+      "learning_objectives": [
+        "Derive the component-wise Jacobi iteration formula from the matrix equation",
+        "Understand why we use x^(k) values on the right-hand side to compute x^(k+1)",
+        "Implement a single Jacobi iteration step for one component",
+        "Recognize the simultaneous update property of Jacobi method"
+      ],
+      "math_content": {
+        "definition": "Given the linear system $Ax = b$ with decomposition $A = D + L + U$, the **Jacobi iteration formula** for computing the $(k+1)$-th iterate from the $k$-th iterate is:\n\n$$x_i^{(k+1)} = \\frac{1}{A_{ii}}\\left(b_i - \\sum_{j=1}^{i-1} A_{ij}x_j^{(k)} - \\sum_{j=i+1}^{n} A_{ij}x_j^{(k)}\\right)$$\n\nThis can be written more compactly as:\n\n$$x_i^{(k+1)} = \\frac{1}{A_{ii}}\\left(b_i - \\sum_{j \\neq i} A_{ij}x_j^{(k)}\\right)$$\n\nfor $i = 1, 2, \\ldots, n$. Note that all components are updated **simultaneously** using values from iteration $k$ only.",
+        "notation": "$x_i^{(k)}$ = value of component $i$ at iteration $k$, $A_{ii}$ = diagonal element of row $i$, $A_{ij}$ = element at row $i$ column $j$, $b_i$ = $i$-th component of right-hand side vector",
+        "theorem": "**Derivation from Matrix Equation:** Starting from $Ax = b$, we write $(D + L + U)x = b$, which gives $Dx = b - (L+U)x$. For a single component $i$: $A_{ii}x_i = b_i - \\sum_{j \\neq i}A_{ij}x_j$. Dividing by $A_{ii}$ (which is non-zero) yields the iteration formula when we use old values on the right side.",
+        "proof_sketch": "The Jacobi method isolates each variable by solving the $i$-th equation for $x_i$:\n\n$$A_{i1}x_1 + A_{i2}x_2 + \\cdots + A_{ii}x_i + \\cdots + A_{in}x_n = b_i$$\n\nRearranging:\n\n$$A_{ii}x_i = b_i - \\sum_{j \\neq i} A_{ij}x_j$$\n\nDividing by $A_{ii}$:\n\n$$x_i = \\frac{1}{A_{ii}}\\left(b_i - \\sum_{j \\neq i} A_{ij}x_j\\right)$$\n\nThe iterative scheme uses values from iteration $k$ to compute iteration $k+1$, ensuring a well-defined update rule.",
+        "examples": [
+          "For system $\\begin{bmatrix} 4 & -1 & 0 \\\\ -1 & 4 & -1 \\\\ 0 & -1 & 4 \\end{bmatrix} \\begin{bmatrix} x_1 \\\\ x_2 \\\\ x_3 \\end{bmatrix} = \\begin{bmatrix} 15 \\\\ 10 \\\\ 10 \\end{bmatrix}$:\n\nIteration formulas:\n$x_1^{(k+1)} = \\frac{1}{4}(15 + x_2^{(k)} + 0 \\cdot x_3^{(k)}) = \\frac{15 + x_2^{(k)}}{4}$\n\n$x_2^{(k+1)} = \\frac{1}{4}(10 + x_1^{(k)} + x_3^{(k)}) = \\frac{10 + x_1^{(k)} + x_3^{(k)}}{4}$\n\n$x_3^{(k+1)} = \\frac{1}{4}(10 + 0 \\cdot x_1^{(k)} + x_2^{(k)}) = \\frac{10 + x_2^{(k)}}{4}$",
+          "Given $x^{(0)} = [0, 0, 0]^T$, the first iteration yields:\n\n$x_1^{(1)} = \\frac{15 + 0}{4} = 3.75$\n\n$x_2^{(1)} = \\frac{10 + 0 + 0}{4} = 2.5$\n\n$x_3^{(1)} = \\frac{10 + 0}{4} = 2.5$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Jacobi Component Update",
+          "latex": "$x_i^{(k+1)} = \\frac{1}{A_{ii}}\\left(b_i - \\sum_{j \\neq i} A_{ij}x_j^{(k)}\\right)$",
+          "description": "Update formula for a single component using all values from previous iteration"
+        },
+        {
+          "name": "Split Summation Form",
+          "latex": "$x_i^{(k+1)} = \\frac{1}{A_{ii}}\\left(b_i - \\sum_{j=1}^{i-1} A_{ij}x_j^{(k)} - \\sum_{j=i+1}^{n} A_{ij}x_j^{(k)}\\right)$",
+          "description": "Separates the summation into elements before and after the diagonal"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs ONE iteration of the Jacobi method. Given the current solution vector x_old, matrix A, and vector b, compute and return the updated solution vector x_new using the Jacobi iteration formula for all components.",
+        "function_signature": "def jacobi_iteration_step(A: np.ndarray, b: np.ndarray, x_old: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef jacobi_iteration_step(A: np.ndarray, b: np.ndarray, x_old: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Perform one iteration of the Jacobi method\n    Args:\n        A: Coefficient matrix of shape (n, n)\n        b: Right-hand side vector of shape (n,)\n        x_old: Current solution estimate of shape (n,)\n    Returns:\n        np.ndarray: Updated solution estimate x_new of shape (n,)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "jacobi_iteration_step(np.array([[4, -1, 0], [-1, 4, -1], [0, -1, 4]]), np.array([15, 10, 10]), np.array([0, 0, 0]))",
+            "expected": "array([3.75, 2.5, 2.5])",
+            "explanation": "First iteration from zero initial guess: x1=(15+0)/4=3.75, x2=(10+0+0)/4=2.5, x3=(10+0)/4=2.5"
+          },
+          {
+            "input": "jacobi_iteration_step(np.array([[10, -1, 2], [-1, 11, -1], [2, -1, 10]]), np.array([7, 6, 8]), np.array([0, 0, 0]))",
+            "expected": "array([0.7, 0.5454545..., 0.8])",
+            "explanation": "First iteration: x1=(7-(-1)(0)-2(0))/10=0.7, x2=(6-(-1)(0)-(-1)(0))/11≈0.545, x3=(8-2(0)-(-1)(0))/10=0.8"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using updated values x_new[j] instead of x_old[j] in the summation (that would be Gauss-Seidel, not Jacobi)",
+        "Including the diagonal term A[i,i]*x[i] in the summation (it should be excluded)",
+        "Not dividing by the diagonal element A[i,i]",
+        "Modifying x_old in place instead of creating a new array x_new",
+        "Forgetting to negate the summation term (it appears with minus sign in the formula)"
+      ],
+      "hint": "Create a new array x_new to store results. For each component i, compute b[i] - sum(A[i,j]*x_old[j] for j != i), then divide by A[i,i]. You can use array operations or loops.",
+      "references": [
+        "Iterative methods for linear systems",
+        "Jacobi vs Gauss-Seidel methods",
+        "Simultaneous vs successive updates"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Rounding and Numerical Precision Management",
+      "relation_to_problem": "The problem requires rounding each intermediate solution to four decimal places after each iteration. Understanding floating-point arithmetic and proper rounding is crucial for obtaining the expected output.",
+      "prerequisites": [
+        "Floating-point representation",
+        "Rounding modes",
+        "Numerical precision"
+      ],
+      "learning_objectives": [
+        "Understand the difference between truncation and rounding",
+        "Apply correct rounding to match expected output format",
+        "Manage numerical precision in iterative algorithms",
+        "Handle rounding for arrays element-wise"
+      ],
+      "math_content": {
+        "definition": "**Rounding** is the process of approximating a number to a specified number of decimal places or significant figures. For rounding to $d$ decimal places:\n\n- If the digit at position $d+1$ is less than 5, round down (truncate remaining digits)\n- If the digit at position $d+1$ is 5 or greater, round up (increment digit at position $d$)\n\nMathematically, rounding a number $x$ to $d$ decimal places can be expressed as:\n\n$$\\text{round}(x, d) = \\frac{\\lfloor x \\cdot 10^d + 0.5 \\rfloor}{10^d}$$\n\nFor negative numbers, the rounding is symmetric: $\\text{round}(-x, d) = -\\text{round}(x, d)$.",
+        "notation": "$d$ = number of decimal places, $\\lfloor \\cdot \\rfloor$ = floor function (greatest integer ≤ argument), $10^d$ = scaling factor for decimal places",
+        "theorem": "**Rounding Error Bound:** When rounding a number $x$ to $d$ decimal places, the absolute error is bounded by:\n\n$$|x - \\text{round}(x, d)| \\leq \\frac{1}{2} \\cdot 10^{-d}$$\n\nThis means the maximum rounding error is half of the least significant digit.",
+        "proof_sketch": "The maximum error occurs when the discarded portion is just below 0.5 in the least significant digit position. Since we round to the nearest value, the error cannot exceed half the unit in the last place (ulp), which is $0.5 \\cdot 10^{-d}$.",
+        "examples": [
+          "Rounding $\\pi = 3.14159265...$ to various decimal places:\n- $d=2$: $\\text{round}(\\pi, 2) = 3.14$\n- $d=4$: $\\text{round}(\\pi, 4) = 3.1416$ (rounds up from 3.14159...)\n- $d=6$: $\\text{round}(\\pi, 6) = 3.141593$ (rounds up from 3.1415926...)",
+          "For array $[0.14634, 0.20318, -0.51748]$ rounded to 4 decimal places:\n- $0.14634 \\to 0.1463$ (4th digit 3, next is 4 < 5, round down)\n- $0.20318 \\to 0.2032$ (4th digit 1, next is 8 ≥ 5, round up)\n- $-0.51748 \\to -0.5175$ (4th digit 4, next is 8 ≥ 5, round up in magnitude)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Rounding Formula",
+          "latex": "$\\text{round}(x, d) = \\frac{\\lfloor x \\cdot 10^d + 0.5 \\rfloor}{10^d}$",
+          "description": "Standard rounding to d decimal places using floor function"
+        },
+        {
+          "name": "Error Bound",
+          "latex": "$|\\text{error}| \\leq \\frac{1}{2} \\cdot 10^{-d}$",
+          "description": "Maximum absolute error when rounding to d decimal places"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that rounds each element of a numpy array to a specified number of decimal places. This will be used after each Jacobi iteration to maintain numerical precision as specified in the problem.",
+        "function_signature": "def round_array(x: np.ndarray, decimals: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef round_array(x: np.ndarray, decimals: int) -> np.ndarray:\n    \"\"\"\n    Round each element of array x to specified decimal places\n    Args:\n        x: Input array of shape (n,)\n        decimals: Number of decimal places to round to\n    Returns:\n        np.ndarray: Array with each element rounded to specified decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "round_array(np.array([0.14634, 0.20318, -0.51748]), 4)",
+            "expected": "array([0.1463, 0.2032, -0.5175])",
+            "explanation": "Each element is rounded to 4 decimal places using standard rounding rules"
+          },
+          {
+            "input": "round_array(np.array([3.14159265, 2.71828183]), 2)",
+            "expected": "array([3.14, 2.72])",
+            "explanation": "π rounds to 3.14, e rounds up to 2.72"
+          },
+          {
+            "input": "round_array(np.array([0.7, 0.545454545, 0.8]), 4)",
+            "expected": "array([0.7, 0.5455, 0.8])",
+            "explanation": "0.7 stays 0.7 (or 0.7000), 0.545454... rounds to 0.5455, 0.8 stays 0.8"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using truncation (floor) instead of proper rounding",
+        "Forgetting that numpy.round() returns floats, not necessarily displaying trailing zeros",
+        "Not handling negative numbers correctly in rounding",
+        "Rounding too early or too late in the computation process",
+        "Confusion between decimal places and significant figures"
+      ],
+      "hint": "NumPy provides a built-in function np.round() or np.around() that can round arrays element-wise. Use it with the decimals parameter.",
+      "references": [
+        "Floating-point arithmetic standards (IEEE 754)",
+        "Numerical stability in iterative algorithms",
+        "Round-off error analysis"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Iteration Control and Convergence Monitoring",
+      "relation_to_problem": "The Jacobi method requires iterating a fixed number of times (n iterations). Understanding iteration control, while-loops, for-loops, and tracking iteration count is essential for implementing the complete algorithm.",
+      "prerequisites": [
+        "Loop constructs",
+        "Iteration counting",
+        "Algorithm design"
+      ],
+      "learning_objectives": [
+        "Implement fixed-iteration loop control for the Jacobi method",
+        "Track iteration count correctly",
+        "Understand when to use fixed iterations vs convergence criteria",
+        "Apply rounding at each iteration step"
+      ],
+      "math_content": {
+        "definition": "An **iterative algorithm** generates a sequence of approximations $x^{(0)}, x^{(1)}, x^{(2)}, \\ldots, x^{(k)}$ where each iterate is computed from the previous one using an update rule. For the Jacobi method, this sequence is defined by:\n\n$$x^{(k+1)} = D^{-1}(b - (L+U)x^{(k)})$$\n\nwith initial guess $x^{(0)}$ (commonly $x^{(0)} = \\mathbf{0}$).\n\n**Fixed-iteration termination:** The algorithm runs for exactly $n$ iterations, producing $x^{(n)}$ as the final output, regardless of convergence status.\n\n**Convergence-based termination:** The algorithm continues until $\\|x^{(k+1)} - x^{(k)}\\| < \\epsilon$ for some tolerance $\\epsilon$, or until a maximum iteration limit is reached.",
+        "notation": "$k$ = iteration index, $x^{(k)}$ = solution estimate at iteration $k$, $n$ = total number of iterations, $\\epsilon$ = convergence tolerance",
+        "theorem": "**Iteration Complexity:** For the Jacobi method on an $n \\times n$ system, each iteration requires $O(n^2)$ operations (primarily for computing the matrix-vector product terms). Therefore, $k$ iterations require $O(kn^2)$ total operations.",
+        "proof_sketch": "In each iteration, for each of the $n$ components, we compute a sum involving up to $n-1$ multiplications and additions. This gives $O(n)$ operations per component, and $O(n^2)$ for all components. Repeating $k$ times yields $O(kn^2)$ complexity.",
+        "examples": [
+          "**Fixed 3 iterations** starting from $x^{(0)} = [0, 0, 0]^T$:\n\nIteration 1: $x^{(1)} = $ [compute using formula]\nIteration 2: $x^{(2)} = $ [compute using formula from $x^{(1)}$]\nIteration 3: $x^{(3)} = $ [compute using formula from $x^{(2)}$]\nReturn $x^{(3)}$",
+          "**With rounding** at each step to 4 decimals:\n\nIteration 1: $x^{(1)} = [3.75, 2.5, 2.5]$\nRound: $x^{(1)} = [3.75, 2.5, 2.5]$ (already at 2 decimals)\nIteration 2: Compute using rounded values, then round result\nContinue..."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Iterative Process",
+          "latex": "$x^{(k+1)} = f(x^{(k)})$ for $k = 0, 1, \\ldots, n-1$",
+          "description": "General form of iteration where f is the Jacobi update function"
+        },
+        {
+          "name": "Iteration Loop",
+          "latex": "$x^{(n)} = f^n(x^{(0)}) = \\underbrace{f(f(\\cdots f}_{n \\text{ times}}(x^{(0)})\\cdots))$",
+          "description": "Result after n iterations is n-fold composition of update function"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that applies the Jacobi iteration step multiple times. Given initial guess x_init, perform exactly n_iterations of the Jacobi method, rounding the result after each iteration to the specified number of decimal places. Return the final result.",
+        "function_signature": "def iterate_jacobi(A: np.ndarray, b: np.ndarray, x_init: np.ndarray, n_iterations: int, decimals: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef iterate_jacobi(A: np.ndarray, b: np.ndarray, x_init: np.ndarray, n_iterations: int, decimals: int) -> np.ndarray:\n    \"\"\"\n    Perform n iterations of Jacobi method with rounding after each iteration\n    Args:\n        A: Coefficient matrix of shape (n, n)\n        b: Right-hand side vector of shape (n,)\n        x_init: Initial guess of shape (n,)\n        n_iterations: Number of iterations to perform\n        decimals: Number of decimal places to round to after each iteration\n    Returns:\n        np.ndarray: Solution after n_iterations iterations\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "iterate_jacobi(np.array([[4, -1, 0], [-1, 4, -1], [0, -1, 4]]), np.array([15, 10, 10]), np.array([0, 0, 0]), 1, 4)",
+            "expected": "array([3.75, 2.5, 2.5])",
+            "explanation": "After 1 iteration from zero initial guess, rounded to 4 decimals"
+          },
+          {
+            "input": "iterate_jacobi(np.array([[10, -1, 2], [-1, 11, -1], [2, -1, 10]]), np.array([7, 6, 8]), np.array([0, 0, 0]), 2, 4)",
+            "expected": "array([0.7364, 0.6291, 0.7309])",
+            "explanation": "After 2 iterations: iteration 1 gives [0.7, 0.5455, 0.8], iteration 2 uses these rounded values"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Rounding only at the end instead of after each iteration",
+        "Off-by-one error in iteration count (performing n+1 or n-1 iterations instead of n)",
+        "Using the wrong starting values (not using x_init properly)",
+        "Not updating x_current correctly for the next iteration",
+        "Forgetting to return the final result"
+      ],
+      "hint": "Use a for-loop to repeat the iteration step n_iterations times. After each Jacobi step, apply rounding before using the result in the next iteration. Keep track of the current x value.",
+      "references": [
+        "Loop invariants in iterative algorithms",
+        "Iteration complexity analysis",
+        "Fixed-point iteration theory"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Jacobi Method Implementation with Initial Guess Strategy",
+      "relation_to_problem": "Bringing all components together: matrix decomposition understanding, iteration formula, rounding, and loop control to create the complete Jacobi solver. The choice of initial guess affects convergence speed but not the final result (when the method converges).",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Function composition",
+        "Algorithm integration"
+      ],
+      "learning_objectives": [
+        "Synthesize all learned concepts into a complete Jacobi solver",
+        "Understand the role of initial guess in iterative methods",
+        "Handle input validation and edge cases",
+        "Produce output in the required format (list of rounded values)"
+      ],
+      "math_content": {
+        "definition": "The **complete Jacobi method** is an iterative algorithm for solving $Ax = b$ that combines all components:\n\n1. **Initialization:** Choose $x^{(0)}$ (typically $\\mathbf{0}$ or based on problem structure)\n2. **Iteration:** For $k = 0, 1, \\ldots, n-1$:\n   $$x_i^{(k+1)} = \\frac{1}{A_{ii}}\\left(b_i - \\sum_{j \\neq i} A_{ij}x_j^{(k)}\\right), \\quad i = 1, \\ldots, n$$\n   Round $x^{(k+1)}$ to specified precision\n3. **Termination:** Return $x^{(n)}$ after $n$ iterations\n\nThe algorithm assumes $A_{ii} \\neq 0$ for all $i$.",
+        "notation": "$x^{(k)} \\in \\mathbb{R}^n$ = iterate at step $k$, $x^{(0)}$ = initial guess, $x^{(n)}$ = final approximate solution",
+        "theorem": "**Initial Guess Independence (for convergent systems):** If the Jacobi method converges (i.e., $\\rho(J) < 1$), then for any initial guess $x^{(0)}$, the sequence $\\{x^{(k)}\\}$ converges to the unique solution $x^*$ of $Ax = b$. The choice of $x^{(0)}$ affects the convergence rate but not the limit.",
+        "proof_sketch": "The error at iteration $k$ is $e^{(k)} = x^{(k)} - x^*$ and satisfies $e^{(k)} = J^k e^{(0)}$. When $\\rho(J) < 1$, we have $\\lim_{k \\to \\infty} J^k = 0$, so $\\lim_{k \\to \\infty} e^{(k)} = 0$ regardless of $e^{(0)} = x^{(0)} - x^*$. Different initial guesses lead to different initial errors, but all converge to zero.",
+        "examples": [
+          "**Complete solution for 2-iteration example:**\n\nGiven: $A = \\begin{bmatrix} 5 & -2 & 3 \\\\ -3 & 9 & 1 \\\\ 2 & -1 & -7 \\end{bmatrix}$, $b = [-1, 2, 3]^T$, $n=2$\n\nInitial guess: $x^{(0)} = [0, 0, 0]^T$\n\n**Iteration 1:**\n$x_1^{(1)} = \\frac{-1 - (-2)(0) - 3(0)}{5} = \\frac{-1}{5} = -0.2$\n$x_2^{(1)} = \\frac{2 - (-3)(0) - 1(0)}{9} = \\frac{2}{9} \\approx 0.2222$\n$x_3^{(1)} = \\frac{3 - 2(0) - (-1)(0)}{-7} = \\frac{3}{-7} \\approx -0.4286$\nRounded to 4 decimals: $x^{(1)} = [-0.2, 0.2222, -0.4286]$\n\n**Iteration 2:**\n$x_1^{(2)} = \\frac{-1 - (-2)(0.2222) - 3(-0.4286)}{5} = \\frac{-1 + 0.4444 + 1.2858}{5} = \\frac{0.7302}{5} = 0.14604$\n$x_2^{(2)} = \\frac{2 - (-3)(-0.2) - 1(-0.4286)}{9} = \\frac{2 - 0.6 + 0.4286}{9} = \\frac{1.8286}{9} \\approx 0.20318$\n$x_3^{(2)} = \\frac{3 - 2(-0.2) - (-1)(0.2222)}{-7} = \\frac{3 + 0.4 + 0.2222}{-7} = \\frac{3.6222}{-7} \\approx -0.51746$\nRounded to 4 decimals: $x^{(2)} = [0.146, 0.2032, -0.5175]$\n\nFinal answer: $[0.146, 0.2032, -0.5175]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Zero Initial Guess",
+          "latex": "$x^{(0)} = \\mathbf{0} = [0, 0, \\ldots, 0]^T$",
+          "description": "Standard default initial guess when no better information is available"
+        },
+        {
+          "name": "Complete Algorithm",
+          "latex": "$x^{(n)} = \\text{round}(f(\\text{round}(f(\\cdots \\text{round}(f(x^{(0)})) \\cdots))), d)$",
+          "description": "Apply Jacobi update f and rounding d decimals repeatedly n times"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete Jacobi method solver. Given matrix A, vector b, and number of iterations n, perform n Jacobi iterations starting from zero initial guess, rounding to 4 decimal places after each iteration. Return the result as a Python list (not numpy array).",
+        "function_signature": "def solve_jacobi(A: np.ndarray, b: np.ndarray, n: int) -> list:",
+        "starter_code": "import numpy as np\n\ndef solve_jacobi(A: np.ndarray, b: np.ndarray, n: int) -> list:\n    \"\"\"\n    Solve linear system Ax=b using Jacobi method\n    Args:\n        A: Coefficient matrix of shape (m, m)\n        b: Right-hand side vector of shape (m,)\n        n: Number of iterations to perform\n    Returns:\n        list: Approximate solution as a list of floats rounded to 4 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "solve_jacobi(np.array([[5, -2, 3], [-3, 9, 1], [2, -1, -7]]), np.array([-1, 2, 3]), 2)",
+            "expected": "[0.146, 0.2032, -0.5175]",
+            "explanation": "After 2 Jacobi iterations with rounding to 4 decimals at each step, starting from zero initial guess"
+          },
+          {
+            "input": "solve_jacobi(np.array([[10, -1, 2], [-1, 11, -1], [2, -1, 10]]), np.array([7, 6, 8]), 1)",
+            "expected": "[0.7, 0.5455, 0.8]",
+            "explanation": "After 1 iteration: x1=7/10=0.7, x2=6/11≈0.5455, x3=8/10=0.8"
+          },
+          {
+            "input": "solve_jacobi(np.array([[4, -1, 0], [-1, 4, -1], [0, -1, 4]]), np.array([15, 10, 10]), 3)",
+            "expected": "[4.0, 3.125, 3.0]",
+            "explanation": "After 3 iterations, the solution converges closer to the true solution [4, 3, 3]"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not starting with zero initial guess when not specified",
+        "Forgetting to convert the final numpy array to a Python list",
+        "Not rounding to exactly 4 decimal places",
+        "Rounding only once at the end instead of after each iteration",
+        "Not handling the case where matrix dimensions mismatch with vector",
+        "Using wrong iteration count (off-by-one errors)"
+      ],
+      "hint": "Combine all previous concepts: start with x = zeros, loop n times performing one Jacobi iteration step, round to 4 decimals after each step, finally convert to list using .tolist() method.",
+      "references": [
+        "Iterative methods for linear systems textbooks",
+        "Numerical linear algebra implementations",
+        "Comparison with Gauss-Seidel and SOR methods",
+        "Convergence analysis of Jacobi method",
+        "Applications in solving large sparse systems"
+      ]
+    }
+  ]
+}

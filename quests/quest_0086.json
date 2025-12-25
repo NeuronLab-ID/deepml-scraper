@@ -1,0 +1,465 @@
+{
+  "problem_id": 86,
+  "title": "Detect Overfitting or Underfitting",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "Write a Python function to determine whether a machine learning model is overfitting, underfitting, or performing well based on training and test accuracy values. The function should take two inputs: `training_accuracy` and `test_accuracy`. It should return one of three values: 1 if Overfitting, -1 if Underfitting, or 0 if a Good fit. The rules for determination are as follows: \n- **Overfitting**: The training accuracy is significantly higher than the test accuracy (difference > 0.2).\n- **Underfitting**: Both training and test accuracy are below 0.7.\n- **Good fit**: Neither of the above conditions is true.",
+  "example": {
+    "input": "training_accuracy = 0.95, test_accuracy = 0.65",
+    "output": "'1'",
+    "reasoning": "The training accuracy is much higher than the test accuracy (difference = 0.30 > 0.2). This indicates that the model is overfitting to the training data and generalizes poorly to unseen data."
+  },
+  "starter_code": "def model_fit_quality(training_accuracy, test_accuracy):\n\t\"\"\"\n\tDetermine if the model is overfitting, underfitting, or a good fit based on training and test accuracy.\n\t:param training_accuracy: float, training accuracy of the model (0 <= training_accuracy <= 1)\n\t:param test_accuracy: float, test accuracy of the model (0 <= test_accuracy <= 1)\n\t:return: int, one of '1', '-1', or '0'.\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Accuracy Metrics and Classification Error Theory",
+      "relation_to_problem": "Understanding accuracy as a performance metric is fundamental to detecting model fit quality, as the main problem requires comparing training and test accuracy values to diagnose overfitting or underfitting.",
+      "prerequisites": [
+        "Basic probability theory",
+        "Confusion matrix concepts"
+      ],
+      "learning_objectives": [
+        "Define accuracy formally as a classification performance metric",
+        "Understand the relationship between accuracy and error rate",
+        "Implement accuracy calculation from predictions and ground truth labels"
+      ],
+      "math_content": {
+        "definition": "**Definition (Classification Accuracy):** Let $\\mathcal{D} = \\{(x_i, y_i)\\}_{i=1}^n$ be a dataset where $x_i \\in \\mathcal{X}$ are input features and $y_i \\in \\{1, 2, \\ldots, K\\}$ are true class labels. Given a classifier $h: \\mathcal{X} \\rightarrow \\{1, 2, \\ldots, K\\}$, the **accuracy** is defined as: $$\\text{Acc}(h, \\mathcal{D}) = \\frac{1}{n} \\sum_{i=1}^n \\mathbb{1}\\{h(x_i) = y_i\\}$$ where $\\mathbb{1}\\{\\cdot\\}$ is the indicator function that equals 1 when the condition is true and 0 otherwise.",
+        "notation": "$n$ = number of samples, $h(x_i)$ = predicted label for input $x_i$, $y_i$ = true label, $\\mathbb{1}\\{\\cdot\\}$ = indicator function",
+        "theorem": "**Theorem (Accuracy-Error Duality):** The classification error rate $\\epsilon(h, \\mathcal{D})$ and accuracy satisfy the relation: $$\\text{Acc}(h, \\mathcal{D}) + \\epsilon(h, \\mathcal{D}) = 1$$ Equivalently, $\\epsilon(h, \\mathcal{D}) = 1 - \\text{Acc}(h, \\mathcal{D})$.",
+        "proof_sketch": "The error rate is defined as $\\epsilon(h, \\mathcal{D}) = \\frac{1}{n} \\sum_{i=1}^n \\mathbb{1}\\{h(x_i) \\neq y_i\\}$. For each sample $i$, either $h(x_i) = y_i$ or $h(x_i) \\neq y_i$, but not both. Therefore: $$\\mathbb{1}\\{h(x_i) = y_i\\} + \\mathbb{1}\\{h(x_i) \\neq y_i\\} = 1$$ Summing over all samples and dividing by $n$ yields the result.",
+        "examples": [
+          "Example 1: Given predictions $[1, 0, 1, 1, 0]$ and true labels $[1, 0, 0, 1, 0]$. Correct predictions: positions 1, 2, 4, 5 (4 out of 5). Accuracy = $\\frac{4}{5} = 0.8$.",
+          "Example 2: A model makes 85 correct predictions out of 100 test samples. Accuracy = $\\frac{85}{100} = 0.85$. Error rate = $1 - 0.85 = 0.15$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Accuracy Formula",
+          "latex": "$\\text{Acc} = \\frac{\\text{Number of Correct Predictions}}{\\text{Total Predictions}}$",
+          "description": "Use this to compute classification accuracy from predictions"
+        },
+        {
+          "name": "Accuracy from True/False Positives and Negatives",
+          "latex": "$\\text{Acc} = \\frac{TP + TN}{TP + TN + FP + FN}$",
+          "description": "When working with confusion matrix elements"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates classification accuracy given two lists: predicted labels and true labels. This is a foundational skill for evaluating model performance.",
+        "function_signature": "def calculate_accuracy(predictions: list, true_labels: list) -> float:",
+        "starter_code": "def calculate_accuracy(predictions: list, true_labels: list) -> float:\n    \"\"\"\n    Calculate classification accuracy.\n    :param predictions: list of predicted labels\n    :param true_labels: list of true labels\n    :return: float, accuracy value between 0 and 1\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_accuracy([1, 0, 1, 1, 0], [1, 0, 0, 1, 0])",
+            "expected": "0.8",
+            "explanation": "4 correct predictions out of 5 total: positions 0, 1, 3, 4 match"
+          },
+          {
+            "input": "calculate_accuracy([1, 1, 1], [1, 1, 1])",
+            "expected": "1.0",
+            "explanation": "All predictions are correct, yielding perfect accuracy"
+          },
+          {
+            "input": "calculate_accuracy([0, 0, 0], [1, 1, 1])",
+            "expected": "0.0",
+            "explanation": "No predictions are correct, yielding zero accuracy"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle empty input lists",
+        "Using integer division instead of float division, resulting in 0 or 1 instead of a decimal",
+        "Confusing accuracy with error rate (they sum to 1)",
+        "Not validating that predictions and true_labels have the same length"
+      ],
+      "hint": "Count how many positions have matching values between the two lists, then divide by the total number of elements.",
+      "references": [
+        "Confusion matrix",
+        "Classification metrics",
+        "Precision and recall"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Generalization Gap and Training-Test Performance Divergence",
+      "relation_to_problem": "The generalization gap (difference between training and test accuracy) is the key indicator for detecting overfitting. The main problem uses a threshold of 0.2 to flag overfitting when this gap is too large.",
+      "prerequisites": [
+        "Accuracy calculation",
+        "Basic statistics",
+        "Concept of training vs test sets"
+      ],
+      "learning_objectives": [
+        "Define the generalization gap formally",
+        "Understand why training accuracy can exceed test accuracy",
+        "Implement gap calculation and interpret its magnitude"
+      ],
+      "math_content": {
+        "definition": "**Definition (Generalization Gap):** Let $h$ be a learned hypothesis/model, $\\mathcal{D}_{\\text{train}}$ be the training dataset, and $\\mathcal{D}_{\\text{test}}$ be the test dataset drawn from the same distribution. The **generalization gap** is defined as: $$\\Delta(h) = \\text{Acc}(h, \\mathcal{D}_{\\text{train}}) - \\text{Acc}(h, \\mathcal{D}_{\\text{test}})$$ A positive gap indicates the model performs better on training data than on unseen test data.",
+        "notation": "$\\Delta(h)$ = generalization gap, $\\text{Acc}(h, \\mathcal{D}_{\\text{train}})$ = training accuracy, $\\text{Acc}(h, \\mathcal{D}_{\\text{test}})$ = test accuracy",
+        "theorem": "**Theorem (Non-negative Expected Gap):** Under the assumption that the model $h$ is trained to minimize error on $\\mathcal{D}_{\\text{train}}$, and both datasets are i.i.d. samples from the same distribution, the expected generalization gap satisfies: $$\\mathbb{E}[\\Delta(h)] \\geq 0$$ with equality when $h$ achieves the Bayes optimal error rate.",
+        "proof_sketch": "The training process optimizes $h$ specifically for $\\mathcal{D}_{\\text{train}}$, giving it an advantage on this dataset. The test set $\\mathcal{D}_{\\text{test}}$ is unseen during training. By the optimization principle, $\\text{Acc}(h, \\mathcal{D}_{\\text{train}}) \\geq \\mathbb{E}[\\text{Acc}(h, \\mathcal{D}_{\\text{test}})]$ when averaged over random splits. Large positive gaps indicate the model has memorized training-specific patterns (noise) rather than learning generalizable patterns.",
+        "examples": [
+          "Example 1: A model achieves 95% training accuracy and 65% test accuracy. Generalization gap = $0.95 - 0.65 = 0.30$. This large gap suggests overfitting.",
+          "Example 2: A model achieves 82% training accuracy and 80% test accuracy. Generalization gap = $0.82 - 0.80 = 0.02$. This small gap suggests good generalization."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Generalization Gap",
+          "latex": "$\\Delta = \\text{Acc}_{\\text{train}} - \\text{Acc}_{\\text{test}}$",
+          "description": "Measure of performance difference between training and test sets"
+        },
+        {
+          "name": "Overfitting Threshold Condition",
+          "latex": "$\\Delta > \\theta \\implies \\text{Overfitting}$",
+          "description": "When gap exceeds threshold $\\theta$ (commonly 0.1 to 0.2), overfitting is likely"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the generalization gap and determines if it exceeds a given threshold, indicating potential overfitting. This directly applies to the main problem's overfitting detection logic.",
+        "function_signature": "def check_generalization_gap(train_acc: float, test_acc: float, threshold: float = 0.2) -> dict:",
+        "starter_code": "def check_generalization_gap(train_acc: float, test_acc: float, threshold: float = 0.2) -> dict:\n    \"\"\"\n    Calculate generalization gap and check if it exceeds threshold.\n    :param train_acc: float, training accuracy (0 <= train_acc <= 1)\n    :param test_acc: float, test accuracy (0 <= test_acc <= 1)\n    :param threshold: float, gap threshold for overfitting detection\n    :return: dict with keys 'gap' and 'exceeds_threshold'\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "check_generalization_gap(0.95, 0.65, 0.2)",
+            "expected": "{'gap': 0.30, 'exceeds_threshold': True}",
+            "explanation": "Gap of 0.30 exceeds threshold of 0.2, indicating overfitting"
+          },
+          {
+            "input": "check_generalization_gap(0.82, 0.80, 0.2)",
+            "expected": "{'gap': 0.02, 'exceeds_threshold': False}",
+            "explanation": "Gap of 0.02 is below threshold, suggesting good generalization"
+          },
+          {
+            "input": "check_generalization_gap(0.75, 0.78, 0.2)",
+            "expected": "{'gap': -0.03, 'exceeds_threshold': False}",
+            "explanation": "Negative gap (test > train) can occur with small samples or regularization"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing test_acc - train_acc instead of train_acc - test_acc",
+        "Using absolute value of the gap, which loses information about which accuracy is higher",
+        "Setting threshold too low (< 0.05) causing false overfitting alarms",
+        "Not considering that small datasets can show high variance in the gap"
+      ],
+      "hint": "Subtract test accuracy from training accuracy. If this difference is large and positive, the model may have memorized training data.",
+      "references": [
+        "Overfitting indicators",
+        "Model selection",
+        "Cross-validation"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Absolute Performance Thresholding and Underfitting Detection",
+      "relation_to_problem": "Underfitting is detected when both training and test accuracy fall below an absolute threshold (0.7 in the main problem). This requires understanding performance baselines and capacity limitations.",
+      "prerequisites": [
+        "Accuracy metrics",
+        "Model capacity concepts",
+        "Random baseline performance"
+      ],
+      "learning_objectives": [
+        "Define underfitting in terms of absolute performance",
+        "Understand minimum acceptable accuracy thresholds",
+        "Implement boolean logic for checking multiple conditions simultaneously"
+      ],
+      "math_content": {
+        "definition": "**Definition (Underfitting via Absolute Threshold):** A model $h$ is said to **underfit** on a learning task if both its training and test accuracies fall below an acceptable threshold $\\tau$: $$\\text{Acc}(h, \\mathcal{D}_{\\text{train}}) < \\tau \\quad \\text{and} \\quad \\text{Acc}(h, \\mathcal{D}_{\\text{test}}) < \\tau$$ The threshold $\\tau$ is task-dependent but typically chosen to be well above random guessing baseline.",
+        "notation": "$\\tau$ = minimum acceptable accuracy threshold (e.g., 0.7 for 70%), $h$ = hypothesis/model, $\\mathcal{D}$ = dataset",
+        "theorem": "**Theorem (Random Baseline):** For a balanced $K$-class classification problem where all classes are equally likely, a random classifier that guesses uniformly achieves expected accuracy: $$\\mathbb{E}[\\text{Acc}_{\\text{random}}] = \\frac{1}{K}$$ Any trained model with $\\text{Acc}(h, \\mathcal{D}) \\approx \\frac{1}{K}$ is not learning meaningful patterns.",
+        "proof_sketch": "A random classifier assigns each sample to class $k$ with probability $\\frac{1}{K}$ independently. For a sample with true label $y_i$, the probability of correct classification is $P(h(x_i) = y_i) = \\frac{1}{K}$. By linearity of expectation over all $n$ samples: $$\\mathbb{E}[\\text{Acc}] = \\mathbb{E}\\left[\\frac{1}{n}\\sum_{i=1}^n \\mathbb{1}\\{h(x_i) = y_i\\}\\right] = \\frac{1}{n}\\sum_{i=1}^n \\frac{1}{K} = \\frac{1}{K}$$ For binary classification ($K=2$), random guessing achieves 50% accuracy. A threshold like $\\tau = 0.7$ ensures we're detecting models performing well above this baseline.",
+        "examples": [
+          "Example 1: Binary classification task. Training accuracy = 0.62, test accuracy = 0.60. Both are below $\\tau = 0.7$, indicating underfitting. The model barely exceeds random guessing (0.5).",
+          "Example 2: 10-class problem. Training accuracy = 0.15, test accuracy = 0.12. Both are near random baseline (0.1), clearly indicating severe underfitting."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Underfitting Condition (Conjunctive)",
+          "latex": "$\\text{Underfit} \\iff (\\text{Acc}_{\\text{train}} < \\tau) \\land (\\text{Acc}_{\\text{test}} < \\tau)$",
+          "description": "Both conditions must be true simultaneously for underfitting diagnosis"
+        },
+        {
+          "name": "Random Baseline",
+          "latex": "$\\text{Acc}_{\\text{baseline}} = \\frac{1}{K}$",
+          "description": "Expected accuracy of random guessing for K classes"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that checks whether both training and test accuracies fall below a specified threshold, indicating underfitting. This implements the core logic needed for underfitting detection in the main problem.",
+        "function_signature": "def is_underfitting(train_acc: float, test_acc: float, threshold: float = 0.7) -> bool:",
+        "starter_code": "def is_underfitting(train_acc: float, test_acc: float, threshold: float = 0.7) -> bool:\n    \"\"\"\n    Determine if model is underfitting based on absolute accuracy threshold.\n    :param train_acc: float, training accuracy (0 <= train_acc <= 1)\n    :param test_acc: float, test accuracy (0 <= test_acc <= 1)\n    :param threshold: float, minimum acceptable accuracy\n    :return: bool, True if underfitting, False otherwise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "is_underfitting(0.62, 0.60, 0.7)",
+            "expected": "True",
+            "explanation": "Both 0.62 and 0.60 are below threshold 0.7, indicating underfitting"
+          },
+          {
+            "input": "is_underfitting(0.82, 0.80, 0.7)",
+            "expected": "False",
+            "explanation": "Both accuracies exceed threshold 0.7, so not underfitting"
+          },
+          {
+            "input": "is_underfitting(0.65, 0.75, 0.7)",
+            "expected": "False",
+            "explanation": "Test accuracy (0.75) exceeds threshold, so not underfitting despite low training accuracy"
+          },
+          {
+            "input": "is_underfitting(0.75, 0.65, 0.7)",
+            "expected": "False",
+            "explanation": "Training accuracy (0.75) exceeds threshold, so not underfitting by definition"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using OR logic instead of AND logic (both must be below threshold)",
+        "Checking if either is below threshold rather than both",
+        "Confusing underfitting with low test accuracy alone (training must also be low)",
+        "Using wrong comparison operators (>= instead of <)"
+      ],
+      "hint": "Underfitting means the model lacks capacity to learn even the training data. Check that BOTH accuracies are below the threshold using logical AND.",
+      "references": [
+        "Model capacity",
+        "Learning curves",
+        "Bias-variance tradeoff"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Conditional Logic and Priority in Multi-Condition Classification",
+      "relation_to_problem": "The main problem requires evaluating multiple conditions (overfitting check, underfitting check) and returning the correct diagnosis. Understanding precedence and mutually exclusive conditions is essential.",
+      "prerequisites": [
+        "Boolean logic",
+        "Conditional statements",
+        "Function return values"
+      ],
+      "learning_objectives": [
+        "Understand how to structure multi-condition decision trees",
+        "Implement correct precedence when conditions might overlap",
+        "Return appropriate categorical outputs based on numerical comparisons"
+      ],
+      "math_content": {
+        "definition": "**Definition (Categorical Classification Function):** A **categorical classifier** is a function $f: \\mathbb{R}^d \\rightarrow \\mathcal{C}$ that maps numerical inputs to a finite set of discrete categories $\\mathcal{C} = \\{c_1, c_2, \\ldots, c_k\\}$. For model diagnosis, we define: $$f(\\text{acc}_{\\text{train}}, \\text{acc}_{\\text{test}}) = \\begin{cases} c_{\\text{overfit}} & \\text{if } P_{\\text{over}}(\\text{acc}_{\\text{train}}, \\text{acc}_{\\text{test}}) \\\\ c_{\\text{underfit}} & \\text{if } P_{\\text{under}}(\\text{acc}_{\\text{train}}, \\text{acc}_{\\text{test}}) \\\\ c_{\\text{good}} & \\text{otherwise} \\end{cases}$$ where $P_{\\text{over}}$ and $P_{\\text{under}}$ are boolean predicates defining the conditions.",
+        "notation": "$\\mathcal{C} = \\{-1, 0, 1\\}$ = category space (underfitting, good fit, overfitting), $P$ = predicate function returning True/False",
+        "theorem": "**Theorem (Logical Precedence in Condition Evaluation):** When multiple conditions $P_1, P_2, \\ldots, P_k$ are evaluated sequentially using if-elif-else structure, the first condition that evaluates to True determines the output. The order matters when conditions are not mutually exclusive: $$\\text{Output} = \\begin{cases} c_1 & \\text{if } P_1 \\\\ c_2 & \\text{if } \\neg P_1 \\land P_2 \\\\ c_3 & \\text{if } \\neg P_1 \\land \\neg P_2 \\land P_3 \\\\ \\vdots \\end{cases}$$",
+        "proof_sketch": "In a sequential if-elif-else structure, each subsequent condition is only evaluated if all previous conditions were False (denoted by $\\neg P_i$). This creates an implicit conjunction. The final 'else' clause captures $\\neg P_1 \\land \\neg P_2 \\land \\cdots \\land \\neg P_k$. This structure ensures exactly one branch executes. When conditions might overlap (e.g., a case could satisfy both overfitting and underfitting criteria theoretically), the order determines which diagnosis takes precedence.",
+        "examples": [
+          "Example 1: For $\\text{acc}_{\\text{train}} = 0.95, \\text{acc}_{\\text{test}} = 0.65$. Check overfitting: $0.95 - 0.65 = 0.30 > 0.2$ ✓. Return 'overfit' without checking underfitting.",
+          "Example 2: For $\\text{acc}_{\\text{train}} = 0.65, \\text{acc}_{\\text{test}} = 0.60$. Check overfitting: $0.65 - 0.60 = 0.05 \\not> 0.2$ ✗. Check underfitting: $(0.65 < 0.7) \\land (0.60 < 0.7)$ ✓. Return 'underfit'."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sequential Conditional Structure",
+          "latex": "$f(x) = \\begin{cases} y_1 & \\text{if } P_1(x) \\\\ y_2 & \\text{if } \\neg P_1(x) \\land P_2(x) \\\\ y_3 & \\text{otherwise} \\end{cases}$",
+          "description": "Structure for evaluating multiple mutually exclusive conditions"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes two numerical values and returns a categorical code based on checking two conditions in sequence: first check if difference exceeds a threshold, then check if both values are below another threshold. Return 1, -1, or 0 based on which condition is met.",
+        "function_signature": "def categorize_values(value1: float, value2: float, diff_threshold: float = 0.2, abs_threshold: float = 0.7) -> int:",
+        "starter_code": "def categorize_values(value1: float, value2: float, diff_threshold: float = 0.2, abs_threshold: float = 0.7) -> int:\n    \"\"\"\n    Categorize based on difference and absolute thresholds.\n    :param value1: float, first value\n    :param value2: float, second value\n    :param diff_threshold: float, threshold for difference check\n    :param abs_threshold: float, threshold for absolute value check\n    :return: int, 1 if value1 - value2 > diff_threshold,\n                  -1 if both values < abs_threshold,\n                  0 otherwise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "categorize_values(0.95, 0.65, 0.2, 0.7)",
+            "expected": "1",
+            "explanation": "Difference 0.95 - 0.65 = 0.30 > 0.2, so return 1 (first condition met)"
+          },
+          {
+            "input": "categorize_values(0.65, 0.60, 0.2, 0.7)",
+            "expected": "-1",
+            "explanation": "Difference 0.05 not > 0.2, but both 0.65 and 0.60 < 0.7, so return -1 (second condition met)"
+          },
+          {
+            "input": "categorize_values(0.82, 0.80, 0.2, 0.7)",
+            "expected": "0",
+            "explanation": "Difference 0.02 not > 0.2, and values not both < 0.7, so return 0 (neither condition)"
+          },
+          {
+            "input": "categorize_values(0.68, 0.65, 0.2, 0.7)",
+            "expected": "-1",
+            "explanation": "Difference 0.03 not > 0.2, but both values < 0.7, so return -1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Checking conditions in wrong order (checking absolute threshold before difference)",
+        "Using 'if' statements instead of 'elif', causing multiple conditions to execute",
+        "Forgetting to return a value in the 'else' case",
+        "Using wrong comparison operators (>= vs >, <= vs <)"
+      ],
+      "hint": "Use if-elif-else structure. First check the difference condition, then check if both values are below threshold, finally handle the remaining case.",
+      "references": [
+        "Control flow",
+        "Decision trees",
+        "Conditional logic"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Statistical Learning Theory: Bias-Variance Tradeoff and Model Complexity",
+      "relation_to_problem": "Understanding the theoretical foundation of why overfitting and underfitting occur provides deeper insight into why we use specific thresholds and what these conditions mean for model selection.",
+      "prerequisites": [
+        "Expected value",
+        "Variance",
+        "Model complexity concepts"
+      ],
+      "learning_objectives": [
+        "Understand the bias-variance decomposition of prediction error",
+        "Relate high bias to underfitting and high variance to overfitting",
+        "Visualize the U-shaped test error curve as a function of model complexity"
+      ],
+      "math_content": {
+        "definition": "**Definition (Expected Prediction Error Decomposition):** For a model $\\hat{f}(x)$ trained on dataset $\\mathcal{D}$, a true function $f(x)$, and target $y = f(x) + \\epsilon$ where $\\epsilon \\sim \\mathcal{N}(0, \\sigma^2)$ is irreducible noise, the expected squared prediction error at a point $x_0$ decomposes as: $$\\mathbb{E}_{\\mathcal{D}}[(y_0 - \\hat{f}(x_0))^2] = \\underbrace{\\left(\\mathbb{E}[\\hat{f}(x_0)] - f(x_0)\\right)^2}_{\\text{Bias}^2} + \\underbrace{\\mathbb{E}\\left[(\\hat{f}(x_0) - \\mathbb{E}[\\hat{f}(x_0)])^2\\right]}_{\\text{Variance}} + \\underbrace{\\sigma^2}_{\\text{Irreducible Error}}$$",
+        "notation": "$\\mathbb{E}_{\\mathcal{D}}[\\cdot]$ = expectation over training sets, $\\hat{f}(x_0)$ = prediction at $x_0$, $f(x_0)$ = true value, $\\sigma^2$ = noise variance",
+        "theorem": "**Theorem (Bias-Variance Tradeoff):** As model complexity increases (parameterized by $k$), bias decreases monotonically while variance increases monotonically: $$\\frac{\\partial \\text{Bias}^2}{\\partial k} \\leq 0, \\quad \\frac{\\partial \\text{Variance}}{\\partial k} \\geq 0$$ The total error exhibits a U-shaped curve with an optimal complexity $k^*$ minimizing $\\text{Bias}^2 + \\text{Variance}$.",
+        "proof_sketch": "**Bias** measures systematic error from model assumptions. More complex models can approximate arbitrary functions better, reducing bias. **Variance** measures sensitivity to training data fluctuations. Complex models with many parameters can fit noise, increasing variance. Low complexity ($k \\ll k^*$): High bias (model too simple) → underfitting. Both training and test error are high. Optimal complexity ($k \\approx k^*$): Balanced bias-variance → good generalization. Training and test error are both moderate and close. High complexity ($k \\gg k^*$): High variance (model fits noise) → overfitting. Training error is low, test error is high (large gap).",
+        "examples": [
+          "Example 1 (Underfitting): Linear model fit to quadratic data. Bias²= 15.2, Variance = 0.8. High bias dominates, causing poor fit on training and test data.",
+          "Example 2 (Overfitting): 20-degree polynomial fit to 15 noisy points. Bias² = 0.1, Variance = 24.5. High variance dominates, causing training error ≈ 0 but test error ≈ 25."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Bias-Variance Decomposition",
+          "latex": "$\\mathbb{E}[(y - \\hat{f})^2] = \\text{Bias}^2 + \\text{Variance} + \\sigma^2$",
+          "description": "Fundamental decomposition of prediction error into three components"
+        },
+        {
+          "name": "Bias Definition",
+          "latex": "$\\text{Bias}[\\hat{f}(x)] = \\mathbb{E}[\\hat{f}(x)] - f(x)$",
+          "description": "Systematic error from model assumptions"
+        },
+        {
+          "name": "Variance Definition",
+          "latex": "$\\text{Var}[\\hat{f}(x)] = \\mathbb{E}[(\\hat{f}(x) - \\mathbb{E}[\\hat{f}(x)])^2]$",
+          "description": "Sensitivity to training data fluctuations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that simulates the relationship between model complexity and bias/variance. Given a complexity level (1-10), return estimated bias² and variance values following the tradeoff principle. This builds intuition for why overfitting/underfitting occur.",
+        "function_signature": "def bias_variance_estimate(complexity: int) -> dict:",
+        "starter_code": "def bias_variance_estimate(complexity: int) -> dict:\n    \"\"\"\n    Estimate bias squared and variance for a given complexity level.\n    Complexity ranges from 1 (simple) to 10 (very complex).\n    Bias should decrease with complexity, variance should increase.\n    :param complexity: int, model complexity level (1-10)\n    :return: dict with keys 'bias_squared' and 'variance'\n    \"\"\"\n    # Your code here\n    # Hint: Use functions that show inverse relationship\n    # e.g., bias² ~ 1/complexity, variance ~ complexity\n    pass",
+        "test_cases": [
+          {
+            "input": "bias_variance_estimate(1)",
+            "expected": "{'bias_squared': > 5.0, 'variance': < 2.0}",
+            "explanation": "Very simple model: high bias (poor fit), low variance (stable)"
+          },
+          {
+            "input": "bias_variance_estimate(5)",
+            "expected": "{'bias_squared': ~2.0, 'variance': ~5.0}",
+            "explanation": "Moderate complexity: balanced bias and variance"
+          },
+          {
+            "input": "bias_variance_estimate(10)",
+            "expected": "{'bias_squared': < 1.0, 'variance': > 10.0}",
+            "explanation": "Very complex model: low bias (can fit anything), high variance (overfits)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Making both bias and variance increase together (they move in opposite directions)",
+        "Not scaling values appropriately to show clear tradeoff",
+        "Forgetting that total error is the sum of both components plus noise",
+        "Assuming linear relationships instead of using functions like 1/x for bias"
+      ],
+      "hint": "Bias² should decrease as complexity increases (inverse relationship), while variance should increase. Use formulas like bias² = k/complexity and variance = complexity * k.",
+      "references": [
+        "Statistical learning theory",
+        "Elements of Statistical Learning",
+        "Model selection",
+        "Regularization techniques"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Integrated Model Fitness Diagnosis System",
+      "relation_to_problem": "This final sub-quest combines all previous concepts—accuracy comparison, generalization gap, absolute thresholds, conditional logic, and theoretical understanding—to build a complete diagnostic function similar to the main problem.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Function composition",
+        "Integration of multiple checks"
+      ],
+      "learning_objectives": [
+        "Integrate multiple diagnostic checks into a single coherent system",
+        "Apply correct precedence and logic flow for multi-criteria classification",
+        "Return meaningful categorical outputs with interpretable codes"
+      ],
+      "math_content": {
+        "definition": "**Definition (Model Fitness Diagnostic Function):** Let $\\mathcal{M}$ denote a trained machine learning model with training accuracy $a_{\\text{tr}}$ and test accuracy $a_{\\text{te}}$. The **fitness diagnostic function** $\\mathcal{F}: [0,1]^2 \\rightarrow \\{-1, 0, 1\\}$ is defined as: $$\\mathcal{F}(a_{\\text{tr}}, a_{\\text{te}}) = \\begin{cases} 1 & \\text{if } a_{\\text{tr}} - a_{\\text{te}} > \\delta_{\\text{gap}} & \\text{(Overfitting)} \\\\ -1 & \\text{if } a_{\\text{tr}} < \\tau_{\\text{min}} \\land a_{\\text{te}} < \\tau_{\\text{min}} & \\text{(Underfitting)} \\\\ 0 & \\text{otherwise} & \\text{(Good Fit)} \\end{cases}$$ where $\\delta_{\\text{gap}}$ is the generalization gap threshold and $\\tau_{\\text{min}}$ is the minimum acceptable accuracy.",
+        "notation": "$\\delta_{\\text{gap}}$ = gap threshold (e.g., 0.2), $\\tau_{\\text{min}}$ = minimum accuracy threshold (e.g., 0.7), $\\mathcal{F}$ = diagnostic function",
+        "theorem": "**Theorem (Diagnostic Coverage):** The three conditions (overfitting, underfitting, good fit) partition the input space $[0,1]^2$ into three regions: $$\\Omega_{\\text{over}} = \\{(a_{\\text{tr}}, a_{\\text{te}}) : a_{\\text{tr}} - a_{\\text{te}} > \\delta_{\\text{gap}}\\}$$ $$\\Omega_{\\text{under}} = \\{(a_{\\text{tr}}, a_{\\text{te}}) : a_{\\text{tr}} < \\tau_{\\text{min}} \\land a_{\\text{te}} < \\tau_{\\text{min}}\\} \\setminus \\Omega_{\\text{over}}$$ $$\\Omega_{\\text{good}} = [0,1]^2 \\setminus (\\Omega_{\\text{over}} \\cup \\Omega_{\\text{under}})$$ These regions are mutually exclusive when evaluated with precedence (overfitting checked first).",
+        "proof_sketch": "The sequential evaluation ensures mutual exclusivity. Region $\\Omega_{\\text{over}}$ is checked first; if true, return 1. Region $\\Omega_{\\text{under}}$ is only checked if $\\neg \\Omega_{\\text{over}}$, ensuring no overlap in returned values. Region $\\Omega_{\\text{good}}$ captures all remaining cases: $\\neg \\Omega_{\\text{over}} \\land \\neg \\Omega_{\\text{under}}$. Together, these three regions cover the entire input space $[0,1]^2$ exactly once. Note: Without precedence, edge cases like $(a_{\\text{tr}} = 0.65, a_{\\text{te}} = 0.40)$ could theoretically satisfy both overfitting ($0.65 - 0.40 = 0.25 > 0.2$) and underfitting ($0.65 < 0.7 \\land 0.40 < 0.7$). Precedence resolves this ambiguity by classifying as overfitting.",
+        "examples": [
+          "Example 1: $(a_{\\text{tr}}, a_{\\text{te}}) = (0.95, 0.65)$. Check: $0.95 - 0.65 = 0.30 > 0.2$ ✓ → Return 1 (overfitting).",
+          "Example 2: $(a_{\\text{tr}}, a_{\\text{te}}) = (0.65, 0.60)$. Check gap: $0.05 \\not> 0.2$ ✗. Check underfit: $(0.65 < 0.7) \\land (0.60 < 0.7)$ ✓ → Return -1 (underfitting).",
+          "Example 3: $(a_{\\text{tr}}, a_{\\text{te}}) = (0.82, 0.80)$. Check gap: $0.02 \\not> 0.2$ ✗. Check underfit: $(0.82 < 0.7) \\land (0.80 < 0.7)$ ✗ → Return 0 (good fit)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Diagnostic Function",
+          "latex": "$\\mathcal{F}(a_{\\text{tr}}, a_{\\text{te}}) = \\begin{cases} 1 & \\text{if } \\Delta > \\delta \\\\ -1 & \\text{if } a_{\\text{tr}} < \\tau \\land a_{\\text{te}} < \\tau \\\\ 0 & \\text{otherwise} \\end{cases}$",
+          "description": "Comprehensive model fitness diagnosis with three outcomes"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a comprehensive model fitness diagnostic function that evaluates both overfitting (via generalization gap) and underfitting (via absolute thresholds) conditions, returning appropriate categorical codes. This integrates all previous sub-quests into a complete solution.",
+        "function_signature": "def diagnose_model_fit(train_accuracy: float, test_accuracy: float, gap_threshold: float = 0.2, min_threshold: float = 0.7) -> int:",
+        "starter_code": "def diagnose_model_fit(train_accuracy: float, test_accuracy: float, gap_threshold: float = 0.2, min_threshold: float = 0.7) -> int:\n    \"\"\"\n    Comprehensive model fitness diagnosis.\n    :param train_accuracy: float, training accuracy (0 <= train_accuracy <= 1)\n    :param test_accuracy: float, test accuracy (0 <= test_accuracy <= 1)\n    :param gap_threshold: float, threshold for overfitting detection (default 0.2)\n    :param min_threshold: float, minimum acceptable accuracy (default 0.7)\n    :return: int, 1 for overfitting, -1 for underfitting, 0 for good fit\n    \"\"\"\n    # Your code here\n    # Use concepts from all previous sub-quests:\n    # 1. Calculate generalization gap (train_accuracy - test_accuracy)\n    # 2. Check if gap exceeds gap_threshold (overfitting)\n    # 3. Check if both accuracies below min_threshold (underfitting)\n    # 4. Use proper if-elif-else structure with correct precedence\n    pass",
+        "test_cases": [
+          {
+            "input": "diagnose_model_fit(0.95, 0.65, 0.2, 0.7)",
+            "expected": "1",
+            "explanation": "Overfitting: generalization gap = 0.30 > 0.2. Training much better than test."
+          },
+          {
+            "input": "diagnose_model_fit(0.65, 0.60, 0.2, 0.7)",
+            "expected": "-1",
+            "explanation": "Underfitting: both 0.65 and 0.60 are below 0.7. Model performs poorly everywhere."
+          },
+          {
+            "input": "diagnose_model_fit(0.82, 0.80, 0.2, 0.7)",
+            "expected": "0",
+            "explanation": "Good fit: gap = 0.02 ≤ 0.2, and both accuracies ≥ 0.7. Balanced performance."
+          },
+          {
+            "input": "diagnose_model_fit(0.88, 0.72, 0.2, 0.7)",
+            "expected": "0",
+            "explanation": "Good fit: gap = 0.16 ≤ 0.2, and both accuracies ≥ 0.7. Acceptable generalization."
+          },
+          {
+            "input": "diagnose_model_fit(0.68, 0.45, 0.2, 0.7)",
+            "expected": "1",
+            "explanation": "Overfitting takes precedence: gap = 0.23 > 0.2, even though both < 0.7"
+          },
+          {
+            "input": "diagnose_model_fit(0.55, 0.58, 0.2, 0.7)",
+            "expected": "-1",
+            "explanation": "Underfitting: both accuracies below 0.7. Negative gap doesn't prevent this diagnosis."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Checking underfitting before overfitting, causing incorrect precedence",
+        "Using OR instead of AND for underfitting condition (both must be below threshold)",
+        "Computing test - train instead of train - test for gap",
+        "Not handling edge cases where both conditions could theoretically apply",
+        "Forgetting the else case for good fit (returning None instead of 0)"
+      ],
+      "hint": "Structure your solution with if-elif-else. First check if the generalization gap indicates overfitting. Then check if both accuracies indicate underfitting. Finally, handle the good fit case. Use all building blocks from previous sub-quests.",
+      "references": [
+        "Model evaluation",
+        "Diagnostic plots",
+        "Learning curves",
+        "Regularization strategies",
+        "Cross-validation techniques"
+      ]
+    }
+  ]
+}

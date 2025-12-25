@@ -1,0 +1,481 @@
+{
+  "problem_id": 73,
+  "title": "Calculate Dice Score for Classification",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "\n## Task: Compute the Dice Score\n\nYour task is to implement a function `dice_score(y_true, y_pred)` that calculates the Dice Score, also known as the Sørensen-Dice coefficient or F1-score, for binary classification. The Dice Score is used to measure the similarity between two sets and is particularly useful in tasks like image segmentation and binary classification.\n\n### Your Task:\nImplement the function `dice_score(y_true, y_pred)` to:\n1. Calculate the Dice Score between the arrays `y_true` and `y_pred`.\n2. Return the Dice Score as a float value rounded to 3 decimal places.\n3. Handle edge cases appropriately, such as when there are no true or predicted positives.\n\nThe Dice Score is defined as:\n\n$$\n\\scriptsize\n\\text{Dice Score} =\n\\frac{2 \\times (\\text{Number of elements in the intersection of } y_{\\text{true}} \\text{ and } y_{\\text{pred}})}{\\text{Number of elements in } y_{\\text{true}} + \\text{Number of elements in } y_{\\text{pred}}}\n$$\n\nWhere:\n- $ y_{\\text{true}} $ and $ y_{\\text{pred}} $ are binary arrays of the same length, representing true and predicted labels.\n- The result ranges from 0 (no overlap) to 1 (perfect overlap).\n",
+  "example": {
+    "input": "y_true = np.array([1, 1, 0, 1, 0, 1])\ny_pred = np.array([1, 1, 0, 0, 0, 1])\nprint(dice_score(y_true, y_pred))",
+    "output": "0.857",
+    "reasoning": "The Dice Score is calculated as (2 * 3) / (2 * 3 + 0 + 1) = 0.857, indicating an 85.7% overlap between the true and predicted labels."
+  },
+  "starter_code": "\nimport numpy as np\n\ndef dice_score(y_true, y_pred):\n\t# Write your code here\n\treturn round(res, 3)\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Set Theory Fundamentals: Intersection and Cardinality",
+      "relation_to_problem": "The Dice Score is fundamentally based on set intersection and cardinality. Understanding how to compute the intersection of two binary sets and their sizes is the foundation for calculating the numerator and denominator of the Dice coefficient.",
+      "prerequisites": [
+        "Basic set notation",
+        "Binary representations"
+      ],
+      "learning_objectives": [
+        "Define and compute set intersection for binary vectors",
+        "Calculate cardinality of sets represented as binary arrays",
+        "Apply element-wise logical operations to compute set properties"
+      ],
+      "math_content": {
+        "definition": "Given two sets $A$ and $B$, the **intersection** $A \\cap B$ is the set containing all elements that belong to both $A$ and $B$. The **cardinality** $|A|$ of a set $A$ is the number of elements in $A$. For binary vectors $\\mathbf{y}_{\\text{true}}, \\mathbf{y}_{\\text{pred}} \\in \\{0,1\\}^n$, we can represent sets as: $A = \\{i : y_{\\text{true}}[i] = 1\\}$ and $B = \\{i : y_{\\text{pred}}[i] = 1\\}$.",
+        "notation": "$A \\cap B$ = intersection of sets A and B; $|A|$ = cardinality (size) of set A; $\\mathbf{y} \\in \\{0,1\\}^n$ = binary vector of length n",
+        "theorem": "**Theorem (Intersection Property):** For binary vectors $\\mathbf{a}, \\mathbf{b} \\in \\{0,1\\}^n$, the cardinality of the intersection equals the sum of element-wise products: $|A \\cap B| = \\sum_{i=1}^{n} a_i \\cdot b_i$ where $A = \\{i : a_i = 1\\}$ and $B = \\{i : b_i = 1\\}$.",
+        "proof_sketch": "**Proof:** The product $a_i \\cdot b_i = 1$ if and only if both $a_i = 1$ and $b_i = 1$. Otherwise, if either is 0, the product is 0. Thus, summing over all positions counts exactly those indices where both vectors have value 1, which is precisely the definition of $|A \\cap B|$. □",
+        "examples": [
+          "Example 1: $\\mathbf{a} = [1, 0, 1, 1]$, $\\mathbf{b} = [1, 1, 0, 1]$. Then $A = \\{0, 2, 3\\}$, $B = \\{0, 1, 3\\}$, so $A \\cap B = \\{0, 3\\}$ with $|A \\cap B| = 2$. Verify: $\\sum a_i \\cdot b_i = 1\\cdot1 + 0\\cdot1 + 1\\cdot0 + 1\\cdot1 = 2$. ✓",
+          "Example 2: $\\mathbf{a} = [1, 1, 1]$, $\\mathbf{b} = [0, 0, 0]$. Then $A \\cap B = \\emptyset$ with $|A \\cap B| = 0$. Verify: $\\sum a_i \\cdot b_i = 1\\cdot0 + 1\\cdot0 + 1\\cdot0 = 0$. ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Set Intersection Cardinality",
+          "latex": "$|A \\cap B| = \\sum_{i=1}^{n} a_i \\cdot b_i$",
+          "description": "Use this to count common positive elements between two binary vectors"
+        },
+        {
+          "name": "Set Cardinality from Binary Vector",
+          "latex": "$|A| = \\sum_{i=1}^{n} a_i$",
+          "description": "Use this to count the number of positive elements in a binary vector"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the cardinality of the intersection of two binary sets represented as NumPy arrays. This is the foundation for the Dice Score numerator.",
+        "function_signature": "def intersection_cardinality(arr1: np.ndarray, arr2: np.ndarray) -> int:",
+        "starter_code": "import numpy as np\n\ndef intersection_cardinality(arr1, arr2):\n    # Compute |A ∩ B| for binary vectors\n    # Hint: Use element-wise multiplication and summation\n    pass",
+        "test_cases": [
+          {
+            "input": "intersection_cardinality(np.array([1, 0, 1, 1]), np.array([1, 1, 0, 1]))",
+            "expected": "2",
+            "explanation": "Positions 0 and 3 have 1 in both arrays, so |A ∩ B| = 2"
+          },
+          {
+            "input": "intersection_cardinality(np.array([1, 1, 1, 1]), np.array([1, 1, 1, 1]))",
+            "expected": "4",
+            "explanation": "Perfect overlap: all 4 positions match, so |A ∩ B| = 4"
+          },
+          {
+            "input": "intersection_cardinality(np.array([1, 0, 1]), np.array([0, 1, 0]))",
+            "expected": "0",
+            "explanation": "No positions have 1 in both arrays, so |A ∩ B| = 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using logical OR instead of logical AND when computing intersection",
+        "Forgetting that element-wise multiplication automatically gives the intersection for binary vectors",
+        "Not handling the case where arrays are of different lengths (though problem assumes equal length)"
+      ],
+      "hint": "For binary values, multiplication acts as logical AND. Sum the element-wise products to count matches.",
+      "references": [
+        "Set Theory basics",
+        "NumPy array operations",
+        "Element-wise operations in arrays"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Confusion Matrix Elements: True Positives, False Positives, False Negatives",
+      "relation_to_problem": "The Dice Score can be expressed in terms of TP, FP, and FN. Understanding these confusion matrix elements is essential for deriving and computing the Dice coefficient in classification contexts.",
+      "prerequisites": [
+        "Binary classification concepts",
+        "Set intersection",
+        "Logical operations"
+      ],
+      "learning_objectives": [
+        "Define and compute True Positives (TP), False Positives (FP), and False Negatives (FN)",
+        "Express these metrics in terms of set operations",
+        "Relate confusion matrix elements to the Dice Score formula"
+      ],
+      "math_content": {
+        "definition": "For binary classification with ground truth $\\mathbf{y}_{\\text{true}}$ and predictions $\\mathbf{y}_{\\text{pred}}$: **True Positives (TP)** = $|\\{i : y_{\\text{true}}[i] = 1 \\land y_{\\text{pred}}[i] = 1\\}|$; **False Positives (FP)** = $|\\{i : y_{\\text{true}}[i] = 0 \\land y_{\\text{pred}}[i] = 1\\}|$; **False Negatives (FN)** = $|\\{i : y_{\\text{true}}[i] = 1 \\land y_{\\text{pred}}[i] = 0\\}|$.",
+        "notation": "$\\text{TP}$ = true positives; $\\text{FP}$ = false positives; $\\text{FN}$ = false negatives; $\\land$ = logical AND",
+        "theorem": "**Theorem (Confusion Matrix Relations):** For binary vectors of length $n$: (1) $\\text{TP} = \\sum_{i=1}^{n} y_{\\text{true}}[i] \\cdot y_{\\text{pred}}[i]$; (2) $\\text{FP} = \\sum_{i=1}^{n} (1 - y_{\\text{true}}[i]) \\cdot y_{\\text{pred}}[i]$; (3) $\\text{FN} = \\sum_{i=1}^{n} y_{\\text{true}}[i] \\cdot (1 - y_{\\text{pred}}[i])$; (4) $|Y_{\\text{true}}| = \\text{TP} + \\text{FN}$; (5) $|Y_{\\text{pred}}| = \\text{TP} + \\text{FP}$.",
+        "proof_sketch": "**Proof of (1):** By definition, TP counts positions where both are 1. The product $y_{\\text{true}}[i] \\cdot y_{\\text{pred}}[i] = 1$ iff both are 1, giving us TP. **Proof of (4):** Every position with $y_{\\text{true}}[i] = 1$ is either correctly predicted (TP) or missed (FN), so $|Y_{\\text{true}}| = \\text{TP} + \\text{FN}$. Similar logic applies to (5). □",
+        "examples": [
+          "Example: $y_{\\text{true}} = [1, 1, 0, 1, 0, 1]$, $y_{\\text{pred}} = [1, 1, 0, 0, 0, 1]$. TP: positions {0,1,2,5} where both=1 gives TP=3. FP: positions where true=0 and pred=1: none, so FP=0. FN: positions where true=1 and pred=0: position 3, so FN=1. Verify: $|Y_{\\text{true}}| = 4 = 3 + 1$ ✓",
+          "Example: Perfect prediction $y_{\\text{true}} = y_{\\text{pred}} = [1, 0, 1]$. TP=2, FP=0, FN=0. All predictions are correct."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "True Positives",
+          "latex": "$\\text{TP} = \\sum_{i=1}^{n} y_{\\text{true}}[i] \\cdot y_{\\text{pred}}[i]$",
+          "description": "Count positions where both prediction and ground truth are positive"
+        },
+        {
+          "name": "False Positives",
+          "latex": "$\\text{FP} = \\sum_{i=1}^{n} (1 - y_{\\text{true}}[i]) \\cdot y_{\\text{pred}}[i]$",
+          "description": "Count positions where prediction is positive but ground truth is negative"
+        },
+        {
+          "name": "False Negatives",
+          "latex": "$\\text{FN} = \\sum_{i=1}^{n} y_{\\text{true}}[i] \\cdot (1 - y_{\\text{pred}}[i])$",
+          "description": "Count positions where prediction is negative but ground truth is positive"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes TP, FP, and FN from binary ground truth and prediction arrays. These components are building blocks for the Dice Score formula.",
+        "function_signature": "def confusion_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> tuple[int, int, int]:",
+        "starter_code": "import numpy as np\n\ndef confusion_metrics(y_true, y_pred):\n    # Compute and return (TP, FP, FN)\n    # Hint: Use element-wise operations with y_true and y_pred\n    pass",
+        "test_cases": [
+          {
+            "input": "confusion_metrics(np.array([1, 1, 0, 1, 0, 1]), np.array([1, 1, 0, 0, 0, 1]))",
+            "expected": "(3, 0, 1)",
+            "explanation": "TP=3 (positions 0,1,5), FP=0 (no false alarms), FN=1 (position 3 missed)"
+          },
+          {
+            "input": "confusion_metrics(np.array([1, 0, 1, 0]), np.array([0, 1, 1, 0]))",
+            "expected": "(1, 1, 1)",
+            "explanation": "TP=1 (position 2), FP=1 (position 1), FN=1 (position 0)"
+          },
+          {
+            "input": "confusion_metrics(np.array([0, 0, 0]), np.array([0, 0, 0]))",
+            "expected": "(0, 0, 0)",
+            "explanation": "All negatives correctly predicted: TP=FP=FN=0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing FP and FN - remember FP is when you predict 1 but truth is 0",
+        "Not using (1 - y_true) or (1 - y_pred) to negate binary values",
+        "Forgetting that TP is identical to the intersection cardinality from Step 1"
+      ],
+      "hint": "TP is the intersection from Step 1. For FP, you need to check where pred=1 AND true=0. Use (1-y_true) to flip binary values.",
+      "references": [
+        "Confusion Matrix",
+        "Binary Classification Metrics",
+        "Type I and Type II errors"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "The Sørensen-Dice Coefficient: Formal Definition and Properties",
+      "relation_to_problem": "This is the core mathematical concept of the main problem. Understanding the formal definition, derivation, and properties of the Dice coefficient is essential for correct implementation.",
+      "prerequisites": [
+        "Set intersection and cardinality",
+        "Confusion matrix elements (TP, FP, FN)",
+        "Basic algebra"
+      ],
+      "learning_objectives": [
+        "State the formal mathematical definition of the Dice coefficient",
+        "Derive the relationship between set-based and confusion matrix formulations",
+        "Understand the range and properties of the Dice Score",
+        "Recognize the equivalence between Dice Score and F1-Score"
+      ],
+      "math_content": {
+        "definition": "The **Sørensen-Dice coefficient** (or Dice Score) for two sets $A$ and $B$ is defined as: $$\\text{Dice}(A, B) = \\frac{2|A \\cap B|}{|A| + |B|}$$ For binary classification with sets $Y_{\\text{true}} = \\{i : y_{\\text{true}}[i] = 1\\}$ and $Y_{\\text{pred}} = \\{i : y_{\\text{pred}}[i] = 1\\}$, this becomes: $$\\text{Dice} = \\frac{2|Y_{\\text{true}} \\cap Y_{\\text{pred}}|}{|Y_{\\text{true}}| + |Y_{\\text{pred}}|}$$",
+        "notation": "$\\text{Dice}(A,B)$ = Dice coefficient between sets A and B; $|A \\cap B|$ = size of intersection; $|A|, |B|$ = sizes of sets A and B",
+        "theorem": "**Theorem (Dice-F1 Equivalence):** The Dice coefficient is algebraically equivalent to the F1-score: $$\\text{Dice} = \\frac{2|A \\cap B|}{|A| + |B|} = \\frac{2\\text{TP}}{2\\text{TP} + \\text{FP} + \\text{FN}} = \\text{F1-Score}$$ **Theorem (Range Property):** For any sets $A, B$: $0 \\leq \\text{Dice}(A,B) \\leq 1$, with equality at 1 iff $A = B$, and equality at 0 iff $A \\cap B = \\emptyset$. **Theorem (Symmetry):** $\\text{Dice}(A,B) = \\text{Dice}(B,A)$ for all sets $A, B$.",
+        "proof_sketch": "**Proof of Dice-F1 Equivalence:** From Step 2, we know $|Y_{\\text{true}}| = \\text{TP} + \\text{FN}$ and $|Y_{\\text{pred}}| = \\text{TP} + \\text{FP}$. Also, $|Y_{\\text{true}} \\cap Y_{\\text{pred}}| = \\text{TP}$. Substituting: $$\\text{Dice} = \\frac{2\\text{TP}}{(\\text{TP} + \\text{FN}) + (\\text{TP} + \\text{FP})} = \\frac{2\\text{TP}}{2\\text{TP} + \\text{FP} + \\text{FN}}$$ This is precisely the F1-score formula. **Proof of Range:** Since $|A \\cap B| \\leq \\min(|A|, |B|) \\leq \\frac{|A| + |B|}{2}$, we have $\\frac{2|A \\cap B|}{|A| + |B|} \\leq 1$. If $A = B$, then $|A \\cap B| = |A| = |B|$, giving $\\text{Dice} = \\frac{2|A|}{2|A|} = 1$. □",
+        "examples": [
+          "Example 1: $y_{\\text{true}} = [1, 1, 0, 1, 0, 1]$, $y_{\\text{pred}} = [1, 1, 0, 0, 0, 1]$. From Steps 1-2: $|Y_{\\text{true}} \\cap Y_{\\text{pred}}| = 3$, $|Y_{\\text{true}}| = 4$, $|Y_{\\text{pred}}| = 3$. Thus: $$\\text{Dice} = \\frac{2 \\cdot 3}{4 + 3} = \\frac{6}{7} \\approx 0.857$$ Verify with confusion matrix: TP=3, FP=0, FN=1. $$\\text{Dice} = \\frac{2 \\cdot 3}{2 \\cdot 3 + 0 + 1} = \\frac{6}{7}$$ ✓",
+          "Example 2: Perfect prediction $y_{\\text{true}} = y_{\\text{pred}} = [1, 0, 1, 1]$. Then $|A \\cap B| = |A| = |B| = 3$, so $\\text{Dice} = \\frac{2 \\cdot 3}{3 + 3} = 1.0$. Perfect score!"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Dice Coefficient (Set Form)",
+          "latex": "$\\text{Dice}(A, B) = \\frac{2|A \\cap B|}{|A| + |B|}$",
+          "description": "Primary definition using set cardinalities"
+        },
+        {
+          "name": "Dice Coefficient (Confusion Matrix Form)",
+          "latex": "$\\text{Dice} = \\frac{2\\text{TP}}{2\\text{TP} + \\text{FP} + \\text{FN}}$",
+          "description": "Equivalent formulation using classification metrics"
+        },
+        {
+          "name": "Dice Coefficient (Vector Form)",
+          "latex": "$\\text{Dice} = \\frac{2\\sum_{i=1}^{n} y_{\\text{true}}[i] \\cdot y_{\\text{pred}}[i]}{\\sum_{i=1}^{n} y_{\\text{true}}[i] + \\sum_{i=1}^{n} y_{\\text{pred}}[i]}$",
+          "description": "Computational form directly from binary vectors"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the Dice Score using the confusion matrix formulation (with TP, FP, FN). Do NOT handle edge cases yet - assume at least one positive example exists.",
+        "function_signature": "def dice_from_confusion(tp: int, fp: int, fn: int) -> float:",
+        "starter_code": "def dice_from_confusion(tp, fp, fn):\n    # Compute Dice Score from confusion matrix elements\n    # Formula: 2*TP / (2*TP + FP + FN)\n    # Do NOT handle divide-by-zero yet\n    pass",
+        "test_cases": [
+          {
+            "input": "dice_from_confusion(3, 0, 1)",
+            "expected": "0.857",
+            "explanation": "From the main problem example: Dice = 2*3/(2*3 + 0 + 1) = 6/7 ≈ 0.857"
+          },
+          {
+            "input": "dice_from_confusion(10, 5, 5)",
+            "expected": "0.667",
+            "explanation": "Dice = 2*10/(2*10 + 5 + 5) = 20/30 = 0.667"
+          },
+          {
+            "input": "dice_from_confusion(1, 0, 0)",
+            "expected": "1.0",
+            "explanation": "Perfect prediction with one positive: Dice = 2*1/(2*1 + 0 + 0) = 1.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to multiply TP by 2 in the numerator",
+        "Using TP + FP + FN in denominator instead of 2*TP + FP + FN",
+        "Confusing Dice Score with Jaccard Index (which has different formula)",
+        "Not recognizing that Dice and F1-Score are identical"
+      ],
+      "hint": "The numerator is 2*TP. The denominator adds all positive predictions (TP+FP) and all true positives (TP+FN), which equals 2*TP + FP + FN.",
+      "references": [
+        "F1-Score",
+        "Sørensen-Dice coefficient",
+        "Harmonic mean of precision and recall",
+        "Set similarity measures"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Edge Cases and Numerical Stability in Similarity Metrics",
+      "relation_to_problem": "Real-world implementations must handle edge cases like empty sets (no positives in either array). Understanding how to define and compute the Dice Score in degenerate cases is crucial for robust implementation.",
+      "prerequisites": [
+        "Dice coefficient definition",
+        "Division by zero concepts",
+        "Limit analysis"
+      ],
+      "learning_objectives": [
+        "Identify edge cases in Dice Score computation",
+        "Understand convention for undefined cases (0/0)",
+        "Implement numerically stable algorithms",
+        "Apply conditional logic to handle special cases"
+      ],
+      "math_content": {
+        "definition": "An **edge case** in the Dice Score occurs when the denominator $|A| + |B| = 0$, which happens iff both sets are empty ($A = B = \\emptyset$). In this degenerate case, the fraction $\\frac{0}{0}$ is mathematically undefined. By convention in machine learning (following scikit-learn), we define: $$\\text{Dice}(\\emptyset, \\emptyset) = 0.0$$ This convention treats \"no predictions and no ground truth\" as complete disagreement rather than perfect agreement.",
+        "notation": "$\\emptyset$ = empty set; $\\lim$ = limit operator; $0/0$ = indeterminate form",
+        "theorem": "**Theorem (Edge Case Classification):** For binary vectors $\\mathbf{y}_{\\text{true}}, \\mathbf{y}_{\\text{pred}}$, there are three cases: (1) **Normal case:** $|Y_{\\text{true}}| + |Y_{\\text{pred}}| > 0$. Use standard formula. (2) **Both empty:** $|Y_{\\text{true}}| = |Y_{\\text{pred}}| = 0$. Define $\\text{Dice} = 0$ by convention. (3) **One empty, one non-empty:** One set empty but not both. Then $\\text{Dice} = 0$ (no overlap). **Theorem (Monotonicity):** If we add a true positive (increase TP by 1 while keeping FP and FN constant), the Dice Score strictly increases.",
+        "proof_sketch": "**Proof of Case 3:** WLOG assume $A = \\emptyset$ and $B \\neq \\emptyset$. Then $|A \\cap B| = 0$ (empty set has no elements to intersect), so $\\text{Dice} = \\frac{2 \\cdot 0}{0 + |B|} = 0$. **Proof of Monotonicity:** Let $D = \\frac{2t}{2t + f}$ where $t = \\text{TP}$ and $f = \\text{FP} + \\text{FN}$. Taking derivative: $\\frac{\\partial D}{\\partial t} = \\frac{2(2t+f) - 2t \\cdot 2}{(2t+f)^2} = \\frac{2f}{(2t+f)^2} > 0$ for $f > 0$. Thus increasing TP increases Dice. □",
+        "examples": [
+          "Example 1 (Both empty): $y_{\\text{true}} = [0, 0, 0]$, $y_{\\text{pred}} = [0, 0, 0]$. Then $|Y_{\\text{true}}| = |Y_{\\text{pred}}| = 0$. By convention, $\\text{Dice} = 0.0$ (not 1.0!).",
+          "Example 2 (One empty): $y_{\\text{true}} = [1, 1, 0]$, $y_{\\text{pred}} = [0, 0, 0]$. Then $|Y_{\\text{true}} \\cap Y_{\\text{pred}}| = 0$, so $\\text{Dice} = \\frac{0}{2 + 0} = 0.0$.",
+          "Example 3 (Normal case): $y_{\\text{true}} = [1]$, $y_{\\text{pred}} = [1]$. Single element match: $\\text{Dice} = \\frac{2 \\cdot 1}{1 + 1} = 1.0$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Dice Score with Edge Case Handling",
+          "latex": "$\\text{Dice} = \\begin{cases} 0 & \\text{if } |A| + |B| = 0 \\\\ \\frac{2|A \\cap B|}{|A| + |B|} & \\text{otherwise} \\end{cases}$",
+          "description": "Complete definition handling the degenerate case"
+        },
+        {
+          "name": "Numerically Stable Computation",
+          "latex": "$\\text{Dice} = \\begin{cases} 0 & \\text{if } \\sum y_{\\text{true}} + \\sum y_{\\text{pred}} = 0 \\\\ \\frac{2\\sum (y_{\\text{true}} \\cdot y_{\\text{pred}})}{\\sum y_{\\text{true}} + \\sum y_{\\text{pred}}} & \\text{otherwise} \\end{cases}$",
+          "description": "Computational form with explicit zero-denominator check"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that checks whether the Dice Score computation will encounter an edge case (both sets empty), and returns True if edge case detected, False otherwise.",
+        "function_signature": "def is_dice_edge_case(y_true: np.ndarray, y_pred: np.ndarray) -> bool:",
+        "starter_code": "import numpy as np\n\ndef is_dice_edge_case(y_true, y_pred):\n    # Return True if both arrays have no positive elements\n    # This indicates the edge case where denominator would be 0\n    pass",
+        "test_cases": [
+          {
+            "input": "is_dice_edge_case(np.array([0, 0, 0]), np.array([0, 0, 0]))",
+            "expected": "True",
+            "explanation": "Both arrays are all zeros - this is the edge case"
+          },
+          {
+            "input": "is_dice_edge_case(np.array([1, 0, 0]), np.array([0, 0, 0]))",
+            "expected": "False",
+            "explanation": "y_true has a positive element, so not an edge case"
+          },
+          {
+            "input": "is_dice_edge_case(np.array([0, 0]), np.array([0, 1]))",
+            "expected": "False",
+            "explanation": "y_pred has a positive element, so not an edge case"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Defining Dice(∅, ∅) = 1.0 instead of 0.0 - this violates standard ML convention",
+        "Not checking for zero denominator before division, causing division by zero errors",
+        "Checking only if intersection is zero instead of if denominator is zero",
+        "Using try-except for division by zero instead of explicit conditional check"
+      ],
+      "hint": "An edge case occurs when the sum of cardinalities equals zero. Check if both np.sum(y_true) and np.sum(y_pred) are zero.",
+      "references": [
+        "Numerical stability",
+        "scikit-learn metrics conventions",
+        "Handling undefined mathematical operations"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Precision and Recall: Understanding Dice as Harmonic Mean",
+      "relation_to_problem": "The Dice Score is exactly the F1-Score, which is the harmonic mean of precision and recall. Understanding this relationship provides deeper insight into what the Dice Score measures and validates our implementation.",
+      "prerequisites": [
+        "Dice coefficient",
+        "Confusion matrix elements",
+        "Harmonic mean"
+      ],
+      "learning_objectives": [
+        "Define precision and recall formally",
+        "Derive the harmonic mean formula",
+        "Prove that Dice Score equals F1-Score",
+        "Understand when Dice Score is preferred over accuracy"
+      ],
+      "math_content": {
+        "definition": "**Precision** measures the fraction of positive predictions that are correct: $$P = \\frac{\\text{TP}}{\\text{TP} + \\text{FP}} = \\frac{\\text{TP}}{|Y_{\\text{pred}}|}$$ **Recall** (or sensitivity) measures the fraction of true positives that are correctly identified: $$R = \\frac{\\text{TP}}{\\text{TP} + \\text{FN}} = \\frac{\\text{TP}}{|Y_{\\text{true}}|}$$ The **harmonic mean** of two positive numbers $a, b$ is: $$H(a, b) = \\frac{2ab}{a + b}$$ The **F1-Score** is the harmonic mean of precision and recall: $$\\text{F1} = \\frac{2 \\cdot P \\cdot R}{P + R}$$",
+        "notation": "$P$ = precision; $R$ = recall; $\\text{F1}$ = F1-Score; $H(a,b)$ = harmonic mean of a and b",
+        "theorem": "**Theorem (Dice-F1 Identity):** The Dice coefficient is exactly equal to the F1-Score: $$\\text{Dice} = \\text{F1} = \\frac{2PR}{P + R}$$ **Theorem (Harmonic vs Arithmetic Mean):** For $0 < a, b \\leq 1$: $$H(a,b) = \\frac{2ab}{a+b} \\leq \\frac{a+b}{2} = A(a,b)$$ with equality iff $a = b$. The harmonic mean penalizes imbalance more than the arithmetic mean.",
+        "proof_sketch": "**Proof of Dice-F1 Identity:** Starting with F1: $$\\text{F1} = \\frac{2PR}{P+R} = \\frac{2 \\cdot \\frac{\\text{TP}}{\\text{TP}+\\text{FP}} \\cdot \\frac{\\text{TP}}{\\text{TP}+\\text{FN}}}{\\frac{\\text{TP}}{\\text{TP}+\\text{FP}} + \\frac{\\text{TP}}{\\text{TP}+\\text{FN}}}$$ Multiply numerator and denominator by $(\\text{TP}+\\text{FP})(\\text{TP}+\\text{FN})$: $$= \\frac{2\\text{TP}^2}{\\text{TP}(\\text{TP}+\\text{FN}) + \\text{TP}(\\text{TP}+\\text{FP})} = \\frac{2\\text{TP}^2}{\\text{TP}(2\\text{TP} + \\text{FN} + \\text{FP})} = \\frac{2\\text{TP}}{2\\text{TP} + \\text{FN} + \\text{FP}} = \\text{Dice}$$ □",
+        "examples": [
+          "Example 1: $y_{\\text{true}} = [1, 1, 0, 1, 0, 1]$, $y_{\\text{pred}} = [1, 1, 0, 0, 0, 1]$. TP=3, FP=0, FN=1. Precision: $P = 3/(3+0) = 1.0$ (all predictions correct). Recall: $R = 3/(3+1) = 0.75$ (missed 25%). F1: $\\text{F1} = 2 \\cdot 1.0 \\cdot 0.75 / (1.0 + 0.75) = 1.5/1.75 ≈ 0.857$. Matches Dice from Step 3! ✓",
+          "Example 2: Perfect balance $P = R = 0.9$. Then arithmetic mean $= 0.9$, harmonic mean $= 2(0.9)(0.9)/(1.8) = 0.9$. Equal since P=R.",
+          "Example 3: Imbalanced $P = 1.0, R = 0.5$. Arithmetic mean $= 0.75$, but F1 $= 2(1.0)(0.5)/(1.5) ≈ 0.667$. Harmonic mean is lower, penalizing the poor recall."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Precision",
+          "latex": "$P = \\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$",
+          "description": "Fraction of positive predictions that are correct"
+        },
+        {
+          "name": "Recall",
+          "latex": "$R = \\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$",
+          "description": "Fraction of actual positives that are identified"
+        },
+        {
+          "name": "F1-Score (Harmonic Mean Form)",
+          "latex": "$\\text{F1} = \\frac{2PR}{P + R}$",
+          "description": "Harmonic mean of precision and recall"
+        },
+        {
+          "name": "Dice = F1 Identity",
+          "latex": "$\\frac{2\\text{TP}}{2\\text{TP} + \\text{FP} + \\text{FN}} = \\frac{2PR}{P+R}$",
+          "description": "Algebraic proof that Dice and F1 are identical"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the F1-Score from precision and recall values, handling edge cases where either is zero. Verify that this produces the same result as the Dice formula.",
+        "function_signature": "def f1_score_from_precision_recall(precision: float, recall: float) -> float:",
+        "starter_code": "def f1_score_from_precision_recall(precision, recall):\n    # Compute F1 = 2*P*R / (P + R)\n    # Handle edge case where P + R = 0\n    # Return 0.0 if both precision and recall are 0\n    pass",
+        "test_cases": [
+          {
+            "input": "f1_score_from_precision_recall(1.0, 0.75)",
+            "expected": "0.857",
+            "explanation": "F1 = 2*1.0*0.75 / (1.0 + 0.75) = 1.5/1.75 ≈ 0.857"
+          },
+          {
+            "input": "f1_score_from_precision_recall(0.0, 0.0)",
+            "expected": "0.0",
+            "explanation": "Edge case: both zero, return 0.0 by convention"
+          },
+          {
+            "input": "f1_score_from_precision_recall(0.8, 0.8)",
+            "expected": "0.8",
+            "explanation": "When P=R, harmonic mean equals their common value"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using arithmetic mean (P+R)/2 instead of harmonic mean 2PR/(P+R)",
+        "Not handling the case where both precision and recall are 0",
+        "Forgetting that F1 and Dice are mathematically identical",
+        "Computing precision/recall from wrong confusion matrix elements"
+      ],
+      "hint": "The harmonic mean formula is 2PR/(P+R). Check if the denominator is zero before dividing. When P=R, the harmonic mean equals that common value.",
+      "references": [
+        "F1-Score",
+        "Harmonic mean",
+        "Precision-Recall tradeoff",
+        "Evaluation metrics for imbalanced data"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Implementation: Integrating All Components",
+      "relation_to_problem": "This final sub-quest combines all previous concepts to implement the complete Dice Score function with proper edge case handling and rounding, directly solving the main problem.",
+      "prerequisites": [
+        "Set intersection cardinality",
+        "Confusion matrix elements",
+        "Dice coefficient formula",
+        "Edge case handling",
+        "F1-Score equivalence"
+      ],
+      "learning_objectives": [
+        "Integrate all learned concepts into a single function",
+        "Apply proper rounding to match output requirements",
+        "Validate implementation against multiple test cases",
+        "Understand computational complexity and efficiency"
+      ],
+      "math_content": {
+        "definition": "The **complete Dice Score function** takes binary arrays $\\mathbf{y}_{\\text{true}}, \\mathbf{y}_{\\text{pred}} \\in \\{0,1\\}^n$ and returns: $$\\text{dice\\_score}(\\mathbf{y}_{\\text{true}}, \\mathbf{y}_{\\text{pred}}) = \\begin{cases} 0.0 & \\text{if } \\sum_{i=1}^n y_{\\text{true}}[i] + \\sum_{i=1}^n y_{\\text{pred}}[i] = 0 \\\\ \\text{round}\\left(\\frac{2\\sum_{i=1}^n y_{\\text{true}}[i] \\cdot y_{\\text{pred}}[i]}{\\sum_{i=1}^n y_{\\text{true}}[i] + \\sum_{i=1}^n y_{\\text{pred}}[i]}, 3\\right) & \\text{otherwise} \\end{cases}$$ where $\\text{round}(x, 3)$ rounds to 3 decimal places.",
+        "notation": "$\\text{round}(x, d)$ = round number x to d decimal places; $\\sum$ = summation operator",
+        "theorem": "**Theorem (Algorithm Correctness):** The algorithm that computes: (1) intersection = $\\sum y_{\\text{true}} \\cdot y_{\\text{pred}}$, (2) denominator = $\\sum y_{\\text{true}} + \\sum y_{\\text{pred}}$, (3) if denominator = 0 return 0, else return $\\text{round}(2 \\cdot \\text{intersection} / \\text{denominator}, 3)$ produces the correct Dice Score. **Theorem (Computational Complexity):** The algorithm has time complexity $O(n)$ and space complexity $O(1)$ where $n$ is the length of input arrays.",
+        "proof_sketch": "**Proof of Correctness:** Step (1) computes $|A \\cap B|$ by Theorem from Step 1. Step (2) computes $|A| + |B|$ by summing cardinalities. Step (3) applies the edge case convention from Step 4 and the standard Dice formula from Step 3. Each step is proven correct in previous sub-quests, so composition is correct. **Proof of Complexity:** Computing sums requires one pass through array ($O(n)$). Division and rounding are $O(1)$. No additional arrays needed beyond inputs ($O(1)$ space). □",
+        "examples": [
+          "Example 1 (Main problem): $y_{\\text{true}} = [1, 1, 0, 1, 0, 1]$, $y_{\\text{pred}} = [1, 1, 0, 0, 0, 1]$. Step 1: intersection = $1\\cdot1 + 1\\cdot1 + 0\\cdot0 + 1\\cdot0 + 0\\cdot0 + 1\\cdot1 = 3$. Step 2: denominator = $4 + 3 = 7$. Step 3: result = $\\text{round}(2 \\cdot 3 / 7, 3) = \\text{round}(0.857142..., 3) = 0.857$. ✓",
+          "Example 2 (Edge case): $y_{\\text{true}} = [0, 0]$, $y_{\\text{pred}} = [0, 0]$. Step 1: intersection = 0. Step 2: denominator = 0. Step 3: return 0.0. ✓",
+          "Example 3 (Perfect score): $y_{\\text{true}} = [1, 0, 1]$, $y_{\\text{pred}} = [1, 0, 1]$. Step 1: intersection = 2. Step 2: denominator = 4. Step 3: result = $\\text{round}(4/4, 3) = 1.0$. ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Dice Score Algorithm",
+          "latex": "$\\text{Dice} = \\begin{cases} 0 & \\text{if } \\sum y_{\\text{true}} + \\sum y_{\\text{pred}} = 0 \\\\ \\text{round}\\left(\\frac{2\\sum(y_{\\text{true}} \\cdot y_{\\text{pred}})}{\\sum y_{\\text{true}} + \\sum y_{\\text{pred}}}, 3\\right) & \\text{otherwise} \\end{cases}$",
+          "description": "Full implementation formula with edge case and rounding"
+        },
+        {
+          "name": "Vectorized Computation",
+          "latex": "$\\text{intersection} = \\mathbf{y}_{\\text{true}}^T \\mathbf{y}_{\\text{pred}}$; $\\text{denominator} = \\|\\mathbf{y}_{\\text{true}}\\|_1 + \\|\\mathbf{y}_{\\text{pred}}\\|_1$",
+          "description": "Matrix notation for efficient NumPy implementation using dot product and L1 norms"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete dice_score function that integrates all learned concepts: computing intersection cardinality, handling edge cases, applying the Dice formula, and rounding to 3 decimal places. This is the solution framework for the main problem.",
+        "function_signature": "def dice_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef dice_score(y_true, y_pred):\n    # Step 1: Compute intersection cardinality (from Sub-quest 1)\n    \n    # Step 2: Compute denominator (sum of cardinalities)\n    \n    # Step 3: Check for edge case (from Sub-quest 4)\n    \n    # Step 4: Apply Dice formula (from Sub-quest 3)\n    \n    # Step 5: Round to 3 decimal places and return\n    \n    pass",
+        "test_cases": [
+          {
+            "input": "dice_score(np.array([1, 1, 0, 1, 0, 1]), np.array([1, 1, 0, 0, 0, 1]))",
+            "expected": "0.857",
+            "explanation": "Main problem example: intersection=3, denominator=7, Dice=6/7≈0.857"
+          },
+          {
+            "input": "dice_score(np.array([0, 0, 0]), np.array([0, 0, 0]))",
+            "expected": "0.0",
+            "explanation": "Edge case: both empty, return 0.0 by convention"
+          },
+          {
+            "input": "dice_score(np.array([1, 1, 1]), np.array([1, 1, 1]))",
+            "expected": "1.0",
+            "explanation": "Perfect prediction: Dice = 6/6 = 1.0"
+          },
+          {
+            "input": "dice_score(np.array([1, 0, 1, 0]), np.array([0, 1, 0, 1]))",
+            "expected": "0.0",
+            "explanation": "No overlap: intersection=0, Dice=0/4=0.0"
+          },
+          {
+            "input": "dice_score(np.array([1, 1, 1, 1, 0]), np.array([1, 1, 0, 0, 0]))",
+            "expected": "0.667",
+            "explanation": "Partial overlap: intersection=2, denominator=6, Dice=4/6≈0.667"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking for zero denominator before division",
+        "Forgetting to multiply intersection by 2 in the numerator",
+        "Rounding to wrong number of decimal places (not 3)",
+        "Using element-wise operations incorrectly (e.g., y_true + y_pred instead of np.sum)",
+        "Not using NumPy operations efficiently (loops instead of vectorization)"
+      ],
+      "hint": "Use np.sum(y_true * y_pred) for intersection, np.sum(y_true) + np.sum(y_pred) for denominator. Check if denominator is 0 first. Apply the formula 2*intersection/denominator and round with Python's round() function.",
+      "references": [
+        "NumPy array operations",
+        "Vectorized computation",
+        "Python rounding",
+        "Complete algorithm design"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,456 @@
+{
+  "problem_id": 110,
+  "title": "Evaluate Translation Quality with METEOR Score",
+  "category": "NLP",
+  "difficulty": "medium",
+  "description": "Develop a function to compute the METEOR score for evaluating machine translation quality. Given a reference translation and a candidate translation, calculate the score based on unigram matches, precision, recall, F-mean, and a penalty for word order fragmentation.",
+  "example": {
+    "input": "meteor_score('Rain falls gently from the sky', 'Gentle rain drops from the sky')",
+    "output": "0.625",
+    "reasoning": "The function identifies 4 unigram matches ('rain', 'gently'/'gentle', 'from', 'sky'), computes precision (4/6) and recall (4/5), calculates an F-mean, and then apply a small penalty for two chunks."
+  },
+  "starter_code": "import numpy as np\nfrom collections import Counter\n\ndef meteor_score(reference, candidate, alpha=0.9, beta=3, gamma=0.5):\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Text Tokenization and Unigram Matching",
+      "relation_to_problem": "METEOR score requires identifying matching unigrams between reference and candidate translations, which forms the foundation for all subsequent calculations.",
+      "prerequisites": [
+        "String manipulation",
+        "Set theory",
+        "Basic Python collections"
+      ],
+      "learning_objectives": [
+        "Understand tokenization as a string-to-sequence transformation",
+        "Implement case-insensitive exact word matching",
+        "Count matching unigrams between two sequences"
+      ],
+      "math_content": {
+        "definition": "Let $R = \\{r_1, r_2, \\ldots, r_n\\}$ be the set of tokens from the reference text and $C = \\{c_1, c_2, \\ldots, c_m\\}$ be the set of tokens from the candidate text. A **unigram match** is a token $t$ such that $t \\in R \\cap C$. The **matching set** is $M = R \\cap C$ under case-insensitive comparison.",
+        "notation": "$|M|$ = cardinality of matching set (number of matches), $|R|$ = total reference tokens, $|C|$ = total candidate tokens",
+        "theorem": "For multisets with repeated elements, the number of matches is $|M| = \\sum_{w \\in V} \\min(\\text{count}_R(w), \\text{count}_C(w))$ where $V$ is the vocabulary and $\\text{count}_X(w)$ is the frequency of word $w$ in text $X$.",
+        "proof_sketch": "Each unique word $w$ can match at most $\\min(\\text{count}_R(w), \\text{count}_C(w))$ times since we need pairs from both texts. Summing over all words in the vocabulary gives total matches. This handles repeated words correctly (e.g., 'the' appearing twice can match twice if both texts have it twice).",
+        "examples": [
+          "Reference: 'the cat sat' → Tokens: ['the', 'cat', 'sat'], Candidate: 'the dog sat' → Tokens: ['the', 'dog', 'sat'], Matches: {'the', 'sat'}, |M| = 2",
+          "Reference: 'rain rain go away' → ['rain', 'rain', 'go', 'away'], Candidate: 'rain go' → ['rain', 'go'], Matches considering frequency: min(2,1) for 'rain' + min(1,1) for 'go' = 1 + 1 = 2"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Multiset Intersection",
+          "latex": "$|M| = \\sum_{w \\in V} \\min(\\text{count}_R(w), \\text{count}_C(w))$",
+          "description": "Count matching unigrams accounting for word frequency"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that tokenizes two strings (splitting by whitespace, converting to lowercase) and counts the number of matching unigrams accounting for word frequency.",
+        "function_signature": "def count_unigram_matches(reference: str, candidate: str) -> int:",
+        "starter_code": "from collections import Counter\n\ndef count_unigram_matches(reference: str, candidate: str) -> int:\n    # Tokenize both strings (split by whitespace, lowercase)\n    # Count matching unigrams using multiset intersection\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "count_unigram_matches('the cat sat', 'the dog sat')",
+            "expected": "2",
+            "explanation": "Matches: 'the' and 'sat'"
+          },
+          {
+            "input": "count_unigram_matches('rain rain go away', 'rain go')",
+            "expected": "2",
+            "explanation": "min(2,1) for 'rain' + min(1,1) for 'go' = 2 total matches"
+          },
+          {
+            "input": "count_unigram_matches('The Quick Brown Fox', 'the quick brown fox')",
+            "expected": "4",
+            "explanation": "Case-insensitive matching: all 4 words match"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using set intersection instead of multiset intersection (ignores word frequency)",
+        "Forgetting case-insensitive comparison",
+        "Not handling punctuation or special characters",
+        "Counting unique matches instead of total matches"
+      ],
+      "hint": "Python's Counter class provides efficient multiset operations. The & operator performs multiset intersection.",
+      "references": [
+        "Multiset theory",
+        "String tokenization methods",
+        "Python Counter documentation"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Precision and Recall in Information Retrieval",
+      "relation_to_problem": "METEOR score uses precision (matching accuracy from candidate's perspective) and recall (matching coverage from reference's perspective) to quantify translation quality before applying penalties.",
+      "prerequisites": [
+        "Set operations",
+        "Ratio and proportion",
+        "Basic probability"
+      ],
+      "learning_objectives": [
+        "Define precision and recall formally in the context of text matching",
+        "Understand the complementary nature of precision and recall",
+        "Compute precision and recall from match counts"
+      ],
+      "math_content": {
+        "definition": "Given a reference text with $|R|$ tokens, a candidate text with $|C|$ tokens, and $|M|$ matching tokens: **Precision** is $P = \\frac{|M|}{|C|}$, the fraction of candidate tokens that match the reference. **Recall** is $R = \\frac{|M|}{|R|}$, the fraction of reference tokens covered by the candidate.",
+        "notation": "$P \\in [0,1]$ = precision, $R \\in [0,1]$ = recall, $|M|$ = matches, $|R|$ = reference length, $|C|$ = candidate length",
+        "theorem": "**Boundary Conditions**: (1) If $|M| = 0$, then $P = R = 0$. (2) If $|M| = |C| = |R|$, then $P = R = 1$ (perfect match). (3) $P = 1$ if and only if every candidate token matches (no false positives). (4) $R = 1$ if and only if every reference token is matched (no false negatives).",
+        "proof_sketch": "From definitions: $P = \\frac{|M|}{|C|} = 1 \\iff |M| = |C| \\iff$ all candidate tokens match. Similarly, $R = \\frac{|M|}{|R|} = 1 \\iff |M| = |R| \\iff$ all reference tokens are matched. When $|M| = 0$, both fractions evaluate to 0.",
+        "examples": [
+          "Reference: 'the cat sat' (|R|=3), Candidate: 'the dog sat' (|C|=3), Matches: 2. Then P = 2/3 ≈ 0.667, R = 2/3 ≈ 0.667",
+          "Reference: 'the cat sat' (|R|=3), Candidate: 'the cat sat on the mat' (|C|=6), Matches: 3. Then P = 3/6 = 0.5 (low precision, many extra words), R = 3/3 = 1.0 (perfect recall, all reference words covered)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Precision",
+          "latex": "$P = \\frac{|M|}{|C|}$",
+          "description": "Fraction of candidate tokens that are correct (measures false positive rate)"
+        },
+        {
+          "name": "Recall",
+          "latex": "$R = \\frac{|M|}{|R|}$",
+          "description": "Fraction of reference tokens that are found (measures false negative rate)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes match count, reference length, and candidate length, then returns both precision and recall as a tuple of floats rounded to 3 decimal places.",
+        "function_signature": "def calculate_precision_recall(matches: int, reference_length: int, candidate_length: int) -> tuple:",
+        "starter_code": "def calculate_precision_recall(matches: int, reference_length: int, candidate_length: int) -> tuple:\n    # Calculate precision = matches / candidate_length\n    # Calculate recall = matches / reference_length\n    # Return (precision, recall) rounded to 3 decimals\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_precision_recall(2, 3, 3)",
+            "expected": "(0.667, 0.667)",
+            "explanation": "Equal lengths with 2/3 matches gives same precision and recall"
+          },
+          {
+            "input": "calculate_precision_recall(3, 3, 6)",
+            "expected": "(0.5, 1.0)",
+            "explanation": "All reference words found (R=1.0) but candidate has extras (P=0.5)"
+          },
+          {
+            "input": "calculate_precision_recall(0, 5, 5)",
+            "expected": "(0.0, 0.0)",
+            "explanation": "No matches results in zero precision and recall"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing precision and recall definitions (which denominator is which)",
+        "Not handling division by zero when lengths are zero",
+        "Rounding incorrectly or at wrong precision",
+        "Forgetting that precision and recall are independent metrics measuring different aspects"
+      ],
+      "hint": "Precision focuses on the candidate (denominator |C|), recall focuses on the reference (denominator |R|). Both use the same numerator |M|.",
+      "references": [
+        "Information retrieval metrics",
+        "Confusion matrix",
+        "Type I and Type II errors"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Harmonic Mean and Weighted F-measure",
+      "relation_to_problem": "METEOR combines precision and recall using a weighted harmonic mean (F-mean) that allows tuning the relative importance of precision vs recall through parameter α.",
+      "prerequisites": [
+        "Arithmetic and geometric means",
+        "Weighted averages",
+        "Harmonic mean properties"
+      ],
+      "learning_objectives": [
+        "Understand why harmonic mean is preferred over arithmetic mean for rates",
+        "Derive the weighted F-measure formula from harmonic mean definition",
+        "Interpret the effect of weight parameter α on balancing precision and recall"
+      ],
+      "math_content": {
+        "definition": "The **weighted F-measure** (F-mean) combines precision $P$ and recall $R$ using a weighted harmonic mean: $F_{\\alpha} = \\frac{P \\cdot R}{\\alpha \\cdot P + (1-\\alpha) \\cdot R}$ where $\\alpha \\in [0,1]$ controls the relative weight given to precision versus recall.",
+        "notation": "$F_{\\alpha}$ = weighted F-measure, $\\alpha$ = precision weight parameter (typically 0.9 for METEOR), $P$ = precision, $R$ = recall",
+        "theorem": "**Properties of F-measure**: (1) $F_{\\alpha} \\leq \\min(P, R)$ (harmonic mean is always less than or equal to the minimum). (2) When $\\alpha = 0.5$, $F_{0.5} = \\frac{2PR}{P+R}$ is the standard F1-score. (3) As $\\alpha \\to 1$, $F_{\\alpha} \\to R$ (recall dominates). (4) As $\\alpha \\to 0$, $F_{\\alpha} \\to P$ (precision dominates). (5) If $P = R$, then $F_{\\alpha} = P = R$ for any $\\alpha$.",
+        "proof_sketch": "For property (1): The harmonic mean $H$ of two positive numbers $a, b$ satisfies $H = \\frac{2ab}{a+b} \\leq \\min(a,b)$ because $2ab \\leq a \\cdot \\min(a,b) + b \\cdot \\min(a,b)$. For property (5): When $P = R$, substituting into the formula: $F_{\\alpha} = \\frac{P \\cdot P}{\\alpha P + (1-\\alpha)P} = \\frac{P^2}{P(\\alpha + 1 - \\alpha)} = \\frac{P^2}{P} = P$.",
+        "examples": [
+          "If P = 0.8, R = 0.6, α = 0.9: $F_{0.9} = \\frac{0.8 \\times 0.6}{0.9 \\times 0.8 + 0.1 \\times 0.6} = \\frac{0.48}{0.72 + 0.06} = \\frac{0.48}{0.78} \\approx 0.615$",
+          "If P = 0.778, R = 0.778, α = 0.9: $F_{0.9} = \\frac{0.778 \\times 0.778}{0.9 \\times 0.778 + 0.1 \\times 0.778} = \\frac{0.605}{0.778} \\approx 0.778$ (confirms property 5)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Weighted F-measure",
+          "latex": "$F_{\\alpha} = \\frac{P \\cdot R}{\\alpha \\cdot P + (1-\\alpha) \\cdot R}$",
+          "description": "Weighted harmonic mean of precision and recall, use when rates need balancing"
+        },
+        {
+          "name": "Standard F1-Score",
+          "latex": "$F_1 = \\frac{2PR}{P+R}$",
+          "description": "Special case when α = 0.5 (equal weight to precision and recall)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the weighted F-measure given precision, recall, and alpha parameter. Return result rounded to 3 decimal places. Handle edge case when both precision and recall are 0 (return 0).",
+        "function_signature": "def calculate_f_mean(precision: float, recall: float, alpha: float = 0.9) -> float:",
+        "starter_code": "def calculate_f_mean(precision: float, recall: float, alpha: float = 0.9) -> float:\n    # Handle edge case: if precision and recall are both 0, return 0\n    # Calculate F_mean = (precision * recall) / (alpha * precision + (1-alpha) * recall)\n    # Round to 3 decimal places\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_f_mean(0.778, 0.778, 0.9)",
+            "expected": "0.778",
+            "explanation": "When P = R, F-mean equals that value regardless of alpha"
+          },
+          {
+            "input": "calculate_f_mean(0.8, 0.6, 0.9)",
+            "expected": "0.615",
+            "explanation": "Alpha=0.9 gives more weight to precision in the harmonic mean"
+          },
+          {
+            "input": "calculate_f_mean(1.0, 0.5, 0.5)",
+            "expected": "0.667",
+            "explanation": "Standard F1 score: 2*1.0*0.5/(1.0+0.5) = 1.0/1.5 = 0.667"
+          },
+          {
+            "input": "calculate_f_mean(0.0, 0.0, 0.9)",
+            "expected": "0.0",
+            "explanation": "Edge case: no matches means F-mean is 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using arithmetic mean (P+R)/2 instead of harmonic mean (wrong for averaging rates)",
+        "Confusing alpha weight direction (alpha weights precision, not recall)",
+        "Not handling division by zero when both P and R are 0",
+        "Incorrect formula: using α*(P+R) in denominator instead of separate weights"
+      ],
+      "hint": "The harmonic mean penalizes extreme imbalances between precision and recall. Verify your formula by checking that when P=R, the result equals P.",
+      "references": [
+        "Harmonic mean vs arithmetic mean",
+        "F-score in machine learning",
+        "Weighted averages"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Sequence Chunking and Fragmentation Analysis",
+      "relation_to_problem": "METEOR penalizes poor word order by counting chunks (contiguous matched sequences). Fewer chunks indicate better preserved word order, which is crucial for translation quality.",
+      "prerequisites": [
+        "Sequence analysis",
+        "Contiguous subsequences",
+        "Indexing and mapping"
+      ],
+      "learning_objectives": [
+        "Identify contiguous matched word sequences between two texts",
+        "Understand fragmentation as a measure of word order preservation",
+        "Implement chunk counting algorithm with position tracking"
+      ],
+      "math_content": {
+        "definition": "A **chunk** is a maximal contiguous subsequence of matched words that appear in the same relative order in both reference and candidate. Formally, let $\\phi: C \\to R$ be a mapping from candidate positions to reference positions for matched words. Positions $i, i+1, \\ldots, i+k$ in the candidate form a chunk if they are consecutive matched positions with $\\phi(i) < \\phi(i+1) < \\cdots < \\phi(i+k)$ (monotonically increasing reference positions).",
+        "notation": "$\\chi$ = number of chunks, $|M|$ = total matches, $\\phi(i)$ = reference position of candidate word at position $i$",
+        "theorem": "**Chunk Bounds**: For $|M| > 0$ matches, $1 \\leq \\chi \\leq |M|$. The minimum $\\chi = 1$ occurs when all matches form a single contiguous sequence (perfect order preservation). The maximum $\\chi = |M|$ occurs when no two matched words are adjacent in the candidate (maximum fragmentation).",
+        "proof_sketch": "Lower bound: At least one chunk must exist if there are matches. Upper bound: Each individual match forms its own chunk in worst case (no adjacencies). A chunk boundary occurs when consecutive candidate positions $i, i+1$ are both matched but $\\phi(i+1) \\leq \\phi(i)$ (non-increasing) or when position $i$ is matched but $i+1$ is not matched.",
+        "examples": [
+          "Reference: ['quick', 'brown', 'fox', 'jumps', 'over', 'lazy', 'dog'] (positions 0-6), Candidate: ['quick', 'brown', 'fox', 'jumps', 'over', 'lazy', 'dog']. Mapping: φ(0)=0, φ(1)=1, φ(2)=2, φ(3)=3, φ(4)=4, φ(5)=5, φ(6)=6. All positions consecutive with increasing φ values → 1 chunk",
+          "Reference: ['the', 'cat', 'sat', 'on', 'mat'], Candidate: ['cat', 'the', 'on', 'sat']. Matches: cat(φ=1), the(φ=0), on(φ=3), sat(φ=2). Chunk 1: 'cat' (φ decreases next). Chunk 2: 'the' (φ increases). Chunk 3: 'on' (φ decreases next). Chunk 4: 'sat' → 4 chunks (maximum fragmentation)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Fragmentation Ratio",
+          "latex": "$f = \\frac{\\chi}{|M|}$",
+          "description": "Ratio of chunks to matches, ranges from 1/|M| (best order) to 1 (worst order)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that counts the number of chunks given two tokenized lists. A chunk is a contiguous sequence of matched words appearing in the same order. Use case-insensitive matching.",
+        "function_signature": "def count_chunks(reference_tokens: list, candidate_tokens: list) -> int:",
+        "starter_code": "def count_chunks(reference_tokens: list, candidate_tokens: list) -> int:\n    # Convert both lists to lowercase for matching\n    # For each candidate token, find its position in reference (if matched)\n    # Count chunks: start new chunk when reference position decreases or match breaks\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "count_chunks(['quick', 'brown', 'fox', 'jumps'], ['quick', 'brown', 'fox', 'jumps'])",
+            "expected": "1",
+            "explanation": "Perfect order preservation: all matched words form one contiguous sequence"
+          },
+          {
+            "input": "count_chunks(['quick', 'brown', 'fox', 'jumps', 'over', 'lazy', 'dog'], ['a', 'quick', 'brown', 'fox', 'jumps', 'over', 'a', 'lazy', 'dog'])",
+            "expected": "3",
+            "explanation": "Chunks: ['quick','brown','fox'], ['jumps','over'], ['lazy','dog'] (separated by 'a')"
+          },
+          {
+            "input": "count_chunks(['the', 'cat', 'sat'], ['sat', 'cat', 'the'])",
+            "expected": "3",
+            "explanation": "Completely reversed order: each word is its own chunk"
+          },
+          {
+            "input": "count_chunks(['rain', 'falls', 'gently'], ['gentle', 'drops'])",
+            "expected": "0",
+            "explanation": "No exact matches (gently vs gentle), so 0 chunks"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Counting only matched words instead of contiguous sequences",
+        "Not tracking reference positions to detect order reversals",
+        "Forgetting that unmatched words break chunk continuity",
+        "Handling repeated words incorrectly (need to track which occurrence)",
+        "Not implementing case-insensitive comparison"
+      ],
+      "hint": "Build a mapping from candidate positions to reference positions for matched words. A new chunk starts when the reference position doesn't increase or when there's a gap in candidate positions.",
+      "references": [
+        "Longest increasing subsequence",
+        "Edit distance and alignment",
+        "Sequence similarity metrics"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Polynomial Penalty Functions",
+      "relation_to_problem": "METEOR applies a fragmentation penalty using the formula Penalty = γ(χ/|M|)^β to reduce the score when word order is poorly preserved, with β controlling penalty steepness.",
+      "prerequisites": [
+        "Polynomial functions",
+        "Exponentiation",
+        "Function composition"
+      ],
+      "learning_objectives": [
+        "Understand how polynomial penalties model quality degradation",
+        "Analyze the effect of exponent β on penalty curve steepness",
+        "Implement parameterized penalty calculation"
+      ],
+      "math_content": {
+        "definition": "The **fragmentation penalty** in METEOR is defined as $\\text{Penalty} = \\gamma \\cdot \\left(\\frac{\\chi}{|M|}\\right)^{\\beta}$ where $\\chi$ is the number of chunks, $|M|$ is the number of matches, $\\beta > 0$ controls the penalty curve shape, and $\\gamma \\in [0,1]$ is the maximum penalty cap.",
+        "notation": "$\\text{Penalty} \\in [0, \\gamma]$, $\\chi$ = chunk count, $|M|$ = match count, $\\beta$ = penalty exponent (typically 3), $\\gamma$ = penalty cap (typically 0.5)",
+        "theorem": "**Penalty Properties**: (1) $\\text{Penalty} \\in [\\gamma/|M|^{\\beta}, \\gamma]$ when $|M| > 0$. (2) Minimum penalty $\\gamma/|M|^{\\beta}$ occurs when $\\chi = 1$ (perfect order). (3) Maximum penalty $\\gamma$ occurs when $\\chi = |M|$ (maximum fragmentation). (4) For fixed $\\chi/|M|$, increasing $\\beta$ increases the penalty (steeper curve). (5) The penalty is a monotonically increasing function of the fragmentation ratio $\\chi/|M|$.",
+        "proof_sketch": "Since $1 \\leq \\chi \\leq |M|$, we have $1/|M| \\leq \\chi/|M| \\leq 1$. Applying the power function: $(1/|M|)^{\\beta} \\leq (\\chi/|M|)^{\\beta} \\leq 1$. Multiplying by $\\gamma$: $\\gamma/|M|^{\\beta} \\leq \\text{Penalty} \\leq \\gamma$. Monotonicity follows from the fact that $f(x) = x^{\\beta}$ is monotonically increasing for $x > 0, \\beta > 0$.",
+        "examples": [
+          "χ=1, |M|=7, β=3, γ=0.5: Penalty = 0.5 × (1/7)³ = 0.5 × 0.00291 ≈ 0.00146 (very small penalty for good order)",
+          "χ=3, |M|=7, β=3, γ=0.5: Penalty = 0.5 × (3/7)³ = 0.5 × 0.0789 ≈ 0.0395 (moderate penalty)",
+          "χ=7, |M|=7, β=3, γ=0.5: Penalty = 0.5 × (7/7)³ = 0.5 × 1 = 0.5 (maximum penalty for complete fragmentation)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "METEOR Fragmentation Penalty",
+          "latex": "$\\text{Penalty} = \\gamma \\cdot \\left(\\frac{\\chi}{|M|}\\right)^{\\beta}$",
+          "description": "Polynomial penalty that increases with fragmentation ratio, use β=3 and γ=0.5 for standard METEOR"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the fragmentation penalty given chunk count, match count, and parameters beta and gamma. Return result rounded to 6 decimal places. Handle edge case when matches=0 (return 0).",
+        "function_signature": "def calculate_penalty(chunks: int, matches: int, beta: float = 3.0, gamma: float = 0.5) -> float:",
+        "starter_code": "def calculate_penalty(chunks: int, matches: int, beta: float = 3.0, gamma: float = 0.5) -> float:\n    # Handle edge case: if matches = 0, return 0\n    # Calculate fragmentation ratio: chunks / matches\n    # Apply penalty formula: gamma * (fragmentation_ratio)^beta\n    # Round to 6 decimal places\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_penalty(1, 7, 3.0, 0.5)",
+            "expected": "0.001458",
+            "explanation": "Best case: single chunk means minimal penalty"
+          },
+          {
+            "input": "calculate_penalty(3, 7, 3.0, 0.5)",
+            "expected": "0.039648",
+            "explanation": "Moderate fragmentation: 0.5 * (3/7)^3 ≈ 0.0396"
+          },
+          {
+            "input": "calculate_penalty(7, 7, 3.0, 0.5)",
+            "expected": "0.5",
+            "explanation": "Maximum fragmentation: each match is its own chunk, penalty hits cap"
+          },
+          {
+            "input": "calculate_penalty(0, 0, 3.0, 0.5)",
+            "expected": "0.0",
+            "explanation": "Edge case: no matches means no penalty"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing (chunks * matches)^beta instead of (chunks/matches)^beta",
+        "Forgetting to multiply by gamma",
+        "Not handling the edge case when matches = 0",
+        "Using integer division instead of float division for the ratio",
+        "Incorrect rounding or precision"
+      ],
+      "hint": "The penalty is smallest when chunks=1 (one contiguous match sequence) and largest when chunks=matches (every match isolated). Test boundary cases first.",
+      "references": [
+        "Polynomial functions",
+        "Curve fitting and smoothing",
+        "Penalty methods in optimization"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Composite Scoring: Integrating Quality Metrics with Penalties",
+      "relation_to_problem": "The final METEOR score multiplies the F-mean (base quality) by (1 - Penalty) to integrate content similarity with word order quality, producing a unified translation evaluation score.",
+      "prerequisites": [
+        "Function composition",
+        "Metric normalization",
+        "All previous sub-quests"
+      ],
+      "learning_objectives": [
+        "Understand multiplicative penalty application in composite metrics",
+        "Analyze how penalty affects the final score across different scenarios",
+        "Synthesize all METEOR components into a coherent evaluation framework"
+      ],
+      "math_content": {
+        "definition": "The **METEOR score** is defined as $\\text{METEOR} = F_{\\alpha} \\cdot (1 - \\text{Penalty})$ where $F_{\\alpha}$ is the weighted F-measure (base content similarity) and $\\text{Penalty}$ is the fragmentation penalty. This multiplicative composition ensures that both content matching and word order quality affect the final score.",
+        "notation": "$\\text{METEOR} \\in [0, 1]$, $F_{\\alpha}$ = F-mean from precision and recall, $\\text{Penalty} = \\gamma(\\chi/|M|)^{\\beta}$",
+        "theorem": "**METEOR Score Properties**: (1) $0 \\leq \\text{METEOR} \\leq F_{\\alpha} \\leq 1$ (penalty can only reduce score). (2) $\\text{METEOR} = F_{\\alpha}$ when $\\chi = 1$ and $|M|$ is large (perfect order, minimal penalty). (3) $\\text{METEOR} = 0$ when $|M| = 0$ (no matches). (4) The score is jointly monotonic in content matching (F-mean) and word order (chunks). (5) For fixed F-mean, lower chunk count yields higher METEOR score.",
+        "proof_sketch": "Since $0 \\leq \\text{Penalty} \\leq \\gamma < 1$, we have $0 < 1 - \\text{Penalty} \\leq 1$. Therefore $\\text{METEOR} = F_{\\alpha} \\cdot (1 - \\text{Penalty}) \\leq F_{\\alpha} \\cdot 1 = F_{\\alpha}$. When $|M| = 0$, both $F_{\\alpha} = 0$ and $\\text{Penalty} = 0$, giving $\\text{METEOR} = 0$. Monotonicity follows from the fact that both factors are monotonic in their respective components.",
+        "examples": [
+          "F-mean = 0.779, Penalty = 0.039: METEOR = 0.779 × (1 - 0.039) = 0.779 × 0.961 ≈ 0.749 (the worked example from the problem)",
+          "F-mean = 0.8, Penalty = 0.1: METEOR = 0.8 × 0.9 = 0.72 (higher penalty reduces score by 10%)",
+          "F-mean = 0.6, Penalty = 0.001: METEOR = 0.6 × 0.999 ≈ 0.599 (near-perfect order, minimal penalty effect)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "METEOR Score",
+          "latex": "$\\text{METEOR} = F_{\\alpha} \\cdot (1 - \\text{Penalty})$",
+          "description": "Final translation quality score combining content similarity and word order"
+        },
+        {
+          "name": "Expanded METEOR",
+          "latex": "$\\text{METEOR} = \\frac{P \\cdot R}{\\alpha P + (1-\\alpha)R} \\cdot \\left(1 - \\gamma\\left(\\frac{\\chi}{|M|}\\right)^{\\beta}\\right)$",
+          "description": "Full formula showing all components from tokenization to final score"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the final METEOR score by combining F-mean and penalty. Given F-mean and penalty values, apply the formula METEOR = F_mean × (1 - Penalty). Return result rounded to 3 decimal places.",
+        "function_signature": "def compute_meteor_score(f_mean: float, penalty: float) -> float:",
+        "starter_code": "def compute_meteor_score(f_mean: float, penalty: float) -> float:\n    # Apply formula: METEOR = f_mean * (1 - penalty)\n    # Round to 3 decimal places\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_meteor_score(0.779, 0.039)",
+            "expected": "0.749",
+            "explanation": "Example from problem: 0.779 × (1 - 0.039) = 0.779 × 0.961 ≈ 0.749"
+          },
+          {
+            "input": "compute_meteor_score(0.8, 0.1)",
+            "expected": "0.72",
+            "explanation": "Higher penalty (10%) reduces score: 0.8 × 0.9 = 0.72"
+          },
+          {
+            "input": "compute_meteor_score(1.0, 0.0)",
+            "expected": "1.0",
+            "explanation": "Perfect score: perfect F-mean with no penalty"
+          },
+          {
+            "input": "compute_meteor_score(0.6, 0.5)",
+            "expected": "0.3",
+            "explanation": "Maximum penalty (50%) halves the score: 0.6 × 0.5 = 0.3"
+          },
+          {
+            "input": "compute_meteor_score(0.0, 0.0)",
+            "expected": "0.0",
+            "explanation": "No matches results in zero METEOR score"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Adding penalty instead of subtracting from 1: F_mean × penalty is wrong",
+        "Computing F_mean - penalty instead of multiplicative composition",
+        "Not understanding that penalty reduces the score (must subtract from 1 first)",
+        "Forgetting to handle edge cases (zero matches)",
+        "Incorrect order of operations or parentheses"
+      ],
+      "hint": "The penalty is applied multiplicatively through the factor (1 - Penalty). This means a penalty of 0.1 reduces the score by 10%, not to 0.1. Verify with boundary cases: penalty=0 should return F-mean unchanged.",
+      "references": [
+        "Composite metric design",
+        "Multiplicative vs additive penalties",
+        "Evaluation metric theory in NLP"
+      ]
+    }
+  ]
+}

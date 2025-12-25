@@ -1,0 +1,543 @@
+{
+  "problem_id": 211,
+  "title": "Two-Sample T-Test Implementation",
+  "category": "Statistics",
+  "difficulty": "medium",
+  "description": "Implement a two-sample independent t-test (Welch's t-test) to determine if two samples have significantly different means. The test should compute the t-statistic, p-value using the Welch-Satterthwaite degrees of freedom, make a decision to reject or fail to reject the null hypothesis, and calculate Cohen's d effect size. Welch's t-test does not assume equal variances between groups. Given two samples and a significance level alpha, return a dictionary with the test results.",
+  "example": {
+    "input": "sample1=[12, 14, 13, 15, 14], sample2=[8, 9, 10, 9, 11], alpha=0.05",
+    "output": "{'t_statistic': 5.8244, 'p_value': 0.000394, 'degrees_of_freedom': 8.0, 'reject_null': True, 'cohens_d': 3.6836}",
+    "reasoning": "Mean₁=13.6, Mean₂=9.4, Var₁=1.3, Var₂=1.3. SE = sqrt(1.3/5 + 1.3/5) = 0.721. t = (13.6-9.4)/0.721 = 5.824. df = 8.0. Two-tailed p = 0.000394. Since p < 0.05, reject null hypothesis. Cohen's d = 4.2/1.14 = 3.684 (very large effect)."
+  },
+  "starter_code": "import numpy as np\nfrom scipy import stats\n\ndef two_sample_t_test(sample1: list[float], sample2: list[float], \n                      alpha: float = 0.05) -> dict:\n\t\"\"\"\n\tPerform a two-sample independent t-test (Welch's t-test).\n\t\n\tArgs:\n\t\tsample1: First sample data\n\t\tsample2: Second sample data\n\t\talpha: Significance level (default 0.05)\n\t\n\tReturns:\n\t\tDictionary containing:\n\t\t- t_statistic: The calculated t-statistic\n\t\t- p_value: Two-tailed p-value\n\t\t- degrees_of_freedom: Degrees of freedom (Welch-Satterthwaite)\n\t\t- reject_null: Boolean, whether to reject null hypothesis\n\t\t- cohens_d: Effect size (Cohen's d)\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Sample Statistics: Mean and Variance Computation",
+      "relation_to_problem": "Computing sample means and variances is the foundational step in Welch's t-test, as these statistics are required to calculate the t-statistic, degrees of freedom, and effect size.",
+      "prerequisites": [
+        "Basic Python",
+        "Understanding of lists and arrays",
+        "Summation notation"
+      ],
+      "learning_objectives": [
+        "Compute the sample mean using summation formulas",
+        "Calculate unbiased sample variance using Bessel's correction (n-1)",
+        "Understand why we use n-1 instead of n for sample variance",
+        "Implement efficient computation without external libraries"
+      ],
+      "math_content": {
+        "definition": "Given a sample of $n$ observations $X = \\{x_1, x_2, \\ldots, x_n\\}$ from a population, the **sample mean** $\\bar{X}$ is the arithmetic average: $$\\bar{X} = \\frac{1}{n}\\sum_{i=1}^{n} x_i$$ The **sample variance** $s^2$ is the average squared deviation from the mean, using Bessel's correction: $$s^2 = \\frac{1}{n-1}\\sum_{i=1}^{n} (x_i - \\bar{X})^2$$",
+        "notation": "$n$ = sample size, $x_i$ = individual observation, $\\bar{X}$ = sample mean, $s^2$ = sample variance, $s$ = sample standard deviation = $\\sqrt{s^2}$",
+        "theorem": "**Bessel's Correction Theorem**: The sample variance with denominator $(n-1)$ is an unbiased estimator of the population variance $\\sigma^2$, meaning $E[s^2] = \\sigma^2$. Using $n$ instead of $(n-1)$ yields a biased estimator that systematically underestimates the true variance.",
+        "proof_sketch": "When we use the sample mean $\\bar{X}$ instead of the true population mean $\\mu$, we introduce dependency between deviations. The sum $\\sum(x_i - \\bar{X})^2$ is minimized at $\\bar{X}$, making it smaller than $\\sum(x_i - \\mu)^2$. We lose one degree of freedom because once we know $(n-1)$ deviations and $\\bar{X}$, the $n$-th deviation is determined. Dividing by $(n-1)$ compensates for this bias.",
+        "examples": [
+          "Sample: $[12, 14, 13, 15, 14]$. Mean: $\\bar{X} = (12+14+13+15+14)/5 = 13.6$. Variance: $s^2 = [(12-13.6)^2 + (14-13.6)^2 + (13-13.6)^2 + (15-13.6)^2 + (14-13.6)^2]/(5-1) = [2.56 + 0.16 + 0.36 + 1.96 + 0.16]/4 = 5.2/4 = 1.3$",
+          "Sample: $[8, 9, 10, 9, 11]$. Mean: $\\bar{X} = 47/5 = 9.4$. Variance: $s^2 = [(8-9.4)^2 + (9-9.4)^2 + (10-9.4)^2 + (9-9.4)^2 + (11-9.4)^2]/4 = [1.96 + 0.16 + 0.36 + 0.16 + 2.56]/4 = 5.2/4 = 1.3$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sample Mean",
+          "latex": "$\\bar{X} = \\frac{1}{n}\\sum_{i=1}^{n} x_i$",
+          "description": "Arithmetic average of all observations; central tendency measure"
+        },
+        {
+          "name": "Sample Variance (Unbiased)",
+          "latex": "$s^2 = \\frac{1}{n-1}\\sum_{i=1}^{n} (x_i - \\bar{X})^2$",
+          "description": "Measure of spread using Bessel's correction; foundation for all subsequent calculations"
+        },
+        {
+          "name": "Computational Formula for Variance",
+          "latex": "$s^2 = \\frac{1}{n-1}\\left(\\sum_{i=1}^{n} x_i^2 - n\\bar{X}^2\\right)$",
+          "description": "Efficient one-pass computation avoiding repeated mean subtraction"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes both the sample mean and unbiased sample variance for a given dataset. This is the first building block for the t-test, as we need these statistics for both samples.",
+        "function_signature": "def compute_sample_statistics(sample: list[float]) -> tuple[float, float]:",
+        "starter_code": "def compute_sample_statistics(sample: list[float]) -> tuple[float, float]:\n    \"\"\"\n    Calculate sample mean and unbiased variance.\n    \n    Args:\n        sample: List of numerical observations\n    \n    Returns:\n        Tuple of (mean, variance)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_sample_statistics([12, 14, 13, 15, 14])",
+            "expected": "(13.6, 1.3)",
+            "explanation": "Mean = 68/5 = 13.6. Variance = 5.2/4 = 1.3 using n-1=4 in denominator"
+          },
+          {
+            "input": "compute_sample_statistics([8, 9, 10, 9, 11])",
+            "expected": "(9.4, 1.3)",
+            "explanation": "Mean = 47/5 = 9.4. Variance = 5.2/4 = 1.3"
+          },
+          {
+            "input": "compute_sample_statistics([100])",
+            "expected": "(100.0, undefined or NaN)",
+            "explanation": "Single observation: mean is 100, but variance undefined (division by zero with n-1=0)"
+          },
+          {
+            "input": "compute_sample_statistics([5, 5, 5, 5])",
+            "expected": "(5.0, 0.0)",
+            "explanation": "All identical values: mean is 5, variance is 0 (no spread)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using n instead of (n-1) in variance denominator, resulting in biased estimates",
+        "Not handling edge case of n=1 sample (variance is undefined)",
+        "Numerical instability with the computational formula when numbers are large",
+        "Integer division issues in Python 2 style code (use float division)",
+        "Not squaring the deviations before summing"
+      ],
+      "hint": "First calculate the mean with a single pass through the data. Then make a second pass to calculate squared deviations. Remember Bessel's correction!",
+      "references": [
+        "Degrees of freedom in statistics",
+        "Bias-variance tradeoff in estimation",
+        "Method of moments estimators",
+        "Computational numerical stability"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Standard Error of the Difference Between Means",
+      "relation_to_problem": "The standard error quantifies the uncertainty in the difference between two sample means. It forms the denominator of the t-statistic and is essential for Welch's t-test, which accounts for unequal variances.",
+      "prerequisites": [
+        "Sample mean and variance computation",
+        "Understanding of sampling distributions",
+        "Properties of variance for independent random variables"
+      ],
+      "learning_objectives": [
+        "Understand why variances add when computing variance of differences",
+        "Calculate standard error for independent samples with potentially unequal variances",
+        "Recognize the difference between pooled and unpooled standard error",
+        "Apply the formula for Welch's t-test standard error"
+      ],
+      "math_content": {
+        "definition": "The **standard error of the difference between means** measures the variability of $\\bar{X}_1 - \\bar{X}_2$ across repeated sampling. For two independent samples with sizes $n_1, n_2$ and variances $s_1^2, s_2^2$, Welch's standard error is: $$SE = \\sqrt{\\frac{s_1^2}{n_1} + \\frac{s_2^2}{n_2}}$$",
+        "notation": "$SE$ = standard error, $s_1^2, s_2^2$ = sample variances, $n_1, n_2$ = sample sizes, $\\bar{X}_1, \\bar{X}_2$ = sample means",
+        "theorem": "**Variance of Independent Differences**: If $X$ and $Y$ are independent random variables, then $\\text{Var}(X - Y) = \\text{Var}(X) + \\text{Var}(Y)$. For sample means, $\\text{Var}(\\bar{X}_1) = \\sigma_1^2/n_1$ and $\\text{Var}(\\bar{X}_2) = \\sigma_2^2/n_2$, so $\\text{Var}(\\bar{X}_1 - \\bar{X}_2) = \\sigma_1^2/n_1 + \\sigma_2^2/n_2$. The standard error is the square root of this variance, estimated using sample variances.",
+        "proof_sketch": "By the Central Limit Theorem, sample means are approximately normally distributed with variance $\\sigma^2/n$. For independent samples, the covariance $\\text{Cov}(\\bar{X}_1, \\bar{X}_2) = 0$. Using the variance formula $\\text{Var}(aX + bY) = a^2\\text{Var}(X) + b^2\\text{Var}(Y) + 2ab\\text{Cov}(X,Y)$, with $a=1, b=-1$, and zero covariance, we get $\\text{Var}(\\bar{X}_1 - \\bar{X}_2) = \\text{Var}(\\bar{X}_1) + \\text{Var}(\\bar{X}_2) = \\sigma_1^2/n_1 + \\sigma_2^2/n_2$.",
+        "examples": [
+          "Samples: $s_1^2 = 1.3, n_1 = 5$ and $s_2^2 = 1.3, n_2 = 5$. SE = $\\sqrt{1.3/5 + 1.3/5} = \\sqrt{0.26 + 0.26} = \\sqrt{0.52} = 0.721$",
+          "Unequal variances: $s_1^2 = 4.0, n_1 = 10$ and $s_2^2 = 1.0, n_2 = 20$. SE = $\\sqrt{4.0/10 + 1.0/20} = \\sqrt{0.4 + 0.05} = \\sqrt{0.45} = 0.671$. Notice how the larger variance (4.0) dominates even with fewer observations.",
+          "Large vs small sample: $s_1^2 = 2.0, n_1 = 100$ and $s_2^2 = 2.0, n_2 = 10$. SE = $\\sqrt{2.0/100 + 2.0/10} = \\sqrt{0.02 + 0.2} = \\sqrt{0.22} = 0.469$. The small sample contributes more to uncertainty."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Standard Error (Welch's)",
+          "latex": "$SE = \\sqrt{\\frac{s_1^2}{n_1} + \\frac{s_2^2}{n_2}}$",
+          "description": "Used in Welch's t-test; does not assume equal variances"
+        },
+        {
+          "name": "Variance of Difference",
+          "latex": "$\\text{Var}(\\bar{X}_1 - \\bar{X}_2) = \\frac{\\sigma_1^2}{n_1} + \\frac{\\sigma_2^2}{n_2}$",
+          "description": "Theoretical variance of the sampling distribution of the difference"
+        },
+        {
+          "name": "Pooled Standard Error (Student's)",
+          "latex": "$SE_{\\text{pooled}} = s_p\\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}}$ where $s_p^2 = \\frac{(n_1-1)s_1^2 + (n_2-1)s_2^2}{n_1+n_2-2}$",
+          "description": "Alternative formula assuming equal variances; NOT used in Welch's test"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the Welch's standard error given two samples' statistics. This will be used directly in the t-statistic calculation.",
+        "function_signature": "def calculate_standard_error(var1: float, n1: int, var2: float, n2: int) -> float:",
+        "starter_code": "def calculate_standard_error(var1: float, n1: int, var2: float, n2: int) -> float:\n    \"\"\"\n    Calculate Welch's standard error for difference between means.\n    \n    Args:\n        var1: Variance of first sample\n        n1: Size of first sample\n        var2: Variance of second sample\n        n2: Size of second sample\n    \n    Returns:\n        Standard error of the difference between means\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_standard_error(1.3, 5, 1.3, 5)",
+            "expected": "0.721",
+            "explanation": "Equal variances and sample sizes: SE = sqrt(1.3/5 + 1.3/5) = sqrt(0.52) ≈ 0.721"
+          },
+          {
+            "input": "calculate_standard_error(4.0, 10, 1.0, 20)",
+            "expected": "0.671",
+            "explanation": "Unequal variances: SE = sqrt(4.0/10 + 1.0/20) = sqrt(0.45) ≈ 0.671"
+          },
+          {
+            "input": "calculate_standard_error(2.0, 100, 2.0, 10)",
+            "expected": "0.469",
+            "explanation": "Different sample sizes with equal variances: small sample dominates uncertainty"
+          },
+          {
+            "input": "calculate_standard_error(0.0, 5, 0.0, 5)",
+            "expected": "0.0",
+            "explanation": "Zero variance in both samples yields zero standard error"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using pooled variance formula when implementing Welch's test (assumes equal variances)",
+        "Forgetting to take square root after summing variance terms",
+        "Dividing variances by (n-1) again when they're already sample variances",
+        "Not accounting for different sample sizes in interpretation",
+        "Confusing standard error with standard deviation"
+      ],
+      "hint": "The formula is straightforward: divide each variance by its sample size, add them, then take the square root. Each term represents the variance contribution from one sample.",
+      "references": [
+        "Central Limit Theorem",
+        "Properties of variance for sums and differences",
+        "Sampling distributions of means",
+        "Welch's approximation rationale"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "T-Statistic Calculation and Hypothesis Testing Framework",
+      "relation_to_problem": "The t-statistic is the core test statistic that quantifies how many standard errors the observed difference is from zero. It's compared against the t-distribution to determine statistical significance.",
+      "prerequisites": [
+        "Sample mean and variance computation",
+        "Standard error calculation",
+        "Understanding of null hypothesis testing",
+        "Basic probability concepts"
+      ],
+      "learning_objectives": [
+        "Calculate the t-statistic for the difference between two means",
+        "Understand the null hypothesis framework for two-sample tests",
+        "Interpret the t-statistic as a standardized effect measure",
+        "Recognize when the t-statistic indicates strong evidence against the null"
+      ],
+      "math_content": {
+        "definition": "The **t-statistic** measures how many standard errors the observed difference between sample means is from the hypothesized difference (usually zero): $$t = \\frac{(\\bar{X}_1 - \\bar{X}_2) - \\Delta_0}{SE}$$ where $\\Delta_0$ is the hypothesized difference under $H_0$ (typically 0), and $SE$ is the standard error of the difference.",
+        "notation": "$t$ = t-statistic, $\\bar{X}_1, \\bar{X}_2$ = sample means, $\\Delta_0$ = hypothesized difference (usually 0), $SE$ = standard error, $H_0$ = null hypothesis, $H_a$ = alternative hypothesis",
+        "theorem": "**Null Hypothesis Framework**: Under $H_0: \\mu_1 = \\mu_2$ (or $\\mu_1 - \\mu_2 = 0$), if assumptions hold, the t-statistic follows a t-distribution with appropriate degrees of freedom. Large absolute values of $t$ (e.g., $|t| > 2$ or $|t| > 3$) provide evidence against $H_0$, suggesting the population means differ. The t-distribution is symmetric and bell-shaped, approaching the standard normal distribution as degrees of freedom increase.",
+        "proof_sketch": "By the Central Limit Theorem, $\\bar{X}_1 - \\bar{X}_2$ is approximately normal with mean $\\mu_1 - \\mu_2$ and variance $\\sigma_1^2/n_1 + \\sigma_2^2/n_2$. Under $H_0$, the mean is zero. Standardizing by dividing by the standard error gives a standard normal if variances were known. Since we estimate variances from data, we introduce additional uncertainty, and the ratio follows a t-distribution rather than standard normal.",
+        "examples": [
+          "Sample 1: $\\bar{X}_1 = 13.6$, Sample 2: $\\bar{X}_2 = 9.4$, SE = 0.721. t = $(13.6 - 9.4) / 0.721 = 4.2 / 0.721 = 5.824$. This large t-value (> 3) strongly suggests means differ.",
+          "If $\\bar{X}_1 = 10.5$, $\\bar{X}_2 = 10.0$, SE = 0.5. t = $(10.5 - 10.0) / 0.5 = 1.0$. This small t-value provides weak evidence against $H_0$.",
+          "If $\\bar{X}_1 = 15.2$, $\\bar{X}_2 = 14.9$, SE = 1.5. t = $(15.2 - 14.9) / 1.5 = 0.2$. This tiny t-value suggests no meaningful difference."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "T-Statistic (Two-Sample)",
+          "latex": "$t = \\frac{\\bar{X}_1 - \\bar{X}_2}{SE}$",
+          "description": "Standardized measure of difference between means; larger absolute values indicate stronger evidence against H₀"
+        },
+        {
+          "name": "Null Hypothesis",
+          "latex": "$H_0: \\mu_1 = \\mu_2$ or equivalently $H_0: \\mu_1 - \\mu_2 = 0$",
+          "description": "Default assumption that population means are equal"
+        },
+        {
+          "name": "Alternative Hypothesis (Two-Tailed)",
+          "latex": "$H_a: \\mu_1 \\neq \\mu_2$",
+          "description": "Research hypothesis that means differ (direction unspecified)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the t-statistic given the means, variances, and sample sizes of two groups. This is the numerator-denominator ratio that forms the basis of hypothesis testing.",
+        "function_signature": "def calculate_t_statistic(mean1: float, mean2: float, var1: float, var2: float, n1: int, n2: int) -> float:",
+        "starter_code": "def calculate_t_statistic(mean1: float, mean2: float, var1: float, var2: float, \n                          n1: int, n2: int) -> float:\n    \"\"\"\n    Calculate t-statistic for two-sample test.\n    \n    Args:\n        mean1, mean2: Sample means\n        var1, var2: Sample variances\n        n1, n2: Sample sizes\n    \n    Returns:\n        T-statistic value\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_t_statistic(13.6, 9.4, 1.3, 1.3, 5, 5)",
+            "expected": "5.824",
+            "explanation": "Difference = 4.2, SE = 0.721, t = 4.2/0.721 = 5.824 (strong evidence)"
+          },
+          {
+            "input": "calculate_t_statistic(10.5, 10.0, 0.25, 0.25, 10, 10)",
+            "expected": "2.236",
+            "explanation": "Small difference with low variance yields moderate t-value"
+          },
+          {
+            "input": "calculate_t_statistic(20.0, 20.0, 4.0, 4.0, 15, 15)",
+            "expected": "0.0",
+            "explanation": "Identical means yield t = 0, indicating no evidence against H₀"
+          },
+          {
+            "input": "calculate_t_statistic(15.2, 14.9, 2.25, 2.25, 8, 8)",
+            "expected": "0.4",
+            "explanation": "Small difference relative to large SE yields small t-value"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to subtract the means in the numerator",
+        "Using standard deviation instead of standard error in denominator",
+        "Not taking absolute value when comparing to critical values for two-tailed tests",
+        "Confusing t-statistic with p-value (they are related but distinct)",
+        "Calculating standard error incorrectly by using pooled variance for Welch's test"
+      ],
+      "hint": "Combine your previous functions: calculate the difference between means, compute the standard error, then divide. The t-statistic tells you how unusual your observed difference is under the null hypothesis.",
+      "references": [
+        "T-distribution properties",
+        "Null hypothesis significance testing",
+        "Type I and Type II errors",
+        "Statistical power analysis"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Welch-Satterthwaite Degrees of Freedom Approximation",
+      "relation_to_problem": "Welch's t-test uses an adjusted degrees of freedom formula that accounts for unequal variances. This determines the shape of the t-distribution used for p-value calculation.",
+      "prerequisites": [
+        "Understanding of degrees of freedom concept",
+        "Sample variance computation",
+        "Knowledge of t-distribution family"
+      ],
+      "learning_objectives": [
+        "Calculate Welch-Satterthwaite degrees of freedom",
+        "Understand why adjusted df is needed when variances are unequal",
+        "Recognize that df is generally non-integer and between min(n₁-1, n₂-1) and n₁+n₂-2",
+        "Appreciate the impact of df on critical values and p-values"
+      ],
+      "math_content": {
+        "definition": "The **Welch-Satterthwaite degrees of freedom** is an approximation used when sample variances are unequal. It's calculated as: $$df = \\frac{\\left(\\frac{s_1^2}{n_1} + \\frac{s_2^2}{n_2}\\right)^2}{\\frac{(s_1^2/n_1)^2}{n_1-1} + \\frac{(s_2^2/n_2)^2}{n_2-1}}$$ This formula provides an effective degrees of freedom that accounts for the relative contributions of each sample's variance to the overall uncertainty.",
+        "notation": "$df$ = degrees of freedom, $s_1^2, s_2^2$ = sample variances, $n_1, n_2$ = sample sizes. The numerator is the square of the total variance contribution, and the denominator weights each sample's contribution by its df.",
+        "theorem": "**Satterthwaite's Approximation**: When combining independent variance estimates with different degrees of freedom, the distribution of the combined estimate can be approximated by a chi-square distribution (or t-distribution for means) with effective degrees of freedom given by the Welch-Satterthwaite formula. This approximation ensures valid inference even when population variances differ. Key properties: (1) $\\max(1, \\min(n_1-1, n_2-1)) \\leq df \\leq n_1 + n_2 - 2$, (2) df equals $n_1 + n_2 - 2$ when $s_1^2/n_1 = s_2^2/n_2$, (3) df approaches the smaller of $n_1-1$ or $n_2-1$ when one sample dominates uncertainty.",
+        "proof_sketch": "The Welch-Satterthwaite formula derives from approximating the distribution of a weighted sum of chi-square random variables. Each sample variance follows a scaled chi-square distribution. When we combine them with weights $w_i = s_i^2/n_i$, the resulting distribution is approximated by matching the first two moments (mean and variance) to a chi-square distribution with effective df. This yields the formula where the numerator represents total weighted variance squared, and the denominator sums individual variance contributions weighted by their degrees of freedom.",
+        "examples": [
+          "Equal variances and sizes: $s_1^2 = 1.3, n_1 = 5, s_2^2 = 1.3, n_2 = 5$. Numerator = $(0.26 + 0.26)^2 = 0.2704$. Denominator = $(0.26)^2/4 + (0.26)^2/4 = 0.0169 + 0.0169 = 0.0338$. df = $0.2704/0.0338 = 8.0$ (equals traditional $n_1 + n_2 - 2$).",
+          "Unequal variances: $s_1^2 = 4.0, n_1 = 10, s_2^2 = 1.0, n_2 = 20$. Numerator = $(0.4 + 0.05)^2 = 0.2025$. Denominator = $(0.4)^2/9 + (0.05)^2/19 = 0.01778 + 0.00013 = 0.01791$. df = $0.2025/0.01791 = 11.3$ (non-integer, closer to n₁-1 = 9 since s₁² is larger).",
+          "Extreme case: $s_1^2 = 10.0, n_1 = 5, s_2^2 = 0.1, n_2 = 50$. The large variance in small sample dominates, so df ≈ 4.1, close to $n_1 - 1 = 4$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Welch-Satterthwaite Degrees of Freedom",
+          "latex": "$df = \\frac{\\left(\\frac{s_1^2}{n_1} + \\frac{s_2^2}{n_2}\\right)^2}{\\frac{(s_1^2/n_1)^2}{n_1-1} + \\frac{(s_2^2/n_2)^2}{n_2-1}}$",
+          "description": "Effective degrees of freedom for Welch's t-test; accounts for unequal variances"
+        },
+        {
+          "name": "Traditional Degrees of Freedom",
+          "latex": "$df_{\\text{Student}} = n_1 + n_2 - 2$",
+          "description": "Used in Student's t-test assuming equal variances; NOT used in Welch's test"
+        },
+        {
+          "name": "Simplified Notation",
+          "latex": "$df = \\frac{(v_1 + v_2)^2}{\\frac{v_1^2}{n_1-1} + \\frac{v_2^2}{n_2-1}}$ where $v_i = s_i^2/n_i$",
+          "description": "More readable form using variance terms"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the Welch-Satterthwaite degrees of freedom calculation. This value determines which t-distribution to use for p-value computation and is a key distinguishing feature of Welch's test.",
+        "function_signature": "def calculate_welch_df(var1: float, n1: int, var2: float, n2: int) -> float:",
+        "starter_code": "def calculate_welch_df(var1: float, n1: int, var2: float, n2: int) -> float:\n    \"\"\"\n    Calculate Welch-Satterthwaite degrees of freedom.\n    \n    Args:\n        var1: Variance of first sample\n        n1: Size of first sample\n        var2: Variance of second sample\n        n2: Size of second sample\n    \n    Returns:\n        Degrees of freedom (typically non-integer)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_welch_df(1.3, 5, 1.3, 5)",
+            "expected": "8.0",
+            "explanation": "Equal variances and sizes yield traditional df = n₁ + n₂ - 2 = 8"
+          },
+          {
+            "input": "calculate_welch_df(4.0, 10, 1.0, 20)",
+            "expected": "11.3",
+            "explanation": "Unequal variances: larger variance in smaller sample pulls df toward 9"
+          },
+          {
+            "input": "calculate_welch_df(2.0, 15, 2.0, 25)",
+            "expected": "38.0",
+            "explanation": "Equal variances: df = 15 + 25 - 2 = 38"
+          },
+          {
+            "input": "calculate_welch_df(10.0, 5, 0.1, 50)",
+            "expected": "4.1",
+            "explanation": "Large variance in small sample dominates: df ≈ n₁ - 1 = 4"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using traditional df = n₁ + n₂ - 2 formula instead of Welch-Satterthwaite",
+        "Forgetting to square the numerator (it's the square of the sum of variance terms)",
+        "Not dividing denominator terms by (n-1) for each sample",
+        "Rounding df to nearest integer prematurely (keep as float for accurate p-values)",
+        "Confusing s² (sample variance) with s²/n (variance of the mean)"
+      ],
+      "hint": "Break the calculation into steps: (1) compute variance terms v₁ = s₁²/n₁ and v₂ = s₂²/n₂, (2) square their sum for numerator, (3) compute weighted sum for denominator, (4) divide. Check that result is between min(n₁-1, n₂-1) and n₁+n₂-2.",
+      "references": [
+        "Chi-square distribution",
+        "Behrens-Fisher problem",
+        "Welch's t-test derivation",
+        "Comparison with Student's t-test"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "P-Value Calculation and Hypothesis Decision",
+      "relation_to_problem": "The p-value quantifies the probability of observing data as extreme as ours if the null hypothesis were true. It's compared to the significance level α to make a formal decision about rejecting H₀.",
+      "prerequisites": [
+        "T-statistic calculation",
+        "Degrees of freedom concept",
+        "Understanding of probability and cumulative distribution functions",
+        "Hypothesis testing framework"
+      ],
+      "learning_objectives": [
+        "Calculate two-tailed p-value from t-statistic and degrees of freedom",
+        "Understand the relationship between p-value and significance level α",
+        "Make formal decisions about rejecting or failing to reject the null hypothesis",
+        "Interpret p-values correctly in context"
+      ],
+      "math_content": {
+        "definition": "The **p-value** is the probability of observing a test statistic as extreme or more extreme than the calculated value, assuming the null hypothesis is true. For a two-tailed test with t-statistic $t$ and degrees of freedom $df$: $$p = 2 \\times P(T > |t|) = 2 \\times (1 - F_t(|t|, df))$$ where $F_t$ is the cumulative distribution function (CDF) of the t-distribution, and $T$ follows a t-distribution with $df$ degrees of freedom under $H_0$.",
+        "notation": "$p$ = p-value, $t$ = observed t-statistic, $|t|$ = absolute value of t, $df$ = degrees of freedom, $F_t$ = t-distribution CDF, $\\alpha$ = significance level (typically 0.05)",
+        "theorem": "**Hypothesis Testing Decision Rule**: Given significance level $\\alpha$ (commonly 0.05): (1) If $p < \\alpha$, reject $H_0$ and conclude there is statistically significant evidence that the means differ. (2) If $p \\geq \\alpha$, fail to reject $H_0$ (do not conclude means differ). The p-value represents the strength of evidence against $H_0$: smaller p-values indicate stronger evidence. Common interpretations: $p < 0.001$ (very strong evidence), $p < 0.01$ (strong evidence), $p < 0.05$ (moderate evidence), $p \\geq 0.05$ (insufficient evidence).",
+        "proof_sketch": "Under $H_0$, the t-statistic follows a t-distribution with the calculated df. The t-distribution is symmetric around zero, so for a two-tailed test, we consider both tails. The probability in each tail beyond $|t|$ is $P(T > |t|)$. Since we're testing for any difference (not just one direction), we sum probabilities from both tails, giving $p = 2 \\times P(T > |t|)$. Using the CDF: $P(T > |t|) = 1 - F_t(|t|)$. The factor of 2 accounts for the two-sided alternative hypothesis.",
+        "examples": [
+          "t = 5.824, df = 8.0, two-tailed. From t-table or software: $P(T > 5.824) \\approx 0.000197$. Two-tailed p = $2 \\times 0.000197 = 0.000394$. Since p < 0.05, reject $H_0$.",
+          "t = 2.1, df = 20, two-tailed. $P(T > 2.1) \\approx 0.024$. p = $2 \\times 0.024 = 0.048$. Since p < 0.05, reject $H_0$ (borderline).",
+          "t = 1.5, df = 15, two-tailed. $P(T > 1.5) \\approx 0.077$. p = $2 \\times 0.077 = 0.154$. Since p > 0.05, fail to reject $H_0$.",
+          "t = 0.5, df = 30, two-tailed. $P(T > 0.5) \\approx 0.31$. p = $2 \\times 0.31 = 0.62$. Since p > 0.05, fail to reject $H_0$ (weak evidence)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Two-Tailed P-Value",
+          "latex": "$p = 2 \\times (1 - F_t(|t|, df))$",
+          "description": "Probability of observing |t| or more extreme in either direction under H₀"
+        },
+        {
+          "name": "One-Tailed P-Value (Upper)",
+          "latex": "$p = 1 - F_t(t, df)$ if testing $H_a: \\mu_1 > \\mu_2$",
+          "description": "Used when alternative hypothesis specifies direction"
+        },
+        {
+          "name": "Decision Rule",
+          "latex": "Reject $H_0$ if $p < \\alpha$, fail to reject if $p \\geq \\alpha$",
+          "description": "Formal rule for hypothesis testing at significance level α"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the two-tailed p-value and makes a hypothesis testing decision. You'll need to use the t-distribution CDF (can use scipy.stats.t.cdf for this exercise as it's part of the final problem setup).",
+        "function_signature": "def calculate_p_value_and_decision(t_statistic: float, df: float, alpha: float = 0.05) -> tuple[float, bool]:",
+        "starter_code": "from scipy import stats\n\ndef calculate_p_value_and_decision(t_statistic: float, df: float, \n                                   alpha: float = 0.05) -> tuple[float, bool]:\n    \"\"\"\n    Calculate two-tailed p-value and make hypothesis decision.\n    \n    Args:\n        t_statistic: Calculated t-statistic\n        df: Degrees of freedom\n        alpha: Significance level (default 0.05)\n    \n    Returns:\n        Tuple of (p_value, reject_null)\n        - p_value: Two-tailed p-value\n        - reject_null: True if reject H₀, False otherwise\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_p_value_and_decision(5.824, 8.0, 0.05)",
+            "expected": "(0.000394, True)",
+            "explanation": "Large t-value yields tiny p-value < 0.05, so reject H₀"
+          },
+          {
+            "input": "calculate_p_value_and_decision(2.1, 20, 0.05)",
+            "expected": "(0.048, True)",
+            "explanation": "Borderline case: p ≈ 0.048 < 0.05, so reject H₀"
+          },
+          {
+            "input": "calculate_p_value_and_decision(1.5, 15, 0.05)",
+            "expected": "(0.154, False)",
+            "explanation": "p ≈ 0.154 > 0.05, so fail to reject H₀"
+          },
+          {
+            "input": "calculate_p_value_and_decision(0.5, 30, 0.05)",
+            "expected": "(0.621, False)",
+            "explanation": "Very weak evidence: p ≈ 0.621 >> 0.05, clearly fail to reject H₀"
+          },
+          {
+            "input": "calculate_p_value_and_decision(3.0, 10, 0.01)",
+            "expected": "(0.013, False)",
+            "explanation": "p ≈ 0.013 < 0.05 but > 0.01, so with α=0.01, fail to reject H₀"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to multiply by 2 for two-tailed test (one-tailed vs two-tailed confusion)",
+        "Not taking absolute value of t-statistic before looking up in CDF",
+        "Confusing 1 - CDF with CDF (p-value is probability in tail, not up to t)",
+        "Misinterpreting p-value as 'probability H₀ is true' (it's probability of data given H₀)",
+        "Using α = 0.05 without considering context (sometimes 0.01 or 0.10 is more appropriate)",
+        "Confusing 'fail to reject H₀' with 'accept H₀' (absence of evidence ≠ evidence of absence)"
+      ],
+      "hint": "Use scipy.stats.t.cdf(abs(t_statistic), df) to get the CDF value. Remember: (1) Take absolute value of t, (2) Get upper tail probability as 1 - CDF, (3) Multiply by 2 for two-tailed, (4) Compare to alpha.",
+      "references": [
+        "Type I error (false positive) and α",
+        "Type II error (false negative) and β",
+        "Statistical power (1 - β)",
+        "Multiple testing corrections",
+        "Fisher vs Neyman-Pearson paradigms"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Effect Size: Cohen's d Calculation",
+      "relation_to_problem": "Cohen's d measures the practical significance of the difference between means, independent of sample size. It provides crucial context that complements the p-value, distinguishing statistical significance from practical importance.",
+      "prerequisites": [
+        "Sample mean and variance",
+        "Pooled standard deviation concept",
+        "Understanding of standardization",
+        "Distinction between statistical and practical significance"
+      ],
+      "learning_objectives": [
+        "Calculate Cohen's d as a standardized effect size measure",
+        "Understand pooled standard deviation and why it's used for effect size",
+        "Interpret Cohen's d values using conventional benchmarks",
+        "Recognize that large samples can detect tiny effects (small d) with high significance (small p)"
+      ],
+      "math_content": {
+        "definition": "**Cohen's d** is a standardized effect size that measures the difference between two means in terms of their pooled standard deviation: $$d = \\frac{\\bar{X}_1 - \\bar{X}_2}{s_{\\text{pooled}}}$$ where the **pooled standard deviation** is: $$s_{\\text{pooled}} = \\sqrt{\\frac{(n_1-1)s_1^2 + (n_2-1)s_2^2}{n_1+n_2-2}}$$ Unlike the p-value, Cohen's d is independent of sample size and quantifies the magnitude of the difference.",
+        "notation": "$d$ = Cohen's d, $\\bar{X}_1, \\bar{X}_2$ = sample means, $s_{\\text{pooled}}$ = pooled standard deviation, $s_1^2, s_2^2$ = sample variances, $n_1, n_2$ = sample sizes",
+        "theorem": "**Cohen's Effect Size Interpretation Guidelines**: $|d| < 0.2$ = negligible effect, $|d| \\approx 0.2$ = small effect, $|d| \\approx 0.5$ = medium effect, $|d| \\approx 0.8$ = large effect, $|d| > 1.2$ = very large effect. These are conventions, not rigid rules. Cohen's d represents how many standard deviations separate the two group means. A value of d = 1.0 means the means differ by one full standard deviation.",
+        "proof_sketch": "The pooled standard deviation is a weighted average of the two sample standard deviations, with weights proportional to degrees of freedom $(n-1)$. This provides the best estimate of the common population standard deviation when we assume equal population variances. Dividing the mean difference by this pooled SD standardizes the effect, making it comparable across different measurement scales and studies. The formula is derived from the weighted average of variances: $s_p^2 = \\frac{(n_1-1)s_1^2 + (n_2-1)s_2^2}{(n_1-1)+(n_2-1)}$, which simplifies to the denominator $n_1+n_2-2$.",
+        "examples": [
+          "Samples: $\\bar{X}_1 = 13.6, \\bar{X}_2 = 9.4, s_1^2 = 1.3, s_2^2 = 1.3, n_1 = n_2 = 5$. Pooled variance: $s_p^2 = [(4)(1.3) + (4)(1.3)]/8 = 10.4/8 = 1.3$. So $s_p = \\sqrt{1.3} = 1.14$. Cohen's d = $(13.6-9.4)/1.14 = 4.2/1.14 = 3.68$ (very large effect).",
+          "Different variances: $\\bar{X}_1 = 50, \\bar{X}_2 = 45, s_1^2 = 100, s_2^2 = 64, n_1 = 20, n_2 = 30$. $s_p^2 = [(19)(100) + (29)(64)]/(48) = [1900 + 1856]/48 = 78.25$. $s_p = 8.85$. d = $(50-45)/8.85 = 0.565$ (medium effect).",
+          "Small raw difference, small variability: $\\bar{X}_1 = 10.5, \\bar{X}_2 = 10.0, s_1^2 = 0.25, s_2^2 = 0.25, n_1 = n_2 = 15$. $s_p = 0.5$. d = $(10.5-10.0)/0.5 = 1.0$ (large effect despite small raw difference).",
+          "Large raw difference, large variability: $\\bar{X}_1 = 100, \\bar{X}_2 = 90, s_1^2 = 900, s_2^2 = 900, n_1 = n_2 = 25$. $s_p = 30$. d = $(100-90)/30 = 0.33$ (small-to-medium effect despite large raw difference)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cohen's d",
+          "latex": "$d = \\frac{\\bar{X}_1 - \\bar{X}_2}{s_{\\text{pooled}}}$",
+          "description": "Standardized effect size independent of sample size"
+        },
+        {
+          "name": "Pooled Standard Deviation",
+          "latex": "$s_{\\text{pooled}} = \\sqrt{\\frac{(n_1-1)s_1^2 + (n_2-1)s_2^2}{n_1+n_2-2}}$",
+          "description": "Weighted average SD assuming equal population variances"
+        },
+        {
+          "name": "Pooled Variance (Alternative Form)",
+          "latex": "$s_p^2 = \\frac{n_1 s_1^2 + n_2 s_2^2}{n_1+n_2}$ (when using population formula)",
+          "description": "Less common variant without Bessel's correction in denominator"
+        }
+      ],
+      "exercise": {
+        "description": "Implement Cohen's d calculation to measure effect size. This completes the statistical analysis by providing context about practical significance alongside the p-value's statistical significance. Combine this with all previous sub-quests to understand the full two-sample t-test.",
+        "function_signature": "def calculate_cohens_d(mean1: float, mean2: float, var1: float, var2: float, n1: int, n2: int) -> float:",
+        "starter_code": "def calculate_cohens_d(mean1: float, mean2: float, var1: float, var2: float, \n                      n1: int, n2: int) -> float:\n    \"\"\"\n    Calculate Cohen's d effect size.\n    \n    Args:\n        mean1, mean2: Sample means\n        var1, var2: Sample variances\n        n1, n2: Sample sizes\n    \n    Returns:\n        Cohen's d (standardized effect size)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_cohens_d(13.6, 9.4, 1.3, 1.3, 5, 5)",
+            "expected": "3.684",
+            "explanation": "Very large effect: difference of 4.2 is 3.68 pooled SDs"
+          },
+          {
+            "input": "calculate_cohens_d(50, 45, 100, 64, 20, 30)",
+            "expected": "0.565",
+            "explanation": "Medium effect: difference of 5 relative to pooled SD of 8.85"
+          },
+          {
+            "input": "calculate_cohens_d(10.5, 10.0, 0.25, 0.25, 15, 15)",
+            "expected": "1.0",
+            "explanation": "Large effect: small absolute difference but low variability"
+          },
+          {
+            "input": "calculate_cohens_d(100, 90, 900, 900, 25, 25)",
+            "expected": "0.333",
+            "explanation": "Small effect: large absolute difference but high variability"
+          },
+          {
+            "input": "calculate_cohens_d(20.0, 20.0, 4.0, 4.0, 10, 10)",
+            "expected": "0.0",
+            "explanation": "No effect: identical means yield d = 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using standard error instead of pooled standard deviation (effect size should not depend on sample size)",
+        "Forgetting to take square root of pooled variance to get pooled SD",
+        "Using unpooled standard deviations (averaging s₁ and s₂ directly) instead of pooling variances first",
+        "Not weighting by (n-1) in the pooled variance formula",
+        "Interpreting Cohen's d thresholds rigidly without considering domain-specific context",
+        "Confusing statistical significance (p-value) with practical significance (effect size)"
+      ],
+      "hint": "First calculate the pooled variance as a weighted average of the two sample variances (weights are n-1). Take its square root to get pooled SD. Then divide the mean difference by this pooled SD. The result tells you how many standard deviations separate the groups.",
+      "references": [
+        "Meta-analysis and effect size standardization",
+        "Statistical power and sample size planning",
+        "Glass's delta and Hedge's g (alternative effect sizes)",
+        "Confidence intervals for effect sizes",
+        "Practical vs statistical significance debate"
+      ]
+    }
+  ]
+}

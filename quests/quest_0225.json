@@ -1,0 +1,528 @@
+{
+  "problem_id": 225,
+  "title": "KL Divergence Estimator for GRPO",
+  "category": "Reinforcement Learning",
+  "difficulty": "easy",
+  "description": "Implement the unbiased KL divergence estimator used in GRPO (Group Relative Policy Optimization). This estimator computes the KL divergence between the current policy and a reference policy for each sample, which is then used as a regularization term to prevent the policy from deviating too far from the reference.",
+  "example": {
+    "input": "pi_theta = np.array([0.8]), pi_ref = np.array([0.4])",
+    "output": "np.array([0.1931])",
+    "reasoning": "ratio = 0.4/0.8 = 0.5. KL = 0.5 - log(0.5) - 1 = 0.5 - (-0.693) - 1 = 0.193. This penalizes the policy for assigning higher probability than the reference."
+  },
+  "starter_code": "import numpy as np\n\ndef kl_divergence_estimator(pi_theta: np.ndarray, pi_ref: np.ndarray) -> np.ndarray:\n\t\"\"\"\n\tCompute the unbiased KL divergence estimator used in GRPO.\n\t\n\tFormula: D_KL = (pi_ref / pi_theta) - log(pi_ref / pi_theta) - 1\n\t\n\tArgs:\n\t\tpi_theta: Current policy probabilities for each sample\n\t\tpi_ref: Reference policy probabilities for each sample\n\t\t\n\tReturns:\n\t\tArray of KL divergence estimates (one per sample)\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Probability Ratios and Log Probability Differences",
+      "relation_to_problem": "The GRPO KL estimator is built on the ratio r = π_ref/π_theta. Understanding how to compute and manipulate probability ratios safely is the foundation for implementing the estimator correctly.",
+      "prerequisites": [
+        "Basic probability theory",
+        "Logarithm properties",
+        "NumPy array operations"
+      ],
+      "learning_objectives": [
+        "Compute probability ratios between two distributions",
+        "Understand the relationship between division and log differences: log(a/b) = log(a) - log(b)",
+        "Handle numerical stability issues when computing ratios of small probabilities"
+      ],
+      "math_content": {
+        "definition": "Given two probability values $\\pi_1(x)$ and $\\pi_2(x)$ for an event $x$, the **probability ratio** is defined as $r(x) = \\frac{\\pi_1(x)}{\\pi_2(x)}$, where $\\pi_2(x) > 0$. This ratio measures how much more (or less) likely $\\pi_1$ considers event $x$ compared to $\\pi_2$.",
+        "notation": "$r$ = probability ratio, $\\pi_1(x)$ = probability under distribution 1, $\\pi_2(x)$ = probability under distribution 2",
+        "theorem": "**Logarithm Ratio Identity**: For positive real numbers $a, b > 0$, we have $\\log\\left(\\frac{a}{b}\\right) = \\log(a) - \\log(b)$. This transformation is computationally stable because it converts multiplication/division operations into addition/subtraction.",
+        "proof_sketch": "Let $y = \\log\\left(\\frac{a}{b}\\right)$. Then $e^y = \\frac{a}{b}$, so $b \\cdot e^y = a$. Taking logarithms: $\\log(b) + y = \\log(a)$, thus $y = \\log(a) - \\log(b)$.",
+        "examples": [
+          "If $\\pi_1(x) = 0.8$ and $\\pi_2(x) = 0.4$, then $r = 0.4/0.8 = 0.5$ (reference assigns half the probability)",
+          "If $\\pi_1(x) = 0.001$ and $\\pi_2(x) = 0.002$, compute via log-space: $\\log(r) = \\log(0.002) - \\log(0.001) = -6.215 - (-6.908) = 0.693$, so $r = e^{0.693} \\approx 2.0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Probability Ratio",
+          "latex": "$r = \\frac{\\pi_{ref}}{\\pi_{\\theta}}$",
+          "description": "Direct computation of the ratio (use when probabilities are well-scaled)"
+        },
+        {
+          "name": "Log-Space Ratio Computation",
+          "latex": "$\\log(r) = \\log(\\pi_{ref}) - \\log(\\pi_{\\theta})$",
+          "description": "Numerically stable computation for small probabilities; exponentiate to get r"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes probability ratios between two arrays of probabilities. The function should handle both direct division and log-space computation for numerical stability.",
+        "function_signature": "def compute_probability_ratio(pi_numerator: np.ndarray, pi_denominator: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_probability_ratio(pi_numerator: np.ndarray, pi_denominator: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute the ratio pi_numerator / pi_denominator for arrays of probabilities.\n    \n    Args:\n        pi_numerator: Numerator probabilities\n        pi_denominator: Denominator probabilities (must be > 0)\n    \n    Returns:\n        Array of probability ratios\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_probability_ratio(np.array([0.4]), np.array([0.8]))",
+            "expected": "np.array([0.5])",
+            "explanation": "0.4 / 0.8 = 0.5, indicating the numerator distribution assigns half the probability"
+          },
+          {
+            "input": "compute_probability_ratio(np.array([0.6, 0.3]), np.array([0.2, 0.6]))",
+            "expected": "np.array([3.0, 0.5])",
+            "explanation": "First ratio: 0.6/0.2 = 3.0 (numerator assigns 3x more), second: 0.3/0.6 = 0.5"
+          },
+          {
+            "input": "compute_probability_ratio(np.array([0.001, 0.999]), np.array([0.002, 0.998]))",
+            "expected": "np.array([0.5, 1.001])",
+            "explanation": "Small probabilities test numerical stability: 0.001/0.002 = 0.5, 0.999/0.998 ≈ 1.001"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check for division by zero when pi_denominator contains zeros",
+        "Not considering numerical underflow when both probabilities are very small (< 1e-10)",
+        "Computing log(a/b) directly instead of log(a) - log(b), which is less stable"
+      ],
+      "hint": "Use NumPy's element-wise division operator. Consider what happens mathematically when both probabilities are equal (ratio should be 1.0).",
+      "references": [
+        "NumPy broadcasting rules",
+        "Numerical stability in probability computations",
+        "Information theory probability ratios"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "The Natural Logarithm Function and Its Convexity",
+      "relation_to_problem": "The GRPO KL estimator contains a log(r) term. Understanding logarithm properties, especially that log is a concave function, is essential for analyzing the estimator's behavior and proving its non-negativity.",
+      "prerequisites": [
+        "Calculus (derivatives)",
+        "Function analysis",
+        "Convexity concepts"
+      ],
+      "learning_objectives": [
+        "Compute natural logarithms of probability ratios",
+        "Understand that log(x) is a concave function with specific curvature",
+        "Apply logarithm properties to simplify expressions",
+        "Recognize the relationship between log(r) and the original ratio r"
+      ],
+      "math_content": {
+        "definition": "The **natural logarithm** $\\ln(x)$ or $\\log(x)$ is the inverse of the exponential function: $y = \\log(x)$ if and only if $e^y = x$, where $e \\approx 2.71828$ is Euler's number. It is defined only for $x > 0$.",
+        "notation": "$\\log(x)$ = natural logarithm (base $e$), domain: $(0, \\infty)$, range: $(-\\infty, \\infty)$",
+        "theorem": "**Concavity of the Logarithm**: The function $f(x) = \\log(x)$ is strictly concave on $(0, \\infty)$. This means its second derivative satisfies $f''(x) < 0$ for all $x > 0$, and for any $\\lambda \\in (0,1)$ and $x_1, x_2 > 0$: $\\log(\\lambda x_1 + (1-\\lambda)x_2) > \\lambda \\log(x_1) + (1-\\lambda)\\log(x_2)$.",
+        "proof_sketch": "Taking derivatives: $f'(x) = \\frac{1}{x}$ and $f''(x) = -\\frac{1}{x^2} < 0$ for all $x > 0$. Since the second derivative is negative everywhere, the function is strictly concave. This property is crucial for analyzing the KL estimator's behavior.",
+        "examples": [
+          "$\\log(1) = 0$ because $e^0 = 1$",
+          "$\\log(e) = 1$ because $e^1 = e$",
+          "$\\log(0.5) \\approx -0.693$, indicating probabilities less than 1 have negative logarithms",
+          "For ratio $r = 2.0$: $\\log(2.0) \\approx 0.693$ (positive log for ratios > 1)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Natural Logarithm",
+          "latex": "$\\log(r)$",
+          "description": "When r > 1, log(r) > 0; when r = 1, log(r) = 0; when 0 < r < 1, log(r) < 0"
+        },
+        {
+          "name": "First Derivative",
+          "latex": "$\\frac{d}{dx}\\log(x) = \\frac{1}{x}$",
+          "description": "The slope of log(x), always positive but decreasing as x increases"
+        },
+        {
+          "name": "Second Derivative",
+          "latex": "$\\frac{d^2}{dx^2}\\log(x) = -\\frac{1}{x^2}$",
+          "description": "Always negative, confirming strict concavity"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the natural logarithm of probability ratios and analyzes the relationship between r and log(r). This is a building block for the KL estimator where we need both r and log(r).",
+        "function_signature": "def compute_log_ratio(r: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_log_ratio(r: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute the natural logarithm of probability ratios.\n    \n    Args:\n        r: Array of probability ratios (must be > 0)\n    \n    Returns:\n        Array of log(r) values\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_log_ratio(np.array([1.0]))",
+            "expected": "np.array([0.0])",
+            "explanation": "log(1.0) = 0 because e^0 = 1; this occurs when policies match exactly"
+          },
+          {
+            "input": "compute_log_ratio(np.array([0.5, 2.0]))",
+            "expected": "np.array([-0.693, 0.693])",
+            "explanation": "log(0.5) ≈ -0.693 (negative for r < 1), log(2.0) ≈ 0.693 (positive for r > 1)"
+          },
+          {
+            "input": "compute_log_ratio(np.array([np.e, 1.0, 1/np.e]))",
+            "expected": "np.array([1.0, 0.0, -1.0])",
+            "explanation": "log(e) = 1, log(1) = 0, log(1/e) = -1; demonstrates special values"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Attempting to compute log of zero or negative values (undefined)",
+        "Confusing natural log (base e) with log base 10 or log base 2",
+        "Not recognizing that log(r) and r have opposite behavior around r=1: when r increases from 1, log(r) increases but more slowly",
+        "Forgetting that log is measured in 'nats' (natural units) not 'bits'"
+      ],
+      "hint": "Use np.log() for natural logarithm. Consider what happens at the critical point r=1 where policies are equal.",
+      "references": [
+        "Calculus of logarithmic functions",
+        "Concave vs convex functions",
+        "Natural logarithm in information theory"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "The Function f(r) = r - log(r) - 1 and Its Properties",
+      "relation_to_problem": "This is the exact functional form of the GRPO KL estimator! Understanding why f(r) ≥ 0 for all r > 0 and equals zero only at r=1 is crucial for understanding why the estimator provides a valid divergence measure.",
+      "prerequisites": [
+        "Calculus (optimization)",
+        "Concave/convex function analysis",
+        "Finding minima via derivatives"
+      ],
+      "learning_objectives": [
+        "Analyze the function f(r) = r - log(r) - 1 mathematically",
+        "Prove that f(r) ≥ 0 for all r > 0 with equality only at r = 1",
+        "Understand the physical meaning: this measures divergence between probability ratios",
+        "Compute f(r) for various probability ratios to build intuition"
+      ],
+      "math_content": {
+        "definition": "Define the function $f:(0, \\infty) \\to \\mathbb{R}$ by $f(r) = r - \\log(r) - 1$. This function appears as the per-sample KL divergence estimator in GRPO, where $r = \\frac{\\pi_{ref}}{\\pi_{\\theta}}$ is the ratio of reference to current policy probabilities.",
+        "notation": "$f(r)$ = KL estimator function, $r$ = probability ratio, domain: $(0, \\infty)$, range: $[0, \\infty)$",
+        "theorem": "**Non-negativity Theorem**: For all $r > 0$, we have $f(r) = r - \\log(r) - 1 \\geq 0$, with equality if and only if $r = 1$. This guarantees that the KL estimator is always non-negative, a fundamental requirement for divergence measures.",
+        "proof_sketch": "To find the minimum, take the derivative: $f'(r) = 1 - \\frac{1}{r} = \\frac{r-1}{r}$. Setting $f'(r) = 0$ gives $r = 1$. The second derivative is $f''(r) = \\frac{1}{r^2} > 0$ for all $r > 0$, confirming $r=1$ is a global minimum. Evaluating: $f(1) = 1 - \\log(1) - 1 = 1 - 0 - 1 = 0$. Since $f$ has a unique critical point that is a global minimum with value 0, we have $f(r) \\geq 0$ for all $r > 0$. As $r \\to 0^+$, $-\\log(r) \\to +\\infty$, so $f(r) \\to +\\infty$. As $r \\to +\\infty$, $r$ dominates $\\log(r)$, so $f(r) \\to +\\infty$.",
+        "examples": [
+          "At $r = 1$ (policies match): $f(1) = 1 - 0 - 1 = 0$ (no divergence)",
+          "At $r = 0.5$ (reference assigns half): $f(0.5) = 0.5 - (-0.693) - 1 = 0.193$",
+          "At $r = 2.0$ (reference assigns double): $f(2.0) = 2.0 - 0.693 - 1 = 0.307$",
+          "Symmetry observation: $f(0.5) \\neq f(2.0)$, showing KL divergence is asymmetric"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "KL Estimator Function",
+          "latex": "$f(r) = r - \\log(r) - 1$",
+          "description": "The core GRPO KL estimator applied to each probability ratio"
+        },
+        {
+          "name": "First Derivative",
+          "latex": "$f'(r) = 1 - \\frac{1}{r}$",
+          "description": "Zero at r=1, negative for r<1, positive for r>1"
+        },
+        {
+          "name": "Second Derivative",
+          "latex": "$f''(r) = \\frac{1}{r^2} > 0$",
+          "description": "Always positive, confirming f is strictly convex with unique minimum"
+        },
+        {
+          "name": "Minimum Value",
+          "latex": "$\\min_{r > 0} f(r) = f(1) = 0$",
+          "description": "Achieved when policies match (r=1), justifying use as divergence measure"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the function f(r) = r - log(r) - 1 and verify its non-negativity property empirically. This is the mathematical core of the GRPO KL estimator.",
+        "function_signature": "def kl_estimator_function(r: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef kl_estimator_function(r: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute f(r) = r - log(r) - 1 for probability ratios.\n    \n    This function is always non-negative and equals zero only when r=1\n    (i.e., when the two policies agree).\n    \n    Args:\n        r: Array of probability ratios (must be > 0)\n    \n    Returns:\n        Array of f(r) values (all non-negative)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "kl_estimator_function(np.array([1.0]))",
+            "expected": "np.array([0.0])",
+            "explanation": "At r=1 (policies match), f(1) = 1 - 0 - 1 = 0, the minimum possible value"
+          },
+          {
+            "input": "kl_estimator_function(np.array([0.5]))",
+            "expected": "np.array([0.193])",
+            "explanation": "f(0.5) = 0.5 - log(0.5) - 1 = 0.5 - (-0.693) - 1 ≈ 0.193 > 0"
+          },
+          {
+            "input": "kl_estimator_function(np.array([2.0]))",
+            "expected": "np.array([0.307])",
+            "explanation": "f(2.0) = 2.0 - log(2.0) - 1 = 2.0 - 0.693 - 1 ≈ 0.307 > 0"
+          },
+          {
+            "input": "kl_estimator_function(np.array([0.1, 1.0, 10.0]))",
+            "expected": "np.array([2.203, 0.0, 6.697])",
+            "explanation": "Function grows as r moves away from 1 in either direction; larger deviations yield larger values"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing r - log(r) and forgetting the -1 term",
+        "Not recognizing that this function is strictly convex (unique global minimum)",
+        "Thinking the function is symmetric around r=1 (it's not: f(2) ≠ f(0.5))",
+        "Attempting to evaluate at r=0 (undefined due to log(0))",
+        "Not verifying that output is always non-negative as a sanity check"
+      ],
+      "hint": "Break it into three parts: compute r, compute log(r), then combine as r - log(r) - 1. Verify the result is never negative.",
+      "references": [
+        "Convex analysis",
+        "KL divergence properties",
+        "Jensen's inequality applications"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "KL Divergence: Definition, Properties, and Estimation",
+      "relation_to_problem": "The GRPO estimator approximates the true KL divergence using per-sample estimates. Understanding the formal definition of KL divergence and why the estimator D_KL = r - log(r) - 1 is unbiased is essential for correct implementation and interpretation.",
+      "prerequisites": [
+        "Probability distributions",
+        "Expectation operator",
+        "Information theory basics"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of Kullback-Leibler divergence",
+        "Recognize that exact KL computation requires summing over all possible outputs (intractable for LLMs)",
+        "Derive why the per-sample estimator r - log(r) - 1 is unbiased",
+        "Connect the mathematical theory to practical RL implementation"
+      ],
+      "math_content": {
+        "definition": "The **Kullback-Leibler (KL) divergence** from distribution $Q$ to distribution $P$ over a discrete space $\\mathcal{X}$ is defined as: $$D_{KL}(P \\parallel Q) = \\sum_{x \\in \\mathcal{X}} P(x) \\log\\frac{P(x)}{Q(x)}$$ It measures how much information is lost when $Q$ is used to approximate $P$. For continuous distributions, replace the sum with an integral.",
+        "notation": "$D_{KL}(P \\parallel Q)$ = KL divergence from $Q$ to $P$, $P(x)$ = target distribution, $Q(x)$ = approximating distribution",
+        "theorem": "**Unbiased Estimation Theorem**: Given samples $o \\sim \\pi_{\\theta}$, the estimator $\\hat{D}_{KL} = r - \\log(r) - 1$ where $r = \\frac{\\pi_{ref}(o)}{\\pi_{\\theta}(o)}$ is an unbiased estimator of $D_{KL}(\\pi_{\\theta} \\parallel \\pi_{ref})$. That is, $\\mathbb{E}_{o \\sim \\pi_{\\theta}}[\\hat{D}_{KL}] = D_{KL}(\\pi_{\\theta} \\parallel \\pi_{ref})$.",
+        "proof_sketch": "Start with the definition: $D_{KL}(\\pi_{\\theta} \\parallel \\pi_{ref}) = \\sum_o \\pi_{\\theta}(o) \\log\\frac{\\pi_{\\theta}(o)}{\\pi_{ref}(o)}$. Let $r = \\frac{\\pi_{ref}(o)}{\\pi_{\\theta}(o)}$, so $\\frac{\\pi_{\\theta}(o)}{\\pi_{ref}(o)} = \\frac{1}{r}$. Then: $$D_{KL} = \\sum_o \\pi_{\\theta}(o) \\log(1/r) = -\\sum_o \\pi_{\\theta}(o) \\log(r)$$. Now consider the expectation: $$\\mathbb{E}_{o \\sim \\pi_{\\theta}}[r] = \\sum_o \\pi_{\\theta}(o) \\cdot \\frac{\\pi_{ref}(o)}{\\pi_{\\theta}(o)} = \\sum_o \\pi_{ref}(o) = 1$$. Using Taylor expansion around $r=1$ and properties of $f(r) = r - \\log(r) - 1$, one can show that $\\mathbb{E}[r - \\log(r) - 1]$ equals the KL divergence. The key insight is that the $-1$ term corrects for the bias introduced by the Jensen gap in $\\mathbb{E}[\\log(r)]$.",
+        "examples": [
+          "If $\\pi_{\\theta}$ and $\\pi_{ref}$ are identical: every $r = 1$, so $\\hat{D}_{KL} = 1 - 0 - 1 = 0$, matching true $D_{KL} = 0$",
+          "For a single sample with $\\pi_{\\theta}(o) = 0.8, \\pi_{ref}(o) = 0.4$: $r = 0.5$, $\\hat{D}_{KL} = 0.193$ (this is one sample's contribution)",
+          "With many samples, averaging these per-sample estimates approximates the true KL divergence"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "KL Divergence Definition",
+          "latex": "$D_{KL}(P \\parallel Q) = \\sum_x P(x) \\log\\frac{P(x)}{Q(x)}$",
+          "description": "Exact KL divergence (intractable for LLMs with large output spaces)"
+        },
+        {
+          "name": "GRPO Direction",
+          "latex": "$D_{KL}(\\pi_{\\theta} \\parallel \\pi_{ref})$",
+          "description": "Measures how much current policy diverges from reference policy"
+        },
+        {
+          "name": "Per-Sample Unbiased Estimator",
+          "latex": "$\\hat{D}_{KL} = r - \\log(r) - 1, \\quad r = \\frac{\\pi_{ref}(o)}{\\pi_{\\theta}(o)}$",
+          "description": "Can be computed from a single sample; expectation equals true KL"
+        },
+        {
+          "name": "Expectation Property",
+          "latex": "$\\mathbb{E}_{o \\sim \\pi_{\\theta}}[\\hat{D}_{KL}] = D_{KL}(\\pi_{\\theta} \\parallel \\pi_{ref})$",
+          "description": "Unbiasedness guarantee: averaging many samples converges to true divergence"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the unbiased per-sample KL divergence estimate given probabilities from the current policy and reference policy. This combines all previous concepts.",
+        "function_signature": "def per_sample_kl_estimate(pi_theta_samples: np.ndarray, pi_ref_samples: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef per_sample_kl_estimate(pi_theta_samples: np.ndarray, pi_ref_samples: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute per-sample unbiased KL divergence estimates.\n    \n    For each sample, computes r = pi_ref / pi_theta, then returns r - log(r) - 1.\n    \n    Args:\n        pi_theta_samples: Probabilities under current policy for each sample\n        pi_ref_samples: Probabilities under reference policy for each sample\n    \n    Returns:\n        Array of per-sample KL divergence estimates (all non-negative)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "per_sample_kl_estimate(np.array([0.8]), np.array([0.8]))",
+            "expected": "np.array([0.0])",
+            "explanation": "When policies assign same probability, r=1, so KL estimate is 0"
+          },
+          {
+            "input": "per_sample_kl_estimate(np.array([0.8]), np.array([0.4]))",
+            "expected": "np.array([0.193])",
+            "explanation": "r = 0.4/0.8 = 0.5, KL = 0.5 - log(0.5) - 1 = 0.5 - (-0.693) - 1 ≈ 0.193"
+          },
+          {
+            "input": "per_sample_kl_estimate(np.array([0.4]), np.array([0.8]))",
+            "expected": "np.array([0.307])",
+            "explanation": "r = 0.8/0.4 = 2.0, KL = 2.0 - log(2.0) - 1 = 2.0 - 0.693 - 1 ≈ 0.307; note asymmetry"
+          },
+          {
+            "input": "per_sample_kl_estimate(np.array([0.5, 0.3, 0.9]), np.array([0.5, 0.6, 0.9]))",
+            "expected": "np.array([0.0, 0.307, 0.0])",
+            "explanation": "First and third samples: r=1 (no divergence). Second: r=2.0 (reference assigns double)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing the ratio backwards (pi_theta / pi_ref instead of pi_ref / pi_theta)",
+        "Not recognizing that this is a per-sample estimate, not the full KL divergence (need to average many samples)",
+        "Forgetting that KL divergence is asymmetric: D_KL(P||Q) ≠ D_KL(Q||P)",
+        "Expecting the estimator to be symmetric: if policies swap, the estimate changes",
+        "Not validating that all outputs are non-negative (indicates implementation error)"
+      ],
+      "hint": "Follow these steps: (1) compute ratio r = pi_ref / pi_theta, (2) compute log(r), (3) combine as r - log(r) - 1. Each step uses concepts from previous sub-quests.",
+      "references": [
+        "Information theory and KL divergence",
+        "Importance sampling in RL",
+        "Unbiased estimation theory"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "GRPO Objective and the Role of KL Regularization",
+      "relation_to_problem": "The KL estimator is embedded in the full GRPO objective function. Understanding how the KL penalty term constrains policy updates and prevents reward hacking is crucial for implementing and tuning the complete algorithm.",
+      "prerequisites": [
+        "Reinforcement learning fundamentals",
+        "Policy gradient methods",
+        "Proximal Policy Optimization (PPO)"
+      ],
+      "learning_objectives": [
+        "Understand the complete GRPO objective with KL regularization",
+        "Recognize how the β coefficient controls the trade-off between reward and policy constraint",
+        "Appreciate why KL regularization prevents model collapse and reward hacking",
+        "Implement the KL penalty component for integration into the full objective"
+      ],
+      "math_content": {
+        "definition": "**Group Relative Policy Optimization (GRPO)** is a policy gradient algorithm for training LLMs with reinforcement learning. The objective function is: $$\\mathcal{J}_{GRPO}(\\pi_{\\theta}) = \\mathbb{E}_{x \\sim \\mathcal{D}, y \\sim \\pi_{\\theta_{old}}}\\left[\\min(\\rho A, \\text{clip}(\\rho, 1-\\epsilon, 1+\\epsilon)A)\\right] - \\beta \\cdot D_{KL}[\\pi_{\\theta} \\parallel \\pi_{ref}]$$ where $\\rho = \\frac{\\pi_{\\theta}(y|x)}{\\pi_{\\theta_{old}}(y|x)}$ is the importance ratio, $A$ is the advantage estimate, $\\epsilon$ is the clipping parameter, and $\\beta$ controls KL regularization strength.",
+        "notation": "$\\pi_{\\theta}$ = current policy, $\\pi_{ref}$ = reference policy (often pretrained model), $\\beta$ = KL coefficient, $A$ = advantage function, $\\rho$ = importance ratio",
+        "theorem": "**Trust Region Principle**: The KL regularization term $-\\beta \\cdot D_{KL}[\\pi_{\\theta} \\parallel \\pi_{ref}]$ constrains policy updates to a trust region around the reference policy. Larger $\\beta$ enforces tighter constraints, preventing large policy changes that could destabilize training or cause the model to collapse to degenerate solutions that exploit reward model weaknesses.",
+        "proof_sketch": "The gradient of the KL term with respect to $\\theta$ is $-\\beta \\nabla_{\\theta} D_{KL}$. This acts as a regularizer that pulls the policy back toward the reference. When the policy deviates ($D_{KL}$ increases), the negative gradient creates a restoring force. The strength of this force is proportional to $\\beta$. In the limit $\\beta \\to \\infty$, the policy cannot change from the reference. For finite $\\beta$, there's a trade-off: the policy can improve to increase reward but is penalized for deviating too far. This is analogous to Ridge regression's $L_2$ penalty, but in distribution space using KL divergence instead of Euclidean distance.",
+        "examples": [
+          "With $\\beta = 0$: No KL penalty, policy can change arbitrarily (may lead to instability)",
+          "With $\\beta = 0.1$ (typical): Moderate constraint, allows policy improvement while staying near reference",
+          "With $\\beta = 1.0$ (high): Strong constraint, policy changes slowly but more stably",
+          "If $D_{KL} = 0.5$ and $\\beta = 0.1$, the KL penalty is $0.1 \\times 0.5 = 0.05$ subtracted from the objective"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Full GRPO Objective",
+          "latex": "$\\mathcal{J}_{GRPO} = \\mathbb{E}\\left[\\min(\\rho A, \\text{clip}(\\rho, 1-\\epsilon, 1+\\epsilon)A)\\right] - \\beta \\cdot D_{KL}$",
+          "description": "Combines PPO-style clipped objective with KL regularization"
+        },
+        {
+          "name": "KL Regularization Term",
+          "latex": "$-\\beta \\cdot D_{KL}[\\pi_{\\theta} \\parallel \\pi_{ref}]$",
+          "description": "Penalty for deviating from reference policy, scaled by β"
+        },
+        {
+          "name": "Per-Sample KL Penalty",
+          "latex": "$-\\beta \\cdot (r - \\log(r) - 1)$",
+          "description": "Practical computation: multiply each sample's KL estimate by -β and add to objective"
+        },
+        {
+          "name": "Gradient Contribution",
+          "latex": "$\\nabla_{\\theta} \\mathcal{J} = \\nabla_{\\theta} \\mathbb{E}[\\cdots] - \\beta \\nabla_{\\theta} D_{KL}$",
+          "description": "KL term contributes a gradient component that constrains policy updates"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the KL penalty component that would be subtracted from the GRPO objective. Given per-sample KL estimates and a β coefficient, compute the total KL penalty (mean of per-sample penalties scaled by β).",
+        "function_signature": "def compute_kl_penalty(pi_theta: np.ndarray, pi_ref: np.ndarray, beta: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_kl_penalty(pi_theta: np.ndarray, pi_ref: np.ndarray, beta: float) -> float:\n    \"\"\"\n    Compute the KL regularization penalty for GRPO.\n    \n    For each sample, computes the KL estimate, then returns beta * mean(KL_estimates).\n    This value is subtracted from the reward objective.\n    \n    Args:\n        pi_theta: Current policy probabilities for each sample\n        pi_ref: Reference policy probabilities for each sample  \n        beta: KL penalty coefficient (controls regularization strength)\n    \n    Returns:\n        Scalar KL penalty (beta * average KL divergence)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_kl_penalty(np.array([0.8, 0.8]), np.array([0.8, 0.8]), beta=0.1)",
+            "expected": "0.0",
+            "explanation": "When policies match exactly, all r=1, all KL estimates are 0, so penalty is 0"
+          },
+          {
+            "input": "compute_kl_penalty(np.array([0.8]), np.array([0.4]), beta=0.1)",
+            "expected": "0.0193",
+            "explanation": "KL estimate is 0.193, penalty = 0.1 * 0.193 = 0.0193"
+          },
+          {
+            "input": "compute_kl_penalty(np.array([0.8, 0.4]), np.array([0.4, 0.8]), beta=0.2)",
+            "expected": "0.05",
+            "explanation": "First sample: KL=0.193, second: KL=0.307, mean=0.25, penalty=0.2*0.25=0.05"
+          },
+          {
+            "input": "compute_kl_penalty(np.array([0.5, 0.5]), np.array([0.5, 0.5]), beta=1.0)",
+            "expected": "0.0",
+            "explanation": "Even with high beta=1.0, if policies match (KL=0), penalty is still 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to multiply by beta after computing KL estimates",
+        "Not averaging the per-sample KL estimates (should take mean over batch)",
+        "Adding the KL term to the objective instead of subtracting (it's a penalty, not a reward)",
+        "Using an incorrect beta value (too large freezes learning, too small allows excessive drift)",
+        "Not considering that beta may need tuning as a hyperparameter for different tasks"
+      ],
+      "hint": "Compute per-sample KL estimates using your previous function, take the mean across all samples, then multiply by beta. This gives a single scalar penalty value.",
+      "references": [
+        "GRPO algorithm paper",
+        "Trust region methods in RL",
+        "PPO and KL regularization",
+        "Hyperparameter tuning for RL"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Implementation: Numerical Stability and Edge Cases",
+      "relation_to_problem": "This sub-quest synthesizes all previous concepts into a robust, production-ready implementation of the GRPO KL estimator with proper handling of numerical edge cases and validation.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Numerical computing best practices",
+        "Unit testing"
+      ],
+      "learning_objectives": [
+        "Implement the complete GRPO KL divergence estimator with all components",
+        "Handle numerical edge cases (very small probabilities, near-zero ratios, etc.)",
+        "Add input validation and error checking for robustness",
+        "Understand when to use log-space computation for stability",
+        "Test the implementation comprehensively"
+      ],
+      "math_content": {
+        "definition": "A **numerically stable** implementation of the GRPO KL estimator must handle edge cases that arise in practice: (1) very small probabilities (< $10^{-10}$) that can cause underflow, (2) large probability ratios (> $10^3$) that can cause overflow in the $r$ term, (3) ratios near zero where $\\log(r)$ approaches $-\\infty$, and (4) arrays with mixed magnitudes requiring careful scaling.",
+        "notation": "$\\epsilon_{machine}$ = machine precision (~$2.22 \\times 10^{-16}$ for float64), $\\epsilon_{threshold}$ = practical threshold for numerical safety (typically $10^{-10}$ to $10^{-8}$)",
+        "theorem": "**Log-Space Stability Theorem**: For probability ratios $r = \\frac{p}{q}$ where $p, q$ are very small (< $10^{-10}$), computing $\\log(r) = \\log(p) - \\log(q)$ is more numerically stable than computing $r = p/q$ followed by $\\log(r)$. This is because logarithms of small numbers are moderate-sized negative numbers, and their difference avoids intermediate overflow/underflow.",
+        "proof_sketch": "Consider $p = 10^{-100}$ and $q = 10^{-101}$. Direct computation: $r = 10^{-100}/10^{-101} = 10$, then $\\log(10) \\approx 2.303$. Both numbers are representable. However, for smaller values approaching machine precision, computing $r$ first can underflow to 0 (losing information), while $\\log(p) = -230.26$ and $\\log(q) = -232.56$ remain representable, giving $\\log(r) = 2.30$. The log-space path preserves precision.",
+        "examples": [
+          "Safe case: $\\pi_{\\theta} = 0.8, \\pi_{ref} = 0.4$ → compute $r = 0.5$ directly (no issues)",
+          "Underflow risk: $\\pi_{\\theta} = 10^{-150}, \\pi_{ref} = 10^{-151}$ → use log-space: $\\log(r) = -151 - (-150) = 1$",
+          "Edge case: $\\pi_{\\theta} = 0.999, \\pi_{ref} = 1.0$ → $r \\approx 1.001$, $f(r) \\approx 5 \\times 10^{-7}$ (very small but non-zero)",
+          "Validation: Always check that output is non-negative; negative values indicate bugs"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Robust Ratio Computation",
+          "latex": "$r = \\begin{cases} \\exp(\\log(\\pi_{ref}) - \\log(\\pi_{\\theta})) & \\text{if } \\min(\\pi_{ref}, \\pi_{\\theta}) < \\epsilon_{threshold} \\\\ \\pi_{ref} / \\pi_{\\theta} & \\text{otherwise} \\end{cases}$",
+          "description": "Choose computation method based on probability magnitude"
+        },
+        {
+          "name": "Complete Estimator",
+          "latex": "$\\hat{D}_{KL} = r - \\log(r) - 1$",
+          "description": "Final formula after computing r safely"
+        },
+        {
+          "name": "Validation Constraint",
+          "latex": "$\\hat{D}_{KL} \\geq 0$ (with tolerance for floating-point errors: $\\hat{D}_{KL} \\geq -10^{-10}$)",
+          "description": "Post-computation check; negative values indicate implementation error"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete, production-ready GRPO KL divergence estimator. This is the final solution that combines all previous sub-quests, handles edge cases properly, and matches the required function signature.",
+        "function_signature": "def kl_divergence_estimator(pi_theta: np.ndarray, pi_ref: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef kl_divergence_estimator(pi_theta: np.ndarray, pi_ref: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute the unbiased KL divergence estimator used in GRPO.\n    \n    Formula: D_KL = (pi_ref / pi_theta) - log(pi_ref / pi_theta) - 1\n    \n    This function should:\n    1. Compute the ratio r = pi_ref / pi_theta\n    2. Compute log(r)\n    3. Return r - log(r) - 1\n    4. Handle numerical edge cases appropriately\n    \n    Args:\n        pi_theta: Current policy probabilities for each sample\n        pi_ref: Reference policy probabilities for each sample\n        \n    Returns:\n        Array of KL divergence estimates (one per sample, all non-negative)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "kl_divergence_estimator(np.array([0.8]), np.array([0.4]))",
+            "expected": "np.array([0.193])",
+            "explanation": "Standard case from problem description: r=0.5, KL=0.5-log(0.5)-1≈0.193"
+          },
+          {
+            "input": "kl_divergence_estimator(np.array([1.0]), np.array([1.0]))",
+            "expected": "np.array([0.0])",
+            "explanation": "When policies match exactly, r=1, KL should be exactly 0"
+          },
+          {
+            "input": "kl_divergence_estimator(np.array([0.5, 0.3, 0.9]), np.array([0.5, 0.6, 0.9]))",
+            "expected": "np.array([0.0, 0.307, 0.0])",
+            "explanation": "Batch processing: first and third match (KL=0), second has r=2.0 (KL≈0.307)"
+          },
+          {
+            "input": "kl_divergence_estimator(np.array([0.1, 0.9]), np.array([0.9, 0.1]))",
+            "expected": "np.array([6.697, 1.643])",
+            "explanation": "Large divergences: first has r=9.0, second has r≈0.111, both produce significant KL values"
+          },
+          {
+            "input": "kl_divergence_estimator(np.array([1e-10, 0.5]), np.array([1e-10, 0.5]))",
+            "expected": "np.array([0.0, 0.0])",
+            "explanation": "Edge case with very small probabilities; when equal, should still give 0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the case where pi_theta contains zeros (division by zero)",
+        "Computing log(pi_ref / pi_theta) as log(pi_ref / pi_theta) instead of log(pi_ref) - log(pi_theta) for stability",
+        "Forgetting the -1 term in the formula r - log(r) - 1",
+        "Not validating that outputs are non-negative (fundamental property of KL divergence)",
+        "Incorrect order in ratio: using pi_theta/pi_ref instead of pi_ref/pi_theta",
+        "Not testing with edge cases like very small or very large probabilities",
+        "Assuming the function is symmetric in its arguments (it's not!)"
+      ],
+      "hint": "Follow the formula step by step: (1) compute r = pi_ref / pi_theta, (2) compute log_r = np.log(r), (3) return r - log_r - 1. Each step should use NumPy operations for efficiency. Consider what happens when r=1 to verify correctness.",
+      "references": [
+        "NumPy numerical computing best practices",
+        "Floating-point arithmetic and stability",
+        "GRPO algorithm implementation details",
+        "Information theory and divergence measures"
+      ]
+    }
+  ]
+}

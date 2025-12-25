@@ -1,0 +1,481 @@
+{
+  "problem_id": 15,
+  "title": "Linear Regression Using Gradient Descent",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "Write a Python function that performs linear regression using gradient descent. The function should take NumPy arrays X (features with a column of ones for the intercept) and y (target) as input, along with learning rate alpha and the number of iterations, and return the coefficients of the linear regression model as a NumPy array. Round your answer to four decimal places. -0.0 is a valid result for rounding a very small number.",
+  "example": {
+    "input": "X = np.array([[1, 1], [1, 2], [1, 3]]), y = np.array([1, 2, 3]), alpha = 0.01, iterations = 1000",
+    "output": "np.array([0.1107, 0.9513])",
+    "reasoning": "The linear model is y = 0.0 + 1.0*x, which fits the input data after gradient descent optimization."
+  },
+  "starter_code": "import numpy as np\n\ndef linear_regression_gradient_descent(X: np.ndarray, y: np.ndarray, alpha: float, iterations: int) -> np.ndarray:\n\t\"\"\"\n\tPerform linear regression using gradient descent.\n\n\tm = number of training examples\n\tn = number of parameters (features), technically n-1 features, 1st column is for intercept\n\n\tX: shape (m, n), `m` training examples with `n` input values for each feature\n\ty: shape (m, 1) array with the target values (ground truth)\n\talpha: learning rate\n\titerations: number of gradient descent steps\n\t\"\"\"\n\n\tm, n = X.shape\n\ty = y.reshape(-1, 1) \t# Make sure y is a column vector\n\ttheta = np.zeros((n, 1))\n\n\t# TODO: Your code here\n\n\treturn np.round(theta.flatten(), 4) \t# Rounded to 4 decimals",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding the Hypothesis Function and Predictions",
+      "relation_to_problem": "The hypothesis function $h_\\theta(x) = \\theta^T x$ is the core prediction mechanism in linear regression. Mastering it is essential for computing predictions and errors in gradient descent.",
+      "prerequisites": [
+        "Matrix multiplication",
+        "Dot products",
+        "NumPy array operations"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical representation of the hypothesis function",
+        "Implement vectorized computation of predictions for multiple training examples",
+        "Recognize how the design matrix X incorporates the intercept term"
+      ],
+      "math_content": {
+        "definition": "The **hypothesis function** in linear regression is a linear combination of input features: For input features $\\mathbf{x} = [x_0, x_1, \\ldots, x_{n-1}]^T$ where $x_0 = 1$ (intercept term), and parameters $\\boldsymbol{\\theta} = [\\theta_0, \\theta_1, \\ldots, \\theta_{n-1}]^T$, the hypothesis function is: $$h_\\theta(\\mathbf{x}) = \\theta_0 x_0 + \\theta_1 x_1 + \\cdots + \\theta_{n-1} x_{n-1} = \\boldsymbol{\\theta}^T \\mathbf{x}$$",
+        "notation": "$h_\\theta(\\mathbf{x})$ = predicted output for input $\\mathbf{x}$ given parameters $\\boldsymbol{\\theta}$; $\\theta_0$ = intercept (bias) term; $\\theta_j$ = weight for feature $j$; $x_0 = 1$ = dummy feature for intercept",
+        "theorem": "**Vectorization Theorem**: For $m$ training examples arranged in a design matrix $\\mathbf{X} \\in \\mathbb{R}^{m \\times n}$ where each row is a training example, the predictions for all examples can be computed simultaneously as: $$\\mathbf{h} = \\mathbf{X}\\boldsymbol{\\theta}$$ where $\\mathbf{h} \\in \\mathbb{R}^{m \\times 1}$ contains all predictions.",
+        "proof_sketch": "For the $i$-th training example, $h_\\theta(\\mathbf{x}^{(i)}) = \\sum_{j=0}^{n-1} \\theta_j x_j^{(i)}$. This is the dot product of row $i$ of $\\mathbf{X}$ with $\\boldsymbol{\\theta}$. Matrix multiplication $\\mathbf{X}\\boldsymbol{\\theta}$ performs this operation for all rows simultaneously, yielding a column vector of predictions.",
+        "examples": [
+          "**Example 1**: Single feature with intercept. Given $X = \\begin{bmatrix} 1 & 2 \\\\ 1 & 3 \\\\ 1 & 4 \\end{bmatrix}$ (3 examples, intercept + 1 feature) and $\\theta = \\begin{bmatrix} 0.5 \\\\ 1.0 \\end{bmatrix}$, then $h = X\\theta = \\begin{bmatrix} 1(0.5) + 2(1.0) \\\\ 1(0.5) + 3(1.0) \\\\ 1(0.5) + 4(1.0) \\end{bmatrix} = \\begin{bmatrix} 2.5 \\\\ 3.5 \\\\ 4.5 \\end{bmatrix}$",
+          "**Example 2**: Multiple features. Given $X = \\begin{bmatrix} 1 & 2 & 3 \\\\ 1 & 4 & 5 \\end{bmatrix}$ and $\\theta = \\begin{bmatrix} 1 \\\\ 0.5 \\\\ 0.2 \\end{bmatrix}$, then $h = \\begin{bmatrix} 1 + 1 + 0.6 \\\\ 1 + 2 + 1.0 \\end{bmatrix} = \\begin{bmatrix} 2.6 \\\\ 4.0 \\end{bmatrix}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Hypothesis Function (Scalar Form)",
+          "latex": "$h_\\theta(\\mathbf{x}) = \\theta_0 + \\theta_1 x_1 + \\theta_2 x_2 + \\cdots + \\theta_{n-1} x_{n-1}$",
+          "description": "Use for single prediction when thinking about individual examples"
+        },
+        {
+          "name": "Hypothesis Function (Vector Form)",
+          "latex": "$h_\\theta(\\mathbf{x}) = \\boldsymbol{\\theta}^T \\mathbf{x}$",
+          "description": "Compact notation for single prediction using dot product"
+        },
+        {
+          "name": "Vectorized Predictions",
+          "latex": "$\\mathbf{h} = \\mathbf{X}\\boldsymbol{\\theta}$",
+          "description": "Efficient computation for all training examples at once; essential for implementation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes predictions for all training examples using the hypothesis function. Given a design matrix X (with intercept column) and parameter vector theta, return the predictions as a column vector.",
+        "function_signature": "def compute_predictions(X: np.ndarray, theta: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_predictions(X: np.ndarray, theta: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute predictions using the hypothesis function h(x) = X * theta.\n    \n    X: shape (m, n) - design matrix with m examples and n parameters\n    theta: shape (n, 1) - parameter vector\n    \n    Returns: shape (m, 1) - predictions for all examples\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_predictions(np.array([[1, 1], [1, 2], [1, 3]]), np.array([[0], [1]]))",
+            "expected": "np.array([[1], [2], [3]])",
+            "explanation": "With theta = [0, 1], the model predicts h(x) = 0 + 1*x, so predictions are [1, 2, 3]"
+          },
+          {
+            "input": "compute_predictions(np.array([[1, 2], [1, 4]]), np.array([[1], [0.5]]))",
+            "expected": "np.array([[2], [3]])",
+            "explanation": "With theta = [1, 0.5], predictions are [1 + 2*0.5, 1 + 4*0.5] = [2, 3]"
+          },
+          {
+            "input": "compute_predictions(np.array([[1, 1, 2], [1, 2, 3], [1, 3, 4]]), np.array([[0.5], [1.0], [0.5]]))",
+            "expected": "np.array([[2.5], [4.0], [5.5]])",
+            "explanation": "Multiple features: h(x) = 0.5 + 1.0*x1 + 0.5*x2"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that theta must be a column vector (n, 1) not (n,) for proper matrix multiplication",
+        "Not including the intercept column (column of ones) in X",
+        "Using element-wise multiplication (*) instead of matrix multiplication (@) or np.dot()",
+        "Shape mismatches: ensure X.shape is (m, n) and theta.shape is (n, 1) so result is (m, 1)"
+      ],
+      "hint": "Use NumPy's matrix multiplication operator @ or np.dot(). Verify shapes: X @ theta should automatically broadcast correctly if shapes are compatible.",
+      "references": [
+        "Linear algebra: matrix-vector multiplication",
+        "NumPy broadcasting rules",
+        "Design matrix representation in machine learning"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Computing Prediction Errors and the Cost Function",
+      "relation_to_problem": "The cost function $J(\\theta)$ quantifies how well our current parameters fit the data. Understanding and computing errors is fundamental to knowing what gradient descent must minimize.",
+      "prerequisites": [
+        "Hypothesis function",
+        "Mean Squared Error (MSE)",
+        "Vector arithmetic"
+      ],
+      "learning_objectives": [
+        "Understand the Mean Squared Error cost function and its role in optimization",
+        "Compute prediction errors (residuals) for all training examples",
+        "Calculate the cost function value to monitor convergence"
+      ],
+      "math_content": {
+        "definition": "The **cost function** (or loss function) measures the discrepancy between predictions and actual values. For linear regression, we use Mean Squared Error (MSE): $$J(\\boldsymbol{\\theta}) = \\frac{1}{2m} \\sum_{i=1}^{m} \\left(h_\\theta(\\mathbf{x}^{(i)}) - y^{(i)}\\right)^2$$ where $m$ is the number of training examples, $h_\\theta(\\mathbf{x}^{(i)})$ is the prediction for example $i$, and $y^{(i)}$ is the actual target value.",
+        "notation": "$J(\\boldsymbol{\\theta})$ = cost function value; $m$ = number of training examples; $h_\\theta(\\mathbf{x}^{(i)})$ = prediction for example $i$; $y^{(i)}$ = actual target for example $i$; $\\mathbf{e} = \\mathbf{h} - \\mathbf{y}$ = error vector (residuals)",
+        "theorem": "**Vectorized Cost Function**: The cost can be computed efficiently as: $$J(\\boldsymbol{\\theta}) = \\frac{1}{2m} (\\mathbf{X}\\boldsymbol{\\theta} - \\mathbf{y})^T(\\mathbf{X}\\boldsymbol{\\theta} - \\mathbf{y}) = \\frac{1}{2m} \\|\\mathbf{X}\\boldsymbol{\\theta} - \\mathbf{y}\\|^2$$ This is the squared $L^2$ norm of the error vector.",
+        "proof_sketch": "Let $\\mathbf{e} = \\mathbf{X}\\boldsymbol{\\theta} - \\mathbf{y}$ be the error vector. Then $\\sum_{i=1}^{m} e_i^2 = \\mathbf{e}^T\\mathbf{e} = \\|\\mathbf{e}\\|^2$. The factor $\\frac{1}{2m}$ normalizes by sample size (the $\\frac{1}{2}$ simplifies derivative calculations).",
+        "examples": [
+          "**Example 1**: Given predictions $\\mathbf{h} = [2, 3, 4]^T$ and actual values $\\mathbf{y} = [1.5, 3.5, 3.8]^T$ with $m=3$. Errors: $\\mathbf{e} = [0.5, -0.5, 0.2]^T$. Cost: $J = \\frac{1}{6}(0.5^2 + 0.5^2 + 0.2^2) = \\frac{1}{6}(0.25 + 0.25 + 0.04) = \\frac{0.54}{6} \\approx 0.09$",
+          "**Example 2**: Perfect predictions where $\\mathbf{h} = \\mathbf{y}$. Then $\\mathbf{e} = \\mathbf{0}$ and $J(\\boldsymbol{\\theta}) = 0$, which is the global minimum."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Error Vector (Residuals)",
+          "latex": "$\\mathbf{e} = \\mathbf{h} - \\mathbf{y} = \\mathbf{X}\\boldsymbol{\\theta} - \\mathbf{y}$",
+          "description": "Difference between predictions and actual values; used in both cost and gradient computation"
+        },
+        {
+          "name": "Mean Squared Error Cost",
+          "latex": "$J(\\boldsymbol{\\theta}) = \\frac{1}{2m} \\sum_{i=1}^{m} (h_\\theta(\\mathbf{x}^{(i)}) - y^{(i)})^2$",
+          "description": "The objective function to minimize during gradient descent"
+        },
+        {
+          "name": "Vectorized Cost",
+          "latex": "$J(\\boldsymbol{\\theta}) = \\frac{1}{2m} \\mathbf{e}^T\\mathbf{e}$",
+          "description": "Efficient vectorized computation using error vector"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the MSE cost function. Given predictions (h), actual target values (y), and the number of examples (m), return the cost value.",
+        "function_signature": "def compute_cost(h: np.ndarray, y: np.ndarray, m: int) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_cost(h: np.ndarray, y: np.ndarray, m: int) -> float:\n    \"\"\"\n    Compute the Mean Squared Error cost function.\n    \n    h: shape (m, 1) - predictions\n    y: shape (m, 1) - actual target values\n    m: number of training examples\n    \n    Returns: scalar cost value\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_cost(np.array([[1], [2], [3]]), np.array([[1], [2], [3]]), 3)",
+            "expected": "0.0",
+            "explanation": "Perfect predictions yield zero cost"
+          },
+          {
+            "input": "compute_cost(np.array([[2], [3], [4]]), np.array([[1], [2], [3]]), 3)",
+            "expected": "0.5",
+            "explanation": "Errors are [1, 1, 1], so cost = (1/6)(1 + 1 + 1) = 0.5"
+          },
+          {
+            "input": "compute_cost(np.array([[1.5], [2.8], [4.2]]), np.array([[1], [3], [4]]), 3)",
+            "expected": "0.04833333",
+            "explanation": "Errors are [0.5, -0.2, 0.2], cost = (1/6)(0.25 + 0.04 + 0.04) ≈ 0.0483"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting the factor of 1/(2m) - both 2 and m are important",
+        "Not squaring the errors before summing",
+        "Computing element-wise products instead of the dot product for e^T * e",
+        "Using the wrong axis for np.sum() when working with matrices"
+      ],
+      "hint": "Compute the error vector first: e = h - y. Then use e.T @ e or np.sum(e**2) to get the sum of squared errors. Don't forget to divide by 2m.",
+      "references": [
+        "Mean Squared Error in regression",
+        "L2 norm",
+        "Convex optimization objective functions"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Deriving and Computing the Gradient Vector",
+      "relation_to_problem": "The gradient $\\nabla J(\\boldsymbol{\\theta})$ tells us which direction to adjust parameters to reduce the cost. Computing it correctly is the heart of gradient descent.",
+      "prerequisites": [
+        "Partial derivatives",
+        "Chain rule",
+        "Matrix calculus",
+        "Cost function"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical derivation of the gradient for MSE cost function",
+        "Implement vectorized gradient computation for all parameters simultaneously",
+        "Recognize how the gradient points in the direction of steepest increase"
+      ],
+      "math_content": {
+        "definition": "The **gradient vector** $\\nabla J(\\boldsymbol{\\theta})$ is a vector of partial derivatives of the cost function with respect to each parameter: $$\\nabla J(\\boldsymbol{\\theta}) = \\begin{bmatrix} \\frac{\\partial J}{\\partial \\theta_0} \\\\ \\frac{\\partial J}{\\partial \\theta_1} \\\\ \\vdots \\\\ \\frac{\\partial J}{\\partial \\theta_{n-1}} \\end{bmatrix}$$ Each component indicates how much the cost changes with a small change in that parameter.",
+        "notation": "$\\nabla J$ = gradient vector; $\\frac{\\partial J}{\\partial \\theta_j}$ = partial derivative of cost with respect to parameter $j$; $\\alpha$ = learning rate (step size)",
+        "theorem": "**Gradient of MSE Cost Function**: For linear regression with cost $J(\\boldsymbol{\\theta}) = \\frac{1}{2m}(\\mathbf{X}\\boldsymbol{\\theta} - \\mathbf{y})^T(\\mathbf{X}\\boldsymbol{\\theta} - \\mathbf{y})$, the gradient is: $$\\nabla J(\\boldsymbol{\\theta}) = \\frac{1}{m} \\mathbf{X}^T(\\mathbf{X}\\boldsymbol{\\theta} - \\mathbf{y})$$",
+        "proof_sketch": "Using the chain rule: $\\frac{\\partial J}{\\partial \\theta_j} = \\frac{1}{m}\\sum_{i=1}^{m}(h_\\theta(\\mathbf{x}^{(i)}) - y^{(i)}) \\cdot \\frac{\\partial h_\\theta(\\mathbf{x}^{(i)})}{\\partial \\theta_j}$. Since $h_\\theta(\\mathbf{x}^{(i)}) = \\sum_{k=0}^{n-1} \\theta_k x_k^{(i)}$, we have $\\frac{\\partial h_\\theta(\\mathbf{x}^{(i)})}{\\partial \\theta_j} = x_j^{(i)}$. Thus: $\\frac{\\partial J}{\\partial \\theta_j} = \\frac{1}{m}\\sum_{i=1}^{m}(h_\\theta(\\mathbf{x}^{(i)}) - y^{(i)}) x_j^{(i)}$. In vector form, this is exactly the $j$-th component of $\\frac{1}{m}\\mathbf{X}^T(\\mathbf{X}\\boldsymbol{\\theta} - \\mathbf{y})$.",
+        "examples": [
+          "**Example 1**: Consider $X = \\begin{bmatrix} 1 & 2 \\\\ 1 & 4 \\end{bmatrix}$, $y = \\begin{bmatrix} 3 \\\\ 5 \\end{bmatrix}$, $\\theta = \\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix}$, $m=2$. Predictions: $h = \\begin{bmatrix} 2 \\\\ 4 \\end{bmatrix}$. Errors: $e = \\begin{bmatrix} -1 \\\\ -1 \\end{bmatrix}$. Gradient: $\\nabla J = \\frac{1}{2}\\begin{bmatrix} 1 & 1 \\\\ 2 & 4 \\end{bmatrix}\\begin{bmatrix} -1 \\\\ -1 \\end{bmatrix} = \\frac{1}{2}\\begin{bmatrix} -2 \\\\ -6 \\end{bmatrix} = \\begin{bmatrix} -1 \\\\ -3 \\end{bmatrix}$",
+          "**Example 2**: At the optimal parameters where predictions match targets perfectly, $\\mathbf{X}\\boldsymbol{\\theta} = \\mathbf{y}$, so the error vector is zero and $\\nabla J = \\mathbf{0}$. This is the stationary point."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gradient Component (Scalar Form)",
+          "latex": "$\\frac{\\partial J}{\\partial \\theta_j} = \\frac{1}{m}\\sum_{i=1}^{m}(h_\\theta(\\mathbf{x}^{(i)}) - y^{(i)}) x_j^{(i)}$",
+          "description": "Individual gradient for parameter j; derived from chain rule"
+        },
+        {
+          "name": "Gradient Vector (Vectorized Form)",
+          "latex": "$\\nabla J(\\boldsymbol{\\theta}) = \\frac{1}{m} \\mathbf{X}^T(\\mathbf{X}\\boldsymbol{\\theta} - \\mathbf{y})$",
+          "description": "Efficient computation of all gradients at once; essential for implementation"
+        },
+        {
+          "name": "Gradient with Error Vector",
+          "latex": "$\\nabla J = \\frac{1}{m} \\mathbf{X}^T \\mathbf{e}$",
+          "description": "Simplified form using error vector e = h - y"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the gradient vector for all parameters. Given the design matrix X, error vector (predictions - targets), and number of examples m, return the gradient vector.",
+        "function_signature": "def compute_gradient(X: np.ndarray, error: np.ndarray, m: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_gradient(X: np.ndarray, error: np.ndarray, m: int) -> np.ndarray:\n    \"\"\"\n    Compute the gradient vector for MSE cost function.\n    \n    X: shape (m, n) - design matrix\n    error: shape (m, 1) - prediction errors (h - y)\n    m: number of training examples\n    \n    Returns: shape (n, 1) - gradient vector\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_gradient(np.array([[1, 1], [1, 2], [1, 3]]), np.array([[0], [0], [0]]), 3)",
+            "expected": "np.array([[0], [0]])",
+            "explanation": "Zero errors mean perfect fit, so gradient is zero (optimal point)"
+          },
+          {
+            "input": "compute_gradient(np.array([[1, 2], [1, 4]]), np.array([[-1], [-1]]), 2)",
+            "expected": "np.array([[-1], [-3]])",
+            "explanation": "X^T * error = [[1,1],[2,4]] * [[-1],[-1]] = [[-2],[-6]], divided by m=2 gives [[-1],[-3]]"
+          },
+          {
+            "input": "compute_gradient(np.array([[1, 1], [1, 2], [1, 3]]), np.array([[1], [0], [-1]]), 3)",
+            "expected": "np.array([[0], [0]])",
+            "explanation": "Errors sum to zero across examples, resulting in zero gradient"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to transpose X (must use X^T, not X)",
+        "Not dividing by m (the number of training examples)",
+        "Using X * error (element-wise) instead of X.T @ error (matrix multiplication)",
+        "Shape errors: ensure error is (m, 1) and result should be (n, 1)"
+      ],
+      "hint": "The gradient formula is (1/m) * X.T @ error. Make sure to use the transpose of X and proper matrix multiplication.",
+      "references": [
+        "Matrix calculus",
+        "Partial derivatives",
+        "Chain rule in multivariable calculus",
+        "Convex optimization gradients"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "The Gradient Descent Update Rule",
+      "relation_to_problem": "This is where optimization happens: using the gradient to iteratively adjust parameters to minimize the cost function. Understanding the update rule is crucial for implementing the algorithm.",
+      "prerequisites": [
+        "Gradient computation",
+        "Iterative algorithms",
+        "Learning rate concept"
+      ],
+      "learning_objectives": [
+        "Understand how gradient descent uses gradients to update parameters",
+        "Implement a single iteration of the gradient descent update",
+        "Recognize the role of the learning rate in controlling convergence"
+      ],
+      "math_content": {
+        "definition": "**Gradient Descent** is an iterative optimization algorithm that updates parameters by moving in the direction opposite to the gradient (downhill). The update rule is: $$\\boldsymbol{\\theta}^{(t+1)} = \\boldsymbol{\\theta}^{(t)} - \\alpha \\nabla J(\\boldsymbol{\\theta}^{(t)})$$ where $\\boldsymbol{\\theta}^{(t)}$ denotes parameters at iteration $t$, $\\alpha > 0$ is the learning rate, and $\\nabla J$ is the gradient vector.",
+        "notation": "$\\boldsymbol{\\theta}^{(t)}$ = parameters at iteration $t$; $\\alpha$ = learning rate (step size); $\\nabla J$ = gradient vector; $t$ = iteration number",
+        "theorem": "**Convergence of Gradient Descent for Convex Functions**: For a convex, differentiable cost function with Lipschitz continuous gradient, gradient descent with sufficiently small learning rate $\\alpha$ converges to the global minimum. The MSE cost function in linear regression is convex, guaranteeing convergence.",
+        "proof_sketch": "For convex $J$, the first-order condition states that $\\boldsymbol{\\theta}^*$ is a minimizer if and only if $\\nabla J(\\boldsymbol{\\theta}^*) = \\mathbf{0}$. Gradient descent moves in the direction $-\\nabla J$, which is the direction of steepest descent. With appropriate $\\alpha$, each step reduces $J$. Since $J$ is bounded below (by 0) and decreases monotonically, it must converge to the minimum where $\\nabla J = \\mathbf{0}$.",
+        "examples": [
+          "**Example 1**: Starting from $\\theta = [0, 0]^T$ with gradient $\\nabla J = [-2, -4]^T$ and $\\alpha = 0.1$. Update: $\\theta^{(1)} = [0, 0]^T - 0.1[-2, -4]^T = [0.2, 0.4]^T$. The parameters moved in the direction opposite to the gradient.",
+          "**Example 2**: Learning rate effect. With large $\\alpha = 10$ and $\\nabla J = [-2, -4]^T$: $\\theta^{(1)} = [0, 0]^T - 10[-2, -4]^T = [20, 40]^T$. This huge step might overshoot the minimum, causing divergence. With small $\\alpha = 0.001$: $\\theta^{(1)} = [0.002, 0.004]^T$. Progress is very slow but stable."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gradient Descent Update (Vector Form)",
+          "latex": "$\\boldsymbol{\\theta}^{(t+1)} = \\boldsymbol{\\theta}^{(t)} - \\alpha \\nabla J(\\boldsymbol{\\theta}^{(t)})$",
+          "description": "Simultaneous update of all parameters; move opposite to gradient direction"
+        },
+        {
+          "name": "Parameter-wise Update",
+          "latex": "$\\theta_j^{(t+1)} = \\theta_j^{(t)} - \\alpha \\frac{\\partial J}{\\partial \\theta_j}$",
+          "description": "Update rule for individual parameter j; all parameters update using the same gradient"
+        },
+        {
+          "name": "Combined Update with Gradient Formula",
+          "latex": "$\\boldsymbol{\\theta} := \\boldsymbol{\\theta} - \\frac{\\alpha}{m} \\mathbf{X}^T(\\mathbf{X}\\boldsymbol{\\theta} - \\mathbf{y})$",
+          "description": "Complete update rule substituting the gradient formula; used in actual implementation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs a single gradient descent update. Given current parameters theta, the gradient vector, and learning rate alpha, return the updated parameters.",
+        "function_signature": "def gradient_descent_step(theta: np.ndarray, gradient: np.ndarray, alpha: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef gradient_descent_step(theta: np.ndarray, gradient: np.ndarray, alpha: float) -> np.ndarray:\n    \"\"\"\n    Perform one gradient descent update step.\n    \n    theta: shape (n, 1) - current parameter values\n    gradient: shape (n, 1) - gradient vector\n    alpha: learning rate (step size)\n    \n    Returns: shape (n, 1) - updated parameters\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "gradient_descent_step(np.array([[0], [0]]), np.array([[-2], [-4]]), 0.1)",
+            "expected": "np.array([[0.2], [0.4]])",
+            "explanation": "theta - alpha * gradient = [0,0] - 0.1*[-2,-4] = [0.2, 0.4]"
+          },
+          {
+            "input": "gradient_descent_step(np.array([[1], [2]]), np.array([[0.5], [1.0]]), 0.01)",
+            "expected": "np.array([[0.995], [1.99]])",
+            "explanation": "theta - alpha * gradient = [1,2] - 0.01*[0.5,1.0] = [0.995, 1.99]"
+          },
+          {
+            "input": "gradient_descent_step(np.array([[5], [10]]), np.array([[0], [0]]), 0.1)",
+            "expected": "np.array([[5], [10]])",
+            "explanation": "Zero gradient means we're at optimal point; parameters don't change"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Adding the gradient instead of subtracting (moving uphill instead of downhill)",
+        "Forgetting to multiply by the learning rate alpha",
+        "Updating parameters sequentially instead of simultaneously (must compute gradient with old theta, then update all)",
+        "Using the wrong learning rate (too large causes divergence, too small is inefficient)"
+      ],
+      "hint": "The update is simply: new_theta = old_theta - alpha * gradient. Make sure to subtract, not add!",
+      "references": [
+        "Optimization algorithms",
+        "Gradient descent variants",
+        "Learning rate scheduling",
+        "Convex optimization"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Iterative Optimization and Convergence Monitoring",
+      "relation_to_problem": "Gradient descent requires multiple iterations to converge. Understanding iteration loops and when to stop is essential for practical implementation.",
+      "prerequisites": [
+        "Gradient descent update rule",
+        "Loop constructs",
+        "Convergence criteria"
+      ],
+      "learning_objectives": [
+        "Implement multiple iterations of gradient descent in a loop",
+        "Understand different stopping criteria (fixed iterations vs. convergence threshold)",
+        "Monitor cost function to verify the algorithm is working correctly"
+      ],
+      "math_content": {
+        "definition": "**Iterative Optimization** repeatedly applies the gradient descent update until the algorithm converges or reaches a maximum number of iterations. At each iteration $t$, we: (1) Compute predictions $\\mathbf{h}^{(t)} = \\mathbf{X}\\boldsymbol{\\theta}^{(t)}$, (2) Compute errors $\\mathbf{e}^{(t)} = \\mathbf{h}^{(t)} - \\mathbf{y}$, (3) Compute gradient $\\nabla J^{(t)} = \\frac{1}{m}\\mathbf{X}^T\\mathbf{e}^{(t)}$, (4) Update parameters $\\boldsymbol{\\theta}^{(t+1)} = \\boldsymbol{\\theta}^{(t)} - \\alpha \\nabla J^{(t)}$.",
+        "notation": "$t$ = iteration number; $T$ = maximum iterations; $\\epsilon$ = convergence threshold; $|\\nabla J|$ = magnitude of gradient vector; $|\\Delta J|$ = change in cost",
+        "theorem": "**Monotonic Decrease Property**: For convex cost functions with appropriate learning rate, the cost decreases monotonically: $J(\\boldsymbol{\\theta}^{(t+1)}) \\leq J(\\boldsymbol{\\theta}^{(t)})$ for all $t$. If the cost increases, the learning rate is too large.",
+        "proof_sketch": "A Taylor expansion shows that moving in the negative gradient direction decreases the function value: $J(\\boldsymbol{\\theta} - \\alpha \\nabla J) \\approx J(\\boldsymbol{\\theta}) - \\alpha \\|\\nabla J\\|^2 + O(\\alpha^2)$. For sufficiently small $\\alpha$, the $\\alpha \\|\\nabla J\\|^2$ term dominates, guaranteeing decrease.",
+        "examples": [
+          "**Example 1**: Fixed iterations. Run exactly 1000 iterations regardless of convergence. Simple but may waste computation if converged early or stop before convergence.",
+          "**Example 2**: Convergence by gradient magnitude. Stop when $\\|\\nabla J\\| < \\epsilon = 10^{-6}$. This means the gradient is nearly zero (near optimal). More sophisticated but requires choosing $\\epsilon$.",
+          "**Example 3**: Convergence by cost change. Stop when $|J^{(t)} - J^{(t-1)}| < \\epsilon$. The cost is barely changing, suggesting convergence."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Full Gradient Descent Algorithm",
+          "latex": "$\\text{For } t = 0, 1, 2, \\ldots, T: \\quad \\boldsymbol{\\theta}^{(t+1)} = \\boldsymbol{\\theta}^{(t)} - \\frac{\\alpha}{m}\\mathbf{X}^T(\\mathbf{X}\\boldsymbol{\\theta}^{(t)} - \\mathbf{y})$",
+          "description": "Complete iterative algorithm; repeat until convergence or max iterations"
+        },
+        {
+          "name": "Gradient Magnitude Stopping Criterion",
+          "latex": "$\\|\\nabla J(\\boldsymbol{\\theta}^{(t)})\\| < \\epsilon$",
+          "description": "Stop when gradient norm is below threshold; indicates near-optimal point"
+        },
+        {
+          "name": "Cost Change Stopping Criterion",
+          "latex": "$|J(\\boldsymbol{\\theta}^{(t)}) - J(\\boldsymbol{\\theta}^{(t-1)})| < \\epsilon$",
+          "description": "Stop when cost barely changes between iterations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the iterative gradient descent loop. Given initial parameters theta, design matrix X, targets y, learning rate alpha, and number of iterations, perform the specified number of gradient descent updates and return the final parameters. Track and print the cost every 100 iterations to monitor convergence.",
+        "function_signature": "def iterative_gradient_descent(theta: np.ndarray, X: np.ndarray, y: np.ndarray, alpha: float, iterations: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef iterative_gradient_descent(theta: np.ndarray, X: np.ndarray, y: np.ndarray, alpha: float, iterations: int) -> np.ndarray:\n    \"\"\"\n    Perform gradient descent for a fixed number of iterations.\n    \n    theta: shape (n, 1) - initial parameters (typically zeros)\n    X: shape (m, n) - design matrix\n    y: shape (m, 1) - target values\n    alpha: learning rate\n    iterations: number of gradient descent steps\n    \n    Returns: shape (n, 1) - optimized parameters\n    \"\"\"\n    m = X.shape[0]\n    \n    for i in range(iterations):\n        # Your code here: compute predictions, errors, gradient, and update theta\n        \n        # Optional: print cost every 100 iterations for monitoring\n        if i % 100 == 0:\n            # Compute and print cost\n            pass\n    \n    return theta",
+        "test_cases": [
+          {
+            "input": "iterative_gradient_descent(np.array([[0], [0]]), np.array([[1, 1], [1, 2], [1, 3]]), np.array([[1], [2], [3]]), 0.01, 1000)",
+            "expected": "np.array([[0.1107], [0.9513]]) (approximately)",
+            "explanation": "After 1000 iterations with alpha=0.01, parameters converge near the optimal solution for y = 0 + 1*x"
+          },
+          {
+            "input": "iterative_gradient_descent(np.array([[0], [0]]), np.array([[1, 2], [1, 4], [1, 6]]), np.array([[3], [5], [7]]), 0.01, 500)",
+            "expected": "Parameters approaching y = 1 + 1*x",
+            "explanation": "Linear relationship with slope 1 and intercept 1"
+          },
+          {
+            "input": "iterative_gradient_descent(np.array([[0], [0]]), np.array([[1, 1], [1, 1], [1, 1]]), np.array([[5], [5], [5]]), 0.1, 100)",
+            "expected": "np.array([[5], [0]]) (approximately)",
+            "explanation": "All x values are 1, so optimal is theta0=5 (mean of y) and theta1=0 (no slope)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not initializing parameters (should start with zeros typically)",
+        "Updating parameters inside the gradient computation (must compute gradient first with old theta)",
+        "Not checking if cost is decreasing (if cost increases, learning rate is too large)",
+        "Running too few iterations for convergence",
+        "Using gradient from previous iteration instead of recomputing each time"
+      ],
+      "hint": "Inside the loop: (1) compute h = X @ theta, (2) compute error = h - y, (3) compute gradient = (1/m) * X.T @ error, (4) update theta = theta - alpha * gradient. Repeat for the specified number of iterations.",
+      "references": [
+        "Iterative algorithms",
+        "Convergence criteria in optimization",
+        "Learning rate tuning",
+        "Debugging gradient descent"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Linear Regression with Gradient Descent",
+      "relation_to_problem": "This final quest integrates all previous concepts into a complete implementation, matching the exact problem requirements including initialization, iteration, and output formatting.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "NumPy array operations",
+        "Function design"
+      ],
+      "learning_objectives": [
+        "Integrate all components into a complete linear regression function",
+        "Handle proper initialization of parameters",
+        "Format output correctly with rounding",
+        "Understand the complete gradient descent workflow for linear regression"
+      ],
+      "math_content": {
+        "definition": "**Complete Linear Regression via Gradient Descent** combines all components: Given training data $(\\mathbf{X}, \\mathbf{y})$, learning rate $\\alpha$, and iterations $T$, the algorithm: (1) Initializes $\\boldsymbol{\\theta} = \\mathbf{0}$, (2) For $t = 0$ to $T-1$: computes $\\nabla J = \\frac{1}{m}\\mathbf{X}^T(\\mathbf{X}\\boldsymbol{\\theta} - \\mathbf{y})$ and updates $\\boldsymbol{\\theta} := \\boldsymbol{\\theta} - \\alpha \\nabla J$, (3) Returns optimized $\\boldsymbol{\\theta}$.",
+        "notation": "$\\mathbf{X} \\in \\mathbb{R}^{m \\times n}$ = design matrix with intercept column; $\\mathbf{y} \\in \\mathbb{R}^{m}$ = target vector; $\\boldsymbol{\\theta} \\in \\mathbb{R}^{n}$ = parameter vector; $\\alpha$ = learning rate; $T$ = iterations",
+        "theorem": "**Optimality Conditions**: The gradient descent algorithm converges to parameters $\\boldsymbol{\\theta}^*$ satisfying the normal equation $\\mathbf{X}^T\\mathbf{X}\\boldsymbol{\\theta}^* = \\mathbf{X}^T\\mathbf{y}$, which are the optimal least-squares parameters. At convergence, $\\nabla J(\\boldsymbol{\\theta}^*) = \\frac{1}{m}\\mathbf{X}^T(\\mathbf{X}\\boldsymbol{\\theta}^* - \\mathbf{y}) = \\mathbf{0}$.",
+        "proof_sketch": "At the minimum of convex $J$, the gradient must be zero: $\\nabla J = \\mathbf{0}$. This gives $\\mathbf{X}^T(\\mathbf{X}\\boldsymbol{\\theta} - \\mathbf{y}) = \\mathbf{0}$, which simplifies to $\\mathbf{X}^T\\mathbf{X}\\boldsymbol{\\theta} = \\mathbf{X}^T\\mathbf{y}$. If $\\mathbf{X}^T\\mathbf{X}$ is invertible, $\\boldsymbol{\\theta}^* = (\\mathbf{X}^T\\mathbf{X})^{-1}\\mathbf{X}^T\\mathbf{y}$, the closed-form solution. Gradient descent iteratively approximates this solution.",
+        "examples": [
+          "**Example 1**: Simple linear fit. $X = [[1,1],[1,2],[1,3]]$, $y = [1,2,3]$. Perfect linear relationship $y = 0 + 1 \\cdot x$. Gradient descent with $\\alpha=0.01$, $T=1000$ converges to $\\theta \\approx [0.1107, 0.9513]$ (close to [0, 1] with some numerical error).",
+          "**Example 2**: Constant prediction. $X = [[1,1],[1,1],[1,1]]$, $y = [5,5,5]$. Since all x are identical, only intercept matters. Optimal: $\\theta = [5, 0]$ (intercept equals mean of y).",
+          "**Example 3**: Multiple features. $X = [[1,2,3],[1,4,5]]$, $y = [10,20]$. With 3 parameters and only 2 examples, the system is underdetermined. Gradient descent finds one solution among infinitely many that minimize MSE."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Algorithm (Pseudocode)",
+          "latex": "$\\boldsymbol{\\theta} \\leftarrow \\mathbf{0}; \\text{ for } t=1 \\text{ to } T: \\boldsymbol{\\theta} \\leftarrow \\boldsymbol{\\theta} - \\frac{\\alpha}{m}\\mathbf{X}^T(\\mathbf{X}\\boldsymbol{\\theta} - \\mathbf{y})$",
+          "description": "Full algorithm: initialize, iterate, return"
+        },
+        {
+          "name": "Normal Equation (Closed Form)",
+          "latex": "$\\boldsymbol{\\theta}^* = (\\mathbf{X}^T\\mathbf{X})^{-1}\\mathbf{X}^T\\mathbf{y}$",
+          "description": "Direct solution without iteration; what gradient descent approximates"
+        },
+        {
+          "name": "Prediction Function",
+          "latex": "$\\hat{y}_{\\text{new}} = \\boldsymbol{\\theta}^T \\mathbf{x}_{\\text{new}}$",
+          "description": "Use learned parameters to make predictions on new data"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete linear regression function using gradient descent. The function should: (1) Extract dimensions m and n, (2) Reshape y to column vector, (3) Initialize theta as zeros, (4) Perform gradient descent iterations, (5) Return flattened and rounded theta. This synthesizes all previous sub-quests into the final solution structure (without revealing the exact implementation details).",
+        "function_signature": "def linear_regression_gradient_descent(X: np.ndarray, y: np.ndarray, alpha: float, iterations: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef linear_regression_gradient_descent(X: np.ndarray, y: np.ndarray, alpha: float, iterations: int) -> np.ndarray:\n    \"\"\"\n    Perform linear regression using gradient descent.\n    \n    X: shape (m, n) - design matrix with intercept column\n    y: shape (m,) or (m, 1) - target values\n    alpha: learning rate\n    iterations: number of gradient descent iterations\n    \n    Returns: shape (n,) - optimized parameters rounded to 4 decimals\n    \"\"\"\n    # Extract dimensions\n    m, n = X.shape\n    \n    # Ensure y is a column vector\n    y = y.reshape(-1, 1)\n    \n    # Initialize parameters\n    theta = np.zeros((n, 1))\n    \n    # Gradient descent loop\n    for i in range(iterations):\n        # TODO: Implement the gradient descent update\n        # Hint: Use concepts from all previous sub-quests\n        pass\n    \n    # Return flattened and rounded parameters\n    return np.round(theta.flatten(), 4)",
+        "test_cases": [
+          {
+            "input": "linear_regression_gradient_descent(np.array([[1, 1], [1, 2], [1, 3]]), np.array([1, 2, 3]), 0.01, 1000)",
+            "expected": "np.array([0.1107, 0.9513])",
+            "explanation": "Linear relationship y = 0 + 1*x; parameters converge near true values [0, 1]"
+          },
+          {
+            "input": "linear_regression_gradient_descent(np.array([[1, 0], [1, 1], [1, 2]]), np.array([1, 3, 5]), 0.01, 1000)",
+            "expected": "Parameters near [1, 2] representing y = 1 + 2*x",
+            "explanation": "Perfect linear fit with intercept=1, slope=2"
+          },
+          {
+            "input": "linear_regression_gradient_descent(np.array([[1, 2, 1], [1, 3, 2], [1, 4, 3]]), np.array([7, 10, 13]), 0.01, 1000)",
+            "expected": "Parameters representing y = 1 + 2*x1 + 3*x2 (approximately)",
+            "explanation": "Multiple linear regression with two features"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not reshaping y to a column vector (causes dimension mismatch)",
+        "Not flattening theta before returning (should return 1D array, not 2D)",
+        "Forgetting to round to 4 decimal places as required",
+        "Initializing theta with random values instead of zeros (non-deterministic results)",
+        "Using incorrect dimensions for theta (should be (n, 1) during computation)"
+      ],
+      "hint": "Combine all previous concepts: (1) predictions = X @ theta, (2) error = predictions - y, (3) gradient = (1/m) * X.T @ error, (4) theta = theta - alpha * gradient. Repeat for the specified iterations. Remember proper reshaping and rounding.",
+      "references": [
+        "Complete gradient descent implementation",
+        "Normal equation comparison",
+        "Scikit-learn LinearRegression",
+        "Optimization in machine learning"
+      ]
+    }
+  ]
+}

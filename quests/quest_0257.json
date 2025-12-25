@@ -1,0 +1,486 @@
+{
+  "problem_id": 257,
+  "title": "Compute Temporal Difference Error",
+  "category": "Reinforcement Learning",
+  "difficulty": "easy",
+  "description": "Implement a function to compute the Temporal Difference (TD) error for a single state transition in reinforcement learning.\n\nThe TD error measures how much the current value estimate differs from a better estimate that incorporates the immediate reward and the bootstrapped value of the next state.\n\nGiven:\n- `v_s`: The current estimate of the value for state s\n- `reward`: The immediate reward received after transitioning from state s  \n- `v_s_prime`: The current estimate of the value for the next state s'\n- `gamma`: The discount factor (between 0 and 1)\n- `done`: A boolean indicating if the next state is terminal\n\nReturn the TD error as a float. Note that when the episode terminates (done=True), there is no future value to bootstrap from since the episode ends.\n\nOnly use NumPy.",
+  "example": {
+    "input": "v_s=5.0, reward=1.0, v_s_prime=10.0, gamma=0.9, done=False",
+    "output": "5.0",
+    "reasoning": "TD target = reward + gamma * V(s') = 1.0 + 0.9 * 10.0 = 10.0. TD error = TD target - V(s) = 10.0 - 5.0 = 5.0. The positive TD error indicates the current value estimate was too low."
+  },
+  "starter_code": "import numpy as np\n\ndef compute_td_error(v_s: float, reward: float, v_s_prime: float, gamma: float, done: bool) -> float:\n    \"\"\"\n    Compute the Temporal Difference (TD) error for a single transition.\n    \n    Args:\n        v_s: Current state value estimate V(s)\n        reward: Immediate reward received\n        v_s_prime: Next state value estimate V(s')\n        gamma: Discount factor (0 <= gamma <= 1)\n        done: True if s' is a terminal state\n    \n    Returns:\n        The TD error delta\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding State Value Functions in Markov Decision Processes",
+      "relation_to_problem": "The TD error formula requires understanding what state value functions V(s) represent - they are the foundation for measuring prediction errors in reinforcement learning.",
+      "prerequisites": [
+        "Basic probability theory",
+        "Expected value computation",
+        "Sequences and summations"
+      ],
+      "learning_objectives": [
+        "Define state value functions formally using the Bellman expectation equation",
+        "Understand the role of discount factors in infinite horizon problems",
+        "Compute expected returns from sequences of rewards"
+      ],
+      "math_content": {
+        "definition": "A **state value function** $V^\\pi(s)$ under policy $\\pi$ is defined as the expected cumulative discounted reward starting from state $s$ and following policy $\\pi$:\n\n$$V^\\pi(s) = \\mathbb{E}_\\pi\\left[\\sum_{k=0}^{\\infty} \\gamma^k R_{t+k+1} \\mid S_t = s\\right]$$\n\nwhere $\\gamma \\in [0,1]$ is the discount factor, $R_{t+k+1}$ is the reward at time $t+k+1$, and the expectation is taken over the stochastic transitions and policy.",
+        "notation": "$V^\\pi(s)$ = value of state $s$ under policy $\\pi$\n$\\gamma$ = discount factor controlling the importance of future rewards\n$R_t$ = reward received at time $t$\n$\\mathbb{E}_\\pi[\\cdot]$ = expected value under policy $\\pi$",
+        "theorem": "**Bellman Expectation Equation**: The value function satisfies the recursive relationship:\n\n$$V^\\pi(s) = \\mathbb{E}_\\pi[R_{t+1} + \\gamma V^\\pi(S_{t+1}) \\mid S_t = s]$$\n\nThis states that the value of a state equals the expected immediate reward plus the discounted value of the successor state.",
+        "proof_sketch": "Starting from the definition:\n\n$$V^\\pi(s) = \\mathbb{E}_\\pi\\left[R_{t+1} + \\gamma R_{t+2} + \\gamma^2 R_{t+3} + \\cdots \\mid S_t = s\\right]$$\n\nFactor out the first reward:\n\n$$V^\\pi(s) = \\mathbb{E}_\\pi[R_{t+1} \\mid S_t = s] + \\mathbb{E}_\\pi\\left[\\gamma(R_{t+2} + \\gamma R_{t+3} + \\cdots) \\mid S_t = s\\right]$$\n\nThe term in parentheses is $V^\\pi(S_{t+1})$, giving:\n\n$$V^\\pi(s) = \\mathbb{E}_\\pi[R_{t+1} + \\gamma V^\\pi(S_{t+1}) \\mid S_t = s]$$",
+        "examples": [
+          "For $\\gamma = 0$, $V^\\pi(s) = \\mathbb{E}_\\pi[R_{t+1}]$ (only immediate rewards matter)",
+          "For $\\gamma = 0.9$ with deterministic rewards $[10, 5, 2]$: $V(s_0) = 10 + 0.9(5) + 0.9^2(2) = 10 + 4.5 + 1.62 = 16.12$",
+          "For a terminal state: $V(s_{\\text{terminal}}) = 0$ (no future rewards possible)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Discounted Return",
+          "latex": "$G_t = \\sum_{k=0}^{\\infty} \\gamma^k R_{t+k+1}$",
+          "description": "Total discounted reward from time t onward; the value function is the expected value of this quantity"
+        },
+        {
+          "name": "Discount Factor Effect",
+          "latex": "$\\gamma^n \\to 0$ as $n \\to \\infty$ for $\\gamma < 1$",
+          "description": "Ensures distant rewards have diminishing influence and the sum converges"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the discounted return from a sequence of rewards. This is the building block for understanding what value functions estimate.",
+        "function_signature": "def compute_discounted_return(rewards: np.ndarray, gamma: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_discounted_return(rewards: np.ndarray, gamma: float) -> float:\n    \"\"\"\n    Compute the discounted return from a sequence of rewards.\n    \n    Args:\n        rewards: Array of rewards [r_0, r_1, r_2, ...]\n        gamma: Discount factor (0 <= gamma <= 1)\n    \n    Returns:\n        The discounted return G = r_0 + gamma*r_1 + gamma^2*r_2 + ...\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_discounted_return(np.array([10.0, 5.0, 2.0]), 0.9)",
+            "expected": "16.12",
+            "explanation": "G = 10 + 0.9*5 + 0.81*2 = 10 + 4.5 + 1.62 = 16.12"
+          },
+          {
+            "input": "compute_discounted_return(np.array([1.0, 1.0, 1.0]), 0.5)",
+            "expected": "1.75",
+            "explanation": "G = 1 + 0.5*1 + 0.25*1 = 1.75"
+          },
+          {
+            "input": "compute_discounted_return(np.array([5.0]), 0.9)",
+            "expected": "5.0",
+            "explanation": "Single reward has no discounting: G = 5.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that gamma is raised to increasing powers (gamma^0, gamma^1, gamma^2, ...), not multiplied repeatedly",
+        "Not handling the edge case of empty reward sequences or single rewards",
+        "Using gamma = 1 in practice, which can cause infinite returns in continuing tasks"
+      ],
+      "hint": "Use numpy's power function or create an array of discount factors [1, gamma, gamma^2, ...] and perform element-wise multiplication with rewards, then sum.",
+      "references": [
+        "Bellman equations in Markov Decision Processes",
+        "Geometric series convergence",
+        "Dynamic programming in sequential decision-making"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "The Bellman Equation and Bootstrapping",
+      "relation_to_problem": "TD error uses bootstrapping - estimating the value of one state using the estimate of another state's value. This requires understanding the Bellman equation's recursive structure.",
+      "prerequisites": [
+        "State value functions",
+        "Expected value",
+        "Recursive equations"
+      ],
+      "learning_objectives": [
+        "Understand bootstrapping as using estimates to update estimates",
+        "Compute one-step lookahead targets using the Bellman equation",
+        "Recognize when bootstrapping is valid (non-terminal states) versus invalid (terminal states)"
+      ],
+      "math_content": {
+        "definition": "**Bootstrapping** in reinforcement learning refers to updating value estimates based on other value estimates rather than only using actual experienced returns. The **one-step TD target** is defined as:\n\n$$\\text{TD Target} = R_{t+1} + \\gamma V(S_{t+1})$$\n\nThis target uses the immediate reward $R_{t+1}$ (actual data) plus the discounted estimated value $V(S_{t+1})$ (bootstrapped estimate).",
+        "notation": "$R_{t+1}$ = actual reward observed\n$V(S_{t+1})$ = current estimate of next state's value (bootstrapped)\n$\\gamma V(S_{t+1})$ = discounted bootstrapped value",
+        "theorem": "**One-Step Bellman Backup**: For any state $s$, if we have experienced a transition $(s, r, s')$, then a better estimate of $V(s)$ is given by:\n\n$$V_{\\text{new}}(s) \\approx r + \\gamma V_{\\text{old}}(s')$$\n\nThis approximation becomes exact in expectation over all possible transitions from $s$.",
+        "proof_sketch": "From the Bellman expectation equation:\n\n$$V^\\pi(s) = \\mathbb{E}_\\pi[R_{t+1} + \\gamma V^\\pi(S_{t+1}) \\mid S_t = s]$$\n\nFor a single sample transition $(s, r, s')$, we can use:\n\n$$r + \\gamma V(s')$$\n\nas an unbiased sample of the expected value. By the law of large numbers, averaging many such samples converges to the true value.",
+        "examples": [
+          "If $V(s) = 5$, $r = 1$, $V(s') = 10$, $\\gamma = 0.9$: TD target = $1 + 0.9 \\times 10 = 10$",
+          "If $s'$ is terminal: TD target = $r + 0 = r$ (since $V(s_{\\text{terminal}}) = 0$)",
+          "If $\\gamma = 0$: TD target = $r$ (myopic, only considers immediate reward)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "TD Target (Non-Terminal)",
+          "latex": "$\\text{TD Target} = R_{t+1} + \\gamma V(S_{t+1})$",
+          "description": "Use when the next state is not terminal; combines actual reward with bootstrapped value"
+        },
+        {
+          "name": "TD Target (Terminal)",
+          "latex": "$\\text{TD Target} = R_{t+1}$",
+          "description": "Use when the next state is terminal; no future value exists"
+        },
+        {
+          "name": "Terminal State Value",
+          "latex": "$V(s_{\\text{terminal}}) = 0$",
+          "description": "By definition, terminal states have zero value (no future rewards)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the TD target for a transition. This is the 'better estimate' that we compare against our current value estimate.",
+        "function_signature": "def compute_td_target(reward: float, v_next: float, gamma: float, done: bool) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_td_target(reward: float, v_next: float, gamma: float, done: bool) -> float:\n    \"\"\"\n    Compute the TD target (one-step bootstrapped return).\n    \n    Args:\n        reward: Immediate reward r\n        v_next: Value estimate of next state V(s')\n        gamma: Discount factor\n        done: True if next state is terminal\n    \n    Returns:\n        The TD target: r + gamma * V(s') or just r if done\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_td_target(1.0, 10.0, 0.9, False)",
+            "expected": "10.0",
+            "explanation": "Non-terminal: target = 1.0 + 0.9 * 10.0 = 10.0"
+          },
+          {
+            "input": "compute_td_target(5.0, 3.0, 0.9, True)",
+            "expected": "5.0",
+            "explanation": "Terminal state: target = 5.0 (ignore v_next since done=True)"
+          },
+          {
+            "input": "compute_td_target(-1.0, 8.0, 0.99, False)",
+            "expected": "6.92",
+            "explanation": "target = -1.0 + 0.99 * 8.0 = -1.0 + 7.92 = 6.92"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using V(s') even when done=True (terminal states have value 0 by definition)",
+        "Forgetting to multiply gamma with V(s'), just adding them",
+        "Not understanding that 'done' indicates a terminal state where no future rewards are possible"
+      ],
+      "hint": "Use a conditional: if the episode is done, return only the reward; otherwise, return reward plus discounted next value.",
+      "references": [
+        "Bellman backup operators",
+        "Monte Carlo vs Temporal Difference methods",
+        "Episode termination in MDPs"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Prediction Errors and Value Function Updates",
+      "relation_to_problem": "The TD error itself is a prediction error - the difference between what we predicted and what actually happened. Understanding prediction errors is key to learning algorithms.",
+      "prerequisites": [
+        "Value functions",
+        "TD targets",
+        "Error metrics"
+      ],
+      "learning_objectives": [
+        "Define prediction error as the difference between target and current estimate",
+        "Understand the sign and magnitude of prediction errors",
+        "Relate prediction errors to learning signals in iterative algorithms"
+      ],
+      "math_content": {
+        "definition": "A **prediction error** (or **residual**) measures the discrepancy between a target value and a current estimate:\n\n$$\\delta = \\text{Target} - \\text{Current Estimate}$$\n\nIn reinforcement learning, the **Temporal Difference (TD) error** is specifically defined as:\n\n$$\\delta_t = (R_{t+1} + \\gamma V(S_{t+1})) - V(S_t)$$\n\nThis measures how much our current value estimate $V(S_t)$ differs from the TD target $R_{t+1} + \\gamma V(S_{t+1})$.",
+        "notation": "$\\delta_t$ = TD error (delta) at time $t$\n$\\text{Target}$ = the better estimate (TD target)\n$\\text{Current}$ = our current value estimate $V(S_t)$",
+        "theorem": "**Interpretation of TD Error Signs**:\n\n1. If $\\delta_t > 0$: The target is higher than our estimate → we underestimated the state's value\n2. If $\\delta_t < 0$: The target is lower than our estimate → we overestimated the state's value\n3. If $\\delta_t = 0$: Our estimate is consistent with the observed transition\n\nThe TD error serves as a learning signal to correct value function estimates.",
+        "proof_sketch": "The TD error measures the **temporal difference** between consecutive value estimates along a trajectory.\n\nConsider the Bellman equation:\n$$V^*(s) = \\mathbb{E}[R_{t+1} + \\gamma V^*(S_{t+1}) \\mid S_t = s]$$\n\nIf our estimate $V(s)$ is correct, then:\n$$V(s) = \\mathbb{E}[R_{t+1} + \\gamma V(S_{t+1})]$$\n\nFor any sample transition, the error:\n$$\\delta = (r + \\gamma V(s')) - V(s)$$\n\nis zero in expectation when $V$ satisfies the Bellman equation. Non-zero errors indicate room for improvement.",
+        "examples": [
+          "If $V(s) = 5$, target = $10$: $\\delta = 10 - 5 = +5$ (positive error → increase estimate)",
+          "If $V(s) = 12$, target = $8$: $\\delta = 8 - 12 = -4$ (negative error → decrease estimate)",
+          "If $V(s) = 7$, target = $7$: $\\delta = 0$ (perfect prediction for this transition)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "TD Error Formula",
+          "latex": "$\\delta_t = R_{t+1} + \\gamma V(S_{t+1}) - V(S_t)$",
+          "description": "The core TD error formula; measures prediction discrepancy"
+        },
+        {
+          "name": "TD(0) Update Rule",
+          "latex": "$V(S_t) \\leftarrow V(S_t) + \\alpha \\delta_t$",
+          "description": "How TD error is used to update value estimates; α is learning rate"
+        },
+        {
+          "name": "Error Sign Interpretation",
+          "latex": "$\\text{sign}(\\delta_t) = \\text{sign}(\\text{Target} - \\text{Current})$",
+          "description": "Positive delta means underestimation, negative means overestimation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes a generic prediction error between a target and current estimate. This abstracts the concept before applying it specifically to TD learning.",
+        "function_signature": "def compute_prediction_error(target: float, current_estimate: float) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_prediction_error(target: float, current_estimate: float) -> float:\n    \"\"\"\n    Compute the prediction error (residual) between target and estimate.\n    \n    Args:\n        target: The target value (better estimate)\n        current_estimate: The current estimated value\n    \n    Returns:\n        The prediction error: target - current_estimate\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_prediction_error(10.0, 5.0)",
+            "expected": "5.0",
+            "explanation": "error = 10.0 - 5.0 = 5.0 (positive: underestimated)"
+          },
+          {
+            "input": "compute_prediction_error(3.0, 8.0)",
+            "expected": "-5.0",
+            "explanation": "error = 3.0 - 8.0 = -5.0 (negative: overestimated)"
+          },
+          {
+            "input": "compute_prediction_error(7.5, 7.5)",
+            "expected": "0.0",
+            "explanation": "error = 0.0 (perfect prediction)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Reversing the subtraction (current - target instead of target - current)",
+        "Confusing absolute error with signed error (TD error preserves sign for learning direction)",
+        "Not understanding that the sign indicates the direction of required correction"
+      ],
+      "hint": "The formula is simply target minus current estimate. The order matters for the sign!",
+      "references": [
+        "Loss functions in supervised learning",
+        "Residuals in regression analysis",
+        "Gradient descent and error signals"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Handling Terminal States in Sequential Decision Problems",
+      "relation_to_problem": "The TD error computation must handle terminal states differently because they have no future value. This is critical for correct implementation.",
+      "prerequisites": [
+        "Markov Decision Processes",
+        "Episode termination",
+        "Value functions"
+      ],
+      "learning_objectives": [
+        "Understand why terminal states have zero value",
+        "Implement conditional logic for terminal vs non-terminal states",
+        "Recognize edge cases in episodic reinforcement learning"
+      ],
+      "math_content": {
+        "definition": "A **terminal state** $s_T$ is a state where an episode ends and no further transitions are possible. By definition:\n\n$$V(s_T) = 0$$\n\nThis is because there are no future rewards from a terminal state:\n\n$$V(s_T) = \\mathbb{E}\\left[\\sum_{k=0}^{\\infty} \\gamma^k R_{t+k+1} \\mid S_t = s_T\\right] = 0$$\n\n(empty sum equals zero).",
+        "notation": "$s_T$ = terminal state\n$\\text{done}$ = boolean flag indicating episode termination\n$V(s_T) = 0$ = value of any terminal state",
+        "theorem": "**TD Error at Terminal States**: When the next state $S_{t+1}$ is terminal (done=True), the TD error simplifies:\n\n$$\\delta_t = R_{t+1} + \\gamma \\cdot 0 - V(S_t) = R_{t+1} - V(S_t)$$\n\nThe bootstrapped term $\\gamma V(S_{t+1})$ vanishes because $V(S_{t+1}) = 0$.",
+        "proof_sketch": "Consider the last transition of an episode: $(s, a, r, s_T)$ where $s_T$ is terminal.\n\nThe return from state $s$ is:\n$$G_t = R_{t+1} + \\gamma R_{t+2} + \\gamma^2 R_{t+3} + \\cdots$$\n\nBut since the episode ends at $s_T$, there are no future rewards ($R_{t+2}, R_{t+3}, \\ldots = 0$):\n$$G_t = R_{t+1}$$\n\nTherefore:\n$$V(s) \\approx R_{t+1}$$\n\nAnd the TD error becomes:\n$$\\delta = R_{t+1} - V(s)$$",
+        "examples": [
+          "Game ends with reward +10, $V(s) = 8$: $\\delta = 10 - 8 = 2$ (no bootstrapping)",
+          "Agent falls off cliff with reward -100, $V(s) = -50$: $\\delta = -100 - (-50) = -50$",
+          "Episode terminates normally with reward 0, $V(s) = 5$: $\\delta = 0 - 5 = -5$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "TD Error (Terminal Case)",
+          "latex": "$\\delta_t = R_{t+1} - V(S_t)$ when done=True",
+          "description": "Simplified form when next state is terminal; no bootstrapping"
+        },
+        {
+          "name": "TD Error (Non-Terminal Case)",
+          "latex": "$\\delta_t = R_{t+1} + \\gamma V(S_{t+1}) - V(S_t)$ when done=False",
+          "description": "Full form with bootstrapping when episode continues"
+        },
+        {
+          "name": "Conditional Value",
+          "latex": "$V(S_{t+1}) \\cdot (1 - \\text{done})$",
+          "description": "Programmatic way to handle both cases: equals 0 if done, V(S_{t+1}) otherwise"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the effective next state value, taking into account whether the state is terminal. Returns 0 for terminal states, otherwise returns the provided value.",
+        "function_signature": "def get_next_state_value(v_next: float, done: bool) -> float:",
+        "starter_code": "import numpy as np\n\ndef get_next_state_value(v_next: float, done: bool) -> float:\n    \"\"\"\n    Get the effective value of the next state.\n    \n    Args:\n        v_next: The estimated value of the next state V(s')\n        done: True if the next state is terminal\n    \n    Returns:\n        0.0 if done is True, otherwise v_next\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "get_next_state_value(10.0, False)",
+            "expected": "10.0",
+            "explanation": "Non-terminal state: return the value as-is"
+          },
+          {
+            "input": "get_next_state_value(10.0, True)",
+            "expected": "0.0",
+            "explanation": "Terminal state: always return 0 regardless of v_next"
+          },
+          {
+            "input": "get_next_state_value(-5.0, True)",
+            "expected": "0.0",
+            "explanation": "Terminal state: return 0 even if v_next is negative"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check the 'done' flag and always using v_next",
+        "Incorrectly treating done=True as multiplying by gamma=0 after computing target",
+        "Not understanding that terminal states ALWAYS have value 0, regardless of what v_next parameter contains"
+      ],
+      "hint": "Use a simple conditional: if done is True, return 0.0; otherwise return v_next. This can also be written as: v_next * (1 - done) for a mathematical formulation.",
+      "references": [
+        "Episodic vs continuing tasks in RL",
+        "Boundary conditions in dynamic programming",
+        "Terminal reward handling in MDPs"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Complete Temporal Difference Error Computation",
+      "relation_to_problem": "This synthesizes all previous concepts into the complete TD error formula, handling both terminal and non-terminal cases correctly.",
+      "prerequisites": [
+        "Value functions",
+        "TD targets",
+        "Prediction errors",
+        "Terminal state handling"
+      ],
+      "learning_objectives": [
+        "Combine all sub-components into the complete TD error formula",
+        "Implement robust TD error computation with proper terminal state handling",
+        "Verify correctness through multiple test scenarios"
+      ],
+      "math_content": {
+        "definition": "The **complete Temporal Difference (TD) error** formula with terminal state handling is:\n\n$$\\delta_t = \\begin{cases}\nR_{t+1} + \\gamma V(S_{t+1}) - V(S_t) & \\text{if } S_{t+1} \\text{ is non-terminal} \\\\\nR_{t+1} - V(S_t) & \\text{if } S_{t+1} \\text{ is terminal}\n\\end{cases}$$\n\nThis can be written in a unified form:\n\n$$\\delta_t = R_{t+1} + \\gamma (1 - d_{t+1}) V(S_{t+1}) - V(S_t)$$\n\nwhere $d_{t+1} = 1$ if $S_{t+1}$ is terminal, else $d_{t+1} = 0$.",
+        "notation": "$\\delta_t$ = TD error at time $t$\n$d_{t+1}$ = terminal indicator (1 if terminal, 0 otherwise)\n$(1 - d_{t+1})$ = continuation indicator (0 if terminal, 1 otherwise)",
+        "theorem": "**TD Error Decomposition**: The TD error can be decomposed into:\n\n$$\\delta_t = \\underbrace{(R_{t+1} + \\gamma V(S_{t+1}))}_{\\text{TD Target}} - \\underbrace{V(S_t)}_{\\text{Current Estimate}}$$\n\n**Properties**:\n1. **Unbiased**: $\\mathbb{E}[\\delta_t \\mid S_t = s] = 0$ when $V$ satisfies the Bellman equation\n2. **Bounded**: If rewards are bounded by $R_{\\max}$ and values by $V_{\\max}$, then $|\\delta_t| \\leq R_{\\max} + \\gamma V_{\\max} + V_{\\max}$\n3. **Martingale Property**: Under optimal policy, $\\{\\delta_t\\}$ forms a martingale difference sequence",
+        "proof_sketch": "**Unbiasedness proof**:\n\nStarting from the Bellman equation:\n$$V^\\pi(s) = \\mathbb{E}_\\pi[R_{t+1} + \\gamma V^\\pi(S_{t+1}) \\mid S_t = s]$$\n\nThe expected TD error is:\n$$\\mathbb{E}[\\delta_t \\mid S_t = s] = \\mathbb{E}[R_{t+1} + \\gamma V(S_{t+1}) - V(S_t) \\mid S_t = s]$$\n$$= \\mathbb{E}[R_{t+1} + \\gamma V(S_{t+1}) \\mid S_t = s] - V(S_t)$$\n\nIf $V = V^\\pi$:\n$$= V^\\pi(s) - V^\\pi(s) = 0$$\n\nThus, TD error is zero in expectation when the value function is correct.",
+        "examples": [
+          "Standard transition: $V(s)=5$, $r=1$, $V(s')=10$, $\\gamma=0.9$, done=False → $\\delta = 1 + 0.9(10) - 5 = 10 - 5 = 5$",
+          "Terminal transition: $V(s)=8$, $r=10$, $V(s')=$ (ignored), $\\gamma=0.9$, done=True → $\\delta = 10 - 8 = 2$",
+          "Zero reward transition: $V(s)=3$, $r=0$, $V(s')=3$, $\\gamma=1.0$, done=False → $\\delta = 0 + 1.0(3) - 3 = 0$",
+          "Negative error: $V(s)=15$, $r=2$, $V(s')=5$, $\\gamma=0.8$, done=False → $\\delta = 2 + 0.8(5) - 15 = 6 - 15 = -9$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "General TD Error",
+          "latex": "$\\delta_t = R_{t+1} + \\gamma (1-d) V(S_{t+1}) - V(S_t)$",
+          "description": "Unified formula handling both terminal (d=1) and non-terminal (d=0) cases"
+        },
+        {
+          "name": "TD Target Computation",
+          "latex": "$\\text{Target}_t = R_{t+1} + \\gamma (1-d) V(S_{t+1})$",
+          "description": "The better estimate used to compute the error"
+        },
+        {
+          "name": "Value Update Direction",
+          "latex": "$V_{\\text{new}}(S_t) = V_{\\text{old}}(S_t) + \\alpha \\delta_t$",
+          "description": "How TD error drives learning; positive delta increases value, negative delta decreases it"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the complete TD error by integrating all previous concepts: computing the TD target (with terminal handling), then computing the prediction error.",
+        "function_signature": "def compute_full_td_error(v_current: float, reward: float, v_next: float, gamma: float, done: bool) -> float:",
+        "starter_code": "import numpy as np\n\ndef compute_full_td_error(v_current: float, reward: float, v_next: float, gamma: float, done: bool) -> float:\n    \"\"\"\n    Compute the complete TD error for a state transition.\n    \n    Args:\n        v_current: Current state value estimate V(s)\n        reward: Immediate reward r\n        v_next: Next state value estimate V(s')\n        gamma: Discount factor\n        done: True if next state is terminal\n    \n    Returns:\n        The TD error: [r + gamma * (1-done) * V(s')] - V(s)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_full_td_error(5.0, 1.0, 10.0, 0.9, False)",
+            "expected": "5.0",
+            "explanation": "TD target = 1.0 + 0.9*10.0 = 10.0; error = 10.0 - 5.0 = 5.0"
+          },
+          {
+            "input": "compute_full_td_error(8.0, 10.0, 100.0, 0.9, True)",
+            "expected": "2.0",
+            "explanation": "Terminal: TD target = 10.0 (ignore v_next); error = 10.0 - 8.0 = 2.0"
+          },
+          {
+            "input": "compute_full_td_error(15.0, 2.0, 5.0, 0.8, False)",
+            "expected": "-9.0",
+            "explanation": "TD target = 2.0 + 0.8*5.0 = 6.0; error = 6.0 - 15.0 = -9.0 (overestimated)"
+          },
+          {
+            "input": "compute_full_td_error(3.0, 0.0, 3.0, 1.0, False)",
+            "expected": "0.0",
+            "explanation": "TD target = 0.0 + 1.0*3.0 = 3.0; error = 3.0 - 3.0 = 0.0 (perfect)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not zeroing out v_next when done=True (most common error)",
+        "Computing target - current in wrong order (current - target gives wrong sign)",
+        "Forgetting to discount v_next with gamma",
+        "Applying gamma to the reward instead of only to v_next"
+      ],
+      "hint": "Break this into two steps: (1) compute TD target = reward + gamma * next_value_considering_done, (2) compute error = target - current. Use your previous functions as building blocks!",
+      "references": [
+        "Sutton & Barto's Reinforcement Learning textbook, Chapter 6 on TD Learning",
+        "TD(0) algorithm implementation",
+        "SARSA and Q-learning derivations from TD error"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Numerical Stability and Edge Cases in TD Error Computation",
+      "relation_to_problem": "Real implementations must handle edge cases like extreme gamma values, floating-point precision, and unusual reward magnitudes to ensure robust TD error computation.",
+      "prerequisites": [
+        "Complete TD error formula",
+        "Floating-point arithmetic",
+        "Numerical computing"
+      ],
+      "learning_objectives": [
+        "Recognize numerical edge cases in TD error computation",
+        "Understand the effect of extreme parameter values",
+        "Implement robust floating-point comparisons and computations"
+      ],
+      "math_content": {
+        "definition": "**Numerical stability** in TD error computation refers to maintaining accuracy and avoiding overflow/underflow when:\n\n1. $\\gamma \\to 1$: Discount factor approaches 1 (undiscounted case)\n2. $\\gamma = 0$: Fully myopic (only immediate rewards)\n3. Large $|V(s)|$ or $|r|$: Values or rewards with large magnitude\n4. Floating-point precision limits: Representing $\\delta$ accurately\n\nThe **robust TD error formula** accounts for these:\n\n$$\\delta_t = r + \\gamma \\cdot \\mathbb{1}_{\\neg \\text{done}} \\cdot V(s') - V(s)$$\n\nwhere $\\mathbb{1}_{\\neg \\text{done}}$ is the indicator function (1 if not done, 0 if done).",
+        "notation": "$\\mathbb{1}_{\\neg \\text{done}}$ = indicator function for non-terminal state\n$\\epsilon_{\\text{machine}}$ = machine epsilon (smallest representable difference)\n$|\\delta| < \\epsilon$ = effectively zero error",
+        "theorem": "**Boundary Behavior of TD Error**:\n\n1. **When $\\gamma = 0$** (myopic agent):\n   $$\\delta_t = r - V(s)$$\n   The agent only cares about immediate rewards, ignoring future.\n\n2. **When $\\gamma = 1$** (undiscounted):\n   $$\\delta_t = r + V(s') - V(s)$$ (if not terminal)\n   Future rewards are valued equally to immediate rewards; can cause infinite returns in continuing tasks.\n\n3. **When $V(s) = V(s') = 0$**:\n   $$\\delta_t = r$$\n   The error equals the reward (common at initialization).",
+        "proof_sketch": "**Edge case analysis**:\n\n*Case 1: $\\gamma = 0$*\n$$\\delta = r + 0 \\cdot V(s') - V(s) = r - V(s)$$\n\n*Case 2: Terminal state*\n$$\\delta = r + \\gamma \\cdot 0 - V(s) = r - V(s)$$\nNote: Same form as $\\gamma=0$ but for different reason.\n\n*Case 3: Perfect prediction*\nIf $V(s) = r + \\gamma V(s')$ exactly (Bellman equation satisfied):\n$$\\delta = (r + \\gamma V(s')) - V(s) = 0$$\n\n*Case 4: Large values*\nIf $|V(s)|, |V(s')| \\gg |r|$, then:\n$$\\delta \\approx \\gamma V(s') - V(s)$$\nReward becomes negligible compared to value differences.",
+        "examples": [
+          "Myopic case: $\\gamma=0$, $r=5$, $V(s)=3$, $V(s')=100$ → $\\delta = 5 - 3 = 2$ (ignores large V(s'))",
+          "Undiscounted: $\\gamma=1$, $r=1$, $V(s)=10$, $V(s')=12$ → $\\delta = 1 + 12 - 10 = 3$",
+          "Initialization: $\\gamma=0.9$, $r=5$, $V(s)=0$, $V(s')=0$ → $\\delta = 5$ (all zeros except reward)",
+          "Large negative: $\\gamma=0.99$, $r=-100$, $V(s)=-50$, $V(s')=-60$ → $\\delta = -100 + 0.99(-60) - (-50) = -100 - 59.4 + 50 = -109.4$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Robust TD Error with Indicator",
+          "latex": "$\\delta = r + \\gamma \\cdot (1 - d) \\cdot V(s') - V(s)$",
+          "description": "Explicit terminal indicator; d=1 for terminal, d=0 for non-terminal"
+        },
+        {
+          "name": "Gamma Boundary Cases",
+          "latex": "$\\lim_{\\gamma \\to 0} \\delta = r - V(s)$, $\\lim_{\\gamma \\to 1} \\delta = r + V(s') - V(s)$",
+          "description": "Limiting behavior at extreme discount factors"
+        },
+        {
+          "name": "Relative Error Magnitude",
+          "latex": "$|\\delta| / \\max(|V(s)|, 1)$",
+          "description": "Normalized error for comparing across different value scales"
+        }
+      ],
+      "exercise": {
+        "description": "Test your TD error implementation with edge cases: extreme gamma values, zero values, large magnitudes, and terminal states. Verify numerical stability.",
+        "function_signature": "def test_td_error_edge_cases() -> dict:",
+        "starter_code": "import numpy as np\n\ndef test_td_error_edge_cases() -> dict:\n    \"\"\"\n    Test TD error computation with various edge cases.\n    \n    Returns:\n        Dictionary with test case names as keys and computed TD errors as values\n    \"\"\"\n    def compute_td_error(v_s, reward, v_s_prime, gamma, done):\n        # Use your TD error implementation here\n        target = reward + gamma * (1 - done) * v_s_prime\n        return target - v_s\n    \n    results = {}\n    \n    # Test case 1: gamma = 0 (myopic)\n    results['myopic'] = compute_td_error(3.0, 5.0, 100.0, 0.0, False)\n    \n    # Test case 2: gamma = 1 (undiscounted)\n    results['undiscounted'] = compute_td_error(10.0, 1.0, 12.0, 1.0, False)\n    \n    # Test case 3: all zeros\n    results['all_zeros'] = compute_td_error(0.0, 0.0, 0.0, 0.9, False)\n    \n    # Test case 4: terminal state with gamma=1\n    results['terminal_gamma_1'] = compute_td_error(8.0, 10.0, 50.0, 1.0, True)\n    \n    # Test case 5: large negative values\n    results['large_negative'] = compute_td_error(-1000.0, -10.0, -950.0, 0.95, False)\n    \n    return results",
+        "test_cases": [
+          {
+            "input": "test_td_error_edge_cases()['myopic']",
+            "expected": "2.0",
+            "explanation": "With gamma=0: delta = 5.0 - 3.0 = 2.0 (ignores v_s_prime)"
+          },
+          {
+            "input": "test_td_error_edge_cases()['undiscounted']",
+            "expected": "3.0",
+            "explanation": "With gamma=1: delta = 1.0 + 1.0*12.0 - 10.0 = 3.0"
+          },
+          {
+            "input": "test_td_error_edge_cases()['all_zeros']",
+            "expected": "0.0",
+            "explanation": "All parameters zero: delta = 0.0"
+          },
+          {
+            "input": "test_td_error_edge_cases()['terminal_gamma_1']",
+            "expected": "2.0",
+            "explanation": "Terminal overrides gamma: delta = 10.0 - 8.0 = 2.0"
+          },
+          {
+            "input": "test_td_error_edge_cases()['large_negative']",
+            "expected": "-912.5",
+            "explanation": "Large negatives: delta = -10.0 + 0.95*(-950.0) - (-1000.0) = -10.0 - 902.5 + 1000.0 = 87.5"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not testing with gamma=0 and gamma=1 boundary cases",
+        "Assuming TD error is always positive or always within a small range",
+        "Not verifying that terminal flag overrides gamma value",
+        "Failing to test with negative rewards and values"
+      ],
+      "hint": "Create a comprehensive test suite covering: (1) boundary gamma values, (2) zero values, (3) terminal states, (4) large magnitudes, (5) negative values. Each test validates a different numerical property.",
+      "references": [
+        "Floating-point arithmetic (IEEE 754 standard)",
+        "Numerical methods for differential equations",
+        "Software testing strategies for numerical algorithms"
+      ]
+    }
+  ]
+}

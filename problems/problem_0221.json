@@ -1,0 +1,64 @@
+{
+  "description": "SW1wbGVtZW50IE5ld3RvbidzIG1ldGhvZCBmb3IgZmluZGluZyB0aGUgbWluaW11bSBvZiBhIGZ1bmN0aW9uLiBHaXZlbiBmdW5jdGlvbnMgdGhhdCBjb21wdXRlIHRoZSBncmFkaWVudCBhbmQgSGVzc2lhbiBhdCBhbnkgcG9pbnQsIGl0ZXJhdGl2ZWx5IHVwZGF0ZSB0aGUgcG9zaXRpb24gdXNpbmcgdGhlIE5ld3RvbiBzdGVwIHVudGlsIGNvbnZlcmdlbmNlLiBOZXd0b24ncyBtZXRob2QgdXNlcyBzZWNvbmQtb3JkZXIgaW5mb3JtYXRpb24gKGN1cnZhdHVyZSkgdG8gY29udmVyZ2UgZmFzdGVyIHRoYW4gZ3JhZGllbnQgZGVzY2VudCwgb2Z0ZW4gZmluZGluZyB0aGUgbWluaW11bSBvZiBxdWFkcmF0aWMgZnVuY3Rpb25zIGluIGEgc2luZ2xlIHN0ZXAu",
+  "id": "221",
+  "test_cases": [
+    {
+      "test": "def grad(x): return [2 * x[0]]\ndef hess(x): return [[2.0]]\nresult = newtons_method_optimization(grad, hess, [5.0])\nprint([round(v, 4) for v in result])",
+      "expected_output": "[0.0]"
+    },
+    {
+      "test": "def grad(x): return [2 * x[0], 2 * x[1]]\ndef hess(x): return [[2.0, 0.0], [0.0, 2.0]]\nresult = newtons_method_optimization(grad, hess, [3.0, 4.0])\nprint([round(v, 4) for v in result])",
+      "expected_output": "[0.0, 0.0]"
+    }
+  ],
+  "difficulty": "medium",
+  "pytorch_difficulty": "medium",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "f(x,y) = (x-1)^2 + (y-2)^2, gradient_func, hessian_func, x0 = [0.0, 0.0]",
+    "output": "[1.0, 2.0]",
+    "reasoning": "At x0=[0,0]: grad=[-2,-4], Hessian=[[2,0],[0,2]]. Newton step: delta = -H^{-1}*grad = -[[0.5,0],[0,0.5]]*[-2,-4] = [1,2]. New point: [0,0]+[1,2]=[1,2]. Since this is a quadratic function, Newton's method converges in exactly one step to the minimum at (1,2)."
+  },
+  "category": "Calculus",
+  "pytorch_starter_code": "aW1wb3J0IHRvcmNoCmZyb20gdHlwaW5nIGltcG9ydCBDYWxsYWJsZQoKZGVmIG5ld3RvbnNfbWV0aG9kX29wdGltaXphdGlvbigKICAgIGxvc3NfZnVuYzogQ2FsbGFibGVbW3RvcmNoLlRlbnNvcl0sIHRvcmNoLlRlbnNvcl0sCiAgICB4MDogdG9yY2guVGVuc29yLAogICAgdG9sOiBmbG9hdCA9IDFlLTYsCiAgICBtYXhfaXRlcjogaW50ID0gMTAwCikgLT4gdG9yY2guVGVuc29yOgogICAgIiIiCiAgICBGaW5kIHRoZSBtaW5pbXVtIG9mIGEgZnVuY3Rpb24gdXNpbmcgTmV3dG9uJ3MgbWV0aG9kIHdpdGggUHlUb3JjaCBhdXRvZ3JhZC4KICAgIAogICAgQXJnczoKICAgICAgICBsb3NzX2Z1bmM6IFNjYWxhciBmdW5jdGlvbiB0byBtaW5pbWl6ZQogICAgICAgIHgwOiBJbml0aWFsIGd1ZXNzIHRlbnNvcgogICAgICAgIHRvbDogQ29udmVyZ2VuY2UgdG9sZXJhbmNlCiAgICAgICAgbWF4X2l0ZXI6IE1heGltdW0gaXRlcmF0aW9ucwogICAgICAgIAogICAgUmV0dXJuczoKICAgICAgICBUaGUgcG9pbnQgdGhhdCBtaW5pbWl6ZXMgdGhlIGZ1bmN0aW9uCiAgICAiIiIKICAgICMgWW91ciBjb2RlIGhlcmUgLSB1c2UgdG9yY2guYXV0b2dyYWQuZnVuY3Rpb25hbC5oZXNzaWFuCiAgICBwYXNz",
+  "title": "Newton's Method for Optimization",
+  "starter_code": "from typing import Callable\n\ndef newtons_method_optimization(\n\tgradient_func: Callable[[list[float]], list[float]],\n\thessian_func: Callable[[list[float]], list[list[float]]],\n\tx0: list[float],\n\ttol: float = 1e-6,\n\tmax_iter: int = 100\n) -> list[float]:\n\t\"\"\"\n\tFind the minimum of a function using Newton's method.\n\t\n\tArgs:\n\t\tgradient_func: Function that returns gradient vector at a point\n\t\thessian_func: Function that returns Hessian matrix at a point\n\t\tx0: Initial guess (list of coordinates)\n\t\ttol: Convergence tolerance for gradient norm\n\t\tmax_iter: Maximum number of iterations\n\t\t\n\tReturns:\n\t\tThe point that minimizes the function\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/Open-Deep-ML",
+      "name": "Deep-ML"
+    }
+  ],
+  "pytorch_test_cases": [
+    {
+      "test": "import torch\ndef f(x): return x[0]**2\nresult = newtons_method_optimization(f, torch.tensor([5.0]))\nprint([round(v, 4) for v in result.tolist()])",
+      "expected_output": "[0.0]"
+    },
+    {
+      "test": "import torch\ndef f(x): return x[0]**2 + x[1]**2\nresult = newtons_method_optimization(f, torch.tensor([3.0, 4.0]))\nprint([round(v, 4) for v in result.tolist()])",
+      "expected_output": "[0.0, 0.0]"
+    },
+    {
+      "test": "import torch\ndef f(x): return (x[0]-1)**2 + (x[1]-2)**2\nresult = newtons_method_optimization(f, torch.tensor([0.0, 0.0]))\nprint([round(v, 4) for v in result.tolist()])",
+      "expected_output": "[1.0, 2.0]"
+    },
+    {
+      "test": "import torch\ndef f(x): return (x[0]-1)**2 + 2*(x[1]-3)**2\nresult = newtons_method_optimization(f, torch.tensor([0.0, 0.0]))\nprint([round(v, 4) for v in result.tolist()])",
+      "expected_output": "[1.0, 3.0]"
+    },
+    {
+      "test": "import torch\ndef f(x): return (x[0]-3)**2\nresult = newtons_method_optimization(f, torch.tensor([10.0]))\nprint([round(v, 4) for v in result.tolist()])",
+      "expected_output": "[3.0]"
+    },
+    {
+      "test": "import torch\ndef f(x): return x[0]**2 + 2*x[0]*x[1] + 2*x[1]**2\nresult = newtons_method_optimization(f, torch.tensor([1.0, 1.0]))\nprint([round(v, 4) for v in result.tolist()])",
+      "expected_output": "[0.0, 0.0]"
+    }
+  ],
+  "createdAt": "December 6, 2025 at 5:47:59 PM UTC-0500",
+  "learn_section": "IyMgTmV3dG9uJ3MgTWV0aG9kIGZvciBPcHRpbWl6YXRpb24KCiMjIyBPdmVydmlldwoKTmV3dG9uJ3MgbWV0aG9kIGZvciBvcHRpbWl6YXRpb24gaXMgYSBwb3dlcmZ1bCBzZWNvbmQtb3JkZXIgYWxnb3JpdGhtIHRoYXQgdXNlcyBib3RoIGdyYWRpZW50IChmaXJzdCBkZXJpdmF0aXZlKSBhbmQgSGVzc2lhbiAoc2Vjb25kIGRlcml2YXRpdmUpIGluZm9ybWF0aW9uIHRvIGZpbmQgZnVuY3Rpb24gbWluaW1hLiBVbmxpa2UgZ3JhZGllbnQgZGVzY2VudCB3aGljaCBvbmx5IHVzZXMgbG9jYWwgc2xvcGUsIE5ld3RvbidzIG1ldGhvZCBhbHNvIGNvbnNpZGVycyBjdXJ2YXR1cmUsIGFsbG93aW5nIGl0IHRvIHRha2UgbW9yZSBpbmZvcm1lZCBzdGVwcy4KCiMjIyBUaGUgQWxnb3JpdGhtCgoqKlVwZGF0ZSBSdWxlOioqCiQkeF97aysxfSA9IHhfayAtIEgoeF9rKV57LTF9IFxuYWJsYSBmKHhfaykkJAoKd2hlcmU6Ci0gJFxuYWJsYSBmKHhfaykkIGlzIHRoZSBncmFkaWVudCBhdCAkeF9rJAotICRIKHhfaykkIGlzIHRoZSBIZXNzaWFuIG1hdHJpeCBhdCAkeF9rJAotICRIXnstMX0gXG5hYmxhIGYkIGlzIGNhbGxlZCB0aGUgTmV3dG9uIHN0ZXAKCiMjIyBEZXJpdmF0aW9uCgpOZXd0b24ncyBtZXRob2QgY29tZXMgZnJvbSBtYWtpbmcgYSBxdWFkcmF0aWMgYXBwcm94aW1hdGlvbiBvZiAkZiQgYXJvdW5kIHRoZSBjdXJyZW50IHBvaW50OgoKJCRmKHgpIFxhcHByb3ggZih4X2spICsgXG5hYmxhIGYoeF9rKV5UICh4IC0geF9rKSArIFxmcmFjezF9ezJ9KHggLSB4X2spXlQgSCh4X2spICh4IC0geF9rKSQkCgpTZXR0aW5nIHRoZSBncmFkaWVudCBvZiB0aGlzIGFwcHJveGltYXRpb24gdG8gemVybzoKJCRcbmFibGEgZih4X2spICsgSCh4X2spKHggLSB4X2spID0gMCQkCgpTb2x2aW5nIGZvciAkeCQ6CiQkeCA9IHhfayAtIEgoeF9rKV57LTF9IFxuYWJsYSBmKHhfaykkJAoKIyMjIEtleSBQcm9wZXJ0aWVzCgoxLiAqKlF1YWRyYXRpYyBDb252ZXJnZW5jZSoqOiBOZWFyIGEgbWluaW11bSwgdGhlIGVycm9yIGRlY3JlYXNlcyBxdWFkcmF0aWNhbGx5OgogICAkJFx8eF97aysxfSAtIHheKlx8IFxsZXEgQ1x8eF9rIC0geF4qXHxeMiQkCgoyLiAqKkV4YWN0IGZvciBRdWFkcmF0aWNzKio6IEZvciBxdWFkcmF0aWMgZnVuY3Rpb25zLCBOZXd0b24ncyBtZXRob2QgZmluZHMgdGhlIG1pbmltdW0gaW4gZXhhY3RseSBvbmUgc3RlcCEKCjMuICoqU2NhbGUgSW52YXJpYW5jZSoqOiBVbmxpa2UgZ3JhZGllbnQgZGVzY2VudCwgTmV3dG9uJ3MgbWV0aG9kIGlzIGludmFyaWFudCB0byBsaW5lYXIgdHJhbnNmb3JtYXRpb25zIG9mIGNvb3JkaW5hdGVzLgoKIyMjIEV4YW1wbGU6IDFEIENhc2UKCkZvciAkZih4KSA9ICh4LTMpXjIkOgotICRmJyh4KSA9IDIoeC0zKSQKLSAkZicnKHgpID0gMiQKClN0YXJ0aW5nIGF0ICR4XzAgPSAxMCQ6CiQkeF8xID0gMTAgLSBcZnJhY3syKDEwLTMpfXsyfSA9IDEwIC0gNyA9IDMkJAoKQ29udmVyZ2VkIGluIG9uZSBzdGVwIQoKIyMjIEV4YW1wbGU6IDJEIENhc2UKCkZvciAkZih4LHkpID0geF4yICsgeV4yJDoKLSAkXG5hYmxhIGYgPSBbMngsIDJ5XV5UJAotICRIID0gXGJlZ2lue3BtYXRyaXh9IDIgJiAwIFxcIDAgJiAyIFxlbmR7cG1hdHJpeH0kCgpTdGFydGluZyBhdCAkKDMsIDQpJDoKJCRcYmVnaW57cG1hdHJpeH0geF8xIFxcIHlfMSBcZW5ke3BtYXRyaXh9ID0gXGJlZ2lue3BtYXRyaXh9IDMgXFwgNCBcZW5ke3BtYXRyaXh9IC0gXGJlZ2lue3BtYXRyaXh9IDAuNSAmIDAgXFwgMCAmIDAuNSBcZW5ke3BtYXRyaXh9IFxiZWdpbntwbWF0cml4fSA2IFxcIDggXGVuZHtwbWF0cml4fSA9IFxiZWdpbntwbWF0cml4fSAwIFxcIDAgXGVuZHtwbWF0cml4fSQkCgojIyMgQ2hhbGxlbmdlcwoKMS4gKipIZXNzaWFuIENvbXB1dGF0aW9uKio6IENvbXB1dGluZyBhbmQgaW52ZXJ0aW5nIHRoZSAkbiBcdGltZXMgbiQgSGVzc2lhbiBpcyAkTyhuXjMpJAoKMi4gKipOb24tQ29udmV4aXR5Kio6IElmIEhlc3NpYW4gaXMgbm90IHBvc2l0aXZlIGRlZmluaXRlLCBOZXd0b24gc3RlcCBtYXkgbm90IGRlY3JlYXNlICRmJAoKMy4gKipTYWRkbGUgUG9pbnRzKio6IENhbiBjb252ZXJnZSB0byBzYWRkbGUgcG9pbnRzIGluc3RlYWQgb2YgbWluaW1hCgojIyMgUHJhY3RpY2FsIFZhcmlhbnRzCgotICoqUXVhc2ktTmV3dG9uIE1ldGhvZHMqKiAoQkZHUywgTC1CRkdTKTogQXBwcm94aW1hdGUgdGhlIEhlc3NpYW4gZnJvbSBncmFkaWVudCBoaXN0b3J5Ci0gKipEYW1wZWQgTmV3dG9uKio6IEFkZCBhIHN0ZXAgc2l6ZSAkXGFscGhhJDogJHhfe2srMX0gPSB4X2sgLSBcYWxwaGEgSF57LTF9IFxuYWJsYSBmJAotICoqVHJ1c3QgUmVnaW9uIE1ldGhvZHMqKjogQ29uc3RyYWluIHN0ZXAgc2l6ZSBiYXNlZCBvbiBtb2RlbCBhY2N1cmFjeQoKIyMjIEFwcGxpY2F0aW9ucyBpbiBNTAoKLSBUcmFpbmluZyBzbWFsbCBuZXVyYWwgbmV0d29ya3MKLSBMb2dpc3RpYyByZWdyZXNzaW9uCi0gU2Vjb25kLW9yZGVyIG9wdGltaXphdGlvbiByZXNlYXJjaAotIENvbXB1dGluZyBuYXR1cmFsIGdyYWRpZW50cw==",
+  "description_decoded": "Implement Newton's method for finding the minimum of a function. Given functions that compute the gradient and Hessian at any point, iteratively update the position using the Newton step until convergence. Newton's method uses second-order information (curvature) to converge faster than gradient descent, often finding the minimum of quadratic functions in a single step.",
+  "learn_section_decoded": "## Newton's Method for Optimization\n\n### Overview\n\nNewton's method for optimization is a powerful second-order algorithm that uses both gradient (first derivative) and Hessian (second derivative) information to find function minima. Unlike gradient descent which only uses local slope, Newton's method also considers curvature, allowing it to take more informed steps.\n\n### The Algorithm\n\n**Update Rule:**\n$$x_{k+1} = x_k - H(x_k)^{-1} \\nabla f(x_k)$$\n\nwhere:\n- $\\nabla f(x_k)$ is the gradient at $x_k$\n- $H(x_k)$ is the Hessian matrix at $x_k$\n- $H^{-1} \\nabla f$ is called the Newton step\n\n### Derivation\n\nNewton's method comes from making a quadratic approximation of $f$ around the current point:\n\n$$f(x) \\approx f(x_k) + \\nabla f(x_k)^T (x - x_k) + \\frac{1}{2}(x - x_k)^T H(x_k) (x - x_k)$$\n\nSetting the gradient of this approximation to zero:\n$$\\nabla f(x_k) + H(x_k)(x - x_k) = 0$$\n\nSolving for $x$:\n$$x = x_k - H(x_k)^{-1} \\nabla f(x_k)$$\n\n### Key Properties\n\n1. **Quadratic Convergence**: Near a minimum, the error decreases quadratically:\n   $$\\|x_{k+1} - x^*\\| \\leq C\\|x_k - x^*\\|^2$$\n\n2. **Exact for Quadratics**: For quadratic functions, Newton's method finds the minimum in exactly one step!\n\n3. **Scale Invariance**: Unlike gradient descent, Newton's method is invariant to linear transformations of coordinates.\n\n### Example: 1D Case\n\nFor $f(x) = (x-3)^2$:\n- $f'(x) = 2(x-3)$\n- $f''(x) = 2$\n\nStarting at $x_0 = 10$:\n$$x_1 = 10 - \\frac{2(10-3)}{2} = 10 - 7 = 3$$\n\nConverged in one step!\n\n### Example: 2D Case\n\nFor $f(x,y) = x^2 + y^2$:\n- $\\nabla f = [2x, 2y]^T$\n- $H = \\begin{pmatrix} 2 & 0 \\\\ 0 & 2 \\end{pmatrix}$\n\nStarting at $(3, 4)$:\n$$\\begin{pmatrix} x_1 \\\\ y_1 \\end{pmatrix} = \\begin{pmatrix} 3 \\\\ 4 \\end{pmatrix} - \\begin{pmatrix} 0.5 & 0 \\\\ 0 & 0.5 \\end{pmatrix} \\begin{pmatrix} 6 \\\\ 8 \\end{pmatrix} = \\begin{pmatrix} 0 \\\\ 0 \\end{pmatrix}$$\n\n### Challenges\n\n1. **Hessian Computation**: Computing and inverting the $n \\times n$ Hessian is $O(n^3)$\n\n2. **Non-Convexity**: If Hessian is not positive definite, Newton step may not decrease $f$\n\n3. **Saddle Points**: Can converge to saddle points instead of minima\n\n### Practical Variants\n\n- **Quasi-Newton Methods** (BFGS, L-BFGS): Approximate the Hessian from gradient history\n- **Damped Newton**: Add a step size $\\alpha$: $x_{k+1} = x_k - \\alpha H^{-1} \\nabla f$\n- **Trust Region Methods**: Constrain step size based on model accuracy\n\n### Applications in ML\n\n- Training small neural networks\n- Logistic regression\n- Second-order optimization research\n- Computing natural gradients"
+}

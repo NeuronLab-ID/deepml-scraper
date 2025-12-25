@@ -1,0 +1,547 @@
+{
+  "problem_id": 176,
+  "title": "Chi-square Probability Distribution",
+  "category": "Probability",
+  "difficulty": "medium",
+  "description": "Calculate the probability of occurrence of x in a Chi-Squared distribution with the given sample value 'x' and degrees of freedom 'k'.",
+  "example": {
+    "input": "x = 2, k = 2",
+    "output": "0.184",
+    "reasoning": "To calculate the probability density for x in a chi-square distribution with k degrees of freedom, we use the formula:\n\nf(x; k) = (1 / (2^(k/2) * Gamma(k/2))) * x^((k/2) - 1) * exp(-x/2)\n\nSubstituting the values:\n\nf(2; 2) = (1 / (2^1 * Gamma(1))) * 2^(1 - 1) * exp(-2/2)\n= (1 / (2 * 1)) * 1 * exp(-1)\n= 0.5 * 0.3679 ≈ 0.184\n\nSo, the probability density at x = 2 for k = 2 is approximately 0.184."
+  },
+  "starter_code": "import math\n\ndef chi_square_probability(x, k):\n    \"\"\"\n    Calculate the probability density of x in a Chi-square distribution\n    with k degrees of freedom.\n    \"\"\"\n    # your code here\n    return round(probability, 3)",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "The Gamma Function: Foundation of Continuous Distributions",
+      "relation_to_problem": "The gamma function Γ(k/2) appears in the normalization constant of the chi-square PDF. Understanding how to compute it is essential for calculating chi-square probabilities.",
+      "prerequisites": [
+        "Factorial notation",
+        "Basic calculus",
+        "Integration techniques"
+      ],
+      "learning_objectives": [
+        "Understand the formal definition of the gamma function as an improper integral",
+        "Compute gamma function values for positive integers and half-integers",
+        "Apply the recursive property Γ(n+1) = n·Γ(n)",
+        "Implement gamma function computation using mathematical libraries"
+      ],
+      "math_content": {
+        "definition": "The gamma function is defined for all complex numbers except non-positive integers by the improper integral: $$\\Gamma(z) = \\int_0^\\infty t^{z-1} e^{-t} dt, \\quad \\text{Re}(z) > 0$$",
+        "notation": "$\\Gamma(n)$ = gamma function evaluated at $n$; for positive integers: $\\Gamma(n) = (n-1)!$",
+        "theorem": "**Recursive Property**: For any $z > 0$, $\\Gamma(z+1) = z \\cdot \\Gamma(z)$. **Special Values**: $\\Gamma(1) = 1$, $\\Gamma(1/2) = \\sqrt{\\pi}$, and for positive integers $n$: $\\Gamma(n) = (n-1)!$",
+        "proof_sketch": "Using integration by parts on the defining integral: $\\Gamma(z+1) = \\int_0^\\infty t^z e^{-t} dt = [-t^z e^{-t}]_0^\\infty + z\\int_0^\\infty t^{z-1} e^{-t} dt = z\\Gamma(z)$. The boundary term vanishes at both limits.",
+        "examples": [
+          "Example 1: $\\Gamma(4) = 3! = 6$",
+          "Example 2: $\\Gamma(5/2) = (3/2) \\cdot \\Gamma(3/2) = (3/2) \\cdot (1/2) \\cdot \\Gamma(1/2) = (3/4)\\sqrt{\\pi} \\approx 1.329$",
+          "Example 3: $\\Gamma(1) = 0! = 1$ by definition"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gamma Function Definition",
+          "latex": "$\\Gamma(z) = \\int_0^\\infty t^{z-1} e^{-t} dt$",
+          "description": "Use for theoretical understanding"
+        },
+        {
+          "name": "Factorial Relation",
+          "latex": "$\\Gamma(n) = (n-1)!$",
+          "description": "Use when n is a positive integer"
+        },
+        {
+          "name": "Recursive Property",
+          "latex": "$\\Gamma(z+1) = z \\cdot \\Gamma(z)$",
+          "description": "Use to compute gamma values from known values"
+        },
+        {
+          "name": "Half-integer Formula",
+          "latex": "$\\Gamma(n + 1/2) = \\frac{(2n)!}{4^n n!}\\sqrt{\\pi}$",
+          "description": "Use for half-integer degrees of freedom"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to compute the gamma function for positive values. For positive integers, use the factorial relation. For half-integers (n/2 where n is odd), use the half-integer formula. For other values, use the math library.",
+        "function_signature": "def compute_gamma(z: float) -> float:",
+        "starter_code": "import math\n\ndef compute_gamma(z: float) -> float:\n    \"\"\"\n    Calculate the gamma function Γ(z) for positive z.\n    Handle special cases: positive integers and half-integers.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_gamma(1)",
+            "expected": "1.0",
+            "explanation": "Γ(1) = 0! = 1 by definition"
+          },
+          {
+            "input": "compute_gamma(4)",
+            "expected": "6.0",
+            "explanation": "Γ(4) = 3! = 6"
+          },
+          {
+            "input": "compute_gamma(0.5)",
+            "expected": "1.772",
+            "explanation": "Γ(1/2) = √π ≈ 1.772 (rounded to 3 decimals)"
+          },
+          {
+            "input": "compute_gamma(2.5)",
+            "expected": "1.329",
+            "explanation": "Γ(5/2) = (3/2)·(1/2)·√π ≈ 1.329"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing Γ(n) with n! instead of (n-1)!",
+        "Not handling the special case Γ(1/2) = √π",
+        "Attempting to compute gamma for non-positive integers where it's undefined",
+        "Rounding errors when using recursive property multiple times"
+      ],
+      "hint": "Use the math.gamma() function as a reference, but implement special cases for integers and half-integers explicitly to understand the structure.",
+      "references": [
+        "Gamma function properties",
+        "Euler's integral",
+        "Special functions in probability theory"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Exponential Functions and Decay in Probability Distributions",
+      "relation_to_problem": "The chi-square PDF contains the exponential term e^(-x/2), which ensures the distribution decays properly as x increases. Understanding exponential functions is crucial for computing probability densities.",
+      "prerequisites": [
+        "Euler's number e",
+        "Exponential properties",
+        "Limits and continuity"
+      ],
+      "learning_objectives": [
+        "Understand the role of exponential decay in probability distributions",
+        "Compute exponential expressions accurately for various inputs",
+        "Recognize how the decay rate parameter affects distribution shape",
+        "Implement robust exponential calculations avoiding overflow/underflow"
+      ],
+      "math_content": {
+        "definition": "The exponential function with base $e$ (Euler's number ≈ 2.71828) is defined as: $$e^x = \\lim_{n \\to \\infty} \\left(1 + \\frac{x}{n}\\right)^n = \\sum_{k=0}^\\infty \\frac{x^k}{k!}$$",
+        "notation": "$e^x$ or $\\exp(x)$ = exponential function; $e^{-\\lambda x}$ represents decay with rate $\\lambda$",
+        "theorem": "**Exponential Decay**: For $\\lambda > 0$, the function $f(x) = e^{-\\lambda x}$ is strictly decreasing for $x \\geq 0$, with $\\lim_{x \\to \\infty} e^{-\\lambda x} = 0$ and $f(0) = 1$. **Product Property**: $e^{a+b} = e^a \\cdot e^b$ and $e^{-x} = 1/e^x$",
+        "proof_sketch": "The derivative $\\frac{d}{dx}e^{-\\lambda x} = -\\lambda e^{-\\lambda x} < 0$ for all $x$, proving the function is strictly decreasing. The limit follows from the fact that exponential decay dominates any polynomial growth.",
+        "examples": [
+          "Example 1: $e^{-1} = 1/e \\approx 0.368$, used in chi-square with k=2",
+          "Example 2: $e^{-2/2} = e^{-1} \\approx 0.368$, decay at x=2",
+          "Example 3: $e^{-5/2} = e^{-2.5} \\approx 0.082$, rapid decay for larger x values"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Standard Exponential",
+          "latex": "$e^x$",
+          "description": "Basic exponential growth"
+        },
+        {
+          "name": "Exponential Decay",
+          "latex": "$e^{-x}$",
+          "description": "Decay form, always positive"
+        },
+        {
+          "name": "Scaled Decay",
+          "latex": "$e^{-x/\\lambda}$",
+          "description": "Decay with scale parameter λ; in chi-square, λ=2"
+        },
+        {
+          "name": "Reciprocal Property",
+          "latex": "$e^{-x} = \\frac{1}{e^x}$",
+          "description": "Alternative computation form"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to compute e^(-x/2) for the chi-square distribution. Handle edge cases like x=0 and large x values. Compare your implementation with math.exp() to verify accuracy.",
+        "function_signature": "def chi_square_exponential(x: float) -> float:",
+        "starter_code": "import math\n\ndef chi_square_exponential(x: float) -> float:\n    \"\"\"\n    Calculate e^(-x/2) for the chi-square distribution.\n    Handle x >= 0.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "chi_square_exponential(0)",
+            "expected": "1.0",
+            "explanation": "e^0 = 1, maximum value of exponential at x=0"
+          },
+          {
+            "input": "chi_square_exponential(2)",
+            "expected": "0.368",
+            "explanation": "e^(-1) ≈ 0.368 (rounded to 3 decimals)"
+          },
+          {
+            "input": "chi_square_exponential(4)",
+            "expected": "0.135",
+            "explanation": "e^(-2) ≈ 0.135, showing decay"
+          },
+          {
+            "input": "chi_square_exponential(10)",
+            "expected": "0.007",
+            "explanation": "e^(-5) ≈ 0.007, rapid decay for large x"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to divide x by 2 before taking the negative exponential",
+        "Not handling x=0 as a special case (result should be 1)",
+        "Numerical underflow for very large x values",
+        "Using e^x instead of e^(-x), missing the negative sign"
+      ],
+      "hint": "The exponential decay term e^(-x/2) ensures that probability density approaches zero as x increases, which is necessary for the distribution to integrate to 1.",
+      "references": [
+        "Exponential function properties",
+        "Probability density normalization",
+        "Numerical stability in exponential calculations"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Power Functions and Distribution Shape",
+      "relation_to_problem": "The chi-square PDF includes x^((k/2)-1), which determines the shape of the distribution near x=0 and how it varies with degrees of freedom k. This power term is critical for correct probability calculations.",
+      "prerequisites": [
+        "Exponentiation rules",
+        "Real number powers",
+        "Function behavior analysis"
+      ],
+      "learning_objectives": [
+        "Understand how fractional and negative exponents affect function behavior",
+        "Compute power expressions x^a for various values of a",
+        "Analyze the impact of degrees of freedom on distribution shape",
+        "Handle the special case x^(-1/2) and other fractional powers"
+      ],
+      "math_content": {
+        "definition": "For $x > 0$ and real $a$, the power function is defined as: $$x^a = e^{a \\ln(x)}$$ where $\\ln(x)$ is the natural logarithm. For integer $a$, this reduces to repeated multiplication.",
+        "notation": "$x^a$ = x raised to power a; $x^{1/2} = \\sqrt{x}$; $x^{-1} = 1/x$",
+        "theorem": "**Power Function Behavior at Origin**: For $a > 0$, $\\lim_{x \\to 0^+} x^a = 0$. For $a < 0$, $\\lim_{x \\to 0^+} x^a = \\infty$. For $a = 0$, $x^0 = 1$ for all $x \\neq 0$. **Power Rules**: $(x^a)^b = x^{ab}$, $x^a \\cdot x^b = x^{a+b}$, $x^{-a} = 1/x^a$",
+        "proof_sketch": "Using the definition $x^a = e^{a\\ln(x)}$: as $x \\to 0^+$, $\\ln(x) \\to -\\infty$. If $a > 0$, then $a\\ln(x) \\to -\\infty$, so $e^{a\\ln(x)} \\to 0$. If $a < 0$, then $a\\ln(x) \\to +\\infty$, so $e^{a\\ln(x)} \\to \\infty$.",
+        "examples": [
+          "Example 1: For k=1, $x^{(1/2)-1} = x^{-1/2} = 1/\\sqrt{x}$, undefined at x=0, approaches infinity as x→0⁺",
+          "Example 2: For k=2, $x^{(2/2)-1} = x^0 = 1$, constant regardless of x",
+          "Example 3: For k=4, $x^{(4/2)-1} = x^1 = x$, linear growth",
+          "Example 4: At x=2, k=3: $2^{(3/2)-1} = 2^{1/2} = \\sqrt{2} \\approx 1.414$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Chi-square Power Term",
+          "latex": "$x^{(k/2)-1}$",
+          "description": "Shape parameter depending on degrees of freedom"
+        },
+        {
+          "name": "Power Computation",
+          "latex": "$x^a = e^{a\\ln(x)}$",
+          "description": "General formula for any real exponent"
+        },
+        {
+          "name": "Negative Exponent",
+          "latex": "$x^{-a} = \\frac{1}{x^a}$",
+          "description": "Used when k < 2"
+        },
+        {
+          "name": "Half Powers",
+          "latex": "$x^{1/2} = \\sqrt{x}$",
+          "description": "Common in chi-square distributions"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to compute the power term x^((k/2)-1) for the chi-square distribution. Handle various degrees of freedom k (both even and odd), and consider the behavior at x=0 for different k values.",
+        "function_signature": "def chi_square_power(x: float, k: int) -> float:",
+        "starter_code": "import math\n\ndef chi_square_power(x: float, k: int) -> float:\n    \"\"\"\n    Calculate x^((k/2)-1) for the chi-square distribution.\n    Handle x > 0 and positive integer k.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "chi_square_power(2, 2)",
+            "expected": "1.0",
+            "explanation": "2^((2/2)-1) = 2^0 = 1, independent of x when k=2"
+          },
+          {
+            "input": "chi_square_power(2, 4)",
+            "expected": "2.0",
+            "explanation": "2^((4/2)-1) = 2^1 = 2"
+          },
+          {
+            "input": "chi_square_power(4, 3)",
+            "expected": "2.0",
+            "explanation": "4^((3/2)-1) = 4^0.5 = 2"
+          },
+          {
+            "input": "chi_square_power(2, 1)",
+            "expected": "0.707",
+            "explanation": "2^((1/2)-1) = 2^(-0.5) = 1/√2 ≈ 0.707"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not computing k/2 - 1 correctly, especially for odd k values",
+        "Attempting to evaluate at x=0 when the exponent is negative (undefined)",
+        "Forgetting that x^0 = 1 even when x ≠ 1",
+        "Integer division issues: using k/2 instead of k/2.0 in some languages",
+        "Not handling fractional exponents properly"
+      ],
+      "hint": "The exponent (k/2 - 1) can be negative (when k < 2), zero (when k = 2), or positive (when k > 2). Each case produces different behavior near x = 0.",
+      "references": [
+        "Power function properties",
+        "Fractional exponents",
+        "Chi-square distribution shape analysis"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Normalization Constants in Probability Distributions",
+      "relation_to_problem": "The chi-square PDF has a normalization constant 1/(2^(k/2) · Γ(k/2)) that ensures the total probability integrates to 1. Computing this constant correctly is essential for accurate probability calculations.",
+      "prerequisites": [
+        "Gamma function",
+        "Exponentiation",
+        "Probability axioms"
+      ],
+      "learning_objectives": [
+        "Understand why probability density functions must integrate to 1",
+        "Compute the normalization constant for chi-square distributions",
+        "Combine gamma function and power calculations",
+        "Verify normalization through numerical integration"
+      ],
+      "math_content": {
+        "definition": "A probability density function (PDF) $f(x)$ must satisfy the normalization condition: $$\\int_{-\\infty}^{\\infty} f(x)dx = 1$$ The normalization constant is the multiplicative factor that ensures this property holds. For the chi-square distribution with support $x \\geq 0$, the normalization constant is: $$C_k = \\frac{1}{2^{k/2} \\Gamma(k/2)}$$",
+        "notation": "$C_k$ = normalization constant for k degrees of freedom; $\\int_0^\\infty f(x)dx = 1$ for normalized PDF",
+        "theorem": "**Normalization Theorem**: For the chi-square distribution, the constant $C_k = \\frac{1}{2^{k/2}\\Gamma(k/2)}$ ensures $$\\int_0^\\infty C_k x^{(k/2)-1} e^{-x/2} dx = 1$$ **Proof**: Using substitution $u = x/2$, $dx = 2du$: $$C_k \\int_0^\\infty x^{(k/2)-1} e^{-x/2} dx = C_k \\int_0^\\infty (2u)^{(k/2)-1} e^{-u} 2du = C_k \\cdot 2^{k/2} \\int_0^\\infty u^{(k/2)-1} e^{-u} du = C_k \\cdot 2^{k/2} \\cdot \\Gamma(k/2) = 1$$",
+        "proof_sketch": "The integral $\\int_0^\\infty x^{(k/2)-1} e^{-x/2} dx$ can be transformed through substitution to match the gamma function definition. The factor $2^{k/2}$ arises from the scale parameter 2 in the exponential, and $\\Gamma(k/2)$ comes from the definition of the gamma function.",
+        "examples": [
+          "Example 1: k=2: $C_2 = 1/(2^1 \\cdot \\Gamma(1)) = 1/(2 \\cdot 1) = 0.5$",
+          "Example 2: k=4: $C_4 = 1/(2^2 \\cdot \\Gamma(2)) = 1/(4 \\cdot 1) = 0.25$",
+          "Example 3: k=1: $C_1 = 1/(2^{0.5} \\cdot \\Gamma(0.5)) = 1/(\\sqrt{2} \\cdot \\sqrt{\\pi}) \\approx 0.399$",
+          "Example 4: k=3: $C_3 = 1/(2^{1.5} \\cdot \\Gamma(1.5)) = 1/(2\\sqrt{2} \\cdot 0.5\\sqrt{\\pi}) \\approx 0.282$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Normalization Constant",
+          "latex": "$C_k = \\frac{1}{2^{k/2} \\Gamma(k/2)}$",
+          "description": "Ensures PDF integrates to 1"
+        },
+        {
+          "name": "Denominator Components",
+          "latex": "$2^{k/2} \\cdot \\Gamma(k/2)$",
+          "description": "Scale factor times gamma function"
+        },
+        {
+          "name": "Normalization Condition",
+          "latex": "$\\int_0^\\infty f(x; k)dx = 1$",
+          "description": "Required property of all PDFs"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to compute the normalization constant 1/(2^(k/2) · Γ(k/2)) for the chi-square distribution. Use your gamma function implementation from the previous exercise. Test for various degrees of freedom.",
+        "function_signature": "def chi_square_normalization(k: int) -> float:",
+        "starter_code": "import math\n\ndef chi_square_normalization(k: int) -> float:\n    \"\"\"\n    Calculate the normalization constant 1/(2^(k/2) * Gamma(k/2))\n    for chi-square distribution with k degrees of freedom.\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "chi_square_normalization(2)",
+            "expected": "0.5",
+            "explanation": "1/(2^1 · Γ(1)) = 1/(2·1) = 0.5"
+          },
+          {
+            "input": "chi_square_normalization(4)",
+            "expected": "0.25",
+            "explanation": "1/(2^2 · Γ(2)) = 1/(4·1) = 0.25"
+          },
+          {
+            "input": "chi_square_normalization(1)",
+            "expected": "0.399",
+            "explanation": "1/(√2 · √π) ≈ 0.399"
+          },
+          {
+            "input": "chi_square_normalization(6)",
+            "expected": "0.125",
+            "explanation": "1/(2^3 · Γ(3)) = 1/(8·2) = 0.125"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing 2^k instead of 2^(k/2), missing the division by 2",
+        "Using Γ(k) instead of Γ(k/2)",
+        "Forgetting to take the reciprocal (1/denominator)",
+        "Rounding errors when k is odd, requiring careful gamma function computation",
+        "Not simplifying for special cases like k=2 where result is exactly 0.5"
+      ],
+      "hint": "Break the computation into steps: first compute 2^(k/2), then Γ(k/2), then multiply them, and finally take the reciprocal. Verify your result satisfies basic sanity checks (e.g., always positive, decreases as k increases).",
+      "references": [
+        "Probability density normalization",
+        "Change of variables in integration",
+        "Gamma function applications"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Combining Components: The Complete Chi-Square PDF",
+      "relation_to_problem": "This sub-quest integrates all previous components (normalization constant, power term, exponential decay) to construct the complete chi-square probability density function. This is the penultimate step before solving the main problem.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Function composition",
+        "Numerical precision"
+      ],
+      "learning_objectives": [
+        "Synthesize normalization constant, power term, and exponential decay",
+        "Implement the complete chi-square PDF formula",
+        "Validate implementation against known distributions",
+        "Understand the interplay between parameters and distribution shape"
+      ],
+      "math_content": {
+        "definition": "The chi-square probability density function with $k$ degrees of freedom is defined for $x \\geq 0$ as: $$f(x; k) = \\frac{1}{2^{k/2} \\Gamma(k/2)} x^{(k/2)-1} e^{-x/2}$$ This is the product of three components: (1) normalization constant $C_k = \\frac{1}{2^{k/2}\\Gamma(k/2)}$, (2) power term $x^{(k/2)-1}$, and (3) exponential decay $e^{-x/2}$.",
+        "notation": "$f(x; k)$ = PDF value at x with k degrees of freedom; $k \\in \\mathbb{Z}^+$ = degrees of freedom parameter",
+        "theorem": "**Properties of Chi-Square PDF**: (1) $f(x; k) > 0$ for all $x > 0$, (2) $\\int_0^\\infty f(x; k)dx = 1$, (3) $\\lim_{x \\to \\infty} f(x; k) = 0$, (4) Mode at $x = \\max(k-2, 0)$, (5) Mean $= k$, Variance $= 2k$. **Distribution Shape**: For $k = 1$, the PDF has a vertical asymptote at $x = 0$. For $k = 2$, the PDF is maximized at $x = 0$ with value 0.5. For $k > 2$, the PDF has a mode at $x = k - 2$.",
+        "proof_sketch": "The positivity follows from each component being positive for $x > 0$. The normalization was proven in the previous sub-quest. The decay follows from exponential dominating polynomial growth. The mode is found by setting $\\frac{d}{dx}f(x; k) = 0$ and solving: $\\frac{d}{dx}[x^{(k/2)-1}e^{-x/2}] = 0$ yields $(k/2 - 1)x^{(k/2)-2}e^{-x/2} - \\frac{1}{2}x^{(k/2)-1}e^{-x/2} = 0$, which simplifies to $x = k - 2$ for $k > 2$.",
+        "examples": [
+          "Example 1: $f(1; 2) = 0.5 \\cdot 1^0 \\cdot e^{-0.5} = 0.5 \\cdot 0.607 = 0.303$",
+          "Example 2: $f(2; 2) = 0.5 \\cdot 1 \\cdot e^{-1} = 0.5 \\cdot 0.368 = 0.184$ (matches problem example)",
+          "Example 3: $f(3; 4) = 0.25 \\cdot 3^1 \\cdot e^{-1.5} = 0.25 \\cdot 3 \\cdot 0.223 = 0.167$",
+          "Example 4: $f(0; 2) = 0.5 \\cdot 1 \\cdot 1 = 0.5$ (maximum for k=2)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete Chi-Square PDF",
+          "latex": "$f(x; k) = \\frac{1}{2^{k/2}\\Gamma(k/2)} x^{(k/2)-1} e^{-x/2}$",
+          "description": "Full formula combining all components"
+        },
+        {
+          "name": "Factored Form",
+          "latex": "$f(x; k) = C_k \\cdot x^{(k/2)-1} \\cdot e^{-x/2}$",
+          "description": "Showing three distinct components"
+        },
+        {
+          "name": "Mode Formula",
+          "latex": "$\\text{mode} = \\max(k-2, 0)$",
+          "description": "Location of maximum density"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete chi-square PDF function by combining all three components: normalization constant, power term, and exponential decay. Use the functions developed in previous sub-quests. Handle edge cases including x=0 and very small/large x values.",
+        "function_signature": "def chi_square_pdf(x: float, k: int) -> float:",
+        "starter_code": "import math\n\ndef chi_square_pdf(x: float, k: int) -> float:\n    \"\"\"\n    Calculate the probability density function of chi-square distribution\n    at value x with k degrees of freedom.\n    Returns the PDF value f(x; k).\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "chi_square_pdf(2, 2)",
+            "expected": "0.184",
+            "explanation": "Example from problem: 0.5 · 1 · e^(-1) ≈ 0.184"
+          },
+          {
+            "input": "chi_square_pdf(0, 2)",
+            "expected": "0.5",
+            "explanation": "Maximum density for k=2 at x=0"
+          },
+          {
+            "input": "chi_square_pdf(1, 2)",
+            "expected": "0.303",
+            "explanation": "0.5 · 1 · e^(-0.5) ≈ 0.303"
+          },
+          {
+            "input": "chi_square_pdf(3, 4)",
+            "expected": "0.167",
+            "explanation": "0.25 · 3 · e^(-1.5) ≈ 0.167"
+          },
+          {
+            "input": "chi_square_pdf(2, 1)",
+            "expected": "0.104",
+            "explanation": "Testing with k=1: 0.399 · 2^(-0.5) · e^(-1) ≈ 0.104"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Multiplying components in wrong order (though commutative, can cause overflow)",
+        "Not handling x=0 case when k < 2 (should return infinity or error)",
+        "Accumulating rounding errors by not using intermediate precision",
+        "Not validating that k is a positive integer",
+        "Computing each component separately with different rounding, causing inconsistencies"
+      ],
+      "hint": "Structure your code to compute the three components separately (normalization, power, exponential) and then multiply them together. This makes debugging easier and improves code readability.",
+      "references": [
+        "Chi-square distribution properties",
+        "PDF composition",
+        "Probability distribution analysis"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Validation and Numerical Stability in Probability Calculations",
+      "relation_to_problem": "The final step focuses on correctly formatting output, handling edge cases, and ensuring numerical stability. This includes proper rounding and validation techniques essential for the main problem solution.",
+      "prerequisites": [
+        "Complete chi-square PDF",
+        "Numerical methods",
+        "Error analysis"
+      ],
+      "learning_objectives": [
+        "Implement proper rounding and formatting of probability values",
+        "Handle edge cases and invalid inputs gracefully",
+        "Validate results against known probability properties",
+        "Ensure numerical stability for extreme parameter values"
+      ],
+      "math_content": {
+        "definition": "**Numerical Stability**: A computation is numerically stable if small perturbations in input produce proportionally small changes in output. **Rounding**: For probability calculations, standard practice is to round to 3-4 significant figures. The rounding function $R_n(x)$ rounds $x$ to $n$ decimal places: $$R_n(x) = \\frac{\\lfloor x \\cdot 10^n + 0.5 \\rfloor}{10^n}$$",
+        "notation": "$\\epsilon$ = machine epsilon (smallest distinguishable difference); $fl(x)$ = floating-point representation of x",
+        "theorem": "**Properties of Valid Probability Densities**: For any PDF $f(x)$: (1) $f(x) \\geq 0$ for all $x$ in the support, (2) $\\int_{\\text{support}} f(x)dx = 1$. **Validation Tests**: For chi-square with $k$ degrees of freedom: (1) $f(x; k) = 0$ for $x < 0$, (2) $f(x; k) > 0$ for $x > 0$ (except $f(0; k) = \\infty$ when $k < 2$), (3) Mode at $k-2$ for $k > 2$, (4) $\\lim_{x \\to \\infty} f(x; k) = 0$",
+        "proof_sketch": "Numerical stability requires careful ordering of operations. Compute logarithms first when values span many orders of magnitude: $\\ln f(x; k) = -\\frac{k}{2}\\ln 2 - \\ln\\Gamma(k/2) + (k/2-1)\\ln x - x/2$, then exponentiate: $f(x; k) = e^{\\ln f(x; k)}$. This avoids intermediate overflow/underflow.",
+        "examples": [
+          "Example 1: Direct computation $f(100; 2) = 0.5e^{-50} \\approx 1.9 \\times 10^{-22}$ risks underflow; use log space",
+          "Example 2: Rounding 0.1837... to 3 decimals: $R_3(0.1837) = 0.184$",
+          "Example 3: Validating k=2, x=2 result: 0.184 > 0 ✓, reasonable magnitude ✓",
+          "Example 4: Edge case x=0, k=2: returns exactly 0.5 (no rounding needed)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Log-Space Computation",
+          "latex": "$\\ln f(x; k) = -\\frac{k}{2}\\ln 2 - \\ln\\Gamma(k/2) + (k/2-1)\\ln x - \\frac{x}{2}$",
+          "description": "For numerical stability with extreme values"
+        },
+        {
+          "name": "Rounding Formula",
+          "latex": "$R_n(x) = \\frac{\\lfloor x \\cdot 10^n + 0.5 \\rfloor}{10^n}$",
+          "description": "Round to n decimal places"
+        },
+        {
+          "name": "Relative Error",
+          "latex": "$\\epsilon_{rel} = \\frac{|x_{\\text{computed}} - x_{\\text{exact}}|}{|x_{\\text{exact}}|}$",
+          "description": "Measure of computation accuracy"
+        }
+      ],
+      "exercise": {
+        "description": "Create a robust chi-square probability calculator that handles all edge cases, validates inputs, computes the PDF accurately, and returns properly rounded results. This is the complete solution framework without giving away the exact implementation.",
+        "function_signature": "def robust_chi_square_probability(x: float, k: int) -> float:",
+        "starter_code": "import math\n\ndef robust_chi_square_probability(x: float, k: int) -> float:\n    \"\"\"\n    Calculate chi-square probability density with proper validation,\n    edge case handling, and rounding to 3 decimal places.\n    \n    Args:\n        x: Sample value (must be >= 0)\n        k: Degrees of freedom (must be positive integer)\n    \n    Returns:\n        Probability density rounded to 3 decimal places\n    \"\"\"\n    # Your code here\n    # Hints: \n    # 1. Validate inputs (x >= 0, k > 0)\n    # 2. Handle x = 0 special case\n    # 3. Compute PDF using components from previous exercises\n    # 4. Round to 3 decimal places\n    pass",
+        "test_cases": [
+          {
+            "input": "robust_chi_square_probability(2, 2)",
+            "expected": "0.184",
+            "explanation": "Main problem example: should match exactly"
+          },
+          {
+            "input": "robust_chi_square_probability(0, 2)",
+            "expected": "0.5",
+            "explanation": "Edge case at x=0 with k=2"
+          },
+          {
+            "input": "robust_chi_square_probability(1, 2)",
+            "expected": "0.303",
+            "explanation": "Standard calculation with proper rounding"
+          },
+          {
+            "input": "robust_chi_square_probability(5, 5)",
+            "expected": "0.122",
+            "explanation": "Odd degrees of freedom test"
+          },
+          {
+            "input": "robust_chi_square_probability(0.5, 3)",
+            "expected": "0.144",
+            "explanation": "Non-integer x value with odd k"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not validating that x >= 0 and k > 0 before computation",
+        "Incorrect rounding (truncating instead of rounding, or rounding to wrong precision)",
+        "Not handling the x=0, k<2 case (should return infinity or raise error)",
+        "Numerical overflow/underflow for extreme values of x or k",
+        "Returning raw float instead of properly rounded value",
+        "Using incorrect rounding mode (banker's rounding vs standard rounding)"
+      ],
+      "hint": "This exercise brings together all previous components. Test each component individually first, then combine them. Always validate inputs before processing and handle special cases explicitly.",
+      "references": [
+        "Numerical stability in scientific computing",
+        "Floating-point arithmetic",
+        "Statistical software validation"
+      ]
+    }
+  ]
+}

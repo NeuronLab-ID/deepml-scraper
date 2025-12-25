@@ -1,0 +1,414 @@
+{
+  "problem_id": 212,
+  "title": "Confidence Interval for Population Mean",
+  "category": "Statistics",
+  "difficulty": "medium",
+  "description": "Implement a function to calculate a confidence interval for a population mean using the t-distribution. Given sample data and a confidence level (e.g., 0.95 for 95%), compute the sample mean, standard error, margin of error, and the lower and upper bounds of the confidence interval. The function should return a dictionary with all relevant statistics.",
+  "example": {
+    "input": "data=[10, 12, 11, 13, 14, 10, 12, 11], confidence_level=0.95",
+    "output": "{'mean': 11.625, 'standard_error': 0.4978, 'margin_of_error': 1.177, 'lower_bound': 10.448, 'upper_bound': 12.802, 'confidence_level': 0.95}",
+    "reasoning": "n=8, mean=11.625, s=1.408. SE = 1.408/√8 = 0.498. With df=7 and 95% confidence, t-critical = 2.365. ME = 2.365 × 0.498 = 1.177. CI = [11.625 - 1.177, 11.625 + 1.177] = [10.448, 12.802]. We are 95% confident the true mean is in this range."
+  },
+  "starter_code": "import numpy as np\nfrom scipy import stats\n\ndef confidence_interval(data: list[float], confidence_level: float = 0.95) -> dict:\n\t\"\"\"\n\tCalculate confidence interval for population mean.\n\t\n\tArgs:\n\t\tdata: Sample data\n\t\tconfidence_level: Confidence level (default 0.95)\n\t\n\tReturns:\n\t\tDictionary containing:\n\t\t- mean: Sample mean (point estimate)\n\t\t- standard_error: Standard error of the mean\n\t\t- margin_of_error: Margin of error\n\t\t- lower_bound: Lower bound of CI\n\t\t- upper_bound: Upper bound of CI\n\t\t- confidence_level: Confidence level used\n\t\"\"\"\n\t# Your code here\n\tpass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Sample Mean and Unbiased Standard Deviation",
+      "relation_to_problem": "The first step in computing a confidence interval is calculating the sample mean (point estimate) and the unbiased sample standard deviation, which are the foundational statistics required for all subsequent calculations.",
+      "prerequisites": [
+        "Basic algebra",
+        "Summation notation",
+        "Understanding of variance"
+      ],
+      "learning_objectives": [
+        "Calculate the sample mean as an estimator of the population mean",
+        "Understand why we use n-1 (Bessel's correction) for unbiased variance estimation",
+        "Compute the sample standard deviation from raw data"
+      ],
+      "math_content": {
+        "definition": "The **sample mean** $\\bar{x}$ is the arithmetic average of sample observations: $$\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n} x_i$$ where $x_i$ are individual observations and $n$ is the sample size. The **unbiased sample variance** is: $$s^2 = \\frac{1}{n-1}\\sum_{i=1}^{n}(x_i - \\bar{x})^2$$ The **sample standard deviation** is $s = \\sqrt{s^2}$.",
+        "notation": "$n$ = sample size, $x_i$ = individual observation, $\\bar{x}$ = sample mean, $s$ = sample standard deviation, $s^2$ = sample variance",
+        "theorem": "**Bessel's Correction**: Using $n-1$ instead of $n$ in the denominator of the variance formula produces an unbiased estimator of the population variance $\\sigma^2$. That is, $E[s^2] = \\sigma^2$ when we divide by $n-1$, but $E[s^2] < \\sigma^2$ when we divide by $n$.",
+        "proof_sketch": "The division by $n-1$ accounts for the loss of one degree of freedom when we estimate the population mean with the sample mean. Since we use $\\bar{x}$ (computed from the data) in the variance formula rather than the true unknown $\\mu$, the deviations $(x_i - \\bar{x})$ are systematically smaller than $(x_i - \\mu)$. Dividing by $n-1$ corrects this downward bias.",
+        "examples": [
+          "For data [10, 12, 11, 13, 14, 10, 12, 11]: $\\bar{x} = \\frac{93}{8} = 11.625$",
+          "Deviations squared: $(10-11.625)^2 + (12-11.625)^2 + ... = 13.875$",
+          "Variance: $s^2 = \\frac{13.875}{8-1} = 1.982$, so $s = \\sqrt{1.982} \\approx 1.408$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sample Mean",
+          "latex": "$\\bar{x} = \\frac{1}{n}\\sum_{i=1}^{n} x_i$",
+          "description": "Central tendency measure and point estimate of population mean"
+        },
+        {
+          "name": "Unbiased Sample Variance",
+          "latex": "$s^2 = \\frac{1}{n-1}\\sum_{i=1}^{n}(x_i - \\bar{x})^2$",
+          "description": "Measure of spread with Bessel's correction for unbiased estimation"
+        },
+        {
+          "name": "Sample Standard Deviation",
+          "latex": "$s = \\sqrt{s^2}$",
+          "description": "Square root of variance, in same units as original data"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates both the sample mean and unbiased sample standard deviation from a list of numerical values. This is the foundational building block for confidence interval computation.",
+        "function_signature": "def calculate_sample_statistics(data: list[float]) -> tuple[float, float]:",
+        "starter_code": "import math\n\ndef calculate_sample_statistics(data: list[float]) -> tuple[float, float]:\n    \"\"\"\n    Calculate sample mean and sample standard deviation.\n    \n    Args:\n        data: List of numerical observations\n    \n    Returns:\n        Tuple of (sample_mean, sample_std)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_sample_statistics([10, 12, 11, 13, 14, 10, 12, 11])",
+            "expected": "(11.625, 1.408)",
+            "explanation": "Mean is 93/8 = 11.625. Variance is 13.875/7 = 1.982, so std is √1.982 ≈ 1.408"
+          },
+          {
+            "input": "calculate_sample_statistics([5, 5, 5, 5])",
+            "expected": "(5.0, 0.0)",
+            "explanation": "All values identical means zero variance and standard deviation"
+          },
+          {
+            "input": "calculate_sample_statistics([1, 2])",
+            "expected": "(1.5, 0.707)",
+            "explanation": "Mean is 1.5, variance is 0.5/(2-1) = 0.5, std is √0.5 ≈ 0.707"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Dividing by n instead of n-1 when calculating variance (produces biased estimator)",
+        "Forgetting to take the square root of variance to get standard deviation",
+        "Not handling the case where n=1 (undefined standard deviation)",
+        "Computing deviations from 0 instead of from the sample mean"
+      ],
+      "hint": "First compute the mean in one pass through the data, then compute squared deviations in a second pass. Remember that Bessel's correction requires n-1 in the denominator.",
+      "references": [
+        "Bessel's correction and degrees of freedom",
+        "Biased vs unbiased estimators",
+        "Sample statistics as estimators of population parameters"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Standard Error of the Mean",
+      "relation_to_problem": "The standard error quantifies the variability of the sample mean across different samples, which is essential for determining how much uncertainty exists in our point estimate. This directly determines the width of the confidence interval.",
+      "prerequisites": [
+        "Sample mean calculation",
+        "Sample standard deviation",
+        "Understanding of sampling distributions"
+      ],
+      "learning_objectives": [
+        "Understand the difference between standard deviation and standard error",
+        "Calculate the standard error from sample statistics",
+        "Recognize how sample size affects the precision of estimates"
+      ],
+      "math_content": {
+        "definition": "The **standard error of the mean (SE)** is the standard deviation of the sampling distribution of the sample mean: $$\\text{SE} = \\frac{s}{\\sqrt{n}}$$ where $s$ is the sample standard deviation and $n$ is the sample size. It measures how much the sample mean $\\bar{x}$ would vary if we repeatedly drew samples from the same population.",
+        "notation": "$\\text{SE}$ = standard error of the mean, $s$ = sample standard deviation, $n$ = sample size, $\\bar{x}$ = sample mean",
+        "theorem": "**Central Limit Theorem (CLT)**: For sufficiently large sample sizes (typically $n \\geq 30$), the sampling distribution of $\\bar{x}$ is approximately normal with mean $\\mu$ and standard deviation $\\sigma/\\sqrt{n}$, regardless of the shape of the population distribution. Formally: $$\\frac{\\bar{x} - \\mu}{\\sigma/\\sqrt{n}} \\sim N(0,1)$$ as $n \\to \\infty$.",
+        "proof_sketch": "The CLT relies on the fact that the sum of independent random variables tends toward a normal distribution. Since $\\bar{x} = \\frac{1}{n}\\sum x_i$, and each $x_i$ contributes $1/n$ to the total, the law of large numbers and properties of convolution lead to normality. The $\\sqrt{n}$ term arises from the variance of a sum: $\\text{Var}(\\bar{x}) = \\text{Var}\\left(\\frac{1}{n}\\sum x_i\\right) = \\frac{1}{n^2} \\cdot n\\sigma^2 = \\frac{\\sigma^2}{n}$.",
+        "examples": [
+          "For $s = 1.408$ and $n = 8$: $\\text{SE} = \\frac{1.408}{\\sqrt{8}} = \\frac{1.408}{2.828} \\approx 0.498$",
+          "If we double the sample size to $n = 16$: $\\text{SE} = \\frac{1.408}{\\sqrt{16}} = \\frac{1.408}{4} = 0.352$ (smaller, more precise)",
+          "The standard error decreases by a factor of $\\sqrt{2}$ when sample size doubles"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Standard Error Formula",
+          "latex": "$\\text{SE} = \\frac{s}{\\sqrt{n}}$",
+          "description": "Quantifies uncertainty in the sample mean due to sampling variability"
+        },
+        {
+          "name": "Relationship to Sample Size",
+          "latex": "$\\text{SE} \\propto \\frac{1}{\\sqrt{n}}$",
+          "description": "Standard error decreases with square root of sample size"
+        },
+        {
+          "name": "Population SE (when σ known)",
+          "latex": "$\\text{SE} = \\frac{\\sigma}{\\sqrt{n}}$",
+          "description": "Use when population standard deviation is known (rare)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the standard error of the mean given sample data. This measures the precision of the sample mean as an estimate of the population mean and is a critical component of the margin of error.",
+        "function_signature": "def calculate_standard_error(data: list[float]) -> float:",
+        "starter_code": "import math\n\ndef calculate_standard_error(data: list[float]) -> float:\n    \"\"\"\n    Calculate the standard error of the mean.\n    \n    Args:\n        data: List of numerical observations\n    \n    Returns:\n        Standard error (float)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_standard_error([10, 12, 11, 13, 14, 10, 12, 11])",
+            "expected": "0.498",
+            "explanation": "With s=1.408 and n=8, SE = 1.408/√8 = 1.408/2.828 ≈ 0.498"
+          },
+          {
+            "input": "calculate_standard_error([5, 10, 15, 20])",
+            "expected": "3.227",
+            "explanation": "Mean=12.5, s≈6.455, n=4, so SE = 6.455/√4 = 6.455/2 ≈ 3.227"
+          },
+          {
+            "input": "calculate_standard_error([100, 100, 100, 100, 100])",
+            "expected": "0.0",
+            "explanation": "Zero variance means zero standard error (no sampling uncertainty)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing standard deviation (describes data spread) with standard error (describes estimate precision)",
+        "Forgetting to take the square root of n",
+        "Using n instead of n-1 in the standard deviation calculation",
+        "Not recognizing that SE decreases with larger samples (more data = more precision)"
+      ],
+      "hint": "You can reuse your function from Step 1 to get the sample standard deviation, then divide by the square root of the sample size. The standard error will always be smaller than the standard deviation.",
+      "references": [
+        "Central Limit Theorem and sampling distributions",
+        "Law of large numbers",
+        "Precision vs accuracy in statistical estimation"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Student's t-Distribution and Critical Values",
+      "relation_to_problem": "When the population standard deviation is unknown (the typical case), we must use the t-distribution instead of the normal distribution to find the critical value. This accounts for additional uncertainty from estimating σ and directly determines the confidence interval width.",
+      "prerequisites": [
+        "Probability distributions",
+        "Standard normal distribution",
+        "Degrees of freedom concept"
+      ],
+      "learning_objectives": [
+        "Understand when and why to use the t-distribution instead of z-distribution",
+        "Calculate degrees of freedom for a given sample",
+        "Find critical t-values for different confidence levels and sample sizes"
+      ],
+      "math_content": {
+        "definition": "**Student's t-distribution** is a probability distribution that arises when estimating the mean of a normally distributed population with unknown variance from a small sample. The distribution is characterized by its **degrees of freedom** $df = n - 1$. The t-statistic is: $$t = \\frac{\\bar{x} - \\mu}{s/\\sqrt{n}}$$ which follows a t-distribution with $df = n-1$ degrees of freedom. The **critical value** $t_{\\alpha/2, df}$ satisfies $P(T > t_{\\alpha/2, df}) = \\alpha/2$ where $T \\sim t_{df}$.",
+        "notation": "$t_{\\alpha/2, df}$ = critical t-value, $\\alpha$ = significance level = 1 - confidence level, $df$ = degrees of freedom = n - 1, $P(\\cdot)$ = probability",
+        "theorem": "**Gosset's Theorem**: When sampling from a normal population with unknown variance, the quantity $\\frac{\\bar{x} - \\mu}{s/\\sqrt{n}}$ follows a t-distribution with $n-1$ degrees of freedom, not a standard normal distribution. As $n \\to \\infty$, the t-distribution converges to the standard normal distribution $N(0,1)$.",
+        "proof_sketch": "The t-distribution arises because we estimate both the numerator (sampling error of the mean) and denominator (standard error) from the data. While $\\frac{\\bar{x} - \\mu}{\\sigma/\\sqrt{n}} \\sim N(0,1)$, replacing $\\sigma$ with $s$ introduces additional variability. The ratio of a standard normal variable to the square root of an independent chi-squared variable (divided by its df) follows a t-distribution. Here, $(n-1)s^2/\\sigma^2 \\sim \\chi^2_{n-1}$.",
+        "examples": [
+          "For 95% confidence and $df = 7$ (n=8): $\\alpha = 0.05$, $\\alpha/2 = 0.025$, so $t_{0.025, 7} = 2.365$",
+          "For 95% confidence and $df = 29$ (n=30): $t_{0.025, 29} = 2.045$ (closer to z=1.96)",
+          "For 99% confidence and $df = 7$: $\\alpha/2 = 0.005$, so $t_{0.005, 7} = 3.499$ (wider interval)",
+          "As df increases: t-critical → z-critical. For df=∞, $t_{0.025, \\infty} = 1.96 = z_{0.025}$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Degrees of Freedom",
+          "latex": "$df = n - 1$",
+          "description": "Number of independent pieces of information available to estimate variance"
+        },
+        {
+          "name": "Two-tailed Critical Value",
+          "latex": "$t_{\\alpha/2, df}$ where $P(T > t_{\\alpha/2, df}) = \\alpha/2$",
+          "description": "Value from t-distribution that leaves α/2 probability in each tail"
+        },
+        {
+          "name": "Alpha from Confidence Level",
+          "latex": "$\\alpha = 1 - \\text{confidence level}$",
+          "description": "For 95% confidence, α = 0.05; for 99% confidence, α = 0.01"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that returns the critical t-value for a given sample size and confidence level. Use scipy.stats.t.ppf() to find the value. This is the multiplier that determines how many standard errors wide the confidence interval will be.",
+        "function_signature": "def get_t_critical(n: int, confidence_level: float) -> float:",
+        "starter_code": "from scipy import stats\n\ndef get_t_critical(n: int, confidence_level: float) -> float:\n    \"\"\"\n    Get the critical t-value for confidence interval.\n    \n    Args:\n        n: Sample size\n        confidence_level: Confidence level (e.g., 0.95 for 95%)\n    \n    Returns:\n        Critical t-value (positive)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "get_t_critical(8, 0.95)",
+            "expected": "2.365",
+            "explanation": "For n=8, df=7, and 95% CI, the critical value is t(0.025, 7) = 2.365"
+          },
+          {
+            "input": "get_t_critical(30, 0.95)",
+            "expected": "2.045",
+            "explanation": "For n=30, df=29, the t-value is 2.045, very close to z=1.96"
+          },
+          {
+            "input": "get_t_critical(8, 0.99)",
+            "expected": "3.499",
+            "explanation": "99% confidence requires wider interval, so larger critical value"
+          },
+          {
+            "input": "get_t_critical(5, 0.90)",
+            "expected": "2.132",
+            "explanation": "For n=5, df=4, and 90% CI, t(0.05, 4) = 2.132"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using z-values instead of t-values when σ is unknown (underestimates uncertainty)",
+        "Forgetting to use α/2 for two-tailed intervals (using α gives one-tailed critical value)",
+        "Using n as degrees of freedom instead of n-1",
+        "Not recognizing that smaller samples require larger t-critical values (more uncertainty)",
+        "Confusing confidence level (0.95) with alpha (0.05)"
+      ],
+      "hint": "Calculate df = n - 1, then find α = 1 - confidence_level. Use scipy.stats.t.ppf(1 - α/2, df) to get the critical value. The 1 - α/2 is because ppf gives the left-tail cumulative probability.",
+      "references": [
+        "Student's t-distribution history (William Gosset)",
+        "Chi-squared distribution and its relation to variance estimation",
+        "Comparison of t-distribution and normal distribution"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Margin of Error Calculation",
+      "relation_to_problem": "The margin of error combines the critical value and standard error to determine the half-width of the confidence interval. It represents the maximum expected difference between the sample mean and the true population mean at the given confidence level.",
+      "prerequisites": [
+        "Standard error calculation",
+        "t-distribution critical values",
+        "Understanding of confidence intervals"
+      ],
+      "learning_objectives": [
+        "Calculate the margin of error from standard error and critical value",
+        "Understand how confidence level and sample size affect margin of error",
+        "Interpret the margin of error in context of population estimation"
+      ],
+      "math_content": {
+        "definition": "The **margin of error (ME)** is the maximum expected sampling error at a given confidence level. It is calculated as: $$\\text{ME} = t_{\\alpha/2, df} \\times \\text{SE} = t_{\\alpha/2, df} \\times \\frac{s}{\\sqrt{n}}$$ The confidence interval is then constructed as $[\\bar{x} - \\text{ME}, \\bar{x} + \\text{ME}]$. The ME quantifies the precision of our estimate.",
+        "notation": "$\\text{ME}$ = margin of error, $t_{\\alpha/2, df}$ = critical t-value, $\\text{SE}$ = standard error, $s$ = sample standard deviation, $n$ = sample size",
+        "theorem": "**Width of Confidence Interval**: The total width of a confidence interval is $2 \\times \\text{ME}$. The margin of error is inversely proportional to $\\sqrt{n}$ and directly proportional to $s$ and $t_{\\alpha/2, df}$. To halve the margin of error, the sample size must be quadrupled.",
+        "proof_sketch": "Since $\\text{ME} = t_{\\alpha/2, df} \\times \\frac{s}{\\sqrt{n}}$, we have $\\text{ME} \\propto \\frac{1}{\\sqrt{n}}$. If we want $\\text{ME}_{new} = \\frac{1}{2}\\text{ME}_{old}$, then $\\frac{1}{\\sqrt{n_{new}}} = \\frac{1}{2\\sqrt{n_{old}}}$, which gives $\\sqrt{n_{new}} = 2\\sqrt{n_{old}}$, so $n_{new} = 4n_{old}$.",
+        "examples": [
+          "For $t_{0.025, 7} = 2.365$ and $\\text{SE} = 0.498$: $\\text{ME} = 2.365 \\times 0.498 = 1.178$",
+          "If confidence increases to 99%, $t_{0.005, 7} = 3.499$: $\\text{ME} = 3.499 \\times 0.498 = 1.742$ (wider)",
+          "If sample size doubles to n=16 with same s, $\\text{SE} = 0.352$: $\\text{ME} = 2.365 \\times 0.352 = 0.832$ (narrower)",
+          "Total interval width: $2 \\times 1.178 = 2.356$ units"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Margin of Error",
+          "latex": "$\\text{ME} = t_{\\alpha/2, df} \\times \\text{SE}$",
+          "description": "Half-width of the confidence interval"
+        },
+        {
+          "name": "Expanded Form",
+          "latex": "$\\text{ME} = t_{\\alpha/2, df} \\times \\frac{s}{\\sqrt{n}}$",
+          "description": "Shows all components explicitly"
+        },
+        {
+          "name": "Sample Size for Desired ME",
+          "latex": "$n = \\left(\\frac{t_{\\alpha/2} \\times s}{\\text{ME}_{desired}}\\right)^2$",
+          "description": "Determine required sample size to achieve specific precision"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates the margin of error given sample data and a confidence level. This combines the standard error with the appropriate t-critical value to determine the interval half-width.",
+        "function_signature": "def calculate_margin_of_error(data: list[float], confidence_level: float) -> float:",
+        "starter_code": "from scipy import stats\nimport math\n\ndef calculate_margin_of_error(data: list[float], confidence_level: float) -> float:\n    \"\"\"\n    Calculate margin of error for confidence interval.\n    \n    Args:\n        data: List of numerical observations\n        confidence_level: Confidence level (e.g., 0.95)\n    \n    Returns:\n        Margin of error (float)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_margin_of_error([10, 12, 11, 13, 14, 10, 12, 11], 0.95)",
+            "expected": "1.177",
+            "explanation": "SE=0.498, t(0.025,7)=2.365, so ME = 2.365 × 0.498 ≈ 1.177"
+          },
+          {
+            "input": "calculate_margin_of_error([10, 12, 11, 13, 14, 10, 12, 11], 0.99)",
+            "expected": "1.742",
+            "explanation": "Higher confidence (99%) requires t(0.005,7)=3.499, so ME = 3.499 × 0.498 ≈ 1.742"
+          },
+          {
+            "input": "calculate_margin_of_error([5, 10, 15, 20], 0.90)",
+            "expected": "7.042",
+            "explanation": "SE=3.227, t(0.05,3)=2.182, so ME = 2.182 × 3.227 ≈ 7.042"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Multiplying by the wrong critical value (using α instead of α/2)",
+        "Using standard deviation instead of standard error in the calculation",
+        "Not updating the critical value when confidence level changes",
+        "Forgetting that larger confidence requires larger margin of error",
+        "Treating margin of error as the full width instead of half-width"
+      ],
+      "hint": "Combine your functions from previous steps: calculate the standard error, get the t-critical value, then multiply them together. The margin of error tells you how far above and below the mean to extend the interval.",
+      "references": [
+        "Precision of statistical estimates",
+        "Sample size determination",
+        "Trade-offs between confidence level and interval width"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Confidence Interval Construction and Interpretation",
+      "relation_to_problem": "This final step integrates all previous concepts to construct the complete confidence interval. It requires computing the sample mean, standard error, critical value, margin of error, and then calculating the lower and upper bounds while properly interpreting the result.",
+      "prerequisites": [
+        "Sample mean and standard deviation",
+        "Standard error",
+        "t-distribution",
+        "Margin of error"
+      ],
+      "learning_objectives": [
+        "Construct a complete confidence interval by combining all components",
+        "Return a structured output with all relevant statistics",
+        "Correctly interpret what a confidence interval means probabilistically",
+        "Understand the relationship between all computed values"
+      ],
+      "math_content": {
+        "definition": "A **confidence interval for the population mean** at confidence level $1-\\alpha$ is an interval $[L, U]$ such that, if the sampling procedure were repeated many times, $(1-\\alpha) \\times 100\\%$ of the resulting intervals would contain the true population mean $\\mu$. The interval is: $$[\\bar{x} - \\text{ME}, \\bar{x} + \\text{ME}] = \\left[\\bar{x} - t_{\\alpha/2, df} \\cdot \\frac{s}{\\sqrt{n}}, \\bar{x} + t_{\\alpha/2, df} \\cdot \\frac{s}{\\sqrt{n}}\\right]$$ where the lower bound $L = \\bar{x} - \\text{ME}$ and upper bound $U = \\bar{x} + \\text{ME}$.",
+        "notation": "$[L, U]$ = confidence interval bounds, $L$ = lower bound, $U$ = upper bound, $\\mu$ = true population mean (unknown), $\\bar{x}$ = sample mean (point estimate)",
+        "theorem": "**Coverage Probability**: For a $(1-\\alpha)$ confidence interval procedure, $P(L \\leq \\mu \\leq U) = 1 - \\alpha$. This is a statement about the long-run frequency of the procedure, not about any single interval. Each computed interval either contains $\\mu$ (probability 1) or doesn't (probability 0), but we don't know which.",
+        "proof_sketch": "Under the assumption that $\\frac{\\bar{x} - \\mu}{s/\\sqrt{n}} \\sim t_{n-1}$, we have $P\\left(-t_{\\alpha/2, n-1} \\leq \\frac{\\bar{x} - \\mu}{s/\\sqrt{n}} \\leq t_{\\alpha/2, n-1}\\right) = 1 - \\alpha$ by definition of the critical value. Multiplying by $s/\\sqrt{n}$ and rearranging: $P\\left(\\bar{x} - t_{\\alpha/2, n-1} \\cdot \\frac{s}{\\sqrt{n}} \\leq \\mu \\leq \\bar{x} + t_{\\alpha/2, n-1} \\cdot \\frac{s}{\\sqrt{n}}\\right) = 1 - \\alpha$. Thus $[L, U] = [\\bar{x} - \\text{ME}, \\bar{x} + \\text{ME}]$ has coverage probability $1-\\alpha$.",
+        "examples": [
+          "For data [10, 12, 11, 13, 14, 10, 12, 11] at 95% confidence: $\\bar{x}=11.625$, $\\text{ME}=1.177$, so CI = [10.448, 12.802]",
+          "Interpretation: 'We are 95% confident that the true population mean lies between 10.448 and 12.802'",
+          "Incorrect: 'There is a 95% probability that μ is in [10.448, 12.802]' - μ is fixed, interval is random",
+          "If 100 researchers took samples and computed 95% CIs, about 95 intervals would contain μ, and about 5 would not"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Lower Bound",
+          "latex": "$L = \\bar{x} - \\text{ME} = \\bar{x} - t_{\\alpha/2, df} \\times \\text{SE}$",
+          "description": "Lower limit of the confidence interval"
+        },
+        {
+          "name": "Upper Bound",
+          "latex": "$U = \\bar{x} + \\text{ME} = \\bar{x} + t_{\\alpha/2, df} \\times \\text{SE}$",
+          "description": "Upper limit of the confidence interval"
+        },
+        {
+          "name": "Complete Confidence Interval",
+          "latex": "$CI = [L, U] = [\\bar{x} - \\text{ME}, \\bar{x} + \\text{ME}]$",
+          "description": "The full interval estimate for the population mean"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes a complete confidence interval with all intermediate statistics. Return a dictionary containing the mean, standard error, margin of error, and confidence bounds. This exercise integrates all previous concepts into the final solution structure.",
+        "function_signature": "def compute_confidence_interval(data: list[float], confidence_level: float) -> dict:",
+        "starter_code": "import numpy as np\nfrom scipy import stats\n\ndef compute_confidence_interval(data: list[float], confidence_level: float) -> dict:\n    \"\"\"\n    Compute confidence interval for population mean with all statistics.\n    \n    Args:\n        data: Sample data\n        confidence_level: Confidence level (e.g., 0.95)\n    \n    Returns:\n        Dictionary with keys: 'mean', 'standard_error', 'margin_of_error',\n        'lower_bound', 'upper_bound', 'confidence_level'\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_confidence_interval([10, 12, 11, 13, 14, 10, 12, 11], 0.95)",
+            "expected": "{'mean': 11.625, 'standard_error': 0.498, 'margin_of_error': 1.177, 'lower_bound': 10.448, 'upper_bound': 12.802, 'confidence_level': 0.95}",
+            "explanation": "All components computed and assembled: mean ± ME gives bounds [10.448, 12.802]"
+          },
+          {
+            "input": "compute_confidence_interval([100, 102, 98, 101, 99], 0.99)",
+            "expected": "{'mean': 100.0, 'standard_error': 0.707, 'margin_of_error': 3.098, 'lower_bound': 96.902, 'upper_bound': 103.098, 'confidence_level': 0.99}",
+            "explanation": "Higher confidence (99%) with small sample (n=5) produces wider interval"
+          },
+          {
+            "input": "compute_confidence_interval([5, 10, 15, 20], 0.90)",
+            "expected": "{'mean': 12.5, 'standard_error': 3.227, 'margin_of_error': 7.042, 'lower_bound': 5.458, 'upper_bound': 19.542, 'confidence_level': 0.90}",
+            "explanation": "Small sample with high variance produces wide interval even at 90% confidence"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Misinterpreting confidence level as probability that μ is in a specific interval",
+        "Forgetting to include all required statistics in the output dictionary",
+        "Incorrectly computing bounds by adding/subtracting standard error instead of margin of error",
+        "Not maintaining consistent precision across all computed values",
+        "Confusing the interval [L, U] with the prediction interval for future observations"
+      ],
+      "hint": "Build this step-by-step using all previous functions: (1) compute mean and standard deviation, (2) compute standard error, (3) get t-critical value, (4) compute margin of error, (5) compute bounds as mean ± ME, (6) assemble dictionary with all values rounded appropriately.",
+      "references": [
+        "Frequentist interpretation of confidence intervals",
+        "Confidence intervals vs prediction intervals",
+        "Proper statistical reporting practices",
+        "Assumptions underlying t-based confidence intervals (normality, independence, random sampling)"
+      ]
+    }
+  ]
+}

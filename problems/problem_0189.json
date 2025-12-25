@@ -1,0 +1,48 @@
+{
+  "description": "SW1wbGVtZW50IHRoZSBMb2NhbCBSZXNwb25zZSBOb3JtYWxpemF0aW9uIChMUk4pIG9wZXJhdGlvbiBpbnRyb2R1Y2VkIGluIHRoZSBBbGV4TmV0IHBhcGVyLiBMUk4gYXBwbGllcyBhIG5vcm1hbGl6YXRpb24gYWNyb3NzIG5laWdoYm9yaW5nIGZlYXR1cmUgbWFwcyAoY2hhbm5lbHMpIHRvIGVuY291cmFnZSBsYXRlcmFsIGluaGliaXRpb24gbWltaWNraW5nIGEgZm9ybSBvZiBjb21wZXRpdGlvbiBhbW9uZyBuZXVyb25zLiBHaXZlbiBhIDREIHRlbnNvciBpbnB1dCBvZiBzaGFwZSAoTiwgQywgSCwgVyksIHlvdXIgdGFzayBpcyB0byBub3JtYWxpemUgZWFjaCBhY3RpdmF0aW9uIHVzaW5nIGl0cyBuZWlnaGJvcnMgd2l0aGluIGEgbG9jYWwgd2luZG93IGFsb25nIHRoZSBjaGFubmVsIGRpbWVuc2lvbi4=",
+  "id": "189",
+  "test_cases": [
+    {
+      "test": "np.random.seed(0)\nx = np.random.randn(1, 3, 2, 2)\nres = local_response_normalization(x)\nprint(np.round(res, 4))",
+      "expected_output": "[[[[ 1.0487, 0.2379], [0.5819, 1.3321]], [[1.1102, -0.5811], [0.5649, -0.09]],[[-0.0614, 0.2441], [0.0856, 0.8645]]]]"
+    },
+    {
+      "test": "np.random.seed(0)\nx = np.random.randn(3, 3, 1, 2)\nres = local_response_normalization(x)\nprint(np.round(res, 4))",
+      "expected_output": "[[[[1.0486, 0.2379]], [[0.5818, 1.3321]], [[1.1101, -0.581]]], [[[0.5649, -0.09]], [[-0.0614, 0.2441]], [[0.0856, 0.8646]]], [[[0.4525, 0.0723]], [[0.2639, 0.1984]], [[0.8883, -0.122]]]]"
+    }
+  ],
+  "difficulty": "medium",
+  "pytorch_difficulty": "medium",
+  "video": "",
+  "likes": "0",
+  "dislikes": "0",
+  "example": {
+    "input": "x = np.random.randn(1, 3, 2, 2); np.round(local_response_normalization(x, n=3, k=2, alpha=1e-4, beta=0.75), 4)",
+    "output": "Example output shape: (1, 3, 2, 2)",
+    "reasoning": "Each channel is normalized by a function of the sum of squared activations in its local neighborhood along the channel axis."
+  },
+  "category": "Deep Learning",
+  "pytorch_starter_code": "aW1wb3J0IHRvcmNoCgpkZWYgbG9jYWxfcmVzcG9uc2Vfbm9ybWFsaXphdGlvbih4OiB0b3JjaC5UZW5zb3IsIG46IGludCA9IDUsIGs6IGZsb2F0ID0gMi4wLCBhbHBoYTogZmxvYXQgPSAxZS00LCBiZXRhOiBmbG9hdCA9IDAuNzUpIC0+IHRvcmNoLlRlbnNvcjoKICAgICIiIkFwcGx5IExvY2FsIFJlc3BvbnNlIE5vcm1hbGl6YXRpb24gYWNyb3NzIGNoYW5uZWxzIChzaW1pbGFyIHRvIEFsZXhOZXQpLiIiIgogICAgIyBZb3VyIGNvZGUgaGVyZQogICAgcGFzcw==",
+  "title": "Implement Local Response Normalization (LRN)",
+  "createdAt": "October 20, 2025 at 3:28:55 PM UTUTC-4",
+  "contributor": [
+    {
+      "profile_link": "https://github.com/moe18",
+      "name": "moe"
+    }
+  ],
+  "pytorch_test_cases": [
+    {
+      "test": "import torch\ntorch.manual_seed(0)\nx = torch.randn(1, 3, 2, 2)\nres = local_response_normalization(x)\nprint(torch.round(res * 10000) / 10000)",
+      "expected_output": "tensor([[[[ 0.9161, -0.1745], [-1.2953, 0.3380]], [[-0.6448, -0.8315], [ 0.2398, 0.4983]], [[-0.4276, -0.2398], [-0.3547, 0.1082]]]])"
+    },
+    {
+      "test": "import torch\ntorch.manual_seed(0)\nx = torch.randn(1, 2, 1, 2)\nres = local_response_normalization(x)\nprint(torch.round(res * 10000) / 10000)",
+      "expected_output": "tensor([[[[ 0.9160, -0.1745]], [[-1.2952, 0.3380]]]])"
+    }
+  ],
+  "learn_section": "IyMgVW5kZXJzdGFuZGluZyBMb2NhbCBSZXNwb25zZSBOb3JtYWxpemF0aW9uIChMUk4pCgpMb2NhbCBSZXNwb25zZSBOb3JtYWxpemF0aW9uIChMUk4pIHdhcyBpbnRyb2R1Y2VkIGluIHRoZSAqKkFsZXhOZXQqKiBwYXBlciAoS3JpemhldnNreSBldCBhbC4sIDIwMTIpIGFzIGEgYmlvbG9naWNhbGx5IGluc3BpcmVkIG1lY2hhbmlzbSB0aGF0IGVuY291cmFnZXMgY29tcGV0aXRpb24gYW1vbmcgbmV1cm9ucyBhdCB0aGUgc2FtZSBzcGF0aWFsIHBvc2l0aW9uIGJ1dCBhY3Jvc3MgbmVpZ2hib3JpbmcgY2hhbm5lbHMuCgojIyMgTWF0aGVtYXRpY2FsIERlZmluaXRpb24KCkdpdmVuIGFuIGlucHV0IHRlbnNvciAkYV97eCx5fV5pJCBhdCBzcGF0aWFsIGxvY2F0aW9uICQoeCx5KSQgYW5kIGNoYW5uZWwgaW5kZXggJGkkLCB0aGUgbm9ybWFsaXplZCBvdXRwdXQgJGJfe3gseX1eaSQgaXMgZGVmaW5lZCBhczoKCiQkCmJfe3gseX1eaSA9IFxmcmFje2Ffe3gseX1eaX17XGxlZnQoayArIFxhbHBoYSBcc3VtX3tqPW1heCgwLCBpIC0gbi8yKX1ee21pbihOIC0gMSwgaSArIG4vMil9IChhX3t4LHl9XmopXjIgXHJpZ2h0KV57XGJldGF9fQokJAoKV2hlcmU6Ci0gJG4kID0gbG9jYWwgc2l6ZSAobnVtYmVyIG9mIG5laWdoYm9yaW5nIGNoYW5uZWxzIHRvIG5vcm1hbGl6ZSBvdmVyKQotICRrJCA9IGFkZGl0aXZlIGNvbnN0YW50ICh1c3VhbGx5IDIpCi0gJFxhbHBoYSQgPSBzY2FsaW5nIHBhcmFtZXRlciAoZS5nLiAkMTBeey00fSQpCi0gJFxiZXRhJCA9IGV4cG9uZW50IHBhcmFtZXRlciAoZS5nLiAwLjc1KQoKIyMjIEludHVpdGlvbgoKLSAqKkNvbXBldGl0aW9uOioqIE5ldXJvbnMgaW5oaWJpdCB0aGVpciBuZWlnaGJvcnMnIGFjdGl2YXRpb25zIHdpdGhpbiBhIGxvY2FsIHJlZ2lvbiwgaW1wcm92aW5nIGdlbmVyYWxpemF0aW9uLgotICoqQ29udHJhc3QgRW5oYW5jZW1lbnQ6KiogRW5jb3VyYWdlcyBkaXZlcnNpdHkgaW4gZmVhdHVyZSByZXNwb25zZXMgYWNyb3NzIGNoYW5uZWxzLgotICoqUHJhY3RpY2FsIEVmZmVjdDoqKiBPZnRlbiBpbXByb3ZlcyBlYXJseSBjb252b2x1dGlvbmFsIGxheWVyIHBlcmZvcm1hbmNlLgoKIyMjIENvbW1vbiBQYXJhbWV0ZXJzCgpBbGV4TmV0IHVzZWQ6CiQkbiA9IDUsXHF1YWQgayA9IDIsXHF1YWQgXGFscGhhID0gMTBeey00fSxccXVhZCBcYmV0YSA9IDAuNzUkJAoK",
+  "starter_code": "import numpy as np\n\ndef local_response_normalization(x: np.ndarray, n: int = 5, k: float = 2.0, alpha: float = 1e-4, beta: float = 0.75) -> np.ndarray:\n    \"\"\"\n    Applies Local Response Normalization across the channel dimension.\n\n    Args:\n        x: Input tensor of shape (N, C, H, W)\n        n: Local window size\n        k: Additive constant\n        alpha: Scaling parameter\n        beta: Exponent parameter\n\n    Returns:\n        Normalized tensor of same shape as input.\n    \"\"\"\n    # Your code here\n    pass",
+  "description_decoded": "Implement the Local Response Normalization (LRN) operation introduced in the AlexNet paper. LRN applies a normalization across neighboring feature maps (channels) to encourage lateral inhibition mimicking a form of competition among neurons. Given a 4D tensor input of shape (N, C, H, W), your task is to normalize each activation using its neighbors within a local window along the channel dimension.",
+  "learn_section_decoded": "## Understanding Local Response Normalization (LRN)\n\nLocal Response Normalization (LRN) was introduced in the **AlexNet** paper (Krizhevsky et al., 2012) as a biologically inspired mechanism that encourages competition among neurons at the same spatial position but across neighboring channels.\n\n### Mathematical Definition\n\nGiven an input tensor $a_{x,y}^i$ at spatial location $(x,y)$ and channel index $i$, the normalized output $b_{x,y}^i$ is defined as:\n\n$$\nb_{x,y}^i = \\frac{a_{x,y}^i}{\\left(k + \\alpha \\sum_{j=max(0, i - n/2)}^{min(N - 1, i + n/2)} (a_{x,y}^j)^2 \\right)^{\\beta}}\n$$\n\nWhere:\n- $n$ = local size (number of neighboring channels to normalize over)\n- $k$ = additive constant (usually 2)\n- $\\alpha$ = scaling parameter (e.g. $10^{-4}$)\n- $\\beta$ = exponent parameter (e.g. 0.75)\n\n### Intuition\n\n- **Competition:** Neurons inhibit their neighbors' activations within a local region, improving generalization.\n- **Contrast Enhancement:** Encourages diversity in feature responses across channels.\n- **Practical Effect:** Often improves early convolutional layer performance.\n\n### Common Parameters\n\nAlexNet used:\n$$n = 5,\\quad k = 2,\\quad \\alpha = 10^{-4},\\quad \\beta = 0.75$$\n\n"
+}

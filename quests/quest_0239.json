@@ -1,0 +1,504 @@
+{
+  "problem_id": 239,
+  "title": "Apply Zero Padding to an Image",
+  "category": "Computer Vision",
+  "difficulty": "easy",
+  "description": "## Task: Zero Padding for Images\n\nIn this task, you will implement a function `zero_pad_image(img, pad_width)` that adds zero padding around a grayscale image.\n\nZero padding is a fundamental operation in image processing and convolutional neural networks where layers of zeros are added around the border of an image.\n\n### **Your Task**:\nImplement the function `zero_pad_image(img, pad_width)` to:\n1. Add `pad_width` rows/columns of zeros on each side of the image (top, bottom, left, right).\n2. Return the padded image as a 2D list with integer values.\n3. Handle edge cases:\n   - If the input is not a valid 2D array.\n   - If the image has empty dimensions.\n   - If `pad_width` is not a non-negative integer.\n\nFor any of these edge cases, the function should return `-1`.",
+  "example": {
+    "input": "img = [[1, 2], [3, 4]]\npad_width = 1\nprint(zero_pad_image(img, pad_width))",
+    "output": "[[0, 0, 0, 0], [0, 1, 2, 0], [0, 3, 4, 0], [0, 0, 0, 0]]",
+    "reasoning": "The original 2x2 image gets a border of zeros added on all sides. The new dimensions are (2+2*1) x (2+2*1) = 4x4. The original pixel values remain in the center while zeros fill the border."
+  },
+  "starter_code": "import numpy as np\n\ndef zero_pad_image(img, pad_width):\n    \"\"\"\n    Add zero padding around a grayscale image.\n    \n    Args:\n        img: 2D list or numpy array of pixel values\n        pad_width: integer number of pixels to pad on each side\n    \n    Returns:\n        Padded image as 2D list with integer values,\n        or -1 if input is invalid\n    \"\"\"\n    # Write your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding 2D Array Indexing and Dimensions",
+      "relation_to_problem": "Zero padding requires understanding how to access and manipulate 2D array elements by their row and column indices, and how to calculate new dimensions when adding borders.",
+      "prerequisites": [
+        "Basic Python lists",
+        "Array indexing",
+        "Integer arithmetic"
+      ],
+      "learning_objectives": [
+        "Define and calculate dimensions of 2D arrays using mathematical notation",
+        "Access elements in 2D arrays using row-column indexing",
+        "Compute new dimensions after adding borders to rectangular arrays"
+      ],
+      "math_content": {
+        "definition": "A 2D array (or matrix) $A$ of dimensions $m \\times n$ is a rectangular arrangement of elements where $m$ is the number of rows and $n$ is the number of columns. Each element $A_{i,j}$ is uniquely identified by its row index $i \\in \\{0, 1, \\ldots, m-1\\}$ and column index $j \\in \\{0, 1, \\ldots, n-1\\}$ (using 0-based indexing).",
+        "notation": "$A \\in \\mathbb{R}^{m \\times n}$ denotes a matrix with $m$ rows and $n$ columns. $A_{i,j}$ or $A[i][j]$ denotes the element at row $i$ and column $j$.",
+        "theorem": "**Dimension Transformation Theorem**: Given a 2D array $A$ of dimensions $m \\times n$ and a border width $b \\geq 0$, adding $b$ layers on all sides produces an array $A'$ with dimensions $m' \\times n'$ where: $$m' = m + 2b$$ $$n' = n + 2b$$",
+        "proof_sketch": "Adding $b$ layers means adding $b$ rows at the top and $b$ rows at the bottom (total $2b$ rows added), and similarly $b$ columns on the left and $b$ columns on the right (total $2b$ columns added). Thus $m' = m + 2b$ and $n' = n + 2b$. $\\square$",
+        "examples": [
+          "Example 1: A $3 \\times 4$ array with $b=1$ becomes $(3+2\\cdot1) \\times (4+2\\cdot1) = 5 \\times 6$",
+          "Example 2: A $2 \\times 2$ array with $b=2$ becomes $(2+2\\cdot2) \\times (2+2\\cdot2) = 6 \\times 6$",
+          "Example 3: A $5 \\times 3$ array with $b=0$ remains $5 \\times 3$ (no border added)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "New Height",
+          "latex": "$H' = H + 2p$",
+          "description": "Calculate padded height from original height $H$ and padding width $p$"
+        },
+        {
+          "name": "New Width",
+          "latex": "$W' = W + 2p$",
+          "description": "Calculate padded width from original width $W$ and padding width $p$"
+        },
+        {
+          "name": "Total Elements",
+          "latex": "$N = m \\times n$",
+          "description": "Total number of elements in an $m \\times n$ array"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a 2D array and computes its dimensions (number of rows and columns). Then, given a border width, calculate what the new dimensions would be after adding that border. Return a tuple (current_rows, current_cols, new_rows, new_cols).",
+        "function_signature": "def calculate_dimensions(arr: list, border_width: int) -> tuple:",
+        "starter_code": "def calculate_dimensions(arr, border_width):\n    \"\"\"\n    Calculate current and new dimensions after adding border.\n    \n    Args:\n        arr: 2D list (assume valid for this exercise)\n        border_width: non-negative integer\n    \n    Returns:\n        (current_rows, current_cols, new_rows, new_cols)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_dimensions([[1, 2], [3, 4]], 1)",
+            "expected": "(2, 2, 4, 4)",
+            "explanation": "Original 2x2 array with border_width=1 becomes 4x4"
+          },
+          {
+            "input": "calculate_dimensions([[1, 2, 3]], 2)",
+            "expected": "(1, 3, 5, 7)",
+            "explanation": "Original 1x3 array with border_width=2 becomes 5x7"
+          },
+          {
+            "input": "calculate_dimensions([[5], [6], [7]], 0)",
+            "expected": "(3, 1, 3, 1)",
+            "explanation": "Original 3x1 array with border_width=0 stays 3x1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to multiply border_width by 2 (borders are added on both sides)",
+        "Confusing rows with columns or mixing up height and width",
+        "Assuming 1-based indexing instead of 0-based indexing"
+      ],
+      "hint": "The number of rows in a 2D list is len(arr), and the number of columns is len(arr[0]) if the array is non-empty. Remember that borders are added on all four sides.",
+      "references": [
+        "2D array representation",
+        "Matrix dimensions",
+        "Array indexing in Python"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Creating Initialized 2D Arrays with Specific Values",
+      "relation_to_problem": "Zero padding requires creating a new larger array filled with zeros, which will hold both the padding and the original image. This is the foundation of the padding operation.",
+      "prerequisites": [
+        "2D array dimensions",
+        "Nested list construction",
+        "List comprehension"
+      ],
+      "learning_objectives": [
+        "Create 2D arrays of specified dimensions initialized with a constant value",
+        "Understand memory allocation for rectangular arrays",
+        "Apply list comprehension for efficient array creation"
+      ],
+      "math_content": {
+        "definition": "A **constant-initialized matrix** $C_{m \\times n}(v)$ is a matrix of dimensions $m \\times n$ where every element equals the constant value $v$: $$C_{i,j} = v \\quad \\forall i \\in \\{0, \\ldots, m-1\\}, j \\in \\{0, \\ldots, n-1\\}$$. The **zero matrix** is the special case where $v = 0$, denoted $\\mathbf{0}_{m \\times n}$ or simply $\\mathbf{0}$ when dimensions are clear.",
+        "notation": "$\\mathbf{0}_{m \\times n}$ denotes the zero matrix of dimensions $m \\times n$. $\\mathbf{1}_{m \\times n}$ denotes the matrix of all ones.",
+        "theorem": "**Matrix Initialization Theorem**: A constant-initialized matrix $C_{m \\times n}(v)$ can be constructed by creating $m$ rows, each containing $n$ copies of value $v$. The total number of assignments required is $m \\cdot n$.",
+        "proof_sketch": "Each of the $m$ rows requires $n$ value assignments (one per column). By the multiplication principle, the total number of assignments is $m \\times n$. This is optimal since every element must be assigned. $\\square$",
+        "examples": [
+          "Example 1: $\\mathbf{0}_{2 \\times 3} = \\begin{pmatrix} 0 & 0 & 0 \\\\ 0 & 0 & 0 \\end{pmatrix}$ has all zeros",
+          "Example 2: $C_{3 \\times 2}(5) = \\begin{pmatrix} 5 & 5 \\\\ 5 & 5 \\\\ 5 & 5 \\end{pmatrix}$ has all fives",
+          "Example 3: $\\mathbf{0}_{1 \\times 1} = \\begin{pmatrix} 0 \\end{pmatrix}$ is a single zero"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Space Complexity",
+          "latex": "$S(m,n) = O(mn)$",
+          "description": "Memory required to store an $m \\times n$ array"
+        },
+        {
+          "name": "Time Complexity",
+          "latex": "$T(m,n) = \\Theta(mn)$",
+          "description": "Time required to initialize all $mn$ elements"
+        },
+        {
+          "name": "Element Access",
+          "latex": "$C_{i,j} = v$",
+          "description": "Every element in constant-initialized matrix equals $v$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that creates a 2D array of specified dimensions, with all elements initialized to a given value. This builds the foundation for creating the zero-filled padded array.",
+        "function_signature": "def create_constant_array(rows: int, cols: int, value: int) -> list:",
+        "starter_code": "def create_constant_array(rows, cols, value):\n    \"\"\"\n    Create a 2D array with all elements set to a constant value.\n    \n    Args:\n        rows: number of rows (positive integer)\n        cols: number of columns (positive integer)\n        value: value to fill the array with\n    \n    Returns:\n        2D list of dimensions rows x cols filled with value\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "create_constant_array(2, 3, 0)",
+            "expected": "[[0, 0, 0], [0, 0, 0]]",
+            "explanation": "2x3 array of zeros"
+          },
+          {
+            "input": "create_constant_array(3, 2, 7)",
+            "expected": "[[7, 7], [7, 7], [7, 7]]",
+            "explanation": "3x2 array of sevens"
+          },
+          {
+            "input": "create_constant_array(1, 1, 5)",
+            "expected": "[[5]]",
+            "explanation": "1x1 array with single element 5"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using [value] * cols and then multiplying by rows creates shallow copies (same row repeated)",
+        "Not using list comprehension or proper row-by-row construction",
+        "Creating a 1D array instead of a proper 2D structure"
+      ],
+      "hint": "Use nested list comprehension: [[value for _ in range(cols)] for _ in range(rows)]. This ensures each row is a separate list object.",
+      "references": [
+        "List comprehension in Python",
+        "Shallow vs deep copy",
+        "2D array initialization"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Coordinate Transformation and Mapping Between Arrays",
+      "relation_to_problem": "When padding an image, we must map each pixel from the original image to its new position in the padded array. This requires understanding coordinate transformations and offset calculations.",
+      "prerequisites": [
+        "2D indexing",
+        "Coordinate systems",
+        "Function composition"
+      ],
+      "learning_objectives": [
+        "Define coordinate transformations between arrays of different dimensions",
+        "Calculate offset mappings for translating array positions",
+        "Understand the relationship between source and destination coordinates in padding operations"
+      ],
+      "math_content": {
+        "definition": "A **coordinate transformation** $T: \\mathbb{Z}^2 \\rightarrow \\mathbb{Z}^2$ is a mapping from coordinates in one space to coordinates in another. For padding, we use a **translation transformation** $T_{\\Delta i, \\Delta j}$ defined as: $$T_{\\Delta i, \\Delta j}(i, j) = (i + \\Delta i, j + \\Delta j)$$ where $(\\Delta i, \\Delta j)$ is the offset vector. In zero padding, this maps original image coordinates to padded image coordinates.",
+        "notation": "Let $(i, j)$ denote coordinates in the original array $A$ and $(i', j')$ denote coordinates in the padded array $A'$. The padding offset is $p$.",
+        "theorem": "**Padding Coordinate Mapping Theorem**: Given an original image $I$ of dimensions $H \\times W$ and padding width $p$, the coordinate mapping from original to padded image $I'$ is: $$I'_{i', j'} = \\begin{cases} I_{i'-p, j'-p} & \\text{if } p \\leq i' < H+p \\text{ and } p \\leq j' < W+p \\\\ 0 & \\text{otherwise} \\end{cases}$$ Equivalently, for each original pixel at $(i, j)$ where $0 \\leq i < H$ and $0 \\leq j < W$, its position in the padded image is $(i+p, j+p)$.",
+        "proof_sketch": "The padding adds $p$ rows above and $p$ columns to the left of the original image. Thus, the pixel originally at $(i, j)$ is shifted right by $p$ columns and down by $p$ rows, placing it at $(i+p, j+p)$ in the padded array. The valid range for original coordinates is $i \\in [0, H)$ and $j \\in [0, W)$, which maps to $i' \\in [p, H+p)$ and $j' \\in [p, W+p)$ in the padded array. All other positions (the border region) contain zeros. $\\square$",
+        "examples": [
+          "Example 1: With $p=1$, original pixel at $(0, 0)$ maps to $(1, 1)$ in padded array",
+          "Example 2: With $p=2$, original pixel at $(3, 5)$ maps to $(5, 7)$ in padded array",
+          "Example 3: In a padded array with $p=1$, position $(0, 0)$ is in the border (padding region) and contains 0"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Forward Mapping",
+          "latex": "$(i', j') = (i + p, j + p)$",
+          "description": "Map original coordinates $(i,j)$ to padded coordinates $(i',j')$"
+        },
+        {
+          "name": "Inverse Mapping",
+          "latex": "$(i, j) = (i' - p, j' - p)$",
+          "description": "Map padded coordinates back to original coordinates"
+        },
+        {
+          "name": "Valid Region Test",
+          "latex": "$p \\leq i' < H+p \\land p \\leq j' < W+p$",
+          "description": "Check if padded coordinate $(i',j')$ corresponds to original image (not border)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes original coordinates (row, col) and a padding width, and returns the corresponding coordinates in the padded array. Also implement the inverse function that checks if padded coordinates map to a valid original position.",
+        "function_signature": "def map_coordinates(orig_row: int, orig_col: int, pad_width: int) -> tuple:",
+        "starter_code": "def map_coordinates(orig_row, orig_col, pad_width):\n    \"\"\"\n    Map original array coordinates to padded array coordinates.\n    \n    Args:\n        orig_row: row index in original array\n        orig_col: column index in original array\n        pad_width: padding width\n    \n    Returns:\n        (padded_row, padded_col) tuple\n    \"\"\"\n    # Your code here\n    pass\n\ndef is_original_region(padded_row, padded_col, pad_width, orig_height, orig_width):\n    \"\"\"\n    Check if a padded array coordinate corresponds to the original image.\n    \n    Args:\n        padded_row, padded_col: coordinates in padded array\n        pad_width: padding width used\n        orig_height, orig_width: dimensions of original array\n    \n    Returns:\n        True if coordinate is in original image region, False if in padding border\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "map_coordinates(0, 0, 1)",
+            "expected": "(1, 1)",
+            "explanation": "Top-left pixel moves to (1,1) with padding 1"
+          },
+          {
+            "input": "map_coordinates(2, 3, 2)",
+            "expected": "(4, 5)",
+            "explanation": "Pixel at (2,3) moves to (4,5) with padding 2"
+          },
+          {
+            "input": "is_original_region(0, 0, 1, 2, 2)",
+            "expected": "False",
+            "explanation": "Position (0,0) is in top-left border with pad_width=1"
+          },
+          {
+            "input": "is_original_region(1, 1, 1, 2, 2)",
+            "expected": "True",
+            "explanation": "Position (1,1) maps to original (0,0) with pad_width=1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting that padding is added on all sides, not just one side",
+        "Confusing the forward mapping (original to padded) with inverse mapping",
+        "Off-by-one errors in boundary checking for valid regions"
+      ],
+      "hint": "The padding creates a 'frame' of width p around the original image. Original pixel (i,j) simply shifts by p in both directions. For checking validity, ensure the padded coordinate minus p falls within original array bounds.",
+      "references": [
+        "Affine transformations",
+        "Translation in 2D space",
+        "Coordinate systems"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Copying Subarray Regions Between Arrays",
+      "relation_to_problem": "After creating the zero-filled padded array and understanding coordinate mapping, we need to copy the original image pixels to their correct positions in the center of the padded array.",
+      "prerequisites": [
+        "2D array traversal",
+        "Coordinate transformations",
+        "Nested loops"
+      ],
+      "learning_objectives": [
+        "Copy values from one 2D array region to another using coordinate mappings",
+        "Implement efficient nested iteration for 2D array operations",
+        "Preserve data integrity during array transformations"
+      ],
+      "math_content": {
+        "definition": "A **subarray copy operation** is a function $\\text{Copy}: A \\rightarrow A'$ that transfers values from source array $A$ to a target region in destination array $A'$ using a coordinate mapping $T$: $$A'_{T(i,j)} = A_{i,j} \\quad \\forall (i,j) \\in \\text{Domain}(A)$$ where $\\text{Domain}(A) = \\{(i,j) : 0 \\leq i < m, 0 \\leq j < n\\}$ for an $m \\times n$ array.",
+        "notation": "$A[i][j] \\leftarrow B[k][l]$ denotes copying value from $B[k][l]$ to $A[i][j]$. $\\text{copy}(A, A', T)$ denotes copying all elements of $A$ to $A'$ using transformation $T$.",
+        "theorem": "**Center Placement Theorem**: For zero padding with width $p$, copying the original $H \\times W$ image $I$ to the center of the $(H+2p) \\times (W+2p)$ padded image $I'$ using the translation $T_p(i,j) = (i+p, j+p)$ preserves all original values in the center region while maintaining zeros in the border region of width $p$.",
+        "proof_sketch": "By construction, $I'$ is initialized with all zeros. The copying operation only modifies positions in the range $i' \\in [p, H+p)$ and $j' \\in [p, W+p)$, leaving positions $i' < p$, $i' \\geq H+p$, $j' < p$, and $j' \\geq W+p$ unchanged (still zero). The transformation $T_p$ is bijective from original to center region, so no values are overwritten incorrectly and all original values are placed exactly once. $\\square$",
+        "examples": [
+          "Example 1: Copying $\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}$ with $p=1$ places 1,2,3,4 at positions (1,1), (1,2), (2,1), (2,2) in the padded array",
+          "Example 2: For a $1 \\times 3$ array $[5, 6, 7]$ with $p=2$, values are placed at row 2, columns 2-4",
+          "Example 3: Empty array with $p=1$ requires no copying, padded result is all zeros"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Source Iteration",
+          "latex": "$\\forall i \\in [0, H), \\forall j \\in [0, W)$",
+          "description": "Iterate over all positions in original array"
+        },
+        {
+          "name": "Destination Assignment",
+          "latex": "$I'_{i+p, j+p} = I_{i,j}$",
+          "description": "Copy original value to offset position in padded array"
+        },
+        {
+          "name": "Copy Complexity",
+          "latex": "$T = O(HW)$",
+          "description": "Time to copy $H \\times W$ elements"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that takes a source 2D array and copies all its values into the center of a larger destination array, applying a specified offset. This simulates placing the original image in the center of the padded array.",
+        "function_signature": "def copy_to_center(source: list, dest: list, offset: int) -> None:",
+        "starter_code": "def copy_to_center(source, dest, offset):\n    \"\"\"\n    Copy source array to the center of destination array with given offset.\n    Modifies dest in-place.\n    \n    Args:\n        source: 2D list (original image)\n        dest: 2D list (larger array, already initialized with zeros)\n        offset: padding width (offset from edges)\n    \n    Returns:\n        None (modifies dest in-place)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "source=[[1,2],[3,4]], dest=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]], offset=1",
+            "expected": "dest becomes [[0,0,0,0],[0,1,2,0],[0,3,4,0],[0,0,0,0]]",
+            "explanation": "2x2 source copied to center of 4x4 dest with offset 1"
+          },
+          {
+            "input": "source=[[5]], dest=[[0,0,0],[0,0,0],[0,0,0]], offset=1",
+            "expected": "dest becomes [[0,0,0],[0,5,0],[0,0,0]]",
+            "explanation": "1x1 source copied to center of 3x3 dest with offset 1"
+          },
+          {
+            "input": "source=[[1,2,3]], dest=[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]], offset=1",
+            "expected": "dest becomes [[0,0,0,0,0],[0,1,2,3,0],[0,0,0,0,0]]",
+            "explanation": "1x3 source copied to center of 3x5 dest with offset 1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to apply offset to both row and column indices",
+        "Attempting to return dest instead of modifying in-place",
+        "Using incorrect loop bounds (should iterate over source dimensions, not dest dimensions)"
+      ],
+      "hint": "Use nested loops: for each row i in source (0 to source_height-1) and each column j in source (0 to source_width-1), copy source[i][j] to dest[i+offset][j+offset].",
+      "references": [
+        "Array copying",
+        "In-place modification",
+        "Nested iteration patterns"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Input Validation and Edge Case Handling",
+      "relation_to_problem": "The zero padding function must handle invalid inputs gracefully, returning -1 for edge cases like non-2D arrays, empty arrays, negative padding, or non-rectangular arrays.",
+      "prerequisites": [
+        "Type checking in Python",
+        "Exception handling",
+        "Defensive programming"
+      ],
+      "learning_objectives": [
+        "Identify and validate preconditions for array operations",
+        "Implement robust error checking for 2D array inputs",
+        "Handle edge cases systematically before performing main computation"
+      ],
+      "math_content": {
+        "definition": "A **valid 2D array** for image processing must satisfy the following properties: (1) It is a list containing sublists (rows), (2) All rows have the same positive length $n > 0$ (rectangular property), (3) The number of rows $m > 0$ is positive, (4) All elements are of the expected type (numeric for images). Formally, $A$ is valid iff: $$A = [r_0, r_1, \\ldots, r_{m-1}]$$ where $m > 0$, each $r_i$ is a list of length $n > 0$, and $|r_i| = n$ for all $i$.",
+        "notation": "$\\text{isValid}(A): \\mathbb{B}$ denotes a boolean predicate that returns True if $A$ is a valid 2D array. $|A|$ denotes number of rows, $|A[0]|$ denotes number of columns (assuming non-empty).",
+        "theorem": "**Precondition Validation Theorem**: A padding operation is well-defined if and only if: (1) $\\text{isValid}(A)$ holds for input array $A$, and (2) padding width $p \\geq 0$. If these preconditions are not met, the operation should fail gracefully without attempting computation.",
+        "proof_sketch": "If $A$ is not rectangular, coordinate mapping becomes undefined (different rows would have different valid column ranges). If $m = 0$ or $n = 0$, there are no elements to copy. If $p < 0$, the resulting dimensions $H' = H + 2p$ and $W' = W + 2p$ could be negative or non-physical. Therefore, all these conditions are necessary for well-defined padding. $\\square$",
+        "examples": [
+          "Example 1: [[1,2], [3,4]] is valid (2x2, rectangular, non-empty)",
+          "Example 2: [[1,2], [3]] is invalid (rows have different lengths, not rectangular)",
+          "Example 3: [] is invalid (empty, no rows)",
+          "Example 4: [[]] is invalid (has 1 row but that row is empty)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Rectangularity Check",
+          "latex": "$\\forall i, j: |r_i| = |r_j| = n$",
+          "description": "All rows must have the same length"
+        },
+        {
+          "name": "Non-empty Check",
+          "latex": "$m > 0 \\land n > 0$",
+          "description": "Array must have at least one element"
+        },
+        {
+          "name": "Padding Validity",
+          "latex": "$p \\geq 0 \\land p \\in \\mathbb{Z}$",
+          "description": "Padding width must be non-negative integer"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a comprehensive validation function that checks if an input is a valid 2D array and if the padding width is valid. Return specific error indicators for different failure modes: 0 for valid, -1 for not a list, -2 for empty outer list, -3 for non-rectangular, -4 for empty rows, -5 for invalid padding.",
+        "function_signature": "def validate_padding_input(arr, pad_width) -> int:",
+        "starter_code": "def validate_padding_input(arr, pad_width):\n    \"\"\"\n    Validate inputs for zero padding operation.\n    \n    Args:\n        arr: input to validate as 2D array\n        pad_width: padding width to validate\n    \n    Returns:\n        0 if valid\n        -1 if arr is not a list\n        -2 if arr is empty\n        -3 if arr is not rectangular (rows have different lengths)\n        -4 if any row is empty\n        -5 if pad_width is negative or not an integer\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "validate_padding_input([[1,2],[3,4]], 1)",
+            "expected": "0",
+            "explanation": "Valid 2x2 array with valid padding"
+          },
+          {
+            "input": "validate_padding_input([[1,2],[3]], 1)",
+            "expected": "-3",
+            "explanation": "Rows have different lengths (non-rectangular)"
+          },
+          {
+            "input": "validate_padding_input([], 1)",
+            "expected": "-2",
+            "explanation": "Empty array"
+          },
+          {
+            "input": "validate_padding_input([[1,2]], -1)",
+            "expected": "-5",
+            "explanation": "Negative padding width"
+          },
+          {
+            "input": "validate_padding_input([[],[]], 1)",
+            "expected": "-4",
+            "explanation": "Rows are empty"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking if inner elements are actually lists (could be non-list types)",
+        "Checking only the first row length instead of verifying all rows are equal length",
+        "Not handling the case where arr itself is not a list",
+        "Forgetting to validate pad_width type and sign"
+      ],
+      "hint": "Check conditions in order: type of arr, emptiness, type and emptiness of rows, equality of row lengths, and finally pad_width validity. Return specific error codes for each failure.",
+      "references": [
+        "Input validation",
+        "Defensive programming",
+        "Type checking in Python"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Synthesizing the Complete Zero Padding Algorithm",
+      "relation_to_problem": "This final sub-quest integrates all previous concepts (dimension calculation, zero array creation, coordinate mapping, copying, and validation) into a complete zero padding implementation.",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Algorithm composition",
+        "Function integration"
+      ],
+      "learning_objectives": [
+        "Compose multiple sub-operations into a complete algorithm",
+        "Apply proper sequencing of validation, initialization, and transformation steps",
+        "Implement the complete zero padding function with all edge cases handled"
+      ],
+      "math_content": {
+        "definition": "The **Zero Padding Algorithm** $\\mathcal{P}: \\mathbb{R}^{H \\times W} \\times \\mathbb{Z}_{\\geq 0} \\rightarrow \\mathbb{R}^{H' \\times W'}$ is a transformation that takes an input image $I$ and padding width $p$ and produces a padded image $I'$ where: $$I'_{i,j} = \\begin{cases} I_{i-p, j-p} & \\text{if } p \\leq i < H+p \\land p \\leq j < W+p \\\\ 0 & \\text{otherwise} \\end{cases}$$ with output dimensions $H' = H + 2p$ and $W' = W + 2p$. If inputs are invalid, the function returns an error indicator.",
+        "notation": "$I'= \\mathcal{P}(I, p)$ denotes applying padding width $p$ to image $I$. $\\mathbf{0}_{H' \\times W'}$ is the initialized zero matrix.",
+        "theorem": "**Complete Padding Algorithm Theorem**: The zero padding operation can be decomposed into the following sequential steps: (1) Validate inputs, (2) Compute new dimensions using $H' = H + 2p$, $W' = W + 2p$, (3) Create zero matrix $I' = \\mathbf{0}_{H' \\times W'}$, (4) Copy original values using transformation $(i,j) \\mapsto (i+p, j+p)$ for all valid $(i,j)$. This algorithm correctly produces the padded image in $O(H'W') = O((H+2p)(W+2p))$ time and space.",
+        "proof_sketch": "Step 1 ensures preconditions are met (otherwise return error). Step 2 computes correct output dimensions by Dimension Transformation Theorem. Step 3 initializes all values to 0, satisfying the padding region requirement. Step 4 places all original values in correct positions by Center Placement Theorem while preserving zeros in border. Time complexity is dominated by initialization $O(H'W')$ and copying $O(HW)$, total $O(H'W')$. Space complexity is $O(H'W')$ for output array. $\\square$",
+        "examples": [
+          "Example 1: $\\mathcal{P}(\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}, 1) = \\begin{pmatrix} 0 & 0 & 0 & 0 \\\\ 0 & 1 & 2 & 0 \\\\ 0 & 3 & 4 & 0 \\\\ 0 & 0 & 0 & 0 \\end{pmatrix}$",
+          "Example 2: $\\mathcal{P}(\\begin{pmatrix} 5 \\end{pmatrix}, 2) = \\begin{pmatrix} 0 & 0 & 0 & 0 & 0 \\\\ 0 & 0 & 0 & 0 & 0 \\\\ 0 & 0 & 5 & 0 & 0 \\\\ 0 & 0 & 0 & 0 & 0 \\\\ 0 & 0 & 0 & 0 & 0 \\end{pmatrix}$",
+          "Example 3: $\\mathcal{P}(\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}, 0) = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}$ (no padding)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Algorithm Steps",
+          "latex": "$I' = \\text{Copy}(I, \\mathbf{0}_{H+2p, W+2p}, T_p)$",
+          "description": "High-level algorithm: copy $I$ into zero matrix using translation $T_p$"
+        },
+        {
+          "name": "Time Complexity",
+          "latex": "$T(H,W,p) = O((H+2p)(W+2p))$",
+          "description": "Dominated by creating and initializing output array"
+        },
+        {
+          "name": "Space Complexity",
+          "latex": "$S(H,W,p) = O((H+2p)(W+2p))$",
+          "description": "Space for output array of padded dimensions"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete zero padding algorithm by integrating all previous components. Given a 2D array and padding width, validate inputs, calculate dimensions, create the zero-filled padded array, and copy the original values to the center. Handle all edge cases by returning -1 for invalid inputs.",
+        "function_signature": "def zero_pad_complete(img: list, pad_width: int) -> list:",
+        "starter_code": "def zero_pad_complete(img, pad_width):\n    \"\"\"\n    Complete zero padding implementation.\n    \n    Args:\n        img: 2D list representing grayscale image\n        pad_width: non-negative integer padding width\n    \n    Returns:\n        Padded 2D list or -1 if inputs are invalid\n    \"\"\"\n    # Step 1: Validate inputs\n    # (check if img is valid 2D array and pad_width is valid)\n    \n    # Step 2: Get original dimensions and calculate new dimensions\n    \n    # Step 3: Create zero-filled array of new dimensions\n    \n    # Step 4: Copy original values to center using offset pad_width\n    \n    # Step 5: Return the padded array\n    pass",
+        "test_cases": [
+          {
+            "input": "zero_pad_complete([[1, 2], [3, 4]], 1)",
+            "expected": "[[0, 0, 0, 0], [0, 1, 2, 0], [0, 3, 4, 0], [0, 0, 0, 0]]",
+            "explanation": "2x2 image with padding 1 becomes 4x4 with border of zeros"
+          },
+          {
+            "input": "zero_pad_complete([[5]], 2)",
+            "expected": "[[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 5, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]]",
+            "explanation": "1x1 image with padding 2 becomes 5x5"
+          },
+          {
+            "input": "zero_pad_complete([[1, 2, 3]], 0)",
+            "expected": "[[1, 2, 3]]",
+            "explanation": "Padding 0 returns the original array"
+          },
+          {
+            "input": "zero_pad_complete([[1, 2], [3]], 1)",
+            "expected": "-1",
+            "explanation": "Invalid non-rectangular array returns -1"
+          },
+          {
+            "input": "zero_pad_complete([], 1)",
+            "expected": "-1",
+            "explanation": "Empty array returns -1"
+          },
+          {
+            "input": "zero_pad_complete([[1, 2]], -1)",
+            "expected": "-1",
+            "explanation": "Negative padding returns -1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not validating inputs first before attempting computation",
+        "Creating output array with wrong dimensions (forgetting to multiply padding by 2)",
+        "Copying values without applying the padding offset",
+        "Not handling the edge case where pad_width is 0 (should return copy of original)"
+      ],
+      "hint": "Follow the algorithm structure: validate → compute dimensions → create zero array → copy with offset. Use the concepts from all previous sub-quests. Remember that each side gets pad_width pixels of padding.",
+      "references": [
+        "Algorithm composition",
+        "End-to-end implementation",
+        "Integration testing"
+      ]
+    }
+  ]
+}

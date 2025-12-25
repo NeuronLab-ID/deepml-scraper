@@ -1,0 +1,500 @@
+{
+  "problem_id": 91,
+  "title": "Calculate F1 Score from Predicted and True Labels",
+  "category": "Machine Learning",
+  "difficulty": "easy",
+  "description": "Implement a function to calculate the F1 score given predicted and true labels. The F1 score is a widely used metric in machine learning, combining precision and recall into a single measure. round your solution to the 3rd decimal place",
+  "example": {
+    "input": "y_true = [1, 0, 1, 1, 0], y_pred = [1, 0, 0, 1, 1]",
+    "output": "0.667",
+    "reasoning": "The true positives, false positives, and false negatives are calculated from the given labels. Precision and recall are derived, and the F1 score is computed as their harmonic mean."
+  },
+  "starter_code": "def calculate_f1_score(y_true, y_pred):\n\t\"\"\"\n\tCalculate the F1 score based on true and predicted labels.\n\n\tArgs:\n\t\ty_true (list): True labels (ground truth).\n\t\ty_pred (list): Predicted labels.\n\n\tReturns:\n\t\tfloat: The F1 score rounded to three decimal places.\n\t\"\"\"\n\t# Your code here\n\tpass\n\treturn round(f1,3)",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding the Confusion Matrix and True Positives",
+      "relation_to_problem": "The F1 score is built upon confusion matrix elements (TP, FP, FN). This sub-quest teaches how to extract True Positives from predicted and true labels, which is the foundation for calculating both precision and recall.",
+      "prerequisites": [
+        "Binary classification concepts",
+        "Basic Python list operations",
+        "Boolean logic"
+      ],
+      "learning_objectives": [
+        "Understand what True Positives represent in binary classification",
+        "Implement element-wise comparison of predicted and true labels",
+        "Count instances where both prediction and ground truth are positive",
+        "Handle edge cases with empty or mismatched arrays"
+      ],
+      "math_content": {
+        "definition": "In binary classification, a **True Positive (TP)** occurs when the model correctly predicts the positive class. Formally, let $\\mathcal{D} = \\{(y_i, \\hat{y}_i)\\}_{i=1}^{n}$ be a dataset where $y_i \\in \\{0, 1\\}$ is the true label and $\\hat{y}_i \\in \\{0, 1\\}$ is the predicted label. Then: $$\\text{TP} = \\sum_{i=1}^{n} \\mathbb{1}_{\\{y_i = 1 \\land \\hat{y}_i = 1\\}}$$ where $\\mathbb{1}_{\\{\\cdot\\}}$ is the indicator function that equals 1 when the condition is true, 0 otherwise.",
+        "notation": "$y_i$ = true label for instance $i$, $\\hat{y}_i$ = predicted label for instance $i$, $n$ = total number of instances, $\\mathbb{1}_{\\{\\cdot\\}}$ = indicator function",
+        "theorem": "**Indicator Function Theorem**: For any condition $C$, the indicator function $\\mathbb{1}_{C}$ satisfies: $\\mathbb{1}_{C} = \\begin{cases} 1 & \\text{if } C \\text{ is true} \\\\ 0 & \\text{if } C \\text{ is false} \\end{cases}$ and $\\sum_{i=1}^{n} \\mathbb{1}_{C_i}$ counts the number of times condition $C$ holds across all instances.",
+        "proof_sketch": "The sum of indicator functions counts occurrences because each indicator contributes 1 when its condition is satisfied and 0 otherwise. For True Positives, we need both $y_i = 1$ (actually positive) AND $\\hat{y}_i = 1$ (predicted positive). The logical AND ($\\land$) ensures both conditions must hold simultaneously.",
+        "examples": [
+          "Example 1: $y = [1, 0, 1]$, $\\hat{y} = [1, 0, 1]$. Check each: $(1 \\land 1) = 1$, $(0 \\land 0) = 0$, $(1 \\land 1) = 1$. Thus $\\text{TP} = 1 + 0 + 1 = 2$.",
+          "Example 2: $y = [1, 1, 0]$, $\\hat{y} = [0, 1, 0]$. Check each: $(1 \\land 0) = 0$, $(1 \\land 1) = 1$, $(0 \\land 0) = 0$. Thus $\\text{TP} = 0 + 1 + 0 = 1$."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "True Positives Count",
+          "latex": "$\\text{TP} = \\sum_{i=1}^{n} \\mathbb{1}_{\\{y_i = 1 \\land \\hat{y}_i = 1\\}}$",
+          "description": "Count instances where both true and predicted labels equal 1 (positive class)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that counts True Positives given true labels and predicted labels. This is the first building block for F1 score calculation.",
+        "function_signature": "def count_true_positives(y_true: list, y_pred: list) -> int:",
+        "starter_code": "def count_true_positives(y_true, y_pred):\n    \"\"\"\n    Count the number of True Positives.\n    \n    Args:\n        y_true (list): True binary labels (0 or 1)\n        y_pred (list): Predicted binary labels (0 or 1)\n    \n    Returns:\n        int: Count of True Positives\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "count_true_positives([1, 0, 1, 1, 0], [1, 0, 0, 1, 1])",
+            "expected": "2",
+            "explanation": "Positions 0 and 3 have both y_true=1 and y_pred=1, so TP=2"
+          },
+          {
+            "input": "count_true_positives([1, 1, 1], [1, 1, 1])",
+            "expected": "3",
+            "explanation": "All three instances are True Positives"
+          },
+          {
+            "input": "count_true_positives([0, 0, 0], [1, 1, 1])",
+            "expected": "0",
+            "explanation": "No True Positives because y_true never equals 1"
+          },
+          {
+            "input": "count_true_positives([1, 1, 0, 0], [0, 1, 1, 0])",
+            "expected": "1",
+            "explanation": "Only position 1 has both y_true=1 and y_pred=1"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing True Positives with all positive predictions (not checking y_true=1)",
+        "Using OR instead of AND logic (counting when either is 1 instead of both)",
+        "Not handling array length mismatches",
+        "Using 'is' instead of '==' for value comparison in Python"
+      ],
+      "hint": "Iterate through both arrays simultaneously using zip() or enumerate(), checking when both values equal 1.",
+      "references": [
+        "Confusion matrix fundamentals",
+        "Binary classification evaluation metrics",
+        "Indicator functions in statistics"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Calculating False Positives and False Negatives",
+      "relation_to_problem": "False Positives (FP) and False Negatives (FN) are essential for computing precision and recall. FP appears in the precision denominator, while FN appears in the recall denominator. This sub-quest completes the confusion matrix understanding needed for F1 calculation.",
+      "prerequisites": [
+        "True Positives concept from Step 1",
+        "Logical operations (AND, NOT)",
+        "Understanding of Type I and Type II errors"
+      ],
+      "learning_objectives": [
+        "Define and calculate False Positives mathematically",
+        "Define and calculate False Negatives mathematically",
+        "Understand the asymmetry between FP and FN in model errors",
+        "Implement efficient counting for both metrics simultaneously"
+      ],
+      "math_content": {
+        "definition": "**False Positive (FP)**: A false positive occurs when the model predicts the positive class but the true label is negative. Formally: $$\\text{FP} = \\sum_{i=1}^{n} \\mathbb{1}_{\\{y_i = 0 \\land \\hat{y}_i = 1\\}}$$ **False Negative (FN)**: A false negative occurs when the model predicts the negative class but the true label is positive. Formally: $$\\text{FN} = \\sum_{i=1}^{n} \\mathbb{1}_{\\{y_i = 1 \\land \\hat{y}_i = 0\\}}$$ These represent the two types of misclassification errors in binary classification.",
+        "notation": "$\\text{FP}$ = count of false positives (Type I error), $\\text{FN}$ = count of false negatives (Type II error), $y_i = 0$ means negative class, $\\hat{y}_i = 1$ means predicted positive",
+        "theorem": "**Confusion Matrix Completeness Theorem**: For binary classification with labels in $\\{0, 1\\}$, the total number of instances satisfies: $$n = \\text{TP} + \\text{TN} + \\text{FP} + \\text{FN}$$ where TN (True Negatives) are instances where $y_i = 0 \\land \\hat{y}_i = 0$. Furthermore, these four quantities partition the instance space into mutually exclusive and exhaustive categories.",
+        "proof_sketch": "Each instance $(y_i, \\hat{y}_i)$ has exactly one of four possible combinations: $(1,1)$ (TP), $(0,0)$ (TN), $(0,1)$ (FP), or $(1,0)$ (FN). Since these are mutually exclusive (no overlap) and exhaustive (cover all cases), their sum equals $n$. The indicator functions ensure each instance contributes to exactly one category.",
+        "examples": [
+          "Example 1: $y = [1, 0, 1, 1, 0]$, $\\hat{y} = [1, 0, 0, 1, 1]$. FP: position 4 has $(0, 1)$, so FP=1. FN: position 2 has $(1, 0)$, so FN=1.",
+          "Example 2: $y = [0, 0, 1]$, $\\hat{y} = [1, 1, 0]$. FP: positions 0 and 1 have $(0, 1)$, so FP=2. FN: position 2 has $(1, 0)$, so FN=1."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "False Positives Count",
+          "latex": "$\\text{FP} = \\sum_{i=1}^{n} \\mathbb{1}_{\\{y_i = 0 \\land \\hat{y}_i = 1\\}}$",
+          "description": "Count instances where true label is 0 but prediction is 1 (Type I error)"
+        },
+        {
+          "name": "False Negatives Count",
+          "latex": "$\\text{FN} = \\sum_{i=1}^{n} \\mathbb{1}_{\\{y_i = 1 \\land \\hat{y}_i = 0\\}}$",
+          "description": "Count instances where true label is 1 but prediction is 0 (Type II error)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that calculates both False Positives and False Negatives. Return them as a tuple (FP, FN). This completes the confusion matrix components needed for precision and recall.",
+        "function_signature": "def count_false_positives_negatives(y_true: list, y_pred: list) -> tuple:",
+        "starter_code": "def count_false_positives_negatives(y_true, y_pred):\n    \"\"\"\n    Count False Positives and False Negatives.\n    \n    Args:\n        y_true (list): True binary labels (0 or 1)\n        y_pred (list): Predicted binary labels (0 or 1)\n    \n    Returns:\n        tuple: (FP, FN) - counts of false positives and false negatives\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "count_false_positives_negatives([1, 0, 1, 1, 0], [1, 0, 0, 1, 1])",
+            "expected": "(1, 1)",
+            "explanation": "FP at position 4 (y=0, pred=1), FN at position 2 (y=1, pred=0)"
+          },
+          {
+            "input": "count_false_positives_negatives([0, 0, 0], [1, 1, 1])",
+            "expected": "(3, 0)",
+            "explanation": "All three predictions are false positives, no false negatives possible"
+          },
+          {
+            "input": "count_false_positives_negatives([1, 1, 1], [0, 0, 0])",
+            "expected": "(0, 3)",
+            "explanation": "All three predictions are false negatives, no false positives possible"
+          },
+          {
+            "input": "count_false_positives_negatives([1, 0, 1, 0], [0, 1, 0, 1])",
+            "expected": "(2, 2)",
+            "explanation": "FP at positions 1,3 and FN at positions 0,2 - complete disagreement"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing FP and FN definitions (swapping the conditions)",
+        "Counting when prediction is wrong without checking which type of error",
+        "Not recognizing that FP and FN are complementary error types",
+        "Forgetting that FP requires y_true=0 (negative ground truth)"
+      ],
+      "hint": "Use a single loop to count both metrics simultaneously. Check the specific combination of (y_true, y_pred) values that define each error type.",
+      "references": [
+        "Type I and Type II errors in hypothesis testing",
+        "Confusion matrix visualization",
+        "Cost-sensitive classification"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Computing Precision from Confusion Matrix Elements",
+      "relation_to_problem": "Precision is one of the two components needed for F1 score. It measures the accuracy of positive predictions and directly uses TP and FP. Understanding precision is essential before computing the harmonic mean in the final F1 calculation.",
+      "prerequisites": [
+        "True Positives from Step 1",
+        "False Positives from Step 2",
+        "Division and fractions",
+        "Understanding of positive predictive value"
+      ],
+      "learning_objectives": [
+        "Define precision formally as a conditional probability",
+        "Calculate precision from TP and FP counts",
+        "Handle the edge case when no positive predictions are made",
+        "Interpret precision in the context of model performance"
+      ],
+      "math_content": {
+        "definition": "**Precision** (also called **Positive Predictive Value**) is the fraction of positive predictions that are correct. It answers: 'Of all instances predicted as positive, what proportion are truly positive?' Formally: $$\\text{Precision} = \\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$$ where the denominator represents all positive predictions. Alternatively, precision can be viewed as a conditional probability: $$\\text{Precision} = P(Y = 1 | \\hat{Y} = 1)$$ the probability that the true label is positive given that the prediction is positive.",
+        "notation": "$\\text{Precision} \\in [0, 1]$ represents the precision value, $\\text{TP} + \\text{FP}$ is the total number of positive predictions, $P(Y = 1 | \\hat{Y} = 1)$ is conditional probability notation",
+        "theorem": "**Precision Bounds Theorem**: Precision satisfies: $$0 \\leq \\text{Precision} \\leq 1$$ with the following properties: (1) $\\text{Precision} = 1$ if and only if $\\text{FP} = 0$ (no false positives), (2) $\\text{Precision} = 0$ if and only if $\\text{TP} = 0$ and $\\text{FP} > 0$ (no true positives but some false positives), (3) $\\text{Precision}$ is undefined when $\\text{TP} + \\text{FP} = 0$ (no positive predictions made).",
+        "proof_sketch": "Since TP and FP are non-negative counts, the numerator $\\text{TP} \\geq 0$ and denominator $\\text{TP} + \\text{FP} \\geq \\text{TP}$. When the denominator is positive, we have $0 \\leq \\frac{\\text{TP}}{\\text{TP} + \\text{FP}} \\leq 1$ with equality to 1 when $\\text{FP} = 0$ and equality to 0 when $\\text{TP} = 0$. The undefined case occurs when the model never predicts positive, making the conditional probability undefined.",
+        "examples": [
+          "Example 1: TP=45, FP=10. $\\text{Precision} = \\frac{45}{45+10} = \\frac{45}{55} \\approx 0.818$. Interpretation: 81.8% of positive predictions are correct.",
+          "Example 2: TP=2, FP=1 (from y_true=[1,0,1,1,0], y_pred=[1,0,0,1,1]). $\\text{Precision} = \\frac{2}{2+1} = \\frac{2}{3} \\approx 0.667$.",
+          "Example 3: TP=10, FP=0. $\\text{Precision} = \\frac{10}{10+0} = 1.0$. Perfect precision - all positive predictions are correct."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Precision Formula",
+          "latex": "$\\text{Precision} = \\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$",
+          "description": "Fraction of positive predictions that are correct. High precision means low false positive rate."
+        },
+        {
+          "name": "Precision as Conditional Probability",
+          "latex": "$\\text{Precision} = P(Y = 1 | \\hat{Y} = 1)$",
+          "description": "Alternative interpretation: probability true label is positive given prediction is positive"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to calculate precision from true and predicted labels. Handle the edge case where no positive predictions are made by returning 0.0. Round to 3 decimal places.",
+        "function_signature": "def calculate_precision(y_true: list, y_pred: list) -> float:",
+        "starter_code": "def calculate_precision(y_true, y_pred):\n    \"\"\"\n    Calculate precision from true and predicted labels.\n    \n    Args:\n        y_true (list): True binary labels (0 or 1)\n        y_pred (list): Predicted binary labels (0 or 1)\n    \n    Returns:\n        float: Precision score rounded to 3 decimal places\n    \"\"\"\n    # Your code here\n    # Remember to handle the case where TP + FP = 0\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_precision([1, 0, 1, 1, 0], [1, 0, 0, 1, 1])",
+            "expected": "0.667",
+            "explanation": "TP=2 (positions 0,3), FP=1 (position 4). Precision = 2/(2+1) = 0.667"
+          },
+          {
+            "input": "calculate_precision([1, 1, 0], [1, 1, 0])",
+            "expected": "1.000",
+            "explanation": "TP=2, FP=0. Precision = 2/(2+0) = 1.0 (perfect precision)"
+          },
+          {
+            "input": "calculate_precision([0, 0, 0], [1, 1, 1])",
+            "expected": "0.000",
+            "explanation": "TP=0, FP=3. Precision = 0/(0+3) = 0.0 (all positive predictions wrong)"
+          },
+          {
+            "input": "calculate_precision([1, 1, 1], [0, 0, 0])",
+            "expected": "0.000",
+            "explanation": "TP=0, FP=0. No positive predictions made, return 0.0 by convention"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Dividing by total instances (n) instead of positive predictions (TP+FP)",
+        "Not handling division by zero when TP+FP=0",
+        "Confusing precision with accuracy (which uses all four confusion matrix elements)",
+        "Not rounding to the specified decimal places"
+      ],
+      "hint": "First calculate TP and FP using methods from previous sub-quests. Check if their sum is zero before dividing to avoid division errors.",
+      "references": [
+        "Positive predictive value in medical testing",
+        "Precision-recall tradeoff",
+        "Bayesian interpretation of precision"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Computing Recall (Sensitivity) from Confusion Matrix Elements",
+      "relation_to_problem": "Recall is the second component needed for F1 score calculation. It measures the model's ability to find all positive instances using TP and FN. Together with precision from Step 3, recall provides the inputs for the harmonic mean that defines F1.",
+      "prerequisites": [
+        "True Positives from Step 1",
+        "False Negatives from Step 2",
+        "Understanding of sensitivity and true positive rate"
+      ],
+      "learning_objectives": [
+        "Define recall formally as a conditional probability",
+        "Calculate recall from TP and FN counts",
+        "Handle the edge case when no actual positives exist",
+        "Understand the complementary nature of precision and recall"
+      ],
+      "math_content": {
+        "definition": "**Recall** (also called **Sensitivity**, **True Positive Rate**, or **Hit Rate**) is the fraction of actual positive instances that are correctly identified. It answers: 'Of all truly positive instances, what proportion did we correctly predict as positive?' Formally: $$\\text{Recall} = \\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$$ where the denominator represents all actual positive instances. As a conditional probability: $$\\text{Recall} = P(\\hat{Y} = 1 | Y = 1)$$ the probability that the prediction is positive given that the true label is positive.",
+        "notation": "$\\text{Recall} \\in [0, 1]$ represents the recall value, $\\text{TP} + \\text{FN}$ is the total number of actual positives in the dataset, also denoted as $P$ (number of positive instances)",
+        "theorem": "**Recall Bounds Theorem**: Recall satisfies: $$0 \\leq \\text{Recall} \\leq 1$$ with the following properties: (1) $\\text{Recall} = 1$ if and only if $\\text{FN} = 0$ (no false negatives, all positives found), (2) $\\text{Recall} = 0$ if and only if $\\text{TP} = 0$ and $\\text{FN} > 0$ (no true positives found among existing positives), (3) $\\text{Recall}$ is undefined when $\\text{TP} + \\text{FN} = 0$ (no positive instances in the dataset). **Precision-Recall Duality**: While precision conditions on predictions ($\\hat{Y}$), recall conditions on ground truth ($Y$), creating complementary perspectives on model performance.",
+        "proof_sketch": "Since TP and FN are non-negative counts representing a partition of actual positives, we have $\\text{TP} \\geq 0$ and $\\text{TP} + \\text{FN} \\geq \\text{TP}$. When $\\text{TP} + \\text{FN} > 0$, the fraction $\\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$ is bounded between 0 and 1. Perfect recall (=1) requires finding all positives ($\\text{FN} = 0$). Zero recall requires missing all positives ($\\text{TP} = 0$). The undefined case occurs when the dataset has no positive instances.",
+        "examples": [
+          "Example 1: TP=45, FN=5 (50 actual positives). $\\text{Recall} = \\frac{45}{45+5} = \\frac{45}{50} = 0.9$. We found 90% of all positive instances.",
+          "Example 2: TP=2, FN=1 (from y_true=[1,0,1,1,0], y_pred=[1,0,0,1,1]). $\\text{Recall} = \\frac{2}{2+1} = \\frac{2}{3} \\approx 0.667$. We found 66.7% of positive instances.",
+          "Example 3: TP=8, FN=0. $\\text{Recall} = \\frac{8}{8+0} = 1.0$. Perfect recall - found all positive instances (but says nothing about false positives)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Recall Formula",
+          "latex": "$\\text{Recall} = \\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$",
+          "description": "Fraction of actual positive instances correctly identified. High recall means low false negative rate."
+        },
+        {
+          "name": "Recall as Conditional Probability",
+          "latex": "$\\text{Recall} = P(\\hat{Y} = 1 | Y = 1)$",
+          "description": "Alternative interpretation: probability prediction is positive given true label is positive"
+        },
+        {
+          "name": "Complement of Recall",
+          "latex": "$\\text{False Negative Rate} = 1 - \\text{Recall} = \\frac{\\text{FN}}{\\text{TP} + \\text{FN}}$",
+          "description": "The fraction of positives that were missed"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to calculate recall from true and predicted labels. Handle the edge case where no actual positive instances exist by returning 0.0. Round to 3 decimal places. This completes the two components needed for F1 score.",
+        "function_signature": "def calculate_recall(y_true: list, y_pred: list) -> float:",
+        "starter_code": "def calculate_recall(y_true, y_pred):\n    \"\"\"\n    Calculate recall from true and predicted labels.\n    \n    Args:\n        y_true (list): True binary labels (0 or 1)\n        y_pred (list): Predicted binary labels (0 or 1)\n    \n    Returns:\n        float: Recall score rounded to 3 decimal places\n    \"\"\"\n    # Your code here\n    # Remember to handle the case where TP + FN = 0\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_recall([1, 0, 1, 1, 0], [1, 0, 0, 1, 1])",
+            "expected": "0.667",
+            "explanation": "TP=2 (positions 0,3), FN=1 (position 2). Recall = 2/(2+1) = 0.667"
+          },
+          {
+            "input": "calculate_recall([1, 1, 0], [1, 1, 0])",
+            "expected": "1.000",
+            "explanation": "TP=2, FN=0. Recall = 2/(2+0) = 1.0 (found all positives)"
+          },
+          {
+            "input": "calculate_recall([1, 1, 1], [0, 0, 0])",
+            "expected": "0.000",
+            "explanation": "TP=0, FN=3. Recall = 0/(0+3) = 0.0 (missed all positives)"
+          },
+          {
+            "input": "calculate_recall([0, 0, 0], [1, 1, 1])",
+            "expected": "0.000",
+            "explanation": "TP=0, FN=0. No actual positives in dataset, return 0.0 by convention"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Dividing by total instances (n) instead of actual positives (TP+FN)",
+        "Confusing recall with precision (using FP instead of FN in denominator)",
+        "Not handling division by zero when TP+FN=0 (no positive ground truth)",
+        "Confusing recall with accuracy or specificity"
+      ],
+      "hint": "Calculate TP and FN using methods from previous sub-quests. The denominator should be the count of all instances where y_true equals 1.",
+      "references": [
+        "Sensitivity in medical diagnostics",
+        "ROC curves and true positive rate",
+        "Precision-recall curves"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Understanding the Harmonic Mean and Its Properties",
+      "relation_to_problem": "The F1 score is defined as the harmonic mean of precision and recall, not their arithmetic mean. This sub-quest explains why the harmonic mean is appropriate and how it differs from other averaging methods, which is crucial for understanding why F1 behaves the way it does.",
+      "prerequisites": [
+        "Arithmetic mean",
+        "Precision from Step 3",
+        "Recall from Step 4",
+        "Basic algebra"
+      ],
+      "learning_objectives": [
+        "Define the harmonic mean formally",
+        "Understand why harmonic mean punishes extreme imbalance",
+        "Compare harmonic mean to arithmetic and geometric means",
+        "Apply harmonic mean formula to two values (precision and recall)"
+      ],
+      "math_content": {
+        "definition": "The **harmonic mean** of $n$ positive numbers $x_1, x_2, \\ldots, x_n$ is defined as: $$H(x_1, \\ldots, x_n) = \\frac{n}{\\sum_{i=1}^{n} \\frac{1}{x_i}}$$ For two values $x$ and $y$, this simplifies to: $$H(x, y) = \\frac{2}{\\frac{1}{x} + \\frac{1}{y}} = \\frac{2xy}{x + y}$$ The harmonic mean is the reciprocal of the arithmetic mean of reciprocals. It gives more weight to smaller values compared to the arithmetic mean.",
+        "notation": "$H$ denotes harmonic mean, $A$ denotes arithmetic mean: $A(x,y) = \\frac{x+y}{2}$, $G$ denotes geometric mean: $G(x,y) = \\sqrt{xy}$",
+        "theorem": "**Mean Inequality Theorem** (Harmonic-Geometric-Arithmetic): For positive numbers $x, y$: $$H(x, y) \\leq G(x, y) \\leq A(x, y)$$ with equality if and only if $x = y$. Specifically: $$\\frac{2xy}{x+y} \\leq \\sqrt{xy} \\leq \\frac{x+y}{2}$$ **Imbalance Punishment Property**: As the ratio $\\frac{\\max(x,y)}{\\min(x,y)}$ increases (greater imbalance), the harmonic mean approaches twice the minimum value: $H(x,y) \\to 2\\min(x,y)$ as one value dominates.",
+        "proof_sketch": "For the inequality $H \\leq A$, we prove $\\frac{2xy}{x+y} \\leq \\frac{x+y}{2}$. Cross-multiplying: $4xy \\leq (x+y)^2 = x^2 + 2xy + y^2$, which simplifies to $0 \\leq x^2 - 2xy + y^2 = (x-y)^2$, always true. Equality holds when $x = y$. For imbalance punishment, consider $x = 0.9, y = 0.1$: $A = 0.5$ but $H = \\frac{2(0.9)(0.1)}{1.0} = 0.18 \\approx 2(0.1)$. The harmonic mean is dominated by the smaller value.",
+        "examples": [
+          "Example 1 (Balanced): Precision=0.8, Recall=0.8. $H = \\frac{2(0.8)(0.8)}{0.8+0.8} = \\frac{1.28}{1.6} = 0.8$. When equal, H equals the values.",
+          "Example 2 (Imbalanced): Precision=0.9, Recall=0.1. $H = \\frac{2(0.9)(0.1)}{0.9+0.1} = \\frac{0.18}{1.0} = 0.18$. Compare to $A = 0.5$. H punishes the imbalance.",
+          "Example 3 (Moderate imbalance): Precision=0.667, Recall=0.667. $H = \\frac{2(0.667)(0.667)}{0.667+0.667} = 0.667$. This will be our F1 for the main problem example."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Harmonic Mean of Two Values",
+          "latex": "$H(x, y) = \\frac{2xy}{x + y}$",
+          "description": "Used for F1 score calculation with x=precision, y=recall"
+        },
+        {
+          "name": "Alternative Harmonic Mean Form",
+          "latex": "$H(x, y) = \\frac{2}{\\frac{1}{x} + \\frac{1}{y}}$",
+          "description": "Reciprocal of arithmetic mean of reciprocals - useful for understanding why small values dominate"
+        },
+        {
+          "name": "Mean Inequality",
+          "latex": "$\\frac{2xy}{x+y} \\leq \\sqrt{xy} \\leq \\frac{x+y}{2}$",
+          "description": "Harmonic ≤ Geometric ≤ Arithmetic means"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to calculate the harmonic mean of two positive values. This function will be directly used to compute F1 from precision and recall. Handle edge cases where either value is zero by returning 0.0. Round to 3 decimal places.",
+        "function_signature": "def harmonic_mean(x: float, y: float) -> float:",
+        "starter_code": "def harmonic_mean(x, y):\n    \"\"\"\n    Calculate the harmonic mean of two values.\n    \n    Args:\n        x (float): First value (must be non-negative)\n        y (float): Second value (must be non-negative)\n    \n    Returns:\n        float: Harmonic mean rounded to 3 decimal places\n    \"\"\"\n    # Your code here\n    # Handle the case where either x or y is 0\n    pass",
+        "test_cases": [
+          {
+            "input": "harmonic_mean(0.667, 0.667)",
+            "expected": "0.667",
+            "explanation": "When both values equal 0.667, harmonic mean = 2(0.667)(0.667)/(0.667+0.667) = 0.667"
+          },
+          {
+            "input": "harmonic_mean(0.9, 0.1)",
+            "expected": "0.18",
+            "explanation": "Imbalanced values: H = 2(0.9)(0.1)/1.0 = 0.18, much lower than arithmetic mean of 0.5"
+          },
+          {
+            "input": "harmonic_mean(1.0, 1.0)",
+            "expected": "1.0",
+            "explanation": "Perfect scores: H = 2(1.0)(1.0)/2.0 = 1.0"
+          },
+          {
+            "input": "harmonic_mean(0.8, 0.0)",
+            "expected": "0.0",
+            "explanation": "When one value is 0, harmonic mean is 0 (by convention to handle division)"
+          },
+          {
+            "input": "harmonic_mean(0.75, 0.6)",
+            "expected": "0.667",
+            "explanation": "H = 2(0.75)(0.6)/(0.75+0.6) = 0.9/1.35 ≈ 0.667"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using arithmetic mean (x+y)/2 instead of harmonic mean",
+        "Not handling the case where x or y equals zero (division by zero)",
+        "Confusing the formula: using x+y in numerator instead of 2xy",
+        "Not understanding why harmonic mean is appropriate for rates and ratios"
+      ],
+      "hint": "The formula is 2*x*y/(x+y). Check if the denominator is zero before dividing. Remember that if either precision or recall is 0, F1 should be 0.",
+      "references": [
+        "Harmonic mean applications in averaging rates",
+        "F-beta score generalizations",
+        "Information retrieval metrics"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Synthesizing the F1 Score: Combining All Components",
+      "relation_to_problem": "This final sub-quest combines all previous concepts to derive and implement the complete F1 score formula. It connects confusion matrix elements (TP, FP, FN) through precision and recall to the harmonic mean, providing multiple equivalent formulations of F1.",
+      "prerequisites": [
+        "Precision from Step 3",
+        "Recall from Step 4",
+        "Harmonic mean from Step 5",
+        "All confusion matrix elements"
+      ],
+      "learning_objectives": [
+        "Derive the F1 score formula from first principles",
+        "Understand the two equivalent F1 formulations",
+        "Implement F1 calculation with proper edge case handling",
+        "Interpret F1 scores in context of model performance"
+      ],
+      "math_content": {
+        "definition": "The **F1 Score** (also called **F-measure** or **F1-measure**) is the harmonic mean of precision and recall, providing a single metric that balances both concerns. **Form 1** (via Precision and Recall): $$F_1 = 2 \\times \\frac{\\text{Precision} \\times \\text{Recall}}{\\text{Precision} + \\text{Recall}}$$ **Form 2** (via Confusion Matrix): $$F_1 = \\frac{2 \\times \\text{TP}}{2 \\times \\text{TP} + \\text{FP} + \\text{FN}}$$ Both formulations are mathematically equivalent. F1 reaches its maximum value of 1 (perfect precision and recall) and minimum of 0 (either precision or recall is zero).",
+        "notation": "$F_1 \\in [0, 1]$ is the F1 score, $\\text{Precision} = \\frac{\\text{TP}}{\\text{TP}+\\text{FP}}$, $\\text{Recall} = \\frac{\\text{TP}}{\\text{TP}+\\text{FN}}$",
+        "theorem": "**F1 Score Equivalence Theorem**: The two forms are equivalent: $$2 \\times \\frac{\\text{Precision} \\times \\text{Recall}}{\\text{Precision} + \\text{Recall}} = \\frac{2 \\times \\text{TP}}{2 \\times \\text{TP} + \\text{FP} + \\text{FN}}$$ **F1 Boundary Conditions**: (1) $F_1 = 1$ if and only if $\\text{FP} = 0$ and $\\text{FN} = 0$ (perfect classification), (2) $F_1 = 0$ if and only if $\\text{TP} = 0$ (no correct positive predictions), (3) $F_1$ is undefined when $\\text{TP} = \\text{FP} = \\text{FN} = 0$ (no positive predictions and no positive ground truth).",
+        "proof_sketch": "Starting from Form 1, substitute $P = \\frac{\\text{TP}}{\\text{TP}+\\text{FP}}$ and $R = \\frac{\\text{TP}}{\\text{TP}+\\text{FN}}$: $$F_1 = \\frac{2PR}{P+R} = \\frac{2 \\cdot \\frac{\\text{TP}}{\\text{TP}+\\text{FP}} \\cdot \\frac{\\text{TP}}{\\text{TP}+\\text{FN}}}{\\frac{\\text{TP}}{\\text{TP}+\\text{FP}} + \\frac{\\text{TP}}{\\text{TP}+\\text{FN}}}$$ Finding common denominator in the denominator: $$= \\frac{\\frac{2\\text{TP}^2}{(\\text{TP}+\\text{FP})(\\text{TP}+\\text{FN})}}{\\frac{\\text{TP}(\\text{TP}+\\text{FN}) + \\text{TP}(\\text{TP}+\\text{FP})}{(\\text{TP}+\\text{FP})(\\text{TP}+\\text{FN})}} = \\frac{2\\text{TP}^2}{\\text{TP}(2\\text{TP}+\\text{FN}+\\text{FP})} = \\frac{2\\text{TP}}{2\\text{TP}+\\text{FP}+\\text{FN}}$$",
+        "examples": [
+          "Example 1 (Main problem): y_true=[1,0,1,1,0], y_pred=[1,0,0,1,1]. TP=2, FP=1, FN=1. $F_1 = \\frac{2(2)}{2(2)+1+1} = \\frac{4}{6} = 0.667$",
+          "Example 2 (Perfect): TP=10, FP=0, FN=0. $F_1 = \\frac{2(10)}{2(10)+0+0} = \\frac{20}{20} = 1.0$",
+          "Example 3 (High Precision, Low Recall): TP=2, FP=0, FN=8. Precision=1.0, Recall=0.2. $F_1 = \\frac{2(1.0)(0.2)}{1.0+0.2} = \\frac{0.4}{1.2} \\approx 0.333$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "F1 Score (Precision-Recall Form)",
+          "latex": "$F_1 = 2 \\times \\frac{\\text{Precision} \\times \\text{Recall}}{\\text{Precision} + \\text{Recall}}$",
+          "description": "Primary formula using precision and recall as inputs"
+        },
+        {
+          "name": "F1 Score (Confusion Matrix Form)",
+          "latex": "$F_1 = \\frac{2 \\times \\text{TP}}{2 \\times \\text{TP} + \\text{FP} + \\text{FN}}$",
+          "description": "Alternative direct formula from confusion matrix elements"
+        },
+        {
+          "name": "F-beta Score Generalization",
+          "latex": "$F_\\beta = (1 + \\beta^2) \\times \\frac{\\text{Precision} \\times \\text{Recall}}{(\\beta^2 \\times \\text{Precision}) + \\text{Recall}}$",
+          "description": "General formula where F1 is the special case with β=1"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to calculate the F1 score using the building blocks from all previous sub-quests. You should calculate precision and recall first, then apply the harmonic mean. Handle all edge cases properly. This mirrors the structure needed for the main problem but with simpler test cases.",
+        "function_signature": "def calculate_f1_score_components(y_true: list, y_pred: list) -> dict:",
+        "starter_code": "def calculate_f1_score_components(y_true, y_pred):\n    \"\"\"\n    Calculate F1 score along with its components for educational purposes.\n    \n    Args:\n        y_true (list): True binary labels (0 or 1)\n        y_pred (list): Predicted binary labels (0 or 1)\n    \n    Returns:\n        dict: Dictionary with keys 'precision', 'recall', 'f1' (all rounded to 3 decimals)\n    \"\"\"\n    # Your code here\n    # Calculate TP, FP, FN\n    # Calculate precision\n    # Calculate recall\n    # Calculate F1 as harmonic mean of precision and recall\n    pass",
+        "test_cases": [
+          {
+            "input": "calculate_f1_score_components([1, 0, 1, 1, 0], [1, 0, 0, 1, 1])",
+            "expected": "{'precision': 0.667, 'recall': 0.667, 'f1': 0.667}",
+            "explanation": "TP=2, FP=1, FN=1. P=2/3, R=2/3, F1=2(2/3)(2/3)/(2/3+2/3)=0.667"
+          },
+          {
+            "input": "calculate_f1_score_components([1, 1, 1], [1, 1, 1])",
+            "expected": "{'precision': 1.0, 'recall': 1.0, 'f1': 1.0}",
+            "explanation": "Perfect prediction: all metrics are 1.0"
+          },
+          {
+            "input": "calculate_f1_score_components([0, 0, 0], [1, 1, 1])",
+            "expected": "{'precision': 0.0, 'recall': 0.0, 'f1': 0.0}",
+            "explanation": "No true positives possible, all metrics are 0"
+          },
+          {
+            "input": "calculate_f1_score_components([1, 1, 0, 0], [1, 0, 0, 0])",
+            "expected": "{'precision': 1.0, 'recall': 0.5, 'f1': 0.667}",
+            "explanation": "TP=1, FP=0, FN=1. P=1.0, R=0.5, F1=2(1.0)(0.5)/(1.0+0.5)=0.667"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling edge cases where precision or recall is undefined (returning wrong default)",
+        "Using arithmetic mean instead of harmonic mean",
+        "Calculating confusion matrix elements incorrectly",
+        "Not rounding to exactly 3 decimal places as specified",
+        "Forgetting to handle the case where both precision and recall are 0"
+      ],
+      "hint": "Build up step-by-step: first count TP, FP, FN; then calculate precision and recall using these counts with edge case handling; finally apply the harmonic mean formula. Use the functions you conceptually built in previous sub-quests.",
+      "references": [
+        "F-measure in information retrieval",
+        "Evaluation metrics for imbalanced datasets",
+        "Multi-class F1 score variants (macro, micro, weighted)"
+      ]
+    }
+  ]
+}

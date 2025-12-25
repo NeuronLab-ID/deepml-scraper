@@ -1,0 +1,518 @@
+{
+  "problem_id": 159,
+  "title": "Incremental Mean for Online Reward Estimation",
+  "category": "Reinforcement Learning",
+  "difficulty": "medium",
+  "description": "Implement an efficient method to update the mean reward for a k-armed bandit action after receiving each new reward, **without storing the full history of rewards**. Given the previous mean estimate (Q_prev), the number of times the action has been selected (k), and a new reward (R), compute the updated mean using the incremental formula.\n\n**Note:** Using a regular mean that stores all past rewards will eventually run out of memory. Your solution should use only the previous mean, the count, and the new reward.",
+  "example": {
+    "input": "Q_prev = 2.0\nk = 2\nR = 6.0\nnew_Q = incremental_mean(Q_prev, k, R)\nprint(round(new_Q, 2))",
+    "output": "4.0",
+    "reasoning": "The updated mean is Q_prev + (1/k) * (R - Q_prev) = 2.0 + (1/2)*(6.0 - 2.0) = 2.0 + 2.0 = 4.0"
+  },
+  "starter_code": "def incremental_mean(Q_prev, k, R):\n    \"\"\"\n    Q_prev: previous mean estimate (float)\n    k: number of times the action has been selected (int)\n    R: new observed reward (float)\n    Returns: new mean estimate (float)\n    \"\"\"\n    # Your code here\n    pass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Understanding Arithmetic Mean and Sample Averages",
+      "relation_to_problem": "Establishes the foundational definition of mean that the incremental formula approximates, showing what we're trying to compute efficiently",
+      "prerequisites": [
+        "Basic algebra",
+        "Summation notation"
+      ],
+      "learning_objectives": [
+        "Formally define the arithmetic mean using summation notation",
+        "Understand the computational complexity of batch mean calculation",
+        "Identify the memory requirements for traditional mean computation"
+      ],
+      "math_content": {
+        "definition": "The **arithmetic mean** (or sample average) of $n$ observations $\\{R_1, R_2, \\ldots, R_n\\}$ is defined as: $$\\bar{R}_n = \\frac{1}{n}\\sum_{i=1}^{n} R_i = \\frac{R_1 + R_2 + \\cdots + R_n}{n}$$ where $n \\in \\mathbb{N}^+$ is the sample size and $R_i \\in \\mathbb{R}$ represents the $i$-th observation.",
+        "notation": "$\\bar{R}_n$ = sample mean after $n$ observations; $R_i$ = $i$-th reward observation; $n$ = total number of observations",
+        "theorem": "**Linearity of Mean**: For any constant $c \\in \\mathbb{R}$ and observations $\\{R_i\\}_{i=1}^n$, the mean satisfies: (1) $\\overline{cR}_n = c\\bar{R}_n$ (homogeneity), and (2) $\\overline{R + c}_n = \\bar{R}_n + c$ (translation invariance)",
+        "proof_sketch": "For homogeneity: $\\overline{cR}_n = \\frac{1}{n}\\sum_{i=1}^{n} cR_i = c \\cdot \\frac{1}{n}\\sum_{i=1}^{n} R_i = c\\bar{R}_n$ by factoring out the constant. Translation invariance follows similarly by distributing the summation.",
+        "examples": [
+          "Example 1: Given rewards $R = \\{2, 4, 6\\}$, the mean is $\\bar{R}_3 = \\frac{2+4+6}{3} = \\frac{12}{3} = 4.0$",
+          "Example 2: Given rewards $R = \\{1.5, 2.5, 3.0, 4.0\\}$, the mean is $\\bar{R}_4 = \\frac{1.5+2.5+3.0+4.0}{4} = \\frac{11}{4} = 2.75$",
+          "Example 3 (Memory issue): For $n=10^6$ observations, storing all values requires $O(n)$ space, which becomes impractical for large-scale online systems"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Arithmetic Mean",
+          "latex": "$\\bar{R}_n = \\frac{1}{n}\\sum_{i=1}^{n} R_i$",
+          "description": "Use when you have access to all $n$ observations and sufficient memory"
+        },
+        {
+          "name": "Computational Complexity",
+          "latex": "$O(n)$ time, $O(n)$ space",
+          "description": "Time to compute mean from scratch; space to store all observations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the standard batch mean calculation. This function takes a list of rewards and returns their arithmetic mean. Understand why this approach has limitations for online learning (hint: memory usage).",
+        "function_signature": "def batch_mean(rewards: list) -> float:",
+        "starter_code": "def batch_mean(rewards):\n    \"\"\"\n    Calculate the arithmetic mean of a list of rewards.\n    \n    Args:\n        rewards: list of float values\n    Returns:\n        float: the arithmetic mean\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "batch_mean([2.0, 4.0, 6.0])",
+            "expected": "4.0",
+            "explanation": "Sum is 12.0, divided by 3 observations gives 4.0"
+          },
+          {
+            "input": "batch_mean([1.5, 2.5, 3.0, 4.0])",
+            "expected": "2.75",
+            "explanation": "Sum is 11.0, divided by 4 observations gives 2.75"
+          },
+          {
+            "input": "batch_mean([10.0])",
+            "expected": "10.0",
+            "explanation": "Mean of a single value is the value itself"
+          },
+          {
+            "input": "batch_mean([0.0, 0.0, 0.0])",
+            "expected": "0.0",
+            "explanation": "Mean of all zeros is zero"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to handle empty lists (though not required here, good practice)",
+        "Using integer division instead of float division in languages like Python 2",
+        "Not recognizing that this approach requires O(n) memory storage",
+        "Attempting to optimize by recalculating from scratch each time a new reward arrives"
+      ],
+      "hint": "The standard formula is straightforward: sum all values and divide by the count. Think about what happens when you receive 1 million rewards—do you really want to store them all?",
+      "references": [
+        "Sample statistics and estimators",
+        "Computational complexity analysis",
+        "Memory-efficient algorithms for streaming data"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Recurrence Relations and Iterative Updates",
+      "relation_to_problem": "Introduces the mathematical framework for expressing sequences iteratively, which is essential for deriving the incremental mean formula",
+      "prerequisites": [
+        "Arithmetic mean",
+        "Basic algebra",
+        "Sequence notation"
+      ],
+      "learning_objectives": [
+        "Define recurrence relations for updating sequences",
+        "Express cumulative sums using iterative formulas",
+        "Understand how to update a running total without recomputing from scratch"
+      ],
+      "math_content": {
+        "definition": "A **recurrence relation** expresses the $n$-th term of a sequence in terms of previous terms. For a cumulative sum $S_n = \\sum_{i=1}^{n} R_i$, we can write the recurrence: $$S_n = S_{n-1} + R_n$$ with base case $S_0 = 0$. This allows computing $S_n$ incrementally using only $S_{n-1}$ and the new observation $R_n$.",
+        "notation": "$S_n$ = cumulative sum after $n$ observations; $S_{n-1}$ = cumulative sum after $n-1$ observations; $R_n$ = $n$-th new observation",
+        "theorem": "**Incremental Sum Formula**: For any sequence $\\{R_i\\}_{i=1}^n$, the cumulative sum satisfies $S_n = S_{n-1} + R_n$ for all $n \\geq 1$ with $S_0 = 0$. This reduces computation from $O(n)$ to $O(1)$ per update.",
+        "proof_sketch": "By definition, $S_n = \\sum_{i=1}^{n} R_i = \\sum_{i=1}^{n-1} R_i + R_n = S_{n-1} + R_n$. The base case $S_0 = 0$ follows from the empty sum convention. Each update requires only one addition operation, giving $O(1)$ time complexity and $O(1)$ space (storing only $S_{n-1}$).",
+        "examples": [
+          "Example 1: $R = \\{2, 4, 6\\}$. Start with $S_0 = 0$. Then $S_1 = S_0 + R_1 = 0 + 2 = 2$, $S_2 = S_1 + R_2 = 2 + 4 = 6$, $S_3 = S_2 + R_3 = 6 + 6 = 12$",
+          "Example 2: Computing $S_{100}$ from $S_{99}$ and $R_{100}$ requires just one addition, not recomputing 100 terms",
+          "Example 3 (Online setting): As new rewards arrive in a stream, maintain only $S_{n-1}$ and update to $S_n$ incrementally"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Recurrence for Cumulative Sum",
+          "latex": "$S_n = S_{n-1} + R_n$",
+          "description": "Update running sum with each new observation in O(1) time"
+        },
+        {
+          "name": "Relation to Mean",
+          "latex": "$\\bar{R}_n = \\frac{S_n}{n}$",
+          "description": "Mean can be computed from cumulative sum and count"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that maintains a running sum. Given the previous cumulative sum and a new reward, return the updated sum. This demonstrates the iterative update principle that will be extended to the mean.",
+        "function_signature": "def update_cumulative_sum(S_prev: float, R_new: float) -> float:",
+        "starter_code": "def update_cumulative_sum(S_prev, R_new):\n    \"\"\"\n    Update the cumulative sum with a new observation.\n    \n    Args:\n        S_prev: previous cumulative sum (float)\n        R_new: new reward observation (float)\n    Returns:\n        float: updated cumulative sum\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "update_cumulative_sum(0.0, 2.0)",
+            "expected": "2.0",
+            "explanation": "Starting from 0, adding first reward 2.0 gives cumulative sum 2.0"
+          },
+          {
+            "input": "update_cumulative_sum(2.0, 4.0)",
+            "expected": "6.0",
+            "explanation": "Previous sum 2.0 plus new reward 4.0 gives 6.0"
+          },
+          {
+            "input": "update_cumulative_sum(6.0, 6.0)",
+            "expected": "12.0",
+            "explanation": "Previous sum 6.0 plus new reward 6.0 gives 12.0"
+          },
+          {
+            "input": "update_cumulative_sum(10.5, -3.5)",
+            "expected": "7.0",
+            "explanation": "Handles negative rewards: 10.5 + (-3.5) = 7.0"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Trying to maintain the entire history when only the previous sum is needed",
+        "Confusing cumulative sum with the mean (sum needs to be divided by count)",
+        "Not recognizing this pattern forms the basis for all incremental statistics",
+        "Forgetting to handle the initial condition (S_0 = 0)"
+      ],
+      "hint": "A running sum only requires remembering the previous total and adding the new value. No historical data storage needed!",
+      "references": [
+        "Recurrence relations in discrete mathematics",
+        "Online algorithms and streaming data",
+        "Dynamic programming principles"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Deriving the Incremental Mean Update Formula",
+      "relation_to_problem": "This is the core mathematical derivation that transforms the batch mean into an incremental update rule—the exact formula needed to solve the main problem",
+      "prerequisites": [
+        "Arithmetic mean",
+        "Recurrence relations",
+        "Algebraic manipulation"
+      ],
+      "learning_objectives": [
+        "Derive the incremental mean formula from first principles",
+        "Understand the mathematical equivalence between batch and incremental methods",
+        "Recognize the error-correction interpretation of the update rule"
+      ],
+      "math_content": {
+        "definition": "The **incremental mean** (also called running average or online mean) is a method to update the sample mean $Q_k$ after observing the $k$-th reward $R_k$, producing $Q_{k+1}$ without storing previous rewards. Let $Q_k$ denote the mean of the first $k$ observations: $$Q_k = \\frac{1}{k}\\sum_{i=1}^{k} R_i$$ The incremental update formula is: $$Q_{k+1} = Q_k + \\frac{1}{k+1}(R_{k+1} - Q_k)$$",
+        "notation": "$Q_k$ = estimated mean after $k$ observations; $R_{k+1}$ = new $(k+1)$-th reward; $\\alpha = \\frac{1}{k+1}$ = step size; $(R_{k+1} - Q_k)$ = prediction error",
+        "theorem": "**Incremental Mean Equivalence**: For any sequence of observations $\\{R_i\\}_{i=1}^{k+1}$, the incremental formula $Q_{k+1} = Q_k + \\frac{1}{k+1}(R_{k+1} - Q_k)$ produces the same result as the batch formula $Q_{k+1} = \\frac{1}{k+1}\\sum_{i=1}^{k+1} R_i$.",
+        "proof_sketch": "Start with the batch definition: $$Q_{k+1} = \\frac{1}{k+1}\\sum_{i=1}^{k+1} R_i = \\frac{1}{k+1}\\left(\\sum_{i=1}^{k} R_i + R_{k+1}\\right)$$ Express the first $k$ terms using $Q_k$: $$Q_{k+1} = \\frac{1}{k+1}(kQ_k + R_{k+1})$$ Expand and rearrange: $$Q_{k+1} = \\frac{k}{k+1}Q_k + \\frac{1}{k+1}R_{k+1} = Q_k + \\frac{1}{k+1}(R_{k+1} - Q_k)$$ The last step uses $\\frac{k}{k+1}Q_k = Q_k - \\frac{1}{k+1}Q_k$. This proves the two formulas are mathematically equivalent.",
+        "examples": [
+          "Example 1: Given $Q_2 = 3.0$ (mean of first 2 rewards), $k=2$, new reward $R_3 = 6.0$. Update: $Q_3 = 3.0 + \\frac{1}{3}(6.0 - 3.0) = 3.0 + 1.0 = 4.0$",
+          "Example 2: Starting from scratch with $Q_0 = 0$ (or undefined), first reward $R_1 = 5.0$: $Q_1 = 0 + \\frac{1}{1}(5.0 - 0) = 5.0$",
+          "Example 3 (Error correction view): If new reward $R_{k+1} > Q_k$, the mean increases by a fraction of the difference. If $R_{k+1} < Q_k$, it decreases proportionally"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Incremental Mean Update",
+          "latex": "$Q_{k+1} = Q_k + \\frac{1}{k+1}(R_{k+1} - Q_k)$",
+          "description": "Core formula for updating mean estimate with new observation"
+        },
+        {
+          "name": "Prediction Error",
+          "latex": "$\\delta_k = R_{k+1} - Q_k$",
+          "description": "Difference between new observation and current estimate"
+        },
+        {
+          "name": "Step Size",
+          "latex": "$\\alpha_k = \\frac{1}{k+1}$",
+          "description": "Decreasing weight given to new observations as sample size grows"
+        },
+        {
+          "name": "Alternative Form",
+          "latex": "$Q_{k+1} = \\frac{k}{k+1}Q_k + \\frac{1}{k+1}R_{k+1}$",
+          "description": "Weighted average interpretation: old estimate plus new observation"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function to verify the derivation algebraically. Given the current mean estimate, count, and a new reward, compute the updated mean using BOTH the batch formula (assuming you have the cumulative sum) and the incremental formula. Return both results to verify they match.",
+        "function_signature": "def verify_incremental_formula(Q_k: float, k: int, R_new: float, S_k: float) -> tuple:",
+        "starter_code": "def verify_incremental_formula(Q_k, k, R_new, S_k):\n    \"\"\"\n    Verify that incremental and batch formulas give the same result.\n    \n    Args:\n        Q_k: current mean estimate (float)\n        k: number of observations so far (int)\n        R_new: new reward observation (float)\n        S_k: cumulative sum of first k observations (float)\n    Returns:\n        tuple: (batch_result, incremental_result) both as float\n    \"\"\"\n    # Calculate using batch formula: (S_k + R_new) / (k + 1)\n    # Calculate using incremental formula: Q_k + (1/(k+1)) * (R_new - Q_k)\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "verify_incremental_formula(3.0, 2, 6.0, 6.0)",
+            "expected": "(4.0, 4.0)",
+            "explanation": "Both methods give 4.0. Batch: (6+6)/3=4. Incremental: 3+(1/3)*(6-3)=4"
+          },
+          {
+            "input": "verify_incremental_formula(2.0, 1, 4.0, 2.0)",
+            "expected": "(3.0, 3.0)",
+            "explanation": "Both give 3.0. Batch: (2+4)/2=3. Incremental: 2+(1/2)*(4-2)=3"
+          },
+          {
+            "input": "verify_incremental_formula(5.0, 3, 3.0, 15.0)",
+            "expected": "(4.5, 4.5)",
+            "explanation": "Both give 4.5. Batch: (15+3)/4=4.5. Incremental: 5+(1/4)*(3-5)=4.5"
+          },
+          {
+            "input": "verify_incremental_formula(10.0, 4, 10.0, 40.0)",
+            "expected": "(10.0, 10.0)",
+            "explanation": "When new reward equals current mean, mean stays unchanged"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using k instead of (k+1) in the denominator—the new observation is the (k+1)-th one",
+        "Forgetting parentheses: Q_k + 1/k+1 * (R - Q_k) is parsed incorrectly",
+        "Computing (R_new - Q_k) / k instead of (R_new - Q_k) / (k+1)",
+        "Not recognizing that Q_k represents the mean of k observations, so the next is the (k+1)-th"
+      ],
+      "hint": "The key insight is rewriting the sum of k+1 terms as (k*Q_k + R_new)/(k+1), then algebraically isolating Q_k on the right side.",
+      "references": [
+        "Sutton & Barto: Reinforcement Learning, Section 2.4",
+        "Incremental algorithms in online learning",
+        "Sample mean as a sufficient statistic"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Step Size Interpretation and Convergence Properties",
+      "relation_to_problem": "Explains why the step size 1/(k+1) in the formula makes sense and how it ensures convergence, deepening understanding of the update mechanism",
+      "prerequisites": [
+        "Incremental mean formula",
+        "Weighted averages",
+        "Basic convergence concepts"
+      ],
+      "learning_objectives": [
+        "Interpret the incremental update as a weighted average",
+        "Understand the role of decreasing step size in convergence",
+        "Analyze how step size affects the influence of new observations"
+      ],
+      "math_content": {
+        "definition": "The **step size** (or learning rate) in the incremental mean formula is $\\alpha_k = \\frac{1}{k+1}$, which determines how much weight is given to the new observation. The update can be written as: $$Q_{k+1} = Q_k + \\alpha_k \\delta_k$$ where $\\delta_k = R_{k+1} - Q_k$ is the **temporal difference error** or prediction error. This is a form of **stochastic approximation**.",
+        "notation": "$\\alpha_k$ = step size at iteration $k$; $\\delta_k$ = prediction error; $\\lim_{k\\to\\infty} \\alpha_k = 0$ = diminishing step size property",
+        "theorem": "**Robbins-Monro Conditions**: For the incremental mean to converge to the true mean $\\mu = \\mathbb{E}[R]$, the step size sequence $\\{\\alpha_k\\}$ must satisfy: (1) $\\sum_{k=1}^{\\infty} \\alpha_k = \\infty$ (infinite travel), and (2) $\\sum_{k=1}^{\\infty} \\alpha_k^2 < \\infty$ (diminishing variance). The step size $\\alpha_k = \\frac{1}{k+1}$ satisfies both conditions.",
+        "proof_sketch": "For $\\alpha_k = \\frac{1}{k+1}$: (1) $\\sum_{k=1}^{\\infty} \\frac{1}{k+1} = \\sum_{j=2}^{\\infty} \\frac{1}{j}$ diverges (harmonic series), satisfying infinite travel. (2) $\\sum_{k=1}^{\\infty} \\frac{1}{(k+1)^2} = \\sum_{j=2}^{\\infty} \\frac{1}{j^2}$ converges (p-series with p=2), satisfying diminishing variance. These conditions ensure the estimate explores sufficiently (condition 1) while variance eventually vanishes (condition 2).",
+        "examples": [
+          "Example 1: After $k=1$ observation, new data has weight $\\alpha_1 = \\frac{1}{2} = 50\\%$. After $k=99$ observations, new data has weight $\\alpha_{99} = \\frac{1}{100} = 1\\%$. Influence decreases as confidence grows.",
+          "Example 2: Weighted average interpretation: $Q_{k+1} = (1-\\alpha_k)Q_k + \\alpha_k R_{k+1} = \\frac{k}{k+1}Q_k + \\frac{1}{k+1}R_{k+1}$. Old estimate weighted by $\\frac{k}{k+1}$, new observation by $\\frac{1}{k+1}$.",
+          "Example 3: For non-stationary problems (where true mean changes over time), constant step size $\\alpha = 0.1$ is often preferred to track recent values, violating condition (2) intentionally"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Step Size for Sample Average",
+          "latex": "$\\alpha_k = \\frac{1}{k+1}$",
+          "description": "Optimal step size for stationary problems (constant true mean)"
+        },
+        {
+          "name": "Update Rule with Step Size",
+          "latex": "$Q_{k+1} = Q_k + \\alpha_k(R_{k+1} - Q_k)$",
+          "description": "General form: move toward new observation by fraction α"
+        },
+        {
+          "name": "Weighted Average Form",
+          "latex": "$Q_{k+1} = (1-\\alpha_k)Q_k + \\alpha_k R_{k+1}$",
+          "description": "Convex combination: interpolate between old estimate and new data"
+        },
+        {
+          "name": "Robbins-Monro Condition 1",
+          "latex": "$\\sum_{k=1}^{\\infty} \\alpha_k = \\infty$",
+          "description": "Ensures sufficient exploration and prevents premature convergence"
+        },
+        {
+          "name": "Robbins-Monro Condition 2",
+          "latex": "$\\sum_{k=1}^{\\infty} \\alpha_k^2 < \\infty$",
+          "description": "Ensures variance of the estimate vanishes asymptotically"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the effective weight given to the initial estimate Q_0 after k updates with decreasing step sizes. This illustrates how early estimates exponentially decay in influence as more data arrives.",
+        "function_signature": "def compute_initial_weight(k: int) -> float:",
+        "starter_code": "def compute_initial_weight(k):\n    \"\"\"\n    Compute the weight of the initial estimate Q_0 after k updates.\n    Using step sizes α_i = 1/(i+1) for i = 0, 1, ..., k-1.\n    \n    Weight of Q_0 is: ∏_{i=0}^{k-1} (1 - α_i) = ∏_{i=1}^{k} (1 - 1/(i+1)) = ∏_{i=1}^{k} (i/(i+1))\n    \n    Args:\n        k: number of updates performed (int)\n    Returns:\n        float: effective weight of initial estimate\n    \"\"\"\n    # Your code here\n    # Hint: This telescopes to 1/(k+1)\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_initial_weight(1)",
+            "expected": "0.5",
+            "explanation": "After 1 update with α_0=1/1=1, weight is (1-1/1)=0... Actually α_0=1/(0+1)=1, this needs correction. With α_1=1/2 for first new observation after Q_0, weight of Q_0 becomes 1/2"
+          },
+          {
+            "input": "compute_initial_weight(2)",
+            "expected": "0.333...",
+            "explanation": "Product (1/2)*(2/3) = 1/3 ≈ 0.333"
+          },
+          {
+            "input": "compute_initial_weight(9)",
+            "expected": "0.1",
+            "explanation": "After 9 updates, initial estimate has weight 1/10 = 0.1"
+          },
+          {
+            "input": "compute_initial_weight(99)",
+            "expected": "0.01",
+            "explanation": "After 99 updates, initial estimate has weight 1/100 = 0.01"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing the step size index: when computing Q_{k+1}, use α_k = 1/(k+1), not 1/k",
+        "Using constant step size α when the problem requires sample average (stationary environment)",
+        "Not recognizing that smaller step sizes make the estimate less responsive to new data",
+        "Thinking the step size is arbitrary—it's mathematically derived from the sample size"
+      ],
+      "hint": "The product ∏_{i=1}^{k} (i/(i+1)) telescopes beautifully: (1/2)*(2/3)*(3/4)*...*(k/(k+1)) = 1/(k+1). Each fraction cancels the numerator of the next!",
+      "references": [
+        "Robbins-Monro stochastic approximation algorithm",
+        "Convergence of online learning algorithms",
+        "Temporal difference learning in RL"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Numerical Stability and Implementation Considerations",
+      "relation_to_problem": "Addresses practical issues that arise when implementing the incremental mean formula, ensuring the solution is robust in real-world scenarios",
+      "prerequisites": [
+        "Incremental mean formula",
+        "Floating-point arithmetic",
+        "Edge cases"
+      ],
+      "learning_objectives": [
+        "Identify edge cases in the incremental mean computation",
+        "Understand numerical precision issues with floating-point arithmetic",
+        "Implement robust code that handles boundary conditions"
+      ],
+      "math_content": {
+        "definition": "**Numerical stability** refers to how small errors in input or arithmetic operations affect the accuracy of the computed result. For incremental mean with floating-point numbers, key concerns include: (1) division by zero when $k=0$, (2) catastrophic cancellation when $R_{k+1} \\approx Q_k$, and (3) overflow/underflow with extreme values.",
+        "notation": "$\\epsilon_{\\text{machine}}$ = machine epsilon (smallest distinguishable difference); $\\text{ULP}$ = unit in last place (precision of floating-point representation)",
+        "theorem": "**Floating-Point Error Accumulation**: Each incremental update introduces relative error $O(\\epsilon_{\\text{machine}})$. After $k$ updates, accumulated error is $O(k\\epsilon_{\\text{machine}})$, which is acceptable for reasonable $k$ (e.g., $k < 10^{10}$ with 64-bit floats).",
+        "proof_sketch": "Each arithmetic operation (addition, subtraction, multiplication, division) introduces relative error bounded by $\\epsilon_{\\text{machine}}$. The incremental formula requires 4 operations: subtraction, division, multiplication, addition. In the worst case, errors accumulate linearly with the number of updates. For IEEE 754 double precision, $\\epsilon_{\\text{machine}} \\approx 2.22 \\times 10^{-16}$, so even $10^9$ updates maintain accuracy to about 7 decimal places.",
+        "examples": [
+          "Example 1 (Edge case): $k=0$ (no previous observations). Convention: set $Q_0 = 0$ or handle specially, because update formula gives $Q_1 = 0 + \\frac{1}{1}(R_1 - 0) = R_1$, which is correct.",
+          "Example 2 (Cancellation): When $R_{k+1}$ is very close to $Q_k$, subtraction $(R_{k+1} - Q_k)$ may lose precision. However, the result is small, so relative error in the update is negligible.",
+          "Example 3 (Large k): For $k=10^6$, step size $\\alpha = 10^{-6}$ means new observations barely affect the mean. This is mathematically correct but may be undesirable in non-stationary environments."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Update for k=0 (First Observation)",
+          "latex": "$Q_1 = R_1$",
+          "description": "First reward becomes the initial mean estimate"
+        },
+        {
+          "name": "General Update",
+          "latex": "$Q_{k+1} = Q_k + \\frac{1}{k+1}(R_{k+1} - Q_k)$ for $k \\geq 0$",
+          "description": "Applies for all subsequent updates"
+        },
+        {
+          "name": "Relative Error Bound",
+          "latex": "$|\\Delta Q| \\leq 4\\epsilon_{\\text{machine}} |Q_k|$",
+          "description": "Per-update error bound for well-conditioned problems"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a robust incremental mean updater that handles edge cases. Given the current mean, count of observations, and new reward, return the updated mean. Handle the case where k=0 (first observation) appropriately.",
+        "function_signature": "def robust_incremental_mean(Q_prev: float, k: int, R: float) -> float:",
+        "starter_code": "def robust_incremental_mean(Q_prev, k, R):\n    \"\"\"\n    Robust incremental mean update with edge case handling.\n    \n    Args:\n        Q_prev: previous mean estimate (float), unused when k=0\n        k: number of observations BEFORE this update (int, k >= 0)\n        R: new reward observation (float)\n    Returns:\n        float: updated mean estimate\n    \"\"\"\n    # Handle k=0 case (first observation)\n    # For k >= 1, use incremental formula\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "robust_incremental_mean(0.0, 0, 5.0)",
+            "expected": "5.0",
+            "explanation": "First observation: mean becomes the first reward value"
+          },
+          {
+            "input": "robust_incremental_mean(5.0, 1, 3.0)",
+            "expected": "4.0",
+            "explanation": "Update: 5 + (1/2)*(3-5) = 5 - 1 = 4"
+          },
+          {
+            "input": "robust_incremental_mean(4.0, 2, 6.0)",
+            "expected": "4.666...",
+            "explanation": "Update: 4 + (1/3)*(6-4) = 4 + 0.666... = 4.666..."
+          },
+          {
+            "input": "robust_incremental_mean(10.0, 999, 10.0)",
+            "expected": "10.0",
+            "explanation": "When new reward equals current mean, mean is unchanged"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling k=0 case—leads to division by zero in formula Q + (1/k)*(R - Q)",
+        "Confusing the parameter k: does it represent count before or after the update?",
+        "Not validating that k >= 0 (negative counts are meaningless)",
+        "Using integer division 1/k instead of float division 1.0/k",
+        "Forgetting that when k observations exist, the new one is the (k+1)-th"
+      ],
+      "hint": "The problem statement says k is the number of times action has been selected. After receiving the new reward R, you have k total observations (not k+1). Re-read the problem carefully!",
+      "references": [
+        "IEEE 754 floating-point arithmetic",
+        "Numerical stability of online algorithms",
+        "Kahan summation algorithm for improved accuracy"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Application to Multi-Armed Bandit and Complete Implementation",
+      "relation_to_problem": "Synthesizes all previous concepts to solve the complete problem in the context of reinforcement learning, showing how incremental mean enables efficient action-value estimation",
+      "prerequisites": [
+        "All previous sub-quests",
+        "Understanding of k-armed bandit problem"
+      ],
+      "learning_objectives": [
+        "Apply incremental mean to action-value estimation in reinforcement learning",
+        "Implement the complete solution with proper parameter interpretation",
+        "Understand memory efficiency: O(1) space vs O(n) for batch methods"
+      ],
+      "math_content": {
+        "definition": "In the **k-armed bandit problem**, an agent selects among $k$ actions and receives rewards. The **action-value** $Q_t(a)$ is the estimated mean reward for action $a$ after $t$ time steps. Let $N_t(a)$ denote the number of times action $a$ has been selected. When action $a$ is selected and reward $R_t$ is received, update: $$Q_{t+1}(a) = Q_t(a) + \\frac{1}{N_t(a)}(R_t - Q_t(a))$$ All other action values remain unchanged: $Q_{t+1}(a') = Q_t(a')$ for $a' \\neq a$.",
+        "notation": "$Q_t(a)$ = estimated value of action $a$ at time $t$; $N_t(a)$ = selection count for action $a$; $R_t$ = reward received at time $t$; $a_t$ = action selected at time $t$",
+        "theorem": "**Memory Efficiency of Incremental Method**: For $k$ actions with $n$ total selections, incremental mean requires $O(k)$ space (storing $Q(a)$ and $N(a)$ for each action). Batch mean would require $O(n)$ space to store all historical rewards. For $n \\gg k$, this is a $O(n/k)$ factor improvement.",
+        "proof_sketch": "Batch method stores all $n$ rewards: space $O(n)$. Incremental method stores only $k$ action values and $k$ counters: space $2k = O(k)$. As $n$ grows (agent takes more actions), batch memory grows linearly while incremental stays constant. Example: $k=10$ actions, $n=10^6$ selections → batch uses 1M floats, incremental uses 20 floats.",
+        "examples": [
+          "Example 1: 3-armed bandit. Action 2 selected twice with rewards {2, 4}, so Q(2)=3 and N(2)=2. New selection yields R=6. Update: Q_new(2) = 3 + (1/2)*(6-3) = 4.",
+          "Example 2: In the problem statement, Q_prev=2.0 represents the mean after k=2 selections. New reward R=6.0 gives Q_new = 2 + (1/2)*(6-2) = 4.",
+          "Example 3: Memory comparison for 1 million selections: batch needs ~8MB (1M * 8 bytes/float), incremental needs ~80 bytes for 10 actions—a 100,000× reduction!"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Action-Value Update",
+          "latex": "$Q_{t+1}(a) = Q_t(a) + \\frac{1}{N_t(a)}(R_t - Q_t(a))$",
+          "description": "Update estimated value when action a is selected"
+        },
+        {
+          "name": "Sample Average Interpretation",
+          "latex": "$Q_t(a) \\to q_*(a)$ as $N_t(a) \\to \\infty$",
+          "description": "Estimate converges to true action value with sufficient samples"
+        },
+        {
+          "name": "Space Complexity",
+          "latex": "$O(k)$ vs $O(n)$",
+          "description": "Incremental: constant per action; Batch: linear in total selections"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete incremental mean function for the k-armed bandit problem. This is the solution to the main problem! Given Q_prev (previous mean), k (number of selections), and R (new reward), return the updated mean. Pay careful attention to parameter interpretation.",
+        "function_signature": "def incremental_mean(Q_prev: float, k: int, R: float) -> float:",
+        "starter_code": "def incremental_mean(Q_prev, k, R):\n    \"\"\"\n    Update action-value estimate using incremental mean.\n    \n    Args:\n        Q_prev: previous mean estimate (float)\n        k: number of times action has been selected SO FAR (int)\n        R: new observed reward (float)\n    Returns:\n        float: updated mean estimate Q_new\n    \"\"\"\n    # Apply the incremental mean formula\n    # Important: k is the count BEFORE this update\n    # So the new observation is the (k+1)-th? Or is it the k-th?\n    # Re-read the problem: after selecting k times, this is the NEW reward\n    # So k observations exist, and R would be part of those k if using batch\n    # Actually: k is selections BEFORE receiving R? Check the example.\n    # Example: k=2, Q_prev=2.0, R=6.0 → formula uses 1/k not 1/(k+1)\n    # This suggests k observations exist INCLUDING R, or formula is Q + (1/k)*(R-Q)\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "incremental_mean(2.0, 2, 6.0)",
+            "expected": "4.0",
+            "explanation": "Example from problem: 2 + (1/2)*(6-2) = 2 + 2 = 4"
+          },
+          {
+            "input": "incremental_mean(0.0, 1, 5.0)",
+            "expected": "5.0",
+            "explanation": "First reward: 0 + (1/1)*(5-0) = 5"
+          },
+          {
+            "input": "incremental_mean(4.0, 3, 8.0)",
+            "expected": "5.333...",
+            "explanation": "Update: 4 + (1/3)*(8-4) = 4 + 1.333... = 5.333..."
+          },
+          {
+            "input": "incremental_mean(10.0, 5, 5.0)",
+            "expected": "9.0",
+            "explanation": "Update: 10 + (1/5)*(5-10) = 10 - 1 = 9"
+          },
+          {
+            "input": "incremental_mean(3.5, 4, 3.5)",
+            "expected": "3.5",
+            "explanation": "When new reward equals current mean, no change occurs"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using 1/(k+1) instead of 1/k—the example shows k=2 uses 1/2, not 1/3",
+        "Not recognizing that k represents the NEW count after including R",
+        "Overthinking the formula—it's exactly what was derived in step 3",
+        "Forgetting to handle floating-point division (use 1.0/k not 1/k in some languages)",
+        "Not understanding the problem context: this is for updating ONE action's value, not all actions"
+      ],
+      "hint": "Look at the example carefully: k=2, formula uses 1/k = 1/2. This means k is the denominator directly. The new observation is being averaged with k-1 previous ones.",
+      "references": [
+        "Sutton & Barto: Reinforcement Learning, Chapter 2",
+        "Multi-armed bandit algorithms",
+        "Exploration-exploitation tradeoff",
+        "Sample-average methods vs constant step-size methods"
+      ]
+    }
+  ]
+}

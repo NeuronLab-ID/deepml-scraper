@@ -1,0 +1,553 @@
+{
+  "problem_id": 76,
+  "title": "Calculate Cosine Similarity Between Vectors",
+  "category": "Linear Algebra",
+  "difficulty": "easy",
+  "description": "\n## Task: Implement Cosine Similarity\n\nIn this task, you need to implement a function `cosine_similarity(v1, v2)` that calculates the cosine similarity between two vectors. Cosine similarity measures the cosine of the angle between two vectors, indicating their directional similarity.\n\n### Input:\n- `v1` and `v2`: Numpy arrays representing the input vectors.\n\n### Output:\n- A float representing the cosine similarity, rounded to three decimal places.\n\n### Constraints:\n- Both input vectors must have the same shape.\n- Input vectors cannot be empty or have zero magnitude.\n",
+  "example": {
+    "input": "import numpy as np\n\nv1 = np.array([1, 2, 3])\nv2 = np.array([2, 4, 6])\nprint(cosine_similarity(v1, v2))",
+    "output": "1.0",
+    "reasoning": "The cosine similarity between v1 and v2 is 1.0, indicating perfect similarity."
+  },
+  "starter_code": "\nimport numpy as np\n\ndef cosine_similarity(v1, v2):\n\t# Implement your code here\n\tpass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Vector Dot Product and Inner Product Spaces",
+      "relation_to_problem": "The dot product is the numerator in the cosine similarity formula and fundamental to measuring vector relationships. Without understanding dot products, computing cosine similarity is impossible.",
+      "prerequisites": [
+        "Basic vector notation",
+        "Summation notation",
+        "Element-wise multiplication"
+      ],
+      "learning_objectives": [
+        "Define the dot product formally and understand its geometric interpretation",
+        "Compute dot products for vectors of arbitrary dimension",
+        "Recognize the algebraic and geometric properties of dot products",
+        "Implement efficient dot product computation in code"
+      ],
+      "math_content": {
+        "definition": "For vectors $\\vec{u} = (u_1, u_2, \\ldots, u_n)$ and $\\vec{v} = (v_1, v_2, \\ldots, v_n)$ in $\\mathbb{R}^n$, the dot product (also called scalar product or inner product) is defined as: $$\\vec{u} \\cdot \\vec{v} = \\sum_{i=1}^{n} u_i v_i = u_1v_1 + u_2v_2 + \\cdots + u_nv_n$$ This operation maps two vectors to a scalar value in $\\mathbb{R}$.",
+        "notation": "$\\vec{u} \\cdot \\vec{v}$ denotes the dot product; $u_i$ is the $i$-th component of vector $\\vec{u}$; $n$ is the dimension of the vector space; $\\sum_{i=1}^{n}$ denotes summation from index 1 to $n$",
+        "theorem": "**Theorem (Geometric Interpretation)**: The dot product of two vectors $\\vec{u}$ and $\\vec{v}$ can be expressed geometrically as $\\vec{u} \\cdot \\vec{v} = \\|\\vec{u}\\| \\|\\vec{v}\\| \\cos \\theta$ where $\\theta$ is the angle between the vectors and $\\|\\cdot\\|$ denotes the Euclidean norm.",
+        "proof_sketch": "The geometric interpretation follows from the law of cosines applied to the triangle formed by vectors $\\vec{u}$, $\\vec{v}$, and $\\vec{u} - \\vec{v}$. Expanding $\\|\\vec{u} - \\vec{v}\\|^2$ algebraically and comparing with the geometric form yields the result.",
+        "examples": [
+          "For $\\vec{u} = (1, 2, 3)$ and $\\vec{v} = (4, 5, 6)$: $\\vec{u} \\cdot \\vec{v} = (1)(4) + (2)(5) + (3)(6) = 4 + 10 + 18 = 32$",
+          "For $\\vec{a} = (2, -1)$ and $\\vec{b} = (3, 6)$: $\\vec{a} \\cdot \\vec{b} = (2)(3) + (-1)(6) = 6 - 6 = 0$ (these vectors are orthogonal)",
+          "For identical vectors $\\vec{c} = (1, 1, 1)$: $\\vec{c} \\cdot \\vec{c} = 1 + 1 + 1 = 3$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Dot Product Definition",
+          "latex": "$\\vec{u} \\cdot \\vec{v} = \\sum_{i=1}^{n} u_i v_i$",
+          "description": "Use this to compute the scalar product of two vectors by summing element-wise products"
+        },
+        {
+          "name": "Commutative Property",
+          "latex": "$\\vec{u} \\cdot \\vec{v} = \\vec{v} \\cdot \\vec{u}$",
+          "description": "Order doesn't matter in dot product computation"
+        },
+        {
+          "name": "Distributive Property",
+          "latex": "$\\vec{u} \\cdot (\\vec{v} + \\vec{w}) = \\vec{u} \\cdot \\vec{v} + \\vec{u} \\cdot \\vec{w}$",
+          "description": "Dot product distributes over vector addition"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the dot product of two vectors. This is the first building block for cosine similarity, as it calculates the numerator of the formula.",
+        "function_signature": "def dot_product(v1: np.ndarray, v2: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef dot_product(v1: np.ndarray, v2: np.ndarray) -> float:\n    \"\"\"\n    Calculate the dot product of two vectors.\n    \n    Args:\n        v1: First vector as numpy array\n        v2: Second vector as numpy array\n    \n    Returns:\n        The dot product as a float\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "dot_product(np.array([1, 2, 3]), np.array([4, 5, 6]))",
+            "expected": "32.0",
+            "explanation": "$(1)(4) + (2)(5) + (3)(6) = 4 + 10 + 18 = 32$"
+          },
+          {
+            "input": "dot_product(np.array([2, -1]), np.array([3, 6]))",
+            "expected": "0.0",
+            "explanation": "$(2)(3) + (-1)(6) = 6 - 6 = 0$, indicating orthogonal vectors"
+          },
+          {
+            "input": "dot_product(np.array([1, 0, 0]), np.array([0, 1, 0]))",
+            "expected": "0.0",
+            "explanation": "Standard basis vectors are orthogonal"
+          },
+          {
+            "input": "dot_product(np.array([3.5, 2.1, -1.3]), np.array([1.2, -0.5, 2.4]))",
+            "expected": "0.03",
+            "explanation": "$(3.5)(1.2) + (2.1)(-0.5) + (-1.3)(2.4) = 4.2 - 1.05 - 3.12 = 0.03$"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to check that vectors have the same dimension before computing",
+        "Attempting to add components instead of multiplying them element-wise",
+        "Confusing dot product with element-wise (Hadamard) multiplication",
+        "Not handling edge cases like empty vectors or mismatched dimensions"
+      ],
+      "hint": "Use numpy's element-wise multiplication and summation, or leverage the fact that numpy arrays support the @ operator for dot products",
+      "references": [
+        "Inner product spaces and Hilbert spaces",
+        "Bilinear forms in linear algebra",
+        "Applications of dot products in projection and orthogonality"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Vector Norms and the Euclidean $L^2$ Norm",
+      "relation_to_problem": "The Euclidean norm appears in the denominator of the cosine similarity formula, normalizing the dot product by the product of vector magnitudes. Computing norms is essential for measuring vector length.",
+      "prerequisites": [
+        "Vector notation",
+        "Square roots",
+        "Summation",
+        "Dot product"
+      ],
+      "learning_objectives": [
+        "Define vector norms formally, particularly the Euclidean $L^2$ norm",
+        "Understand the geometric meaning of norm as vector magnitude",
+        "Compute norms efficiently and handle numerical stability",
+        "Recognize the relationship between norm and dot product"
+      ],
+      "math_content": {
+        "definition": "A norm on a vector space $V$ is a function $\\|\\cdot\\|: V \\rightarrow \\mathbb{R}$ satisfying three axioms: (1) Positive definiteness: $\\|\\vec{v}\\| \\geq 0$ with equality iff $\\vec{v} = \\vec{0}$; (2) Homogeneity: $\\|\\alpha\\vec{v}\\| = |\\alpha| \\|\\vec{v}\\|$ for scalar $\\alpha$; (3) Triangle inequality: $\\|\\vec{u} + \\vec{v}\\| \\leq \\|\\vec{u}\\| + \\|\\vec{v}\\|$. The Euclidean norm (or $L^2$ norm) is defined as: $$\\|\\vec{v}\\| = \\|\\vec{v}\\|_2 = \\sqrt{\\vec{v} \\cdot \\vec{v}} = \\sqrt{\\sum_{i=1}^{n} v_i^2}$$",
+        "notation": "$\\|\\vec{v}\\|$ or $\\|\\vec{v}\\|_2$ denotes the Euclidean norm; $\\|\\vec{v}\\|_p = \\left(\\sum_{i=1}^{n} |v_i|^p\\right)^{1/p}$ is the general $L^p$ norm; $\\vec{0}$ is the zero vector",
+        "theorem": "**Theorem (Norm from Inner Product)**: For any inner product space, the norm can be defined via $\\|\\vec{v}\\| = \\sqrt{\\langle \\vec{v}, \\vec{v} \\rangle}$ where $\\langle \\cdot, \\cdot \\rangle$ is the inner product. For Euclidean space, this reduces to $\\|\\vec{v}\\| = \\sqrt{\\vec{v} \\cdot \\vec{v}}$.",
+        "proof_sketch": "The three norm axioms can be verified from the properties of the inner product. Positive definiteness follows from the fact that $\\langle \\vec{v}, \\vec{v} \\rangle = 0$ iff $\\vec{v} = \\vec{0}$. Homogeneity follows from $\\langle \\alpha\\vec{v}, \\alpha\\vec{v} \\rangle = \\alpha^2 \\langle \\vec{v}, \\vec{v} \\rangle$. The triangle inequality follows from the Cauchy-Schwarz inequality.",
+        "examples": [
+          "For $\\vec{v} = (3, 4)$: $\\|\\vec{v}\\| = \\sqrt{3^2 + 4^2} = \\sqrt{9 + 16} = \\sqrt{25} = 5$",
+          "For $\\vec{u} = (1, 1, 1)$: $\\|\\vec{u}\\| = \\sqrt{1^2 + 1^2 + 1^2} = \\sqrt{3} \\approx 1.732$",
+          "For $\\vec{w} = (2, -3, 6, 1)$: $\\|\\vec{w}\\| = \\sqrt{4 + 9 + 36 + 1} = \\sqrt{50} = 5\\sqrt{2} \\approx 7.071$",
+          "Unit vector: $\\vec{e}_1 = (1, 0, 0)$ has $\\|\\vec{e}_1\\| = 1$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Euclidean Norm",
+          "latex": "$\\|\\vec{v}\\| = \\sqrt{\\sum_{i=1}^{n} v_i^2}$",
+          "description": "Standard way to compute vector magnitude in Euclidean space"
+        },
+        {
+          "name": "Norm via Dot Product",
+          "latex": "$\\|\\vec{v}\\| = \\sqrt{\\vec{v} \\cdot \\vec{v}}$",
+          "description": "Alternative formulation using dot product with itself"
+        },
+        {
+          "name": "Squared Norm",
+          "latex": "$\\|\\vec{v}\\|^2 = \\sum_{i=1}^{n} v_i^2 = \\vec{v} \\cdot \\vec{v}$",
+          "description": "Often computed first to avoid unnecessary square root operations"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the Euclidean norm (magnitude) of a vector. This is needed for the denominator of the cosine similarity formula.",
+        "function_signature": "def euclidean_norm(v: np.ndarray) -> float:",
+        "starter_code": "import numpy as np\n\ndef euclidean_norm(v: np.ndarray) -> float:\n    \"\"\"\n    Calculate the Euclidean (L2) norm of a vector.\n    \n    Args:\n        v: Input vector as numpy array\n    \n    Returns:\n        The Euclidean norm as a float\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "euclidean_norm(np.array([3, 4]))",
+            "expected": "5.0",
+            "explanation": "$\\sqrt{3^2 + 4^2} = \\sqrt{25} = 5$ (classic 3-4-5 right triangle)"
+          },
+          {
+            "input": "euclidean_norm(np.array([1, 1, 1]))",
+            "expected": "1.732",
+            "explanation": "$\\sqrt{1 + 1 + 1} = \\sqrt{3} \\approx 1.732$"
+          },
+          {
+            "input": "euclidean_norm(np.array([1, 0, 0, 0]))",
+            "expected": "1.0",
+            "explanation": "Unit vector along first dimension has norm 1"
+          },
+          {
+            "input": "euclidean_norm(np.array([2, -3, 6, 1]))",
+            "expected": "7.071",
+            "explanation": "$\\sqrt{4 + 9 + 36 + 1} = \\sqrt{50} = 5\\sqrt{2} \\approx 7.071$"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to take the square root after summing squared components",
+        "Not handling negative components correctly (they should be squared, making them positive)",
+        "Attempting to compute norm of a zero vector without considering edge cases",
+        "Numerical overflow for very large vectors - consider normalizing by max component first",
+        "Confusing $L^1$ norm (sum of absolute values) with $L^2$ norm (square root of sum of squares)"
+      ],
+      "hint": "Remember that the norm is the square root of the dot product of a vector with itself. You can reuse your dot product function or use numpy's built-in operations.",
+      "references": [
+        "Normed vector spaces and metric spaces",
+        "Different $L^p$ norms and their properties",
+        "Unit vectors and normalization",
+        "Numerical stability in norm computation"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "The Cauchy-Schwarz Inequality and Boundedness",
+      "relation_to_problem": "The Cauchy-Schwarz inequality proves that cosine similarity is always bounded in $[-1, 1]$, ensuring the formula is mathematically well-defined. Understanding this inequality is crucial for validating implementation correctness.",
+      "prerequisites": [
+        "Dot product",
+        "Vector norms",
+        "Basic inequality manipulation"
+      ],
+      "learning_objectives": [
+        "State and understand the Cauchy-Schwarz inequality",
+        "Prove why cosine similarity must be bounded between -1 and 1",
+        "Verify the inequality computationally for given vectors",
+        "Recognize when equality holds (parallel vectors)"
+      ],
+      "math_content": {
+        "definition": "The Cauchy-Schwarz inequality is a fundamental result in linear algebra stating that for any vectors $\\vec{u}, \\vec{v}$ in an inner product space: $$|\\vec{u} \\cdot \\vec{v}| \\leq \\|\\vec{u}\\| \\|\\vec{v}\\|$$ with equality if and only if one vector is a scalar multiple of the other (i.e., $\\vec{u} = \\lambda\\vec{v}$ for some scalar $\\lambda$, or one is the zero vector).",
+        "notation": "$|\\cdot|$ denotes absolute value; $\\vec{u} = \\lambda\\vec{v}$ means the vectors are parallel (linearly dependent); $\\Leftrightarrow$ denotes 'if and only if'",
+        "theorem": "**Theorem (Boundedness of Cosine Similarity)**: For non-zero vectors $\\vec{u}, \\vec{v} \\in \\mathbb{R}^n$, the cosine similarity satisfies: $$-1 \\leq \\frac{\\vec{u} \\cdot \\vec{v}}{\\|\\vec{u}\\| \\|\\vec{v}\\|} \\leq 1$$ This follows directly from Cauchy-Schwarz by dividing both sides by $\\|\\vec{u}\\| \\|\\vec{v}\\| > 0$.",
+        "proof_sketch": "**Proof of Cauchy-Schwarz**: Consider the function $f(t) = \\|\\vec{u} + t\\vec{v}\\|^2$ for any real $t$. Since norms are non-negative, $f(t) \\geq 0$ for all $t$. Expanding: $f(t) = \\|\\vec{u}\\|^2 + 2t(\\vec{u} \\cdot \\vec{v}) + t^2\\|\\vec{v}\\|^2$. This is a quadratic in $t$ that is always non-negative, so its discriminant must be non-positive: $4(\\vec{u} \\cdot \\vec{v})^2 - 4\\|\\vec{u}\\|^2\\|\\vec{v}\\|^2 \\leq 0$. Simplifying yields $(\\vec{u} \\cdot \\vec{v})^2 \\leq \\|\\vec{u}\\|^2\\|\\vec{v}\\|^2$, which gives the inequality.",
+        "examples": [
+          "For $\\vec{u} = (1, 2)$ and $\\vec{v} = (3, 4)$: $\\vec{u} \\cdot \\vec{v} = 11$, $\\|\\vec{u}\\| = \\sqrt{5}$, $\\|\\vec{v}\\| = 5$. Check: $11 \\leq \\sqrt{5} \\cdot 5 = 5\\sqrt{5} \\approx 11.18$ ✓",
+          "For parallel vectors $\\vec{u} = (1, 2, 3)$ and $\\vec{v} = (2, 4, 6) = 2\\vec{u}$: $\\vec{u} \\cdot \\vec{v} = 28$, $\\|\\vec{u}\\| = \\sqrt{14}$, $\\|\\vec{v}\\| = 2\\sqrt{14}$. Check: $28 = \\sqrt{14} \\cdot 2\\sqrt{14} = 28$ (equality holds)",
+          "For orthogonal vectors $\\vec{u} = (1, 0)$ and $\\vec{v} = (0, 1)$: $\\vec{u} \\cdot \\vec{v} = 0$, inequality is $0 \\leq 1 \\cdot 1 = 1$ ✓"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Cauchy-Schwarz Inequality",
+          "latex": "$|\\vec{u} \\cdot \\vec{v}| \\leq \\|\\vec{u}\\| \\|\\vec{v}\\|$",
+          "description": "Fundamental bound on the dot product of two vectors"
+        },
+        {
+          "name": "Normalized Form",
+          "latex": "$\\left|\\frac{\\vec{u} \\cdot \\vec{v}}{\\|\\vec{u}\\| \\|\\vec{v}\\|}\\right| \\leq 1$",
+          "description": "Normalized version showing the ratio is always at most 1 in absolute value"
+        },
+        {
+          "name": "Equality Condition",
+          "latex": "$|\\vec{u} \\cdot \\vec{v}| = \\|\\vec{u}\\| \\|\\vec{v}\\| \\Leftrightarrow \\vec{u} = \\lambda\\vec{v}$ for some $\\lambda \\in \\mathbb{R}$",
+          "description": "Equality holds precisely when vectors are parallel"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that verifies whether the Cauchy-Schwarz inequality holds for two given vectors. This validates understanding of the mathematical bound that ensures cosine similarity is well-defined.",
+        "function_signature": "def verify_cauchy_schwarz(v1: np.ndarray, v2: np.ndarray) -> dict:",
+        "starter_code": "import numpy as np\n\ndef verify_cauchy_schwarz(v1: np.ndarray, v2: np.ndarray) -> dict:\n    \"\"\"\n    Verify the Cauchy-Schwarz inequality for two vectors.\n    \n    Args:\n        v1: First vector as numpy array\n        v2: Second vector as numpy array\n    \n    Returns:\n        Dictionary with keys:\n        - 'dot_product_abs': |v1 · v2|\n        - 'product_of_norms': ||v1|| * ||v2||\n        - 'inequality_holds': boolean indicating if |v1 · v2| <= ||v1|| * ||v2||\n        - 'are_parallel': boolean indicating if equality holds (vectors parallel)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "verify_cauchy_schwarz(np.array([1, 2]), np.array([3, 4]))",
+            "expected": "{'dot_product_abs': 11.0, 'product_of_norms': 11.18, 'inequality_holds': True, 'are_parallel': False}",
+            "explanation": "$|1 \\cdot 3 + 2 \\cdot 4| = 11 < \\sqrt{5} \\cdot 5 \\approx 11.18$, inequality holds strictly"
+          },
+          {
+            "input": "verify_cauchy_schwarz(np.array([1, 2, 3]), np.array([2, 4, 6]))",
+            "expected": "{'dot_product_abs': 28.0, 'product_of_norms': 28.0, 'inequality_holds': True, 'are_parallel': True}",
+            "explanation": "Vectors are parallel ($\\vec{v}_2 = 2\\vec{v}_1$), so equality holds: $28 = \\sqrt{14} \\cdot 2\\sqrt{14}$"
+          },
+          {
+            "input": "verify_cauchy_schwarz(np.array([1, 0, 0]), np.array([0, 1, 0]))",
+            "expected": "{'dot_product_abs': 0.0, 'product_of_norms': 1.0, 'inequality_holds': True, 'are_parallel': False}",
+            "explanation": "Orthogonal vectors: $0 < 1 \\cdot 1$, inequality holds with margin"
+          },
+          {
+            "input": "verify_cauchy_schwarz(np.array([3, -4]), np.array([-6, 8]))",
+            "expected": "{'dot_product_abs': 50.0, 'product_of_norms': 50.0, 'inequality_holds': True, 'are_parallel': True}",
+            "explanation": "Antiparallel vectors ($\\vec{v}_2 = -2\\vec{v}_1$), equality holds"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to take absolute value of the dot product when checking inequality",
+        "Not recognizing that equality holds for antiparallel vectors (negative scalar multiple)",
+        "Numerical precision issues when checking if equality holds exactly",
+        "Assuming the inequality is strict (it can be an equality for parallel vectors)",
+        "Dividing by zero when one or both vectors are zero vectors"
+      ],
+      "hint": "Use your previously implemented dot_product and euclidean_norm functions. Consider using a small epsilon (e.g., 1e-9) when checking for equality due to floating-point precision.",
+      "references": [
+        "Triangle inequality and its relationship to Cauchy-Schwarz",
+        "Hölder's inequality as a generalization",
+        "Applications in proving other inequalities (e.g., AM-GM)",
+        "Geometric interpretation: projection and angles"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Vector Normalization and Unit Vectors",
+      "relation_to_problem": "Normalizing vectors to unit length is a key optimization for cosine similarity. When vectors are normalized, the cosine similarity simplifies to just the dot product, making computation more efficient.",
+      "prerequisites": [
+        "Vector norms",
+        "Scalar multiplication",
+        "Division by scalars"
+      ],
+      "learning_objectives": [
+        "Define unit vectors and the normalization process",
+        "Understand how normalization preserves direction while standardizing magnitude",
+        "Implement vector normalization with proper error handling",
+        "Recognize the computational advantage of pre-normalizing vectors"
+      ],
+      "math_content": {
+        "definition": "A unit vector is a vector with Euclidean norm equal to 1. For any non-zero vector $\\vec{v} \\in \\mathbb{R}^n$, its normalization (or unit vector in the direction of $\\vec{v}$) is defined as: $$\\hat{v} = \\frac{\\vec{v}}{\\|\\vec{v}\\|} = \\frac{1}{\\|\\vec{v}\\|} \\vec{v}$$ where $\\hat{v}$ denotes the normalized vector. By construction, $\\|\\hat{v}\\| = 1$.",
+        "notation": "$\\hat{v}$ denotes a unit vector (often called 'v-hat'); $\\frac{\\vec{v}}{\\|\\vec{v}\\|}$ means scalar division of each component by the norm; standard basis vectors $\\vec{e}_1, \\vec{e}_2, \\ldots, \\vec{e}_n$ are canonical unit vectors",
+        "theorem": "**Theorem (Normalization Preserves Direction)**: For non-zero $\\vec{v}$, the normalized vector $\\hat{v} = \\frac{\\vec{v}}{\\|\\vec{v}\\|}$ is the unique unit vector parallel to $\\vec{v}$. Furthermore, $\\|\\hat{v}\\| = 1$ always. **Theorem (Cosine Similarity of Unit Vectors)**: If $\\vec{u}$ and $\\vec{v}$ are unit vectors, then $\\cos\\_\\text{sim}(\\vec{u}, \\vec{v}) = \\vec{u} \\cdot \\vec{v}$.",
+        "proof_sketch": "To verify $\\|\\hat{v}\\| = 1$: $$\\|\\hat{v}\\| = \\left\\|\\frac{\\vec{v}}{\\|\\vec{v}\\|}\\right\\| = \\frac{1}{\\|\\vec{v}\\|} \\|\\vec{v}\\| = 1$$ For the cosine similarity of unit vectors: $$\\cos\\_\\text{sim}(\\hat{u}, \\hat{v}) = \\frac{\\hat{u} \\cdot \\hat{v}}{\\|\\hat{u}\\| \\|\\hat{v}\\|} = \\frac{\\hat{u} \\cdot \\hat{v}}{1 \\cdot 1} = \\hat{u} \\cdot \\hat{v}$$ This shows that pre-normalizing eliminates the need for division in the similarity computation.",
+        "examples": [
+          "Normalize $\\vec{v} = (3, 4)$: $\\|\\vec{v}\\| = 5$, so $\\hat{v} = (3/5, 4/5) = (0.6, 0.8)$. Verify: $\\|(0.6, 0.8)\\| = \\sqrt{0.36 + 0.64} = 1$ ✓",
+          "Normalize $\\vec{u} = (1, 1, 1)$: $\\|\\vec{u}\\| = \\sqrt{3}$, so $\\hat{u} = (1/\\sqrt{3}, 1/\\sqrt{3}, 1/\\sqrt{3}) \\approx (0.577, 0.577, 0.577)$",
+          "Already normalized: $\\vec{w} = (1, 0, 0)$ has $\\|\\vec{w}\\| = 1$, so $\\hat{w} = \\vec{w}$",
+          "For $\\vec{a} = (2, 0, 0)$: $\\hat{a} = (1, 0, 0)$ (same direction, unit length)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Normalization Formula",
+          "latex": "$\\hat{v} = \\frac{\\vec{v}}{\\|\\vec{v}\\|}$",
+          "description": "Convert any non-zero vector to a unit vector in the same direction"
+        },
+        {
+          "name": "Component-wise Normalization",
+          "latex": "$\\hat{v}_i = \\frac{v_i}{\\sqrt{\\sum_{j=1}^{n} v_j^2}}$ for $i = 1, \\ldots, n$",
+          "description": "Each component divided by the vector's norm"
+        },
+        {
+          "name": "Dot Product of Unit Vectors",
+          "latex": "$\\hat{u} \\cdot \\hat{v} = \\cos \\theta$",
+          "description": "For unit vectors, dot product directly gives cosine of the angle"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that normalizes a vector to unit length. This optimization is crucial for efficient cosine similarity computation in systems that compute many similarities.",
+        "function_signature": "def normalize_vector(v: np.ndarray) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef normalize_vector(v: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Normalize a vector to unit length.\n    \n    Args:\n        v: Input vector as numpy array\n    \n    Returns:\n        Normalized vector with Euclidean norm equal to 1\n    \n    Raises:\n        ValueError: If the input is a zero vector (norm is 0)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "normalize_vector(np.array([3, 4]))",
+            "expected": "array([0.6, 0.8])",
+            "explanation": "$\\vec{v}/\\|\\vec{v}\\| = (3, 4)/5 = (0.6, 0.8)$, and $\\sqrt{0.6^2 + 0.8^2} = 1$"
+          },
+          {
+            "input": "normalize_vector(np.array([1, 1, 1]))",
+            "expected": "array([0.577, 0.577, 0.577])",
+            "explanation": "$\\vec{v}/\\sqrt{3} = (1/\\sqrt{3}, 1/\\sqrt{3}, 1/\\sqrt{3}) \\approx (0.577, 0.577, 0.577)$"
+          },
+          {
+            "input": "normalize_vector(np.array([1, 0, 0, 0]))",
+            "expected": "array([1.0, 0.0, 0.0, 0.0])",
+            "explanation": "Already a unit vector, normalization preserves it"
+          },
+          {
+            "input": "normalize_vector(np.array([5, 0]))",
+            "expected": "array([1.0, 0.0])",
+            "explanation": "$\\vec{v}/5 = (1, 0)$, pointing along positive x-axis"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not checking for zero vectors before dividing (leads to division by zero)",
+        "Normalizing in-place and modifying the original vector unintentionally",
+        "Assuming normalization changes the vector's components uniformly (it scales by 1/norm)",
+        "Numerical instability for very small or very large vectors",
+        "Forgetting that normalization is undefined for the zero vector"
+      ],
+      "hint": "First compute the norm using your euclidean_norm function, check if it's zero, then divide each component by the norm. Numpy broadcasting makes this division operation simple.",
+      "references": [
+        "Unit vectors in spherical and polar coordinates",
+        "Normalization in machine learning (feature scaling)",
+        "Gram-Schmidt orthogonalization process",
+        "Applications in direction fields and tangent vectors"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Angular Similarity and Geometric Interpretation",
+      "relation_to_problem": "Understanding cosine similarity geometrically as measuring the angle between vectors explains why it's direction-focused and magnitude-invariant. This interpretation is essential for understanding when to use cosine similarity vs. other metrics.",
+      "prerequisites": [
+        "Dot product",
+        "Vector norms",
+        "Trigonometry",
+        "Cauchy-Schwarz inequality"
+      ],
+      "learning_objectives": [
+        "Understand the geometric relationship between dot product and angles",
+        "Interpret cosine similarity values in terms of vector alignment",
+        "Recognize that cosine similarity is independent of vector magnitude",
+        "Compute and interpret the angle between vectors"
+      ],
+      "math_content": {
+        "definition": "For non-zero vectors $\\vec{u}, \\vec{v} \\in \\mathbb{R}^n$, the angle $\\theta \\in [0, \\pi]$ between them is defined by the relationship: $$\\cos \\theta = \\frac{\\vec{u} \\cdot \\vec{v}}{\\|\\vec{u}\\| \\|\\vec{v}\\|}$$ This is the cosine similarity. The angle itself can be recovered via: $$\\theta = \\arccos\\left(\\frac{\\vec{u} \\cdot \\vec{v}}{\\|\\vec{u}\\| \\|\\vec{v}\\|}\\right)$$ where $\\arccos: [-1, 1] \\rightarrow [0, \\pi]$ is the inverse cosine function.",
+        "notation": "$\\theta$ denotes the angle between vectors; $\\arccos$ is the inverse cosine (arccosine); $[0, \\pi]$ means angles from 0 to 180 degrees (or 0 to $\\pi$ radians); $\\perp$ denotes perpendicularity",
+        "theorem": "**Theorem (Interpretation of Cosine Similarity Values)**: For vectors $\\vec{u}, \\vec{v}$: (1) $\\cos\\_\\text{sim}(\\vec{u}, \\vec{v}) = 1 \\Leftrightarrow \\theta = 0$ (same direction); (2) $\\cos\\_\\text{sim}(\\vec{u}, \\vec{v}) = 0 \\Leftrightarrow \\theta = \\pi/2$ (orthogonal); (3) $\\cos\\_\\text{sim}(\\vec{u}, \\vec{v}) = -1 \\Leftrightarrow \\theta = \\pi$ (opposite directions); (4) $0 < \\cos\\_\\text{sim}(\\vec{u}, \\vec{v}) < 1$ means acute angle; (5) $-1 < \\cos\\_\\text{sim}(\\vec{u}, \\vec{v}) < 0$ means obtuse angle.",
+        "proof_sketch": "The interpretation follows from properties of the cosine function on $[0, \\pi]$: $\\cos$ is strictly decreasing, $\\cos(0) = 1$, $\\cos(\\pi/2) = 0$, and $\\cos(\\pi) = -1$. The magnitude invariance follows from the formula: if we scale $\\vec{u} \\rightarrow c\\vec{u}$ for $c > 0$, then $$\\frac{(c\\vec{u}) \\cdot \\vec{v}}{\\|c\\vec{u}\\| \\|\\vec{v}\\|} = \\frac{c(\\vec{u} \\cdot \\vec{v})}{c\\|\\vec{u}\\| \\|\\vec{v}\\|} = \\frac{\\vec{u} \\cdot \\vec{v}}{\\|\\vec{u}\\| \\|\\vec{v}\\|}$$ showing the similarity is unchanged.",
+        "examples": [
+          "Parallel vectors: $\\vec{u} = (1, 2)$, $\\vec{v} = (2, 4)$ give $\\cos\\_\\text{sim} = 1$, angle $\\theta = 0°$",
+          "Orthogonal: $\\vec{u} = (1, 0)$, $\\vec{v} = (0, 1)$ give $\\cos\\_\\text{sim} = 0$, angle $\\theta = 90°$",
+          "Opposite: $\\vec{u} = (1, 0)$, $\\vec{v} = (-1, 0)$ give $\\cos\\_\\text{sim} = -1$, angle $\\theta = 180°$",
+          "Acute angle: $\\vec{u} = (1, 0)$, $\\vec{v} = (1, 1)$ give $\\cos\\_\\text{sim} = 1/\\sqrt{2} \\approx 0.707$, angle $\\theta = 45°$",
+          "Magnitude invariance: $(1, 1)$ vs $(2, 2)$ and $(1, 1)$ vs $(100, 100)$ both give $\\cos\\_\\text{sim} = 1$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Angle from Cosine Similarity",
+          "latex": "$\\theta = \\arccos\\left(\\frac{\\vec{u} \\cdot \\vec{v}}{\\|\\vec{u}\\| \\|\\vec{v}\\|}\\right)$",
+          "description": "Convert cosine similarity to angle in radians"
+        },
+        {
+          "name": "Cosine Similarity Formula",
+          "latex": "$\\text{cos\\_sim}(\\vec{u}, \\vec{v}) = \\frac{\\vec{u} \\cdot \\vec{v}}{\\|\\vec{u}\\| \\|\\vec{v}\\|}$",
+          "description": "The complete cosine similarity formula"
+        },
+        {
+          "name": "Orthogonality Condition",
+          "latex": "$\\vec{u} \\perp \\vec{v} \\Leftrightarrow \\vec{u} \\cdot \\vec{v} = 0 \\Leftrightarrow \\text{cos\\_sim}(\\vec{u}, \\vec{v}) = 0$",
+          "description": "Vectors are perpendicular when their dot product is zero"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the angle (in degrees) between two vectors and classifies their relationship. This demonstrates understanding of the geometric meaning of cosine similarity.",
+        "function_signature": "def vector_angle_analysis(v1: np.ndarray, v2: np.ndarray) -> dict:",
+        "starter_code": "import numpy as np\n\ndef vector_angle_analysis(v1: np.ndarray, v2: np.ndarray) -> dict:\n    \"\"\"\n    Compute the angle between two vectors and classify their relationship.\n    \n    Args:\n        v1: First vector as numpy array\n        v2: Second vector as numpy array\n    \n    Returns:\n        Dictionary with keys:\n        - 'cosine_similarity': float in [-1, 1]\n        - 'angle_degrees': angle in degrees [0, 180]\n        - 'angle_radians': angle in radians [0, π]\n        - 'relationship': string describing relationship\n            ('same direction', 'opposite direction', 'orthogonal',\n             'acute angle', or 'obtuse angle')\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "vector_angle_analysis(np.array([1, 2, 3]), np.array([2, 4, 6]))",
+            "expected": "{'cosine_similarity': 1.0, 'angle_degrees': 0.0, 'angle_radians': 0.0, 'relationship': 'same direction'}",
+            "explanation": "Parallel vectors in same direction: $\\vec{v}_2 = 2\\vec{v}_1$"
+          },
+          {
+            "input": "vector_angle_analysis(np.array([1, 0, 0]), np.array([0, 1, 0]))",
+            "expected": "{'cosine_similarity': 0.0, 'angle_degrees': 90.0, 'angle_radians': 1.571, 'relationship': 'orthogonal'}",
+            "explanation": "Standard basis vectors are perpendicular"
+          },
+          {
+            "input": "vector_angle_analysis(np.array([1, 0]), np.array([-1, 0]))",
+            "expected": "{'cosine_similarity': -1.0, 'angle_degrees': 180.0, 'angle_radians': 3.142, 'relationship': 'opposite direction'}",
+            "explanation": "Antiparallel vectors pointing in opposite directions"
+          },
+          {
+            "input": "vector_angle_analysis(np.array([1, 0]), np.array([1, 1]))",
+            "expected": "{'cosine_similarity': 0.707, 'angle_degrees': 45.0, 'angle_radians': 0.785, 'relationship': 'acute angle'}",
+            "explanation": "45-degree angle between vectors: $\\cos(45°) = 1/\\sqrt{2}$"
+          },
+          {
+            "input": "vector_angle_analysis(np.array([1, 0]), np.array([-1, 1]))",
+            "expected": "{'cosine_similarity': -0.707, 'angle_degrees': 135.0, 'angle_radians': 2.356, 'relationship': 'obtuse angle'}",
+            "explanation": "135-degree angle: $\\cos(135°) = -1/\\sqrt{2}$"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing cosine similarity (a ratio) with the angle itself (requires arccos)",
+        "Not converting between radians and degrees correctly (multiply by 180/π)",
+        "Assuming larger cosine values mean larger angles (cosine is decreasing on [0, π])",
+        "Not handling numerical errors that push cosine slightly outside [-1, 1] before arccos",
+        "Thinking magnitude affects the angle (it doesn't due to normalization in the formula)",
+        "Forgetting that angles in higher dimensions still have the same interpretation"
+      ],
+      "hint": "Use your previous functions for dot product and norm. Apply np.arccos to get the angle in radians, then convert to degrees. Use epsilon-based comparisons for classifying relationships.",
+      "references": [
+        "Law of cosines in triangles",
+        "Projection of one vector onto another",
+        "Angular distance as a metric",
+        "Applications: document similarity in NLP, recommender systems"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete Cosine Similarity Implementation with Validation",
+      "relation_to_problem": "This final sub-quest synthesizes all previous concepts to implement the full cosine similarity function with proper validation, error handling, and edge case management—the complete solution pathway.",
+      "prerequisites": [
+        "Dot product",
+        "Euclidean norm",
+        "Cauchy-Schwarz inequality",
+        "Vector normalization",
+        "Geometric interpretation"
+      ],
+      "learning_objectives": [
+        "Combine all previous building blocks into the complete cosine similarity formula",
+        "Implement proper input validation and error handling",
+        "Handle edge cases: zero vectors, numerical precision issues",
+        "Optimize implementation choices based on use case",
+        "Validate correctness using mathematical properties"
+      ],
+      "math_content": {
+        "definition": "The cosine similarity between two non-zero vectors $\\vec{u}, \\vec{v} \\in \\mathbb{R}^n$ is formally defined as: $$\\text{cosine\\_similarity}(\\vec{u}, \\vec{v}) = \\frac{\\vec{u} \\cdot \\vec{v}}{\\|\\vec{u}\\|_2 \\|\\vec{v}\\|_2} = \\frac{\\sum_{i=1}^{n} u_i v_i}{\\sqrt{\\sum_{i=1}^{n} u_i^2} \\sqrt{\\sum_{i=1}^{n} v_i^2}}$$ This measures the cosine of the angle between the vectors, ranging from -1 (opposite directions) through 0 (orthogonal) to 1 (same direction). It is undefined for zero vectors.",
+        "notation": "$\\text{cosine\\_similarity}(\\cdot, \\cdot): \\mathbb{R}^n \\times \\mathbb{R}^n \\rightarrow [-1, 1]$ is the function mapping; $\\vec{u}, \\vec{v} \\neq \\vec{0}$ means non-zero vectors; Domain: $\\mathbb{R}^n \\setminus \\{\\vec{0}\\} \\times \\mathbb{R}^n \\setminus \\{\\vec{0}\\}$; Range: $[-1, 1]$",
+        "theorem": "**Theorem (Properties of Cosine Similarity)**: (1) **Symmetry**: $\\text{cos\\_sim}(\\vec{u}, \\vec{v}) = \\text{cos\\_sim}(\\vec{v}, \\vec{u})$; (2) **Boundedness**: $-1 \\leq \\text{cos\\_sim}(\\vec{u}, \\vec{v}) \\leq 1$ (from Cauchy-Schwarz); (3) **Scale Invariance**: $\\text{cos\\_sim}(c\\vec{u}, d\\vec{v}) = \\text{sign}(cd) \\cdot \\text{cos\\_sim}(\\vec{u}, \\vec{v})$ for $c, d \\neq 0$; (4) **Identity**: $\\text{cos\\_sim}(\\vec{v}, \\vec{v}) = 1$ for any non-zero $\\vec{v}$; (5) **Normalized Form**: If $\\vec{u}, \\vec{v}$ are unit vectors, $\\text{cos\\_sim}(\\vec{u}, \\vec{v}) = \\vec{u} \\cdot \\vec{v}$.",
+        "proof_sketch": "Symmetry follows from commutativity of dot product. Boundedness follows from Cauchy-Schwarz. Scale invariance: $$\\text{cos\\_sim}(c\\vec{u}, d\\vec{v}) = \\frac{cd(\\vec{u} \\cdot \\vec{v})}{|c|\\|\\vec{u}\\| |d|\\|\\vec{v}\\|} = \\text{sign}(cd) \\cdot \\frac{\\vec{u} \\cdot \\vec{v}}{\\|\\vec{u}\\| \\|\\vec{v}\\|}$$ Identity: $\\text{cos\\_sim}(\\vec{v}, \\vec{v}) = \\frac{\\vec{v} \\cdot \\vec{v}}{\\|\\vec{v}\\|^2} = \\frac{\\|\\vec{v}\\|^2}{\\|\\vec{v}\\|^2} = 1$.",
+        "examples": [
+          "Standard computation: $\\vec{u} = (1, 2, 3)$, $\\vec{v} = (2, 4, 6)$: $\\vec{u} \\cdot \\vec{v} = 28$, $\\|\\vec{u}\\| = \\sqrt{14}$, $\\|\\vec{v}\\| = 2\\sqrt{14}$, so $\\text{cos\\_sim} = 28/(\\sqrt{14} \\cdot 2\\sqrt{14}) = 28/28 = 1.0$",
+          "Partial overlap: $\\vec{u} = (1, 2, 3)$, $\\vec{v} = (3, 2, 1)$: $\\vec{u} \\cdot \\vec{v} = 10$, norms are both $\\sqrt{14}$, so $\\text{cos\\_sim} = 10/14 \\approx 0.714$",
+          "Orthogonal: $\\vec{u} = (1, -1, 0)$, $\\vec{v} = (1, 1, 0)$: $\\vec{u} \\cdot \\vec{v} = 0$, so $\\text{cos\\_sim} = 0$",
+          "Opposite: $\\vec{u} = (1, 0)$, $\\vec{v} = (-2, 0)$: $\\vec{u} \\cdot \\vec{v} = -2$, $\\|\\vec{u}\\| = 1$, $\\|\\vec{v}\\| = 2$, so $\\text{cos\\_sim} = -2/2 = -1.0$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Full Cosine Similarity Formula",
+          "latex": "$\\text{cos\\_sim}(\\vec{u}, \\vec{v}) = \\frac{\\vec{u} \\cdot \\vec{v}}{\\|\\vec{u}\\| \\|\\vec{v}\\|}$",
+          "description": "The complete formula combining dot product and norms"
+        },
+        {
+          "name": "Expanded Form",
+          "latex": "$\\text{cos\\_sim}(\\vec{u}, \\vec{v}) = \\frac{\\sum_{i=1}^{n} u_i v_i}{\\sqrt{\\sum_{i=1}^{n} u_i^2} \\sqrt{\\sum_{i=1}^{n} v_i^2}}$",
+          "description": "Component-wise expansion showing all operations explicitly"
+        },
+        {
+          "name": "For Unit Vectors",
+          "latex": "$\\text{cos\\_sim}(\\hat{u}, \\hat{v}) = \\hat{u} \\cdot \\hat{v}$ when $\\|\\hat{u}\\| = \\|\\hat{v}\\| = 1$",
+          "description": "Simplified form when vectors are pre-normalized"
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete cosine similarity function that integrates all previous concepts: dot product, norms, validation, and proper handling of edge cases. This is the culmination of all sub-quests and provides a production-ready implementation.",
+        "function_signature": "def cosine_similarity_complete(v1: np.ndarray, v2: np.ndarray, tolerance: float = 1e-10) -> float:",
+        "starter_code": "import numpy as np\n\ndef cosine_similarity_complete(v1: np.ndarray, v2: np.ndarray, tolerance: float = 1e-10) -> float:\n    \"\"\"\n    Compute cosine similarity between two vectors with complete validation.\n    \n    Args:\n        v1: First vector as numpy array\n        v2: Second vector as numpy array\n        tolerance: Small value to check for zero vectors (default 1e-10)\n    \n    Returns:\n        Cosine similarity as float in range [-1, 1], rounded to 3 decimal places\n    \n    Raises:\n        ValueError: If vectors have different shapes\n        ValueError: If either vector is a zero vector (norm < tolerance)\n        ValueError: If vectors are empty\n    \n    Notes:\n        - Validates input shapes and dimensions\n        - Checks for zero vectors (undefined cosine similarity)\n        - Uses numerical tolerance for zero checking\n        - Clamps result to [-1, 1] to handle floating-point errors\n        - Returns result rounded to 3 decimal places\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "cosine_similarity_complete(np.array([1, 2, 3]), np.array([2, 4, 6]))",
+            "expected": "1.0",
+            "explanation": "Perfect similarity: $\\vec{v}_2 = 2\\vec{v}_1$, parallel vectors"
+          },
+          {
+            "input": "cosine_similarity_complete(np.array([1, 0, 0]), np.array([0, 1, 0]))",
+            "expected": "0.0",
+            "explanation": "Orthogonal basis vectors: dot product is 0"
+          },
+          {
+            "input": "cosine_similarity_complete(np.array([1, 2]), np.array([-1, -2]))",
+            "expected": "-1.0",
+            "explanation": "Opposite directions: $\\vec{v}_2 = -\\vec{v}_1$"
+          },
+          {
+            "input": "cosine_similarity_complete(np.array([1, 2, 3]), np.array([3, 2, 1]))",
+            "expected": "0.714",
+            "explanation": "Partial alignment: $(1 \\cdot 3 + 2 \\cdot 2 + 3 \\cdot 1)/(\\sqrt{14} \\cdot \\sqrt{14}) = 10/14 \\approx 0.714$"
+          },
+          {
+            "input": "cosine_similarity_complete(np.array([3, 4]), np.array([4, 3]))",
+            "expected": "0.96",
+            "explanation": "$(3 \\cdot 4 + 4 \\cdot 3)/(5 \\cdot 5) = 24/25 = 0.96$"
+          },
+          {
+            "input": "cosine_similarity_complete(np.array([1.0, 2.0, 3.0, 4.0]), np.array([0.5, 1.0, 1.5, 2.0]))",
+            "expected": "1.0",
+            "explanation": "Second vector is 0.5 times the first, perfectly aligned"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not validating that input vectors have the same shape before computing",
+        "Not checking for zero vectors, leading to division by zero errors",
+        "Not handling floating-point precision issues that can push result slightly outside [-1, 1]",
+        "Inefficient implementation that computes norms separately instead of using vectorized operations",
+        "Not rounding the result as specified in requirements",
+        "Using incorrect tolerance when checking for zero magnitude",
+        "Forgetting to handle 1D vs 2D numpy arrays consistently",
+        "Not considering that numpy's default float precision may cause small numerical errors"
+      ],
+      "hint": "Combine your understanding from all previous exercises. Compute the dot product and norms, validate inputs carefully, handle edge cases with appropriate error messages, and ensure the result is properly bounded and rounded. Consider using np.clip to enforce the [-1, 1] range.",
+      "references": [
+        "Vector similarity metrics: Euclidean distance, Manhattan distance, Jaccard similarity",
+        "Applications in natural language processing: TF-IDF and word embeddings",
+        "Applications in recommendation systems: collaborative filtering",
+        "Computational optimization: batch computation, GPU acceleration",
+        "Alternative similarity measures: Pearson correlation, Spearman rank correlation"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,526 @@
+{
+  "problem_id": 193,
+  "title": "Compute Confusion Matrix with Normalization",
+  "category": "Machine Learning",
+  "difficulty": "medium",
+  "description": "Implement a function to compute a confusion matrix for multi-class classification with optional normalization. The function should support three normalization modes: by true labels (row-wise), by predicted labels (column-wise), and by all samples (global). When normalization is enabled, round the outputs to a configurable number of decimal places.",
+  "example": {
+    "input": "compute_confusion_matrix([0,1,2,2], [0,2,1,2], 3, normalize='true', round_decimals=4)",
+    "output": "[[1.0, 0.0, 0.0], [0.0, 0.0, 1.0], [0.0, 0.5, 0.5]]",
+    "reasoning": "Counts: [[1,0,0],[0,0,1],[0,1,1]]. Row-wise normalization divides each row by its sum; rows with sums 1 stay the same, the last row [0,1,1]/2 -> [0.0, 0.5, 0.5]."
+  },
+  "starter_code": "import numpy as np\n\ndef compute_confusion_matrix(y_true, y_pred, num_classes, normalize=None, round_decimals=4):\n    \"\"\"\n    Compute a KxK confusion matrix with optional normalization.\n\n    Args:\n        y_true: Iterable of true labels in [0, K-1]\n        y_pred: Iterable of predicted labels in [0, K-1]\n        num_classes: K, number of classes\n        normalize: None | 'true' | 'pred' | 'all'\n        round_decimals: decimals to round when normalization is applied\n\n    Returns:\n        list[list[int|float]] confusion matrix\n    \"\"\"\n    # Your implementation here\n    pass\n",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Building Multi-Class Count Matrices from Label Vectors",
+      "relation_to_problem": "The confusion matrix is fundamentally a count matrix. This sub-quest teaches how to construct a KxK matrix by counting occurrences of (true_label, predicted_label) pairs, which is the foundation of the confusion matrix before any normalization.",
+      "prerequisites": [
+        "Basic Python",
+        "List/Array indexing",
+        "Nested loops",
+        "2D array/matrix concepts"
+      ],
+      "learning_objectives": [
+        "Understand the structure of a KxK confusion matrix where rows represent true classes and columns represent predicted classes",
+        "Implement indicator function logic to count label pair occurrences",
+        "Handle edge cases where some classes may not appear in the input"
+      ],
+      "math_content": {
+        "definition": "A confusion matrix for a $K$-class classification problem is a $K \\times K$ matrix $C$ where each element $C_{ij}$ represents the count of samples with true label $i$ and predicted label $j$. Formally: $$C_{ij} = \\sum_{n=1}^{N} \\mathbf{1}[y^{(n)}=i \\wedge \\hat{y}^{(n)}=j]$$ where $\\mathbf{1}[\\cdot]$ is the indicator function that returns 1 if the condition is true, 0 otherwise, $y^{(n)}$ is the true label of the $n$-th sample, $\\hat{y}^{(n)}$ is the predicted label, and $N$ is the total number of samples.",
+        "notation": "$C$ = confusion matrix, $K$ = number of classes, $i,j \\in \\{0,1,\\ldots,K-1\\}$ = class indices, $y^{(n)}$ = true label of sample $n$, $\\hat{y}^{(n)}$ = predicted label of sample $n$, $N$ = total number of samples",
+        "theorem": "**Matrix Dimension Invariance Theorem**: The confusion matrix has fixed dimensions $K \\times K$ determined by the number of classes, regardless of which classes actually appear in the data. This ensures consistent shape across different subsets of data.",
+        "proof_sketch": "By definition, $i$ and $j$ range over all possible class labels $\\{0, 1, \\ldots, K-1\\}$. Even if no samples exist with true label $i$ or predicted label $j$, the corresponding row or column exists with all zero entries. Therefore, the matrix always has exactly $K$ rows and $K$ columns.",
+        "examples": [
+          "Example 1: Binary classification ($K=2$) with $y_{\\text{true}}=[0,1,0,1]$ and $y_{\\text{pred}}=[0,0,1,1]$. We compute: $C_{00}=1$ (one sample with true=0, pred=0), $C_{01}=1$ (one sample with true=0, pred=1), $C_{10}=1$ (one sample with true=1, pred=0), $C_{11}=1$ (one sample with true=1, pred=1). Result: $C = \\begin{pmatrix} 1 & 1 \\\\ 1 & 1 \\end{pmatrix}$",
+          "Example 2: Three-class problem ($K=3$) with $y_{\\text{true}}=[0,1,2,2]$ and $y_{\\text{pred}}=[0,2,1,2]$. Computing each entry: $C_{00}=1$, $C_{01}=0$, $C_{02}=0$, $C_{10}=0$, $C_{11}=0$, $C_{12}=1$, $C_{20}=0$, $C_{21}=1$, $C_{22}=1$. Result: $C = \\begin{pmatrix} 1 & 0 & 0 \\\\ 0 & 0 & 1 \\\\ 0 & 1 & 1 \\end{pmatrix}$. Note that class 0 was never predicted except correctly, and class 1 never appeared as a true label."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Indicator Function",
+          "latex": "$\\mathbf{1}[\\text{condition}] = \\begin{cases} 1 & \\text{if condition is true} \\\\ 0 & \\text{otherwise} \\end{cases}$",
+          "description": "Used to count occurrences of specific label pairs. In implementation, this is equivalent to checking boolean conditions."
+        },
+        {
+          "name": "Confusion Matrix Entry",
+          "latex": "$C_{ij} = \\sum_{n=1}^{N} \\mathbf{1}[y^{(n)}=i \\wedge \\hat{y}^{(n)}=j]$",
+          "description": "The fundamental counting formula for each cell in the confusion matrix. Sum over all samples where both conditions (true label = i AND predicted label = j) are met."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that creates a KxK confusion matrix (raw counts, no normalization) given true labels, predicted labels, and the number of classes. Initialize a KxK matrix of zeros, then iterate through all samples to increment the appropriate cells based on (true_label, pred_label) pairs.",
+        "function_signature": "def build_count_matrix(y_true, y_pred, num_classes) -> list:",
+        "starter_code": "def build_count_matrix(y_true, y_pred, num_classes):\n    \"\"\"\n    Build a KxK confusion matrix with raw counts.\n    \n    Args:\n        y_true: List of true labels [0, K-1]\n        y_pred: List of predicted labels [0, K-1]\n        num_classes: K, the number of classes\n    \n    Returns:\n        list[list[int]]: KxK matrix where entry [i][j] is count of samples with true label i and predicted label j\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "build_count_matrix([0,1,0,1], [0,0,1,1], 2)",
+            "expected": "[[1, 1], [1, 1]]",
+            "explanation": "Class 0: one correctly predicted (0,0) and one predicted as 1 (0,1). Class 1: one predicted as 0 (1,0) and one correctly predicted (1,1)."
+          },
+          {
+            "input": "build_count_matrix([0,1,2,2], [0,2,1,2], 3)",
+            "expected": "[[1, 0, 0], [0, 0, 1], [0, 1, 1]]",
+            "explanation": "Class 0: 1 sample correctly predicted as 0. Class 1: 1 sample incorrectly predicted as 2. Class 2: 2 samples, one predicted as 1 and one correctly as 2."
+          },
+          {
+            "input": "build_count_matrix([2,2,2], [1,1,1], 3)",
+            "expected": "[[0, 0, 0], [0, 0, 0], [0, 3, 0]]",
+            "explanation": "All 3 samples have true label 2 but were predicted as 1, so C[2][1]=3 and all other entries are 0."
+          },
+          {
+            "input": "build_count_matrix([], [], 2)",
+            "expected": "[[0, 0], [0, 0]]",
+            "explanation": "Empty input produces a zero matrix of the specified size."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row and column indices: rows should represent TRUE labels, columns should represent PREDICTED labels",
+        "Creating a matrix sized by the max label value instead of num_classes parameter (misses classes not in data)",
+        "Using 1-based indexing instead of 0-based indexing for classes",
+        "Not initializing all matrix entries to zero before counting"
+      ],
+      "hint": "Start by creating a 2D list of zeros with dimensions num_classes × num_classes. Then iterate through paired elements from y_true and y_pred simultaneously using zip(), incrementing matrix[true_label][pred_label] for each pair.",
+      "references": [
+        "Matrix initialization in Python",
+        "Nested list comprehensions",
+        "Zip function for parallel iteration",
+        "2D array indexing"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Row-wise Normalization and Conditional Probability",
+      "relation_to_problem": "Row-wise normalization (normalize='true') is one of the three normalization modes required for the main problem. It transforms counts into conditional probabilities P(predicted=j | true=i), showing the distribution of predictions for each true class.",
+      "prerequisites": [
+        "Matrix operations",
+        "Division operations",
+        "Understanding of probability",
+        "Handling division by zero"
+      ],
+      "learning_objectives": [
+        "Understand row-wise normalization as computing conditional probabilities of predictions given true class",
+        "Implement safe division that handles zero row sums",
+        "Apply rounding to normalize floating-point precision"
+      ],
+      "math_content": {
+        "definition": "**Row-wise Normalization** transforms a confusion matrix $C$ into a normalized matrix $C^{(\\text{true})}$ by dividing each entry by its row sum: $$C^{(\\text{true})}_{ij} = \\begin{cases}\\dfrac{C_{ij}}{\\sum_{j'=0}^{K-1} C_{ij'}} & \\text{if } \\sum_{j'=0}^{K-1} C_{ij'}>0\\\\[8pt]0 & \\text{otherwise}\\end{cases}$$ Each row $i$ represents samples with true label $i$, and the normalization converts counts to proportions that sum to 1 (or 0 if the row is empty).",
+        "notation": "$C^{(\\text{true})}$ = row-normalized confusion matrix, $\\sum_{j'=0}^{K-1} C_{ij'}$ = row sum (total samples with true label $i$), $C^{(\\text{true})}_{ij}$ = proportion of true class $i$ predicted as class $j$",
+        "theorem": "**Probability Interpretation Theorem**: The row-normalized confusion matrix represents conditional probabilities: $$C^{(\\text{true})}_{ij} = P(\\hat{Y}=j \\mid Y=i)$$ where $Y$ is the true label and $\\hat{Y}$ is the predicted label. This is the empirical estimate of the classifier's conditional prediction distribution.",
+        "proof_sketch": "By definition of conditional probability, $P(\\hat{Y}=j \\mid Y=i) = \\frac{P(Y=i, \\hat{Y}=j)}{P(Y=i)}$. Using empirical probabilities from our dataset: $P(Y=i) \\approx \\frac{\\sum_{j'} C_{ij'}}{N}$ (proportion of samples with true label $i$) and $P(Y=i, \\hat{Y}=j) \\approx \\frac{C_{ij}}{N}$ (proportion with both conditions). Therefore: $$P(\\hat{Y}=j \\mid Y=i) \\approx \\frac{C_{ij}/N}{(\\sum_{j'} C_{ij'})/N} = \\frac{C_{ij}}{\\sum_{j'} C_{ij'}}$$ which is exactly our row normalization formula.",
+        "examples": [
+          "Example 1: Consider row 0 of matrix $C = \\begin{pmatrix} 3 & 1 \\\\ 2 & 4 \\end{pmatrix}$. Row sum: $3+1=4$. Row-normalized: $[3/4, 1/4] = [0.75, 0.25]$. Interpretation: When the true label is 0, the classifier predicts 0 with probability 75% and predicts 1 with probability 25%.",
+          "Example 2: Empty row case. If row 2 is $[0, 0, 0]$ with row sum 0, we cannot divide by 0. By convention, we keep it as $[0, 0, 0]$ rather than undefined, representing that no samples of class 2 exist in the data.",
+          "Example 3: Perfect classification. Row $[0, 5, 0]$ with sum 5 normalizes to $[0, 1, 0]$. All 5 samples of this true class were correctly predicted (assuming the true class index matches the column with value 5)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Row Sum",
+          "latex": "$R_i = \\sum_{j=0}^{K-1} C_{ij}$",
+          "description": "The sum of row i, representing the total number of samples with true label i in the dataset."
+        },
+        {
+          "name": "Row-wise Normalized Entry",
+          "latex": "$C^{(\\text{true})}_{ij} = \\begin{cases}\\dfrac{C_{ij}}{R_i} & \\text{if } R_i>0\\\\[6pt]0 & \\text{otherwise}\\end{cases}$",
+          "description": "Each entry divided by its row sum. Check for zero row sum to avoid division by zero."
+        },
+        {
+          "name": "Row Sum Property",
+          "latex": "$\\sum_{j=0}^{K-1} C^{(\\text{true})}_{ij} = \\begin{cases}1 & \\text{if } R_i>0\\\\[6pt]0 & \\text{otherwise}\\end{cases}$",
+          "description": "Non-empty rows sum to 1 after normalization, forming a probability distribution over predicted classes."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs row-wise normalization on a confusion matrix. For each row, compute the sum, then divide all elements in that row by the sum (if non-zero). Apply rounding to a specified number of decimal places. Return the normalized matrix as a list of lists of floats.",
+        "function_signature": "def normalize_by_row(matrix, round_decimals=4) -> list:",
+        "starter_code": "def normalize_by_row(matrix, round_decimals=4):\n    \"\"\"\n    Normalize a confusion matrix row-wise (by true labels).\n    \n    Args:\n        matrix: List[List[int|float]] - KxK confusion matrix\n        round_decimals: int - number of decimal places for rounding\n    \n    Returns:\n        List[List[float]]: Row-normalized matrix where each row sums to 1 (or is all zeros)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "normalize_by_row([[3, 1], [2, 4]], 2)",
+            "expected": "[[0.75, 0.25], [0.33, 0.67]]",
+            "explanation": "Row 0: [3,1] sum=4, normalized=[3/4, 1/4]=[0.75, 0.25]. Row 1: [2,4] sum=6, normalized=[2/6, 4/6]=[0.33, 0.67] rounded to 2 decimals."
+          },
+          {
+            "input": "normalize_by_row([[1, 0, 0], [0, 0, 1], [0, 1, 1]], 4)",
+            "expected": "[[1.0, 0.0, 0.0], [0.0, 0.0, 1.0], [0.0, 0.5, 0.5]]",
+            "explanation": "Row 0: sum=1, stays [1,0,0]. Row 1: sum=1, stays [0,0,1]. Row 2: sum=2, becomes [0/2, 1/2, 1/2]=[0, 0.5, 0.5]."
+          },
+          {
+            "input": "normalize_by_row([[0, 0], [5, 5]], 3)",
+            "expected": "[[0.0, 0.0], [0.5, 0.5]]",
+            "explanation": "Row 0: sum=0, stays [0,0] (avoid division by zero). Row 1: sum=10, becomes [5/10, 5/10]=[0.5, 0.5]."
+          },
+          {
+            "input": "normalize_by_row([[6]], 1)",
+            "expected": "[[1.0]]",
+            "explanation": "Single element matrix with sum=6 normalizes to 6/6=1.0."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Attempting to divide by zero when a row sum is zero (must check and handle this case)",
+        "Forgetting to round the results to the specified decimal places",
+        "Modifying the original matrix instead of creating a new normalized matrix",
+        "Not converting integer division to float division, leading to integer results",
+        "Rounding prematurely (round final result, not intermediate calculations)"
+      ],
+      "hint": "For each row, first compute its sum. If the sum is greater than 0, create a new row where each element is the original element divided by the row sum, then round. If the sum is 0, create a row of zeros. Python's round() function can be used for rounding floats.",
+      "references": [
+        "Python round() function",
+        "List comprehensions with conditionals",
+        "Safe division patterns",
+        "Floating-point arithmetic precision"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Column-wise Normalization and Inverse Probability",
+      "relation_to_problem": "Column-wise normalization (normalize='pred') is the second normalization mode needed. It computes P(true=i | predicted=j), showing the precision-like distribution for each predicted class.",
+      "prerequisites": [
+        "Matrix operations",
+        "Row-wise normalization concepts",
+        "Conditional probability",
+        "Matrix transpose operations"
+      ],
+      "learning_objectives": [
+        "Understand column-wise normalization as transpose of row-wise normalization logic",
+        "Compute conditional probabilities of true labels given predicted labels",
+        "Recognize the relationship between column normalization and precision metrics"
+      ],
+      "math_content": {
+        "definition": "**Column-wise Normalization** transforms a confusion matrix $C$ into a normalized matrix $C^{(\\text{pred})}$ by dividing each entry by its column sum: $$C^{(\\text{pred})}_{ij} = \\begin{cases}\\dfrac{C_{ij}}{\\sum_{i'=0}^{K-1} C_{i'j}} & \\text{if } \\sum_{i'=0}^{K-1} C_{i'j}>0\\\\[8pt]0 & \\text{otherwise}\\end{cases}$$ Each column $j$ represents samples predicted as class $j$, and normalization converts counts to proportions that sum to 1 (or 0 if the column is empty).",
+        "notation": "$C^{(\\text{pred})}$ = column-normalized confusion matrix, $\\sum_{i'=0}^{K-1} C_{i'j}$ = column sum (total samples predicted as class $j$), $S_j$ = column sum for column $j$",
+        "theorem": "**Inverse Probability Theorem**: The column-normalized confusion matrix represents inverse conditional probabilities: $$C^{(\\text{pred})}_{ij} = P(Y=i \\mid \\hat{Y}=j)$$ This tells us, given the classifier predicted class $j$, what is the probability the true class is actually $i$. The diagonal entry $C^{(\\text{pred})}_{jj}$ represents the precision for class $j$.",
+        "proof_sketch": "By Bayes' theorem and empirical estimation: $P(Y=i \\mid \\hat{Y}=j) = \\frac{P(\\hat{Y}=j \\mid Y=i) \\cdot P(Y=i)}{P(\\hat{Y}=j)}$. Using empirical counts: $P(\\hat{Y}=j) \\approx \\frac{\\sum_{i'} C_{i'j}}{N}$ and $P(Y=i, \\hat{Y}=j) \\approx \\frac{C_{ij}}{N}$. Therefore: $$P(Y=i \\mid \\hat{Y}=j) = \\frac{P(Y=i, \\hat{Y}=j)}{P(\\hat{Y}=j)} \\approx \\frac{C_{ij}/N}{(\\sum_{i'} C_{i'j})/N} = \\frac{C_{ij}}{\\sum_{i'} C_{i'j}}$$ which is the column normalization formula.",
+        "examples": [
+          "Example 1: Consider column 1 of matrix $C = \\begin{pmatrix} 2 & 1 \\\\ 1 & 3 \\end{pmatrix}$. Column sum: $1+3=4$. Column-normalized: $[1/4, 3/4]^T = [0.25, 0.75]^T$. Interpretation: When the classifier predicts class 1, the true label is class 0 with 25% probability and class 1 with 75% probability (precision of 75% for class 1).",
+          "Example 2: Perfect precision column. Column $[0, 8, 0]^T$ with sum 8 normalizes to $[0, 1, 0]^T$. All predictions for this class were correct.",
+          "Example 3: Unused predicted class. If column 2 is $[0, 0, 0]^T$ (classifier never predicts class 2), column sum is 0. We keep it as $[0, 0, 0]^T$ to avoid division by zero."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Column Sum",
+          "latex": "$S_j = \\sum_{i=0}^{K-1} C_{ij}$",
+          "description": "The sum of column j, representing the total number of samples predicted as class j by the classifier."
+        },
+        {
+          "name": "Column-wise Normalized Entry",
+          "latex": "$C^{(\\text{pred})}_{ij} = \\begin{cases}\\dfrac{C_{ij}}{S_j} & \\text{if } S_j>0\\\\[6pt]0 & \\text{otherwise}\\end{cases}$",
+          "description": "Each entry divided by its column sum. Must check for zero column sum to avoid division by zero."
+        },
+        {
+          "name": "Precision Formula",
+          "latex": "$\\text{Precision}_j = C^{(\\text{pred})}_{jj}$",
+          "description": "The diagonal entry in column-normalized form equals the precision metric for class j: the proportion of predictions for class j that are correct."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs column-wise normalization on a confusion matrix. For each column, compute the sum across all rows, then divide all elements in that column by the sum (if non-zero). Apply rounding to the specified number of decimal places. Return the normalized matrix.",
+        "function_signature": "def normalize_by_column(matrix, round_decimals=4) -> list:",
+        "starter_code": "def normalize_by_column(matrix, round_decimals=4):\n    \"\"\"\n    Normalize a confusion matrix column-wise (by predicted labels).\n    \n    Args:\n        matrix: List[List[int|float]] - KxK confusion matrix\n        round_decimals: int - number of decimal places for rounding\n    \n    Returns:\n        List[List[float]]: Column-normalized matrix where each column sums to 1 (or is all zeros)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "normalize_by_column([[2, 1], [1, 3]], 2)",
+            "expected": "[[0.67, 0.25], [0.33, 0.75]]",
+            "explanation": "Column 0: [2,1] sum=3, normalized=[2/3, 1/3]=[0.67, 0.33]. Column 1: [1,3] sum=4, normalized=[1/4, 3/4]=[0.25, 0.75]."
+          },
+          {
+            "input": "normalize_by_column([[1, 0, 0], [0, 0, 1], [0, 1, 1]], 4)",
+            "expected": "[[1.0, 0.0, 0.0], [0.0, 0.0, 0.5], [0.0, 1.0, 0.5]]",
+            "explanation": "Column 0: sum=1, stays [1,0,0]. Column 1: sum=1, stays [0,0,1]. Column 2: sum=2, becomes [0/2, 1/2, 1/2]=[0, 0.5, 0.5]."
+          },
+          {
+            "input": "normalize_by_column([[0, 5], [0, 5]], 1)",
+            "expected": "[[0.0, 0.5], [0.0, 0.5]]",
+            "explanation": "Column 0: sum=0, stays [0,0]. Column 1: sum=10, becomes [5/10, 5/10]=[0.5, 0.5]."
+          },
+          {
+            "input": "normalize_by_column([[4, 2], [2, 6]], 3)",
+            "expected": "[[0.667, 0.25], [0.333, 0.75]]",
+            "explanation": "Column 0: sum=6, [4/6, 2/6]=[0.667, 0.333]. Column 1: sum=8, [2/8, 6/8]=[0.25, 0.75]."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing row sums instead of column sums (mixing up i and j indices)",
+        "Iterating incorrectly over 2D lists when computing column sums (need to iterate over all rows for each column index)",
+        "Forgetting to handle zero column sums",
+        "Not maintaining the correct matrix structure when building the normalized result",
+        "Rounding column sums instead of the final normalized values"
+      ],
+      "hint": "Unlike row normalization, you need to compute column sums first. For a KxK matrix, compute K column sums by iterating through all rows for each column index. Then for each entry [i][j], divide by the j-th column sum (if non-zero) and round the result.",
+      "references": [
+        "2D list traversal by columns",
+        "Matrix transpose concepts",
+        "Nested loop patterns for column operations",
+        "Bayes' theorem and inverse probabilities"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Global Normalization and Joint Probability Distribution",
+      "relation_to_problem": "Global normalization (normalize='all') is the third and simplest normalization mode. It divides all entries by the total sample count, converting the confusion matrix into a joint probability distribution P(true=i, predicted=j).",
+      "prerequisites": [
+        "Confusion matrix structure",
+        "Joint probability concepts",
+        "Matrix element-wise operations"
+      ],
+      "learning_objectives": [
+        "Understand global normalization as computing joint probability distributions",
+        "Implement element-wise division by a scalar (total count)",
+        "Recognize that global normalization preserves relative proportions across all cells"
+      ],
+      "math_content": {
+        "definition": "**Global Normalization** transforms a confusion matrix $C$ into a normalized matrix $C^{(\\text{all})}$ by dividing every entry by the total number of samples: $$C^{(\\text{all})}_{ij} = \\frac{C_{ij}}{N}$$ where $N = \\sum_{i=0}^{K-1}\\sum_{j=0}^{K-1} C_{ij}$ is the total number of samples across all entries. If $N=0$ (empty matrix), all entries remain 0.",
+        "notation": "$C^{(\\text{all})}$ = globally normalized confusion matrix, $N$ = total sample count, $C^{(\\text{all})}_{ij}$ = proportion of all samples with true label $i$ and predicted label $j$",
+        "theorem": "**Joint Probability Theorem**: The globally normalized confusion matrix represents the joint probability distribution of true and predicted labels: $$C^{(\\text{all})}_{ij} = P(Y=i, \\hat{Y}=j)$$ The entire matrix sums to 1 (when $N>0$), forming a valid probability distribution over the $(K \\times K)$ outcome space.",
+        "proof_sketch": "By definition of empirical joint probability, the proportion of samples with both $Y=i$ and $\\hat{Y}=j$ is: $$P(Y=i, \\hat{Y}=j) = \\frac{\\text{count of samples with } Y=i \\text{ and } \\hat{Y}=j}{\\text{total samples}} = \\frac{C_{ij}}{N}$$ This is exactly the global normalization formula. Furthermore: $$\\sum_{i=0}^{K-1}\\sum_{j=0}^{K-1} C^{(\\text{all})}_{ij} = \\sum_{i=0}^{K-1}\\sum_{j=0}^{K-1} \\frac{C_{ij}}{N} = \\frac{1}{N}\\sum_{i,j} C_{ij} = \\frac{N}{N} = 1$$ confirming it's a valid probability distribution.",
+        "examples": [
+          "Example 1: Binary matrix $C = \\begin{pmatrix} 6 & 2 \\\\ 1 & 3 \\end{pmatrix}$ with $N=12$. Globally normalized: $C^{(\\text{all})} = \\begin{pmatrix} 0.5 & 0.167 \\\\ 0.083 & 0.25 \\end{pmatrix}$. Interpretation: 50% of all samples are true negatives correctly predicted, 16.7% are false positives, etc.",
+          "Example 2: Perfect classification $C = \\begin{pmatrix} 5 & 0 \\\\ 0 & 5 \\end{pmatrix}$ with $N=10$ gives $C^{(\\text{all})} = \\begin{pmatrix} 0.5 & 0 \\\\ 0 & 0.5 \\end{pmatrix}$. Half the data is class 0 (all correct), half is class 1 (all correct).",
+          "Example 3: Imbalanced data $C = \\begin{pmatrix} 90 & 5 \\\\ 3 & 2 \\end{pmatrix}$ with $N=100$ gives $C^{(\\text{all})} = \\begin{pmatrix} 0.9 & 0.05 \\\\ 0.03 & 0.02 \\end{pmatrix}$. This reveals that 95% of data is class 0, only 5% is class 1, highlighting severe class imbalance."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Total Sample Count",
+          "latex": "$N = \\sum_{i=0}^{K-1}\\sum_{j=0}^{K-1} C_{ij}$",
+          "description": "The sum of all entries in the confusion matrix, equal to the total number of samples evaluated."
+        },
+        {
+          "name": "Globally Normalized Entry",
+          "latex": "$C^{(\\text{all})}_{ij} = \\begin{cases}\\dfrac{C_{ij}}{N} & \\text{if } N>0\\\\[6pt]0 & \\text{otherwise}\\end{cases}$",
+          "description": "Each entry divided by the total sample count. Forms a joint probability distribution."
+        },
+        {
+          "name": "Normalization Property",
+          "latex": "$\\sum_{i=0}^{K-1}\\sum_{j=0}^{K-1} C^{(\\text{all})}_{ij} = 1$ when $N>0$",
+          "description": "The globally normalized matrix sums to 1, satisfying the axioms of probability."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that performs global normalization on a confusion matrix. Compute the sum of all elements in the matrix (total sample count), then divide every element by this sum (if non-zero). Apply rounding to the specified number of decimal places and return the normalized matrix.",
+        "function_signature": "def normalize_globally(matrix, round_decimals=4) -> list:",
+        "starter_code": "def normalize_globally(matrix, round_decimals=4):\n    \"\"\"\n    Normalize a confusion matrix globally (by all samples).\n    \n    Args:\n        matrix: List[List[int|float]] - KxK confusion matrix\n        round_decimals: int - number of decimal places for rounding\n    \n    Returns:\n        List[List[float]]: Globally normalized matrix where all entries sum to 1\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "normalize_globally([[6, 2], [1, 3]], 2)",
+            "expected": "[[0.5, 0.17], [0.08, 0.25]]",
+            "explanation": "Total sum N=12. Each entry divided by 12: [6/12, 2/12, 1/12, 3/12] = [0.5, 0.17, 0.08, 0.25] rounded to 2 decimals."
+          },
+          {
+            "input": "normalize_globally([[1, 0, 0], [0, 0, 1], [0, 1, 1]], 4)",
+            "expected": "[[0.25, 0.0, 0.0], [0.0, 0.0, 0.25], [0.0, 0.25, 0.25]]",
+            "explanation": "Total sum N=4. Each entry divided by 4: [1/4, 0, 0, 0, 0, 1/4, 0, 1/4, 1/4] = all 0.25 or 0."
+          },
+          {
+            "input": "normalize_globally([[0, 0], [0, 0]], 3)",
+            "expected": "[[0.0, 0.0], [0.0, 0.0]]",
+            "explanation": "Total sum N=0. Avoid division by zero, return all zeros."
+          },
+          {
+            "input": "normalize_globally([[5, 5], [5, 5]], 1)",
+            "expected": "[[0.2, 0.2], [0.2, 0.2]]",
+            "explanation": "Total sum N=20. Each 5/20 = 0.25 rounds to 0.2 with 1 decimal place."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Computing row or column sums instead of the total sum of all elements",
+        "Not checking for N=0 case before division",
+        "Incorrectly computing the total sum (e.g., only summing one dimension)",
+        "Forgetting to apply rounding to each normalized value",
+        "Attempting to verify that results sum to 1.0 without accounting for rounding errors"
+      ],
+      "hint": "First, compute the total sum by iterating through all rows and all elements, accumulating the sum. If the total is zero, return a matrix of zeros with the same dimensions. Otherwise, create a new matrix where each entry is the original value divided by the total sum, then rounded.",
+      "references": [
+        "Nested list traversal",
+        "Element-wise scalar division",
+        "Joint probability distributions",
+        "Python sum() with nested structures"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Parameterized Normalization Selection with Switch Logic",
+      "relation_to_problem": "The main problem requires selecting one of four normalization modes based on a string parameter (None, 'true', 'pred', 'all'). This sub-quest teaches how to implement conditional logic that dispatches to different normalization functions based on the mode parameter.",
+      "prerequisites": [
+        "String comparison",
+        "Conditional statements",
+        "Function composition",
+        "All previous normalization techniques"
+      ],
+      "learning_objectives": [
+        "Implement a dispatch pattern to select different normalization strategies",
+        "Handle the case where no normalization is applied (return raw counts)",
+        "Validate input parameters and handle invalid normalization modes",
+        "Compose previously implemented normalization functions into a unified interface"
+      ],
+      "math_content": {
+        "definition": "A **parameterized normalization function** is a higher-order function that selects and applies one of multiple normalization strategies based on a mode parameter: $$\\text{normalize}(C, \\text{mode}) = \\begin{cases} C & \\text{if mode} = \\text{None} \\\\ C^{(\\text{true})} & \\text{if mode} = \\text{'true'} \\\\ C^{(\\text{pred})} & \\text{if mode} = \\text{'pred'} \\\\ C^{(\\text{all})} & \\text{if mode} = \\text{'all'} \\end{cases}$$ where $C$ is the raw confusion matrix and $C^{(\\cdot)}$ represents the respective normalized forms defined in previous sub-quests.",
+        "notation": "$\\text{normalize}(C, \\text{mode})$ = parameterized normalization function, $\\text{mode} \\in \\{\\text{None, 'true', 'pred', 'all'}\\}$ = normalization mode selector",
+        "theorem": "**Idempotence of None Mode**: When mode=None, the normalization function acts as an identity transformation: $$\\text{normalize}(C, \\text{None}) = C$$ This preserves the original count matrix without modification (though type conversion from int to float may occur for consistency).",
+        "proof_sketch": "By definition, when mode=None, the function returns the input matrix unchanged. Formally, for all entries $C_{ij}$: $$\\text{normalize}(C, \\text{None})_{ij} = C_{ij}$$ This satisfies the identity property: $f(x) = x$ for all $x$.",
+        "examples": [
+          "Example 1: mode=None with matrix $[[2,1],[1,2]]$ returns $[[2,1],[1,2]]$ (or $[[2.0,1.0],[1.0,2.0]]$ if converted to float).",
+          "Example 2: mode='true' with matrix $[[4,0],[0,4]]$ returns $[[1.0,0.0],[0.0,1.0]]$ (row-wise normalization).",
+          "Example 3: mode='pred' with matrix $[[3,1],[1,3]]$ returns $[[0.75,0.25],[0.25,0.75]]$ rounded appropriately (column-wise).",
+          "Example 4: mode='all' with matrix $[[5,5],[5,5]]$ with N=20 returns $[[0.25,0.25],[0.25,0.25]]$ (global)."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Mode Dispatch Function",
+          "latex": "$f(\\text{mode}) = \\begin{cases} \\text{identity} & \\text{mode=None} \\\\ \\text{row\\_norm} & \\text{mode='true'} \\\\ \\text{col\\_norm} & \\text{mode='pred'} \\\\ \\text{global\\_norm} & \\text{mode='all'} \\end{cases}$",
+          "description": "Maps mode parameter to the appropriate normalization function. This is a functional dispatch pattern."
+        },
+        {
+          "name": "Normalization Selection",
+          "latex": "$\\text{result} = f(\\text{mode})(C, \\text{round\\_decimals})$",
+          "description": "Apply the selected normalization function to matrix C with the specified rounding parameter."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that accepts a confusion matrix, a normalization mode string, and a rounding parameter. Based on the mode, apply the appropriate normalization (row-wise for 'true', column-wise for 'pred', global for 'all', or no normalization for None). Use if-elif-else logic or a dictionary dispatch pattern. Return the appropriately normalized and rounded matrix.",
+        "function_signature": "def apply_normalization(matrix, normalize_mode=None, round_decimals=4) -> list:",
+        "starter_code": "def apply_normalization(matrix, normalize_mode=None, round_decimals=4):\n    \"\"\"\n    Apply the specified normalization mode to a confusion matrix.\n    \n    Args:\n        matrix: List[List[int|float]] - KxK confusion matrix (raw counts)\n        normalize_mode: None | 'true' | 'pred' | 'all' - normalization strategy\n        round_decimals: int - number of decimal places for rounding (only used when normalizing)\n    \n    Returns:\n        List[List[int|float]]: Normalized matrix according to the specified mode\n    \"\"\"\n    # Your code here\n    # Hint: Use if-elif-else to check normalize_mode and call the appropriate function\n    pass",
+        "test_cases": [
+          {
+            "input": "apply_normalization([[3, 1], [1, 3]], None, 4)",
+            "expected": "[[3, 1], [1, 3]]",
+            "explanation": "mode=None returns the original count matrix unchanged."
+          },
+          {
+            "input": "apply_normalization([[4, 0], [0, 4]], 'true', 2)",
+            "expected": "[[1.0, 0.0], [0.0, 1.0]]",
+            "explanation": "mode='true' applies row-wise normalization. Each row sums to 1."
+          },
+          {
+            "input": "apply_normalization([[3, 1], [1, 3]], 'pred', 3)",
+            "expected": "[[0.75, 0.25], [0.25, 0.75]]",
+            "explanation": "mode='pred' applies column-wise normalization. Column 0: [3,1]/4=[0.75,0.25], Column 1: [1,3]/4=[0.25,0.75]."
+          },
+          {
+            "input": "apply_normalization([[2, 2], [2, 2]], 'all', 2)",
+            "expected": "[[0.25, 0.25], [0.25, 0.25]]",
+            "explanation": "mode='all' applies global normalization. Total=8, each entry 2/8=0.25."
+          },
+          {
+            "input": "apply_normalization([[1, 0, 0], [0, 0, 1], [0, 1, 1]], 'true', 4)",
+            "expected": "[[1.0, 0.0, 0.0], [0.0, 0.0, 1.0], [0.0, 0.5, 0.5]]",
+            "explanation": "Row-wise normalization with 4 decimal places as specified in the main problem example."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using equality checks with = instead of == for string comparison",
+        "Not handling the None case (when normalize_mode is None, not the string 'None')",
+        "Applying rounding even when mode=None (rounding should only apply when normalizing)",
+        "Case sensitivity issues (mode should be exactly 'true', 'pred', or 'all' in lowercase)",
+        "Not returning the matrix in the same format (list of lists) for all modes"
+      ],
+      "hint": "Use a conditional structure: if normalize_mode is None, return the original matrix. elif normalize_mode == 'true', call the row normalization function. elif normalize_mode == 'pred', call the column normalization function. elif normalize_mode == 'all', call the global normalization function. Pass the round_decimals parameter to normalization functions.",
+      "references": [
+        "Python if-elif-else statements",
+        "String comparison and equality",
+        "Function composition patterns",
+        "Dispatcher pattern in Python"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Integrating Components: Full Confusion Matrix Pipeline",
+      "relation_to_problem": "This final sub-quest combines all previous components—building the count matrix from labels, selecting the appropriate normalization mode, and handling edge cases—to create a complete confusion matrix computation pipeline that solves the main problem.",
+      "prerequisites": [
+        "Building count matrices",
+        "All normalization techniques",
+        "Parameter validation",
+        "Edge case handling"
+      ],
+      "learning_objectives": [
+        "Integrate multiple components (counting, normalization, rounding) into a unified pipeline",
+        "Validate input parameters (matching lengths of y_true and y_pred, valid class labels)",
+        "Handle edge cases (empty inputs, all zeros, missing classes)",
+        "Ensure output format consistency across all normalization modes"
+      ],
+      "math_content": {
+        "definition": "The **complete confusion matrix pipeline** is a composition of functions: $$\\text{compute\\_cm}(y_{\\text{true}}, y_{\\text{pred}}, K, \\text{mode}, d) = \\text{normalize}(\\text{build\\_count}(y_{\\text{true}}, y_{\\text{pred}}, K), \\text{mode}, d)$$ where $y_{\\text{true}}$ and $y_{\\text{pred}}$ are label vectors, $K$ is the number of classes, mode is the normalization strategy, and $d$ is the rounding precision. This represents function composition: first build the count matrix, then apply normalization.",
+        "notation": "$\\circ$ = function composition operator, $f \\circ g$ means apply $g$ first then $f$, $\\text{compute\\_cm}$ = complete pipeline function",
+        "theorem": "**Pipeline Correctness Theorem**: The confusion matrix pipeline produces consistent output across all normalization modes when given valid inputs. Specifically:\n1. Output dimensions are always $K \\times K$ regardless of input labels\n2. When mode=None, output contains integer counts\n3. When mode $\\in$ {'true', 'pred', 'all'}, output contains floats rounded to $d$ decimals\n4. For non-empty normalized matrices: row sums equal 1 (mode='true'), column sums equal 1 (mode='pred'), or total sum equals 1 (mode='all')",
+        "proof_sketch": "By construction: (1) The count matrix builder always creates a $K \\times K$ matrix using the num_classes parameter, not the data. (2) When mode=None, the normalize function returns the count matrix unchanged, preserving integer types. (3) When mode specifies normalization, the normalize function divides by sums (converting to float) and applies rounding with precision $d$. (4) The normalization theorems from previous sub-quests guarantee that non-empty rows/columns/entire matrix sum to 1 after normalization.",
+        "examples": [
+          "Example 1 (Main problem): $y_{\\text{true}}=[0,1,2,2]$, $y_{\\text{pred}}=[0,2,1,2]$, $K=3$, mode='true', $d=4$. Count matrix: $[[1,0,0],[0,0,1],[0,1,1]]$. Row normalization: row 0 sum=1 → [1,0,0], row 1 sum=1 → [0,0,1], row 2 sum=2 → [0, 0.5, 0.5]. Result: $[[1.0,0.0,0.0],[0.0,0.0,1.0],[0.0,0.5,0.5]]$.",
+          "Example 2 (No normalization): Same inputs with mode=None returns $[[1,0,0],[0,0,1],[0,1,1]]$ (integers).",
+          "Example 3 (Edge case): Empty inputs $y_{\\text{true}}=[]$, $y_{\\text{pred}}=[]$, $K=2$ returns $[[0,0],[0,0]]$ for any mode."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Pipeline Composition",
+          "latex": "$\\text{CM}_{\\text{final}} = \\text{normalize}(\\text{build\\_count}(y_{\\text{true}}, y_{\\text{pred}}, K), \\text{mode}, d)$",
+          "description": "The final confusion matrix is obtained by first building counts, then applying the selected normalization with rounding."
+        },
+        {
+          "name": "Input Validation Constraint",
+          "latex": "$|y_{\\text{true}}| = |y_{\\text{pred}}| = N$ and $\\forall i: y_{\\text{true}}[i], y_{\\text{pred}}[i] \\in \\{0,1,\\ldots,K-1\\}$",
+          "description": "Input vectors must have the same length and all labels must be valid class indices in the range [0, K-1]."
+        }
+      ],
+      "exercise": {
+        "description": "Implement the complete confusion matrix computation function that integrates all previous components. Build the count matrix from input labels, apply the specified normalization mode, and return the result. The function should handle all edge cases (empty inputs, zero rows/columns) and produce output matching the exact format required by the main problem.",
+        "function_signature": "def compute_confusion_matrix_full(y_true, y_pred, num_classes, normalize=None, round_decimals=4) -> list:",
+        "starter_code": "def compute_confusion_matrix_full(y_true, y_pred, num_classes, normalize=None, round_decimals=4):\n    \"\"\"\n    Compute a confusion matrix with optional normalization.\n    \n    Args:\n        y_true: Iterable of true labels in [0, K-1]\n        y_pred: Iterable of predicted labels in [0, K-1]\n        num_classes: K, number of classes\n        normalize: None | 'true' | 'pred' | 'all'\n        round_decimals: decimals to round when normalization is applied\n    \n    Returns:\n        List[List[int|float]]: KxK confusion matrix\n    \"\"\"\n    # Step 1: Build the count matrix\n    # Step 2: Apply normalization based on mode\n    # Step 3: Return the result\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_confusion_matrix_full([0,1,2,2], [0,2,1,2], 3, 'true', 4)",
+            "expected": "[[1.0, 0.0, 0.0], [0.0, 0.0, 1.0], [0.0, 0.5, 0.5]]",
+            "explanation": "Main problem example: count matrix [[1,0,0],[0,0,1],[0,1,1]], row-normalized with 4 decimals."
+          },
+          {
+            "input": "compute_confusion_matrix_full([0,1,0,1], [0,0,1,1], 2, None, 4)",
+            "expected": "[[1, 1], [1, 1]]",
+            "explanation": "No normalization, return raw counts as integers."
+          },
+          {
+            "input": "compute_confusion_matrix_full([0,0,1,1], [0,0,1,1], 2, 'pred', 2)",
+            "expected": "[[1.0, 0.0], [0.0, 1.0]]",
+            "explanation": "Perfect classification, column-normalized. Both columns sum to 1."
+          },
+          {
+            "input": "compute_confusion_matrix_full([0,1,2], [1,2,0], 3, 'all', 3)",
+            "expected": "[[0.0, 0.333, 0.0], [0.0, 0.0, 0.333], [0.333, 0.0, 0.0]]",
+            "explanation": "All predictions wrong, global normalization: 3 entries of 1/3 each, rounded to 3 decimals."
+          },
+          {
+            "input": "compute_confusion_matrix_full([], [], 2, 'true', 4)",
+            "expected": "[[0.0, 0.0], [0.0, 0.0]]",
+            "explanation": "Empty inputs produce zero matrix. With normalization mode, output is floats."
+          },
+          {
+            "input": "compute_confusion_matrix_full([2,2,2], [0,0,0], 4, 'true', 2)",
+            "expected": "[[0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0]]",
+            "explanation": "Only class 2 appears (true), only class 0 predicted. Matrix is 4x4 with entry [2][0]=3, row-normalized to [1.0, 0, 0, 0] in row 2."
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not initializing matrix with correct size num_classes × num_classes (using max(labels) instead)",
+        "Returning integers when normalization is applied (should be floats)",
+        "Not handling empty input lists (should return zero matrix)",
+        "Applying rounding when normalize=None (should only round when normalizing)",
+        "Not preserving the list[list] output format (some implementations might use numpy arrays)",
+        "Forgetting to handle labels that don't appear in the input data (those rows/columns should be zeros)"
+      ],
+      "hint": "Structure your solution in three clear steps: (1) Create a KxK matrix of zeros and populate it by iterating through paired (y_true, y_pred) labels; (2) Check the normalize parameter and call the appropriate normalization function from previous exercises; (3) Return the result ensuring the correct type (int for None, float for normalized).",
+      "references": [
+        "Function composition in Python",
+        "Input validation patterns",
+        "Type consistency in return values",
+        "Integration testing strategies"
+      ]
+    }
+  ]
+}

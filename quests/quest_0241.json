@@ -1,0 +1,450 @@
+{
+  "problem_id": 241,
+  "title": "Sobel Edge Detection",
+  "category": "Computer Vision",
+  "difficulty": "medium",
+  "description": "## Task: Sobel Edge Detection\n\nEdge detection is a fundamental technique in computer vision used to identify boundaries within images. In this task, you will implement a function `sobel_edge_detection(image)` that applies the Sobel operator to detect edges in a grayscale image.\n\n### Input:\n- `image`: A 2D list/array representing a grayscale image with pixel values in range [0, 255]\n\n### Output:\n- Return the edge magnitude image as a 2D list with integer values normalized to [0, 255]\n- The output dimensions will be (H-2, W-2) due to valid convolution (no padding)\n- Return `-1` for invalid inputs\n\n### Edge Cases to Handle:\n- Input is not a valid 2D array\n- Image dimensions are smaller than 3x3 (minimum required for Sobel)\n- Any pixel values are outside the valid range (0-255)\n- Empty image\n\n### Notes:\n- Use the standard Sobel kernels for gradient computation\n- Compute gradient magnitude from horizontal and vertical gradients\n- Normalize the output to the range [0, 255] based on the maximum magnitude value",
+  "example": {
+    "input": "image = [[0, 0, 255], [0, 0, 255], [0, 0, 255]]\nprint(sobel_edge_detection(image))",
+    "output": "[[255]]",
+    "reasoning": "This 3x3 image has a strong vertical edge (black on left, white on right). The Sobel operator computes: Gx = 1020 (strong horizontal gradient), Gy = 0 (no vertical gradient). The magnitude sqrt(1020^2 + 0^2) = 1020 is normalized to 255 since it's the maximum value."
+  },
+  "starter_code": "import numpy as np\n\ndef sobel_edge_detection(image):\n    \"\"\"\n    Apply Sobel edge detection to a grayscale image.\n    \n    Args:\n        image: 2D list/array representing a grayscale image\n               with values in range [0, 255]\n    \n    Returns:\n        Edge magnitude image as 2D list with integer values (0-255),\n        or -1 if input is invalid\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Discrete Convolution in Image Processing",
+      "relation_to_problem": "The Sobel operator applies 3x3 convolution kernels to the image. Understanding discrete convolution is fundamental to computing gradients at each pixel position.",
+      "prerequisites": [
+        "Linear algebra basics",
+        "Matrix operations",
+        "Basic Python programming"
+      ],
+      "learning_objectives": [
+        "Understand the formal mathematical definition of discrete 2D convolution",
+        "Implement element-wise convolution for a single kernel and image window",
+        "Recognize how convolution computes weighted sums of neighborhoods"
+      ],
+      "math_content": {
+        "definition": "For a discrete 2D image $I$ and kernel $K$ of size $(2k+1) \\times (2k+1)$, the convolution at position $(i,j)$ is defined as: $$S(i,j) = (I * K)(i,j) = \\sum_{m=-k}^{k} \\sum_{n=-k}^{k} I(i+m, j+n) \\cdot K(k+m, k+n)$$ where $*$ denotes the convolution operator. For a $3 \\times 3$ kernel, $k=1$.",
+        "notation": "$I(i,j)$ = intensity value at pixel position $(i,j)$; $K(m,n)$ = kernel weight at position $(m,n)$; $S(i,j)$ = convolution result at position $(i,j)$",
+        "theorem": "Convolution Linearity Theorem: Convolution is a linear operation. For images $I_1$, $I_2$ and scalar $\\alpha$: $(\\alpha I_1 + I_2) * K = \\alpha(I_1 * K) + (I_2 * K)$",
+        "proof_sketch": "By distributivity of multiplication over addition: $\\sum_{m,n} (\\alpha I_1(i+m,j+n) + I_2(i+m,j+n)) \\cdot K(m,n) = \\alpha \\sum_{m,n} I_1(i+m,j+n) \\cdot K(m,n) + \\sum_{m,n} I_2(i+m,j+n) \\cdot K(m,n)$",
+        "examples": [
+          "For a $3 \\times 3$ image window $\\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\\\ 7 & 8 & 9 \\end{bmatrix}$ and kernel $\\begin{bmatrix} 0 & 1 & 0 \\\\ 1 & -4 & 1 \\\\ 0 & 1 & 0 \\end{bmatrix}$, the convolution result is: $(0 \\cdot 1) + (1 \\cdot 2) + (0 \\cdot 3) + (1 \\cdot 4) + (-4 \\cdot 5) + (1 \\cdot 6) + (0 \\cdot 7) + (1 \\cdot 8) + (0 \\cdot 9) = 2 + 4 - 20 + 6 + 8 = 0$",
+          "Identity kernel $\\begin{bmatrix} 0 & 0 & 0 \\\\ 0 & 1 & 0 \\\\ 0 & 0 & 0 \\end{bmatrix}$ returns the center pixel: $S(i,j) = I(i,j)$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "2D Discrete Convolution",
+          "latex": "$S(i,j) = \\sum_{m=-1}^{1} \\sum_{n=-1}^{1} I(i+m, j+n) \\cdot K(m+1, n+1)$",
+          "description": "Use this to compute the weighted sum of a $3 \\times 3$ neighborhood around pixel $(i,j)$"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the convolution of a 3x3 image window with a given 3x3 kernel. This is the core operation needed for Sobel edge detection.",
+        "function_signature": "def convolve_window(window: list[list[int]], kernel: list[list[int]]) -> int:",
+        "starter_code": "def convolve_window(window, kernel):\n    \"\"\"\n    Compute convolution of a 3x3 window with a 3x3 kernel.\n    \n    Args:\n        window: 3x3 list of pixel values\n        kernel: 3x3 list of kernel weights\n    \n    Returns:\n        Integer sum of element-wise products\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "convolve_window([[1,2,3],[4,5,6],[7,8,9]], [[1,0,-1],[1,0,-1],[1,0,-1]])",
+            "expected": "-12",
+            "explanation": "Sum = (1·1)+(2·0)+(3·-1)+(4·1)+(5·0)+(6·-1)+(7·1)+(8·0)+(9·-1) = 1-3+4-6+7-9 = -6... wait, = 1+0-3+4+0-6+7+0-9 = -6"
+          },
+          {
+            "input": "convolve_window([[0,0,0],[0,1,0],[0,0,0]], [[0,0,0],[0,1,0],[0,0,0]])",
+            "expected": "1",
+            "explanation": "Identity kernel on single pixel returns 1"
+          },
+          {
+            "input": "convolve_window([[100,100,100],[100,100,100],[100,100,100]], [[1,1,1],[1,1,1],[1,1,1]])",
+            "expected": "900",
+            "explanation": "Uniform image with sum kernel: 100·9 = 900"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing row-major indexing: kernel[row][col] not kernel[col][row]",
+        "Off-by-one errors when indexing kernel elements",
+        "Not handling negative convolution results (edges can produce negative values)"
+      ],
+      "hint": "Use nested loops to iterate through all 9 positions. Multiply corresponding elements and accumulate the sum.",
+      "references": [
+        "Digital Image Processing - Gonzalez & Woods (Chapter 3)",
+        "Discrete convolution properties",
+        "Correlation vs. Convolution"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Gradient Approximation via Finite Differences",
+      "relation_to_problem": "The Sobel operator approximates image gradients using finite differences. Understanding how discrete derivatives work is essential to interpreting what the Sobel kernels compute.",
+      "prerequisites": [
+        "Calculus (partial derivatives)",
+        "Discrete approximations",
+        "Convolution from Step 1"
+      ],
+      "learning_objectives": [
+        "Understand how continuous gradients are approximated in discrete domains",
+        "Compute first-order finite difference approximations",
+        "Recognize that convolution with difference kernels computes discrete derivatives"
+      ],
+      "math_content": {
+        "definition": "The gradient of a continuous 2D function $f(x,y)$ is the vector of partial derivatives: $$\\nabla f = \\begin{bmatrix} \\frac{\\partial f}{\\partial x} \\\\ \\frac{\\partial f}{\\partial y} \\end{bmatrix}$$ For discrete images, we approximate partial derivatives using finite differences: $$\\frac{\\partial I}{\\partial x} \\bigg|_{(i,j)} \\approx \\frac{I(i,j+1) - I(i,j-1)}{2}$$ $$\\frac{\\partial I}{\\partial y} \\bigg|_{(i,j)} \\approx \\frac{I(i+1,j) - I(i-1,j)}{2}$$",
+        "notation": "$\\nabla f$ = gradient vector; $\\frac{\\partial f}{\\partial x}$ = partial derivative with respect to x; $I(i,j)$ = discrete image intensity at row $i$, column $j$",
+        "theorem": "Central Difference Theorem: The central difference approximation $\\frac{f(x+h) - f(x-h)}{2h}$ has truncation error $O(h^2)$, making it more accurate than forward/backward differences which have error $O(h)$.",
+        "proof_sketch": "Using Taylor expansion: $f(x+h) = f(x) + hf'(x) + \\frac{h^2}{2}f''(x) + O(h^3)$ and $f(x-h) = f(x) - hf'(x) + \\frac{h^2}{2}f''(x) + O(h^3)$. Subtracting: $f(x+h) - f(x-h) = 2hf'(x) + O(h^3)$, thus $\\frac{f(x+h)-f(x-h)}{2h} = f'(x) + O(h^2)$.",
+        "examples": [
+          "For row $[50, 100, 150]$, the central difference at middle position is: $\\frac{150-50}{2} = 50$, indicating intensity increases by 50 units per pixel",
+          "For uniform region $[100, 100, 100]$, gradient is $\\frac{100-100}{2} = 0$, indicating no edge"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Central Difference (Horizontal)",
+          "latex": "$\\frac{\\partial I}{\\partial x}\\bigg|_{(i,j)} \\approx \\frac{I(i,j+1) - I(i,j-1)}{2}$",
+          "description": "Approximates horizontal gradient using left and right neighbors"
+        },
+        {
+          "name": "Central Difference (Vertical)",
+          "latex": "$\\frac{\\partial I}{\\partial y}\\bigg|_{(i,j)} \\approx \\frac{I(i+1,j) - I(i-1,j)}{2}$",
+          "description": "Approximates vertical gradient using top and bottom neighbors"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes horizontal and vertical gradients at a center pixel using central differences. This is a simplified version of what Sobel does on a single row/column.",
+        "function_signature": "def compute_central_difference(neighbors: dict) -> tuple[float, float]:",
+        "starter_code": "def compute_central_difference(neighbors):\n    \"\"\"\n    Compute horizontal and vertical gradients using central differences.\n    \n    Args:\n        neighbors: Dictionary with keys 'left', 'right', 'top', 'bottom'\n                   containing pixel intensity values\n    \n    Returns:\n        Tuple (gx, gy) where gx is horizontal gradient, gy is vertical gradient\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_central_difference({'left': 0, 'right': 100, 'top': 50, 'bottom': 50})",
+            "expected": "(50.0, 0.0)",
+            "explanation": "Horizontal gradient: (100-0)/2 = 50, vertical gradient: (50-50)/2 = 0. Strong vertical edge."
+          },
+          {
+            "input": "compute_central_difference({'left': 100, 'right': 100, 'top': 0, 'bottom': 200})",
+            "expected": "(0.0, 100.0)",
+            "explanation": "Horizontal gradient: (100-100)/2 = 0, vertical gradient: (200-0)/2 = 100. Strong horizontal edge."
+          },
+          {
+            "input": "compute_central_difference({'left': 50, 'right': 50, 'top': 50, 'bottom': 50})",
+            "expected": "(0.0, 0.0)",
+            "explanation": "Uniform region, no gradient in any direction"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing x/y coordinates with row/column indexing (x is horizontal/column, y is vertical/row)",
+        "Forgetting the division by 2 in central difference formula",
+        "Not recognizing that gradients can be negative (decreasing intensity)"
+      ],
+      "hint": "The gradient in each direction is simply the difference between opposing neighbors divided by 2.",
+      "references": [
+        "Finite difference methods",
+        "Numerical differentiation",
+        "Image gradient computation"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Weighted Gradient Estimation with Sobel Kernels",
+      "relation_to_problem": "The Sobel operator extends simple finite differences by incorporating weighted averages from neighboring rows/columns, providing noise robustness. Understanding these kernels is central to the solution.",
+      "prerequisites": [
+        "Convolution (Step 1)",
+        "Finite differences (Step 2)",
+        "Matrix operations"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical derivation of Sobel kernels",
+        "Apply Sobel kernels to compute directional gradients",
+        "Recognize how Sobel combines differentiation and smoothing"
+      ],
+      "math_content": {
+        "definition": "The Sobel operator computes weighted approximations to the image gradient using separable convolution kernels. The horizontal Sobel kernel is: $$G_x = \\begin{bmatrix} -1 & 0 & 1 \\\\ -2 & 0 & 2 \\\\ -1 & 0 & 1 \\end{bmatrix} = \\begin{bmatrix} 1 \\\\ 2 \\\\ 1 \\end{bmatrix} \\begin{bmatrix} -1 & 0 & 1 \\end{bmatrix}$$ The vertical Sobel kernel is: $$G_y = \\begin{bmatrix} -1 & -2 & -1 \\\\ 0 & 0 & 0 \\\\ 1 & 2 & 1 \\end{bmatrix} = \\begin{bmatrix} -1 \\\\ 0 \\\\ 1 \\end{bmatrix} \\begin{bmatrix} 1 & 2 & 1 \\end{bmatrix}$$ These kernels are products of a derivative filter $[-1, 0, 1]$ and a smoothing filter $[1, 2, 1]^T$ (unnormalized binomial approximation to Gaussian).",
+        "notation": "$G_x$ = horizontal Sobel kernel (detects vertical edges); $G_y$ = vertical Sobel kernel (detects horizontal edges); $*$ = convolution operator",
+        "theorem": "Sobel Separability Theorem: The Sobel operator can be computed as two 1D convolutions (one for smoothing, one for differentiation), reducing computational complexity from $O(n^2)$ to $O(2n)$ per kernel application.",
+        "proof_sketch": "Since $G_x = \\mathbf{s} \\mathbf{d}^T$ where $\\mathbf{s} = [1,2,1]^T$ and $\\mathbf{d} = [-1,0,1]$, we have $(I * G_x) = (I * \\mathbf{s}) * \\mathbf{d}^T$ by associativity of convolution. This allows computing the smoothing in one direction, then differentiation in the perpendicular direction.",
+        "examples": [
+          "For a vertical edge image window $\\begin{bmatrix} 0 & 0 & 255 \\\\ 0 & 0 & 255 \\\\ 0 & 0 & 255 \\end{bmatrix}$, applying $G_x$: $(0·(-1) + 0·0 + 255·1) + (0·(-2) + 0·0 + 255·2) + (0·(-1) + 0·0 + 255·1) = 255 + 510 + 255 = 1020$. Strong positive horizontal gradient.",
+          "For horizontal edge $\\begin{bmatrix} 0 & 0 & 0 \\\\ 0 & 0 & 0 \\\\ 255 & 255 & 255 \\end{bmatrix}$, applying $G_y$: $(0·(-1) + 0·(-2) + 0·(-1)) + (0·0 + 0·0 + 0·0) + (255·1 + 255·2 + 255·1) = 0 + 0 + 1020 = 1020$. Strong positive vertical gradient."
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Sobel Horizontal Gradient",
+          "latex": "$G_x(i,j) = \\sum_{m=-1}^{1} \\sum_{n=-1}^{1} I(i+m, j+n) \\cdot S_x(m+1, n+1)$",
+          "description": "Convolve image with horizontal Sobel kernel to detect vertical edges"
+        },
+        {
+          "name": "Sobel Vertical Gradient",
+          "latex": "$G_y(i,j) = \\sum_{m=-1}^{1} \\sum_{n=-1}^{1} I(i+m, j+n) \\cdot S_y(m+1, n+1)$",
+          "description": "Convolve image with vertical Sobel kernel to detect horizontal edges"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that applies a single Sobel kernel (either horizontal or vertical) to a 3x3 image window. This builds directly toward the full Sobel implementation.",
+        "function_signature": "def apply_sobel_kernel(window: list[list[int]], direction: str) -> int:",
+        "starter_code": "def apply_sobel_kernel(window, direction):\n    \"\"\"\n    Apply Sobel kernel to a 3x3 window.\n    \n    Args:\n        window: 3x3 list of pixel values\n        direction: 'horizontal' for Gx or 'vertical' for Gy\n    \n    Returns:\n        Integer gradient value (can be negative)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "apply_sobel_kernel([[0,0,255],[0,0,255],[0,0,255]], 'horizontal')",
+            "expected": "1020",
+            "explanation": "Vertical edge (black left, white right) produces strong positive horizontal gradient: 255(1+2+1) = 1020"
+          },
+          {
+            "input": "apply_sobel_kernel([[0,0,0],[0,0,0],[255,255,255]], 'vertical')",
+            "expected": "1020",
+            "explanation": "Horizontal edge (black top, white bottom) produces strong positive vertical gradient: 255(1+2+1) = 1020"
+          },
+          {
+            "input": "apply_sobel_kernel([[255,0,255],[0,255,0],[255,0,255]], 'horizontal')",
+            "expected": "0",
+            "explanation": "Checkerboard pattern has symmetric horizontal differences that cancel out"
+          },
+          {
+            "input": "apply_sobel_kernel([[100,100,100],[100,100,100],[100,100,100]], 'vertical')",
+            "expected": "0",
+            "explanation": "Uniform region has no gradient"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing which kernel detects which edges: Gx detects VERTICAL edges (horizontal gradient), Gy detects HORIZONTAL edges (vertical gradient)",
+        "Not handling negative gradient values correctly",
+        "Hardcoding kernel values incorrectly (double-check the signs and magnitudes)"
+      ],
+      "hint": "Define both Sobel kernels as 2D lists, select the appropriate one based on direction parameter, then use your convolution function from Step 1.",
+      "references": [
+        "Sobel operator derivation",
+        "Separable filters",
+        "Edge orientation vs. gradient direction"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Gradient Magnitude and Vector Geometry",
+      "relation_to_problem": "The Sobel edge strength is computed as the magnitude of the gradient vector formed by horizontal and vertical components. Understanding vector magnitude is essential for combining Gx and Gy.",
+      "prerequisites": [
+        "Linear algebra (vectors)",
+        "Pythagorean theorem",
+        "Sobel kernels (Step 3)"
+      ],
+      "learning_objectives": [
+        "Understand the geometric interpretation of image gradients as vectors",
+        "Compute gradient magnitude using the Euclidean norm",
+        "Recognize why magnitude represents edge strength"
+      ],
+      "math_content": {
+        "definition": "The gradient at pixel $(i,j)$ forms a 2D vector $\\mathbf{g}(i,j) = [G_x(i,j), G_y(i,j)]^T$. The gradient magnitude (edge strength) is the Euclidean norm of this vector: $$M(i,j) = \\|\\mathbf{g}(i,j)\\| = \\sqrt{G_x^2(i,j) + G_y^2(i,j)}$$ The magnitude represents the maximum rate of intensity change at that pixel, regardless of direction.",
+        "notation": "$\\mathbf{g}$ = gradient vector; $\\|\\cdot\\|$ = Euclidean norm; $M(i,j)$ = gradient magnitude (edge strength) at pixel $(i,j)$",
+        "theorem": "Maximum Gradient Theorem: The gradient vector $\\nabla f$ points in the direction of maximum rate of increase of $f$, and its magnitude $\\|\\nabla f\\|$ equals the maximum directional derivative.",
+        "proof_sketch": "The directional derivative in direction $\\mathbf{u}$ is $D_{\\mathbf{u}}f = \\nabla f \\cdot \\mathbf{u} = \\|\\nabla f\\| \\|\\mathbf{u}\\| \\cos\\theta$. Since $\\|\\mathbf{u}\\| = 1$ for unit vectors, this is maximized when $\\cos\\theta = 1$, i.e., when $\\mathbf{u}$ aligns with $\\nabla f$, giving $D_{\\mathbf{u}}f = \\|\\nabla f\\|$.",
+        "examples": [
+          "For $G_x = 30$, $G_y = 40$, the magnitude is $\\sqrt{30^2 + 40^2} = \\sqrt{900 + 1600} = \\sqrt{2500} = 50$",
+          "For pure horizontal edge with $G_x = 100$, $G_y = 0$: $M = \\sqrt{100^2 + 0^2} = 100$",
+          "For diagonal edge with $G_x = G_y = 50$: $M = \\sqrt{50^2 + 50^2} = 50\\sqrt{2} \\approx 70.7$, showing diagonal edges have higher magnitude for same component values"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Gradient Magnitude",
+          "latex": "$M(i,j) = \\sqrt{G_x^2(i,j) + G_y^2(i,j)}$",
+          "description": "Compute edge strength by combining horizontal and vertical gradients"
+        },
+        {
+          "name": "Gradient Direction",
+          "latex": "$\\theta(i,j) = \\arctan\\left(\\frac{G_y(i,j)}{G_x(i,j)}\\right)$",
+          "description": "Compute edge orientation (perpendicular to gradient direction)"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the gradient magnitude from horizontal and vertical gradient components. This combines the outputs from Step 3 to produce edge strength.",
+        "function_signature": "def compute_gradient_magnitude(gx: float, gy: float) -> float:",
+        "starter_code": "def compute_gradient_magnitude(gx, gy):\n    \"\"\"\n    Compute gradient magnitude from horizontal and vertical components.\n    \n    Args:\n        gx: Horizontal gradient (from Sobel Gx)\n        gy: Vertical gradient (from Sobel Gy)\n    \n    Returns:\n        Gradient magnitude as a float\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_gradient_magnitude(0, 0)",
+            "expected": "0.0",
+            "explanation": "No gradient in uniform region produces zero magnitude"
+          },
+          {
+            "input": "compute_gradient_magnitude(30, 40)",
+            "expected": "50.0",
+            "explanation": "Classic 3-4-5 right triangle: sqrt(900 + 1600) = 50"
+          },
+          {
+            "input": "compute_gradient_magnitude(1020, 0)",
+            "expected": "1020.0",
+            "explanation": "Pure vertical edge (from Step 3 example) has magnitude equal to Gx"
+          },
+          {
+            "input": "compute_gradient_magnitude(-100, 100)",
+            "expected": "141.42135623730951",
+            "explanation": "Diagonal edge: sqrt(10000 + 10000) = 100*sqrt(2) ≈ 141.42"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to take the square root (computing G_x^2 + G_y^2 instead of sqrt(G_x^2 + G_y^2))",
+        "Not handling negative gradient values correctly (squaring eliminates sign, which is correct)",
+        "Using abs(gx) + abs(gy) as a shortcut (Manhattan distance), which is faster but less accurate"
+      ],
+      "hint": "Use the Pythagorean theorem: the magnitude of vector [a, b] is sqrt(a² + b²).",
+      "references": [
+        "Vector norms",
+        "Euclidean distance",
+        "Gradient vectors in multivariable calculus"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Image Border Handling and Valid Convolution",
+      "relation_to_problem": "The Sobel operator requires a 3x3 neighborhood, making it impossible to compute gradients at image borders. Understanding valid convolution and output dimensions is crucial for the implementation.",
+      "prerequisites": [
+        "Convolution (Step 1)",
+        "Array indexing",
+        "Boundary conditions"
+      ],
+      "learning_objectives": [
+        "Understand why convolution reduces output dimensions",
+        "Implement valid convolution that only processes complete neighborhoods",
+        "Calculate output dimensions for arbitrary kernel sizes"
+      ],
+      "math_content": {
+        "definition": "For an image of size $H \\times W$ and kernel of size $K \\times K$, valid convolution (no padding) produces an output of size $(H-K+1) \\times (W-K+1)$. For a $3 \\times 3$ Sobel kernel, the output is $(H-2) \\times (W-2)$. Valid convolution only computes results where the kernel fully overlaps the image: $$S(i,j) = \\sum_{m=0}^{K-1} \\sum_{n=0}^{K-1} I(i+m, j+n) \\cdot K(m,n)$$ for $0 \\leq i \\leq H-K$ and $0 \\leq j \\leq W-K$.",
+        "notation": "$H$ = image height (rows); $W$ = image width (columns); $K$ = kernel size; $S(i,j)$ = output at position $(i,j)$",
+        "theorem": "Valid Convolution Dimension Theorem: For input size $N$ and kernel size $K$, valid convolution produces output size $N - K + 1$. This generalizes to 2D as $(H-K+1) \\times (W-K+1)$.",
+        "proof_sketch": "The first valid kernel position is at index 0 (kernel starts at image corner). The last valid position is at index $N-K$ (kernel ends at image corner). The number of valid positions is $(N-K) - 0 + 1 = N-K+1$.",
+        "examples": [
+          "A $5 \\times 5$ image with $3 \\times 3$ kernel produces $(5-3+1) \\times (5-3+1) = 3 \\times 3$ output",
+          "A $3 \\times 3$ image with $3 \\times 3$ kernel produces $(3-3+1) \\times (3-3+1) = 1 \\times 1$ output (single value)",
+          "A $2 \\times 2$ image is too small for a $3 \\times 3$ kernel: $(2-3+1) = 0$, no valid positions"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Valid Convolution Output Size",
+          "latex": "$H_{out} = H - K + 1, \\quad W_{out} = W - K + 1$",
+          "description": "Calculate output dimensions for valid convolution without padding"
+        },
+        {
+          "name": "Minimum Image Size",
+          "latex": "$H \\geq K \\text{ and } W \\geq K$",
+          "description": "Image must be at least as large as kernel for valid convolution"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that extracts all valid 3x3 windows from an image and returns their positions and content. This is essential for iterating through the image during Sobel edge detection.",
+        "function_signature": "def extract_windows(image: list[list[int]]) -> list[tuple[int, int, list[list[int]]]]:",
+        "starter_code": "def extract_windows(image):\n    \"\"\"\n    Extract all valid 3x3 windows from an image.\n    \n    Args:\n        image: 2D list representing grayscale image\n    \n    Returns:\n        List of tuples (i, j, window) where:\n        - i, j are the output coordinates (0-indexed)\n        - window is the 3x3 subimage at position (i, j)\n        Returns empty list if image is too small\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "extract_windows([[1,2,3],[4,5,6],[7,8,9]])",
+            "expected": "[(0, 0, [[1,2,3],[4,5,6],[7,8,9]])]",
+            "explanation": "A 3x3 image has exactly one valid 3x3 window at position (0,0)"
+          },
+          {
+            "input": "extract_windows([[1,2],[3,4]])",
+            "expected": "[]",
+            "explanation": "A 2x2 image is too small for 3x3 windows"
+          },
+          {
+            "input": "len(extract_windows([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]]))",
+            "expected": "4",
+            "explanation": "A 4x4 image produces (4-2)×(4-2) = 2×2 = 4 valid windows"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Off-by-one errors in loop bounds (should iterate from 0 to H-3, not H-2)",
+        "Forgetting to validate minimum image size before processing",
+        "Confusing input coordinates (which pixel to center on) with output coordinates (position in result array)"
+      ],
+      "hint": "For a 3x3 kernel, iterate i from 0 to H-3 and j from 0 to W-3. Extract window from image[i:i+3][j:j+3].",
+      "references": [
+        "Valid vs. same vs. full convolution",
+        "Padding strategies",
+        "Boundary conditions in image processing"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Normalization and Dynamic Range Mapping",
+      "relation_to_problem": "Sobel magnitudes can exceed the display range [0, 255]. Normalization maps the full range of gradient magnitudes to [0, 255] for visualization, preserving relative edge strengths.",
+      "prerequisites": [
+        "Linear transformations",
+        "Min-max scaling",
+        "Gradient magnitude (Step 4)"
+      ],
+      "learning_objectives": [
+        "Understand min-max normalization for dynamic range mapping",
+        "Implement normalization that preserves relative differences",
+        "Handle edge cases like zero-range inputs"
+      ],
+      "math_content": {
+        "definition": "Min-max normalization maps values from range $[m, M]$ to target range $[a, b]$ using the linear transformation: $$x_{normalized} = a + \\frac{(x - m)(b - a)}{M - m}$$ For Sobel edge detection, we map gradient magnitudes from $[0, M_{max}]$ to $[0, 255]$: $$M_{normalized}(i,j) = \\frac{M(i,j)}{M_{max}} \\times 255$$ where $M_{max} = \\max_{i,j} M(i,j)$ is the maximum magnitude in the image.",
+        "notation": "$m$ = minimum value in original range; $M$ = maximum value in original range; $[a,b]$ = target range; $M_{max}$ = maximum gradient magnitude",
+        "theorem": "Affine Transformation Theorem: Min-max normalization is an affine transformation that preserves the ordering and relative distances between values. If $x_1 < x_2$, then $f(x_1) < f(x_2)$ where $f$ is the normalization function.",
+        "proof_sketch": "The normalization function $f(x) = a + \\frac{(x-m)(b-a)}{M-m}$ is a linear function with positive slope $\\frac{b-a}{M-m} > 0$ (assuming $M > m$ and $b > a$). Linear functions with positive slope are strictly increasing, thus preserving order.",
+        "examples": [
+          "Magnitude range $[0, 1020]$ normalized to $[0, 255]$: for $M=510$, $M_{norm} = \\frac{510}{1020} \\times 255 = 127.5 \\approx 128$",
+          "If $M_{max} = 100$ and $M(i,j) = 50$, then $M_{norm}(i,j) = \\frac{50}{100} \\times 255 = 127.5 \\approx 128$",
+          "Edge case: if all magnitudes are 0 (uniform image), set output to 0 to avoid division by zero"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Min-Max Normalization",
+          "latex": "$x_{norm} = \\frac{x - x_{min}}{x_{max} - x_{min}} \\times (b - a) + a$",
+          "description": "General formula for mapping from $[x_{min}, x_{max}]$ to $[a, b]$"
+        },
+        {
+          "name": "Sobel Magnitude Normalization",
+          "latex": "$M_{norm}(i,j) = \\begin{cases} \\frac{M(i,j)}{M_{max}} \\times 255 & \\text{if } M_{max} > 0 \\\\ 0 & \\text{if } M_{max} = 0 \\end{cases}$",
+          "description": "Map gradient magnitudes to displayable range [0, 255]"
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that normalizes a 2D array of gradient magnitudes to the range [0, 255] with integer values. This is the final step in producing the edge-detected image.",
+        "function_signature": "def normalize_magnitudes(magnitudes: list[list[float]]) -> list[list[int]]:",
+        "starter_code": "def normalize_magnitudes(magnitudes):\n    \"\"\"\n    Normalize gradient magnitudes to range [0, 255].\n    \n    Args:\n        magnitudes: 2D list of gradient magnitude values (floats)\n    \n    Returns:\n        2D list of normalized integer values in range [0, 255]\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "normalize_magnitudes([[0.0, 50.0, 100.0]])",
+            "expected": "[[0, 128, 255]]",
+            "explanation": "Max is 100, so normalization: 0→0, 50→127.5→128, 100→255"
+          },
+          {
+            "input": "normalize_magnitudes([[0.0, 0.0], [0.0, 0.0]])",
+            "expected": "[[0, 0], [0, 0]]",
+            "explanation": "Uniform zero image remains zero (avoid division by zero)"
+          },
+          {
+            "input": "normalize_magnitudes([[1020]])",
+            "expected": "[[255]]",
+            "explanation": "Single maximum value normalizes to 255"
+          },
+          {
+            "input": "normalize_magnitudes([[100, 200], [300, 400]])",
+            "expected": "[[64, 128], [191, 255]]",
+            "explanation": "Max is 400: 100→63.75→64, 200→127.5→128, 300→191.25→191, 400→255"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Not handling the edge case where all magnitudes are zero (division by zero)",
+        "Forgetting to convert floats to integers (use round() or int() appropriately)",
+        "Using integer division which can produce incorrect results for normalization",
+        "Not ensuring output values are in [0, 255] range (clipping may be needed for numerical precision)"
+      ],
+      "hint": "First find the maximum magnitude across all values. If it's zero, return all zeros. Otherwise, scale each magnitude by (magnitude/max_magnitude) * 255 and round to nearest integer.",
+      "references": [
+        "Feature scaling",
+        "Min-max normalization",
+        "Data normalization techniques",
+        "Image histogram stretching"
+      ]
+    }
+  ]
+}

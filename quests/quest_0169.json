@@ -1,0 +1,488 @@
+{
+  "problem_id": 169,
+  "title": "Implement AdamW Optimizer Step",
+  "category": "Optimization",
+  "difficulty": "medium",
+  "description": "Implement a single update step of the AdamW optimizer for a parameter vector $w$ and its gradients $g$. AdamW is a variant of the Adam optimizer that decouples weight decay from the gradient update, leading to better generalization.\n\n**Your Task:**\nWrite a function `adamw_update(w, g, m, v, t, lr, beta1, beta2, epsilon, weight_decay)` that performs one update step for the parameter vector $w$ with its gradient $g$ using AdamW. The function should:\n- Update the first moment $m$ and second moment $v$ (moving averages of gradients and squared gradients)\n- Apply bias correction for $m$ and $v$\n- Apply the AdamW update rule (with decoupled weight decay)\n- Return the updated parameter vector and the new values of $m$ and $v$\n\n**Arguments:**\n- `w`: NumPy array, current parameter vector\n- `g`: NumPy array, gradient vector (same shape as `w`)\n- `m`: NumPy array, first moment vector (same shape as `w`)\n- `v`: NumPy array, second moment vector (same shape as `w`)\n- `t`: Integer, current time step (starting from 1)\n- `lr`: Learning rate (float)\n- `beta1`: Decay rate for the first moment (float)\n- `beta2`: Decay rate for the second moment (float)\n- `epsilon`: Small constant for numerical stability (float)\n- `weight_decay`: Weight decay coefficient (float)\n\n",
+  "example": {
+    "input": "import numpy as np\nw = np.array([1.0, 2.0])\ng = np.array([0.1, -0.2])\nm = np.zeros(2)\nv = np.zeros(2)\nt = 1\nlr = 0.01\nbeta1 = 0.9\nbeta2 = 0.999\nepsilon = 1e-8\nweight_decay = 0.1\nw_new, m_new, v_new = adamw_update(w, g, m, v, t, lr, beta1, beta2, epsilon, weight_decay)\nprint(np.round(w_new, 4))",
+    "output": "[0.989 2.008]",
+    "reasoning": "After applying AdamW update, the weights are moved in the negative gradient direction and decayed by 1%. The result is [0.989, 2.001]."
+  },
+  "starter_code": "import numpy as np\n\ndef adamw_update(w, g, m, v, t, lr, beta1, beta2, epsilon, weight_decay):\n    \"\"\"\n    Perform one AdamW optimizer step.\n    Args:\n      w: parameter vector (np.ndarray)\n      g: gradient vector (np.ndarray)\n      m: first moment vector (np.ndarray)\n      v: second moment vector (np.ndarray)\n      t: integer, current time step\n      lr: float, learning rate\n      beta1: float, beta1 parameter\n      beta2: float, beta2 parameter\n      epsilon: float, small constant\n      weight_decay: float, weight decay coefficient\n    Returns:\n      w_new, m_new, v_new\n    \"\"\"\n    # Your code here\n    pass",
+  "sub_quests": [
+    {
+      "step": 1,
+      "title": "Exponential Moving Average (EMA) for Gradient Moments",
+      "relation_to_problem": "AdamW maintains exponential moving averages of gradients (first moment $m$) and squared gradients (second moment $v$). Understanding EMA is foundational to implementing the moment updates in AdamW.",
+      "prerequisites": [
+        "Basic calculus",
+        "NumPy array operations",
+        "Understanding of gradients"
+      ],
+      "learning_objectives": [
+        "Understand the mathematical definition of exponential moving averages",
+        "Implement EMA update rule for a time series",
+        "Recognize why EMA is used for gradient statistics in optimization"
+      ],
+      "math_content": {
+        "definition": "An **Exponential Moving Average (EMA)** is a weighted average of a time series where recent observations have exponentially higher weights than older ones. For a sequence $x_1, x_2, ..., x_t$, the EMA at time $t$ is defined recursively as: $$\\text{EMA}_t = \\beta \\cdot \\text{EMA}_{t-1} + (1 - \\beta) \\cdot x_t$$ where $\\beta \\in [0, 1]$ is the decay rate, and $\\text{EMA}_0 = 0$ (or initialized to $x_1$).",
+        "notation": "$\\beta$ = decay rate (momentum coefficient), controls how quickly old observations are forgotten\n$x_t$ = observation at time $t$\n$\\text{EMA}_t$ = exponential moving average at time $t$",
+        "theorem": "**Recurrence Expansion Theorem**: The EMA at time $t$ can be expressed as an infinite weighted sum: $$\\text{EMA}_t = (1-\\beta)\\sum_{i=1}^{t} \\beta^{t-i} x_i + \\beta^t \\cdot \\text{EMA}_0$$ This shows that EMA gives exponentially decaying weights to past observations.",
+        "proof_sketch": "Expand the recurrence relation: $\\text{EMA}_t = \\beta(\\beta \\cdot \\text{EMA}_{t-2} + (1-\\beta)x_{t-1}) + (1-\\beta)x_t = \\beta^2 \\text{EMA}_{t-2} + (1-\\beta)\\beta x_{t-1} + (1-\\beta)x_t$. Continue expanding until reaching $\\text{EMA}_0$, yielding the geometric series with weights $(1-\\beta)\\beta^{t-i}$ for observation $x_i$.",
+        "examples": [
+          "For $\\beta = 0.9$ and sequence $[1, 2, 3]$: $\\text{EMA}_1 = 0.9(0) + 0.1(1) = 0.1$, $\\text{EMA}_2 = 0.9(0.1) + 0.1(2) = 0.29$, $\\text{EMA}_3 = 0.9(0.29) + 0.1(3) = 0.561$",
+          "For gradient sequence $g = [0.5, 0.3, 0.7]$ with $\\beta_1 = 0.9$: $m_1 = 0.05$, $m_2 = 0.075$, $m_3 = 0.1375$ (first moment estimate)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "EMA Update Rule",
+          "latex": "$\\text{EMA}_t = \\beta \\cdot \\text{EMA}_{t-1} + (1 - \\beta) \\cdot x_t$",
+          "description": "Use this formula to update the moving average with each new observation. In AdamW, this updates both $m$ (first moment) and $v$ (second moment)."
+        },
+        {
+          "name": "Effective Window Size",
+          "latex": "$N_{\\text{eff}} \\approx \\frac{1}{1-\\beta}$",
+          "description": "The approximate number of recent observations that significantly influence the EMA. For $\\beta=0.9$, $N_{\\text{eff}} \\approx 10$; for $\\beta=0.999$, $N_{\\text{eff}} \\approx 1000$."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the exponential moving average given a current EMA value, a new observation, and a decay rate. This is the core operation for updating gradient moments in AdamW.",
+        "function_signature": "def compute_ema(ema_prev: np.ndarray, x_new: np.ndarray, beta: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_ema(ema_prev, x_new, beta):\n    \"\"\"\n    Compute exponential moving average update.\n    \n    Args:\n      ema_prev: previous EMA value (np.ndarray)\n      x_new: new observation (np.ndarray, same shape as ema_prev)\n      beta: decay rate (float, 0 <= beta <= 1)\n    \n    Returns:\n      ema_new: updated EMA (np.ndarray)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_ema(np.array([0.0, 0.0]), np.array([1.0, 2.0]), 0.9)",
+            "expected": "np.array([0.1, 0.2])",
+            "explanation": "Starting from zero EMA, first update gives (1-0.9)*[1.0, 2.0] = [0.1, 0.2]"
+          },
+          {
+            "input": "compute_ema(np.array([0.1, 0.2]), np.array([0.5, 1.0]), 0.9)",
+            "expected": "np.array([0.14, 0.28])",
+            "explanation": "Second update: 0.9*[0.1, 0.2] + 0.1*[0.5, 1.0] = [0.09+0.05, 0.18+0.1] = [0.14, 0.28]"
+          },
+          {
+            "input": "compute_ema(np.array([1.5]), np.array([3.0]), 0.5)",
+            "expected": "np.array([2.25])",
+            "explanation": "With beta=0.5, equal weight to old and new: 0.5*1.5 + 0.5*3.0 = 2.25"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing beta with (1-beta) - the decay rate beta multiplies the OLD value, not the new one",
+        "Initializing EMA incorrectly - starting with zeros causes bias toward zero in early iterations",
+        "Using the wrong data type - ensure EMA maintains float precision even with integer inputs"
+      ],
+      "hint": "The formula is simply a weighted average: (weight_for_old × old_value) + (weight_for_new × new_value). Remember that the two weights must sum to 1.",
+      "references": [
+        "Exponential smoothing in time series analysis",
+        "Momentum methods in optimization",
+        "Low-pass filtering in signal processing"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Bias Correction in Early Optimization Steps",
+      "relation_to_problem": "AdamW uses bias correction to counteract initialization bias when moment estimates start at zero. Without bias correction, the optimizer takes poor steps early in training, especially with high beta values.",
+      "prerequisites": [
+        "Exponential Moving Average",
+        "Geometric series",
+        "Understanding of initialization effects"
+      ],
+      "learning_objectives": [
+        "Understand why initialization at zero biases EMA estimates",
+        "Derive the bias correction formula mathematically",
+        "Implement bias correction for moment estimates"
+      ],
+      "math_content": {
+        "definition": "**Bias Correction** adjusts moment estimates to compensate for initialization bias. When $m_0 = 0$ and $v_0 = 0$, the EMA $m_t$ is biased toward zero, especially for large $\\beta$ and small $t$. The bias-corrected estimate is: $$\\hat{m}_t = \\frac{m_t}{1 - \\beta_1^t}, \\quad \\hat{v}_t = \\frac{v_t}{1 - \\beta_2^t}$$ where $\\beta_1, \\beta_2$ are the respective decay rates for first and second moments.",
+        "notation": "$m_t$ = biased first moment estimate\n$\\hat{m}_t$ = unbiased (bias-corrected) first moment estimate\n$\\beta_1^t$ = beta raised to power $t$ (current time step)\n$(1 - \\beta_1^t)$ = bias correction factor",
+        "theorem": "**Bias Correction Theorem**: If observations $x_i$ are drawn from a distribution with mean $\\mu$, then $\\mathbb{E}[m_t] = \\mu(1 - \\beta^t)$ when initialized at $m_0 = 0$. Therefore, $\\mathbb{E}[\\hat{m}_t] = \\mathbb{E}[m_t/(1-\\beta^t)] = \\mu$, making $\\hat{m}_t$ an unbiased estimator of $\\mu$.",
+        "proof_sketch": "Given $m_t = \\beta m_{t-1} + (1-\\beta)x_t$ with $m_0 = 0$, expand recursively: $m_t = (1-\\beta)\\sum_{i=1}^t \\beta^{t-i}x_i$. Taking expectation: $\\mathbb{E}[m_t] = (1-\\beta)\\mu\\sum_{i=1}^t \\beta^{t-i} = (1-\\beta)\\mu \\cdot \\frac{1-\\beta^t}{1-\\beta} = \\mu(1-\\beta^t)$. Dividing by $(1-\\beta^t)$ yields $\\mathbb{E}[\\hat{m}_t] = \\mu$.",
+        "examples": [
+          "For $\\beta=0.9$, $t=1$: correction factor is $1/(1-0.9^1) = 10$. If $m_1 = 0.1$, then $\\hat{m}_1 = 1.0$ (strong correction)",
+          "For $\\beta=0.9$, $t=10$: correction factor is $1/(1-0.9^{10}) \\approx 1.54$. If $m_{10} = 0.5$, then $\\hat{m}_{10} \\approx 0.77$ (weaker correction)",
+          "For $\\beta=0.999$, $t=100$: correction factor is $1/(1-0.999^{100}) \\approx 10.5$. High beta requires correction for many steps"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Bias Correction Factor",
+          "latex": "$\\alpha_t = \\frac{1}{1 - \\beta^t}$",
+          "description": "Multiplicative factor to remove initialization bias. Approaches 1 as $t \\to \\infty$, meaning bias becomes negligible in later training."
+        },
+        {
+          "name": "Bias-Corrected First Moment",
+          "latex": "$\\hat{m}_t = \\frac{m_t}{1 - \\beta_1^t}$",
+          "description": "Apply to the biased first moment $m_t$ before using it in parameter updates."
+        },
+        {
+          "name": "Bias-Corrected Second Moment",
+          "latex": "$\\hat{v}_t = \\frac{v_t}{1 - \\beta_2^t}$",
+          "description": "Apply to the biased second moment $v_t$ before taking square root in parameter updates."
+        }
+      ],
+      "exercise": {
+        "description": "Implement bias correction for a moment estimate. Given a biased moment value, the beta parameter, and the current time step, compute the bias-corrected moment. This is essential for accurate early-stage optimization in AdamW.",
+        "function_signature": "def bias_correct(moment: np.ndarray, beta: float, t: int) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef bias_correct(moment, beta, t):\n    \"\"\"\n    Apply bias correction to a moment estimate.\n    \n    Args:\n      moment: biased moment estimate (np.ndarray)\n      beta: decay rate used for this moment (float)\n      t: current time step, starting from 1 (int)\n    \n    Returns:\n      corrected_moment: bias-corrected moment (np.ndarray)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "bias_correct(np.array([0.1, 0.2]), 0.9, 1)",
+            "expected": "np.array([1.0, 2.0])",
+            "explanation": "At t=1 with beta=0.9, correction factor is 1/(1-0.9) = 10, so [0.1, 0.2] becomes [1.0, 2.0]"
+          },
+          {
+            "input": "bias_correct(np.array([0.5]), 0.9, 10)",
+            "expected": "np.array([0.7716])",
+            "explanation": "At t=10, beta^10 = 0.3487, correction factor = 1/(1-0.3487) ≈ 1.5432, so 0.5 * 1.5432 ≈ 0.7716"
+          },
+          {
+            "input": "bias_correct(np.array([0.05]), 0.999, 1)",
+            "expected": "np.array([50.0])",
+            "explanation": "At t=1 with beta=0.999, correction factor is 1/(1-0.999) = 1000, so 0.05 becomes 50.0"
+          },
+          {
+            "input": "bias_correct(np.array([0.8, 1.2]), 0.9, 100)",
+            "expected": "np.array([0.8, 1.2])",
+            "explanation": "At t=100, beta^100 ≈ 0 (negligible), correction factor ≈ 1, moment is essentially unchanged"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Using zero-based indexing for t - time step should start at t=1, not t=0",
+        "Forgetting to apply different correction factors for m (using beta1) and v (using beta2)",
+        "Applying bias correction to the wrong moment - must correct BEFORE using in updates",
+        "Computing beta^t incorrectly - use proper exponentiation, not multiplication"
+      ],
+      "hint": "The correction factor grows as beta increases and t decreases. Think about why: with high beta, the EMA 'remembers' the zero initialization longer. Calculate the denominator first, then divide.",
+      "references": [
+        "Adam optimizer paper (Kingma & Ba, 2015)",
+        "Initialization bias in online learning",
+        "Method of moments estimation"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Element-wise Operations and Second Moment Statistics",
+      "relation_to_problem": "AdamW uses the second moment (moving average of squared gradients) to compute adaptive per-parameter learning rates. Understanding element-wise squaring and division is crucial for the denominator term in AdamW updates.",
+      "prerequisites": [
+        "NumPy array broadcasting",
+        "Statistical variance and standard deviation",
+        "Element-wise array operations"
+      ],
+      "learning_objectives": [
+        "Understand why squared gradients estimate gradient variance",
+        "Implement element-wise squaring and square root operations",
+        "Compute adaptive learning rate denominators with numerical stability"
+      ],
+      "math_content": {
+        "definition": "The **second moment** of a random variable $X$ is $\\mathbb{E}[X^2]$. In optimization, the second moment of gradients $v_t = \\mathbb{E}[g_t^2]$ estimates the variance structure of gradients. For element-wise operations on vectors: $$(g \\odot g)_i = g_i^2, \\quad (\\sqrt{v} + \\epsilon)_i = \\sqrt{v_i} + \\epsilon$$ where $\\odot$ denotes element-wise (Hadamard) product, and operations are applied component-wise.",
+        "notation": "$g^2$ = element-wise square of gradient vector, i.e., $g \\odot g$\n$v_t$ = exponential moving average of $g^2$ (second moment)\n$\\sqrt{v_t}$ = element-wise square root of $v_t$\n$\\epsilon$ = small constant (typically $10^{-8}$) for numerical stability",
+        "theorem": "**Adaptive Learning Rate Scaling**: Given gradients with heterogeneous scales across parameters, normalizing by $\\sqrt{v_t} + \\epsilon$ provides per-parameter adaptive learning rates. Parameters with consistently large gradients (high $v_t$) receive smaller effective learning rates, while parameters with small gradients receive larger effective learning rates, balancing convergence across all dimensions.",
+        "proof_sketch": "Consider two parameters: $w_1$ with typical gradient magnitude $|g_1| \\sim 10$ and $w_2$ with $|g_2| \\sim 0.1$. Without adaptation, $w_1$ would update much more aggressively. With second moment $v_1 \\approx 100$ and $v_2 \\approx 0.01$, the effective step sizes become $\\frac{g_1}{\\sqrt{v_1}} \\sim \\frac{10}{10} = 1$ and $\\frac{g_2}{\\sqrt{v_2}} \\sim \\frac{0.1}{0.1} = 1$, equalizing update magnitudes.",
+        "examples": [
+          "For gradient $g = [0.1, 1.0, 0.01]$, element-wise square is $g^2 = [0.01, 1.0, 0.0001]$",
+          "If $v = [0.01, 1.0, 0.0001]$ and $\\epsilon = 10^{-8}$, then $\\sqrt{v} + \\epsilon \\approx [0.1, 1.0, 0.01]$",
+          "Computing adaptive update: $\\frac{m}{\\sqrt{v} + \\epsilon} = \\frac{[0.1, 0.5, 0.01]}{[0.1, 1.0, 0.01]} = [1.0, 0.5, 1.0]$ (normalized magnitudes)"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Second Moment Update",
+          "latex": "$v_t = \\beta_2 \\cdot v_{t-1} + (1 - \\beta_2) \\cdot g_t^2$",
+          "description": "Update the running average of squared gradients element-wise. Use this to track gradient variance for each parameter independently."
+        },
+        {
+          "name": "Adaptive Learning Rate Denominator",
+          "latex": "$d_t = \\sqrt{\\hat{v}_t} + \\epsilon$",
+          "description": "Compute the denominator for adaptive learning rate scaling. The epsilon prevents division by zero and improves numerical stability."
+        },
+        {
+          "name": "Normalized Update Direction",
+          "latex": "$\\Delta w = \\frac{\\hat{m}_t}{\\sqrt{\\hat{v}_t} + \\epsilon}$",
+          "description": "The actual update direction in Adam/AdamW, combining first and second moments. Each element is scaled by its own gradient statistics."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a function that computes the adaptive learning rate denominator from a second moment estimate. Given the bias-corrected second moment and epsilon, compute the element-wise square root and add epsilon for numerical stability. This is the denominator in the AdamW update rule.",
+        "function_signature": "def compute_denominator(v_hat: np.ndarray, epsilon: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_denominator(v_hat, epsilon):\n    \"\"\"\n    Compute adaptive learning rate denominator.\n    \n    Args:\n      v_hat: bias-corrected second moment (np.ndarray)\n      epsilon: small constant for numerical stability (float)\n    \n    Returns:\n      denominator: sqrt(v_hat) + epsilon (np.ndarray)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_denominator(np.array([0.01, 1.0, 0.04]), 1e-8)",
+            "expected": "np.array([0.1, 1.0, 0.2])",
+            "explanation": "Element-wise: sqrt(0.01) + 1e-8 ≈ 0.1, sqrt(1.0) + 1e-8 ≈ 1.0, sqrt(0.04) + 1e-8 ≈ 0.2"
+          },
+          {
+            "input": "compute_denominator(np.array([0.0]), 1e-8)",
+            "expected": "np.array([1e-8])",
+            "explanation": "When v_hat is zero, sqrt(0) + epsilon = epsilon, preventing division by zero"
+          },
+          {
+            "input": "compute_denominator(np.array([1e-10, 1e-5]), 1e-8)",
+            "expected": "np.array([1.00001e-8, 3.162e-3])",
+            "explanation": "For very small v_hat (< epsilon^2), epsilon dominates. For 1e-5, sqrt gives 3.162e-3"
+          },
+          {
+            "input": "compute_denominator(np.array([4.0, 9.0, 16.0]), 0.0)",
+            "expected": "np.array([2.0, 3.0, 4.0])",
+            "explanation": "With epsilon=0 (not recommended in practice), result is just element-wise square root"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting element-wise operations - must apply sqrt to each element independently, not to the vector norm",
+        "Adding epsilon before taking square root - the correct order is sqrt(v) + epsilon, not sqrt(v + epsilon)",
+        "Using too large epsilon - typical values are 1e-8 to 1e-10; larger values interfere with adaptive scaling",
+        "Not handling negative or NaN values - ensure v_hat is non-negative before square root"
+      ],
+      "hint": "NumPy's np.sqrt() naturally operates element-wise on arrays. Remember to add epsilon AFTER computing the square root, not before.",
+      "references": [
+        "RMSprop optimizer",
+        "Adaptive gradient methods",
+        "Numerical stability in optimization"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Combining First and Second Moments for Adaptive Updates",
+      "relation_to_problem": "AdamW combines the bias-corrected first moment (gradient direction) and second moment (gradient scale) to compute the adaptive gradient update. This is the core of the Adam algorithm before applying weight decay.",
+      "prerequisites": [
+        "Exponential Moving Average",
+        "Bias Correction",
+        "Element-wise operations",
+        "Second moment statistics"
+      ],
+      "learning_objectives": [
+        "Understand how first and second moments work together for adaptation",
+        "Implement the element-wise division of first moment by second moment",
+        "Recognize the geometric interpretation of the adaptive update"
+      ],
+      "math_content": {
+        "definition": "The **adaptive gradient update** in Adam combines momentum (first moment) with adaptive learning rates (second moment): $$\\Delta w = \\eta \\cdot \\frac{\\hat{m}_t}{\\sqrt{\\hat{v}_t} + \\epsilon}$$ where $\\eta$ is the base learning rate, $\\hat{m}_t$ is the bias-corrected first moment (directional information), and $\\sqrt{\\hat{v}_t} + \\epsilon$ normalizes by gradient scale (magnitude information). This division is performed element-wise.",
+        "notation": "$\\eta$ = learning rate (step size scalar)\n$\\hat{m}_t$ = bias-corrected first moment (direction vector)\n$\\sqrt{\\hat{v}_t} + \\epsilon$ = adaptive scaling factor (per-element normalizer)\n$\\Delta w$ = parameter update vector",
+        "theorem": "**Scale Invariance Property**: The adaptive update $\\frac{\\hat{m}_t}{\\sqrt{\\hat{v}_t} + \\epsilon}$ is approximately invariant to rescaling of gradients by a constant factor. If gradients are scaled by $c > 0$, then $\\hat{m}_t \\to c\\hat{m}_t$ and $\\hat{v}_t \\to c^2\\hat{v}_t$, but $\\frac{c\\hat{m}_t}{\\sqrt{c^2\\hat{v}_t}} = \\frac{c\\hat{m}_t}{c\\sqrt{\\hat{v}_t}} = \\frac{\\hat{m}_t}{\\sqrt{\\hat{v}_t}}$ (ignoring epsilon). This makes Adam robust to gradient rescaling.",
+        "proof_sketch": "Let $g'_t = c \\cdot g_t$ for constant $c > 0$. Then $m'_t = c \\cdot m_t$ (by linearity of EMA), and $(g'_t)^2 = c^2 g_t^2$, so $v'_t = c^2 v_t$. The adaptive update becomes $\\frac{m'_t}{\\sqrt{v'_t}} = \\frac{c m_t}{\\sqrt{c^2 v_t}} = \\frac{c m_t}{c\\sqrt{v_t}} = \\frac{m_t}{\\sqrt{v_t}}$. Thus rescaling cancels out (when epsilon is negligible).",
+        "examples": [
+          "If $\\hat{m} = [0.1, -0.2]$ and $\\sqrt{\\hat{v}} + \\epsilon = [0.1, 0.2]$, then $\\frac{\\hat{m}}{\\sqrt{\\hat{v}} + \\epsilon} = [1.0, -1.0]$ (normalized)",
+          "With learning rate $\\eta = 0.01$, the full update is $\\Delta w = 0.01 \\cdot [1.0, -1.0] = [0.01, -0.01]$",
+          "Parameter update: $w_{new} = w_{old} - \\Delta w = [1.0, 2.0] - [0.01, -0.01] = [0.99, 2.01]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Adam Adaptive Update",
+          "latex": "$\\Delta w_t = \\eta \\cdot \\frac{\\hat{m}_t}{\\sqrt{\\hat{v}_t} + \\epsilon}$",
+          "description": "The core Adam update combining direction (first moment) and adaptive scaling (second moment). Apply this element-wise."
+        },
+        {
+          "name": "Element-wise Update Formula",
+          "latex": "$\\Delta w_i = \\eta \\cdot \\frac{\\hat{m}_{t,i}}{\\sqrt{\\hat{v}_{t,i}} + \\epsilon}$",
+          "description": "Each parameter component $w_i$ has its own adaptive learning rate determined by its gradient statistics."
+        },
+        {
+          "name": "Parameter Update Rule",
+          "latex": "$w_{t+1} = w_t - \\Delta w_t$",
+          "description": "Subtract the adaptive update from current parameters (gradient descent direction)."
+        }
+      ],
+      "exercise": {
+        "description": "Implement the adaptive gradient update computation (without weight decay). Given bias-corrected first and second moments, learning rate, and epsilon, compute the full adaptive update vector. This is the gradient descent step before applying weight decay in AdamW.",
+        "function_signature": "def compute_adaptive_update(m_hat: np.ndarray, v_hat: np.ndarray, lr: float, epsilon: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef compute_adaptive_update(m_hat, v_hat, lr, epsilon):\n    \"\"\"\n    Compute adaptive gradient update (Adam style, without weight decay).\n    \n    Args:\n      m_hat: bias-corrected first moment (np.ndarray)\n      v_hat: bias-corrected second moment (np.ndarray)\n      lr: learning rate (float)\n      epsilon: small constant for numerical stability (float)\n    \n    Returns:\n      update: adaptive gradient update vector (np.ndarray)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "compute_adaptive_update(np.array([0.1, -0.2]), np.array([0.01, 0.04]), 0.01, 1e-8)",
+            "expected": "np.array([0.01, -0.01])",
+            "explanation": "Denominators: [sqrt(0.01), sqrt(0.04)] = [0.1, 0.2]. Updates: 0.01 * [0.1/0.1, -0.2/0.2] = [0.01, -0.01]"
+          },
+          {
+            "input": "compute_adaptive_update(np.array([1.0]), np.array([1.0]), 0.001, 1e-8)",
+            "expected": "np.array([0.001])",
+            "explanation": "Simple case: 0.001 * 1.0/sqrt(1.0) = 0.001"
+          },
+          {
+            "input": "compute_adaptive_update(np.array([0.5, 0.5]), np.array([0.25, 4.0]), 0.1, 1e-8)",
+            "expected": "np.array([0.1, 0.025])",
+            "explanation": "First param: 0.1*0.5/sqrt(0.25) = 0.1*0.5/0.5 = 0.1. Second: 0.1*0.5/sqrt(4.0) = 0.1*0.5/2.0 = 0.025"
+          },
+          {
+            "input": "compute_adaptive_update(np.array([0.0, 1.0]), np.array([1.0, 0.0]), 0.01, 1e-8)",
+            "expected": "np.array([0.0, 1e6])",
+            "explanation": "Zero gradient gives zero update. When v_hat=0, epsilon dominates denominator: 0.01*1.0/1e-8 = 1e6 (huge update - why epsilon matters!)"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Forgetting to multiply by learning rate - the result should be lr * (m_hat / denominator)",
+        "Dividing learning rate instead of multiplying - lr amplifies the normalized update, not reduces it",
+        "Computing denominator incorrectly - must use sqrt(v_hat) + epsilon, not sqrt(v_hat + epsilon)",
+        "Wrong order of operations - compute full denominator first, then divide m_hat element-wise"
+      ],
+      "hint": "Break this into steps: (1) compute denominator from v_hat and epsilon, (2) divide m_hat by denominator element-wise, (3) multiply by learning rate. Each step can use NumPy's natural element-wise operations.",
+      "references": [
+        "Adam optimizer paper (Kingma & Ba, 2015)",
+        "Adaptive learning rate methods",
+        "RMSprop and AdaGrad"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Decoupled Weight Decay Regularization",
+      "relation_to_problem": "The key innovation of AdamW is decoupled weight decay, which applies regularization directly to parameters rather than through the loss function. This is the critical difference between Adam and AdamW that improves generalization.",
+      "prerequisites": [
+        "Gradient descent",
+        "L2 regularization",
+        "Understanding of overfitting and generalization"
+      ],
+      "learning_objectives": [
+        "Understand the difference between L2 regularization and direct weight decay",
+        "Explain why decoupling weight decay from adaptive learning rates improves optimization",
+        "Implement the weight decay update independently of gradient updates"
+      ],
+      "math_content": {
+        "definition": "**Decoupled Weight Decay** applies regularization directly to parameters rather than adding $L_2$ penalty to the loss. In standard Adam with $L_2$ regularization, the gradient includes $\\lambda w_t$, leading to: $$w_{t+1} = w_t - \\eta \\frac{\\hat{m}_t + \\lambda w_t}{\\sqrt{\\hat{v}_t} + \\epsilon}$$ In AdamW, weight decay is **decoupled**: $$w_{t+1} = w_t - \\eta \\frac{\\hat{m}_t}{\\sqrt{\\hat{v}_t} + \\epsilon} - \\eta \\lambda w_t = (1 - \\eta\\lambda)w_t - \\eta \\frac{\\hat{m}_t}{\\sqrt{\\hat{v}_t} + \\epsilon}$$ where $\\lambda$ is the weight decay coefficient, and the decay is applied **outside** the adaptive learning rate calculation.",
+        "notation": "$\\lambda$ = weight decay coefficient (regularization strength)\n$\\eta$ = learning rate\n$w_t$ = current parameter vector\n$(1 - \\eta\\lambda)$ = multiplicative decay factor applied to weights",
+        "theorem": "**Decoupling Theorem**: In Adam with $L_2$ regularization, the effective weight decay depends on the ratio $\\frac{\\lambda}{\\sqrt{\\hat{v}_t}}$, making it adaptive and unequal across parameters. In AdamW, weight decay $\\eta\\lambda$ is constant across all parameters and independent of gradient statistics. This separation allows independent tuning of learning rate $\\eta$ and regularization strength $\\lambda$, improving hyperparameter orthogonality.",
+        "proof_sketch": "In Adam + $L_2$: gradient becomes $g_t + \\lambda w_t$, so update is $\\eta \\frac{\\hat{m}_t + \\lambda w_t}{\\sqrt{\\hat{v}_t}}$, giving effective weight decay $\\eta\\lambda w_t / \\sqrt{\\hat{v}_t}$ (varies by parameter). In AdamW: gradient update $\\eta \\frac{\\hat{m}_t}{\\sqrt{\\hat{v}_t}}$ and weight decay $\\eta\\lambda w_t$ are separate, giving uniform decay $\\eta\\lambda$ across all parameters (independent of $\\hat{v}_t$).",
+        "examples": [
+          "For $w = [1.0, 2.0]$, $\\eta = 0.01$, $\\lambda = 0.1$: decay term is $0.01 \\times 0.1 \\times [1.0, 2.0] = [0.001, 0.002]$",
+          "Multiplicative form: $(1 - 0.01 \\times 0.1) = 0.999$, so weights shrink to $0.999 \\times [1.0, 2.0] = [0.999, 1.998]$",
+          "After gradient update $\\Delta w = [0.01, -0.01]$ and weight decay: $w_{new} = [1.0, 2.0] - [0.01, -0.01] - [0.001, 0.002] = [0.989, 2.008]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Weight Decay Update",
+          "latex": "$w_{t+1} = w_t - \\eta \\lambda w_t = (1 - \\eta\\lambda) w_t$",
+          "description": "Direct multiplicative decay of parameters, applied independently of gradients. Use this AFTER the adaptive gradient update."
+        },
+        {
+          "name": "Additive Weight Decay Form",
+          "latex": "$\\Delta w_{\\text{decay}} = \\eta \\lambda w_t$",
+          "description": "Alternative formulation: compute decay as a separate update term and subtract from parameters."
+        },
+        {
+          "name": "Combined AdamW Update",
+          "latex": "$w_{t+1} = w_t - \\eta \\frac{\\hat{m}_t}{\\sqrt{\\hat{v}_t} + \\epsilon} - \\eta \\lambda w_t$",
+          "description": "Full AdamW update: adaptive gradient step + decoupled weight decay. These two terms are computed and applied independently."
+        }
+      ],
+      "exercise": {
+        "description": "Implement the decoupled weight decay operation. Given current parameters, learning rate, and weight decay coefficient, compute the weight decay update. This will be combined with the adaptive gradient update to form the complete AdamW step.",
+        "function_signature": "def apply_weight_decay(w: np.ndarray, lr: float, weight_decay: float) -> np.ndarray:",
+        "starter_code": "import numpy as np\n\ndef apply_weight_decay(w, lr, weight_decay):\n    \"\"\"\n    Compute weight decay update (decoupled from gradients).\n    \n    Args:\n      w: current parameter vector (np.ndarray)\n      lr: learning rate (float)\n      weight_decay: weight decay coefficient (float)\n    \n    Returns:\n      decay_update: weight decay to subtract from parameters (np.ndarray)\n    \"\"\"\n    # Your code here\n    pass",
+        "test_cases": [
+          {
+            "input": "apply_weight_decay(np.array([1.0, 2.0]), 0.01, 0.1)",
+            "expected": "np.array([0.001, 0.002])",
+            "explanation": "Weight decay: lr * weight_decay * w = 0.01 * 0.1 * [1.0, 2.0] = [0.001, 0.002]"
+          },
+          {
+            "input": "apply_weight_decay(np.array([0.5]), 0.001, 0.01)",
+            "expected": "np.array([5e-6])",
+            "explanation": "Small decay: 0.001 * 0.01 * 0.5 = 0.000005 = 5e-6"
+          },
+          {
+            "input": "apply_weight_decay(np.array([10.0, -5.0, 0.0]), 0.01, 0.1)",
+            "expected": "np.array([0.01, -0.005, 0.0])",
+            "explanation": "Decay is proportional to weight magnitude: [0.01*10, 0.01*(-5), 0.01*0] = [0.01, -0.005, 0.0]"
+          },
+          {
+            "input": "apply_weight_decay(np.array([1.0, 2.0]), 0.01, 0.0)",
+            "expected": "np.array([0.0, 0.0])",
+            "explanation": "With weight_decay=0, no regularization is applied"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Confusing weight decay with L2 regularization - weight decay in AdamW is applied OUTSIDE the adaptive learning rate calculation",
+        "Forgetting to multiply by learning rate - the decay term is lr * weight_decay * w, not just weight_decay * w",
+        "Applying decay before gradient update - while order doesn't matter mathematically, conventionally decay is computed after gradient update",
+        "Using absolute values - decay should preserve sign: negative weights decay toward zero from below, positive from above"
+      ],
+      "hint": "Weight decay is simply a scaled version of the current parameters: multiply by (lr × weight_decay). The result is subtracted from parameters to shrink them toward zero.",
+      "references": [
+        "AdamW paper (Loshchilov & Hutter, 2019)",
+        "L2 regularization vs weight decay",
+        "Decoupled weight decay regularization"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Complete AdamW Optimizer Step Integration",
+      "relation_to_problem": "This sub-quest integrates all previous concepts - exponential moving averages, bias correction, adaptive updates, and decoupled weight decay - into a complete AdamW optimizer step. This is the culmination of all prior sub-quests.",
+      "prerequisites": [
+        "Exponential Moving Average",
+        "Bias Correction",
+        "Element-wise operations",
+        "Adaptive gradient updates",
+        "Decoupled weight decay"
+      ],
+      "learning_objectives": [
+        "Integrate all AdamW components in the correct order",
+        "Understand the complete information flow from gradients to parameter updates",
+        "Implement the full AdamW step with proper sequencing and data flow"
+      ],
+      "math_content": {
+        "definition": "The **complete AdamW update** integrates momentum, adaptive learning rates, and decoupled weight decay in a specific sequence:\n\n1. **Update moments**: $m_t = \\beta_1 m_{t-1} + (1-\\beta_1)g_t$, $v_t = \\beta_2 v_{t-1} + (1-\\beta_2)g_t^2$\n2. **Bias correction**: $\\hat{m}_t = m_t/(1-\\beta_1^t)$, $\\hat{v}_t = v_t/(1-\\beta_2^t)$\n3. **Adaptive gradient step**: $w \\leftarrow w - \\eta \\frac{\\hat{m}_t}{\\sqrt{\\hat{v}_t} + \\epsilon}$\n4. **Weight decay**: $w \\leftarrow w - \\eta\\lambda w$\n\nAlternatively, steps 3-4 can be combined: $w_{t+1} = w_t - \\eta \\frac{\\hat{m}_t}{\\sqrt{\\hat{v}_t} + \\epsilon} - \\eta\\lambda w_t$",
+        "notation": "$g_t$ = gradient at time $t$\n$m_t, v_t$ = biased moment estimates\n$\\hat{m}_t, \\hat{v}_t$ = bias-corrected moment estimates\n$\\eta$ = learning rate\n$\\beta_1, \\beta_2$ = moment decay rates (typically 0.9, 0.999)\n$\\epsilon$ = numerical stability constant (typically $10^{-8}$)\n$\\lambda$ = weight decay coefficient",
+        "theorem": "**AdamW Convergence**: Under standard assumptions (bounded gradients, Lipschitz continuous loss, etc.), AdamW converges to a critical point of the objective function. The decoupled weight decay improves generalization compared to Adam+L2 by maintaining consistent regularization strength across parameters with different gradient magnitudes, leading to better test performance in practice.",
+        "proof_sketch": "Convergence follows from the Adam convergence proof (Kingma & Ba, 2015) with modifications for weight decay. The key insight is that decoupled weight decay $w \\leftarrow (1-\\eta\\lambda)w$ shrinks weights uniformly (independent of adaptive learning rate), preventing the interaction between regularization and adaptation that occurs in Adam+L2. Empirical results (Loshchilov & Hutter, 2019) demonstrate superior generalization, especially with learning rate schedules.",
+        "examples": [
+          "Complete example with $w=[1.0, 2.0]$, $g=[0.1, -0.2]$, $m=v=[0,0]$, $t=1$, $\\beta_1=0.9$, $\\beta_2=0.999$, $\\eta=0.01$, $\\lambda=0.1$, $\\epsilon=10^{-8}$:\n   1. $m_1 = 0.9(0) + 0.1[0.1,-0.2] = [0.01, -0.02]$\n   2. $v_1 = 0.999(0) + 0.001[0.01, 0.04] = [0.00001, 0.00004]$\n   3. $\\hat{m}_1 = [0.01,-0.02]/(1-0.9) = [0.1, -0.2]$\n   4. $\\hat{v}_1 = [0.00001, 0.00004]/(1-0.999) = [0.01, 0.04]$\n   5. Adaptive update: $0.01 \\times [0.1,-0.2] / [\\sqrt{0.01}, \\sqrt{0.04}] = [0.01, -0.01]$\n   6. Weight decay: $0.01 \\times 0.1 \\times [1.0, 2.0] = [0.001, 0.002]$\n   7. $w_{new} = [1.0, 2.0] - [0.01, -0.01] - [0.001, 0.002] = [0.989, 2.008]$"
+        ]
+      },
+      "key_formulas": [
+        {
+          "name": "Complete AdamW Algorithm",
+          "latex": "$\\begin{align*}m_t &= \\beta_1 m_{t-1} + (1-\\beta_1)g_t \\\\ v_t &= \\beta_2 v_{t-1} + (1-\\beta_2)g_t^2 \\\\ \\hat{m}_t &= m_t/(1-\\beta_1^t) \\\\ \\hat{v}_t &= v_t/(1-\\beta_2^t) \\\\ w_{t+1} &= w_t - \\eta\\frac{\\hat{m}_t}{\\sqrt{\\hat{v}_t}+\\epsilon} - \\eta\\lambda w_t\\end{align*}$",
+          "description": "Full AdamW update sequence. Execute in this exact order: moment updates → bias correction → parameter update."
+        },
+        {
+          "name": "Return Values",
+          "latex": "$(w_{t+1}, m_t, v_t)$",
+          "description": "AdamW returns updated parameters and the NEW (not bias-corrected) moment estimates for use in the next iteration."
+        }
+      ],
+      "exercise": {
+        "description": "Implement a complete AdamW optimizer step that integrates all components: update first and second moments using EMA, apply bias correction, compute adaptive gradient update, apply weight decay, and return updated parameters and moments. This exercise combines all skills from previous sub-quests into the full algorithm.",
+        "function_signature": "def adamw_step(w: np.ndarray, g: np.ndarray, m: np.ndarray, v: np.ndarray, t: int, lr: float, beta1: float, beta2: float, epsilon: float, weight_decay: float) -> tuple:",
+        "starter_code": "import numpy as np\n\ndef adamw_step(w, g, m, v, t, lr, beta1, beta2, epsilon, weight_decay):\n    \"\"\"\n    Perform one complete AdamW optimizer step.\n    \n    Args:\n      w: parameter vector (np.ndarray)\n      g: gradient vector (np.ndarray)\n      m: first moment vector (np.ndarray)\n      v: second moment vector (np.ndarray)\n      t: current time step, starting from 1 (int)\n      lr: learning rate (float)\n      beta1: decay rate for first moment (float)\n      beta2: decay rate for second moment (float)\n      epsilon: numerical stability constant (float)\n      weight_decay: weight decay coefficient (float)\n    \n    Returns:\n      (w_new, m_new, v_new): tuple of updated parameters and moments\n    \"\"\"\n    # Your code here - integrate all previous sub-quest concepts\n    # 1. Update moments (use EMA from sub-quest 1)\n    # 2. Apply bias correction (sub-quest 2)\n    # 3. Compute adaptive update (sub-quest 4)\n    # 4. Apply weight decay (sub-quest 5)\n    # 5. Update parameters and return\n    pass",
+        "test_cases": [
+          {
+            "input": "adamw_step(np.array([1.0, 2.0]), np.array([0.1, -0.2]), np.zeros(2), np.zeros(2), 1, 0.01, 0.9, 0.999, 1e-8, 0.1)",
+            "expected": "(np.array([0.989, 2.008]), np.array([0.01, -0.02]), np.array([0.00001, 0.00004]))",
+            "explanation": "First step with zero-initialized moments. Adaptive update ≈ [0.01, -0.01], weight decay = [0.001, 0.002], giving [0.989, 2.008]. Moments store biased estimates."
+          },
+          {
+            "input": "adamw_step(np.array([0.5]), np.array([0.1]), np.array([0.05]), np.array([0.001]), 10, 0.001, 0.9, 0.999, 1e-8, 0.01)",
+            "expected": "(np.array([0.4989...]), np.array([0.055]), np.array([0.0010099]))",
+            "explanation": "Step 10 with existing moments. Bias correction factors ≈ 1.54 for m, ≈ 1.01 for v. Small learning rate and weight decay give modest parameter change."
+          },
+          {
+            "input": "adamw_step(np.array([1.0]), np.array([0.0]), np.array([0.1]), np.array([0.01]), 5, 0.01, 0.9, 0.999, 1e-8, 0.1)",
+            "expected": "(np.array([0.981...]), np.array([0.09]), np.array([0.00999]))",
+            "explanation": "Zero gradient: moments decay but no gradient update. Only weight decay applies: 1.0 - 0.01*0.1*1.0 = 0.999. Moments: m = 0.9*0.1 = 0.09, v = 0.999*0.01 = 0.00999"
+          }
+        ]
+      },
+      "common_mistakes": [
+        "Returning bias-corrected moments instead of biased ones - must return m_t and v_t (not m_hat and v_hat) for next iteration",
+        "Wrong order of operations - moments must be updated BEFORE bias correction is applied",
+        "Forgetting to square gradients for second moment - v_t uses g_t^2, not g_t",
+        "Applying weight decay to wrong variable - decay uses ORIGINAL w_t, not w_t after gradient update",
+        "Mutating input arrays - create new arrays for moments and parameters to avoid side effects"
+      ],
+      "hint": "Follow the sequence methodically: (1) update m and v using EMA, (2) compute m_hat and v_hat with bias correction, (3) compute adaptive gradient update using m_hat and v_hat, (4) compute weight decay term, (5) update w by subtracting both terms, (6) return new w and the biased m and v.",
+      "references": [
+        "AdamW paper (Loshchilov & Hutter, 2019)",
+        "Adam optimizer paper (Kingma & Ba, 2015)",
+        "PyTorch AdamW implementation",
+        "Understanding optimization algorithms"
+      ]
+    }
+  ]
+}
